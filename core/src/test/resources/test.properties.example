@@ -1,0 +1,10 @@
+storage.local-dir=/tmp
+storage.overwrite-existing=true
+storage.use-existing=true
+# Data source
+db.username=studytracker
+db.password=studytracker
+db.host=localhost
+db.name=study-tracker-test
+db.port=27017
+db.connectionString=mongodb://${db.host}:${db.port}

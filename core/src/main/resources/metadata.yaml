@@ -1,0 +1,9 @@
+metadata:
+
+  default:
+
+    status:
+
+      - value: IN_PLANNING
+        label: "In Planning"
+        default: true

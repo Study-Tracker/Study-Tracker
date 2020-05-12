@@ -1,0 +1,216 @@
+/*
+ * Copyright 2020 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import {
+  Button,
+  Col,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row
+} from "reactstrap";
+import React from "react";
+import ReactQuill from "react-quill";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEdit, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
+
+/**
+ * Displays the study conclusions or a placeholder.
+ *
+ * @param conclusions
+ * @param toggleModal
+ * @param isSignedIn
+ * @returns {*}
+ * @constructor
+ */
+export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
+
+  if (!!conclusions) {
+
+    const createMarkup = (content) => {
+      return {__html: content};
+    };
+
+    return (
+        <Row>
+
+          <Col sm={12}>
+            <div dangerouslySetInnerHTML={createMarkup(conclusions.content)}/>
+          </Col>
+
+          <Col sm={6}>
+
+            <h6 className="details-label">Created By</h6>
+            <p>{conclusions.createdBy.displayName}</p>
+
+            {
+              !!conclusions.lastModifiedBy
+                  ? (
+                      <div>
+                        <h6 className="details-label">Updated By</h6>
+                        <p>{conclusions.lastModifiedBy.displayName}</p>
+                      </div>
+                  )
+                  : ''
+            }
+
+          </Col>
+
+          <Col sm={6}>
+
+            <h6 className="details-label">Date Created</h6>
+            <p>{new Date(conclusions.createdAt).toLocaleString()}</p>
+
+            {
+              !!conclusions.updatedAt
+                  ? (
+                      <div>
+                        <h6 className="details-label">Last Updated</h6>
+                        <p>{new Date(conclusions.updatedAt).toLocaleString()}</p>
+                      </div>
+                  )
+                  : ''
+            }
+
+          </Col>
+
+          {
+            isSignedIn ? (
+                <Col sm={12}>
+                  <Button color={'info'} onClick={() => toggleModal()}>
+                    Edit
+                    &nbsp;&nbsp;
+                    <FontAwesomeIcon icon={faEdit}/>
+                  </Button>
+                </Col>
+            ) : ''
+          }
+
+        </Row>
+    );
+  } else {
+    return (
+        <Row>
+          <Col sm={12}>
+            <div className={"text-center"}>
+              <h4>No conclusions have been added.</h4>
+              {
+                isSignedIn
+                    ? (
+                        <div>
+                          <Button color={"primary"} onClick={() => toggleModal()}>
+                            Add Conclusions
+                            &nbsp;&nbsp;
+                            <FontAwesomeIcon icon={faPlusCircle}/>
+                          </Button>
+                        </div>
+                    ) : ''
+              }
+            </div>
+          </Col>
+        </Row>
+    );
+  }
+
+};
+
+/**
+ * Modal for adding conclusions.
+ */
+export class ConclusionsModal extends React.Component {
+
+  constructor(props) {
+    super(props);
+    const conclusions = !!props.conclusions ? {
+      ...props.conclusions,
+      lastModifiedBy: props.user
+    } : {
+      content: '',
+      createdBy: props.user
+    };
+    this.state = {
+      conclusions: conclusions
+    };
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+  }
+
+  handleSubmit() {
+    this.props.handleSubmit(this.state.conclusions);
+  }
+
+  handleUpdate(content) {
+    this.setState({
+      conclusions: {
+        ...this.state.conclusions,
+        content: content
+      }
+    })
+  }
+
+  render() {
+    return (
+        <Modal
+            isOpen={this.props.isOpen}
+            toggle={() => this.props.toggleModal()}
+            size={"lg"}
+        >
+
+          <ModalHeader toggle={() => this.props.toggleModal()}>
+            Add Conclusions
+          </ModalHeader>
+
+          <ModalBody className="m-3">
+
+            <Row form>
+
+              <Col sm={12}>
+                <p>
+                  Add a brief summary of your study's conclusions. Supporting
+                  documents may be uploaded as attachments.
+                </p>
+              </Col>
+
+              <Col sm={12}>
+                <ReactQuill
+                    theme="snow"
+                    defaultValue={this.state.conclusions.content}
+                    onChange={(content, delta, source, editor) => {
+                      this.handleUpdate(content);
+                    }}
+                />
+              </Col>
+
+            </Row>
+
+          </ModalBody>
+
+          <ModalFooter>
+            <Button color={"secondary"}
+                    onClick={() => this.props.toggleModal()}>
+              Cancel
+            </Button>
+            <Button color={"primary"} onClick={this.handleSubmit}>
+              Save
+            </Button>
+          </ModalFooter>
+
+        </Modal>
+    )
+  }
+
+}

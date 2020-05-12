@@ -1,0 +1,16 @@
+*.iml
+.idea/
+target/
+node_modules/
+/web/src/main/resources/static/js/bundle.js
+/web/src/main/resources/static/css/app.css
+security.properties
+*.log
+TODO.md
+test.properties
+
+# To be removed
+application.properties
+application-local.properties
+study_template.pptx
+decibel-*.png
