@@ -1,0 +1,10 @@
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+    - mvn clean install -DskipTests
+
