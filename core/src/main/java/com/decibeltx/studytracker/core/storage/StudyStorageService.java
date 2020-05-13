@@ -22,7 +22,6 @@ import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageDuplicateException;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageException;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageNotFoundException;
-import com.decibeltx.studytracker.core.storage.exception.StudyStorageWriteException;
 import java.io.File;
 
 /**
@@ -60,7 +59,8 @@ public interface StudyStorageService {
   /**
    * Creates a folder for the target {@link Program}. Throws a {@link
    * StudyStorageDuplicateException} if the folder already exists and a {@link
-   * StudyStorageWriteException} if the folder cannot be created.
+   * com.decibeltx.studytracker.core.storage.exception.StudyStorageWriteException} if the folder
+   * cannot be created.
    *
    * @param program
    * @return
@@ -70,7 +70,8 @@ public interface StudyStorageService {
   /**
    * Creates a new directory in the storage file system for the target {@link Study}. Throws a
    * {@link StudyStorageDuplicateException} if the folder already exists and a {@link
-   * StudyStorageWriteException} if the folder cannot be created.
+   * com.decibeltx.studytracker.core.storage.exception.StudyStorageWriteException} if the folder
+   * cannot be created.
    *
    * @param study
    * @return
@@ -80,7 +81,8 @@ public interface StudyStorageService {
   /**
    * Creates a new directory in the storage file system for the target {@link Assay}. Throws a
    * {@link StudyStorageDuplicateException} if the folder already exists and a {@link
-   * StudyStorageWriteException} if the folder cannot be created.
+   * com.decibeltx.studytracker.core.storage.exception.StudyStorageWriteException} if the folder
+   * cannot be created.
    *
    * @param assay
    * @return
@@ -90,8 +92,9 @@ public interface StudyStorageService {
   /**
    * Uploads the target file to the appropriate directory for the target {@link Study}. Throws a
    * {@link StudyStorageDuplicateException} if the file already exists, a {@link
-   * StudyStorageWriteException} if the file cannot be written, and a {@link
-   * StudyStorageNotFoundException} if the target folder cannot be found.
+   * com.decibeltx.studytracker.core.storage.exception.StudyStorageWriteException} if the file
+   * cannot be written, and a {@link StudyStorageNotFoundException} if the target folder cannot be
+   * found.
    *
    * @param file
    * @param study
@@ -102,8 +105,9 @@ public interface StudyStorageService {
   /**
    * Uploads the target file to the appropriate directory for the target {@link Assay}. Throws a *
    * {@link StudyStorageDuplicateException} if the file already exists, a *   {@link
-   * StudyStorageWriteException} if the file cannot be written, and a *   {@link
-   * StudyStorageNotFoundException} if the target folder cannot be found.
+   * com.decibeltx.studytracker.core.storage.exception.StudyStorageWriteException} if the file
+   * cannot be written, and a *   {@link StudyStorageNotFoundException} if the target folder cannot
+   * be found.
    *
    * @param file
    * @param assay
