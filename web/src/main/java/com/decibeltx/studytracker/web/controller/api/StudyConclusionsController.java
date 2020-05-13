@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.web.controller.api;
 
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Conclusions;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
@@ -61,9 +62,13 @@ public class StudyConclusionsController extends StudyController {
   @PostMapping("")
   public HttpEntity<?> newStudyConclusions(@PathVariable("studyId") String studyId,
       @RequestBody Conclusions conclusions) {
+    Study study = getStudyFromIdentifier(studyId);
+    if (conclusions.getId() != null || study.getConclusions() != null) {
+      throw new StudyTrackerException("Study conclusions object already exists.");
+    }
     LOGGER.info(
         String.format("Creating conclusions for study %s: %s", studyId, conclusions.toString()));
-    Study study = getStudyFromIdentifier(studyId);
+
     UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     User user = getUserService().findByAccountName(userDetails.getUsername())
