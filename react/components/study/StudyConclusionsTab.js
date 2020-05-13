@@ -38,7 +38,7 @@ class StudyConclusionsTab extends React.Component {
 
   handleSubmit(conclusions) {
     fetch("/api/study/" + this.props.study.code + "/conclusions", {
-      method: 'POST',
+      method: !!conclusions.id ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -63,7 +63,7 @@ class StudyConclusionsTab extends React.Component {
 
           <Row className="justify-content-between align-items-center">
             <div className={"col-6"}>
-              <h4>Conclusions</h4>
+              <h4>Study Conclusions</h4>
             </div>
             <div className="col-auto"></div>
           </Row>
