@@ -47,6 +47,18 @@ public interface EgnyteClientOperations {
   EgnyteObject findObjectByPath(String path) throws ObjectNotFoundException;
 
   /**
+   * Returns the {@link EgnyteObject} the resides at the target path. Throws an exception if nothing
+   * exists at the given location. The response object will either be a {@link EgnyteFolder} or
+   * {@link EgnyteFile} object.
+   *
+   * @param path  full path of file or folder
+   * @param depth maximum folder depth to traverse
+   * @return
+   * @throws EgnyteException
+   */
+  EgnyteObject findObjectByPath(String path, int depth) throws ObjectNotFoundException;
+
+  /**
    * Fetches information about the folder with the provided {@code folder_id}.
    *
    * @param folderId

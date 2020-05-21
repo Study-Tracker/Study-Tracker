@@ -29,6 +29,7 @@ notebook.mode=none
 # Options: local, egnyte
 storage.mode=local
 storage.use-existing=true
+storage.max-folder-read-depth=1
 #
 # Local
 storage.temp-dir=/tmp

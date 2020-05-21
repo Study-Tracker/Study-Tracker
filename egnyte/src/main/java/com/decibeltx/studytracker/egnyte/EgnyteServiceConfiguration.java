@@ -78,6 +78,9 @@ public class EgnyteServiceConfiguration {
     } else if (env.containsProperty("egnyte.sleep")) {
       options.setSleep(env.getRequiredProperty("egnyte.sleep", Integer.class));
     }
+    if (env.containsProperty("storage.max-folder-read-depth")) {
+      options.setMaxReadDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
+    }
     return options;
   }
 

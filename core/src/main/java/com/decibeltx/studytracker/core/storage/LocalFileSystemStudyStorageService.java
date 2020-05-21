@@ -44,6 +44,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
   private final Path rootUrl = Paths.get("/static");
   private boolean overwriteExisting = false;
   private boolean useExisting = false;
+  private int maxDepth = 2;
 
   public LocalFileSystemStudyStorageService(Path rootPath) {
     this.rootPath = rootPath;
@@ -90,15 +91,20 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
    * @param path
    * @return
    */
-  private List<StorageFolder> getSubfolders(Path path) {
+  private List<StorageFolder> getSubfolders(Path path, int depth) {
     try {
       return Files.walk(path, 1)
           .filter(Files::isDirectory)
+          .filter(p -> !p.toString().equals(path.toString()))
           .map(d -> {
             BasicStorageFolder folder = new BasicStorageFolder();
             folder.setName(d.toFile().getName());
             folder.setPath(d);
             folder.setUrl(getObjectUrl(d));
+            if (depth < maxDepth) {
+              folder.setFiles(this.getFolderFiles(d));
+              folder.setSubFolders(this.getSubfolders(d, depth + 1));
+            }
             return folder;
           })
           .collect(Collectors.toList());
@@ -119,7 +125,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(path));
     folder.setFiles(getFolderFiles(path));
-    folder.setSubFolders(getSubfolders(path));
+    folder.setSubFolders(getSubfolders(path, 0));
     return folder;
   }
 
@@ -139,7 +145,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(studyFolder));
     folder.setFiles(getFolderFiles(studyFolder));
-    folder.setSubFolders(getSubfolders(studyFolder));
+    folder.setSubFolders(getSubfolders(studyFolder, 0));
     return folder;
   }
 
@@ -158,7 +164,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(assayFolder));
     folder.setFiles(getFolderFiles(assayFolder));
-    folder.setSubFolders(getSubfolders(assayFolder));
+    folder.setSubFolders(getSubfolders(assayFolder, 0));
     return folder;
   }
 
@@ -312,5 +318,9 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   public void setUseExisting(boolean useExisting) {
     this.useExisting = useExisting;
+  }
+
+  public void setMaxDepth(int maxDepth) {
+    this.maxDepth = maxDepth;
   }
 }
