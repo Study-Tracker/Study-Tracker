@@ -70,7 +70,6 @@ public class EgnyteFolder implements EgnyteObject, StorageFolder {
   @JsonProperty("allow_links")
   private Boolean allowLinks;
 
-  @JsonProperty("folders")
   @Transient
   private List<EgnyteFolder> subFolders = new ArrayList<>();
 
@@ -187,11 +186,13 @@ public class EgnyteFolder implements EgnyteObject, StorageFolder {
     this.allowLinks = allowLinks;
   }
 
+  @JsonProperty("subFolders")
   @Override
   public List<EgnyteFolder> getSubFolders() {
     return subFolders;
   }
 
+  @JsonProperty("folders")
   public void setSubFolders(
       List<EgnyteFolder> subFolders) {
     this.subFolders = subFolders;

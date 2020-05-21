@@ -26,7 +26,9 @@ import com.decibeltx.studytracker.egnyte.exception.ObjectNotFoundException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -78,18 +80,41 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
   }
 
   @Override
-  public EgnyteObject findObjectByPath(String path) throws ObjectNotFoundException {
+  public EgnyteObject findObjectByPath(String path, int depth) throws ObjectNotFoundException {
+
     LOGGER.info("Making request to Egnyte API for object at path: " + path);
+
     doBefore();
+
     URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/" + path);
     LOGGER.debug("Request URL: " + url.toString());
+
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + options.getToken());
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
     ResponseEntity<EgnyteObject> response = restTemplate
         .exchange(url.toString(), HttpMethod.GET, request, EgnyteObject.class);
-    LOGGER.debug("Successfully completed Egnyte API request.");
-    return response.getBody();
+
+    EgnyteObject object = response.getBody();
+    if (object.isFolder()) {
+      EgnyteFolder folder = (EgnyteFolder) object;
+      if (depth < options.getMaxReadDepth()) {
+        List<EgnyteFolder> subFolders = new ArrayList<>();
+        for (int i = 0; i < folder.getSubFolders().size(); i++) {
+          EgnyteFolder subFolder = folder.getSubFolders().get(i);
+          subFolders.add((EgnyteFolder) findObjectByPath(subFolder.getPath(), depth + 1));
+        }
+        folder.setSubFolders(subFolders);
+      }
+      return folder;
+    } else {
+      return object;
+    }
+  }
+
+  @Override
+  public EgnyteObject findObjectByPath(String path) throws ObjectNotFoundException {
+    return findObjectByPath(path, 0);
   }
 
   @Override
@@ -156,5 +181,4 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
       throw new RuntimeException(ex);
     }
   }
-
 }

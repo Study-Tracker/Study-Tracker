@@ -29,6 +29,7 @@ public class EgnyteOptions {
   private String token;
   private Integer qps = 1;
   private Integer sleep;
+  private Integer maxReadDepth = 1;
 
 
   @PostConstruct
