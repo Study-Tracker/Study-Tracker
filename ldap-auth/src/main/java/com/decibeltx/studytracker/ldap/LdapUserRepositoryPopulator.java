@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.ldap;
 
+import com.decibeltx.studytracker.core.config.UserRepositoryPopulator;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.service.UserService;
 import java.util.Optional;
@@ -23,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class LdapUserRepositoryPopulator {
+public class LdapUserRepositoryPopulator implements UserRepositoryPopulator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserRepositoryPopulator.class);
 
@@ -32,7 +33,8 @@ public class LdapUserRepositoryPopulator {
   @Autowired
   private LdapUserDetailsService userDetailsService;
 
-  public void updateUserRepository() {
+  @Override
+  public void populateUserRepository() {
     LOGGER.info("Updating user repository from LDAP AD source...");
     int count = 0;
     for (LdapUser ldapUser : userDetailsService.loadAllUsers()) {

@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
@@ -154,9 +156,16 @@ public class StudyBaseController extends StudyController {
     LOGGER.info(study.toString());
 
     // Get authenticated user
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String accountName;
+    if (authentication instanceof UsernamePasswordAuthenticationToken) {
+      accountName = authentication.getName();
+    } else {
+      UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+      accountName = userDetails.getUsername();
+    }
+
+    User user = getUserService().findByAccountName(accountName)
         .orElseThrow(RecordNotFoundException::new);
     study.setCreatedBy(user);
 

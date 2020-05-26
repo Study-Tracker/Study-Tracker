@@ -20,7 +20,6 @@ import com.decibeltx.studytracker.egnyte.entity.EgnyteFile;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteFolder;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteObject;
 import com.decibeltx.studytracker.egnyte.exception.EgnyteException;
-import com.decibeltx.studytracker.egnyte.exception.ObjectNotFoundException;
 import java.io.File;
 
 public interface EgnyteClientOperations {
@@ -44,7 +43,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteObject findObjectByPath(String path) throws ObjectNotFoundException;
+  EgnyteObject findObjectByPath(String path) throws EgnyteException;
 
   /**
    * Returns the {@link EgnyteObject} the resides at the target path. Throws an exception if nothing
@@ -56,7 +55,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteObject findObjectByPath(String path, int depth) throws ObjectNotFoundException;
+  EgnyteObject findObjectByPath(String path, int depth) throws EgnyteException;
 
   /**
    * Fetches information about the folder with the provided {@code folder_id}.
@@ -65,7 +64,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteFolder findFolderById(String folderId) throws ObjectNotFoundException;
+  EgnyteFolder findFolderById(String folderId) throws EgnyteException;
 
   /**
    * Fetches information about the file with the provided {@code group_id}.
@@ -74,7 +73,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteFile findFileById(String fileId) throws ObjectNotFoundException;
+  EgnyteFile findFileById(String fileId) throws EgnyteException;
 
   /**
    * Uploads the supplied file to the target directory. If the directory does not already exist, it

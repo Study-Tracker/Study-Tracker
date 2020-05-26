@@ -45,8 +45,14 @@ public class AuthenticationController {
     User user = null;
     if (authentication.isAuthenticated() && !authentication.getPrincipal()
         .equals("anonymousUser")) {
-      ldapUser = (LdapUser) authentication.getPrincipal();
-      user = userService.findByEmail(ldapUser.getEmail()).orElse(null);
+      Object principal = authentication.getPrincipal();
+      if (principal instanceof LdapUser) {
+        ldapUser = (LdapUser) principal;
+        user = userService.findByEmail(ldapUser.getEmail()).orElse(null);
+      } else {
+        String username = principal.toString();
+        user = userService.findByAccountName(username).orElse(null);
+      }
     }
     Map<String, Object> payload = new HashMap<>();
     payload.put("user", user);

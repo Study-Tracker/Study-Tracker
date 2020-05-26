@@ -18,6 +18,7 @@ package com.decibeltx.studytracker.ldap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -30,7 +31,7 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.util.Assert;
 
 @Configuration
-@ConditionalOnMissingBean(AuthenticationProvider.class)
+@ConditionalOnProperty(name = "security.mode", havingValue = "ldap")
 public class LdapAuthenticationConfiguration {
 
   @Autowired

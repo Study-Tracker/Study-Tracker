@@ -31,7 +31,6 @@ import com.decibeltx.studytracker.egnyte.entity.EgnyteFolder;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteObject;
 import com.decibeltx.studytracker.egnyte.exception.DuplicateFolderException;
 import com.decibeltx.studytracker.egnyte.exception.EgnyteException;
-import com.decibeltx.studytracker.egnyte.exception.ObjectNotFoundException;
 import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +92,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
         throw new StudyTrackerException("Found resource is not a folder");
       }
       return (EgnyteFolder) obj;
-    } catch (ObjectNotFoundException e) {
+    } catch (EgnyteException e) {
       throw new StudyStorageNotFoundException(e);
     }
   }
@@ -107,7 +106,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
         throw new StudyTrackerException("Found resource is not a folder");
       }
       return (EgnyteFolder) obj;
-    } catch (ObjectNotFoundException e) {
+    } catch (EgnyteException e) {
       throw new StudyStorageNotFoundException(e);
     }
   }
@@ -121,7 +120,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
         throw new StudyTrackerException("Found resource is not a folder");
       }
       return (EgnyteFolder) obj;
-    } catch (ObjectNotFoundException e) {
+    } catch (EgnyteException e) {
       throw new StudyStorageNotFoundException(e);
     }
   }
@@ -133,6 +132,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     try {
       return egnyteClient.createFolder(path);
     } catch (DuplicateFolderException e) {
+      if (options.isUseExisting()) {
+        return this.getProgramFolder(program);
+      }
       throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
@@ -148,6 +150,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     try {
       return egnyteClient.createFolder(path);
     } catch (DuplicateFolderException e) {
+      if (options.isUseExisting()) {
+        return this.getStudyFolder(study);
+      }
       throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
@@ -163,6 +168,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     try {
       return egnyteClient.createFolder(path);
     } catch (DuplicateFolderException e) {
+      if (options.isUseExisting()) {
+        return this.getAssayFolder(assay);
+      }
       throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);

@@ -11,15 +11,11 @@ db.name=study-tracker
 db.port=27017
 db.connectionString=mongodb://${db.host}:${db.port}
 #
+# Security
+
+#
 #Document writing
 documents.slideshow.template=study_template.pptx
-#
-### Web
-spring.mvc.view.prefix=/WEB-INF/jsp/
-spring.mvc.view.suffix=.jsp
-spring.mvc.static-path-pattern=/static/**
-server.error.whitelabel.enabled=false
-spring.data.web.pageable.default-page-size=100
 #
 ### Notebook
 # Options: none, idbs
