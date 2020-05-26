@@ -18,7 +18,9 @@ package com.decibeltx.studytracker.web.controller.api;
 
 import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.service.ActivityService;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,10 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class StudyActivityController extends StudyController {
 
+  @Autowired
+  private ActivityService activityService;
+
   @RequestMapping("")
   public List<Activity> getStudyActivity(@PathVariable("studyId") String studyId) {
     Study study = this.getStudyFromIdentifier(studyId);
-    return study.getActivity();
+    return activityService.findByStudy(study);
   }
 
 }

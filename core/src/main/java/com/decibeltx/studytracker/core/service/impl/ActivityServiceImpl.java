@@ -77,7 +77,8 @@ public class ActivityServiceImpl implements ActivityService {
   public List<Activity> findByProgram(Program program) {
     List<Activity> activities = new ArrayList<>();
     for (Study study : studyRepository.findByProgramId(program.getId())) {
-      activities.addAll(study.getActivity());
+      List<Activity> activityList = activityRepository.findByStudyId(study.getId());
+      activities.addAll(activityList);
     }
     return activities;
   }
@@ -111,8 +112,6 @@ public class ActivityServiceImpl implements ActivityService {
 
   @Override
   public void deleteStudyActivity(Study study) {
-    study.setActivity(new ArrayList<>());
-    studyRepository.save(study);
     for (Activity activity : this.findByStudy(study)) {
       this.delete(activity);
     }

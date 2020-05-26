@@ -20,6 +20,7 @@ import com.decibeltx.studytracker.core.config.UserServiceAuditor;
 import com.decibeltx.studytracker.core.model.User;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -58,6 +59,7 @@ public class WebSecurityConfiguration {
 
   @Configuration
   @Order(1)
+  @ConditionalOnProperty(name = "security.mode", havingValue = "demo")
   public static class DemoSecurityConfiguration {
 
     @Bean

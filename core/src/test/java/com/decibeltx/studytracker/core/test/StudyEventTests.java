@@ -24,12 +24,14 @@ import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
 import com.decibeltx.studytracker.core.service.StudyService;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,6 +61,9 @@ public class StudyEventTests {
 
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
+  @Autowired
+  private ActivityRepository activityRepository;
 
   @Before
   public void doBefore() {
@@ -93,9 +98,10 @@ public class StudyEventTests {
     studyService.create(generateStudy());
     Study study = studyRepository.findByCode("CPA-9000").orElseThrow(RecordNotFoundException::new);
     Assert.assertNotNull(study.getId());
-    Assert.assertFalse(study.getActivity().isEmpty());
-    Assert.assertEquals(1, study.getActivity().size());
-    Activity activity = study.getActivity().get(0);
+    List<Activity> activityList = activityRepository.findByStudyId(study.getId());
+    Assert.assertFalse(activityList.isEmpty());
+    Assert.assertEquals(1, activityList.size());
+    Activity activity = activityList.get(0);
     Assert.assertEquals(study.getId(), activity.getStudy().getId());
     Assert.assertNotNull(study.getStorageFolder());
   }
@@ -106,9 +112,10 @@ public class StudyEventTests {
     Study study = studyRepository.findByCode("CPA-9000").orElseThrow(RecordNotFoundException::new);
     studyService.updateStatus(study, Status.COMPLETE);
     study = studyRepository.findByCode("CPA-9000").orElseThrow(RecordNotFoundException::new);
-    Assert.assertFalse(study.getActivity().isEmpty());
-    Assert.assertEquals(2, study.getActivity().size());
-    Activity activity = study.getActivity().get(1);
+    List<Activity> activityList = activityRepository.findByStudyId(study.getId());
+    Assert.assertFalse(activityList.isEmpty());
+    Assert.assertEquals(2, activityList.size());
+    Activity activity = activityList.get(1);
     Assert.assertEquals(Type.STUDY_STATUS_CHANGED.toString(), activity.getAction());
     Assert.assertEquals(Status.COMPLETE.toString(), activity.getData());
   }

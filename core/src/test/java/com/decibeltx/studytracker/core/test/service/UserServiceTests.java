@@ -39,6 +39,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ActiveProfiles({"test", "example", "storage-local"})
 public class UserServiceTests {
 
+  private static final int USER_COUNT = 4;
+
   @Autowired
   private UserRepository userRepository;
 
@@ -57,7 +59,7 @@ public class UserServiceTests {
   public void findAlltest() {
     List<User> users = userService.findAll();
     Assert.assertTrue(!users.isEmpty());
-    Assert.assertEquals(3, users.size());
+    Assert.assertEquals(USER_COUNT, users.size());
     System.out.println(users.toString());
   }
 
@@ -90,7 +92,7 @@ public class UserServiceTests {
     user.setDepartment("Chemistry");
     userService.create(user);
     Assert.assertNotNull(user.getId());
-    Assert.assertEquals(4, userService.findAll().size());
+    Assert.assertEquals(USER_COUNT + 1, userService.findAll().size());
   }
 
   @Test
@@ -114,7 +116,7 @@ public class UserServiceTests {
 
   @Test
   public void duplicateAccountNameTest() {
-    Assert.assertEquals(3, userRepository.count());
+    Assert.assertEquals(USER_COUNT, userRepository.count());
     Exception exception = null;
     User user = new User();
     user.setAccountName("jsmith");
@@ -134,7 +136,7 @@ public class UserServiceTests {
 
   @Test
   public void userModificationTest() {
-    Assert.assertEquals(3, userRepository.count());
+    Assert.assertEquals(USER_COUNT, userRepository.count());
     Optional<User> optional = userService.findByAccountName("jsmith");
     Assert.assertTrue(optional.isPresent());
     User user = optional.get();
@@ -144,7 +146,7 @@ public class UserServiceTests {
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals("VP", optional.get().getTitle());
     userService.delete(optional.get());
-    Assert.assertEquals(2, userRepository.count());
+    Assert.assertEquals(USER_COUNT - 1, userRepository.count());
     optional = userService.findByAccountName("jsmith");
     Assert.assertFalse(optional.isPresent());
   }

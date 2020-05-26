@@ -445,7 +445,7 @@ export const StudyTimelineActivity = ({activity}) => {
 export const Timeline = ({activities}) => {
   console.log(activities);
   if (!activities || activities.length === 0) {
-    return <p>Oops..</p>;
+    return <h5 className="text-muted">There is no activity to display</h5>;
   }
   let flag = false;
   const elements = activities

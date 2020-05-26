@@ -16,11 +16,8 @@
 
 package com.decibeltx.studytracker.core.events;
 
-import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Activity;
-import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.ActivityRepository;
-import com.decibeltx.studytracker.core.repository.StudyRepository;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +36,6 @@ public class StudyActivityListener {
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyActivityListener.class);
 
   @Autowired
-  private StudyRepository studyRepository;
-
-  @Autowired
   private ActivityRepository activityRepository;
 
   @EventListener
@@ -55,10 +49,5 @@ public class StudyActivityListener {
     activity.setStudy(studyEvent.getStudy());
     activity.setData(studyEvent.getData());
     activityRepository.save(activity);
-    Study study = studyRepository.findById(studyEvent.getStudy().getId())
-        .orElseThrow(RecordNotFoundException::new);
-    study.getActivity().add(activity);
-    study.setUpdatedAt(new Date());
-    studyRepository.save(study);
   }
 }
