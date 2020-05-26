@@ -18,6 +18,7 @@ package com.decibeltx.studytracker.web.config;
 
 import com.decibeltx.studytracker.core.config.UserServiceAuditor;
 import com.decibeltx.studytracker.core.model.User;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,10 +27,16 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
@@ -51,6 +58,28 @@ public class WebSecurityConfiguration {
 
   @Configuration
   @Order(1)
+  public static class DemoSecurityConfiguration {
+
+    @Bean
+    public UserDetailsService demoUserDetailsService() {
+      UserDetails user =
+          org.springframework.security.core.userdetails.User.builder()
+              .username("demo")
+              .password("password")
+              .roles("USER")
+              .build();
+      return new InMemoryUserDetailsManager(user);
+    }
+
+    @Bean
+    public AuthenticationProvider demoAuthenticationProvider() {
+      return new DemoAuthenticationProvider(demoUserDetailsService());
+    }
+
+  }
+
+  @Configuration
+  @Order(2)
   public static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -94,9 +123,8 @@ public class WebSecurityConfiguration {
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Configuration
-  @Order(2)
+  @Order(3)
   public static class WebAppSecurityConfiguration extends WebSecurityConfigurerAdapter {
-
 
     @Autowired
     private AuthenticationProvider authenticationProvider;
@@ -133,6 +161,34 @@ public class WebSecurityConfiguration {
           .csrf().disable();
     }
 
+  }
+
+  static class DemoAuthenticationProvider implements AuthenticationProvider {
+
+    private final UserDetailsService userDetailsService;
+
+    public DemoAuthenticationProvider(
+        UserDetailsService userDetailsService) {
+      this.userDetailsService = userDetailsService;
+    }
+
+    @Override
+    public Authentication authenticate(Authentication authentication)
+        throws AuthenticationException {
+      String username = authentication.getName();
+      String password = authentication.getCredentials().toString();
+      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+      if (userDetails.getUsername().equals(username) && userDetails.getPassword()
+          .equals(password)) {
+        return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
+      }
+      return null;
+    }
+
+    @Override
+    public boolean supports(Class<?> auth) {
+      return auth.equals(UsernamePasswordAuthenticationToken.class);
+    }
   }
 
 }

@@ -76,7 +76,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     }
     Assert.assertNotNull(exception);
     Assert.assertNull(folder);
-    Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
+    Assert.assertTrue(exception instanceof ObjectNotFoundException);
   }
 
   @Test
@@ -126,7 +126,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     }
     Assert.assertNotNull(exception);
     Assert.assertNull(folder);
-    Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
+    Assert.assertTrue(exception instanceof ObjectNotFoundException);
   }
 
   @Test
@@ -150,7 +150,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     }
     Assert.assertNotNull(exception);
     Assert.assertNull(egnyteObject);
-    Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
+    Assert.assertTrue(exception instanceof ObjectNotFoundException);
   }
 
   @Test
@@ -172,7 +172,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     }
     Assert.assertNotNull(exception);
     Assert.assertNull(file);
-    Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
+    Assert.assertTrue(exception instanceof ObjectNotFoundException);
   }
 
 }

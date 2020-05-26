@@ -35,6 +35,12 @@ TODO: Adding programs
 | `db.port` | `27107` | Database host connection port |
 | `db.connectionString` | `mongodb://${db.host}:${db.port}` | URL used to connect to the database |
 
+### Web Security
+
+| Property | Default | Description |
+| -------- | ------- | ----------- |
+| `security.mode` | `demo` | Sets the user authentication mechanism. Defaults to the `demo` mode, which creates a single user with the credentials: l/p: `demo`/`password`. Options: `demo`, `ldap` |
+
 ### Document writing
 
 | Property | Default | Description |

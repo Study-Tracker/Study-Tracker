@@ -18,7 +18,6 @@ package com.decibeltx.studytracker.egnyte;
 
 import com.decibeltx.studytracker.core.config.LocalStudyStorageServiceConfiguration;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteObject;
-import com.decibeltx.studytracker.egnyte.exception.EgnyteExceptionHandler;
 import com.decibeltx.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import com.decibeltx.studytracker.egnyte.rest.EgnyteRestApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,8 +55,7 @@ public class EgnyteServiceConfiguration {
 
   @Bean
   public RestTemplate egnyteRestTemplate() throws Exception {
-    RestTemplate restTemplate = new RestTemplateBuilder()
-        .errorHandler(new EgnyteExceptionHandler(egnyteObjectMapper())).build();
+    RestTemplate restTemplate = new RestTemplateBuilder().build();
     MappingJackson2HttpMessageConverter httpMessageConverter = new MappingJackson2HttpMessageConverter();
     httpMessageConverter.setObjectMapper(egnyteObjectMapper());
     restTemplate.getMessageConverters().add(0, httpMessageConverter);
@@ -80,6 +78,9 @@ public class EgnyteServiceConfiguration {
     }
     if (env.containsProperty("storage.max-folder-read-depth")) {
       options.setMaxReadDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
+    }
+    if (env.containsProperty("storage.use-existing")) {
+      options.setUseExisting(env.getRequiredProperty("storage.use-existing", boolean.class));
     }
     return options;
   }

@@ -172,6 +172,15 @@ public class ExampleDataGenerator {
     user.setDepartment("IT");
     users.add(user);
 
+    user = new User();
+    user.setAccountName("demo");
+    user.setDisplayName("Demo User");
+    user.setEmail("demo@email.com");
+    user.setTitle("n/a");
+    user.setAdmin(true);
+    user.setDepartment("n/a");
+    users.add(user);
+
     return users;
 
   }

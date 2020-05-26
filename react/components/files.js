@@ -34,7 +34,6 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {CardLoadingMessage} from "./loading";
 import {DismissableAlert} from "./errors";
-import 'react-sortable-tree/style.css';
 
 const baseStyle = {
   flex: 1,
