@@ -55,13 +55,17 @@ public class ActivityServiceTests {
     exampleDataGenerator.populateDatabase();
   }
 
-  private static final int ACTION_COUNT = 1;
+  private static final int ACTION_COUNT = 2;
 
   @Test
   public void addStudyActivityTest() {
 
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
-    Assert.assertEquals(ACTION_COUNT, study.getActivity().size());
+    List<Activity> activityList = activityService.findByStudy(study);
+    for (Activity activity : activityList) {
+      System.out.println(activity.getAction());
+    }
+    Assert.assertEquals(ACTION_COUNT, activityList.size());
     Activity activity = new Activity();
     activity.setStudy(study);
     activity.setDate(new Date());
@@ -69,14 +73,12 @@ public class ActivityServiceTests {
     activity.setAction(Type.STUDY_STATUS_CHANGED.toString());
     activity.setData(Status.COMPLETE);
     activityService.create(activity);
-    study.getActivity().add(activity);
-    studyRepository.save(study);
 
     Assert.assertNotNull(activity.getId());
-    study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
-    Assert.assertEquals(ACTION_COUNT + 1, study.getActivity().size());
+    activityList = activityService.findByStudy(study);
+    Assert.assertEquals(ACTION_COUNT + 1, activityList.size());
 
-    activity = study.getActivity().get(ACTION_COUNT);
+    activity = activityList.get(ACTION_COUNT);
     Assert.assertEquals(study.getCode(), activity.getStudyCode());
     Assert.assertEquals(study.getCreatedBy().getAccountName(), activity.getUserAccountName());
     Assert.assertEquals(Type.STUDY_STATUS_CHANGED.toString(), activity.getAction());
@@ -96,9 +98,9 @@ public class ActivityServiceTests {
     Assert.assertEquals(4, activities.size());
 
     activities = activityService.findByProgram(study.getProgram());
-    Assert.assertEquals(2, activities.size());
+    Assert.assertEquals(4, activities.size());
     activities = activityService.findByProgram(study2.getProgram());
-    Assert.assertEquals(2, activities.size());
+    Assert.assertEquals(6, activities.size());
 
     activities = activityService.findByType(Type.NEW_STUDY);
     Assert.assertEquals(6, activities.size());

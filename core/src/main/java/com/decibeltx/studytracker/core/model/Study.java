@@ -113,10 +113,6 @@ public class Study implements Persistable<String> {
 
   private List<Keyword> keywords = new ArrayList<>();
 
-  @Linked(model = Activity.class)
-  @DBRef
-  private List<Activity> activity = new ArrayList<>();
-
   @Linked(model = Assay.class)
   @DBRef(lazy = true)
   private List<Assay> assays = new ArrayList<>();

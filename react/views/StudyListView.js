@@ -51,7 +51,13 @@ class StudyListView extends React.Component {
 
     fetch("/api/study" + query)
     .then(response => response.json())
-    .then(studies => {
+    .then(async studies => {
+
+      for (const study of studies) {
+        await fetch("/api/study/" + study.code + "/activity")
+        .then(response => response.json())
+        .then(json => study.activity = json);
+      }
 
       console.log(studies);
 
