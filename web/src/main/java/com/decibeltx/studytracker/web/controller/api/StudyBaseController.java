@@ -21,6 +21,7 @@ import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -165,9 +166,22 @@ public class StudyBaseController extends StudyController {
       accountName = userDetails.getUsername();
     }
 
+    // Created by
     User user = getUserService().findByAccountName(accountName)
         .orElseThrow(RecordNotFoundException::new);
     study.setCreatedBy(user);
+
+    // Study team
+    List<User> team = new ArrayList<>();
+    for (User u : study.getUsers()) {
+      team.add(getUserService().findByAccountName(u.getAccountName())
+          .orElseThrow(RecordNotFoundException::new));
+    }
+    study.setUsers(team);
+
+    // Owner
+    study.setOwner(getUserService().findByAccountName(study.getOwner().getAccountName())
+        .orElseThrow(RecordNotFoundException::new));
 
     // Save the record
     getStudyService().create(study);
@@ -180,11 +194,26 @@ public class StudyBaseController extends StudyController {
   public HttpEntity<Study> updateStudy(@PathVariable("id") String id, @RequestBody Study study) {
     LOGGER.info("Updating study");
     LOGGER.info(study.toString());
+
+    // Last modified by
     UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     User user = getUserService().findByAccountName(userDetails.getUsername())
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
+
+    // Study team
+    List<User> team = new ArrayList<>();
+    for (User u : study.getUsers()) {
+      team.add(getUserService().findByAccountName(u.getAccountName())
+          .orElseThrow(RecordNotFoundException::new));
+    }
+    study.setUsers(team);
+
+    // Owner
+    study.setOwner(getUserService().findByAccountName(study.getOwner().getAccountName())
+        .orElseThrow(RecordNotFoundException::new));
+
     getStudyService().update(study);
     return new ResponseEntity<>(study, HttpStatus.CREATED);
   }

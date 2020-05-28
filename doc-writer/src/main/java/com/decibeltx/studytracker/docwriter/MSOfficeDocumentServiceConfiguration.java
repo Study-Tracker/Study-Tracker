@@ -40,9 +40,8 @@ public class MSOfficeDocumentServiceConfiguration {
     if (env.containsProperty("documents.slideshow.template")) {
       Resource slideTemplate = new ClassPathResource(
           env.getRequiredProperty("documents.slideshow.template"));
-      Assert.isTrue(slideTemplate.exists() && slideTemplate.isFile() && slideTemplate.isReadable(),
-          "Slide show template file is not readable: " + env
-              .getRequiredProperty("documents.slideshow.template"));
+      Assert.isTrue(slideTemplate.exists(), "Slide show template file does not exist: "
+          + env.getRequiredProperty("documents.slideshow.template"));
       options.setSlideShowTemplate(slideTemplate);
     }
     return options;

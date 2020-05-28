@@ -16,8 +16,10 @@
 
 package com.decibeltx.studytracker.web.config;
 
+import com.decibeltx.studytracker.core.config.UserRepositoryPopulator;
 import com.decibeltx.studytracker.core.config.UserServiceAuditor;
 import com.decibeltx.studytracker.core.model.User;
+import com.decibeltx.studytracker.web.example.ExampleUserRepositoryPopulator;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -76,6 +78,11 @@ public class WebSecurityConfiguration {
     @Bean
     public AuthenticationProvider demoAuthenticationProvider() {
       return new DemoAuthenticationProvider(demoUserDetailsService());
+    }
+
+    @Bean
+    public UserRepositoryPopulator exampleUserRepositoryPopulator() {
+      return new ExampleUserRepositoryPopulator();
     }
 
   }
