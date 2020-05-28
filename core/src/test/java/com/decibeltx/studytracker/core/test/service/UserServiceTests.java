@@ -39,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ActiveProfiles({"test", "example", "storage-local"})
 public class UserServiceTests {
 
-  private static final int USER_COUNT = 4;
+  private static final int USER_COUNT = 3;
 
   @Autowired
   private UserRepository userRepository;
