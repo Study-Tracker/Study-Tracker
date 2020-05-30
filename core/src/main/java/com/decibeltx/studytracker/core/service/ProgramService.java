@@ -30,4 +30,10 @@ public interface ProgramService {
 
   List<Program> findByCode(String code);
 
+  void create(Program program);
+
+  void update(Program program);
+
+  void delete(Program program);
+
 }
