@@ -9,6 +9,10 @@ Study management software for research organizations.
 - MongoDB 3+
 - NPM and Node.JS
 
+## Documentation
+
+Details documentation (work-in-progress) can be found in the `documentation` folder of the repository.
+
 ## Supported Integrations
 
 ### Electronic Laboratory Notebook

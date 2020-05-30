@@ -42,6 +42,7 @@
     <module>doc-writer</module>
     <module>elasticsearch</module>
     <module>web</module>
+    <module>cli</module>
   </modules>
 
   <developers>
@@ -60,16 +61,22 @@
     </license>
   </licenses>
 
-  <!-- TODO
+
   <scm>
-    <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
-    <developerConnection>scm:git:git@github.com:blueprintmedicines/centromere.git
+    <connection>
+      scm:git:git@github.com:Decibel-Therapeutics/Study-Tracker.git
+    </connection>
+    <developerConnection>
+      scm:git:git@github.com:Decibel-Therapeutics/Study-Tracker.git
     </developerConnection>
-    <url>git@github.com:blueprintmedicines/centromere.git</url>
+    <url>
+      git@github.com:Decibel-Therapeutics/Study-Tracker.git
+    </url>
   </scm>
 
-  <url>https://github.com/blueprintmedicines/centromere</url>
+  <url>https://github.com/Decibel-Therapeutics/Study-Tracker</url>
 
+  <!-- TODO
   <distributionManagement>
     <repository>
       <id>ossrh</id>

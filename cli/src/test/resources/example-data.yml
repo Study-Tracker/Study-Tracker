@@ -1,0 +1,8 @@
+programs:
+
+  - name: "Program X"
+    code: "PX"
+
+  - name: "Program Y"
+    code: "PY"
+    active: false
