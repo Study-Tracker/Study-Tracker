@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.web;
+package com.decibeltx.studytracker.web.service;
 
 import com.decibeltx.studytracker.core.exception.FileStorageException;
 import java.nio.file.Path;

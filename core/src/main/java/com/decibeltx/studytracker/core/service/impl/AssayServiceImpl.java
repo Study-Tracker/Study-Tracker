@@ -16,8 +16,7 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
-import com.decibeltx.studytracker.core.events.StudyEventPublisher;
+import com.decibeltx.studytracker.core.events.AssayEventPublisher;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Status;
@@ -44,7 +43,7 @@ public class AssayServiceImpl implements AssayService {
   private StudyRepository studyRepository;
 
   @Autowired
-  private StudyEventPublisher eventPublisher;
+  private AssayEventPublisher eventPublisher;
 
   @Override
   public Optional<Assay> findById(String id) {
@@ -76,7 +75,7 @@ public class AssayServiceImpl implements AssayService {
     assayRepository.insert(assay);
     study.getAssays().add(assay);
     studyRepository.save(study);
-    eventPublisher.publishStudyEvent(study, assay.getCreatedBy(), Type.NEW_ASSAY, assay);
+    eventPublisher.publishNewAssayEvent(assay, assay.getCreatedBy());
   }
 
   @Override
@@ -84,26 +83,24 @@ public class AssayServiceImpl implements AssayService {
     LOGGER.info("Updating assay record with code: " + updated.getCode());
     Assay assay = assayRepository.findById(updated.getId())
         .orElseThrow(RecordNotFoundException::new);
-    Study study = assay.getStudy();
     assayRepository.save(updated);
-    eventPublisher.publishStudyEvent(study, assay.getLastModifiedBy(), Type.UPDATED_ASSAY, updated);
+    eventPublisher.publishUpdatedAssayEvent(assay, assay.getLastModifiedBy());
   }
 
   @Override
   public void delete(Assay assay) {
     assay.setActive(false);
-    Study study = assay.getStudy();
     assayRepository.save(assay);
-    eventPublisher.publishStudyEvent(study, assay.getLastModifiedBy(), Type.DELETED_ASSAY, assay);
+    eventPublisher.publishDeletedAssayEvent(assay, assay.getLastModifiedBy());
   }
 
   @Override
   public void updateStatus(Assay assay, Status status) {
+    Status oldStatus = assay.getStatus();
     assay.setStatus(status);
     assayRepository.save(assay);
-    Study study = assay.getStudy();
     eventPublisher
-        .publishStudyEvent(study, assay.getLastModifiedBy(), Type.ASSAY_STATUS_CHANGED, status);
+        .publishAssayStatusChangedEvent(assay, assay.getLastModifiedBy(), oldStatus, status);
   }
 
   @Override

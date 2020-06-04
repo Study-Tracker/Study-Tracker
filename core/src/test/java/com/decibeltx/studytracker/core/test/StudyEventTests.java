@@ -16,7 +16,7 @@
 
 package com.decibeltx.studytracker.core.test;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
+import com.decibeltx.studytracker.core.events.type.EventType;
 import com.decibeltx.studytracker.core.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Activity;
@@ -102,7 +102,7 @@ public class StudyEventTests {
     Assert.assertFalse(activityList.isEmpty());
     Assert.assertEquals(1, activityList.size());
     Activity activity = activityList.get(0);
-    Assert.assertEquals(study.getId(), activity.getStudy().getId());
+    Assert.assertEquals(study.getId(), activity.getReferenceId());
     Assert.assertNotNull(study.getStorageFolder());
   }
 
@@ -116,8 +116,10 @@ public class StudyEventTests {
     Assert.assertFalse(activityList.isEmpty());
     Assert.assertEquals(2, activityList.size());
     Activity activity = activityList.get(1);
-    Assert.assertEquals(Type.STUDY_STATUS_CHANGED.toString(), activity.getAction());
-    Assert.assertEquals(Status.COMPLETE.toString(), activity.getData());
+    Assert.assertEquals(EventType.STUDY_STATUS_CHANGED, activity.getEventType());
+    Assert.assertFalse(activity.getData().isEmpty());
+    Assert.assertTrue(activity.getData().containsKey("newStatus"));
+    Assert.assertEquals(Status.COMPLETE.toString(), activity.getData().get("newStatus"));
   }
 
 }

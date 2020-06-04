@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEvent;
 import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.StudyRelationship;
@@ -90,10 +89,10 @@ public class StudyRelationshipServiceImpl implements StudyRelationshipService {
     studyRepository.save(sourceStudy);
     studyRepository.save(targetStudy);
 
-    studyEventPublisher.publishStudyEvent(sourceStudy, sourceStudy.getLastModifiedBy(),
-        StudyEvent.Type.NEW_STUDY_RELATIONSHIP, sourceRelationship);
-    studyEventPublisher.publishStudyEvent(targetStudy, targetStudy.getLastModifiedBy(),
-        StudyEvent.Type.NEW_STUDY_RELATIONSHIP, targetRelationship);
+    studyEventPublisher.publishNewRelationshipEvent(sourceStudy, sourceStudy.getLastModifiedBy(),
+        sourceRelationship);
+    studyEventPublisher.publishNewRelationshipEvent(targetStudy, targetStudy.getLastModifiedBy(),
+        targetRelationship);
   }
 
   @Override
@@ -113,10 +112,10 @@ public class StudyRelationshipServiceImpl implements StudyRelationshipService {
     studyRepository.save(sourceStudy);
     studyRepository.save(targetStudy);
 
-    studyEventPublisher.publishStudyEvent(sourceStudy, sourceStudy.getLastModifiedBy(),
-        StudyEvent.Type.DELETED_STUDY_RELATIONSHIP);
-    studyEventPublisher.publishStudyEvent(targetStudy, targetStudy.getLastModifiedBy(),
-        StudyEvent.Type.DELETED_STUDY_RELATIONSHIP);
+    studyEventPublisher
+        .publishDeletedRelationshipEvent(sourceStudy, sourceStudy.getLastModifiedBy());
+    studyEventPublisher
+        .publishDeletedRelationshipEvent(targetStudy, targetStudy.getLastModifiedBy());
   }
 
 }

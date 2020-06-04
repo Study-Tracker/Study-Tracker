@@ -16,8 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEvent;
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
 import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.core.exception.InvalidConstraintException;
@@ -123,8 +121,7 @@ public class StudyServiceImpl implements StudyService {
         study.getCode(), study.getId()));
 
     // Publish events
-    studyEventPublisher
-        .publishStudyEvent(study, study.getCreatedBy(), StudyEvent.Type.NEW_STUDY, study);
+    studyEventPublisher.publishNewStudyEvent(study, study.getCreatedBy());
 
   }
 
@@ -133,16 +130,14 @@ public class StudyServiceImpl implements StudyService {
     LOGGER.info("Attempting to update existing study with code: " + study.getCode());
     studyRepository.findById(study.getId()).orElseThrow(RecordNotFoundException::new);
     studyRepository.save(study);
-    studyEventPublisher
-        .publishStudyEvent(study, study.getLastModifiedBy(), StudyEvent.Type.UPDATED_STUDY, study);
+    studyEventPublisher.publishUpdatedStudyEvent(study, study.getLastModifiedBy());
   }
 
   @Override
   public void delete(Study study) {
     study.setActive(false);
     studyRepository.save(study);
-    studyEventPublisher
-        .publishStudyEvent(study, study.getLastModifiedBy(), StudyEvent.Type.DELETED_STUDY);
+    studyEventPublisher.publishDeletedStudyEvent(study, study.getLastModifiedBy());
   }
 
   @Override
@@ -171,10 +166,11 @@ public class StudyServiceImpl implements StudyService {
 
   @Override
   public void updateStatus(Study study, Status status) {
+    Status oldStatus = study.getStatus();
     study.setStatus(status);
     studyRepository.save(study);
     studyEventPublisher
-        .publishStudyEvent(study, study.getLastModifiedBy(), Type.STUDY_STATUS_CHANGED, status);
+        .publishStudyStatusChangedEvent(study, study.getLastModifiedBy(), oldStatus, status);
   }
 
   @Override

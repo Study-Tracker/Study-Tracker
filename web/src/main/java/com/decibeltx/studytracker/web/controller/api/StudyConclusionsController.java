@@ -22,6 +22,7 @@ import com.decibeltx.studytracker.core.model.Conclusions;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.service.StudyConclusionsService;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,9 +69,9 @@ public class StudyConclusionsController extends StudyController {
     LOGGER.info(
         String.format("Creating conclusions for study %s: %s", studyId, conclusions.toString()));
 
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     conclusions.setCreatedBy(user);
@@ -85,9 +85,9 @@ public class StudyConclusionsController extends StudyController {
     LOGGER.info(
         String.format("Updating conclusions for study %s: %s", studyId, conclusions.toString()));
     Study study = getStudyFromIdentifier(studyId);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     conclusions.setLastModifiedBy(user);
@@ -99,9 +99,9 @@ public class StudyConclusionsController extends StudyController {
   public HttpEntity<?> deleteStudyConclusions(@PathVariable("studyId") String studyId) {
     LOGGER.info(String.format("Deleting conclusions for study %s", studyId));
     Study study = getStudyFromIdentifier(studyId);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyConclusionsService.deleteStudyConclusions(study);

@@ -25,7 +25,7 @@ import com.decibeltx.studytracker.core.storage.StorageFolder;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteFile;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteFolder;
 import com.decibeltx.studytracker.idbs.eln.entities.IdbsNotebookEntry;
-import com.decibeltx.studytracker.web.FileSystemStorageService;
+import com.decibeltx.studytracker.web.service.FileSystemStorageService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;

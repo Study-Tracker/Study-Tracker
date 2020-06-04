@@ -16,9 +16,12 @@
 
 package com.decibeltx.studytracker.core.events;
 
-import com.decibeltx.studytracker.core.events.ProgramEvent.Type;
+import com.decibeltx.studytracker.core.events.type.EventType;
+import com.decibeltx.studytracker.core.events.type.ProgramEvent;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.User;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -29,12 +32,28 @@ public class ProgramEventPublisher {
   @Autowired
   private ApplicationEventPublisher publisher;
 
-  public void publishProgramEvent(Program program, User user, Type type, Object data) {
-    publisher.publishEvent(new ProgramEvent(this, program, user, type, data));
+  public void publishNewProgramEvent(Program program, User triggeredBy) {
+    Map<String, Object> data = new HashMap<>();
+    data.put("name", program.getName());
+    data.put("code", program.getCode());
+    publisher
+        .publishEvent(new ProgramEvent(this, program, triggeredBy, EventType.NEW_PROGRAM, data));
   }
 
-  public void publishProgramEvent(Program program, User user, Type type) {
-    this.publishProgramEvent(program, user, type, null);
+  public void publishUpdatedProgramEvent(Program program, User triggeredBy) {
+    Map<String, Object> data = new HashMap<>();
+    data.put("name", program.getName());
+    data.put("code", program.getCode());
+    publisher.publishEvent(
+        new ProgramEvent(this, program, triggeredBy, EventType.UPDATED_PROGRAM, data));
+  }
+
+  public void publishDeletedProgramEvent(Program program, User triggeredBy) {
+    Map<String, Object> data = new HashMap<>();
+    data.put("name", program.getName());
+    data.put("code", program.getCode());
+    publisher.publishEvent(
+        new ProgramEvent(this, program, triggeredBy, EventType.DELETED_PROGRAM, data));
   }
 
 }

@@ -21,6 +21,7 @@ import com.decibeltx.studytracker.core.model.Comment;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.service.StudyCommentService;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -30,7 +31,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,9 +61,9 @@ public class StudyCommentsController extends StudyController {
     LOGGER
         .info(String.format("Creating new comment for study %s: %s", studyId, comment.toString()));
     Study study = getStudyFromIdentifier(studyId);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyCommentService.addStudyComment(study, comment);
@@ -74,9 +74,9 @@ public class StudyCommentsController extends StudyController {
   public HttpEntity<Comment> editedStudyComment(@PathVariable("studyId") String studyId,
       @PathVariable("commentId") String commentId, @RequestBody Comment updated) {
     LOGGER.info(String.format("Editing comment for study %s: %s", studyId, updated.toString()));
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     Study study = getStudyFromIdentifier(studyId);
     Optional<Comment> optional = studyCommentService.findStudyCommentById(study, commentId);
@@ -96,9 +96,9 @@ public class StudyCommentsController extends StudyController {
       @PathVariable("commentId") String commentId) {
     LOGGER.info(String.format("Removing comment %s for study %s", commentId, studyId));
     Study study = getStudyFromIdentifier(studyId);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     Optional<Comment> optional = studyCommentService.findStudyCommentById(study, commentId);

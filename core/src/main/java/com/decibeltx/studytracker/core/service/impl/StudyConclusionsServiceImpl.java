@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
 import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.model.Conclusions;
 import com.decibeltx.studytracker.core.model.Study;
@@ -48,8 +47,7 @@ public class StudyConclusionsServiceImpl implements StudyConclusionsService {
     conclusions.setId(UUID.randomUUID().toString());
     study.setConclusions(conclusions);
     studyRepository.save(study);
-    studyEventPublisher.publishStudyEvent(study, study.getLastModifiedBy(),
-        Type.NEW_STUDY_CONCLUSIONS, conclusions);
+    studyEventPublisher.publishNewConclusionsEvent(study, study.getLastModifiedBy(), conclusions);
     return conclusions;
   }
 
@@ -58,8 +56,8 @@ public class StudyConclusionsServiceImpl implements StudyConclusionsService {
     conclusions.setUpdatedAt(new Date());
     study.setConclusions(conclusions);
     studyRepository.save(study);
-    studyEventPublisher.publishStudyEvent(study, study.getLastModifiedBy(),
-        Type.EDITED_STUDY_CONCLUSIONS, conclusions);
+    studyEventPublisher
+        .publishUpdatedConclusionsEvent(study, study.getLastModifiedBy(), conclusions);
     return conclusions;
   }
 
@@ -67,8 +65,7 @@ public class StudyConclusionsServiceImpl implements StudyConclusionsService {
   public void deleteStudyConclusions(Study study) {
     study.setConclusions(null);
     studyRepository.save(study);
-    studyEventPublisher.publishStudyEvent(study, study.getLastModifiedBy(),
-        Type.DELETED_STUDY_CONCLUSIONS);
+    studyEventPublisher.publishDeletedConclusionsEvent(study, study.getLastModifiedBy());
   }
 
 }

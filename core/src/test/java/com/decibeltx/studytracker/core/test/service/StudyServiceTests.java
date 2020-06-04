@@ -81,6 +81,12 @@ public class StudyServiceTests {
   }
 
   @Test
+  public void findByCode() throws Exception {
+    Study study = studyService.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals("PPB-10001", study.getCode());
+  }
+
+  @Test
   public void findByProgramTest() {
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);

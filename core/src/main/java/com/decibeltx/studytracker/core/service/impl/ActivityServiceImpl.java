@@ -16,7 +16,7 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
+import com.decibeltx.studytracker.core.events.type.EventType;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Assay;
@@ -84,8 +84,8 @@ public class ActivityServiceImpl implements ActivityService {
   }
 
   @Override
-  public List<Activity> findByType(Type type) {
-    return activityRepository.findByAction(type.toString());
+  public List<Activity> findByEventType(EventType type) {
+    return activityRepository.findByEventType(type);
   }
 
   @Override

@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.repository;
 
+import com.decibeltx.studytracker.core.events.type.EventType;
 import com.decibeltx.studytracker.core.model.Activity;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -23,12 +24,15 @@ import org.springframework.data.mongodb.repository.Query;
 
 public interface ActivityRepository extends MongoRepository<Activity, String> {
 
-  List<Activity> findByAction(String action);
+  List<Activity> findByEventType(EventType eventType);
 
-  @Query("{ 'study.id': ?0 }")
+  @Query("{ 'reference': 'STUDY', 'referenceId': ?0 }")
   List<Activity> findByStudyId(String studyId);
 
-  @Query("{ 'assay.id': ?0 }")
+  @Query("{ 'reference': 'ASSAY', 'referenceId': ?0 }")
   List<Activity> findByAssayId(String assayId);
+
+  @Query("{ 'reference': 'PROGRAM', 'referenceId': ?0 }")
+  List<Activity> findByProgramId(String programId);
 
 }
