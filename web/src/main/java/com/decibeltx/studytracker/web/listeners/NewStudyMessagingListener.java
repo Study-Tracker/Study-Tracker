@@ -16,8 +16,8 @@
 
 package com.decibeltx.studytracker.web.listeners;
 
-import com.decibeltx.studytracker.core.events.StudyEvent;
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
+import com.decibeltx.studytracker.core.events.type.EventType;
+import com.decibeltx.studytracker.core.events.type.StudyEvent;
 import com.decibeltx.studytracker.core.model.ExternalLink;
 import com.decibeltx.studytracker.core.model.Message;
 import com.decibeltx.studytracker.core.model.Study;
@@ -48,7 +48,7 @@ public class NewStudyMessagingListener implements ApplicationListener<StudyEvent
 
   @Override
   public void onApplicationEvent(StudyEvent studyEvent) {
-    if (messagingService != null && studyEvent.getType().equals(Type.NEW_STUDY)) {
+    if (messagingService != null && studyEvent.getEventType().equals(EventType.NEW_STUDY)) {
       Study study = studyEvent.getStudy();
       Resource resource = null;
       String content = null;

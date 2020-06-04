@@ -16,7 +16,8 @@
 
 package com.decibeltx.studytracker.core.test.service;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
+import com.decibeltx.studytracker.core.events.type.EventType;
+import com.decibeltx.studytracker.core.events.type.StudyEvent;
 import com.decibeltx.studytracker.core.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Activity;
@@ -25,8 +26,9 @@ import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.service.ActivityService;
 import com.decibeltx.studytracker.core.test.TestConfiguration;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,15 +65,18 @@ public class ActivityServiceTests {
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     List<Activity> activityList = activityService.findByStudy(study);
     for (Activity activity : activityList) {
-      System.out.println(activity.getAction());
+      System.out.println(activity.getEventType());
     }
     Assert.assertEquals(ACTION_COUNT, activityList.size());
-    Activity activity = new Activity();
-    activity.setStudy(study);
-    activity.setDate(new Date());
-    activity.setUser(study.getCreatedBy());
-    activity.setAction(Type.STUDY_STATUS_CHANGED.toString());
-    activity.setData(Status.COMPLETE);
+    Map<String, Object> data = new HashMap<>();
+    data.put("code", study.getCode());
+    data.put("name", study.getName());
+    data.put("oldStatus", Status.IN_PLANNING);
+    data.put("newStatus", Status.COMPLETE);
+    StudyEvent event = new StudyEvent(this, study, study.getLastModifiedBy(),
+        EventType.STUDY_STATUS_CHANGED, data);
+    Activity activity = Activity.from(event);
+
     activityService.create(activity);
 
     Assert.assertNotNull(activity.getId());
@@ -79,10 +84,10 @@ public class ActivityServiceTests {
     Assert.assertEquals(ACTION_COUNT + 1, activityList.size());
 
     activity = activityList.get(ACTION_COUNT);
-    Assert.assertEquals(study.getCode(), activity.getStudyCode());
-    Assert.assertEquals(study.getCreatedBy().getAccountName(), activity.getUserAccountName());
-    Assert.assertEquals(Type.STUDY_STATUS_CHANGED.toString(), activity.getAction());
-    Assert.assertEquals(Status.COMPLETE.toString(), activity.getData());
+    Assert.assertEquals(study.getCode(), activity.getData().get("code"));
+    Assert.assertEquals(study.getCreatedBy().getAccountName(), activity.getUser().getAccountName());
+    Assert.assertEquals(EventType.STUDY_STATUS_CHANGED, activity.getEventType());
+    Assert.assertEquals(Status.COMPLETE.toString(), activity.getData().get("newStatus"));
 
   }
 
@@ -102,9 +107,9 @@ public class ActivityServiceTests {
     activities = activityService.findByProgram(study2.getProgram());
     Assert.assertEquals(6, activities.size());
 
-    activities = activityService.findByType(Type.NEW_STUDY);
+    activities = activityService.findByEventType(EventType.NEW_STUDY);
     Assert.assertEquals(6, activities.size());
-    activities = activityService.findByType(Type.DELETED_STUDY);
+    activities = activityService.findByEventType(EventType.DELETED_STUDY);
     Assert.assertEquals(0, activities.size());
 
   }

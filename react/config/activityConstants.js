@@ -15,6 +15,8 @@
  */
 
 export const studyActions = {
+
+  // Studies
   NEW_STUDY: {
     value: "NEW_STUDY",
     label: "New Study",
@@ -99,5 +101,46 @@ export const studyActions = {
     value: "DELETED_STUDY_EXTERNAL_LINK",
     label: "Study External Link Removed",
     visible: true
+  },
+
+  // Assays
+
+  NEW_ASSAY: {
+    value: "NEW_ASSAY",
+    label: "New Assay",
+    visible: true
+  },
+  UPDATED_ASSAY: {
+    value: "UPDATED_ASSAY",
+    label: "Updated Assay",
+    visible: true
+  },
+  DELETED_ASSAY: {
+    value: "DELETED_ASSAY",
+    label: "Assay Deleted",
+    visible: true
+  },
+  ASSAY_STATUS_CHANGED: {
+    value: "ASSAY_STATUS_CHANGED",
+    label: "Assay Status Updated",
+    visible: true
+  },
+
+  // Programs
+  NEW_PROGRAM: {
+    value: "NEW_PROGRAM",
+    label: "New Program",
+    visible: true
+  },
+  UPDATED_PROGRAM: {
+    value: "UPDATED_PROGRAM",
+    label: "Updated Program",
+    visible: true
+  },
+  DELETED_PROGRAM: {
+    value: "DELETED_PROGRAM",
+    label: "Program Deleted",
+    visible: true
   }
+
 };

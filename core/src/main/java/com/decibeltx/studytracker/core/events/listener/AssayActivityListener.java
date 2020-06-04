@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.events;
+package com.decibeltx.studytracker.core.events.listener;
 
+import com.decibeltx.studytracker.core.events.type.AssayEvent;
 import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.repository.ActivityRepository;
-import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,27 +27,21 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Invoked on any {@link StudyEvent} event. Creates a new {@link Activity} record to associate with
- * the target study.
+ * Invoked on any {@link AssayEvent} event. Creates a new {@link Activity} record to associate with
+ * the target assay.
  */
 @Component
-public class StudyActivityListener {
+public class AssayActivityListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StudyActivityListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssayActivityListener.class);
 
   @Autowired
   private ActivityRepository activityRepository;
 
   @EventListener
   @Order(1)
-  public void onApplicationEvent(StudyEvent studyEvent) {
-    LOGGER.info("Logging new study event: " + studyEvent.toString());
-    Activity activity = new Activity();
-    activity.setAction(studyEvent.getType().toString());
-    activity.setUser(studyEvent.getUser());
-    activity.setDate(new Date());
-    activity.setStudy(studyEvent.getStudy());
-    activity.setData(studyEvent.getData());
-    activityRepository.save(activity);
+  public void onApplicationEvent(AssayEvent assayEvent) {
+    LOGGER.info("Logging new study event: " + assayEvent.toString());
+    activityRepository.save(Activity.from(assayEvent));
   }
 }

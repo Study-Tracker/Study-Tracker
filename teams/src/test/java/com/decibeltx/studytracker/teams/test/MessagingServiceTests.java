@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.teams.test;
 
+import com.decibeltx.studytracker.core.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Message;
 import com.decibeltx.studytracker.core.model.Study;
@@ -24,6 +25,7 @@ import com.decibeltx.studytracker.teams.TeamsMessageUtils;
 import com.decibeltx.studytracker.teams.TeamsMessagingService;
 import com.decibeltx.studytracker.teams.entity.DriveItem;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,14 @@ public class MessagingServiceTests {
 
   @Autowired
   private StudyService studyService;
+
+  @Autowired
+  private ExampleDataGenerator exampleDataGenerator;
+
+  @Before
+  public void doBefore() {
+    exampleDataGenerator.populateDatabase();
+  }
 
   @Test
   public void newStudyMessageTest() throws Exception {

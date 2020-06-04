@@ -79,10 +79,12 @@ public class StudyConclusionsServiceTests {
   public void updateConclusionsTest() {
     addConclusionsTest();
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    study.setLastModifiedBy(study.getCreatedBy());
     Conclusions conclusions = study.getConclusions();
     Date firstDate = conclusions.getCreatedAt();
     Assert.assertNull(conclusions.getUpdatedAt());
     conclusions.setContent("Different text");
+    conclusions.setLastModifiedBy(conclusions.getCreatedBy());
     studyConclusionsService.updateStudyConclusions(study, conclusions);
     Assert.assertNotNull(conclusions.getUpdatedAt());
     Assert.assertNotEquals(firstDate, conclusions.getUpdatedAt());

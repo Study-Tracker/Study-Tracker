@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.ProgramEvent.Type;
 import com.decibeltx.studytracker.core.events.ProgramEventPublisher;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Program;
@@ -64,7 +63,7 @@ public class ProgramServiceImpl implements ProgramService {
   public void create(Program program) {
     LOGGER.info("Creating new program with name: " + program.getName());
     programRepository.insert(program);
-    programEventPublisher.publishProgramEvent(program, null, Type.NEW_PROGRAM, program);
+    programEventPublisher.publishNewProgramEvent(program, null);
   }
 
   @Override
@@ -72,7 +71,7 @@ public class ProgramServiceImpl implements ProgramService {
     LOGGER.info("Updating program with name: " + program.getName());
     programRepository.findById(program.getId()).orElseThrow(RecordNotFoundException::new);
     programRepository.save(program);
-    programEventPublisher.publishProgramEvent(program, null, Type.UPDATED_PROGRAM, program);
+    programEventPublisher.publishUpdatedProgramEvent(program, null);
   }
 
   @Override
@@ -81,6 +80,6 @@ public class ProgramServiceImpl implements ProgramService {
     programRepository.findById(program.getId()).orElseThrow(RecordNotFoundException::new);
     program.setActive(false);
     programRepository.save(program);
-    programEventPublisher.publishProgramEvent(program, null, Type.DELETED_PROGRAM, program);
+    programEventPublisher.publishDeletedProgramEvent(program, null);
   }
 }

@@ -65,13 +65,9 @@ public class ActivityControllerTests {
     mockMvc.perform(get("/api/activity"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0]", hasKey("id")))
-        .andExpect(jsonPath("$[0]", hasKey("action")))
+        .andExpect(jsonPath("$[0]", hasKey("eventType")))
         .andExpect(jsonPath("$[0]", hasKey("date")))
-        .andExpect(jsonPath("$[0]", hasKey("data")))
-        .andExpect(jsonPath("$[0]", hasKey("studyCode")))
-        .andExpect(jsonPath("$[0]", hasKey("assayCode")))
-        .andExpect(jsonPath("$[0]", hasKey("userAccountName")))
-        .andExpect(jsonPath("$[0]", hasKey("userDisplayName")));
+        .andExpect(jsonPath("$[0]", hasKey("data")));
 
   }
 
@@ -84,14 +80,16 @@ public class ActivityControllerTests {
 
     mockMvc.perform(get("/api/activity?sort=date,desc"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0]", hasKey("action")))
-        .andExpect(jsonPath("$[0].action", is("STUDY_STATUS_CHANGED")))
+        .andExpect(jsonPath("$[0]", hasKey("eventType")))
+        .andExpect(jsonPath("$[0].eventType", is("STUDY_STATUS_CHANGED")))
         .andExpect(jsonPath("$[0]", hasKey("data")))
-        .andExpect(jsonPath("$[0].data", is("COMPLETE")))
-        .andExpect(jsonPath("$[1]", hasKey("action")))
-        .andExpect(jsonPath("$[1].action", is("STUDY_STATUS_CHANGED")))
+        .andExpect(jsonPath("$[0].data", hasKey("newStatus")))
+        .andExpect(jsonPath("$[0].data.newStatus", is("COMPLETE")))
+        .andExpect(jsonPath("$[1]", hasKey("eventType")))
+        .andExpect(jsonPath("$[1].eventType", is("STUDY_STATUS_CHANGED")))
         .andExpect(jsonPath("$[1]", hasKey("data")))
-        .andExpect(jsonPath("$[1].data", is("ON_HOLD")));
+        .andExpect(jsonPath("$[1].data", hasKey("newStatus")))
+        .andExpect(jsonPath("$[1].data.newStatus", is("ON_HOLD")));
 
   }
 
@@ -113,14 +111,16 @@ public class ActivityControllerTests {
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$.sort", hasKey("sorted")))
         .andExpect(jsonPath("$.sort.sorted", is(true)))
-        .andExpect(jsonPath("$.content[0]", hasKey("action")))
-        .andExpect(jsonPath("$.content[0].action", is("STUDY_STATUS_CHANGED")))
+        .andExpect(jsonPath("$.content[0]", hasKey("eventType")))
+        .andExpect(jsonPath("$.content[0].eventType", is("STUDY_STATUS_CHANGED")))
         .andExpect(jsonPath("$.content[0]", hasKey("data")))
-        .andExpect(jsonPath("$.content[0].data", is("COMPLETE")))
-        .andExpect(jsonPath("$.content[1]", hasKey("action")))
-        .andExpect(jsonPath("$.content[1].action", is("STUDY_STATUS_CHANGED")))
+        .andExpect(jsonPath("$.content[0].data", hasKey("newStatus")))
+        .andExpect(jsonPath("$.content[0].data.newStatus", is("COMPLETE")))
+        .andExpect(jsonPath("$.content[1]", hasKey("eventType")))
+        .andExpect(jsonPath("$.content[1].eventType", is("STUDY_STATUS_CHANGED")))
         .andExpect(jsonPath("$.content[1]", hasKey("data")))
-        .andExpect(jsonPath("$.content[1].data", is("ON_HOLD")));
+        .andExpect(jsonPath("$.content[1].data", hasKey("newStatus")))
+        .andExpect(jsonPath("$.content[1].data.newStatus", is("ON_HOLD")));
 
   }
 

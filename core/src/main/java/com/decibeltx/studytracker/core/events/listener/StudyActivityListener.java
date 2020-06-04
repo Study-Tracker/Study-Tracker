@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.events;
+package com.decibeltx.studytracker.core.events.listener;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
-import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.events.type.StudyEvent;
+import com.decibeltx.studytracker.core.model.Activity;
+import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+/**
+ * Invoked on any {@link StudyEvent} event. Creates a new {@link Activity} record to associate with
+ * the target study.
+ */
 @Component
-public class NewStudyNotebookListener {
+public class StudyActivityListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(NewStudyFolderListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyActivityListener.class);
+
+  @Autowired
+  private ActivityRepository activityRepository;
 
   @EventListener
+  @Order(1)
   public void onApplicationEvent(StudyEvent studyEvent) {
-    if (studyEvent.getType().equals(Type.NEW_STUDY)) {
-      Study study = studyEvent.getStudy();
-      LOGGER.warn(String.format("TODO: Creating ELN entry for study: %s", study.getCode()));
-    }
+    LOGGER.info("Logging new study event: " + studyEvent.toString());
+    activityRepository.save(Activity.from(studyEvent));
   }
 }

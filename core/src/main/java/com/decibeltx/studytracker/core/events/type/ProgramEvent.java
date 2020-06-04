@@ -14,31 +14,36 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.events;
+package com.decibeltx.studytracker.core.events.type;
 
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.User;
+import java.util.Map;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.NonNull;
 
-public class ProgramEvent extends ApplicationEvent {
+public class ProgramEvent extends ApplicationEvent implements StudyTrackerEvent {
 
-  private final Type type;
+  private final EventType eventType;
+
   private final Program program;
+
   private final User user;
-  private final Object data;
+
+  private final Map<String, Object> data;
 
   public ProgramEvent(@NonNull Object source, @NonNull Program program, @NonNull User user,
-      @NonNull Type type, Object data) {
+      @NonNull EventType eventType, @NonNull Map<String, Object> data) {
     super(source);
-    this.type = type;
+    this.eventType = eventType;
     this.program = program;
     this.user = user;
     this.data = data;
   }
 
-  public Type getType() {
-    return type;
+  @Override
+  public EventType getEventType() {
+    return eventType;
   }
 
   public Program getProgram() {
@@ -49,23 +54,19 @@ public class ProgramEvent extends ApplicationEvent {
     return user;
   }
 
-  public Object getData() {
+  @Override
+  public Map<String, Object> getData() {
     return data;
   }
 
   @Override
   public String toString() {
-    return "StudyEvent{" +
-        "type=" + type +
-        ", program=" + program +
-        ", user=" + user +
+    return "ProgramEvent{" +
+        "eventType=" + eventType +
+        ", program=" + program.getName() +
+        ", user=" + user.getAccountName() +
         ", data=" + data +
         '}';
   }
 
-  public enum Type {
-    NEW_PROGRAM,
-    UPDATED_PROGRAM,
-    DELETED_PROGRAM
-  }
 }

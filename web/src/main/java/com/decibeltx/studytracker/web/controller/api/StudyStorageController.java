@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
 import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.exception.FileStorageException;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
@@ -25,7 +24,8 @@ import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.storage.StorageFile;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
 import com.decibeltx.studytracker.core.storage.StudyStorageService;
-import com.decibeltx.studytracker.web.FileStorageService;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
+import com.decibeltx.studytracker.web.service.FileStorageService;
 import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,9 +69,9 @@ public class StudyStorageController extends StudyController {
   public HttpEntity<?> uploadStudyFile(@PathVariable("studyId") String studyId,
       @RequestParam("file") MultipartFile file) throws Exception {
     LOGGER.info("Uploaded file: " + file.getOriginalFilename());
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     Study study = getStudyFromIdentifier(studyId);
     Path path;
@@ -84,7 +83,7 @@ public class StudyStorageController extends StudyController {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     StorageFile storageFile = studyStorageService.saveStudyFile(path.toFile(), study);
-    studyEventPublisher.publishStudyEvent(study, user, Type.FILE_UPLOADED, storageFile);
+    studyEventPublisher.publishFileUploadEvent(study, user, storageFile);
     return new ResponseEntity<>(storageFile, HttpStatus.CREATED);
   }
 

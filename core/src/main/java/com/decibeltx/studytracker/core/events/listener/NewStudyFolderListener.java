@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.events;
+package com.decibeltx.studytracker.core.events.listener;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
+import com.decibeltx.studytracker.core.events.type.EventType;
+import com.decibeltx.studytracker.core.events.type.StudyEvent;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
@@ -41,7 +42,7 @@ public class NewStudyFolderListener {
 
   @EventListener
   public void onApplicationEvent(StudyEvent studyEvent) {
-    if (studyEvent.getType().equals(Type.NEW_STUDY)) {
+    if (studyEvent.getEventType().equals(EventType.NEW_STUDY)) {
       Study study = studyEvent.getStudy();
       LOGGER.info(String.format("Creating storage folder for study: %s", study.getCode()));
       try {

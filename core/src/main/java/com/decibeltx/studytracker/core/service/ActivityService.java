@@ -16,7 +16,7 @@
 
 package com.decibeltx.studytracker.core.service;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
+import com.decibeltx.studytracker.core.events.type.EventType;
 import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
@@ -43,7 +43,7 @@ public interface ActivityService {
 
   List<Activity> findByProgram(Program program);
 
-  List<Activity> findByType(Type type);
+  List<Activity> findByEventType(EventType type);
 
   Activity create(Activity activity);
 

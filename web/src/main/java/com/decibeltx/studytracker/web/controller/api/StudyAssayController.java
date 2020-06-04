@@ -20,6 +20,7 @@ import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,9 +60,9 @@ public class StudyAssayController extends StudyController {
     LOGGER.info(assay.toString());
     Study study = getStudyService().findByCode(studyId).orElseThrow(RecordNotFoundException::new);
     assay.setStudy(study);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     assay.setCreatedBy(user);
     getAssayService().create(assay);
@@ -76,9 +76,9 @@ public class StudyAssayController extends StudyController {
       @RequestBody Assay assay) {
     LOGGER.info("Updating assay");
     LOGGER.info(assay.toString());
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
     getAssayService().update(assay);
@@ -89,9 +89,9 @@ public class StudyAssayController extends StudyController {
   public HttpEntity<?> deleteAssay(@PathVariable("assayId") String id) {
     LOGGER.info("Deleting assay: " + id);
     Assay assay = getAssayService().findByCode(id).orElseThrow(RecordNotFoundException::new);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
     getAssayService().delete(assay);

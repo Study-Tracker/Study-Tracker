@@ -170,20 +170,20 @@ const ActivityIcon = ({action}) => {
 };
 
 const ActivityMessage = ({activity}) => {
-  switch (activity.action) {
+  switch (activity.eventType) {
     case studyActions.NEW_STUDY.value:
       return (
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has created a new study:
             </p>
             <div className="bg-light text-secondary p-3">
               <h5><a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a></h5>
+              + activity.data.code}>{activity.data.code}</a></h5>
               <h3>{activity.data.name}</h3>
-              <h5 className="text-muted">{activity.data.program.name}</h5>
+              <h5 className="text-muted">{activity.data.program}</h5>
               <div dangerouslySetInnerHTML={createMarkup(
                   activity.data.description)}/>
               <p>
@@ -197,14 +197,14 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has made an edit to a study:
             </p>
             <div className="bg-light text-secondary p-3">
               <h5><a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a></h5>
+              + activity.data.code}>{activity.data.code}</a></h5>
               <h3>{activity.data.name}</h3>
-              <h5 className="text-muted">{activity.data.program.name}</h5>
+              <h5 className="text-muted">{activity.data.program}</h5>
               <div dangerouslySetInnerHTML={createMarkup(
                   activity.data.description)}/>
               <p>
@@ -217,19 +217,21 @@ const ActivityMessage = ({activity}) => {
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
-            &nbsp;has removed study: {activity.studyCode}
+            + activity.user.accountName}>{activity.user.displayName}</a>
+            &nbsp;has removed study: {activity.data.code}
           </p>
       );
     case studyActions.STUDY_STATUS_CHANGED.value:
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
+            + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has updated the status of study&nbsp;
-            <a href={"/studies/" + activity.studyCode}>{activity.studyCode}</a>
+            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
+            &nbsp;from&nbsp;
+            <StatusBadge status={activity.data.oldStatus}/>
             &nbsp;to&nbsp;
-            <StatusBadge status={activity.data}/>
+            <StatusBadge status={activity.data.newStatus}/>
           </p>
       );
     case studyActions.FILE_UPLOADED.value:
@@ -237,17 +239,17 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has attached a new file to study:&nbsp;
               <a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a>
+              + activity.data.code}>{activity.data.code}</a>
             </p>
             <div className="bg-light text-secondary p-3">
               <h3>
                 <a href={activity.data.url} target="_blank">
                   <File size={24}/>
                   &nbsp;
-                  {activity.data.filename}
+                  {activity.data.fileName}
                 </a>
               </h3>
             </div>
@@ -259,10 +261,10 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has added new conclusions for study:&nbsp;
               <a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a>
+              + activity.data.code}>{activity.data.code}</a>
             </p>
             <div className="bg-light font-italic text-secondary p-3"
                  dangerouslySetInnerHTML={createMarkup(activity.data.content)}/>
@@ -273,10 +275,10 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has updated the conclusions for study:&nbsp;
               <a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a>
+              + activity.data.code}>{activity.data.code}</a>
             </p>
             <div className="bg-light font-italic text-secondary p-3"
                  dangerouslySetInnerHTML={createMarkup(activity.data.content)}/>
@@ -287,9 +289,9 @@ const ActivityMessage = ({activity}) => {
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
+            + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed the conclusions for study:&nbsp;
-            <a href={"/studies/" + activity.studyCode}>{activity.studyCode}</a>
+            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     case studyActions.NEW_COMMENT.value:
@@ -297,10 +299,10 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has posted a new comment to study&nbsp;
               <a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a>:
+              + activity.data.code}>{activity.data.code}</a>:
             </p>
             <p className="bg-light font-italic text-secondary p-3">
               "{activity.data.text}"
@@ -313,10 +315,10 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has edited their comment to study:&nbsp;
               <a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a>
+              + activity.data.code}>{activity.data.code}</a>
             </p>
             <p className="bg-light font-italic text-secondary p-3">
               "{activity.data.text}"
@@ -327,36 +329,44 @@ const ActivityMessage = ({activity}) => {
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
+            + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed their comment to study:&nbsp;
-            <a href={"/studies/" + activity.studyCode}>{activity.studyCode}</a>
+            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     case studyActions.NEW_STUDY_RELATIONSHIP.value:
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
-            &nbsp;has added a new study relationship for study:&nbsp;
-            <a href={"/studies/" + activity.studyCode}>{activity.studyCode}</a>
+            + activity.user.accountName}>{activity.user.displayName}</a>
+            &nbsp;has added a new study relationship:&nbsp;
+            <a href={"/studies/"
+            + activity.data.sourceStudyCode}>{activity.data.sourceStudyCode}</a>
+            &nbsp;{activity.data.type}&nbsp;
+            <a href={"/studies/"
+            + activity.data.targetStudyCode}>{activity.data.targetStudyCode}</a>
           </p>
       );
     case studyActions.UPDATED_STUDY_RELATIONSHIP.value:
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
-            &nbsp;has updated a study relationship for study:&nbsp;
-            <a href={"/studies/" + activity.studyCode}>{activity.studyCode}</a>
+            + activity.user.accountName}>{activity.user.displayName}</a>
+            &nbsp;has added a new study relationship:&nbsp;
+            <a href={"/studies/"
+            + activity.data.sourceStudyCode}>{activity.data.sourceStudyCode}</a>
+            &nbsp;{activity.data.type}&nbsp;
+            <a href={"/studies/"
+            + activity.data.targetStudyCode}>{activity.data.targetStudyCode}</a>
           </p>
       );
     case studyActions.DELETED_STUDY_RELATIONSHIP.value:
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
+            + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed a study relationship for study:&nbsp;
-            <a href={"/studies/" + activity.studyCode}>{activity.studyCode}</a>
+            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     case studyActions.NEW_STUDY_EXTERNAL_LINK.value:
@@ -364,10 +374,10 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has added a new external link for study:&nbsp;
               <a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a>
+              + activity.data.code}>{activity.data.code}</a>
             </p>
             <p className="bg-light text-secondary p-3">
               <Link size={16}/>
@@ -382,10 +392,10 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
             <p>
               <a href={"/users/"
-              + activity.userAccountName}>{activity.userDisplayName}</a>
+              + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has edited an external link for study:&nbsp;
               <a href={"/studies/"
-              + activity.studyCode}>{activity.studyCode}</a>
+              + activity.data.code}>{activity.data.code}</a>
             </p>
             <p className="bg-light text-secondary p-3">
               <Link size={16}/>
@@ -399,15 +409,15 @@ const ActivityMessage = ({activity}) => {
       return (
           <p>
             <a href={"/users/"
-            + activity.userAccountName}>{activity.userDisplayName}</a>
+            + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed an external link for study:&nbsp;
-            <a href={"/studies/" + activity.studyCode}>{activity.studyCode}</a>
+            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     default:
       return (
           <p>
-            {activity.userDisplayName}
+            {activity.user.displayName}
           </p>
       );
   }
@@ -417,7 +427,7 @@ export const StudyTimelineActivity = ({activity}) => {
   return (
       <Media>
 
-        <ActivityIcon action={activity.action}/>
+        <ActivityIcon action={activity.eventType}/>
 
         <Media body>
 
@@ -428,8 +438,8 @@ export const StudyTimelineActivity = ({activity}) => {
           <p className="mb-2">
             <strong>
               {
-                studyActions.hasOwnProperty(activity.action)
-                    ? studyActions[activity.action].label
+                studyActions.hasOwnProperty(activity.eventType)
+                    ? studyActions[activity.eventType].label
                     : "New Activity"
               }
             </strong>
@@ -449,7 +459,7 @@ export const Timeline = ({activities}) => {
   }
   let flag = false;
   const elements = activities
-  .filter(a => studyActions[a.action].visible)
+  .filter(a => studyActions[a.eventType].visible)
   .sort((a, b) => {
     if (a.date > b.date) {
       return -1;
@@ -494,8 +504,8 @@ export const ActivityTable = ({activity}) => {
   .map(a => {
     return (
         <tr key={'activity-' + a.date}>
-          <td>{a.userDisplayName}</td>
-          <td>{a.action}</td>
+          <td>{a.user.displayName}</td>
+          <td>{a.eventType}</td>
           <td>{new Date(a.date).toLocaleString()}</td>
         </tr>
     );

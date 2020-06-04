@@ -21,6 +21,7 @@ import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,10 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -100,9 +99,9 @@ public class StudyBaseController extends StudyController {
     // My studies TODO
     else if (my) {
       try {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
-        User user = getUserService().findByAccountName(userDetails.getUsername())
+        String username = UserAuthenticationUtils
+            .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+        User user = getUserService().findByAccountName(username)
             .orElseThrow(RecordNotFoundException::new);
         return getStudyService().findAll().stream()
             .filter(s -> s.getOwner().equals(user))
@@ -158,13 +157,7 @@ public class StudyBaseController extends StudyController {
 
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String accountName;
-    if (authentication instanceof UsernamePasswordAuthenticationToken) {
-      accountName = authentication.getName();
-    } else {
-      UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-      accountName = userDetails.getUsername();
-    }
+    String accountName = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
 
     // Created by
     User user = getUserService().findByAccountName(accountName)
@@ -196,9 +189,9 @@ public class StudyBaseController extends StudyController {
     LOGGER.info(study.toString());
 
     // Last modified by
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
 
@@ -222,9 +215,9 @@ public class StudyBaseController extends StudyController {
   public HttpEntity<?> deleteStudy(@PathVariable("id") String id) {
     LOGGER.info("Deleting study: " + id);
     Study study = getStudyFromIdentifier(id);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     getStudyService().delete(study);
@@ -238,9 +231,9 @@ public class StudyBaseController extends StudyController {
       throw new StudyTrackerException("No status label provided.");
     }
     Study study = getStudyFromIdentifier(id);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByAccountName(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     String label = (String) params.get("status");

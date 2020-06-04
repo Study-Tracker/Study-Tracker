@@ -14,55 +14,36 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.events;
+package com.decibeltx.studytracker.core.events.type;
 
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import java.util.Map;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.NonNull;
 
-public class StudyEvent extends ApplicationEvent {
+public class StudyEvent extends ApplicationEvent implements StudyTrackerEvent {
 
-  public enum Type {
-    NEW_STUDY,
-    UPDATED_STUDY,
-    DELETED_STUDY,
-    STUDY_STATUS_CHANGED,
-    FILE_UPLOADED,
-    NEW_STUDY_CONCLUSIONS,
-    EDITED_STUDY_CONCLUSIONS,
-    DELETED_STUDY_CONCLUSIONS,
-    NEW_COMMENT,
-    EDITED_COMMENT,
-    DELETED_COMMENT,
-    NEW_STUDY_RELATIONSHIP,
-    UPDATED_STUDY_RELATIONSHIP,
-    DELETED_STUDY_RELATIONSHIP,
-    NEW_STUDY_EXTERNAL_LINK,
-    UPDATED_STUDY_EXTERNAL_LINK,
-    DELETED_STUDY_EXTERNAL_LINK,
-    NEW_ASSAY,
-    UPDATED_ASSAY,
-    DELETED_ASSAY,
-    ASSAY_STATUS_CHANGED
-  }
+  private final EventType eventType;
 
-  private final Type type;
   private final Study study;
+
   private final User user;
-  private final Object data;
+
+  private final Map<String, Object> data;
 
   public StudyEvent(@NonNull Object source, @NonNull Study study, @NonNull User user,
-      @NonNull Type type, Object data) {
+      @NonNull EventType eventType, @NonNull Map<String, Object> data) {
     super(source);
-    this.type = type;
+    this.eventType = eventType;
     this.study = study;
     this.user = user;
     this.data = data;
   }
 
-  public Type getType() {
-    return type;
+  @Override
+  public EventType getEventType() {
+    return eventType;
   }
 
   public Study getStudy() {
@@ -73,16 +54,17 @@ public class StudyEvent extends ApplicationEvent {
     return user;
   }
 
-  public Object getData() {
+  @Override
+  public Map<String, Object> getData() {
     return data;
   }
 
   @Override
   public String toString() {
     return "StudyEvent{" +
-        "type=" + type +
-        ", study=" + study +
-        ", user=" + user +
+        "eventType=" + eventType +
+        ", study=" + study.getCode() +
+        ", user=" + user.getAccountName() +
         ", data=" + data +
         '}';
   }
