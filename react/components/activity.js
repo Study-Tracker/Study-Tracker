@@ -180,7 +180,7 @@ const ActivityMessage = ({activity}) => {
               &nbsp;has created a new study:
             </p>
             <div className="bg-light text-secondary p-3">
-              <h5><a href={"/studies/"
+              <h5><a href={"/study/"
               + activity.data.code}>{activity.data.code}</a></h5>
               <h3>{activity.data.name}</h3>
               <h5 className="text-muted">{activity.data.program}</h5>
@@ -201,7 +201,7 @@ const ActivityMessage = ({activity}) => {
               &nbsp;has made an edit to a study:
             </p>
             <div className="bg-light text-secondary p-3">
-              <h5><a href={"/studies/"
+              <h5><a href={"/study/"
               + activity.data.code}>{activity.data.code}</a></h5>
               <h3>{activity.data.name}</h3>
               <h5 className="text-muted">{activity.data.program}</h5>
@@ -227,7 +227,7 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has updated the status of study&nbsp;
-            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
             &nbsp;from&nbsp;
             <StatusBadge status={activity.data.oldStatus}/>
             &nbsp;to&nbsp;
@@ -241,7 +241,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/users/"
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has attached a new file to study:&nbsp;
-              <a href={"/studies/"
+              <a href={"/study/"
               + activity.data.code}>{activity.data.code}</a>
             </p>
             <div className="bg-light text-secondary p-3">
@@ -263,7 +263,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/users/"
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has added new conclusions for study:&nbsp;
-              <a href={"/studies/"
+              <a href={"/study/"
               + activity.data.code}>{activity.data.code}</a>
             </p>
             <div className="bg-light font-italic text-secondary p-3"
@@ -277,7 +277,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/users/"
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has updated the conclusions for study:&nbsp;
-              <a href={"/studies/"
+              <a href={"/study/"
               + activity.data.code}>{activity.data.code}</a>
             </p>
             <div className="bg-light font-italic text-secondary p-3"
@@ -291,7 +291,7 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed the conclusions for study:&nbsp;
-            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     case studyActions.NEW_COMMENT.value:
@@ -301,7 +301,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/users/"
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has posted a new comment to study&nbsp;
-              <a href={"/studies/"
+              <a href={"/study/"
               + activity.data.code}>{activity.data.code}</a>:
             </p>
             <p className="bg-light font-italic text-secondary p-3">
@@ -317,7 +317,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/users/"
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has edited their comment to study:&nbsp;
-              <a href={"/studies/"
+              <a href={"/study/"
               + activity.data.code}>{activity.data.code}</a>
             </p>
             <p className="bg-light font-italic text-secondary p-3">
@@ -331,7 +331,7 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed their comment to study:&nbsp;
-            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     case studyActions.NEW_STUDY_RELATIONSHIP.value:
@@ -340,10 +340,10 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has added a new study relationship:&nbsp;
-            <a href={"/studies/"
+            <a href={"/study/"
             + activity.data.sourceStudyCode}>{activity.data.sourceStudyCode}</a>
             &nbsp;{activity.data.type}&nbsp;
-            <a href={"/studies/"
+            <a href={"/study/"
             + activity.data.targetStudyCode}>{activity.data.targetStudyCode}</a>
           </p>
       );
@@ -353,10 +353,10 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has added a new study relationship:&nbsp;
-            <a href={"/studies/"
+            <a href={"/study/"
             + activity.data.sourceStudyCode}>{activity.data.sourceStudyCode}</a>
             &nbsp;{activity.data.type}&nbsp;
-            <a href={"/studies/"
+            <a href={"/study/"
             + activity.data.targetStudyCode}>{activity.data.targetStudyCode}</a>
           </p>
       );
@@ -366,7 +366,7 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed a study relationship for study:&nbsp;
-            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     case studyActions.NEW_STUDY_EXTERNAL_LINK.value:
@@ -376,7 +376,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/users/"
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has added a new external link for study:&nbsp;
-              <a href={"/studies/"
+              <a href={"/study/"
               + activity.data.code}>{activity.data.code}</a>
             </p>
             <p className="bg-light text-secondary p-3">
@@ -394,7 +394,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/users/"
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has edited an external link for study:&nbsp;
-              <a href={"/studies/"
+              <a href={"/study/"
               + activity.data.code}>{activity.data.code}</a>
             </p>
             <p className="bg-light text-secondary p-3">
@@ -411,7 +411,7 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed an external link for study:&nbsp;
-            <a href={"/studies/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
           </p>
       );
     default:
