@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.decibeltx.studytracker.idbs.inventory.IdbsInventoryServiceConfiguration
+  com.decibeltx.studytracker.idbs.inventory.IdbsInventoryServiceConfiguration,\
+  com.decibeltx.studytracker.idbs.eln.IdbsElnServiceConfiguration
