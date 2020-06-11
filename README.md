@@ -47,7 +47,7 @@ To build and run the project locally:
     ```bash
     npm install
     npm run build
-    mvn clean package
+    mvn clean install
     ```
    
 6. You can run the application with Maven:
