@@ -28,6 +28,11 @@ import AssayFormView from './views/AssayForm'
 import AssayDetailsView from "./views/AssayDetailsView";
 import Error, {ErrorBoundary} from "./views/Error";
 import ScrollToTop from "./structure/ScrollToTop";
+import ProgramListView from "./views/ProgramListView";
+import ProgramDetailsView from "./views/ProgramDetailsView";
+import ProgramFormView from "./views/ProgramFormView";
+import UserListView from "./views/UserListView";
+import UserDetailsView from "./views/UserDetailsView";
 
 export const history = createBrowserHistory();
 
@@ -46,7 +51,7 @@ export default class App extends React.Component {
               <ScrollToTop>
                 <Switch>
 
-                  {/*Home page*/}
+                  {/*Home page / study list*/}
                   <Route exact path={["/", "/studies"]}
                          render={props =>
                              <StudyListView {...props} title={"All Studies"}/>}
@@ -75,6 +80,36 @@ export default class App extends React.Component {
                   {/*Edit assay*/}
                   <Route exact path={"/study/:studyCode/assay/:assayCode/edit"}
                          render={props => <AssayFormView {...props} />}/>
+
+                  {/*Program list*/}
+                  <Route
+                      exact
+                      path={"/programs"}
+                      render={props => <ProgramListView {...props} />}
+                  />
+
+                  {/*Program details*/}
+                  <Route exact path={"/program/:programId"}
+                         render={props => <ProgramDetailsView {...props} />}/>
+
+                  {/*New Program*/}
+                  <Route exact path={"/programs/new"}
+                         render={props => <ProgramFormView {...props} />}/>
+
+                  {/*Edit Program*/}
+                  <Route exact path={"/program/:programId/edit"}
+                         render={props => <ProgramFormView {...props} />}/>
+
+                  {/* User list */}
+                  <Route
+                      exact
+                      path={"/users"}
+                      render={props => <UserListView {...props} />}
+                  />
+
+                  {/*User details*/}
+                  <Route exact path={"/user/:userId"}
+                         render={props => <UserDetailsView {...props} />}/>
 
                   {/*404*/}
                   <Route render={props => <Error {...props} code={404}/>}/>

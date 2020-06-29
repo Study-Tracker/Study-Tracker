@@ -17,13 +17,19 @@
 package com.decibeltx.studytracker.core.model;
 
 import com.decibeltx.studytracker.core.storage.StorageFolder;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "programs")
@@ -39,6 +45,26 @@ public class Program implements Persistable<String> {
   @Indexed(unique = true)
   @NotNull(message = "Program name must not be empty")
   private String name;
+
+  private String description;
+
+  @CreatedBy
+  @Linked(model = User.class)
+  @NotNull
+  @DBRef
+  private User createdBy;
+
+  @LastModifiedBy
+  @Linked(model = User.class)
+  @NotNull
+  @DBRef
+  private User lastModifiedBy;
+
+  @CreatedDate
+  private Date createdAt;
+
+  @LastModifiedDate
+  private Date updatedAt;
 
   private StorageFolder storageFolder;
 

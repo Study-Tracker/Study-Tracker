@@ -63,7 +63,7 @@ public class ProgramServiceImpl implements ProgramService {
   public void create(Program program) {
     LOGGER.info("Creating new program with name: " + program.getName());
     programRepository.insert(program);
-    programEventPublisher.publishNewProgramEvent(program, null);
+    programEventPublisher.publishNewProgramEvent(program, program.getCreatedBy());
   }
 
   @Override
@@ -71,7 +71,7 @@ public class ProgramServiceImpl implements ProgramService {
     LOGGER.info("Updating program with name: " + program.getName());
     programRepository.findById(program.getId()).orElseThrow(RecordNotFoundException::new);
     programRepository.save(program);
-    programEventPublisher.publishUpdatedProgramEvent(program, null);
+    programEventPublisher.publishUpdatedProgramEvent(program, program.getLastModifiedBy());
   }
 
   @Override
@@ -80,6 +80,6 @@ public class ProgramServiceImpl implements ProgramService {
     programRepository.findById(program.getId()).orElseThrow(RecordNotFoundException::new);
     program.setActive(false);
     programRepository.save(program);
-    programEventPublisher.publishDeletedProgramEvent(program, null);
+    programEventPublisher.publishDeletedProgramEvent(program, program.getLastModifiedBy());
   }
 }
