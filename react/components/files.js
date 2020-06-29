@@ -279,7 +279,7 @@ export const UploadFilesModal = ({isOpen, toggleModal, handleSubmit}) => {
             <Col sm={12}></Col>
 
             <Col sm={12}>
-              <h4>To be uploaded:</h4>
+              <h4 className="mt-3">To be uploaded:</h4>
               <ul>
                 {files}
               </ul>

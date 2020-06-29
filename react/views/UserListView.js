@@ -17,19 +17,19 @@
 import React from 'react';
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
-import StudyList from "../components/study/StudyList";
 import {connect} from 'react-redux';
 import {compose} from 'redux';
 import crossfilter from "crossfilter2";
-import StudyFilters, {labels as filter} from '../components/filters/studyFilters'
 import {withRouter} from 'react-router-dom';
 import SideBar from "../structure/SideBar";
 import NavBar from "../structure/NavBar";
 import Footer from "../structure/Footer";
+import UserList from "../components/user/UserList";
+import UserFilters, {labels as filter} from "../components/filters/userFilters";
 
 const qs = require('qs');
 
-class StudyListView extends React.Component {
+class UserListView extends React.Component {
 
   constructor(props) {
     super(props);
@@ -39,48 +39,50 @@ class StudyListView extends React.Component {
       title: this.props.title,
       data: {}
     };
+    this.indexUsers = this.indexUsers.bind(this);
+    this.applyFilters = this.applyFilters.bind(this);
+  }
+
+  indexUsers(users) {
+    console.log(users);
+    const data = {};
+    data.cf = crossfilter(users);
+    data.dimensions = {};
+    data.dimensions.allData = data.cf.dimension(d => d);
+    data.dimensions[filter.ACTIVE] = data.cf.dimension(d => d.active)
+    data.dimensions[filter.INACTIVE] = data.cf.dimension(d => !d.active)
+    data.dimensions[filter.ADMIN] = data.cf.dimension(d => d.admin)
+
+    this.setState({
+      data: data,
+      isLoaded: true
+    });
+  }
+
+  applyFilters(filters) {
+    for (let key of Object.keys(this.state.data.dimensions)) {
+      this.state.data.dimensions[key].filterAll();
+      if (filters.hasOwnProperty(key) && filters[key] != null) {
+        if (Array.isArray(filters[key])) {
+          this.state.data.dimensions[key].filter(
+              d => filters[key].indexOf(d) > -1);
+        } else {
+          this.state.data.dimensions[key].filter(filters[key]);
+        }
+      }
+    }
   }
 
   componentDidMount() {
     const params = qs.parse(this.props.location.search,
         {ignoreQueryPrefix: true});
     let title = params.title || this.state.title;
-    let query = '';
-    if (!!params.search) {
-      query = "?search=" + params.search;
-      title = 'Search Results';
-    }
+    this.setState({title: title});
 
-    fetch("/api/study" + query)
+    fetch("/api/user")
     .then(response => response.json())
-    .then(async studies => {
-
-      for (const study of studies) {
-        await fetch("/api/study/" + study.code + "/activity")
-        .then(response => response.json())
-        .then(json => study.activity = json);
-      }
-
-      console.log(studies);
-
-      const data = {};
-      data.cf = crossfilter(studies);
-      data.dimensions = {};
-      data.dimensions.allData = data.cf.dimension(d => d);
-      data.dimensions[filter.PROGRAM] = data.cf.dimension(d => d.program.id);
-      data.dimensions[filter.LEGACY] = data.cf.dimension(d => d.legacy);
-      data.dimensions[filter.EXTERNAL] = data.cf.dimension(
-          d => !!d.collaborator);
-      data.dimensions[filter.MY_STUDY] = data.cf.dimension(
-          d => this.props.user && d.owner.id === this.props.user.id);
-      data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
-
-      this.setState({
-        data: data,
-        isLoaded: true,
-        title: title
-      });
-
+    .then(async users => {
+      this.indexUsers(users);
     })
     .catch(error => {
       console.error(error);
@@ -105,23 +107,11 @@ class StudyListView extends React.Component {
 
         console.log("Filters: ");
         console.log(this.props.filters);
-
-        for (let key of Object.keys(this.state.data.dimensions)) {
-          this.state.data.dimensions[key].filterAll();
-          if (this.props.filters.hasOwnProperty(key) && this.props.filters[key]
-              != null) {
-            if (Array.isArray(this.props.filters[key])) {
-              this.state.data.dimensions[key].filter(
-                  d => this.props.filters[key].indexOf(d) > -1);
-            } else {
-              this.state.data.dimensions[key].filter(this.props.filters[key]);
-            }
-          }
-        }
+        this.applyFilters(this.props.filters)
 
         content =
-            <StudyList
-                studies={this.state.data.dimensions.allData.top(Infinity)}
+            <UserList
+                users={this.state.data.dimensions.allData.top(Infinity)}
                 title={this.state.title}
                 filters={this.props.filters}
                 user={this.props.user}
@@ -146,7 +136,7 @@ class StudyListView extends React.Component {
               <Footer/>
             </div>
           </div>
-          <StudyFilters/>
+          <UserFilters/>
         </React.Fragment>
     );
 
@@ -162,4 +152,4 @@ export default compose(
           user: store.user
         })
     )
-)(StudyListView);
+)(UserListView);

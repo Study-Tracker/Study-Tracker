@@ -91,37 +91,53 @@ public class ExampleDataGenerator {
   @Autowired
   private StudyConclusionsService conclusionsService;
 
-  public List<Program> generateExamplePrograms() {
+  public List<Program> generateExamplePrograms(List<User> users) {
+    User user = users.get(0);
     List<Program> programs = new ArrayList<>();
 
     Program program = new Program();
     program.setName("Clinical Program A");
     program.setCode("CPA");
     program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
     programs.add(program);
 
     program = new Program();
     program.setName("Preclinical Project B");
     program.setCode("PPB");
     program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
     programs.add(program);
 
     program = new Program();
     program.setName("Cancelled Program C");
     program.setCode("CPC");
     program.setActive(false);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
     programs.add(program);
 
     program = new Program();
     program.setName("Target ID Project D");
     program.setCode("TID");
     program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
     programs.add(program);
 
     program = new Program();
     program.setName("Target ID Project E");
     program.setCode("TID");
     program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
     programs.add(program);
 
     return programs;
@@ -499,9 +515,9 @@ public class ExampleDataGenerator {
       activityRepository.deleteAll();
 
       LOGGER.info("Inserting example data...");
-      programRepository.insert(generateExamplePrograms());
-      createProgramFolders();
       userRepository.insert(generateExampleUsers());
+      programRepository.insert(generateExamplePrograms(userRepository.findAll()));
+      createProgramFolders();
       collaboratorRepository.insert(generateExampleCollaborators());
       //createStudyFolders();
       generateExampleStudies();

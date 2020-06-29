@@ -54,24 +54,24 @@ const assayRoutes = {
   icon: Layers,
   children: [
     {
-      path: "/assays",
+      path: "/assays?title=All Assays",
       name: "All Assays"
     },
     {
-      path: "/assays/my",
+      path: "/assays?myAssay=true&title=My Assays",
       name: "My Assays",
       protected: true
     },
     {
-      path: "/assays/active",
+      path: "/assays?status=IN_PLANNING,ACTIVE&title=Active Assays",
       name: "Active Assays"
     },
     {
-      path: "/assays/legacy",
+      path: "/assays?legacy=true&title=Legacy Assays",
       name: "Legacy Assays"
     },
     {
-      path: "/assays/external",
+      path: "/assays?external=true&title=External Assays",
       name: "External Assays"
     }
   ]
@@ -83,20 +83,20 @@ const programRoutes = {
   icon: Target,
   children: [
     {
-      path: '/programs',
+      path: '/programs?title=All Programs',
       name: 'All Programs'
     },
     {
-      path: '/programs?my=true',
+      path: '/programs?myProgram=true&title=My Programs',
       name: 'My Programs',
       protected: true
     },
     {
-      path: '/programs?active=true',
+      path: '/programs?active=true&title=Active Programs',
       name: 'Active Programs'
     },
     {
-      path: '/programs?legacy=true',
+      path: '/programs?inactive=true&title=Legacy Programs',
       name: 'Legacy Programs'
     }
   ]

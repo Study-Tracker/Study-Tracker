@@ -21,6 +21,7 @@ import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.model.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,8 @@ public interface ActivityService {
   List<Activity> findByProgram(Program program);
 
   List<Activity> findByEventType(EventType type);
+
+  List<Activity> findByUser(User user);
 
   Activity create(Activity activity);
 

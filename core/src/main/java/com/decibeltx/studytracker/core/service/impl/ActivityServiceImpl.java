@@ -22,6 +22,7 @@ import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.service.ActivityService;
@@ -86,6 +87,11 @@ public class ActivityServiceImpl implements ActivityService {
   @Override
   public List<Activity> findByEventType(EventType type) {
     return activityRepository.findByEventType(type);
+  }
+
+  @Override
+  public List<Activity> findByUser(User user) {
+    return activityRepository.findByUserId(user.getId());
   }
 
   @Override
