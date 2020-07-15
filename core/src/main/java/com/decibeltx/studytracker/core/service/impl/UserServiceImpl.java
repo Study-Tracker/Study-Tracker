@@ -23,10 +23,13 @@ import com.decibeltx.studytracker.core.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
   @Autowired
   private UserRepository userRepository;
@@ -47,8 +50,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> findByAccountName(String accountName) {
-    return userRepository.findByAccountName(accountName);
+  public Optional<User> findByUsername(String username) {
+    return userRepository.findByUsername(username);
   }
 
   @Override
@@ -72,4 +75,8 @@ public class UserServiceImpl implements UserService {
     userRepository.delete(user);
   }
 
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return findByUsername(username).orElse(null);
+  }
 }

@@ -48,7 +48,7 @@ public class LdapUserRepositoryPopulator implements UserRepositoryPopulator {
       } else {
         User user = new User();
         user.setDisplayName(ldapUser.getDisplayName());
-        user.setAccountName(ldapUser.getUsername());
+        user.setUsername(ldapUser.getUsername());
         user.setEmail(ldapUser.getEmail());
         user.setDepartment((String) ldapUser.getAttributes().getOrDefault("department", null));
         user.setTitle((String) ldapUser.getAttributes().getOrDefault("title", null));

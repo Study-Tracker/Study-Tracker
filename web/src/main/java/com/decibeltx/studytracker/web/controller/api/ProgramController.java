@@ -82,7 +82,7 @@ public class ProgramController {
     // Get authenticated user
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByAccountName(username)
+    User user = userService.findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     program.setCreatedBy(user);
 
@@ -103,7 +103,7 @@ public class ProgramController {
     // Get authenticated user
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByAccountName(username)
+    User user = userService.findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     program.setLastModifiedBy(user);
     programService.update(program);
@@ -122,7 +122,7 @@ public class ProgramController {
     // Get authenticated user
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByAccountName(username)
+    User user = userService.findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     program.setLastModifiedBy(user);
     programService.delete(program);
@@ -139,7 +139,7 @@ public class ProgramController {
     Program program = optional.get();
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByAccountName(username)
+    User user = userService.findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     program.setLastModifiedBy(user);
     program.setActive(active);

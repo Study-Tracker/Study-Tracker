@@ -62,7 +62,7 @@ public class StudyAssayController extends StudyController {
     assay.setStudy(study);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     assay.setCreatedBy(user);
     getAssayService().create(assay);
@@ -78,7 +78,7 @@ public class StudyAssayController extends StudyController {
     LOGGER.info(assay.toString());
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
     getAssayService().update(assay);
@@ -91,7 +91,7 @@ public class StudyAssayController extends StudyController {
     Assay assay = getAssayService().findByCode(id).orElseThrow(RecordNotFoundException::new);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
     getAssayService().delete(assay);

@@ -7,14 +7,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class UserAuthenticationUtils {
 
   public static String getUsernameFromAuthentication(Authentication authentication) {
-    String accountName;
+    String username;
     if (authentication instanceof UsernamePasswordAuthenticationToken) {
-      accountName = authentication.getName();
+      username = authentication.getName();
     } else {
       UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-      accountName = userDetails.getUsername();
+      username = userDetails.getUsername();
     }
-    return accountName;
+    return username;
   }
 
 }

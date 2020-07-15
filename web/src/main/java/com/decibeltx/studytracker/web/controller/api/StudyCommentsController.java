@@ -63,7 +63,7 @@ public class StudyCommentsController extends StudyController {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyCommentService.addStudyComment(study, comment);
@@ -76,7 +76,7 @@ public class StudyCommentsController extends StudyController {
     LOGGER.info(String.format("Editing comment for study %s: %s", studyId, updated.toString()));
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     Study study = getStudyFromIdentifier(studyId);
     Optional<Comment> optional = studyCommentService.findStudyCommentById(study, commentId);
@@ -98,7 +98,7 @@ public class StudyCommentsController extends StudyController {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     Optional<Comment> optional = studyCommentService.findStudyCommentById(study, commentId);

@@ -28,7 +28,7 @@ public interface UserService {
 
   Optional<User> findByEmail(String email);
 
-  Optional<User> findByAccountName(String accountName);
+  Optional<User> findByUsername(String username);
 
   List<User> search(String keyword);
 

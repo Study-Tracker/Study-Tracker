@@ -5,18 +5,23 @@ import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class ExampleUserRepositoryPopulator implements UserRepositoryPopulator {
 
   @Autowired
   private UserService userService;
 
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
   @Override
   public void populateUserRepository() {
-    Optional<User> optional = userService.findByAccountName("demo");
+    Optional<User> optional = userService.findByUsername("demo");
     if (!optional.isPresent()) {
       User user = new User();
-      user.setAccountName("demo");
+      user.setUsername("demo");
+      user.setPassword(passwordEncoder.encode("password"));
       user.setActive(true);
       user.setAdmin(true);
       user.setDisplayName("Demo User");

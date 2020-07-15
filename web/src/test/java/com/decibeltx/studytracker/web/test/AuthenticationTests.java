@@ -67,10 +67,10 @@ public class AuthenticationTests {
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
     String username = env.getRequiredProperty("security.example.user");
-    Optional<User> optional = userRepository.findByAccountName(username);
+    Optional<User> optional = userRepository.findByUsername(username);
     if (!optional.isPresent()) {
       User user = new User();
-      user.setAccountName(username);
+      user.setUsername(username);
       user.setDisplayName(username);
       user.setActive(true);
       user.setEmail(username + "@test.com");
@@ -88,7 +88,7 @@ public class AuthenticationTests {
   public void postWithoutAuthenticationTest() throws Exception {
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
@@ -114,7 +114,7 @@ public class AuthenticationTests {
 
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();

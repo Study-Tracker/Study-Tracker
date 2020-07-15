@@ -63,7 +63,7 @@ public class AssayEvent extends ApplicationEvent implements StudyTrackerEvent {
     return "AssayEvent{" +
         "eventType=" + eventType +
         ", assay=" + assay.getCode() +
-        ", user=" + user.getAccountName() +
+        ", user=" + user.getUsername() +
         ", data=" + data +
         '}';
   }
