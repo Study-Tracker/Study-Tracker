@@ -16,23 +16,30 @@
 
 package com.decibeltx.studytracker.core.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Document(collection = "users")
 @Data
-public class User implements Persistable<String> {
+public class User implements Persistable<String>, UserDetails {
 
   @Id
   private String id;
 
   @Indexed(unique = true)
   @NotNull
-  private String accountName;
+  private String username;
+
+  @NotNull
+  private String password;
 
   private String department;
 
@@ -48,9 +55,36 @@ public class User implements Persistable<String> {
 
   private boolean active = true;
 
+  private boolean locked = false;
+
+  private boolean expired = false;
+
+  private boolean credentialsExpired = false;
+
+  private List<GrantedAuthority> authorities = new ArrayList<>();
+
   @Override
   public boolean isNew() {
     return id == null;
   }
 
+  @Override
+  public boolean isAccountNonExpired() {
+    return !expired;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return !locked;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return !credentialsExpired;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return active;
+  }
 }

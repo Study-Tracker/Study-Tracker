@@ -74,7 +74,7 @@ public class StudyEventTests {
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();
-    Optional<User> optionalUser = userRepository.findByAccountName("jsmith");
+    Optional<User> optionalUser = userRepository.findByUsername("jsmith");
     Assert.assertTrue(optionalUser.isPresent());
     User user = optionalUser.get();
     Study study = new Study();

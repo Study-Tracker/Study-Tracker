@@ -71,7 +71,7 @@ public class StudyConclusionsController extends StudyController {
 
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     conclusions.setCreatedBy(user);
@@ -87,7 +87,7 @@ public class StudyConclusionsController extends StudyController {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     conclusions.setLastModifiedBy(user);
@@ -101,7 +101,7 @@ public class StudyConclusionsController extends StudyController {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyConclusionsService.deleteStudyConclusions(study);

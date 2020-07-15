@@ -73,18 +73,18 @@ public class UserServiceTests {
   }
 
   @Test
-  public void findByAccountNameTest() {
-    Optional<User> optional = userService.findByAccountName("jsmith");
+  public void findByUsernameTest() {
+    Optional<User> optional = userService.findByUsername("jsmith");
     Assert.assertTrue(optional.isPresent());
-    Assert.assertEquals("jsmith", optional.get().getAccountName());
-    optional = userService.findByAccountName("bad");
+    Assert.assertEquals("jsmith", optional.get().getUsername());
+    optional = userService.findByUsername("bad");
     Assert.assertTrue(!optional.isPresent());
   }
 
   @Test
   public void createNewUserTest() {
     User user = new User();
-    user.setAccountName("jperson");
+    user.setUsername("jperson");
     user.setDisplayName("Joe Person");
     user.setEmail("jperson@email.com");
     user.setTitle("Director");
@@ -99,7 +99,7 @@ public class UserServiceTests {
   public void fieldValidationTest() {
     Exception exception = null;
     User user = new User();
-    user.setAccountName("jperson");
+    user.setUsername("jperson");
     user.setDisplayName("Joe Person");
     user.setTitle("Director");
     user.setAdmin(false);
@@ -115,11 +115,11 @@ public class UserServiceTests {
   }
 
   @Test
-  public void duplicateAccountNameTest() {
+  public void duplicateUsernameTest() {
     Assert.assertEquals(USER_COUNT, userRepository.count());
     Exception exception = null;
     User user = new User();
-    user.setAccountName("jsmith");
+    user.setUsername("jsmith");
     user.setDisplayName("Joe Smith");
     user.setEmail("jperson@email.com");
     user.setTitle("Director");
@@ -137,17 +137,17 @@ public class UserServiceTests {
   @Test
   public void userModificationTest() {
     Assert.assertEquals(USER_COUNT, userRepository.count());
-    Optional<User> optional = userService.findByAccountName("jsmith");
+    Optional<User> optional = userService.findByUsername("jsmith");
     Assert.assertTrue(optional.isPresent());
     User user = optional.get();
     user.setTitle("VP");
     userService.update(user);
-    optional = userService.findByAccountName("jsmith");
+    optional = userService.findByUsername("jsmith");
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals("VP", optional.get().getTitle());
     userService.delete(optional.get());
     Assert.assertEquals(USER_COUNT - 1, userRepository.count());
-    optional = userService.findByAccountName("jsmith");
+    optional = userService.findByUsername("jsmith");
     Assert.assertFalse(optional.isPresent());
   }
 

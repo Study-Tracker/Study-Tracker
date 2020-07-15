@@ -96,7 +96,7 @@ public class StudyLinkControllerTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
     ExternalLink link = new ExternalLink();
     link.setLabel("Twitter");
@@ -105,7 +105,7 @@ public class StudyLinkControllerTests {
     mockMvc.perform(post("/api/study/CPA-10001/links")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(link))
-        .with(user(user.getAccountName())))
+        .with(user(user.getUsername())))
         .andExpect(status().isCreated());
 
     mockMvc.perform(get("/api/study/CPA-10001/links"))
@@ -120,7 +120,7 @@ public class StudyLinkControllerTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(study.getExternalLinks().isEmpty());
@@ -129,7 +129,7 @@ public class StudyLinkControllerTests {
     mockMvc.perform(delete("/api/study/CPA-10001/links/" + link.getId())
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(link))
-        .with(user(user.getAccountName())))
+        .with(user(user.getUsername())))
         .andExpect(status().isOk());
 
     mockMvc.perform(get("/api/study/CPA-10001/links"))

@@ -31,6 +31,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,7 +40,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
@@ -48,6 +49,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class WebSecurityConfiguration {
+
+  @Autowired
+  private UserDetailsService userDetailsService;
 
   @Bean
   public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler() {
@@ -59,26 +63,23 @@ public class WebSecurityConfiguration {
     return new UserServiceAuditor();
   }
 
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(); // TODO password salt
+  }
+
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setPasswordEncoder(passwordEncoder());
+    provider.setUserDetailsService(userDetailsService);
+    return provider;
+  }
+
   @Configuration
   @Order(1)
   @ConditionalOnProperty(name = "security.mode", havingValue = "demo")
   public static class DemoSecurityConfiguration {
-
-    @Bean
-    public UserDetailsService demoUserDetailsService() {
-      UserDetails user =
-          org.springframework.security.core.userdetails.User.builder()
-              .username("demo")
-              .password("password")
-              .roles("USER")
-              .build();
-      return new InMemoryUserDetailsManager(user);
-    }
-
-    @Bean
-    public AuthenticationProvider demoAuthenticationProvider() {
-      return new DemoAuthenticationProvider(demoUserDetailsService());
-    }
 
     @Bean
     public UserRepositoryPopulator exampleUserRepositoryPopulator() {

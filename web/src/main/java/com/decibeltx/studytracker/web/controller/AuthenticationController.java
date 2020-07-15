@@ -18,7 +18,6 @@ package com.decibeltx.studytracker.web.controller;
 
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.service.UserService;
-import com.decibeltx.studytracker.ldap.LdapUser;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,22 +40,19 @@ public class AuthenticationController {
   @GetMapping("/user")
   public HttpEntity<?> getAuthenticatedUser() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    LdapUser ldapUser = null;
     User user = null;
     if (authentication.isAuthenticated() && !authentication.getPrincipal()
         .equals("anonymousUser")) {
       Object principal = authentication.getPrincipal();
-      if (principal instanceof LdapUser) {
-        ldapUser = (LdapUser) principal;
-        user = userService.findByEmail(ldapUser.getEmail()).orElse(null);
+      if (principal instanceof User) {
+        user = (User) principal;
       } else {
         String username = principal.toString();
-        user = userService.findByAccountName(username).orElse(null);
+        user = userService.findByUsername(username).orElse(null);
       }
     }
     Map<String, Object> payload = new HashMap<>();
     payload.put("user", user);
-    payload.put("principal", ldapUser);
     return new ResponseEntity<>(payload, HttpStatus.OK);
   }
 

@@ -26,7 +26,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 
   Optional<User> findByEmail(String email);
 
-  Optional<User> findByAccountName(String accountName);
+  Optional<User> findByUsername(String username);
 
   @Query("{ displayName: { '$regex': ?0, '$options': 'i'  }}")
   List<User> findByDisplayNameLike(String keyword);
