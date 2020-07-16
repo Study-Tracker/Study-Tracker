@@ -17,7 +17,6 @@
 package com.decibeltx.studytracker.ldap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +24,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.util.Assert;
@@ -77,7 +75,7 @@ public class LdapAuthenticationConfiguration {
   }
 
   @Bean
-  @ConditionalOnMissingBean(UserDetailsService.class)
+  //@ConditionalOnMissingBean(UserDetailsService.class)
   public LdapUserDetailsService ldapUserDetailsService() {
     return new LdapUserDetailsService();
   }

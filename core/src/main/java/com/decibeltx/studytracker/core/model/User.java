@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -39,6 +40,7 @@ public class User implements Persistable<String>, UserDetails {
   private String username;
 
   @NotNull
+  @JsonIgnore
   private String password;
 
   private String department;

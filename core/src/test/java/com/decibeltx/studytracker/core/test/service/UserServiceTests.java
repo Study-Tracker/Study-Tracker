@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -85,6 +86,7 @@ public class UserServiceTests {
   public void createNewUserTest() {
     User user = new User();
     user.setUsername("jperson");
+    user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Person");
     user.setEmail("jperson@email.com");
     user.setTitle("Director");
@@ -120,6 +122,7 @@ public class UserServiceTests {
     Exception exception = null;
     User user = new User();
     user.setUsername("jsmith");
+    user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Smith");
     user.setEmail("jperson@email.com");
     user.setTitle("Director");
