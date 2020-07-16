@@ -20,7 +20,6 @@ import com.decibeltx.studytracker.core.config.UserRepositoryPopulator;
 import com.decibeltx.studytracker.core.config.UserServiceAuditor;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.web.example.ExampleUserRepositoryPopulator;
-import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -28,30 +27,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class WebSecurityConfiguration {
-
-  @Autowired
-  private UserDetailsService userDetailsService;
 
   @Bean
   public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler() {
@@ -64,16 +54,8 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
-  public BCryptPasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder(); // TODO password salt
-  }
-
-  @Bean
-  public AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-    provider.setPasswordEncoder(passwordEncoder());
-    provider.setUserDetailsService(userDetailsService);
-    return provider;
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(); // TODO add salt
   }
 
   @Configuration
@@ -94,7 +76,10 @@ public class WebSecurityConfiguration {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
-    private AuthenticationProvider authenticationProvider;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Bean
     public AuthenticationEntryPoint apiAuthenticationEntryPoint() {
@@ -104,10 +89,16 @@ public class WebSecurityConfiguration {
     }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+      auth
+          .userDetailsService(userDetailsService)
+          .passwordEncoder(passwordEncoder);
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
       http
           .antMatcher("/api/**")
-          .authenticationProvider(authenticationProvider)
           .authorizeRequests()
           .antMatchers(HttpMethod.POST).fullyAuthenticated()
           .antMatchers(HttpMethod.PUT).fullyAuthenticated()
@@ -120,7 +111,6 @@ public class WebSecurityConfiguration {
           .cors()
           .and()
           .exceptionHandling()
-          .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
           .and()
           .headers()
           .frameOptions().disable()
@@ -136,23 +126,34 @@ public class WebSecurityConfiguration {
   @Order(3)
   public static class WebAppSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
-    private AuthenticationProvider authenticationProvider;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+      auth
+          .userDetailsService(userDetailsService)
+          .passwordEncoder(passwordEncoder);
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
       http
-          .authenticationProvider(authenticationProvider)
           .authorizeRequests()
           .antMatchers("/studies/new", "/study/*/assays/new", "study/*/edit",
               "study/*/assays/*/edit")
           .fullyAuthenticated()
           .antMatchers("/", "/study/**", "/studies")
           .permitAll()
-          .anyRequest().permitAll()
+          .anyRequest()
+          .permitAll()
           .and()
           .formLogin()
           .successHandler(userAuthenticationSuccessHandler)
@@ -171,34 +172,6 @@ public class WebSecurityConfiguration {
           .csrf().disable();
     }
 
-  }
-
-  static class DemoAuthenticationProvider implements AuthenticationProvider {
-
-    private final UserDetailsService userDetailsService;
-
-    public DemoAuthenticationProvider(
-        UserDetailsService userDetailsService) {
-      this.userDetailsService = userDetailsService;
-    }
-
-    @Override
-    public Authentication authenticate(Authentication authentication)
-        throws AuthenticationException {
-      String username = authentication.getName();
-      String password = authentication.getCredentials().toString();
-      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-      if (userDetails.getUsername().equals(username) && userDetails.getPassword()
-          .equals(password)) {
-        return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
-      }
-      return null;
-    }
-
-    @Override
-    public boolean supports(Class<?> auth) {
-      return auth.equals(UsernamePasswordAuthenticationToken.class);
-    }
   }
 
 }
