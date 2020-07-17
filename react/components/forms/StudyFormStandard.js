@@ -477,7 +477,12 @@ export default class StudyForm extends React.Component {
                                   type="text"
                                   defaultValue={this.state.study.elnUrl || ''}
                                   onChange={(e) => this.handleFormUpdate(
-                                      {"elnUrl": e.target.value})}
+                                      {
+                                        "notebookEntry": {
+                                          label: "ELN",
+                                          url: e.target.value
+                                        }
+                                      })}
                               />
                               <FormText>If the study already has an ELN entry,
                                 provide the URL here.</FormText>

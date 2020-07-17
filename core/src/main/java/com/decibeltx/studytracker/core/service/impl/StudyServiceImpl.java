@@ -34,6 +34,7 @@ import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -50,6 +51,9 @@ public class StudyServiceImpl implements StudyService {
 
   @Autowired
   private StudyEventPublisher studyEventPublisher;
+
+  @Autowired
+  private Environment environment;
 
   @Override
   public Optional<Study> findById(String id) {
@@ -146,7 +150,9 @@ public class StudyServiceImpl implements StudyService {
       throw new StudyTrackerException("Legacy studies do not recieve new study codes.");
     }
     Program program = study.getProgram();
-    Integer count = 10001;
+    Integer count = environment.containsProperty("study.code-counter-start")
+        ? environment.getRequiredProperty("study.code-counter-start", Integer.class)
+        : 10001;
     for (Program p : programService.findByCode(program.getCode())) {
       count = count + (studyRepository.findActiveProgramStudies(p.getId())).size();
     }
