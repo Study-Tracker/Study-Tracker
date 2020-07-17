@@ -68,6 +68,12 @@
 
     <dependency>
       <groupId>com.decibeltx</groupId>
+      <artifactId>study-tracker-benchling</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.decibeltx</groupId>
       <artifactId>study-tracker-idbs</artifactId>
       <version>${parent.version}</version>
     </dependency>
