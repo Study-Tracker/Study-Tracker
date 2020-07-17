@@ -27,7 +27,7 @@
 
   <artifactId>study-tracker-core</artifactId>
   <packaging>jar</packaging>
-  <name>Study Traacker: Core</name>
+  <name>Study Tracker: Core</name>
 
   <developers>
     <developer>
