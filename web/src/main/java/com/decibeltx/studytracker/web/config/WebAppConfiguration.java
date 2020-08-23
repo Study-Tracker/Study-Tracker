@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.web.config;
 
+import com.decibeltx.studytracker.benchling.eln.entities.BenchlingNotebookEntry;
 import com.decibeltx.studytracker.core.notebook.NotebookEntry;
 import com.decibeltx.studytracker.core.notebook.SimpleNotebookEntry;
 import com.decibeltx.studytracker.core.storage.BasicStorageFile;
@@ -66,23 +67,43 @@ public class WebAppConfiguration {
   @Bean
   @Primary
   public ObjectMapper objectMapper() {
+
     ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new SimpleModule()
-        .addAbstractTypeMapping(StorageFile.class, BasicStorageFile.class));
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(StorageFile.class, EgnyteFile.class)
-    );
-    objectMapper.registerModule(new SimpleModule()
-        .addAbstractTypeMapping(StorageFolder.class, BasicStorageFolder.class));
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(StorageFolder.class, EgnyteFolder.class)
-    );
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(NotebookEntry.class, SimpleNotebookEntry.class));
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(NotebookEntry.class, IdbsNotebookEntry.class));
+
+    // Storage
+    if (env.containsProperty("storage.mode")
+        && env.getRequiredProperty("storage.mode").equals("egnyte")) {
+      objectMapper.registerModule(
+          new SimpleModule().addAbstractTypeMapping(StorageFile.class, EgnyteFile.class));
+      objectMapper.registerModule(
+          new SimpleModule().addAbstractTypeMapping(StorageFolder.class, EgnyteFolder.class));
+    } else {
+      objectMapper.registerModule(new SimpleModule()
+          .addAbstractTypeMapping(StorageFile.class, BasicStorageFile.class));
+      objectMapper.registerModule(new SimpleModule()
+          .addAbstractTypeMapping(StorageFolder.class, BasicStorageFolder.class));
+    }
+
+    // ELN
+    if (env.containsProperty("notebook.mode")
+        && env.getRequiredProperty("notebook.mode").equals("idbs")) {
+      objectMapper.registerModule(
+          new SimpleModule().addAbstractTypeMapping(NotebookEntry.class, IdbsNotebookEntry.class));
+    } else if (env.containsProperty("notebook.mode")
+        && env.getRequiredProperty("notebook.mode").equals("benchling")) {
+      objectMapper.registerModule(
+          new SimpleModule()
+              .addAbstractTypeMapping(NotebookEntry.class, BenchlingNotebookEntry.class));
+    } else {
+      objectMapper.registerModule(
+          new SimpleModule()
+              .addAbstractTypeMapping(NotebookEntry.class, SimpleNotebookEntry.class));
+    }
+
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     return objectMapper;
+
   }
 
 }
