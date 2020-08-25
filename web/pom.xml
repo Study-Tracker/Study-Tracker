@@ -78,11 +78,11 @@
       <version>${parent.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.decibeltx</groupId>
-      <artifactId>study-tracker-ldap</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>com.decibeltx</groupId>-->
+    <!--      <artifactId>study-tracker-ldap</artifactId>-->
+    <!--      <version>${parent.version}</version>-->
+    <!--    </dependency>-->
 
     <dependency>
       <groupId>com.decibeltx</groupId>

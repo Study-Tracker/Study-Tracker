@@ -47,7 +47,7 @@ const UserDetailHeader = ({targetUser, user}) => {
   return (
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>{targetUser.displayName} ({targetUser.accountName})</h1>
+          <h1>{targetUser.displayName} ({targetUser.username})</h1>
         </Col>
         <Col className="col-auto">
           {

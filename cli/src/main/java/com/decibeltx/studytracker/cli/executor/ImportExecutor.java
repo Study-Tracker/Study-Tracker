@@ -1,5 +1,6 @@
-package com.decibeltx.studytracker.cli;
+package com.decibeltx.studytracker.cli.executor;
 
+import com.decibeltx.studytracker.cli.argument.ImportArguments;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Collaborator;
 import com.decibeltx.studytracker.core.model.Program;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -49,7 +51,10 @@ public class ImportExecutor {
   @Autowired
   private UserService userService;
 
-  public void execute(ImportArguments args) throws Exception {
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  public void execute(ImportArguments args, User user) throws Exception {
 
     // Validate the input
     Path workingDir = Paths.get(System.getProperty("user.dir"));
@@ -80,13 +85,13 @@ public class ImportExecutor {
       } catch (Exception e) {
         throw new IOException("Failed to parse seed file: " + file.getAbsolutePath());
       }
-      loadData(records);
+      loadData(records, user);
     }
 
     LOGGER.info("Data import complete.");
   }
 
-  private void loadData(DatabaseRecords seeds) throws StudyTrackerException {
+  private void loadData(DatabaseRecords seeds, User createdBy) throws StudyTrackerException {
 
     LOGGER.info("Inserting database seeds...");
 
@@ -94,6 +99,8 @@ public class ImportExecutor {
     if (!seeds.getPrograms().isEmpty()) {
       LOGGER.info("Inserting program records...");
       for (Program program : seeds.getPrograms()) {
+        program.setCreatedBy(createdBy);
+        program.setLastModifiedBy(createdBy);
         programService.create(program);
       }
     }
@@ -102,6 +109,7 @@ public class ImportExecutor {
     if (!seeds.getUsers().isEmpty()) {
       LOGGER.info("Inserting user records...");
       for (User user : seeds.getUsers()) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.create(user);
       }
     }
@@ -118,6 +126,9 @@ public class ImportExecutor {
     if (!seeds.getStudies().isEmpty()) {
       LOGGER.info("Inserting study records...");
       for (Study study : seeds.getStudies()) {
+        if (study.getCreatedBy() == null) {
+          study.setCreatedBy(createdBy);
+        }
         studyService.create(study);
       }
     }

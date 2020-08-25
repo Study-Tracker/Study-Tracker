@@ -1,4 +1,4 @@
-package com.decibeltx.studytracker.cli;
+package com.decibeltx.studytracker.cli.executor;
 
 import com.decibeltx.studytracker.core.model.Collaborator;
 import com.decibeltx.studytracker.core.model.Program;

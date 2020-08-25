@@ -115,7 +115,7 @@ public class ProgramControllerTests {
   @Test
   public void createProgramTest() throws Exception {
 
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     Program program = new Program();
@@ -124,7 +124,7 @@ public class ProgramControllerTests {
     program.setActive(true);
 
     mockMvc.perform(post("/api/program/")
-        .with(user(user.getAccountName()))
+        .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(program)))
         .andExpect(status().isCreated())
@@ -148,7 +148,7 @@ public class ProgramControllerTests {
 
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     mockMvc.perform(get("/api/program/" + program.getId()))
@@ -159,7 +159,7 @@ public class ProgramControllerTests {
     program.setActive(false);
 
     mockMvc.perform(put("/api/program/" + program.getId())
-        .with(user(user.getAccountName()))
+        .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(program)))
         .andExpect(status().isCreated());
@@ -180,10 +180,10 @@ public class ProgramControllerTests {
   public void deleteProgramTest() throws Exception {
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
     mockMvc.perform(delete("/api/program/" + program.getId())
-        .with(user(user.getAccountName())))
+        .with(user(user.getUsername())))
         .andExpect(status().isOk());
     program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);

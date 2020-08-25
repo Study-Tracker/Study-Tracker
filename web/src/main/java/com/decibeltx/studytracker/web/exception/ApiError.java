@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.web.controller;
+package com.decibeltx.studytracker.web.exception;
 
 import java.util.Date;
 import lombok.Data;

@@ -23,6 +23,8 @@ import com.decibeltx.studytracker.core.service.ActivityService;
 import com.decibeltx.studytracker.core.service.UserService;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +42,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
   @Autowired
   private UserService userService;
@@ -82,6 +88,32 @@ public class UserController {
     User user = optional.get();
     List<Activity> activities = activityService.findByUser(user);
     return new ResponseEntity<>(activities, HttpStatus.OK);
+  }
+
+  @PostMapping("")
+  public HttpEntity<User> createUser(@RequestBody User user) {
+    LOGGER.info("Registering new user: " + user.toString());
+    userService.create(user);
+    return new ResponseEntity<>(user, HttpStatus.CREATED);
+  }
+
+  @PutMapping("/{id}")
+  public HttpEntity<User> updateUser(@PathVariable("id") String userId,
+      @RequestBody User updatedUser) {
+
+    Optional<User> optional = userService.findById(userId);
+    if (!optional.isPresent()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    User user = optional.get();
+    user.setDisplayName(updatedUser.getDisplayName());
+    user.setActive(updatedUser.isActive());
+    user.setAdmin(updatedUser.isAdmin());
+    user.setDepartment(updatedUser.getDepartment());
+    user.setTitle(updatedUser.getTitle());
+    userService.update(user);
+    return new ResponseEntity<>(user, HttpStatus.CREATED);
+
   }
 
 }

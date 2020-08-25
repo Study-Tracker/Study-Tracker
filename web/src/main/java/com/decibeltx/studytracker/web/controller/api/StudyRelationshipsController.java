@@ -61,7 +61,7 @@ public class StudyRelationshipsController extends StudyController {
             sourceStudyId, studyRelationship.getType(), studyRelationship.getStudyId()));
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     Study sourceStudy = getStudyFromIdentifier(sourceStudyId);
     sourceStudy.setLastModifiedBy(user);
@@ -77,7 +77,7 @@ public class StudyRelationshipsController extends StudyController {
       @RequestBody StudyRelationship studyRelationship) {
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     Study sourceStudy = getStudyFromIdentifier(sourceStudyId);
     sourceStudy.setLastModifiedBy(user);

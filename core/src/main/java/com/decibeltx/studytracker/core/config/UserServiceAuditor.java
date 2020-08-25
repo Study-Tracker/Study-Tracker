@@ -37,14 +37,14 @@ public class UserServiceAuditor implements AuditorAware<User> {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.isAuthenticated()
         && !authentication.getPrincipal().toString().equals("anonymousUser")) {
-      String accountName;
+      String username;
       if (authentication instanceof UsernamePasswordAuthenticationToken) {
-        accountName = authentication.getName();
+        username = authentication.getName();
       } else {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        accountName = userDetails.getUsername();
+        username = userDetails.getUsername();
       }
-      user = userService.findByAccountName(accountName).orElse(null);
+      user = userService.findByUsername(username).orElse(null);
     }
     return Optional.ofNullable(user);
   }
