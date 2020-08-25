@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -39,8 +40,6 @@ public class User implements Persistable<String>, UserDetails {
   @NotNull
   private String username;
 
-  @NotNull
-  @JsonIgnore
   private String password;
 
   private String department;
@@ -51,6 +50,7 @@ public class User implements Persistable<String>, UserDetails {
   private String displayName;
 
   @NotNull
+  @Indexed(unique = true)
   private String email;
 
   private boolean admin = false;
@@ -64,6 +64,16 @@ public class User implements Persistable<String>, UserDetails {
   private boolean credentialsExpired = false;
 
   private List<GrantedAuthority> authorities = new ArrayList<>();
+
+  @JsonIgnore
+  public String getPassword() {
+    return password;
+  }
+
+  @JsonProperty
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
   @Override
   public boolean isNew() {

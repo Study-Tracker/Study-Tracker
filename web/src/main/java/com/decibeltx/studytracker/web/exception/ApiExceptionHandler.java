@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.web.controller;
+package com.decibeltx.studytracker.web.exception;
 
 import com.decibeltx.studytracker.core.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.core.exception.InvalidConstraintException;
@@ -39,6 +39,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     ex.printStackTrace();
     ApiError apiError = new ApiError("Validation failed", ex.getBindingResult().toString());
     return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(UnauthorizedException.class)
+  public final ResponseEntity<ApiError> unauthroizedError(UnauthorizedException ex,
+      WebRequest webRequest) {
+    ex.printStackTrace();
+    ApiError apiError = new ApiError(ex.getMessage(), webRequest.getDescription(false));
+    return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler(InvalidConstraintException.class)

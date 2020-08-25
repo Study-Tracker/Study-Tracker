@@ -133,8 +133,8 @@ public class WebSecurityConfiguration {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
+//    @Autowired
+//    private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -148,7 +148,7 @@ public class WebSecurityConfiguration {
       http
           .authorizeRequests()
           .antMatchers("/studies/new", "/study/*/assays/new", "study/*/edit",
-              "study/*/assays/*/edit")
+              "study/*/assays/*/edit", "/programs/new", "/users/new")
           .fullyAuthenticated()
           .antMatchers("/", "/study/**", "/studies")
           .permitAll()
@@ -156,7 +156,10 @@ public class WebSecurityConfiguration {
           .permitAll()
           .and()
           .formLogin()
-          .successHandler(userAuthenticationSuccessHandler)
+          .loginPage("/login")
+          //.loginProcessingUrl("/authenticate")
+          //.failureUrl("/login?error=true")
+          //.successHandler(userAuthenticationSuccessHandler)
           .defaultSuccessUrl("/")
           .permitAll()
           .and()

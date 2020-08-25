@@ -6,3 +6,22 @@ programs:
   - name: "Program Y"
     code: "PY"
     active: false
+
+users:
+
+  - username: "jperson"
+    password: "password"
+    department: "IT"
+    title: "Manager"
+    displayName: "Joe Person"
+    email: "jperson@email.com"
+    admin: true
+
+collaborators:
+
+  - label: "CRO Corp - East"
+    organizationName: "CRO Corp"
+    organizationLocation: "California"
+    contactPersonName: "Anne Person"
+    contactEmail: "support@crocorp.com"
+    code: "CRO"
