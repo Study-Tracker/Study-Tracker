@@ -113,7 +113,7 @@ public class StudyBaseController extends StudyController {
       try {
         String username = UserAuthenticationUtils
             .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-        User user = getUserService().findByAccountName(username)
+        User user = getUserService().findByUsername(username)
             .orElseThrow(RecordNotFoundException::new);
         return getStudyService().findAll().stream()
             .filter(s -> s.getOwner().equals(user))
@@ -169,23 +169,23 @@ public class StudyBaseController extends StudyController {
 
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String accountName = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
+    String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
 
     // Created by
-    User user = getUserService().findByAccountName(accountName)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setCreatedBy(user);
 
     // Study team
     List<User> team = new ArrayList<>();
     for (User u : study.getUsers()) {
-      team.add(getUserService().findByAccountName(u.getAccountName())
+      team.add(getUserService().findByUsername(u.getUsername())
           .orElseThrow(RecordNotFoundException::new));
     }
     study.setUsers(team);
 
     // Owner
-    study.setOwner(getUserService().findByAccountName(study.getOwner().getAccountName())
+    study.setOwner(getUserService().findByUsername(study.getOwner().getUsername())
         .orElseThrow(RecordNotFoundException::new));
 
     // Save the record
@@ -203,20 +203,20 @@ public class StudyBaseController extends StudyController {
     // Last modified by
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
 
     // Study team
     List<User> team = new ArrayList<>();
     for (User u : study.getUsers()) {
-      team.add(getUserService().findByAccountName(u.getAccountName())
+      team.add(getUserService().findByUsername(u.getUsername())
           .orElseThrow(RecordNotFoundException::new));
     }
     study.setUsers(team);
 
     // Owner
-    study.setOwner(getUserService().findByAccountName(study.getOwner().getAccountName())
+    study.setOwner(getUserService().findByUsername(study.getOwner().getUsername())
         .orElseThrow(RecordNotFoundException::new));
 
     getStudyService().update(study);
@@ -229,7 +229,7 @@ public class StudyBaseController extends StudyController {
     Study study = getStudyFromIdentifier(id);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     getStudyService().delete(study);
@@ -245,7 +245,7 @@ public class StudyBaseController extends StudyController {
     Study study = getStudyFromIdentifier(id);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     String label = (String) params.get("status");

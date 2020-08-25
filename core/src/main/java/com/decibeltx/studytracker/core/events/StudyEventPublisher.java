@@ -53,7 +53,7 @@ public class StudyEventPublisher {
     data.put("code", study.getCode());
     data.put("externalCode", study.getExternalCode());
     data.put("createdAt", study.getCreatedAt());
-    data.put("createdBy", study.getCreatedBy().getAccountName());
+    data.put("createdBy", study.getCreatedBy().getUsername());
     data.put("description", study.getDescription());
     data.put("name", study.getName());
     data.put("status", study.getStatus());
@@ -68,9 +68,9 @@ public class StudyEventPublisher {
     data.put("code", study.getCode());
     data.put("externalCode", study.getExternalCode());
     data.put("createdAt", study.getCreatedAt());
-    data.put("createdBy", study.getCreatedBy().getAccountName());
+    data.put("createdBy", study.getCreatedBy().getUsername());
     data.put("updatedAt", study.getUpdatedAt());
-    data.put("lastModifiedBy", study.getLastModifiedBy().getAccountName());
+    data.put("lastModifiedBy", study.getLastModifiedBy().getUsername());
     data.put("description", study.getDescription());
     data.put("name", study.getName());
     data.put("status", study.getStatus());
@@ -109,7 +109,7 @@ public class StudyEventPublisher {
     data.put("code", study.getCode());
     data.put("name", study.getName());
     data.put("content", conclusions.getContent());
-    data.put("createdBy", conclusions.getCreatedBy().getAccountName());
+    data.put("createdBy", conclusions.getCreatedBy().getUsername());
     data.put("createdAt", conclusions.getCreatedAt());
     publisher.publishEvent(
         new StudyEvent(this, study, triggeredBy, EventType.NEW_STUDY_CONCLUSIONS, data));
@@ -121,9 +121,9 @@ public class StudyEventPublisher {
     data.put("code", study.getCode());
     data.put("name", study.getName());
     data.put("content", conclusions.getContent());
-    data.put("createdBy", conclusions.getCreatedBy().getAccountName());
+    data.put("createdBy", conclusions.getCreatedBy().getUsername());
     data.put("createdAt", conclusions.getCreatedAt());
-    data.put("lastModifiedBy", conclusions.getLastModifiedBy().getAccountName());
+    data.put("lastModifiedBy", conclusions.getLastModifiedBy().getUsername());
     data.put("updatedAt", conclusions.getUpdatedAt());
     publisher.publishEvent(
         new StudyEvent(this, study, triggeredBy, EventType.EDITED_STUDY_CONCLUSIONS, data));
@@ -142,7 +142,7 @@ public class StudyEventPublisher {
     data.put("code", study.getCode());
     data.put("name", study.getName());
     data.put("text", comment.getText());
-    data.put("createdBy", comment.getCreatedBy().getAccountName());
+    data.put("createdBy", comment.getCreatedBy().getUsername());
     data.put("createdAt", comment.getCreatedAt());
     publisher.publishEvent(new StudyEvent(this, study, triggeredBy, EventType.NEW_COMMENT, data));
   }
@@ -152,7 +152,7 @@ public class StudyEventPublisher {
     data.put("code", study.getCode());
     data.put("name", study.getName());
     data.put("text", comment.getText());
-    data.put("createdBy", comment.getCreatedBy().getAccountName());
+    data.put("createdBy", comment.getCreatedBy().getUsername());
     data.put("createdAt", comment.getCreatedAt());
     data.put("updatedAt", comment.getUpdatedAt());
     publisher

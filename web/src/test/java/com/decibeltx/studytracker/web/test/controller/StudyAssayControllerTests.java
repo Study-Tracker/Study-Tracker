@@ -131,7 +131,7 @@ public class StudyAssayControllerTests {
     mockMvc.perform(post("/api/study/CPA-XXXXX/assays")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(assay))
-        .with(user(user.getAccountName())))
+        .with(user(user.getUsername())))
         .andExpect(status().isNotFound());
 
     mockMvc.perform(post("/api/study/CPA-10001/assays")
@@ -142,7 +142,7 @@ public class StudyAssayControllerTests {
     mockMvc.perform(post("/api/study/CPA-10001/assays")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(assay))
-        .with(user(user.getAccountName())))
+        .with(user(user.getUsername())))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
@@ -173,7 +173,7 @@ public class StudyAssayControllerTests {
     mockMvc.perform(put("/api/study/PPB-10001/assays/PPB-10001-00001")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(assay))
-        .with(user(assay.getOwner().getAccountName())))
+        .with(user(assay.getOwner().getUsername())))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("COMPLETE")));

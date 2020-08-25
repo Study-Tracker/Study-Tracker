@@ -57,7 +57,7 @@ public class StudyExternalLinksController extends StudyController {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyExternalLinkService.addStudyExternalLink(study, externalLink);
@@ -70,7 +70,7 @@ public class StudyExternalLinksController extends StudyController {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     Optional<ExternalLink> optional = studyExternalLinkService
@@ -88,7 +88,7 @@ public class StudyExternalLinksController extends StudyController {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyExternalLinkService.deleteStudyExternalLink(study, linkId);

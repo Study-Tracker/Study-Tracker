@@ -140,7 +140,7 @@ public class Activity {
 
   @JsonProperty("triggeredBy")
   public String triggeredBy() {
-    return user.getAccountName();
+    return user.getUsername();
   }
 
   public enum Reference {

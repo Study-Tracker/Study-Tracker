@@ -64,7 +64,7 @@ public class ProgramEvent extends ApplicationEvent implements StudyTrackerEvent 
     return "ProgramEvent{" +
         "eventType=" + eventType +
         ", program=" + program.getName() +
-        ", user=" + user.getAccountName() +
+        ", user=" + user.getUsername() +
         ", data=" + data +
         '}';
   }

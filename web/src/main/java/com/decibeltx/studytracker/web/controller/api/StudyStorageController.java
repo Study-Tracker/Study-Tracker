@@ -71,7 +71,7 @@ public class StudyStorageController extends StudyController {
     LOGGER.info("Uploaded file: " + file.getOriginalFilename());
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByAccountName(username)
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     Study study = getStudyFromIdentifier(studyId);
     Path path;
