@@ -1,4 +1,4 @@
-package com.decibeltx.studytracker.cli;
+package com.decibeltx.studytracker.cli.argument;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
