@@ -95,12 +95,12 @@ public class StudyRelationshipControllerTests {
     Assert.assertEquals(1, targetStudy.getStudyRelationships().size());
     Assert.assertEquals(Type.IS_BLOCKING, sourceStudy.getStudyRelationships().get(0).getType());
     Assert.assertEquals(targetStudy.getCode(),
-        sourceStudy.getStudyRelationships().get(0).getStudyId());
+        sourceStudy.getStudyRelationships().get(0).getStudy().getId());
     targetStudy = studyRepository.findByCode("PPB-10001")
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Type.IS_BLOCKED_BY, targetStudy.getStudyRelationships().get(0).getType());
     Assert.assertEquals(sourceStudy.getCode(),
-        targetStudy.getStudyRelationships().get(0).getStudyId());
+        targetStudy.getStudyRelationships().get(0).getStudy().getId());
 
   }
 

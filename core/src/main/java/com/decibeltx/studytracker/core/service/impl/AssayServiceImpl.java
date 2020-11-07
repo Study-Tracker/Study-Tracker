@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.AssayEventPublisher;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Status;
@@ -41,9 +40,6 @@ public class AssayServiceImpl implements AssayService {
 
   @Autowired
   private StudyRepository studyRepository;
-
-  @Autowired
-  private AssayEventPublisher eventPublisher;
 
   @Override
   public Optional<Assay> findById(String id) {
@@ -75,32 +71,26 @@ public class AssayServiceImpl implements AssayService {
     assayRepository.insert(assay);
     study.getAssays().add(assay);
     studyRepository.save(study);
-    eventPublisher.publishNewAssayEvent(assay, assay.getCreatedBy());
   }
 
   @Override
   public void update(Assay updated) {
     LOGGER.info("Updating assay record with code: " + updated.getCode());
-    Assay assay = assayRepository.findById(updated.getId())
+    assayRepository.findById(updated.getId())
         .orElseThrow(RecordNotFoundException::new);
     assayRepository.save(updated);
-    eventPublisher.publishUpdatedAssayEvent(assay, assay.getLastModifiedBy());
   }
 
   @Override
   public void delete(Assay assay) {
     assay.setActive(false);
     assayRepository.save(assay);
-    eventPublisher.publishDeletedAssayEvent(assay, assay.getLastModifiedBy());
   }
 
   @Override
   public void updateStatus(Assay assay, Status status) {
-    Status oldStatus = assay.getStatus();
     assay.setStatus(status);
     assayRepository.save(assay);
-    eventPublisher
-        .publishAssayStatusChangedEvent(assay, assay.getLastModifiedBy(), oldStatus, status);
   }
 
   @Override

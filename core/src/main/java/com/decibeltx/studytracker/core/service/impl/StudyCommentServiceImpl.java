@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.model.Comment;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
@@ -34,9 +33,6 @@ public class StudyCommentServiceImpl implements StudyCommentService {
 
   @Autowired
   private StudyRepository studyRepository;
-
-  @Autowired
-  private StudyEventPublisher studyEventPublisher;
 
   @Override
   public Optional<Comment> findStudyCommentById(Study study, String id) {
@@ -61,7 +57,6 @@ public class StudyCommentServiceImpl implements StudyCommentService {
     comment.setCreatedAt(new Date());
     study.getComments().add(comment);
     studyRepository.save(study);
-    studyEventPublisher.publishNewCommentEvent(study, study.getLastModifiedBy(), comment);
     return comment;
   }
 
@@ -74,7 +69,6 @@ public class StudyCommentServiceImpl implements StudyCommentService {
     comments.add(comment);
     study.setComments(comments);
     studyRepository.save(study);
-    studyEventPublisher.publishEditedCommentEvent(study, study.getLastModifiedBy(), comment);
     return comment;
   }
 
@@ -85,7 +79,6 @@ public class StudyCommentServiceImpl implements StudyCommentService {
         .collect(Collectors.toList());
     study.setComments(comments);
     studyRepository.save(study);
-    studyEventPublisher.publishDeletedCommentEvent(study, study.getLastModifiedBy());
   }
 
 }

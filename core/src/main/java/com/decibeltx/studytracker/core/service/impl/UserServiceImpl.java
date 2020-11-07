@@ -60,6 +60,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   }
 
   @Override
+  public long count() {
+    return userRepository.count();
+  }
+
+  @Override
   public void create(User user) {
     userRepository.insert(user);
   }

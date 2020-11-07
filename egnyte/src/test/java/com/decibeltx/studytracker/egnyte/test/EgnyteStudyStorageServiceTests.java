@@ -28,9 +28,9 @@ import com.decibeltx.studytracker.core.repository.AssayRepository;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
+import com.decibeltx.studytracker.core.storage.StorageFile;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
 import com.decibeltx.studytracker.egnyte.EgnyteStudyStorageService;
-import com.decibeltx.studytracker.egnyte.entity.EgnyteFile;
 import com.decibeltx.studytracker.egnyte.exception.DuplicateFolderException;
 import com.decibeltx.studytracker.egnyte.exception.ObjectNotFoundException;
 import java.util.Collections;
@@ -123,15 +123,18 @@ public class EgnyteStudyStorageServiceTests {
     }
 
     exception = null;
-    EgnyteFile file = null;
+    StorageFile file = null;
     try {
       file = storageService.saveStudyFile(TEST_FILE.getFile(), study);
     } catch (Exception e) {
       exception = e;
     }
+    System.out.println(file.toString());
     Assert.assertNull(exception);
     Assert.assertNotNull(file);
     Assert.assertTrue(file.getPath().endsWith("test.txt"));
+    Assert.assertEquals(TEST_FILE.getFilename(), file.getName());
+    Assert.assertNotNull(file.getUrl());
 
   }
 
@@ -216,7 +219,7 @@ public class EgnyteStudyStorageServiceTests {
     }
 
     exception = null;
-    EgnyteFile file = null;
+    StorageFile file = null;
     try {
       file = storageService.saveAssayFile(TEST_FILE.getFile(), assay);
     } catch (Exception e) {
@@ -251,6 +254,5 @@ public class EgnyteStudyStorageServiceTests {
     Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
     Assert.assertNull(folder);
   }
-
 
 }

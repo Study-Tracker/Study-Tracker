@@ -16,8 +16,10 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
+import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
+import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Conclusions;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
@@ -76,6 +78,12 @@ public class StudyConclusionsController extends StudyController {
     study.setLastModifiedBy(user);
     conclusions.setCreatedBy(user);
     studyConclusionsService.addStudyConclusions(study, conclusions);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromNewConclusions(study, user, conclusions);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -92,6 +100,11 @@ public class StudyConclusionsController extends StudyController {
     study.setLastModifiedBy(user);
     conclusions.setLastModifiedBy(user);
     studyConclusionsService.updateStudyConclusions(study, conclusions);
+
+    Activity activity = StudyActivityUtils.fromUpdatedConclusions(study, user, conclusions);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -105,6 +118,11 @@ public class StudyConclusionsController extends StudyController {
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyConclusionsService.deleteStudyConclusions(study);
+
+    Activity activity = StudyActivityUtils.fromDeletedConclusions(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

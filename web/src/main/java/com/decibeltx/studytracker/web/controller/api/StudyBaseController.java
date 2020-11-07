@@ -16,8 +16,10 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
+import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
+import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
@@ -192,6 +194,11 @@ public class StudyBaseController extends StudyController {
     getStudyService().create(study);
     Assert.notNull(study.getId(), "Study not persisted.");
 
+    // Publish events
+    Activity activity = StudyActivityUtils.fromNewStudy(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(study, HttpStatus.CREATED);
   }
 
@@ -220,38 +227,63 @@ public class StudyBaseController extends StudyController {
         .orElseThrow(RecordNotFoundException::new));
 
     getStudyService().update(study);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromUpdatedStudy(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(study, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> deleteStudy(@PathVariable("id") String id) {
+
     LOGGER.info("Deleting study: " + id);
+
     Study study = getStudyFromIdentifier(id);
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
+
     getStudyService().delete(study);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromDeletedStudy(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/{id}/status")
   public void updateStudyStatus(@PathVariable("id") String id,
       @RequestBody Map<String, Object> params) throws StudyTrackerException {
+
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
     }
+
     Study study = getStudyFromIdentifier(id);
+    Status oldStatus = study.getStatus();
+
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
+
     String label = (String) params.get("status");
     Status status = Status.valueOf(label);
     LOGGER.info(String.format("Setting status of study %s to %s", id, label));
     getStudyService().updateStatus(study, status);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromStudyStatusChange(study, user, oldStatus, status);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
   }
 
 }

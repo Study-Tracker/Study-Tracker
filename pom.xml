@@ -29,21 +29,18 @@
 
   <groupId>com.decibeltx</groupId>
   <artifactId>study-tracker-parent</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <name>Study Tracker: Parent</name>
   <packaging>pom</packaging>
 
   <modules>
     <module>core</module>
+    <module>aws</module>
     <module>egnyte</module>
-    <module>idbs</module>
-    <module>teams</module>
-    <module>ldap-auth</module>
-    <module>doc-writer</module>
     <module>elasticsearch</module>
+    <module>benchling</module>
     <module>web</module>
     <module>cli</module>
-    <module>benchling</module>
   </modules>
 
   <developers>

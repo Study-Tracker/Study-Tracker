@@ -43,6 +43,11 @@ public interface StorageObject {
 
   void setPath(Path path);
 
+  /**
+   * Returns the object name.
+   *
+   * @return
+   */
   String getName();
 
   void setName(String name);
