@@ -18,9 +18,10 @@ import React from "react";
 import {FormFeedback, FormGroup, Label} from "reactstrap";
 import Select from "react-select";
 
-export const ProgramDropdown = ({programs, selectedProgram, onChange, isValid, disabled}) => {
+export const ProgramDropdown = ({programs, selectedProgram, onChange, isValid, disabled, isLegacyStudy}) => {
 
   const programOptions = programs
+  .filter(p => !!isLegacyStudy || !!p.active)
   .sort((a, b) => {
     if (a.name > b.name) {
       return 1;
