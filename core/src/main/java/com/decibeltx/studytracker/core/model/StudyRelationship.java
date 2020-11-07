@@ -17,41 +17,24 @@
 package com.decibeltx.studytracker.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-@Getter
-@Setter
+@Data
 public class StudyRelationship {
 
-  public enum Type {
-    IS_RELATED_TO,
-    IS_PARENT_OF,
-    IS_CHILD_OF,
-    IS_BLOCKING,
-    IS_BLOCKED_BY,
-    IS_PRECEDED_BY,
-    IS_SUCCEEDED_BY
-  }
-
   private Type type;
-
-  @Transient
-  private String studyId;
 
   @DBRef(lazy = true)
   @JsonIgnore
   private Study study;
 
-  public StudyRelationship() {
-  }
+  @Transient
+  private String studyId;
 
-  public StudyRelationship(Type type, String studyId) {
-    this.type = type;
-    this.studyId = studyId;
+  public StudyRelationship() {
   }
 
   @PersistenceConstructor
@@ -59,6 +42,50 @@ public class StudyRelationship {
     this.type = type;
     this.study = study;
     this.studyId = study.getCode();
+  }
+
+  public StudyRelationship(Type type, String studyId) {
+    this.type = type;
+    this.studyId = studyId;
+  }
+
+  public StudyRelationship(Type type, Study study, String studyId) {
+    this.type = type;
+    this.study = study;
+    this.studyId = studyId;
+  }
+
+  public enum Type {
+
+    IS_RELATED_TO,
+    IS_PARENT_OF,
+    IS_CHILD_OF,
+    IS_BLOCKING,
+    IS_BLOCKED_BY,
+    IS_PRECEDED_BY,
+    IS_SUCCEEDED_BY;
+
+    public static Type getInverse(Type type) {
+      switch (type) {
+        case IS_RELATED_TO:
+          return IS_RELATED_TO;
+        case IS_PARENT_OF:
+          return IS_CHILD_OF;
+        case IS_CHILD_OF:
+          return IS_PARENT_OF;
+        case IS_BLOCKING:
+          return IS_BLOCKED_BY;
+        case IS_BLOCKED_BY:
+          return IS_BLOCKING;
+        case IS_PRECEDED_BY:
+          return IS_SUCCEEDED_BY;
+        case IS_SUCCEEDED_BY:
+          return IS_PRECEDED_BY;
+        default:
+          return IS_RELATED_TO;
+      }
+    }
+
   }
 
 }

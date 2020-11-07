@@ -16,9 +16,8 @@
 
 package com.decibeltx.studytracker.benchling.eln;
 
-import lombok.Data;
-
 import java.net.URL;
+import lombok.Data;
 
 @Data
 public class BenchlingElnOptions {

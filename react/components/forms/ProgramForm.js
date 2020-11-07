@@ -55,13 +55,15 @@ export default class ProgramForm extends React.Component {
         active: true,
         createdBy: this.props.user,
         lastModifiedBy: this.props.user,
-        attributes: {}
+        attributes: {},
+        notebookFolder: {}
       },
       validation: {
         nameIsValid: true,
         nameIsUnique: true,
         descriptionIsValid: true,
-        codeIsValid: true
+        codeIsValid: true,
+        programFolderIdIsValid: true
       },
       showLoadingOverlay: false
     };
@@ -123,6 +125,28 @@ export default class ProgramForm extends React.Component {
     } else {
       validation.codeIsValid = true;
     }
+
+    // ELN
+    if (!program.notebookFolder.referenceId) {
+      isError = true;
+      validation.programFolderIdIsValid = false;
+    } else {
+      validation.programFolderIdIsValid = true;
+    }
+
+    // if (!program.notebookFolder.name) {
+    //   isError = true;
+    //   validation.programFolderNameIsValid = false;
+    // } else {
+    //   validation.programFolderNameIsValid = true;
+    // }
+    //
+    // if (!program.notebookFolder.url) {
+    //   isError = true;
+    //   validation.programFolderUrlIsValid = false;
+    // } else {
+    //   validation.programFolderUrlIsValid = true;
+    // }
 
     this.setState({
       validation: validation
@@ -327,13 +351,15 @@ export default class ProgramForm extends React.Component {
                       <Col md="7">
                         <FormGroup>
                           <Label>Description *</Label>
-                          <ReactQuill
-                              theme="snow"
-                              defaultValue={this.state.program.description
-                              || ''}
-                              onChange={content => this.handleFormUpdate(
-                                  {"description": content})}
-                          />
+                          <div>
+                            <ReactQuill
+                                theme="snow"
+                                defaultValue={this.state.program.description
+                                || ''}
+                                onChange={content => this.handleFormUpdate(
+                                    {"description": content})}
+                            />
+                          </div>
                           <FormFeedback>
                             Description must not be empty.
                           </FormFeedback>
@@ -361,6 +387,99 @@ export default class ProgramForm extends React.Component {
                             creating new studies. Eg. a code of 'PG' would
                             result in a study code such as
                             'PG-10001'.</FormText>
+                        </FormGroup>
+                      </Col>
+
+                    </Row>
+
+                    <Row>
+                      <Col>
+                        <hr/>
+                      </Col>
+                    </Row>
+
+                    <Row form>
+
+                      <Col md="12">
+                        <h5 className="card-title">Electronic Laboratory
+                          Notebook Folder</h5>
+                        <h6 className="card-subtitle text-muted">
+                          When using an electronic laboratory notebook, all
+                          programs require a folder in which all studies and
+                          entries will be created. You will have to create the
+                          program in the ELN software before Study Tracker can
+                          register the study and hook into the ELN platform.
+                          Provide the unique ID for the ELN program (aka.
+                          Program Folder ID), the name of the program as it
+                          appears in the ELN, and the URL for creating a link to
+                          the program page in the ELN.
+                        </h6>
+                        <br/>
+                      </Col>
+
+                      <Col md="6">
+                        <FormGroup>
+                          <Label>Program Folder ID *</Label>
+                          <Input
+                              type="text"
+                              invalid={!this.state.validation.programFolderIdIsValid}
+                              defaultValue={this.state.program.notebookFolder.referenceId
+                              || ''}
+                              onChange={(e) => this.handleFormUpdate({
+                                "notebookFolder": {
+                                  ...this.state.program.notebookFolder,
+                                  referenceId: e.target.value
+                                }
+                              })}
+                          />
+                          <FormFeedback>Program Folder ID must not be
+                            empty.</FormFeedback>
+                          <FormText>This is the ID assigned to the program
+                            folder in the ELN. For example, in Benchling the ID
+                            will take the form of an alphanumeric code with a
+                            prefix of <code>lib_</code>.</FormText>
+                        </FormGroup>
+                      </Col>
+
+                      <Col md="6">
+                        <FormGroup>
+                          <Label>Folder Name</Label>
+                          <Input
+                              type="text"
+                              // invalid={!this.state.validation.programFolderNameIsValid}
+                              defaultValue={this.state.program.notebookFolder.name
+                              || ''}
+                              onChange={(e) => this.handleFormUpdate({
+                                "notebookFolder": {
+                                  ...this.state.program.notebookFolder,
+                                  name: e.target.value
+                                }
+                              })}
+                          />
+                          <FormFeedback>Folder Name must not be
+                            empty.</FormFeedback>
+                          <FormText>If different from the program
+                            name.</FormText>
+                        </FormGroup>
+                      </Col>
+
+                      <Col md="6">
+                        <FormGroup>
+                          <Label>URL</Label>
+                          <Input
+                              type="text"
+                              // invalid={!this.state.validation.programFolderUrlIsValid}
+                              defaultValue={this.state.program.notebookFolder.url
+                              || ''}
+                              onChange={(e) => this.handleFormUpdate({
+                                "notebookFolder": {
+                                  ...this.state.program.notebookFolder,
+                                  url: e.target.value
+                                }
+                              })}
+                          />
+                          <FormFeedback>URL must not be empty.</FormFeedback>
+                          <FormText>URL for the program in the ELN.</FormText>
                         </FormGroup>
                       </Col>
 

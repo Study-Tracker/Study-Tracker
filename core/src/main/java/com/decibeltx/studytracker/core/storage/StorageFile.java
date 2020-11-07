@@ -16,13 +16,63 @@
 
 package com.decibeltx.studytracker.core.storage;
 
-public interface StorageFile extends StorageObject {
+import java.net.URL;
+import java.nio.file.Path;
 
-  /**
-   * Returns the file name.
-   *
-   * @return
-   */
-  String getName();
+public class StorageFile implements StorageObject {
 
+  private String url;
+
+  private String path;
+
+  private String name;
+
+  @Override
+  public String getUrl() {
+    return url;
+  }
+
+  @Override
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
+  @Override
+  public void setUrl(URL url) {
+    this.url = url.toString();
+  }
+
+  @Override
+  public String getPath() {
+    return path;
+  }
+
+  @Override
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  @Override
+  public void setPath(Path path) {
+    this.path = path.toString();
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String toString() {
+    return "StorageFile{" +
+        "url='" + url + '\'' +
+        ", path='" + path + '\'' +
+        ", name='" + name + '\'' +
+        '}';
+  }
 }

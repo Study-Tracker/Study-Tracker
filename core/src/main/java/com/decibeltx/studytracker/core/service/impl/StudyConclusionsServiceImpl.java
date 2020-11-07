@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.model.Conclusions;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
@@ -33,9 +32,6 @@ public class StudyConclusionsServiceImpl implements StudyConclusionsService {
   @Autowired
   private StudyRepository studyRepository;
 
-  @Autowired
-  private StudyEventPublisher studyEventPublisher;
-
   @Override
   public Optional<Conclusions> findStudyConclusions(Study study) {
     return Optional.ofNullable(study.getConclusions());
@@ -47,7 +43,6 @@ public class StudyConclusionsServiceImpl implements StudyConclusionsService {
     conclusions.setId(UUID.randomUUID().toString());
     study.setConclusions(conclusions);
     studyRepository.save(study);
-    studyEventPublisher.publishNewConclusionsEvent(study, study.getLastModifiedBy(), conclusions);
     return conclusions;
   }
 
@@ -56,8 +51,6 @@ public class StudyConclusionsServiceImpl implements StudyConclusionsService {
     conclusions.setUpdatedAt(new Date());
     study.setConclusions(conclusions);
     studyRepository.save(study);
-    studyEventPublisher
-        .publishUpdatedConclusionsEvent(study, study.getLastModifiedBy(), conclusions);
     return conclusions;
   }
 
@@ -65,7 +58,6 @@ public class StudyConclusionsServiceImpl implements StudyConclusionsService {
   public void deleteStudyConclusions(Study study) {
     study.setConclusions(null);
     studyRepository.save(study);
-    studyEventPublisher.publishDeletedConclusionsEvent(study, study.getLastModifiedBy());
   }
 
 }

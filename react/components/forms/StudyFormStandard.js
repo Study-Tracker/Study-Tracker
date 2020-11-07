@@ -335,6 +335,7 @@ export default class StudyForm extends React.Component {
                             onChange={this.handleFormUpdate}
                             isValid={this.state.validation.programIsValid}
                             disabled={!!this.state.study.id}
+                            isLegacyStudy={!!this.state.study.legacy}
                         />
                       </Col>
 

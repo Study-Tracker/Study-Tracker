@@ -1,0 +1,27 @@
+# Storage
+storage.local-dir=/tmp
+storage.overwrite-existing=true
+storage.use-existing=true
+storage.max-folder-read-depth=1
+#
+# Data source
+db.username=studytracker
+db.password=studytracker
+db.host=localhost
+db.name=study-tracker-test
+db.port=27017
+db.connectionString=mongodb://${db.host}:${db.port}
+#
+# Events
+events.mode=local
+#
+# Notebook
+notebook.mode=benchling
+benchling.eln.api.token=xxx
+benchling.eln.api.username=
+benchling.eln.api.password=
+benchling.eln.api.root-url=xxx
+benchling.eln.api.root-entity=
+benchling.eln.api.root-folder-url=
+
+notebook.test.default-project=

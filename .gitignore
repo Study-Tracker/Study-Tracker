@@ -8,6 +8,7 @@ security.properties
 *.log
 TODO.md
 test.properties
+internal/
 
 # To be removed
 application.properties

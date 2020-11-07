@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.example;
 
+import com.decibeltx.studytracker.core.eln.NotebookFolder;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Assay;
@@ -29,7 +30,6 @@ import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.Task;
 import com.decibeltx.studytracker.core.model.User;
-import com.decibeltx.studytracker.core.notebook.SimpleNotebookEntry;
 import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
 import com.decibeltx.studytracker.core.repository.CollaboratorRepository;
@@ -269,11 +269,13 @@ public class ExampleDataGenerator {
     study.setUsers(Collections.singletonList(user));
     study.setCollaborator(collaborator);
     study.setExternalCode(collaborator.getCode() + "-00001");
-    SimpleNotebookEntry notebookEntry = new SimpleNotebookEntry();
-    notebookEntry.setLabel("IDBS ELN");
+
+    NotebookFolder notebookEntry = new NotebookFolder();
+    notebookEntry.setName("IDBS ELN");
     notebookEntry.setUrl(
         "https://decibel.idbs-eworkbook.com:8443/EWorkbookWebApp/#entity/displayEntity?entityId=603e68c0e01411e7acd000000a0000a2&v=y");
-    study.setNotebookEntry(notebookEntry);
+    notebookEntry.setReferenceId("12345");
+    study.setNotebookFolder(notebookEntry);
 
     studyService.create(study);
 
@@ -301,11 +303,12 @@ public class ExampleDataGenerator {
     study.setStartDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
-    notebookEntry = new SimpleNotebookEntry();
-    notebookEntry.setLabel("ELN");
-    notebookEntry.setUrl(
-        "https://google.com");
-    study.setNotebookEntry(notebookEntry);
+
+    notebookEntry = new NotebookFolder();
+    notebookEntry.setName("ELN");
+    notebookEntry.setUrl("https://google.com");
+    notebookEntry.setReferenceId("12345");
+    study.setNotebookFolder(notebookEntry);
 
     studyService.create(study);
 
@@ -346,11 +349,11 @@ public class ExampleDataGenerator {
     study.setEndDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
-    notebookEntry = new SimpleNotebookEntry();
-    notebookEntry.setLabel("ELN");
+    notebookEntry = new NotebookFolder();
+    notebookEntry.setName("ELN");
     notebookEntry.setUrl(
         "https://google.com");
-    study.setNotebookEntry(notebookEntry);
+    study.setNotebookFolder(notebookEntry);
     studyService.create(study);
     studyService.updateStatus(study, Status.COMPLETE);
 
@@ -525,7 +528,6 @@ public class ExampleDataGenerator {
       programRepository.insert(generateExamplePrograms(userRepository.findAll()));
       createProgramFolders();
       collaboratorRepository.insert(generateExampleCollaborators());
-      //createStudyFolders();
       generateExampleStudies();
 
       for (Assay assay : generateExampleAssays(studyRepository.findAll())) {
