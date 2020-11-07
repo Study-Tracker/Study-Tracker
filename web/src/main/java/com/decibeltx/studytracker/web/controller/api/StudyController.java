@@ -16,11 +16,12 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
-import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.service.ActivityService;
 import com.decibeltx.studytracker.core.service.AssayService;
+import com.decibeltx.studytracker.core.service.EventsService;
 import com.decibeltx.studytracker.core.service.ProgramService;
 import com.decibeltx.studytracker.core.service.StudyService;
 import com.decibeltx.studytracker.core.service.UserService;
@@ -30,10 +31,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class StudyController {
 
   private StudyService studyService;
+
   private UserService userService;
+
   private ProgramService programService;
+
   private AssayService assayService;
-  private StudyEventPublisher studyEventPublisher;
+
+  private ActivityService activityService;
+
+  private EventsService eventsService;
 
   protected Study getStudyFromIdentifier(String id) {
     Study study;
@@ -103,13 +110,21 @@ public abstract class StudyController {
     this.assayService = assayService;
   }
 
-  public StudyEventPublisher getStudyEventPublisher() {
-    return studyEventPublisher;
+  public ActivityService getActivityService() {
+    return activityService;
   }
 
   @Autowired
-  public void setStudyEventPublisher(
-      StudyEventPublisher studyEventPublisher) {
-    this.studyEventPublisher = studyEventPublisher;
+  public void setActivityService(ActivityService activityService) {
+    this.activityService = activityService;
+  }
+
+  public EventsService getEventsService() {
+    return eventsService;
+  }
+
+  @Autowired
+  public void setEventsService(EventsService eventsService) {
+    this.eventsService = eventsService;
   }
 }

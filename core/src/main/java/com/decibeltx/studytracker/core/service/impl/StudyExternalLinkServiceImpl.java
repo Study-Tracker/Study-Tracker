@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEventPublisher;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.ExternalLink;
 import com.decibeltx.studytracker.core.model.Study;
@@ -38,9 +37,6 @@ public class StudyExternalLinkServiceImpl implements StudyExternalLinkService {
 
   @Autowired
   private StudyRepository studyRepository;
-
-  @Autowired
-  private StudyEventPublisher studyEventPublisher;
 
   @Override
   public List<ExternalLink> findAllStudyExternalLinks(Study study) {
@@ -66,7 +62,6 @@ public class StudyExternalLinkServiceImpl implements StudyExternalLinkService {
     LOGGER.info(String.format("Adding new external link for study %s: %s",
         study.getCode(), externalLink));
     studyRepository.save(study);
-    studyEventPublisher.publishNewExternalLinkEvent(study, study.getLastModifiedBy(), externalLink);
     return externalLink;
   }
 
@@ -86,8 +81,6 @@ public class StudyExternalLinkServiceImpl implements StudyExternalLinkService {
               externalLink.getId(), study.getCode()));
     }
     studyRepository.save(study);
-    studyEventPublisher
-        .publishUpdatedExternalLinkEvent(study, study.getLastModifiedBy(), externalLink);
     return externalLink;
   }
 
@@ -106,7 +99,6 @@ public class StudyExternalLinkServiceImpl implements StudyExternalLinkService {
     LOGGER
         .info(String.format("Removing external link with ID %s for study %s", id, study.getCode()));
     studyRepository.save(study);
-    studyEventPublisher.publishDeletedExternalLinkEvent(study, study.getLastModifiedBy());
   }
 
 }

@@ -181,13 +181,14 @@ const ActivityMessage = ({activity}) => {
             </p>
             <div className="bg-light text-secondary p-3">
               <h5><a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a></h5>
-              <h3>{activity.data.name}</h3>
-              <h5 className="text-muted">{activity.data.program}</h5>
+              + activity.data.study.code}>{activity.data.study.code}</a></h5>
+              <h3>{activity.data.study.name}</h3>
+              <h5 className="text-muted">{activity.data.study.program}</h5>
               <div dangerouslySetInnerHTML={createMarkup(
-                  activity.data.description)}/>
+                  activity.data.study.description)}/>
               <p>
-                <KeywordBadgeList keywords={activity.data.keywords}/>
+                <KeywordBadgeList
+                    keywords={activity.data.study.keywords || []}/>
               </p>
             </div>
           </React.Fragment>
@@ -202,13 +203,13 @@ const ActivityMessage = ({activity}) => {
             </p>
             <div className="bg-light text-secondary p-3">
               <h5><a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a></h5>
-              <h3>{activity.data.name}</h3>
-              <h5 className="text-muted">{activity.data.program}</h5>
+              + activity.data.study.code}>{activity.data.study.code}</a></h5>
+              <h3>{activity.data.study.name}</h3>
+              <h5 className="text-muted">{activity.data.study.program}</h5>
               <div dangerouslySetInnerHTML={createMarkup(
-                  activity.data.description)}/>
+                  activity.data.study.description)}/>
               <p>
-                <KeywordBadgeList keywords={activity.data.keywords}/>
+                <KeywordBadgeList keywords={activity.data.study.keywords}/>
               </p>
             </div>
           </React.Fragment>
@@ -218,7 +219,7 @@ const ActivityMessage = ({activity}) => {
           <p>
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
-            &nbsp;has removed study: {activity.data.code}
+            &nbsp;has removed study: {activity.data.study.code}
           </p>
       );
     case studyActions.STUDY_STATUS_CHANGED.value:
@@ -227,7 +228,8 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has updated the status of study&nbsp;
-            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/"
+            + activity.data.study.code}>{activity.data.study.code}</a>
             &nbsp;from&nbsp;
             <StatusBadge status={activity.data.oldStatus}/>
             &nbsp;to&nbsp;
@@ -242,14 +244,14 @@ const ActivityMessage = ({activity}) => {
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has attached a new file to study:&nbsp;
               <a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a>
+              + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
             <div className="bg-light text-secondary p-3">
               <h3>
-                <a href={activity.data.url} target="_blank">
+                <a href={activity.data.file.url} target="_blank">
                   <File size={24}/>
                   &nbsp;
-                  {activity.data.fileName}
+                  {activity.data.file.name}
                 </a>
               </h3>
             </div>
@@ -264,10 +266,11 @@ const ActivityMessage = ({activity}) => {
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has added new conclusions for study:&nbsp;
               <a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a>
+              + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
             <div className="bg-light font-italic text-secondary p-3"
-                 dangerouslySetInnerHTML={createMarkup(activity.data.content)}/>
+                 dangerouslySetInnerHTML={createMarkup(
+                     activity.data.conclusions.content)}/>
           </React.Fragment>
       );
     case studyActions.EDITED_STUDY_CONCLUSIONS.value:
@@ -278,10 +281,11 @@ const ActivityMessage = ({activity}) => {
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has updated the conclusions for study:&nbsp;
               <a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a>
+              + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
             <div className="bg-light font-italic text-secondary p-3"
-                 dangerouslySetInnerHTML={createMarkup(activity.data.content)}/>
+                 dangerouslySetInnerHTML={createMarkup(
+                     activity.data.conclusions.content)}/>
           </React.Fragment>
 
       );
@@ -291,7 +295,8 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed the conclusions for study:&nbsp;
-            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/"
+            + activity.data.study.code}>{activity.data.study.code}</a>
           </p>
       );
     case studyActions.NEW_COMMENT.value:
@@ -302,10 +307,10 @@ const ActivityMessage = ({activity}) => {
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has posted a new comment to study&nbsp;
               <a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a>:
+              + activity.data.study.code}>{activity.data.study.code}</a>:
             </p>
             <p className="bg-light font-italic text-secondary p-3">
-              "{activity.data.text}"
+              "{activity.data.comment.text}"
             </p>
           </React.Fragment>
 
@@ -318,10 +323,10 @@ const ActivityMessage = ({activity}) => {
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has edited their comment to study:&nbsp;
               <a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a>
+              + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
             <p className="bg-light font-italic text-secondary p-3">
-              "{activity.data.text}"
+              "{activity.data.comment.text}"
             </p>
           </React.Fragment>
       );
@@ -331,7 +336,8 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed their comment to study:&nbsp;
-            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/"
+            + activity.data.study.code}>{activity.data.study.code}</a>
           </p>
       );
     case studyActions.NEW_STUDY_RELATIONSHIP.value:
@@ -341,10 +347,10 @@ const ActivityMessage = ({activity}) => {
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has added a new study relationship:&nbsp;
             <a href={"/study/"
-            + activity.data.sourceStudyCode}>{activity.data.sourceStudyCode}</a>
-            &nbsp;{activity.data.type}&nbsp;
+            + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
+            &nbsp;{activity.data.relationship.type}&nbsp;
             <a href={"/study/"
-            + activity.data.targetStudyCode}>{activity.data.targetStudyCode}</a>
+            + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
           </p>
       );
     case studyActions.UPDATED_STUDY_RELATIONSHIP.value:
@@ -354,10 +360,10 @@ const ActivityMessage = ({activity}) => {
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has added a new study relationship:&nbsp;
             <a href={"/study/"
-            + activity.data.sourceStudyCode}>{activity.data.sourceStudyCode}</a>
-            &nbsp;{activity.data.type}&nbsp;
+            + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
+            &nbsp;{activity.data.relationship.type}&nbsp;
             <a href={"/study/"
-            + activity.data.targetStudyCode}>{activity.data.targetStudyCode}</a>
+            + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
           </p>
       );
     case studyActions.DELETED_STUDY_RELATIONSHIP.value:
@@ -366,7 +372,8 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed a study relationship for study:&nbsp;
-            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/"
+            + activity.data.study.code}>{activity.data.study.code}</a>
           </p>
       );
     case studyActions.NEW_STUDY_EXTERNAL_LINK.value:
@@ -377,13 +384,13 @@ const ActivityMessage = ({activity}) => {
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has added a new external link for study:&nbsp;
               <a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a>
+              + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
             <p className="bg-light text-secondary p-3">
               <Link size={16}/>
               &nbsp;
-              <a href={activity.data.url}
-                 target="_blank">{activity.data.label}</a>
+              <a href={activity.data.link.url}
+                 target="_blank">{activity.data.link.label}</a>
             </p>
           </React.Fragment>
       );
@@ -395,13 +402,13 @@ const ActivityMessage = ({activity}) => {
               + activity.user.accountName}>{activity.user.displayName}</a>
               &nbsp;has edited an external link for study:&nbsp;
               <a href={"/study/"
-              + activity.data.code}>{activity.data.code}</a>
+              + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
             <p className="bg-light text-secondary p-3">
               <Link size={16}/>
               &nbsp;
-              <a href={activity.data.url}
-                 target="_blank">{activity.data.label}</a>
+              <a href={activity.data.link.url}
+                 target="_blank">{activity.data.link.label}</a>
             </p>
           </React.Fragment>
       );
@@ -411,7 +418,8 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has removed an external link for study:&nbsp;
-            <a href={"/study/" + activity.data.code}>{activity.data.code}</a>
+            <a href={"/study/"
+            + activity.data.study.code}>{activity.data.study.code}</a>
           </p>
       );
     default:

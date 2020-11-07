@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.model;
 
+import com.decibeltx.studytracker.core.eln.NotebookFolder;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -65,6 +66,8 @@ public class Program implements Persistable<String> {
 
   @LastModifiedDate
   private Date updatedAt;
+
+  private NotebookFolder notebookFolder;
 
   private StorageFolder storageFolder;
 

@@ -32,6 +32,8 @@ public interface UserService {
 
   List<User> search(String keyword);
 
+  long count();
+
   void create(User user);
 
   void update(User user);

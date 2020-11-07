@@ -1,8 +1,8 @@
 spring.profiles.active=example
-#
+
 ### App
 spring.application.name=Study Tracker
-#
+
 ### Data source
 db.username=studytracker
 db.password=studytracker
@@ -10,51 +10,42 @@ db.host=localhost
 db.name=study-tracker
 db.port=27017
 db.connectionString=mongodb://${db.host}:${db.port}
-#
-# Security
 
-#
-#Document writing
-documents.slideshow.template=study_template.pptx
-#
+### Events
+events.mode=local
+
+# AWS
+aws.region=us-east-1
+aws.access-key-id=xxx
+aws.secret-access-key=xxx
+
 ### Notebook
-# Options: none, idbs
+# Options: none, benchling
 notebook.mode=none
-#
+
+### Benchling
+benchling.eln.api.token=xxx
+benchling.eln.tenant=xxx
+benchling.eln.api.root-url=https://${benchling.eln.tenant}.benchling.com
+benchling.eln.api.root-entity=
+benchling.eln.api.root-folder-url=${benchling.eln.tenant}/xxx/f_
+
 ### Storage
 # Options: local, egnyte
 storage.mode=local
 storage.use-existing=true
 storage.max-folder-read-depth=1
-#
+
 # Local
 storage.temp-dir=/tmp
 storage.local-dir=${storage.temp-dir}
-#
+
 # Egnyte
 egnyte.root-url=
 egnyte.api-token=
 egnyte.root-path=
 egnyte.qps=3
-#
+
 ### Studies
 study.default-code-prefix=ST
 study.default-external-code-prefix=EX
-#
-### LDAP
-ldap.url=
-ldap.domain=
-ldap.base=
-ldap.searchBase=
-ldap.filter=
-ldap.admin.username=
-ldap.admin.password=
-#
-### Teams
-teams.enabled=true
-teams.username=
-teams.password=
-teams.client-id=
-teams.secret=
-teams.default-team=
-teams.default-channel=

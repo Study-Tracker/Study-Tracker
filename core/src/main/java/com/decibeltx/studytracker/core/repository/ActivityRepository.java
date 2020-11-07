@@ -16,8 +16,8 @@
 
 package com.decibeltx.studytracker.core.repository;
 
-import com.decibeltx.studytracker.core.events.type.EventType;
 import com.decibeltx.studytracker.core.model.Activity;
+import com.decibeltx.studytracker.core.model.EventType;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

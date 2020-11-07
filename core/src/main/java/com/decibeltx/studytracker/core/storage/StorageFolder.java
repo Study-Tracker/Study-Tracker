@@ -16,20 +16,90 @@
 
 package com.decibeltx.studytracker.core.storage;
 
-public interface StorageFolder extends StorageObject {
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.data.annotation.Transient;
 
-  /**
-   * Returns a list of sub-folders.
-   *
-   * @return
-   */
-  Iterable<? extends StorageFolder> getSubFolders();
+public class StorageFolder implements StorageObject {
 
-  /**
-   * Returns a list of files in the folder.
-   *
-   * @return
-   */
-  Iterable<? extends StorageFile> getFiles();
+  @Transient
+  private StorageFolder parentFolder;
 
+  private String url;
+
+  private String path;
+
+  private String name;
+
+  @Transient
+  private List<StorageFolder> subFolders = new ArrayList<>();
+
+  @Transient
+  private List<StorageFile> files = new ArrayList<>();
+
+  public StorageFolder getParentFolder() {
+    return parentFolder;
+  }
+
+  public void setParentFolder(StorageFolder parentFolder) {
+    this.parentFolder = parentFolder;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String getUrl() {
+    return url;
+  }
+
+  @Override
+  public void setUrl(URL url) {
+    this.url = url.toString();
+  }
+
+  @Override
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
+  @Override
+  public String getPath() {
+    return path;
+  }
+
+  @Override
+  public void setPath(Path path) {
+    this.path = path.toString();
+  }
+
+  @Override
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  public List<StorageFolder> getSubFolders() {
+    return subFolders;
+  }
+
+  public void setSubFolders(List<StorageFolder> subFolders) {
+    this.subFolders = subFolders;
+  }
+
+  public List<StorageFile> getFiles() {
+    return files;
+  }
+
+  public void setFiles(List<StorageFile> files) {
+    this.files = files;
+  }
 }

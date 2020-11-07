@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.egnyte.entity;
 
-import com.decibeltx.studytracker.core.storage.StorageFile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URL;
@@ -26,7 +25,7 @@ import lombok.ToString;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class EgnyteFile implements EgnyteObject, StorageFile {
+public class EgnyteFile implements EgnyteObject {
 
   @JsonProperty("name")
   private String name;
@@ -68,17 +67,14 @@ public class EgnyteFile implements EgnyteObject, StorageFile {
     return false;
   }
 
-  @Override
   public void setUrl(URL url) {
     this.url = url.toString();
   }
 
-  @Override
   public void setPath(Path path) {
     this.path = path.toString();
   }
 
-  @Override
   public String getName() {
     return name;
   }
@@ -87,12 +83,10 @@ public class EgnyteFile implements EgnyteObject, StorageFile {
     this.name = name;
   }
 
-  @Override
   public String getPath() {
     return path;
   }
 
-  @Override
   public void setPath(String path) {
     this.path = path;
   }
@@ -169,12 +163,10 @@ public class EgnyteFile implements EgnyteObject, StorageFile {
     this.parentId = parentId;
   }
 
-  @Override
   public String getUrl() {
     return url;
   }
 
-  @Override
   public void setUrl(String url) {
     this.url = url;
   }

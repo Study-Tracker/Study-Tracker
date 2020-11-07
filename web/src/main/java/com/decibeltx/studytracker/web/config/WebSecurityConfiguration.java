@@ -16,12 +16,9 @@
 
 package com.decibeltx.studytracker.web.config;
 
-import com.decibeltx.studytracker.core.config.UserRepositoryPopulator;
 import com.decibeltx.studytracker.core.config.UserServiceAuditor;
 import com.decibeltx.studytracker.core.model.User;
-import com.decibeltx.studytracker.web.example.ExampleUserRepositoryPopulator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -55,20 +52,20 @@ public class WebSecurityConfiguration {
 
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder(); // TODO add salt
+    return new BCryptPasswordEncoder();
   }
 
-  @Configuration
-  @Order(1)
-  @ConditionalOnProperty(name = "security.mode", havingValue = "demo")
-  public static class DemoSecurityConfiguration {
-
-    @Bean
-    public UserRepositoryPopulator exampleUserRepositoryPopulator() {
-      return new ExampleUserRepositoryPopulator();
-    }
-
-  }
+//  @Configuration
+//  @Order(1)
+//  @ConditionalOnProperty(name = "security.mode", havingValue = "demo")
+//  public static class DemoSecurityConfiguration {
+//
+//    @Bean
+//    public UserRepositoryPopulator exampleUserRepositoryPopulator() {
+//      return new ExampleUserRepositoryPopulator();
+//    }
+//
+//  }
 
   @Configuration
   @Order(2)

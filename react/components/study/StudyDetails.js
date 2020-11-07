@@ -260,20 +260,20 @@ class StudyDetails extends React.Component {
                             ? (
                                 <a href={study.storageFolder.url}
                                    target="_blank"
-                                   className="btn btn-info mr-2">
-                                  Egnyte
+                                   className="btn btn-info mt-2 mr-2">
+                                  Study Storage Folder
                                   <Folder
                                       className="feather align-middle ml-2 mb-1"/>
                                 </a>
                             ) : ''
                       }
                       {
-                        !!study.notebookEntry
+                        !!study.notebookFolder
                             ? (
-                                <a href={study.notebookEntry.url}
+                                <a href={study.notebookFolder.url}
                                    target="_blank"
-                                   className="btn btn-info mr-2">
-                                  {study.notebookEntry.label}
+                                   className="btn btn-info mt-2 mr-2">
+                                  Study ELN Folder
                                   <Book
                                       className="feather align-middle ml-2 mb-1"/>
                                 </a>
