@@ -16,7 +16,8 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEventPublisher;
+import com.decibeltx.studytracker.core.eln.NotebookFolder;
+import com.decibeltx.studytracker.core.eln.StudyNotebookService;
 import com.decibeltx.studytracker.core.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.core.exception.InvalidConstraintException;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
@@ -28,6 +29,9 @@ import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.service.ProgramService;
 import com.decibeltx.studytracker.core.service.StudyService;
+import com.decibeltx.studytracker.core.storage.StorageFolder;
+import com.decibeltx.studytracker.core.storage.StudyStorageService;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.ConstraintViolationException;
@@ -39,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class StudyServiceImpl implements StudyService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyServiceImpl.class);
@@ -50,7 +55,10 @@ public class StudyServiceImpl implements StudyService {
   private ProgramService programService;
 
   @Autowired
-  private StudyEventPublisher studyEventPublisher;
+  private StudyStorageService studyStorageService;
+
+  @Autowired(required = false)
+  private StudyNotebookService notebookService;
 
   @Autowired
   private Environment environment;
@@ -121,11 +129,43 @@ public class StudyServiceImpl implements StudyService {
       }
     }
 
+    // Create the study storage folder
+    try {
+      studyStorageService.createStudyFolder(study);
+      StorageFolder folder = studyStorageService.getStudyFolder(study);
+      study.setStorageFolder(folder);
+      study.setUpdatedAt(new Date());
+      studyRepository.save(study);
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.error("Failed to create storage folder for study: " + study.getCode());
+    }
+
+    // Create the ELN folder
+    LOGGER.warn(String.format("Creating ELN entry for study: %s", study.getCode()));
+    if (study.isLegacy()) {
+      LOGGER.warn(String.format("Legacy Study : %s", study.getCode()));
+      NotebookFolder notebookFolder = study.getNotebookFolder();
+      notebookFolder.setName("Benchling");
+      study.setNotebookFolder(notebookFolder);
+      study.setUpdatedAt(new Date());
+      studyRepository.save(study);
+    } else {
+      if (notebookService != null) {
+        try {
+          NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
+          study.setNotebookFolder(notebookFolder);
+          study.setUpdatedAt(new Date());
+          studyRepository.save(study);
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOGGER.error("Failed to create notebook entry for study: " + study.getCode());
+        }
+      }
+    }
+
     LOGGER.info(String.format("Successfully created new study with code %s and ID %s",
         study.getCode(), study.getId()));
-
-    // Publish events
-    studyEventPublisher.publishNewStudyEvent(study, study.getCreatedBy());
 
   }
 
@@ -134,14 +174,12 @@ public class StudyServiceImpl implements StudyService {
     LOGGER.info("Attempting to update existing study with code: " + study.getCode());
     studyRepository.findById(study.getId()).orElseThrow(RecordNotFoundException::new);
     studyRepository.save(study);
-    studyEventPublisher.publishUpdatedStudyEvent(study, study.getLastModifiedBy());
   }
 
   @Override
   public void delete(Study study) {
     study.setActive(false);
     studyRepository.save(study);
-    studyEventPublisher.publishDeletedStudyEvent(study, study.getLastModifiedBy());
   }
 
   @Override
@@ -172,11 +210,8 @@ public class StudyServiceImpl implements StudyService {
 
   @Override
   public void updateStatus(Study study, Status status) {
-    Status oldStatus = study.getStatus();
     study.setStatus(status);
     studyRepository.save(study);
-    studyEventPublisher
-        .publishStudyStatusChangedEvent(study, study.getLastModifiedBy(), oldStatus, status);
   }
 
   @Override

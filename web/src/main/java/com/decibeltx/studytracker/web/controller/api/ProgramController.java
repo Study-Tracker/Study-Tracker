@@ -16,11 +16,13 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
+import com.decibeltx.studytracker.core.events.util.ProgramActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.service.ActivityService;
+import com.decibeltx.studytracker.core.service.EventsService;
 import com.decibeltx.studytracker.core.service.ProgramService;
 import com.decibeltx.studytracker.core.service.UserService;
 import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
@@ -59,6 +61,9 @@ public class ProgramController {
   @Autowired
   private ActivityService activityService;
 
+  @Autowired
+  private EventsService eventsService;
+
   @GetMapping("")
   public List<Program> getAllPrograms() throws Exception {
     return programService.findAll();
@@ -87,6 +92,13 @@ public class ProgramController {
     program.setCreatedBy(user);
 
     programService.create(program);
+
+    // Publish events
+    Activity activity = ProgramActivityUtils
+        .fromNewProgram(program, user);
+    activityService.create(activity);
+    eventsService.dispatchEvent(activity);
+
     return new ResponseEntity<>(program, HttpStatus.CREATED);
 
   }
@@ -107,6 +119,12 @@ public class ProgramController {
         .orElseThrow(RecordNotFoundException::new);
     program.setLastModifiedBy(user);
     programService.update(program);
+
+    // Publish events
+    Activity activity = ProgramActivityUtils.fromUpdatedProgram(program, user);
+    activityService.create(activity);
+    eventsService.dispatchEvent(activity);
+
     return new ResponseEntity<>(program, HttpStatus.CREATED);
 
   }
@@ -126,6 +144,13 @@ public class ProgramController {
         .orElseThrow(RecordNotFoundException::new);
     program.setLastModifiedBy(user);
     programService.delete(program);
+
+    // Publish events
+    Activity activity = ProgramActivityUtils
+        .fromDeletedProgram(program, user);
+    activityService.create(activity);
+    eventsService.dispatchEvent(activity);
+
     return new ResponseEntity<>(program, HttpStatus.OK);
   }
 
@@ -144,6 +169,13 @@ public class ProgramController {
     program.setLastModifiedBy(user);
     program.setActive(active);
     programService.update(program);
+
+    // Publish events
+    Activity activity = ProgramActivityUtils
+        .fromUpdatedProgram(program, user);
+    activityService.create(activity);
+    eventsService.dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

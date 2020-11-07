@@ -16,12 +16,9 @@
 
 package com.decibeltx.studytracker.core.model;
 
-import com.decibeltx.studytracker.core.events.type.AssayEvent;
-import com.decibeltx.studytracker.core.events.type.EventType;
-import com.decibeltx.studytracker.core.events.type.ProgramEvent;
-import com.decibeltx.studytracker.core.events.type.StudyEvent;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
@@ -31,56 +28,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "activity")
 public class Activity {
 
+  @Id
+  private String id;
+
   private Reference reference;
 
   private String referenceId;
 
   private EventType eventType;
 
-  private Map<String, Object> data;
-
-  @Id
-  private String id;
+  private Map<String, Object> data = new HashMap<>();
 
   @Linked(model = User.class)
   @NotNull
   @DBRef
   private User user;
 
-  public static Activity from(StudyEvent event) {
-    Activity activity = new Activity();
-    activity.setReference(Reference.STUDY);
-    activity.setReferenceId(event.getStudy().getId());
-    activity.setEventType(event.getEventType());
-    activity.setDate(new Date());
-    activity.setUser(event.getUser());
-    activity.setData(event.getData());
-    return activity;
-  }
-
-  public static Activity from(AssayEvent event) {
-    Activity activity = new Activity();
-    activity.setReference(Reference.ASSAY);
-    activity.setReferenceId(event.getAssay().getId());
-    activity.setEventType(event.getEventType());
-    activity.setDate(new Date());
-    activity.setUser(event.getUser());
-    activity.setData(event.getData());
-    return activity;
-  }
-
-  public static Activity from(ProgramEvent event) {
-    Activity activity = new Activity();
-    activity.setReference(Reference.PROGRAM);
-    activity.setReferenceId(event.getProgram().getId());
-    activity.setEventType(event.getEventType());
-    activity.setDate(new Date());
-    activity.setUser(event.getUser());
-    activity.setData(event.getData());
-    return activity;
-  }
-
   private Date date;
+
+  /* Getters and Setters */
 
   public User getUser() {
     return user;
@@ -146,7 +112,8 @@ public class Activity {
   public enum Reference {
     STUDY,
     ASSAY,
-    PROGRAM
+    PROGRAM,
+    USER
   }
 
 }

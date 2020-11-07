@@ -16,7 +16,9 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
+import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.ExternalLink;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
@@ -61,6 +63,12 @@ public class StudyExternalLinksController extends StudyController {
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyExternalLinkService.addStudyExternalLink(study, externalLink);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromNewExternalLink(study, user, externalLink);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
@@ -79,6 +87,12 @@ public class StudyExternalLinksController extends StudyController {
       throw new RecordNotFoundException("Cannot find external link with ID: " + linkId);
     }
     studyExternalLinkService.updateStudyExternalLink(study, externalLink);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromUpdatedExternalLink(study, user, externalLink);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
@@ -92,6 +106,12 @@ public class StudyExternalLinksController extends StudyController {
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyExternalLinkService.deleteStudyExternalLink(study, linkId);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromDeletedExternalLink(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

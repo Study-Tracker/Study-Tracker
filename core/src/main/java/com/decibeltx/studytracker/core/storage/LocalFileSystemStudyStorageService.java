@@ -73,7 +73,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
       return Files.walk(path, 1)
           .filter(Files::isRegularFile)
           .map(f -> {
-            BasicStorageFile file = new BasicStorageFile();
+            StorageFile file = new StorageFile();
             file.setPath(f);
             file.setName(f.getFileName().toString());
             file.setUrl(getObjectUrl(f));
@@ -97,7 +97,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
           .filter(Files::isDirectory)
           .filter(p -> !p.toString().equals(path.toString()))
           .map(d -> {
-            BasicStorageFolder folder = new BasicStorageFolder();
+            StorageFolder folder = new StorageFolder();
             folder.setName(d.toFile().getName());
             folder.setPath(d);
             folder.setUrl(getObjectUrl(d));
@@ -120,7 +120,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(program.getName());
     }
-    BasicStorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setPath(path);
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(path));
@@ -140,7 +140,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(study.getCode());
     }
-    BasicStorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setPath(studyFolder);
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(studyFolder));
@@ -159,7 +159,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(assay.getCode());
     }
-    BasicStorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setPath(assayFolder);
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(assayFolder));
@@ -195,7 +195,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
             "Failed to create program folder: " + newFolder.getAbsolutePath());
       }
     }
-    StorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setName(newFolder.getName());
     folder.setPath(programPath);
     folder.setUrl(getObjectUrl(programPath));
@@ -230,7 +230,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
             "Failed to create study folder: " + newFolder.getAbsolutePath());
       }
     }
-    StorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setName(newFolder.getName());
     folder.setPath(studyPath);
     folder.setUrl(getObjectUrl(studyPath));
@@ -266,7 +266,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
             "Failed to create assay folder: " + newFolder.getAbsolutePath());
       }
     }
-    StorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setName(newFolder.getName());
     folder.setPath(assayPath);
     folder.setUrl(getObjectUrl(assayPath));
@@ -287,9 +287,10 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     } catch (Exception e) {
       throw new StudyTrackerException(e);
     }
-    StorageFile studyFile = new BasicStorageFile();
+    StorageFile studyFile = new StorageFile();
     studyFile.setPath(newFilePath);
     studyFile.setUrl(getObjectUrl(newFilePath));
+    studyFile.setName(newFile.getName());
     return studyFile;
   }
 
@@ -306,9 +307,10 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     } catch (Exception e) {
       throw new StudyTrackerException(e);
     }
-    StorageFile assayFile = new BasicStorageFile();
+    StorageFile assayFile = new StorageFile();
     assayFile.setPath(newFilePath);
     assayFile.setUrl(getObjectUrl(newFilePath));
+    assayFile.setName(newFile.getName());
     return assayFile;
   }
 

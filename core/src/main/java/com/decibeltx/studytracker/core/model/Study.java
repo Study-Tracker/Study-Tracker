@@ -16,8 +16,8 @@
 
 package com.decibeltx.studytracker.core.model;
 
+import com.decibeltx.studytracker.core.eln.NotebookFolder;
 import com.decibeltx.studytracker.core.keyword.Keyword;
-import com.decibeltx.studytracker.core.notebook.NotebookEntry;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
 import java.net.URL;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public class Study implements Persistable<String> {
 
   private boolean active = true;
 
-  private NotebookEntry notebookEntry;
+  private NotebookFolder notebookFolder;
 
   private StorageFolder storageFolder;
 
