@@ -111,6 +111,45 @@ const ExportToCsv = (props) => {
   );
 };
 
+export const UserTable = ({users}) => {
+  return (
+      <ToolkitProvider
+          keyField="id"
+          data={users}
+          columns={columns}
+          search
+          exportCSV
+      >
+        {props => (
+            <div>
+              <div className="float-right">
+                <ExportToCsv{...props.csvProps} />
+                &nbsp;&nbsp;
+                <Search.SearchBar
+                    {...props.searchProps}
+                />
+              </div>
+              <BootstrapTable
+                  bootstrap4
+                  keyField="id"
+                  bordered={false}
+                  pagination={paginationFactory({
+                    sizePerPage: 10,
+                    sizePerPageList: [10, 20, 40, 80]
+                  })}
+                  defaultSorted={[{
+                    dataField: "updatedAt",
+                    order: "desc"
+                  }]}
+                  {...props.baseProps}
+              >
+              </BootstrapTable>
+            </div>
+        )}
+      </ToolkitProvider>
+  )
+}
+
 const UserList = ({title, user, users}) => {
 
   return (
@@ -138,40 +177,7 @@ const UserList = ({title, user, users}) => {
           <Col lg="12">
             <Card>
               <CardBody>
-                <ToolkitProvider
-                    keyField="id"
-                    data={users}
-                    columns={columns}
-                    search
-                    exportCSV
-                >
-                  {props => (
-                      <div>
-                        <div className="float-right">
-                          <ExportToCsv{...props.csvProps} />
-                          &nbsp;&nbsp;
-                          <Search.SearchBar
-                              {...props.searchProps}
-                          />
-                        </div>
-                        <BootstrapTable
-                            bootstrap4
-                            keyField="id"
-                            bordered={false}
-                            pagination={paginationFactory({
-                              sizePerPage: 10,
-                              sizePerPageList: [10, 20, 40, 80]
-                            })}
-                            defaultSorted={[{
-                              dataField: "updatedAt",
-                              order: "desc"
-                            }]}
-                            {...props.baseProps}
-                        >
-                        </BootstrapTable>
-                      </div>
-                  )}
-                </ToolkitProvider>
+                <UserTable users={users}/>
               </CardBody>
             </Card>
           </Col>

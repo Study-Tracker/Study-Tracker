@@ -164,7 +164,8 @@ export default class UserForm extends React.Component {
         const json = await response.json();
         console.log(json);
         if (response.ok) {
-          history.push("/user/" + json.id);
+          // history.push("/user/" + json.id);
+          history.push("/admin?active=users");
         } else {
           this.setState({showLoadingOverlay: false})
           swal("Something went wrong",
@@ -195,7 +196,7 @@ export default class UserForm extends React.Component {
     })
     .then(val => {
       if (val) {
-        history.push("/users");
+        history.push("/admin?active=users");
       }
     });
   }
@@ -220,6 +221,9 @@ export default class UserForm extends React.Component {
                             <a href={"/"}>Home</a>
                           </BreadcrumbItem>
                           <BreadcrumbItem>
+                            <a href={"/admin"}>Admin Dashboard</a>
+                          </BreadcrumbItem>
+                          <BreadcrumbItem>
                             <a href={"/user/" + this.state.user.id}>
                               User Detail
                             </a>
@@ -230,7 +234,10 @@ export default class UserForm extends React.Component {
                     : (
                         <Breadcrumb>
                           <BreadcrumbItem>
-                            <a href={"/users"}>Users</a>
+                            <a href={"/"}>Home</a>
+                          </BreadcrumbItem>
+                          <BreadcrumbItem>
+                            <a href={"/admin"}>Admin Dashboard</a>
                           </BreadcrumbItem>
                           <BreadcrumbItem active>New User</BreadcrumbItem>
                         </Breadcrumb>
