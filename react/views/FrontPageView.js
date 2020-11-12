@@ -17,64 +17,59 @@
 import React from 'react';
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
-import StudyList from "../components/study/StudyList";
 import {connect} from 'react-redux';
 import {compose} from 'redux';
-import crossfilter from "crossfilter2";
-import StudyFilters, {labels as filter} from '../components/filters/studyFilters'
 import {withRouter} from 'react-router-dom';
 import SideBar from "../structure/SideBar";
 import NavBar from "../structure/NavBar";
 import Footer from "../structure/Footer";
+import FrontPageTimeline from "../components/timeline/FrontPageTimeline";
 
 const qs = require('qs');
 
-class StudyListView extends React.Component {
+class FrontPageView extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
       isError: false,
-      title: this.props.title,
-      data: {}
+      activity: [],
+
     };
   }
 
   componentDidMount() {
     const params = qs.parse(this.props.location.search,
         {ignoreQueryPrefix: true});
-    let title = params.title || this.state.title;
+    console.log(params);
+    let page = !!params.page ? parseInt(params.page) : 0;
+    let size = !!params.size ? parseInt(params.size) : 20;
+    let sort = "date,desc";
     let query = '';
     if (!!params.search) {
       query = "?search=" + params.search;
-      title = 'Search Results';
     }
 
-    fetch("/api/study" + query)
+    fetch("/api/activity?sort=" + sort + "&page=" + page + "&size=" + size)
     .then(response => response.json())
-    .then(studies => {
-
-      console.log(studies);
-
-      const data = {};
-      data.cf = crossfilter(studies);
-      data.dimensions = {};
-      data.dimensions.allData = data.cf.dimension(d => d);
-      data.dimensions[filter.PROGRAM] = data.cf.dimension(d => d.program.id);
-      data.dimensions[filter.LEGACY] = data.cf.dimension(d => d.legacy);
-      data.dimensions[filter.EXTERNAL] = data.cf.dimension(
-          d => !!d.collaborator);
-      data.dimensions[filter.MY_STUDY] = data.cf.dimension(
-          d => this.props.user && d.owner.id === this.props.user.id);
-      data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
-
-      this.setState({
-        data: data,
-        isLoaded: true,
-        title: title
-      });
-
+    .then(activityPage => {
+      fetch("/api/stats/frontpage")
+      .then(response => response.json())
+      .then(stats => {
+        this.setState({
+          stats: stats,
+          activity: activityPage.content,
+          isLoaded: true,
+          pageNumber: page,
+          pageSize: size,
+          pageSort: sort,
+          totalItems: activityPage.numberOfElements,
+          totalPages: activityPage.totalPages,
+          hasNextPage: !activityPage.last,
+          hasPreviousPage: page > 0
+        })
+      })
     })
     .catch(error => {
       console.error(error);
@@ -83,6 +78,7 @@ class StudyListView extends React.Component {
         error: error
       });
     });
+
   }
 
   render() {
@@ -97,30 +93,15 @@ class StudyListView extends React.Component {
 
       } else if (this.state.isLoaded) {
 
-        // Apply filters
-        console.log("Filters: ");
-        console.log(this.props.filters);
-
-        for (let key of Object.keys(this.state.data.dimensions)) {
-          this.state.data.dimensions[key].filterAll();
-          if (this.props.filters.hasOwnProperty(key) && this.props.filters[key]
-              != null) {
-            if (Array.isArray(this.props.filters[key])) {
-              this.state.data.dimensions[key].filter(
-                  d => this.props.filters[key].indexOf(d) > -1);
-            } else {
-              this.state.data.dimensions[key].filter(this.props.filters[key]);
-            }
-          }
-        }
-
-        content =
-            <StudyList
-                studies={this.state.data.dimensions.allData.top(Infinity)}
-                title={this.state.title}
-                filters={this.props.filters}
-                user={this.props.user}
-            />;
+        content = <FrontPageTimeline
+            activity={this.state.activity}
+            stats={this.state.stats}
+            user={this.props.user}
+            pageNumber={this.state.pageNumber}
+            pageSize={this.state.pageSize}
+            hasNextPage={this.state.hasNextPage}
+            hasPreviousPage={this.state.hasPreviousPage}
+        />;
 
       }
 
@@ -141,7 +122,7 @@ class StudyListView extends React.Component {
               <Footer/>
             </div>
           </div>
-          <StudyFilters/>
+          {/*<StudyFilters/>*/}
         </React.Fragment>
     );
 
@@ -157,4 +138,4 @@ export default compose(
           user: store.user
         })
     )
-)(StudyListView);
+)(FrontPageView);

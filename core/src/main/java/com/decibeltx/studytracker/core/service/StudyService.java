@@ -19,6 +19,7 @@ package com.decibeltx.studytracker.core.service;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,5 +128,16 @@ public interface StudyService {
    * @return
    */
   List<Study> search(String keyword);
+
+  /**
+   * Counting number of studies created before/after/between given dates.
+   */
+  long count();
+
+  long countFromDate(Date startDate);
+
+  long countBeforeDate(Date endDate);
+
+  long countBetweenDates(Date startDate, Date endDate);
 
 }

@@ -110,4 +110,24 @@ public class ProgramServiceImpl implements ProgramService {
     program.setActive(false);
     programRepository.save(program);
   }
+
+  @Override
+  public long count() {
+    return programRepository.count();
+  }
+
+  @Override
+  public long countFromDate(Date startDate) {
+    return programRepository.countByCreatedAtAfter(startDate);
+  }
+
+  @Override
+  public long countBeforeDate(Date endDate) {
+    return programRepository.countByCreatedAtBefore(endDate);
+  }
+
+  @Override
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return programRepository.countByCreatedAtBetween(startDate, endDate);
+  }
 }

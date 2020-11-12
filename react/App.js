@@ -36,6 +36,7 @@ import UserDetailsView from "./views/UserDetailsView";
 import UserFormView from "./views/UserFormView";
 import SignInView from "./views/SignInView";
 import PasswordResetView from "./views/PasswordResetView";
+import FrontPageView from "./views/FrontPageView";
 
 export const history = createBrowserHistory();
 
@@ -54,8 +55,14 @@ export default class App extends React.Component {
               <ScrollToTop>
                 <Switch>
 
-                  {/*Home page / study list*/}
-                  <Route exact path={["/", "/studies"]}
+                  {/*Home page */}
+                  <Route exact path={["/"]}
+                         render={props =>
+                             <FrontPageView {...props} />}
+                  />
+
+                  {/* Study List */}
+                  <Route exact path={["/studies"]}
                          render={props =>
                              <StudyListView {...props} title={"All Studies"}/>}
                   />

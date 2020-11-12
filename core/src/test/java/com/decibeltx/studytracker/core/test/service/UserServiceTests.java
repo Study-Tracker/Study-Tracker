@@ -167,4 +167,10 @@ public class UserServiceTests {
     Assert.assertEquals(0, users.size());
   }
 
+  @Test
+  public void activeUserCountTest() {
+    long count = userService.countActiveUsers();
+    Assert.assertEquals(USER_COUNT, count);
+  }
+
 }
