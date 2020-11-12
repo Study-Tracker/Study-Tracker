@@ -29,4 +29,9 @@ public class DefaultController {
     return "index";
   }
 
+  @GetMapping({"/admin"})
+  public String admin() {
+    return "index";
+  }
+
 }

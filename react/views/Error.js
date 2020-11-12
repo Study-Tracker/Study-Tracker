@@ -102,11 +102,14 @@ const Unauthorized = () => {
 const ServerError = () => {
   return (
       <div className="text-center">
-        <h1 className="display-1 font-weight-bold">500</h1>
-        <p className="h1">Internal Server Error</p>
+        {/*<h1 className="display-1 font-weight-bold">500</h1>*/}
+        <p className="h1">Something went wrong...</p>
         <p className="h4 font-weight-normal mt-3 mb-4">
-          The server encountered something unexpected that didn't allow it to
-          complete the request. We apologize.
+          Study Tracker has encountered an error it was not able to handle.
+          Please
+          reload the page and try again. If the error persists, contact your
+          local
+          help desk.
         </p>
         <a className="btn btn-lg btn-primary"
            style={{paddingLeft: "50", paddingRight: "50"}} href="/">Home</a>
