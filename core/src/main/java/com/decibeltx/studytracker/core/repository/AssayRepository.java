@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.repository;
 
 import com.decibeltx.studytracker.core.model.Assay;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -30,5 +31,11 @@ public interface AssayRepository extends MongoRepository<Assay, String> {
 
   @Query("{ 'code': { '$regex': ?0, '$options': 'i' } }")
   List<Assay> findByCodePrefix(String prefix);
+
+  long countByCreatedAtBefore(Date date);
+
+  long countByCreatedAtAfter(Date date);
+
+  long countByCreatedAtBetween(Date startDate, Date endDate);
 
 }

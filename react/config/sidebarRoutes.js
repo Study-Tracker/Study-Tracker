@@ -15,14 +15,29 @@
  */
 
 import React from "react";
-import {Clipboard, Droplet, GitHub, Layers, Target, Users} from "react-feather";
+import {
+  Activity,
+  Clipboard,
+  Droplet,
+  GitHub,
+  Layers,
+  Target,
+  Users
+} from "react-feather";
+
+const timelineRoutes = {
+  path: "/",
+  name: "Activity",
+  header: "Navigation",
+  icon: Activity,
+  containsHome: true,
+  children: null
+}
 
 const studyRoutes = {
-  path: "/",
+  path: "/studies?title=All Studies",
   name: "Studies",
-  header: "Navigation",
   icon: Clipboard,
-  containsHome: true,
   children: [
     {
       path: "/studies?title=All Studies",
@@ -124,6 +139,7 @@ const userRoutes = {
 };
 
 export default [
+  timelineRoutes,
   studyRoutes,
   assayRoutes,
   programRoutes,

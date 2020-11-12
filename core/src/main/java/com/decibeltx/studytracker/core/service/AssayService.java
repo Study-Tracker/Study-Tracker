@@ -18,6 +18,7 @@ package com.decibeltx.studytracker.core.service;
 
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Status;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,5 +47,16 @@ public interface AssayService {
   void updateStatus(Assay assay, Status status);
 
   String generateAssayCode(Assay assay);
+
+  /**
+   * Counting number of assays created before/after/between given dates.
+   */
+  long count();
+
+  long countFromDate(Date startDate);
+
+  long countBeforeDate(Date endDate);
+
+  long countBetweenDates(Date startDate, Date endDate);
 
 }

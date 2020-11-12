@@ -23,6 +23,7 @@ import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.service.AssayService;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -99,5 +100,25 @@ public class AssayServiceImpl implements AssayService {
     String prefix = study.getProgram().getCode() + "-";
     int count = assayRepository.findByCodePrefix(prefix).size();
     return study.getCode() + "-" + String.format("%05d", count + 1);
+  }
+
+  @Override
+  public long count() {
+    return assayRepository.count();
+  }
+
+  @Override
+  public long countFromDate(Date startDate) {
+    return assayRepository.countByCreatedAtAfter(startDate);
+  }
+
+  @Override
+  public long countBeforeDate(Date endDate) {
+    return assayRepository.countByCreatedAtBefore(endDate);
+  }
+
+  @Override
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return assayRepository.countByCreatedAtBetween(startDate, endDate);
   }
 }

@@ -19,10 +19,13 @@ package com.decibeltx.studytracker.core.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -52,6 +55,12 @@ public class User implements Persistable<String>, UserDetails {
   @NotNull
   @Indexed(unique = true)
   private String email;
+
+  @CreatedDate
+  private Date createdAt;
+
+  @LastModifiedDate
+  private Date updatedAt;
 
   private boolean admin = false;
 

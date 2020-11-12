@@ -27,6 +27,7 @@ import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.service.ActivityService;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,5 +122,30 @@ public class ActivityServiceImpl implements ActivityService {
     for (Activity activity : this.findByStudy(study)) {
       this.delete(activity);
     }
+  }
+
+  @Override
+  public long count() {
+    return activityRepository.count();
+  }
+
+  @Override
+  public long countFromDate(Date startDate) {
+    return activityRepository.countByDateAfter(startDate);
+  }
+
+  @Override
+  public long countBeforeDate(Date endDate) {
+    return activityRepository.countByDateBefore(endDate);
+  }
+
+  @Override
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return activityRepository.countByDateBetween(startDate, endDate);
+  }
+
+  @Override
+  public long countCompletedStudiesFromDate(Date date) {
+    return activityRepository.findCompletedStudiesAfterDate(date).size();
   }
 }

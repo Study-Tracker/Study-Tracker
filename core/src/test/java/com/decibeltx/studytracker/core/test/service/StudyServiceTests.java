@@ -29,6 +29,7 @@ import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
 import com.decibeltx.studytracker.core.service.StudyService;
 import com.decibeltx.studytracker.core.test.TestConfiguration;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -243,5 +244,19 @@ public class StudyServiceTests {
     Assert.assertEquals(Status.COMPLETE, updated.getStatus());
   }
 
+  @Test
+  public void studyCountTest() {
+
+    Date now = new Date();
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.MONTH, -1);
+    Date monthAgo = calendar.getTime();
+
+    Assert.assertEquals(STUDY_COUNT, studyService.count());
+    Assert.assertEquals(0, studyService.countBeforeDate(monthAgo));
+    Assert.assertEquals(STUDY_COUNT, studyService.countFromDate(monthAgo));
+    Assert.assertEquals(STUDY_COUNT, studyService.countBetweenDates(monthAgo, now));
+
+  }
 
 }

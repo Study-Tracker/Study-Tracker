@@ -219,4 +219,24 @@ public class StudyServiceImpl implements StudyService {
     return studyRepository.findByNameOrCodeLike(keyword);
   }
 
+  @Override
+  public long count() {
+    return studyRepository.count();
+  }
+
+  @Override
+  public long countFromDate(Date startDate) {
+    return studyRepository.countByCreatedAtAfter(startDate);
+  }
+
+  @Override
+  public long countBeforeDate(Date endDate) {
+    return studyRepository.countByCreatedAtBefore(endDate);
+  }
+
+  @Override
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return studyRepository.countByCreatedAtBetween(startDate, endDate);
+  }
+
 }

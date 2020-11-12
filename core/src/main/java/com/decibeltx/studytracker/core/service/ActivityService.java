@@ -22,6 +22,7 @@ import com.decibeltx.studytracker.core.model.EventType;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -55,5 +56,18 @@ public interface ActivityService {
   void delete(Activity activity);
 
   void deleteStudyActivity(Study study);
+
+  /**
+   * Counting instances of activity before/after/between given dates
+   */
+  long count();
+
+  long countFromDate(Date startDate);
+
+  long countBeforeDate(Date endDate);
+
+  long countBetweenDates(Date startDate, Date endDate);
+
+  long countCompletedStudiesFromDate(Date date);
 
 }
