@@ -45,14 +45,14 @@ public class StudyRelationshipServiceImpl implements StudyRelationshipService {
 
     List<StudyRelationship> sourceRelationships = sourceStudy.getStudyRelationships()
         .stream()
-        .filter(r -> r.getStudy().getId().equals(targetStudy.getId()))
+        .filter(r -> !r.getStudy().getId().equals(targetStudy.getId()))
         .collect(Collectors.toList());
     sourceRelationships.add(sourceRelationship);
     sourceStudy.setStudyRelationships(sourceRelationships);
 
     List<StudyRelationship> targetRelationships = targetStudy.getStudyRelationships()
         .stream()
-        .filter(r -> r.getStudy().getId().equals(sourceStudy.getId()))
+        .filter(r -> !r.getStudy().getId().equals(sourceStudy.getId()))
         .collect(Collectors.toList());
     targetRelationships.add(targetRelationship);
     targetStudy.setStudyRelationships(targetRelationships);
@@ -66,13 +66,13 @@ public class StudyRelationshipServiceImpl implements StudyRelationshipService {
   public void removeStudyRelationship(Study sourceStudy, Study targetStudy) {
     List<StudyRelationship> sourceRelationships = sourceStudy.getStudyRelationships()
         .stream()
-        .filter(r -> r.getStudy().getId().equals(targetStudy.getId()))
+        .filter(r -> !r.getStudy().getId().equals(targetStudy.getId()))
         .collect(Collectors.toList());
     sourceStudy.setStudyRelationships(sourceRelationships);
 
     List<StudyRelationship> targetRelationships = targetStudy.getStudyRelationships()
         .stream()
-        .filter(r -> r.getStudy().getId().equals(sourceStudy.getId()))
+        .filter(r -> !r.getStudy().getId().equals(sourceStudy.getId()))
         .collect(Collectors.toList());
     targetStudy.setStudyRelationships(targetRelationships);
 

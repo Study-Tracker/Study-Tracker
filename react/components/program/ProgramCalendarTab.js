@@ -30,25 +30,11 @@ class ProgramCalendarTab extends React.Component {
   render() {
     return (
         <div>
-
-          <Row className="justify-content-between align-items-center">
-            <div className="col-6">
-              <h4>Program Calendar</h4>
-            </div>
-          </Row>
-
-          <Row>
-            <Col sm={12}>
-              <hr/>
-            </Col>
-          </Row>
-
           <Row>
             <Col sm={12}>
               TO DO
             </Col>
           </Row>
-
         </div>
     )
   }

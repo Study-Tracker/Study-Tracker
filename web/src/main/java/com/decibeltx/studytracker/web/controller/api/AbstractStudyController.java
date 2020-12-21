@@ -28,7 +28,7 @@ import com.decibeltx.studytracker.core.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class StudyController {
+public abstract class AbstractStudyController {
 
   private StudyService studyService;
 

@@ -31,7 +31,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@ComponentScan(basePackages = {"com.decibeltx.studytracker.web.controller"})
+@ComponentScan(basePackages = {"com.decibeltx.studytracker.web.controller",
+    "com.decibeltx.studytracker.web.exception"})
 @PropertySource("classpath:web.properties")
 public class WebAppConfiguration {
 

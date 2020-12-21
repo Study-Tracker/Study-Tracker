@@ -120,15 +120,18 @@ export const StudySummaryCards = ({studies}) => {
         </Row>
     );
   } else {
-    studies.forEach(study => {
-      content.push(<hr key={"study-border-" + study.id}/>);
+    for (let i = 0; i < studies.length; i++) {
+      let study = studies[i];
+      if (i > 0) {
+        content.push(<hr key={"study-border-" + study.id}/>);
+      }
       content.push(
           <StudySummaryCard
               key={"study-card-" + study.id}
               study={study}
           />
       );
-    });
+    }
   }
 
   return (

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Row} from "reactstrap";
+import {Button, Col, Row} from "reactstrap";
 import {history} from "../../App";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
@@ -24,28 +24,27 @@ import {StudySummaryCards} from "../studies";
 const ProgramStudiesTab = ({studies, user}) => {
 
   return (
-      <div>
+      <React.Fragment>
         <Row className="justify-content-between align-items-center">
-          <div className="col-6">
-            <h4>Program Studies</h4>
-          </div>
-          <div className="col-auto">
+          <Col>
             {
               !!user
                   ? (
-                      <Button color="info"
-                              onClick={() => history.push("/studies/new")}>
-                        New Study
-                        &nbsp;
-                        <FontAwesomeIcon icon={faPlusCircle}/>
-                      </Button>
+                      <span className="float-right">
+                        <Button color="info"
+                                onClick={() => history.push("/studies/new")}>
+                          New Study
+                          &nbsp;
+                          <FontAwesomeIcon icon={faPlusCircle}/>
+                        </Button>
+                      </span>
                   ) : ''
             }
-          </div>
+          </Col>
         </Row>
 
         <StudySummaryCards studies={studies}/>
-      </div>
+      </React.Fragment>
   );
 
 };

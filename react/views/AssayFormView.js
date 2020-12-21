@@ -34,52 +34,56 @@ class AssayFormView extends React.Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
 
-    fetch("/api/study/" + this.state.studyCode)
-    .then(response => response.json())
-    .then(study => {
-
-      // Selected assay
-      if (!!this.state.assayCode) {
-        fetch("/api/assay/" + this.state.assayCode)
-        .then(response => response.json())
-        .then(assay => {
-          console.log(assay);
-          if (!!assay.startDate) {
-            assay.startDate = Date.parse(assay.startDate);
-          }
-          if (!!assay.endDate) {
-            assay.endDate = Date.parse(assay.endDate);
-          }
-          this.setState({
-            study: study,
-            assay: assay,
-            isLoaded: true
-          });
-        })
-        .catch(error => {
-          console.error(error);
-          this.setState({
-            isError: true,
-            error: error
-          });
-        })
-      } else {
-        this.setState({
-          isLoaded: true,
-          study: study,
-          assay: null
-        })
-      }
-    })
+    const study = await fetch("/api/study/" + this.state.studyCode)
+    .then(async response => await response.json())
     .catch(error => {
       console.error(error);
       this.setState({
         isError: true,
         error: error
       });
-    })
+    });
+
+    let assay = null;
+    if (!!this.state.assayCode) {
+
+      assay = await fetch("/api/assay/" + this.state.assayCode)
+      .then(async response => await response.json())
+      .catch(error => {
+        console.error(error);
+        this.setState({
+          isError: true,
+          error: error
+        });
+      });
+
+      if (!!assay.startDate) {
+        assay.startDate = Date.parse(assay.startDate);
+      }
+      if (!!assay.endDate) {
+        assay.endDate = Date.parse(assay.endDate);
+      }
+
+    }
+
+    const assayTypes = await fetch("/api/assaytype/")
+    .then(async response => await response.json())
+    .catch(error => {
+      console.error(error);
+      this.setState({
+        isError: true,
+        error: error
+      });
+    });
+
+    this.setState({
+      study: study,
+      assay: assay,
+      assayTypes: assayTypes,
+      isLoaded: true
+    });
 
   }
 
@@ -94,6 +98,7 @@ class AssayFormView extends React.Component {
           study={this.state.study}
           assay={this.state.assay}
           user={this.props.user}
+          assayTypes={this.state.assayTypes}
       />;
     }
     return (

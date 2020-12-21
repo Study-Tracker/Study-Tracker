@@ -40,137 +40,89 @@ const createMarkup = (content) => {
 
 const ActivityIcon = ({action}) => {
   switch (action) {
+
     case studyActions.NEW_STUDY.value:
-      return (
-          <Star
-              size={36}
-              className="align-middle text-warning mr-4"
-          />
-      );
+      return <Star size={36} className="align-middle text-warning mr-4"/>;
+
     case studyActions.UPDATED_STUDY.value:
-      return (
-          <Edit
-              size={36}
-              className="align-middle text-warning mr-4"
-          />
-      );
+      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+
     case studyActions.DELETED_STUDY.value:
-      return (
-          <Trash2
-              size={36}
-              className="align-middle text-danger mr-4"
-          />
-      );
+      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
     case studyActions.STUDY_STATUS_CHANGED.value:
-      return (
-          <Bell
-              size={36}
-              className="align-middle text-info mr-4"
-          />
-      );
+      return <Bell size={36} className="align-middle text-info mr-4"/>;
+
+    case studyActions.NEW_ASSAY.value:
+      return <Star size={36} className="align-middle text-warning mr-4"/>;
+
+    case studyActions.UPDATED_ASSAY.value:
+      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+
+    case studyActions.DELETED_ASSAY.value:
+      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
+    case studyActions.ASSAY_STATUS_CHANGED.value:
+      return <Bell size={36} className="align-middle text-info mr-4"/>;
+
+    case studyActions.NEW_PROGRAM.value:
+      return <Star size={36} className="align-middle text-warning mr-4"/>;
+
+    case studyActions.UPDATED_PROGRAM.value:
+      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+
+    case studyActions.DELETED_PROGRAM.value:
+      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
     case studyActions.FILE_UPLOADED.value:
-      return (
-          <FilePlus
-              size={36}
-              className="align-middle text-primary mr-4"
-          />
-      );
+      return <FilePlus size={36} className="align-middle text-primary mr-4"/>;
+
     case studyActions.NEW_STUDY_CONCLUSIONS.value:
-      return (
-          <FileText
-              size={36}
-              className="align-middle text-primary mr-4"
-          />
-      );
+      return <FileText size={36} className="align-middle text-primary mr-4"/>;
+
     case studyActions.EDITED_STUDY_CONCLUSIONS.value:
-      return (
-          <Edit
-              size={36}
-              className="align-middle text-warning mr-4"
-          />
-      );
+      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+
     case studyActions.DELETED_STUDY_CONCLUSIONS.value:
-      return (
-          <Trash2
-              size={36}
-              className="align-middle text-danger mr-4"
-          />
-      );
+      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
     case studyActions.NEW_COMMENT.value:
-      return (
-          <MessageCircle
-              size={36}
-              className="align-middle text-info mr-4"
-          />
-      );
+      return <MessageCircle size={36} className="align-middle text-info mr-4"/>;
+
     case studyActions.EDITED_COMMENT.value:
-      return (
-          <MessageCircle
-              size={36}
-              className="align-middle text-info mr-4"
-          />
-      );
+      return <MessageCircle size={36} className="align-middle text-info mr-4"/>;
+
     case studyActions.DELETED_COMMENT.value:
-      return (
-          <Trash2
-              size={36}
-              className="align-middle text-danger mr-4"
-          />
-      );
+      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
     case studyActions.NEW_STUDY_RELATIONSHIP.value:
-      return (
-          <Link
-              size={36}
-              className="align-middle text-primary mr-4"
-          />
-      );
+      return <Link size={36} className="align-middle text-primary mr-4"/>;
+
     case studyActions.UPDATED_STUDY_RELATIONSHIP.value:
-      return (
-          <Edit
-              size={36}
-              className="align-middle text-warning mr-4"
-          />
-      );
+      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+
     case studyActions.DELETED_STUDY_RELATIONSHIP.value:
-      return (
-          <Trash2
-              size={36}
-              className="align-middle text-danger mr-4"
-          />
-      );
+      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
     case studyActions.NEW_STUDY_EXTERNAL_LINK.value:
-      return (
-          <ExternalLink
-              size={36}
-              className="align-middle text-primary mr-4"
-          />
-      );
+      return <ExternalLink size={36}
+                           className="align-middle text-primary mr-4"/>;
+
     case studyActions.UPDATED_STUDY_EXTERNAL_LINK.value:
-      return (
-          <Edit
-              size={36}
-              className="align-middle text-warning mr-4"
-          />
-      );
+      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+
     case studyActions.DELETED_STUDY_EXTERNAL_LINK.value:
-      return (
-          <Trash2
-              size={36}
-              className="align-middle text-danger mr-4"
-          />
-      );
+      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
     default:
-      return (
-          <Bell
-              size={36}
-              className="align-middle text-info mr-4"
-          />
-      );
+      return <Bell size={36} className="align-middle text-info mr-4"/>;
+
   }
 };
 
 const ActivityMessage = ({activity}) => {
   switch (activity.eventType) {
+
     case studyActions.NEW_STUDY.value:
       return (
           <React.Fragment>
@@ -193,6 +145,7 @@ const ActivityMessage = ({activity}) => {
             </div>
           </React.Fragment>
       );
+
     case studyActions.UPDATED_STUDY.value:
       return (
           <React.Fragment>
@@ -214,6 +167,7 @@ const ActivityMessage = ({activity}) => {
             </div>
           </React.Fragment>
       );
+
     case studyActions.DELETED_STUDY.value:
       return (
           <p>
@@ -222,6 +176,7 @@ const ActivityMessage = ({activity}) => {
             &nbsp;has removed study: {activity.data.study.code}
           </p>
       );
+
     case studyActions.STUDY_STATUS_CHANGED.value:
       return (
           <p>
@@ -236,6 +191,154 @@ const ActivityMessage = ({activity}) => {
             <StatusBadge status={activity.data.newStatus}/>
           </p>
       );
+
+    case studyActions.NEW_ASSAY.value:
+      return (
+          <React.Fragment>
+
+            <p>
+              <a href={"/users/"
+              + activity.user.accountName}>{activity.user.displayName}</a>
+              &nbsp;has created a new assay:
+            </p>
+
+            <div className="bg-light text-secondary p-3">
+
+              <h5>
+                <a href={"/assay/" + activity.data.assay.code}>
+                  {activity.data.assay.code}
+                </a>
+              </h5>
+
+              <h3>{activity.data.assay.name}</h3>
+
+              <h5 className="text-muted">
+                {activity.data.assay.assayType.name}
+              </h5>
+
+              <div dangerouslySetInnerHTML={createMarkup(
+                  activity.data.assay.description)}/>
+
+            </div>
+          </React.Fragment>
+      );
+
+    case studyActions.UPDATED_ASSAY.value:
+      return (
+          <React.Fragment>
+
+            <p>
+              <a href={"/users/"
+              + activity.user.accountName}>{activity.user.displayName}</a>
+              &nbsp;has made an edit to an assay:
+            </p>
+
+            <div className="bg-light text-secondary p-3">
+
+              <h5>
+                <a href={"/assay/" + activity.data.assay.code}>
+                  {activity.data.assay.code}
+                </a>
+              </h5>
+
+              <h3>{activity.data.assay.name}</h3>
+
+              <h5 className="text-muted">
+                {activity.data.assay.assayType.name}
+              </h5>
+
+              <div dangerouslySetInnerHTML={createMarkup(
+                  activity.data.assay.description)}/>
+
+            </div>
+          </React.Fragment>
+      );
+
+    case studyActions.DELETED_ASSAY.value:
+      return (
+          <p>
+            <a href={"/users/"
+            + activity.user.accountName}>{activity.user.displayName}</a>
+            &nbsp;has removed assay: {activity.data.assay.code}
+          </p>
+      );
+
+    case studyActions.ASSAY_STATUS_CHANGED.value:
+      return (
+          <p>
+            <a href={"/users/"
+            + activity.user.accountName}>{activity.user.displayName}</a>
+            &nbsp;has updated the status of assay&nbsp;
+            <a href={"/assay/"
+            + activity.data.assay.code}>{activity.data.assay.code}</a>
+            &nbsp;from&nbsp;
+            <StatusBadge status={activity.data.oldStatus}/>
+            &nbsp;to&nbsp;
+            <StatusBadge status={activity.data.newStatus}/>
+          </p>
+      );
+
+    case studyActions.NEW_PROGRAM.value:
+      return (
+          <React.Fragment>
+
+            <p>
+              <a href={"/users/"
+              + activity.user.accountName}>{activity.user.displayName}</a>
+              &nbsp;has created a new assay:
+            </p>
+
+            <div className="bg-light text-secondary p-3">
+
+              <h3>
+                <a href={"/program/" + activity.data.program.id}>
+                  {activity.data.program.name}
+                </a>
+              </h3>
+
+              <div dangerouslySetInnerHTML={createMarkup(
+                  activity.data.program.description)}/>
+
+            </div>
+
+          </React.Fragment>
+      );
+
+    case studyActions.UPDATED_PROGRAM.value:
+      return (
+          <React.Fragment>
+
+            <p>
+              <a href={"/users/"
+              + activity.user.accountName}>{activity.user.displayName}</a>
+              &nbsp;has made an edit to a program:
+            </p>
+
+            <div className="bg-light text-secondary p-3">
+
+              <h3>
+                <a href={"/program/" + activity.data.program.id}>
+                  {activity.data.program.name}
+                </a>
+              </h3>
+
+              <div dangerouslySetInnerHTML={createMarkup(
+                  activity.data.program.description)}/>
+
+            </div>
+
+          </React.Fragment>
+      );
+
+    case studyActions.DELETED_PROGRAM.value:
+      return (
+          <p>
+            <a href={"/users/"
+            + activity.user.accountName}>{activity.user.displayName}</a>
+            &nbsp;has removed program: {activity.data.assay.code}
+          </p>
+      );
+
     case studyActions.FILE_UPLOADED.value:
       return (
           <React.Fragment>

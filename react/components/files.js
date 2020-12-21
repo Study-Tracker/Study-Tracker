@@ -128,8 +128,6 @@ const File = ({file}) => {
             &nbsp;
             {file.name}
           </a>
-          &nbsp;-&nbsp;
-          {formatFileSize(file.size)}
         </div>
       </li>
   )
@@ -168,10 +166,15 @@ const FolderContents = ({folder, depth}) => {
 
   return items.length
       ? (
-          <ul className="list-unstyled"
-              style={{marginLeft: (depth > 0 ? 1 : 0) + "em"}}>
-            {items}
-          </ul>
+          <div>
+            <h4>
+              <a href={folder.url} target="_blank">{folder.path}</a>
+            </h4>
+            <ul className="list-unstyled"
+                style={{marginLeft: (depth > 0 ? 1 : 0) + "em"}}>
+              {items}
+            </ul>
+          </div>
       ) : '';
 
 }
@@ -198,7 +201,7 @@ export const StorageFolderFileList = ({folder, isLoaded, isError}) => {
           </div>
       );
     } else {
-      return <FolderContents folder={folder} depth={1}/>
+      return <FolderContents folder={folder} depth={3}/>
     }
   } else {
     return <CardLoadingMessage/>;

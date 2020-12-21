@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/study")
-public class StudyBaseController extends StudyController {
+public class StudyBaseController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyBaseController.class);
 

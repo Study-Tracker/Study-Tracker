@@ -145,9 +145,11 @@ public class WebSecurityConfiguration {
       http
           .authorizeRequests()
           .antMatchers("/studies/new", "/study/*/assays/new", "study/*/edit",
-              "study/*/assays/*/edit", "/programs/new", "/users/new", "/admin")
+              "study/*/assays/*/edit", "/programs/new", "/users/new", "/admin",
+              "/assaytypes/new", "/assaytypes/*/edit")
           .fullyAuthenticated()
-          .antMatchers("/", "/study/**", "/studies")
+          .antMatchers("/", "/study/**", "/studies", "/assays", "/assay/**", "/assaytypes",
+              "/assaytype/**")
           .permitAll()
           .anyRequest()
           .permitAll()

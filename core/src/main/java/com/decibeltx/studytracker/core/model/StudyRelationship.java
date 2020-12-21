@@ -17,12 +17,14 @@
 package com.decibeltx.studytracker.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-@Data
+@Getter
+@Setter
 public class StudyRelationship {
 
   private Type type;

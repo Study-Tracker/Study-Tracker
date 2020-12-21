@@ -99,9 +99,19 @@ public class ImportExecutor {
     if (!seeds.getPrograms().isEmpty()) {
       LOGGER.info("Inserting program records...");
       for (Program program : seeds.getPrograms()) {
-        program.setCreatedBy(createdBy);
-        program.setLastModifiedBy(createdBy);
-        programService.create(program);
+        if (programService.findByName(program.getName()).isPresent()) {
+          LOGGER.warn(String.format("A program with this name %s already exists. Skipping record.",
+              program.getName()));
+        } else {
+          try {
+            program.setCreatedBy(createdBy);
+            program.setLastModifiedBy(createdBy);
+            programService.create(program);
+          } catch (Exception e) {
+            LOGGER.error("Failed to import program: " + program.toString());
+            throw e;
+          }
+        }
       }
     }
 
@@ -109,8 +119,19 @@ public class ImportExecutor {
     if (!seeds.getUsers().isEmpty()) {
       LOGGER.info("Inserting user records...");
       for (User user : seeds.getUsers()) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.create(user);
+        if (userService.findByUsername(user.getUsername()).isPresent()
+            || userService.findByEmail(user.getEmail()).isPresent()) {
+          LOGGER.warn(String.format("A user with the username %s or email %s already exists. "
+              + "Skipping record.", user.getUsername(), user.getEmail()));
+        } else {
+          try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userService.create(user);
+          } catch (Exception e) {
+            LOGGER.error("Failed to import user: " + user.toString());
+            throw e;
+          }
+        }
       }
     }
 

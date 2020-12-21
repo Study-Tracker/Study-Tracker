@@ -24,7 +24,7 @@ import store from "./redux/store";
 import {Provider} from "react-redux";
 import ReduxToastr from "react-redux-toastr";
 import {Switch} from "react-router-dom";
-import AssayFormView from './views/AssayForm'
+import AssayFormView from './views/AssayFormView'
 import AssayDetailsView from "./views/AssayDetailsView";
 import Error, {ErrorBoundary} from "./views/Error";
 import ScrollToTop from "./structure/ScrollToTop";
@@ -38,6 +38,7 @@ import SignInView from "./views/SignInView";
 import PasswordResetView from "./views/PasswordResetView";
 import AdminDashboardView from "./views/AdminDashboardView";
 import FrontPageView from "./views/FrontPageView";
+import AssayTypeFormView from "./views/AssayTypeFormView";
 
 export const history = createBrowserHistory();
 
@@ -136,6 +137,12 @@ export default class App extends React.Component {
 
                   <Route exact path={"/auth/passwordreset"}
                          render={props => <PasswordResetView {...props} />}/>
+
+                  <Route exact path={"/assaytypes/new"}
+                         render={props => <AssayTypeFormView {...props} />}/>
+
+                  <Route exact path={"/assaytypes/:assayTypeId/edit"}
+                         render={props => <AssayTypeFormView {...props} />}/>
 
                   {/* Admin */}
 

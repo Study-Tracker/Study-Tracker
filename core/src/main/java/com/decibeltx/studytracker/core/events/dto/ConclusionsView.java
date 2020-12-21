@@ -5,7 +5,7 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class ConclusionsView {
+public final class ConclusionsView {
 
   private String content;
 

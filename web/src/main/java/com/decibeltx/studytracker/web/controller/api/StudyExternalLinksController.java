@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/study/{id}/links")
 @RestController
-public class StudyExternalLinksController extends StudyController {
+public class StudyExternalLinksController extends AbstractStudyController {
 
   @Autowired
   private StudyExternalLinkService studyExternalLinkService;

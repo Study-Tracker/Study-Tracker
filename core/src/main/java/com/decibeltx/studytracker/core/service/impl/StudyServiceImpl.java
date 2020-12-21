@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.service.impl;
 
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
+import com.decibeltx.studytracker.core.eln.NotebookUtils;
 import com.decibeltx.studytracker.core.eln.StudyNotebookService;
 import com.decibeltx.studytracker.core.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.core.exception.InvalidConstraintException;
@@ -146,7 +147,7 @@ public class StudyServiceImpl implements StudyService {
     if (study.isLegacy()) {
       LOGGER.warn(String.format("Legacy Study : %s", study.getCode()));
       NotebookFolder notebookFolder = study.getNotebookFolder();
-      notebookFolder.setName("Benchling");
+      notebookFolder.setName(NotebookUtils.getStudyFolderName(study));
       study.setNotebookFolder(notebookFolder);
       study.setUpdatedAt(new Date());
       studyRepository.save(study);

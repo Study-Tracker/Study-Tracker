@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.test.service;
 
+import com.decibeltx.studytracker.core.events.dto.StudyView;
 import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
@@ -77,7 +78,7 @@ public class ActivityServiceTests {
     Assert.assertEquals(ACTION_COUNT + 1, activityList.size());
 
     activity = activityList.get(ACTION_COUNT);
-    Assert.assertEquals(study.getCode(), ((Study) activity.getData().get("study")).getCode());
+    Assert.assertEquals(study.getCode(), ((StudyView) activity.getData().get("study")).getCode());
     Assert.assertEquals(study.getCreatedBy().getUsername(), activity.getUser().getUsername());
     Assert.assertEquals(EventType.STUDY_STATUS_CHANGED, activity.getEventType());
     Assert.assertEquals(Status.COMPLETE.toString(), activity.getData().get("newStatus"));

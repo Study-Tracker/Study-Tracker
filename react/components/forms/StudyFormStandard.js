@@ -65,7 +65,8 @@ export default class StudyForm extends React.Component {
         }],
         owner: this.props.user,
         createdBy: this.props.user,
-        lastModifiedBy: this.props.user
+        lastModifiedBy: this.props.user,
+        notebookFolder: {}
       },
       validation: {
         nameIsValid: true,
@@ -476,11 +477,11 @@ export default class StudyForm extends React.Component {
                               <Label>Notebook URL</Label>
                               <Input
                                   type="text"
-                                  defaultValue={this.state.study.elnUrl || ''}
+                                  defaultValue={this.state.study.notebookFolder.url
+                                  || ''}
                                   onChange={(e) => this.handleFormUpdate(
                                       {
-                                        "notebookEntry": {
-                                          label: "ELN",
+                                        "notebookFolder": {
                                           url: e.target.value
                                         }
                                       })}

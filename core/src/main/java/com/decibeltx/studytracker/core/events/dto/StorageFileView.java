@@ -4,7 +4,7 @@ import com.decibeltx.studytracker.core.storage.StorageFile;
 import lombok.Data;
 
 @Data
-public class StorageFileView {
+public final class StorageFileView {
 
   private String name;
 
