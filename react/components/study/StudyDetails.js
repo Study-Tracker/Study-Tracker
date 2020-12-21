@@ -54,7 +54,8 @@ const StudyDetailHeader = ({study, user}) => {
   return (
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>Study {study.code}</h1>
+          <h1>{study.name}</h1>
+          <h5 className="text-muted">{study.code}</h5>
         </Col>
         <Col className="col-auto">
           {
@@ -69,7 +70,7 @@ const StudyDetailHeader = ({study, user}) => {
           }
           {
             !study.active ? <Button size="lg" className="mr-1 mb-1"
-                                    color="danger">Innactive Study</Button> : ''
+                                    color="danger">Inactive Study</Button> : ''
           }
           {
             study.legacy ? <Button size="lg" className="mr-1 mb-1"
@@ -175,17 +176,32 @@ class StudyDetails extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   </div>
+
                   <CardTitle tag="h5" className="mb-0 text-muted">
-                    {study.program.name}
+                    Summary
                   </CardTitle>
+
                 </CardHeader>
 
                 <CardBody>
                   <Row>
                     <Col xs={12}>
 
-                      {/*<h5 className="text-muted">{study.program.name}</h5>*/}
-                      <h3>{study.name}</h3>
+                      <h6 className="details-label">Program</h6>
+                      <p>{study.program.name}</p>
+
+                      <h6 className="details-label">Code</h6>
+                      <p>{study.code}</p>
+
+                      {
+                        !!study.externalCode
+                            ? (
+                                <React.Fragment>
+                                  <h6 className="details-label">External Code</h6>
+                                  <p>{study.externalCode}</p>
+                                </React.Fragment>
+                            ) : ''
+                      }
 
                       <h6 className="details-label">Description</h6>
                       <div dangerouslySetInnerHTML={createMarkup(
@@ -220,7 +236,7 @@ class StudyDetails extends React.Component {
                             <Row>
                               <Col xs={12}>
                                 <div>
-                                  <h6 className="details-label">CRO/Collaborator</h6>
+                                  <CardTitle>CRO/Collaborator</CardTitle>
                                   <StudyCollaborator
                                       collaborator={study.collaborator}
                                       externalCode={study.externalCode}
@@ -235,7 +251,7 @@ class StudyDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-                      <h6 className="details-label">Study Team</h6>
+                      <CardTitle>Study Team</CardTitle>
                       <StudyTeam users={study.users} owner={study.owner}/>
                     </Col>
                   </Row>
@@ -244,7 +260,7 @@ class StudyDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-                      <h6 className="details-label">Keywords</h6>
+                      <CardTitle>Keywords</CardTitle>
                       <StudyKeywords keywords={study.keywords}/>
                     </Col>
                   </Row>
@@ -253,14 +269,13 @@ class StudyDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-
-                      <h6 className="details-label">Workspaces</h6>
+                      <CardTitle>Workspaces</CardTitle>
                       {
                         !!study.storageFolder
                             ? (
                                 <a href={study.storageFolder.url}
                                    target="_blank"
-                                   className="btn btn-info mt-2 mr-2">
+                                   className="btn btn-outline-info mt-2 mr-2">
                                   Study Storage Folder
                                   <Folder
                                       className="feather align-middle ml-2 mb-1"/>
@@ -272,7 +287,7 @@ class StudyDetails extends React.Component {
                             ? (
                                 <a href={study.notebookFolder.url}
                                    target="_blank"
-                                   className="btn btn-info mt-2 mr-2">
+                                   className="btn btn-outline-info mt-2 mr-2">
                                   Study ELN Folder
                                   <Book
                                       className="feather align-middle ml-2 mb-1"/>

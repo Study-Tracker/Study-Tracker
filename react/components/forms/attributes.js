@@ -1,8 +1,8 @@
 import React from 'react';
 import {Button, Col, FormGroup, Input, Label, Row} from "reactstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
+import {Trash} from "react-feather";
 
 const mapToAttributeArray = (map) => {
   let array = [];
@@ -95,13 +95,11 @@ class Attributes extends React.Component {
             </Col>
             <Col xs={2}>
               <a
+                  className="text-danger"
                   title={"Remove attribute"}
                   onClick={() => this.handleRemoveAttributeClick(i)}
               >
-                <FontAwesomeIcon
-                    icon={faTimesCircle}
-                    className="align-middle mr-2 mt-3 text-danger"
-                />
+                <Trash className="align-middle mt-3" size={18}/>
               </a>
             </Col>
           </Row>

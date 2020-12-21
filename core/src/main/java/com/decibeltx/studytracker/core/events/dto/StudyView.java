@@ -35,6 +35,10 @@ public final class StudyView {
 
   private String lastModifiedBy;
 
+  private Date startDate;
+
+  private Date endDate;
+
   private Date createdAt;
 
   private Date updatedAt;
@@ -69,6 +73,8 @@ public final class StudyView {
     view.setLegacy(study.isLegacy());
     view.setActive(study.isActive());
     view.setKeywords(study.getKeywords());
+    view.setStartDate(study.getStartDate());
+    view.setEndDate(study.getEndDate());
     view.setUsers(study.getUsers().stream()
         .map(User::getDisplayName)
         .collect(Collectors.toList()));
@@ -221,5 +227,21 @@ public final class StudyView {
 
   private void setCollaborator(String collaborator) {
     this.collaborator = collaborator;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
   }
 }

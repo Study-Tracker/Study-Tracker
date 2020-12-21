@@ -21,6 +21,8 @@ import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.AssayType;
+import com.decibeltx.studytracker.core.model.AssayTypeField;
+import com.decibeltx.studytracker.core.model.AssayTypeField.AssayFieldType;
 import com.decibeltx.studytracker.core.model.Collaborator;
 import com.decibeltx.studytracker.core.model.Comment;
 import com.decibeltx.studytracker.core.model.Conclusions;
@@ -29,9 +31,11 @@ import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.Task;
+import com.decibeltx.studytracker.core.model.Task.TaskStatus;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
+import com.decibeltx.studytracker.core.repository.AssayTypeRepository;
 import com.decibeltx.studytracker.core.repository.CollaboratorRepository;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
@@ -45,6 +49,7 @@ import com.decibeltx.studytracker.core.storage.StudyStorageService;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +61,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class ExampleDataGenerator {
+
+  public static final int ASSAY_TYPE_COUNT = 2;
+
+  public static final int ASSAY_COUNT = 2;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 
@@ -91,6 +100,9 @@ public class ExampleDataGenerator {
 
   @Autowired
   private StudyConclusionsService conclusionsService;
+
+  @Autowired
+  private AssayTypeRepository assayTypeRepository;
 
   public List<Program> generateExamplePrograms(List<User> users) {
     User user = users.get(0);
@@ -441,9 +453,42 @@ public class ExampleDataGenerator {
     }
   }
 
+  public List<AssayType> generateExampleAssayTypes() {
+
+    List<AssayType> assayTypes = new ArrayList<>();
+
+    AssayType assayType = new AssayType();
+    assayType.setName("Generic");
+    assayType.setActive(true);
+    assayTypes.add(assayType);
+
+    assayType = new AssayType();
+    assayType.setName("Histology");
+    assayType.setActive(true);
+    assayType.setFields(Arrays.asList(
+        new AssayTypeField("No. Slides", "number_of_slides", AssayFieldType.INTEGER, true),
+        new AssayTypeField("Antibodies", "antibodies", AssayFieldType.TEXT),
+        new AssayTypeField("Concentration (ul/mg)", "concentration", AssayFieldType.FLOAT),
+        new AssayTypeField("Date", "date", AssayFieldType.DATE),
+        new AssayTypeField("External", "external", AssayFieldType.BOOLEAN, true),
+        new AssayTypeField("Stain", "stain", AssayFieldType.STRING)
+    ));
+    assayType.setTasks(Arrays.asList(
+        new Task("Embed tissue", TaskStatus.TODO, 0),
+        new Task("Cut slides", TaskStatus.TODO, 1),
+        new Task("Stain slides", TaskStatus.TODO, 2)
+    ));
+    assayTypes.add(assayType);
+
+    return assayTypes;
+
+  }
+
   public List<Assay> generateExampleAssays(List<Study> studies) {
 
     List<Assay> assays = new ArrayList<>();
+    AssayType assayType = assayTypeRepository.findByName("Generic")
+        .orElseThrow(RecordNotFoundException::new);
 
     Study study = studies.stream()
         .filter(s -> s.getCode().equals("PPB-10001"))
@@ -459,7 +504,7 @@ public class ExampleDataGenerator {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ");
     assay.setStatus(Status.ACTIVE);
     assay.setStartDate(new Date());
-    assay.setAssayType(AssayType.HISTOLOGY);
+    assay.setAssayType(assayType);
     assay.setOwner(user);
     assay.setCreatedBy(user);
     assay.setUsers(Collections.singletonList(user));
@@ -479,7 +524,7 @@ public class ExampleDataGenerator {
     assay.setStatus(Status.COMPLETE);
     assay.setStartDate(new Date());
     assay.setEndDate(new Date());
-    assay.setAssayType(AssayType.IN_VIVO);
+    assay.setAssayType(assayType);
     assay.setOwner(user);
     assay.setCreatedBy(user);
     assay.setUsers(Collections.singletonList(user));
@@ -522,10 +567,12 @@ public class ExampleDataGenerator {
       studyRepository.deleteAll();
       assayRepository.deleteAll();
       activityRepository.deleteAll();
+      assayTypeRepository.deleteAll();
 
       LOGGER.info("Inserting example data...");
       userRepository.insert(generateExampleUsers());
       programRepository.insert(generateExamplePrograms(userRepository.findAll()));
+      assayTypeRepository.insert(generateExampleAssayTypes());
       createProgramFolders();
       collaboratorRepository.insert(generateExampleCollaborators());
       generateExampleStudies();

@@ -16,6 +16,43 @@
 
 package com.decibeltx.studytracker.core.model;
 
-public enum AssayType {
-  GENERIC, IN_VIVO, IN_VITRO, HISTOLOGY, PHYSIOLOGY, SEQUENCING
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "assay_types")
+@Data
+public class AssayType implements Persistable<String> {
+
+  @Id
+  private String id;
+
+  @NotNull
+  @Indexed(unique = true)
+  private String name;
+
+  @NotNull
+  private String description;
+
+  private boolean active;
+
+  private List<AssayTypeField> fields = new ArrayList<>();
+
+  private List<Task> tasks = new ArrayList<>();
+
+  private Map<String, String> attributes = new HashMap<>();
+
+  @Override
+  @JsonIgnore
+  public boolean isNew() {
+    return id == null;
+  }
 }

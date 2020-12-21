@@ -45,7 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/api/study/{studyId}/storage")
 @RestController
-public class StudyStorageController extends StudyController {
+public class StudyStorageController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyStorageController.class);
 

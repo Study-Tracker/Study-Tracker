@@ -68,13 +68,13 @@ class AdminDashboard extends React.Component {
                   </CardTitle>
                 </CardHeader>
                 <ListGroup flush>
-                  <ListGroupItem tag="a" href="#" action
+                  <ListGroupItem tag="a" action
                                  active={this.state.active === "users"}
                                  onClick={() => this.setState(
                                      {active: "users"})}>
                     Users
                   </ListGroupItem>
-                  <ListGroupItem tag="a" href="#" action
+                  <ListGroupItem tag="a" action
                                  active={this.state.active === "assay-types"}
                                  onClick={() => this.setState(
                                      {active: "assay-types"})}>

@@ -15,7 +15,6 @@
  */
 
 import React from "react";
-import {Col, Row} from 'reactstrap';
 import {Conclusions, ConclusionsModal} from "../conclusions";
 
 class StudyConclusionsTab extends React.Component {
@@ -60,19 +59,6 @@ class StudyConclusionsTab extends React.Component {
 
     return (
         <div>
-
-          <Row className="justify-content-between align-items-center">
-            <div className={"col-6"}>
-              <h4>Study Conclusions</h4>
-            </div>
-            <div className="col-auto"></div>
-          </Row>
-
-          <Row>
-            <Col sm={12}>
-              <hr/>
-            </Col>
-          </Row>
 
           <Conclusions
               conclusions={this.state.conclusions}

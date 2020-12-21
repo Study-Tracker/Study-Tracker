@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.test.service;
 
 import com.decibeltx.studytracker.core.example.ExampleDataGenerator;
+import com.decibeltx.studytracker.core.exception.InvalidConstraintException;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.AssayType;
@@ -25,12 +26,15 @@ import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.Task;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
+import com.decibeltx.studytracker.core.repository.AssayTypeRepository;
 import com.decibeltx.studytracker.core.service.AssayService;
 import com.decibeltx.studytracker.core.service.StudyService;
 import com.decibeltx.studytracker.core.test.TestConfiguration;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +54,9 @@ public class AssayServiceTests {
 
   @Autowired
   private AssayRepository assayRepository;
+
+  @Autowired
+  private AssayTypeRepository assayTypeRepository;
 
   @Autowired
   private StudyService studyService;
@@ -74,6 +81,8 @@ public class AssayServiceTests {
 
   @Test
   public void createAssayTest() {
+    AssayType assayType = assayTypeRepository.findByName("Generic")
+        .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(ASSAY_COUNT, assayRepository.count());
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     User user = study.getOwner();
@@ -84,7 +93,7 @@ public class AssayServiceTests {
     assay.setDescription("This is a test");
     assay.setStatus(Status.IN_PLANNING);
     assay.setStartDate(new Date());
-    assay.setAssayType(AssayType.GENERIC);
+    assay.setAssayType(assayType);
     assay.setOwner(user);
     assay.setUsers(Collections.singletonList(user));
     assay.setCreatedBy(user);
@@ -103,6 +112,90 @@ public class AssayServiceTests {
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertTrue(!updated.getAssays().isEmpty());
     Assert.assertEquals(updated.getAssays().get(0).getCode(), assay.getCode());
+  }
+
+  @Test
+  public void createAssayWithFieldDataTest() {
+    AssayType assayType = assayTypeRepository.findByName("Histology")
+        .orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(ASSAY_COUNT, assayRepository.count());
+    Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    User user = study.getOwner();
+
+    Assay assay = new Assay();
+    assay.setStudy(study);
+    assay.setActive(true);
+    assay.setName("Test assay");
+    assay.setDescription("This is a test");
+    assay.setStatus(Status.IN_PLANNING);
+    assay.setStartDate(new Date());
+    assay.setAssayType(assayType);
+    assay.setOwner(user);
+    assay.setUsers(Collections.singletonList(user));
+    assay.setCreatedBy(user);
+    assay.setLastModifiedBy(user);
+    assay.setUpdatedAt(new Date());
+    assay.setAttributes(Collections.singletonMap("key", "value"));
+    Map<String, Object> fields = new LinkedHashMap<>();
+    fields.put("number_of_slides", 10);
+    fields.put("antibodies", "AKT1, AKT2, AKT3");
+    fields.put("concentration", 1.2345F);
+    fields.put("date", new Date());
+    fields.put("external", true);
+    fields.put("stain", "DAPI");
+    assay.setFields(fields);
+
+    assayService.create(assay);
+    Assert.assertEquals(ASSAY_COUNT + 1, assayRepository.count());
+    Assert.assertNotNull(assay.getId());
+    Assert.assertNotNull(assay.getCode());
+    Assert.assertEquals(study.getCode() + "-00001", assay.getCode());
+    study.getAssays().add(assay);
+    studyService.update(study);
+    Study updated = studyService.findByCode(study.getCode())
+        .orElseThrow(RecordNotFoundException::new);
+    Assert.assertTrue(!updated.getAssays().isEmpty());
+    Assert.assertEquals(updated.getAssays().get(0).getCode(), assay.getCode());
+  }
+
+  @Test
+  public void createAssayWithInvalidFieldDataTest() {
+    AssayType assayType = assayTypeRepository.findByName("Histology")
+        .orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(ASSAY_COUNT, assayRepository.count());
+    Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    User user = study.getOwner();
+
+    Assay assay = new Assay();
+    assay.setStudy(study);
+    assay.setActive(true);
+    assay.setName("Test assay");
+    assay.setDescription("This is a test");
+    assay.setStatus(Status.IN_PLANNING);
+    assay.setStartDate(new Date());
+    assay.setAssayType(assayType);
+    assay.setOwner(user);
+    assay.setUsers(Collections.singletonList(user));
+    assay.setCreatedBy(user);
+    assay.setLastModifiedBy(user);
+    assay.setUpdatedAt(new Date());
+    assay.setAttributes(Collections.singletonMap("key", "value"));
+    Map<String, Object> fields = new LinkedHashMap<>();
+    fields.put("antibodies", "AKT1, AKT2, AKT3");
+    fields.put("concentration", 1.2345F);
+    fields.put("date", new Date());
+    fields.put("external", true);
+    fields.put("stain", "DAPI");
+    assay.setFields(fields);
+
+    Exception exception = null;
+    try {
+      assayService.create(assay);
+    } catch (Exception e) {
+      exception = e;
+    }
+    Assert.assertNotNull(exception);
+    Assert.assertTrue(exception instanceof InvalidConstraintException);
   }
 
   @Test

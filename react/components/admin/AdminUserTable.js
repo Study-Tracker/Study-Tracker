@@ -1,9 +1,9 @@
 import React from 'react';
-import {Button} from "reactstrap";
-import {File} from "react-feather";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
+import {history} from "../../App";
+import {Edit, Trash} from "react-feather";
 
 const columns = [
   {
@@ -30,7 +30,7 @@ const columns = [
     dataField: "displayName",
     text: "Display Name",
     sort: true,
-    headerStyle: {width: '30%%'},
+    headerStyle: {width: '25%%'},
     formatter: (c, d, i, x) => {
       return (
           <a href={"#"}>{d.displayName}</a>
@@ -50,7 +50,7 @@ const columns = [
     dataField: "email",
     text: "Email",
     sort: true,
-    headerStyle: {width: '30%'},
+    headerStyle: {width: '25%'},
     formatter: (cell, d, index, x) => d.email
   },
   {
@@ -100,23 +100,31 @@ const columns = [
         )
       }
     }
+  },
+  {
+    dataField: "controls",
+    text: "Options",
+    sort: false,
+    headerStyle: {width: '10%'},
+    formatter: (c, d, i, x) => {
+      return (
+          <React.Fragment>
+
+            <a className="text-warning" title={"Edit user"}
+               onClick={() => history.push("/users/" + d.id + "/edit")}>
+              <Edit className="align-middle mr-1" size={18}/>
+            </a>
+
+            <a className="text-danger" title={"Disable user"}
+               onClick={() => console.log("click")}>
+              <Trash className="align-middle mr-1" size={18}/>
+            </a>
+
+          </React.Fragment>
+      )
+    }
   }
 ];
-
-const ExportToCsv = (props) => {
-  const handleClick = () => {
-    props.onExport();
-  };
-  return (
-      <span>
-        <Button color={'primary'} onClick={handleClick}>
-          Export to CSV
-          &nbsp;
-          <File className="feather align-middle ml-2 mb-1"/>
-        </Button>
-      </span>
-  );
-};
 
 const AdminUserTable = ({users}) => {
   return (
@@ -130,8 +138,6 @@ const AdminUserTable = ({users}) => {
         {props => (
             <div>
               <div className="float-right">
-                <ExportToCsv{...props.csvProps} />
-                &nbsp;&nbsp;
                 <Search.SearchBar
                     {...props.searchProps}
                 />
@@ -145,8 +151,8 @@ const AdminUserTable = ({users}) => {
                     sizePerPageList: [10, 20, 40, 80]
                   })}
                   defaultSorted={[{
-                    dataField: "updatedAt",
-                    order: "desc"
+                    dataField: "username",
+                    order: "asc"
                   }]}
                   {...props.baseProps}
               >

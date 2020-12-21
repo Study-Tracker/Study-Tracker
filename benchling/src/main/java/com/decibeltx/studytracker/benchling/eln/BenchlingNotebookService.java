@@ -124,14 +124,21 @@ public final class BenchlingNotebookService implements StudyNotebookService {
   public NotebookFolder createProgramFolder(Program program) throws NotebookException {
     LOGGER.info(
         "Registering new program folder. NOTE: Benchling does not support project creation, so a valid folderId must be provided when registering new programs.");
-    try {
-      BenchlingFolder folder = client.findFolderById(program.getNotebookFolder().getReferenceId())
-          .get();
-      return this.convertFolder(folder);
-    } catch (Exception e) {
-      LOGGER.error("Failed to register new program: " + program.getName());
-      throw new NotebookException(e);
+    if (program.getNotebookFolder() != null
+        && program.getNotebookFolder().getReferenceId() != null) {
+      try {
+        BenchlingFolder folder = client.findFolderById(program.getNotebookFolder().getReferenceId())
+            .get();
+        return this.convertFolder(folder);
+      } catch (Exception e) {
+        LOGGER.error("Failed to register new program: " + program.getName());
+        throw new NotebookException(e);
+      }
+    } else {
+      LOGGER.warn("Program folder ID is not set, cannot create NotebookFolder record for program: "
+          + program.getName());
     }
+    return null;
   }
 
   @Override

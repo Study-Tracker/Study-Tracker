@@ -5,7 +5,7 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class CommentView {
+public final class CommentView {
 
   private String text;
 

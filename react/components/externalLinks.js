@@ -16,6 +16,7 @@
 
 import {
   Button,
+  CardTitle,
   Col,
   FormGroup,
   Input,
@@ -154,7 +155,7 @@ class ExternalLinks extends React.Component {
     return (
         <div>
 
-          <h6 className="details-label">
+          <CardTitle>
             External Links
             {
               !!this.props.user ? (
@@ -166,7 +167,7 @@ class ExternalLinks extends React.Component {
                 </span>
               ) : ''
             }
-          </h6>
+          </CardTitle>
 
           {
             links.length

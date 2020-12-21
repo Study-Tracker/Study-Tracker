@@ -180,18 +180,6 @@ class StudyCommentsTab extends React.Component {
     return (
         <div>
 
-          <Row className="justify-content-between align-items-center">
-            <Col sm={12}>
-              <h4>Comments</h4>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col sm={12}>
-              <hr/>
-            </Col>
-          </Row>
-
           <Row>
             {content}
           </Row>

@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/study/{studyId}/conclusions")
 @RestController
-public class StudyConclusionsController extends StudyController {
+public class StudyConclusionsController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyConclusionsController.class);
 

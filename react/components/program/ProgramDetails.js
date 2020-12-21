@@ -167,7 +167,7 @@ class ProgramDetails extends React.Component {
                     </UncontrolledDropdown>
                   </div>
                   <CardTitle tag="h5" className="mb-0 text-muted">
-                    Program
+                    Summary
                   </CardTitle>
                 </CardHeader>
 
@@ -197,7 +197,7 @@ class ProgramDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-                      <h6 className="details-label">Program Team</h6>
+                      <CardTitle>Program Team</CardTitle>
                       <ProgramTeam program={program} studies={studies}/>
                     </Col>
                   </Row>
@@ -206,45 +206,11 @@ class ProgramDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-                      <h6 className="details-label">Keywords</h6>
+                      <CardTitle>Keywords</CardTitle>
                       <ProgramKeywords studies={studies}/>
                     </Col>
                   </Row>
                 </CardBody>
-
-                {/*<CardBody>*/}
-                {/*  <Row>*/}
-                {/*    <Col xs={12}>*/}
-
-                {/*      <h6 className="details-label">Workspaces</h6>*/}
-                {/*      {*/}
-                {/*        !!study.storageFolder*/}
-                {/*            ? (*/}
-                {/*                <a href={study.storageFolder.url}*/}
-                {/*                   target="_blank"*/}
-                {/*                   className="btn btn-info mr-2">*/}
-                {/*                  Egnyte*/}
-                {/*                  <Folder*/}
-                {/*                      className="feather align-middle ml-2 mb-1"/>*/}
-                {/*                </a>*/}
-                {/*            ) : ''*/}
-                {/*      }*/}
-                {/*      {*/}
-                {/*        !!study.notebookEntry*/}
-                {/*            ? (*/}
-                {/*                <a href={study.notebookEntry.url}*/}
-                {/*                   target="_blank"*/}
-                {/*                   className="btn btn-info mr-2">*/}
-                {/*                  {study.notebookEntry.label}*/}
-                {/*                  <Book*/}
-                {/*                      className="feather align-middle ml-2 mb-1"/>*/}
-                {/*                </a>*/}
-                {/*            ) : ''*/}
-                {/*      }*/}
-
-                {/*    </Col>*/}
-                {/*  </Row>*/}
-                {/*</CardBody>*/}
 
               </Card>
             </Col>

@@ -146,9 +146,19 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
   @Override
   public StorageFolder getProgramFolder(Program program) throws StudyStorageNotFoundException {
+    return this.getProgramFolder(program, true);
+  }
+
+  public StorageFolder getProgramFolder(Program program, boolean includeContents)
+      throws StudyStorageNotFoundException {
     String path = getProgramFolderPath(program);
     try {
-      EgnyteObject obj = egnyteClient.findObjectByPath(path);
+      EgnyteObject obj;
+      if (includeContents) {
+        obj = egnyteClient.findObjectByPath(path);
+      } else {
+        obj = egnyteClient.findObjectByPath(path, -1);
+      }
       if (!obj.isFolder()) {
         throw new StudyTrackerException("Found resource is not a folder");
       }
@@ -160,9 +170,19 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
   @Override
   public StorageFolder getStudyFolder(Study study) throws StudyStorageNotFoundException {
+    return this.getStudyFolder(study, true);
+  }
+
+  public StorageFolder getStudyFolder(Study study, boolean includeContents)
+      throws StudyStorageNotFoundException {
     String path = getStudyFolderPath(study);
     try {
-      EgnyteObject obj = egnyteClient.findObjectByPath(path);
+      EgnyteObject obj;
+      if (includeContents) {
+        obj = egnyteClient.findObjectByPath(path);
+      } else {
+        obj = egnyteClient.findObjectByPath(path, -1);
+      }
       if (!obj.isFolder()) {
         throw new StudyTrackerException("Found resource is not a folder");
       }
@@ -174,9 +194,19 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
   @Override
   public StorageFolder getAssayFolder(Assay assay) throws StudyStorageNotFoundException {
+    return this.getAssayFolder(assay, true);
+  }
+
+  public StorageFolder getAssayFolder(Assay assay, boolean includeContents)
+      throws StudyStorageNotFoundException {
     String path = getAssayFolderPath(assay);
     try {
-      EgnyteObject obj = egnyteClient.findObjectByPath(path);
+      EgnyteObject obj;
+      if (includeContents) {
+        obj = egnyteClient.findObjectByPath(path);
+      } else {
+        obj = egnyteClient.findObjectByPath(path, -1);
+      }
       if (!obj.isFolder()) {
         throw new StudyTrackerException("Found resource is not a folder");
       }
@@ -194,7 +224,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       return this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
       if (options.isUseExisting()) {
-        return this.getProgramFolder(program);
+        LOGGER.warn("Existing folder will be used.");
+        return this.getProgramFolder(program, false);
       }
       throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
@@ -212,7 +243,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       return this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
       if (options.isUseExisting()) {
-        return this.getStudyFolder(study);
+        LOGGER.warn("Existing folder will be used.");
+        return this.getStudyFolder(study, false);
       }
       throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
@@ -230,7 +262,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       return this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
       if (options.isUseExisting()) {
-        return this.getAssayFolder(assay);
+        LOGGER.warn("Existing folder will be used.");
+        return this.getAssayFolder(assay, false);
       }
       throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {

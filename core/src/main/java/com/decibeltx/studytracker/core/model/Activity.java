@@ -113,7 +113,8 @@ public class Activity {
     STUDY,
     ASSAY,
     PROGRAM,
-    USER
+    USER,
+    ASSAY_TYPE
   }
 
 }

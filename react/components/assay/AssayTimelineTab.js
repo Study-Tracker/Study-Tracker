@@ -16,11 +16,11 @@
 
 import React from "react";
 import {Col, Row} from 'reactstrap'
-import {ActivityTable} from "../activity";
+import {Timeline} from "../activity";
 import {CardLoadingMessage} from "../loading";
 import {DismissableAlert} from "../errors";
 
-class StudyActivityTab extends React.Component {
+class AssayTimelineTab extends React.Component {
 
   constructor(props) {
     super(props);
@@ -31,7 +31,7 @@ class StudyActivityTab extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/api/study/" + this.props.study.code + "/activity")
+    fetch("/api/assay/" + this.props.assay.code + "/activity")
     .then(response => response.json())
     .then(json => {
       this.setState({
@@ -50,21 +50,15 @@ class StudyActivityTab extends React.Component {
   render() {
 
     let content = <CardLoadingMessage/>;
-    if (this.state.isLoaded && !!this.state.activity) {
-      content = <ActivityTable activity={this.state.activity}/>;
+    if (!!this.state.isLoaded && !!this.state.activity) {
+      content = <Timeline activities={this.state.activity}/>;
     } else if (this.state.isError) {
       content = <DismissableAlert color={'warning'}
-                                  message={'Failed to load study activity.'}/>;
+                                  message={'Failed to load assay activity.'}/>;
     }
 
     return (
-        <div className="activity-tab">
-
-          <Row className="justify-content-between align-items-center">
-            <Col sm={12}>
-              <h4 className={"mb-4"}>Study Activity</h4>
-            </Col>
-          </Row>
+        <div className="timeline-tab">
 
           <Row>
             <Col sm={12}>
@@ -79,4 +73,4 @@ class StudyActivityTab extends React.Component {
 
 }
 
-export default StudyActivityTab;
+export default AssayTimelineTab;

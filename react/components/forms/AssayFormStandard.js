@@ -41,6 +41,11 @@ import {UserInputs} from "./users";
 import swal from 'sweetalert';
 import {history} from '../../App';
 import {AssayTypeDropdown} from "./assayTypes";
+import {AssayTypeFieldCaptureInputList} from "./assayTypeFieldCapture";
+import Attributes from "./attributes";
+import {TaskInputs} from "./tasks";
+import {LoadingOverlay} from "../loading";
+import ReactQuill from "react-quill";
 
 export default class AssayForm extends React.Component {
 
@@ -53,7 +58,10 @@ export default class AssayForm extends React.Component {
       users: this.props.study.users,
       owner: this.props.study.owner,
       createdBy: this.props.user,
-      lastModifiedBy: this.props.user
+      lastModifiedBy: this.props.user,
+      fields: {},
+      tasks: [],
+      attributes: {}
     };
     assay.lastModifiedBy = this.props.user;
 
@@ -65,13 +73,15 @@ export default class AssayForm extends React.Component {
         startDateIsValid: true,
         usersIsValid: true,
         ownerIsValid: true
-      }
+      },
+      showLoadingOverlay: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleFormUpdate = this.handleFormUpdate.bind(this);
     this.validateForm = this.validateForm.bind(this);
+    this.handleFieldUpdate = this.handleFieldUpdate.bind(this);
 
   }
 
@@ -89,6 +99,14 @@ export default class AssayForm extends React.Component {
     this.setState({
       assay: assay
     })
+  }
+
+  handleFieldUpdate(data) {
+    const fields = {
+      ...this.state.assay.fields,
+      ...data
+    };
+    this.handleFormUpdate({"fields": fields})
   }
 
   validateForm(assay) {
@@ -143,7 +161,9 @@ export default class AssayForm extends React.Component {
 
   handleSubmit() {
 
-    let isError = this.validateForm(this.state.assay);
+    let assay = this.state.assay;
+
+    let isError = this.validateForm(assay);
     console.log(this.state);
 
     if (isError) {
@@ -155,19 +175,31 @@ export default class AssayForm extends React.Component {
 
     } else {
 
-      const isUpdate = !!this.state.assay.id;
+      // Sort the tasks
+      if (!!assay.tasks && assay.tasks.length > 0) {
+        const tasks = document.getElementById("task-input-container").children;
+        if (tasks.length > 0) {
+          for (let i = 0; i < tasks.length; i++) {
+            let idx = parseInt(tasks[i].dataset.index);
+            assay.tasks[idx].order = i;
+          }
+        }
+      }
+
+      const isUpdate = !!assay.id;
 
       const url = isUpdate
           ? "/api/study/" + this.props.study.code + "/assay/"
           + this.state.assay.id
           : "/api/study/" + this.props.study.code + "/assays/";
+      this.setState({showLoadingOverlay: true});
 
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(this.state.assay)
+        body: JSON.stringify(assay)
       })
       .then(async response => {
 
@@ -177,6 +209,7 @@ export default class AssayForm extends React.Component {
           history.push(
               "/study/" + this.props.study.code + "/assay/" + json.code);
         } else {
+          this.setState({showLoadingOverlay: false})
           swal("Something went wrong",
               !!json.message
                   ? "Error: " + json.message :
@@ -186,6 +219,7 @@ export default class AssayForm extends React.Component {
         }
 
       }).catch(e => {
+        this.setState({showLoadingOverlay: false})
         swal(
             "Something went wrong",
             "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
@@ -213,6 +247,11 @@ export default class AssayForm extends React.Component {
 
     return (
         <Container fluid className="animated fadeIn max-width-1200">
+
+          <LoadingOverlay
+              isVisible={this.state.showLoadingOverlay}
+              message={"Creating your assay..."}
+          />
 
           <Row>
             <Col>
@@ -277,6 +316,7 @@ export default class AssayForm extends React.Component {
                               defaultValue={this.state.assay.name || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"name": e.target.value})}
+                              disabled={!!this.state.assay.id}
                           />
                           <FormFeedback>Name must not be empty.</FormFeedback>
                         </FormGroup>
@@ -284,9 +324,11 @@ export default class AssayForm extends React.Component {
 
                       <Col sm="5">
                         <AssayTypeDropdown
+                            assayTypes={this.props.assayTypes}
                             selectedType={!!this.state.assay.assayType
                                 ? this.state.assay.assayType.id : -1}
                             onChange={this.handleFormUpdate}
+                            disabled={!!this.state.assay.id}
                         />
                       </Col>
 
@@ -296,14 +338,20 @@ export default class AssayForm extends React.Component {
                       <Col sm="7">
                         <FormGroup>
                           <Label>Description *</Label>
-                          <Input
-                              type="textarea"
-                              invalid={!this.state.validation.descriptionIsValid}
-                              rows="5"
+                          <ReactQuill
+                              theme="snow"
                               defaultValue={this.state.assay.description || ''}
-                              onChange={(e) => this.handleFormUpdate(
-                                  {"description": e.target.value})}
+                              onChange={content => this.handleFormUpdate(
+                                  {"description": content})}
                           />
+                          {/*<Input*/}
+                          {/*    type="textarea"*/}
+                          {/*    invalid={!this.state.validation.descriptionIsValid}*/}
+                          {/*    rows="5"*/}
+                          {/*    defaultValue={this.state.assay.description || ''}*/}
+                          {/*    onChange={(e) => this.handleFormUpdate(*/}
+                          {/*        {"description": e.target.value})}*/}
+                          {/*/>*/}
                           <FormFeedback>Description must not be
                             empty.</FormFeedback>
                           <FormText>Provide a brief description of your
@@ -363,21 +411,129 @@ export default class AssayForm extends React.Component {
                       </Col>
                     </Row>
 
-                    {/*CRO*/}
+                    {/* Legacy study assay */}
 
-                    {/*<CollaboratorInputs*/}
-                    {/*    collaborator={this.state.study.collaborator}*/}
-                    {/*    externalCode={this.state.study.externalCode}*/}
-                    {/*    onChange={this.handleFormUpdate}*/}
-                    {/*/>*/}
+                    {
+                      !!this.props.study.legacy
+                          ? (
+                              <React.Fragment>
+                                <Row form>
 
-                    {/*<Row>*/}
-                    {/*  <Col>*/}
-                    {/*    <hr/>*/}
-                    {/*  </Col>*/}
-                    {/*</Row>*/}
+                                  <Col md="12">
+                                    <h5 className="card-title">Legacy Study</h5>
+                                    <h6 className="card-subtitle text-muted">Studies
+                                      created
+                                      prior to the introduction of Study Tracker are
+                                      considered legacy. Enabling this option allows
+                                      you to
+                                      specify certain attributes that would
+                                      otherwise be
+                                      automatically generated.</h6>
+                                    <br/>
+                                  </Col>
 
-                    {/*Study Team*/}
+                                  <Col md="12">
+
+                                    <FormGroup>
+                                      <Label>Notebook URL</Label>
+                                      <Input
+                                          type="text"
+                                          defaultValue={this.state.assay.notebookFolder
+                                              ? this.state.assay.notebookFolder.url
+                                              : ''}
+                                          onChange={(e) => this.handleFormUpdate(
+                                              {
+                                                "notebookEntry": {
+                                                  label: "ELN",
+                                                  url: e.target.value
+                                                }
+                                              })}
+                                      />
+                                      <FormText>If the study already has an ELN
+                                        entry,
+                                        provide the URL here.</FormText>
+                                    </FormGroup>
+                                  </Col>
+
+                                </Row>
+
+                                <Row form>
+                                  <Col>
+                                    <hr/>
+                                  </Col>
+                                </Row>
+
+                              </React.Fragment>
+                          ) : ''
+                    }
+
+                    {/* Assay type fields */}
+
+                    {
+                      !!this.state.assay.assayType
+                      && this.state.assay.assayType.fields.length > 0
+                          ? (
+                              <React.Fragment>
+
+                                <Row form>
+
+                                  <Col md="12">
+                                    <h5 className="card-title">
+                                      {this.state.assay.assayType.name} Fields
+                                    </h5>
+                                    <h6 className="card-subtitle text-muted">
+                                      {this.state.assay.assayType.description}
+                                    </h6>
+                                    <br/>
+                                  </Col>
+
+                                </Row>
+
+                                <AssayTypeFieldCaptureInputList
+                                    assayType={this.state.assay.assayType}
+                                    assayFields={this.state.assay.fields}
+                                    handleUpdate={this.handleFieldUpdate}
+                                />
+
+                                <Row form>
+                                  <Col>
+                                    <hr/>
+                                  </Col>
+                                </Row>
+
+                              </React.Fragment>
+                          )
+                          : ''
+                    }
+
+                    {/* Tasks */}
+
+                    <Row form>
+                      <Col sm="12">
+                        <h5 className="card-title">Tasks</h5>
+                        <h6 className="card-subtitle text-muted">
+                          You can define an ordered list of tasks that must be
+                          completed for your assay here. Task status changes are
+                          captured with user-associated timestamps.
+                        </h6>
+                        <br/>
+                      </Col>
+                    </Row>
+
+                    <TaskInputs
+                        tasks={this.state.assay.tasks}
+                        handleUpdate={(tasks) => {
+                          this.handleFormUpdate({tasks: tasks})
+                        }}
+                    />
+
+                    <Row>
+                      <Col>
+                        <hr/>
+                      </Col>
+                    </Row>
+
+                    {/* Assay Team */}
                     <Row form>
                       <Col sm="12">
                         <h5 className="card-title">Assay Team</h5>
@@ -399,6 +555,39 @@ export default class AssayForm extends React.Component {
                       </Col>
 
                     </Row>
+
+                    <Row>
+                      <Col>
+                        <hr/>
+                      </Col>
+                    </Row>
+
+                    {/* Attributes */}
+
+                    <Row form>
+
+                      <Col md="12">
+                        <h5 className="card-title">Assay Attributes</h5>
+                        <h6 className="card-subtitle text-muted">
+                          Key-value attributes for adding additional information
+                          about the assay, or for adding application-aware
+                          attributes for external integrations (for example, ELN
+                          identifiers). You can add as many or as few attributes
+                          as you'd like. Attribute values should not be left
+                          empty. All values are saved as simple character
+                          strings.
+                        </h6>
+                        <br/>
+                      </Col>
+
+                    </Row>
+
+                    <Attributes
+                        attributes={this.state.assay.attributes}
+                        handleUpdate={(attributes) => this.handleFormUpdate({
+                          attributes: attributes
+                        })}
+                    />
 
                     <Row>
                       <Col>

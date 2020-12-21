@@ -141,6 +141,40 @@ export const studyActions = {
     value: "DELETED_PROGRAM",
     label: "Program Deleted",
     visible: true
+  },
+
+  // Assay Type
+  NEW_ASSAY_TYPE: {
+    value: "NEW_ASSAY_TYPE",
+    label: "New Assay Type",
+    visible: false
+  },
+  UPDATED_ASSAY_TYPE: {
+    value: "UPDATED_ASSAY_TYPE",
+    label: "Updated Assay Type",
+    visible: false
+  },
+  DELETED_ASSAY_TYPE: {
+    value: "DELETED_ASSAY_TYPE",
+    label: "Assay Deleted Type",
+    visible: false
+  },
+
+  // Users
+  NEW_USER: {
+    value: "NEW_USER",
+    label: "New User",
+    visible: false
+  },
+  UPDATED_USER: {
+    value: "UPDATED_USER",
+    label: "Updated User",
+    visible: false
+  },
+  DELETED_USER: {
+    value: "DELETED_USER",
+    label: "Program User",
+    visible: false
   }
 
 };
