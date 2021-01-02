@@ -213,7 +213,7 @@ class StudyCommentsTab extends React.Component {
                       <Input
                           ref={this.textInput}
                           type={'textarea'}
-                          defaultValue={this.state.newComment}
+                          value={this.state.newComment}
                           onChange={(e) => this.handleUpdate(e.target.value)}
                       />
                     </FormGroup>

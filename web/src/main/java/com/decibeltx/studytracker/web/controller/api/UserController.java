@@ -51,6 +51,15 @@ public class UserController {
   @Autowired
   private ActivityService activityService;
 
+  private Optional<User> findByIdentifier(String id) {
+    Optional<User> optional = userService.findById(id);
+    if (optional.isPresent()) {
+      return optional;
+    } else {
+      return userService.findByUsername(id);
+    }
+  }
+
   @GetMapping("")
   public List<User> getAllUsers() throws Exception {
     return userService.findAll();
@@ -58,7 +67,7 @@ public class UserController {
 
   @GetMapping("/{id}")
   public User getUser(@PathVariable("id") String id) throws Exception {
-    Optional<User> optional = userService.findById(id);
+    Optional<User> optional = this.findByIdentifier(id);
     if (optional.isPresent()) {
       return optional.get();
     } else {

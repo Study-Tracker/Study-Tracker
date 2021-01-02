@@ -29,7 +29,7 @@ import {
   UncontrolledDropdown
 } from "reactstrap";
 import {toggleSidebar} from "../redux/actions/sidebarActions";
-import {HelpCircle, LogIn, LogOut, Settings, User} from "react-feather";
+import {LogIn, LogOut, Settings, User} from "react-feather";
 import {connect} from "react-redux";
 import {setUser} from '../redux/actions/userActions'
 
@@ -162,13 +162,13 @@ class NavBarComponent extends React.Component {
                               </a>
                             </DropdownItem>
 
-                            <DropdownItem>
-                              <a href="#">
-                                <HelpCircle size={18}
-                                            className="align-middle mr-2"/>
-                                Help
-                              </a>
-                            </DropdownItem>
+                            {/*<DropdownItem>*/}
+                            {/*  <a href="#">*/}
+                            {/*    <HelpCircle size={18}*/}
+                            {/*                className="align-middle mr-2"/>*/}
+                            {/*    Help*/}
+                            {/*  </a>*/}
+                            {/*</DropdownItem>*/}
 
                             <DropdownItem>
                               <a href="/logout">

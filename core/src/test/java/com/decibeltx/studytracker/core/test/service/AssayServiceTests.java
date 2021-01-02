@@ -28,6 +28,7 @@ import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
 import com.decibeltx.studytracker.core.repository.AssayTypeRepository;
 import com.decibeltx.studytracker.core.service.AssayService;
+import com.decibeltx.studytracker.core.service.NamingService;
 import com.decibeltx.studytracker.core.service.StudyService;
 import com.decibeltx.studytracker.core.test.TestConfiguration;
 import java.util.Collections;
@@ -63,6 +64,9 @@ public class AssayServiceTests {
 
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
+  @Autowired
+  private NamingService namingService;
 
   private static final int ASSAY_COUNT = 2;
 
@@ -105,7 +109,7 @@ public class AssayServiceTests {
     Assert.assertEquals(ASSAY_COUNT + 1, assayRepository.count());
     Assert.assertNotNull(assay.getId());
     Assert.assertNotNull(assay.getCode());
-    Assert.assertEquals(study.getCode() + "-00001", assay.getCode());
+    Assert.assertEquals(study.getCode() + "-001", assay.getCode());
     study.getAssays().add(assay);
     studyService.update(study);
     Study updated = studyService.findByCode(study.getCode())
@@ -139,7 +143,7 @@ public class AssayServiceTests {
     Map<String, Object> fields = new LinkedHashMap<>();
     fields.put("number_of_slides", 10);
     fields.put("antibodies", "AKT1, AKT2, AKT3");
-    fields.put("concentration", 1.2345F);
+    fields.put("concentration", 1.2345);
     fields.put("date", new Date());
     fields.put("external", true);
     fields.put("stain", "DAPI");
@@ -149,7 +153,7 @@ public class AssayServiceTests {
     Assert.assertEquals(ASSAY_COUNT + 1, assayRepository.count());
     Assert.assertNotNull(assay.getId());
     Assert.assertNotNull(assay.getCode());
-    Assert.assertEquals(study.getCode() + "-00001", assay.getCode());
+    Assert.assertEquals(study.getCode() + "-001", assay.getCode());
     study.getAssays().add(assay);
     studyService.update(study);
     Study updated = studyService.findByCode(study.getCode())
@@ -200,7 +204,7 @@ public class AssayServiceTests {
 
   @Test
   public void assayUpdateTest() {
-    String code = "PPB-10001-00001";
+    String code = "PPB-10001-001";
     Date now = new Date();
     Assay assay = assayService.findByCode(code).orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(code, assay.getCode());
@@ -218,29 +222,29 @@ public class AssayServiceTests {
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
     assay.setStudy(study);
-    String code = assayService.generateAssayCode(assay);
+    String code = namingService.generateAssayCode(assay);
     Assert.assertNotNull(code);
-    Assert.assertEquals(study.getCode() + "-00001", code);
+    Assert.assertEquals(study.getCode() + "-001", code);
   }
 
   @Test
   public void inactivateAssayTest() {
-    Assay assay = assayService.findByCode("PPB-10001-00001")
+    Assay assay = assayService.findByCode("PPB-10001-001")
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertTrue(assay.isActive());
     assayService.delete(assay);
-    Assay updated = assayService.findByCode("PPB-10001-00001")
+    Assay updated = assayService.findByCode("PPB-10001-001")
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(updated.isActive());
   }
 
   @Test
   public void updateAssayStatusTest() {
-    Assay assay = assayService.findByCode("PPB-10001-00001")
+    Assay assay = assayService.findByCode("PPB-10001-001")
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Status.ACTIVE, assay.getStatus());
     assayService.updateStatus(assay, Status.COMPLETE);
-    Assay updated = assayService.findByCode("PPB-10001-00001")
+    Assay updated = assayService.findByCode("PPB-10001-001")
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Status.COMPLETE, updated.getStatus());
   }

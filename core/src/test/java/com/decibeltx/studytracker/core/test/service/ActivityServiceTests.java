@@ -56,7 +56,7 @@ public class ActivityServiceTests {
     exampleDataGenerator.populateDatabase();
   }
 
-  private static final int ACTION_COUNT = 0;
+  private static final int ACTION_COUNT = 2;
 
   @Test
   public void addStudyActivityTest() {

@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.storage;
+import * as types from '../constants'
 
+const initialState = null;
 
-import com.decibeltx.studytracker.core.model.Assay;
-import com.decibeltx.studytracker.core.model.Program;
-import com.decibeltx.studytracker.core.model.Study;
-
-public class StorageUtils {
-
-  public static String getProgramFolderName(Program program) {
-    return program.getName();
+export default function reducer(state = initialState, actions) {
+  switch (actions.type) {
+    case types.SET_ASSAY_TYPES:
+      return {
+        ...state,
+        ...actions.payload
+      };
+    default:
+      return state;
   }
-
-  public static String getStudyFolderName(Study study) {
-    return study.getName() + " (" + study.getCode() + ")";
-  }
-
-  public static String getAssayFolderName(Assay assay) {
-    return assay.getName() + " (" + assay.getCode() + ")";
-  }
-
 }

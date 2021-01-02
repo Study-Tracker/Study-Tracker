@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.example;
 
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
+import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Assay;
@@ -291,11 +292,15 @@ public class ExampleDataGenerator {
 
     studyService.create(study);
 
+    activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
+
     ExternalLink link = new ExternalLink();
     link.setId(UUID.randomUUID().toString());
     link.setLabel("Google");
     link.setUrl(new URL("https://google.com"));
     externalLinkService.addStudyExternalLink(study, link);
+
+    activityRepository.insert(StudyActivityUtils.fromNewExternalLink(study, user, link));
 
     // Study 2
     program = programRepository.findByName("Preclinical Project B")
@@ -324,7 +329,12 @@ public class ExampleDataGenerator {
 
     studyService.create(study);
 
+    activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
+
     studyService.updateStatus(study, Status.ACTIVE);
+
+    activityRepository.insert(
+        StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.ACTIVE));
 
     Comment comment = new Comment();
     comment.setId(UUID.randomUUID().toString());
@@ -334,6 +344,8 @@ public class ExampleDataGenerator {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     commentService.addStudyComment(study, comment);
 
+    activityRepository.insert(StudyActivityUtils.fromNewComment(study, user, comment));
+
     Conclusions conclusions = new Conclusions();
     conclusions.setId(UUID.randomUUID().toString());
     conclusions.setCreatedAt(new Date());
@@ -341,6 +353,8 @@ public class ExampleDataGenerator {
     conclusions.setContent(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
     conclusionsService.addStudyConclusions(study, conclusions);
+
+    activityRepository.insert(StudyActivityUtils.fromNewConclusions(study, user, conclusions));
 
     // Study 3
     program = programRepository.findByName("Preclinical Project B")
@@ -367,7 +381,13 @@ public class ExampleDataGenerator {
         "https://google.com");
     study.setNotebookFolder(notebookEntry);
     studyService.create(study);
+
+    activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
+
     studyService.updateStatus(study, Status.COMPLETE);
+
+    activityRepository.insert(
+        StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.COMPLETE));
 
     // Study 4
     program = programRepository.findByName("Clinical Program A")
@@ -388,7 +408,13 @@ public class ExampleDataGenerator {
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
     studyService.create(study);
+
+    activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
+
     studyService.updateStatus(study, Status.ON_HOLD);
+
+    activityRepository.insert(
+        StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.ON_HOLD));
 
     // Study 5
     program = programRepository.findByName("Target ID Project D")
@@ -410,7 +436,10 @@ public class ExampleDataGenerator {
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
     studyService.create(study);
+    activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
     studyService.updateStatus(study, Status.COMPLETE);
+    activityRepository.insert(
+        StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.COMPLETE));
 
     // Study 6
     program = programRepository.findByName("Target ID Project E")
@@ -432,6 +461,7 @@ public class ExampleDataGenerator {
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
     studyService.create(study);
+    activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
 
   }
 
@@ -459,11 +489,13 @@ public class ExampleDataGenerator {
 
     AssayType assayType = new AssayType();
     assayType.setName("Generic");
+    assayType.setDescription("Generic assay type for all purposes");
     assayType.setActive(true);
     assayTypes.add(assayType);
 
     assayType = new AssayType();
     assayType.setName("Histology");
+    assayType.setDescription("Histological analysis assays");
     assayType.setActive(true);
     assayType.setFields(Arrays.asList(
         new AssayTypeField("No. Slides", "number_of_slides", AssayFieldType.INTEGER, true),
@@ -498,7 +530,7 @@ public class ExampleDataGenerator {
     Assay assay = new Assay();
     assay.setStudy(study);
     assay.setActive(true);
-    assay.setCode(study.getCode() + "-00001");
+    assay.setCode(study.getCode() + "-001");
     assay.setName("Histology assay");
     assay.setDescription(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ");

@@ -15,15 +15,7 @@
  */
 
 import React from "react";
-import {
-  Activity,
-  Clipboard,
-  Droplet,
-  GitHub,
-  Layers,
-  Target,
-  Users
-} from "react-feather";
+import {Activity, Clipboard, Layers, Target, Users} from "react-feather";
 
 const timelineRoutes = {
   path: "/",
@@ -117,20 +109,6 @@ const programRoutes = {
   ]
 };
 
-const animalRoutes = {
-  path: "/animals",
-  name: "Animals",
-  icon: GitHub,
-  children: null
-};
-
-const sampleRoutes = {
-  path: "/samples",
-  name: "Samples",
-  icon: Droplet,
-  children: null
-};
-
 const userRoutes = {
   path: "/users",
   name: "Users",
@@ -143,7 +121,5 @@ export default [
   studyRoutes,
   assayRoutes,
   programRoutes,
-  animalRoutes,
-  sampleRoutes,
   userRoutes
 ]

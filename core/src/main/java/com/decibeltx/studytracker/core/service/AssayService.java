@@ -46,8 +46,6 @@ public interface AssayService {
    */
   void updateStatus(Assay assay, Status status);
 
-  String generateAssayCode(Assay assay);
-
   /**
    * Counting number of assays created before/after/between given dates.
    */

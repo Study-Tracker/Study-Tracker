@@ -76,6 +76,7 @@ public class AssayTypeServiceTests {
     AssayType assayType = new AssayType();
     assayType.setActive(true);
     assayType.setName("Test");
+    assayType.setDescription("This is a test");
     AssayTypeField field = new AssayTypeField();
     field.setDisplayName("Name");
     field.setFieldName("name");
@@ -98,6 +99,7 @@ public class AssayTypeServiceTests {
     AssayType assayType = new AssayType();
     assayType.setActive(true);
     assayType.setName("Test");
+    assayType.setDescription("This is a test");
     AssayTypeField field = new AssayTypeField();
     field.setDisplayName("Name");
     field.setFieldName("name");
@@ -135,6 +137,7 @@ public class AssayTypeServiceTests {
     AssayType assayType = new AssayType();
     assayType.setActive(true);
     assayType.setName("Test");
+    assayType.setDescription("This is a test");
     AssayTypeField field = new AssayTypeField();
     field.setDisplayName("Name");
     field.setFieldName("name");

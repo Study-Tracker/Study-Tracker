@@ -98,6 +98,12 @@ Study Tracker requires a connection to a MongoDB-compatible database. You must p
 | -------- | ------- | ----------- |
 | `study.default-code-prefix` | `ST` | Default prefix for generating study codes, if one is not provided by the associated program. |
 | `study.default-external-code-prefix` | `EX` | Default prefix for generating study codes, if one is not provided by the associated external collaborator. |
+| `study.study-code-counter-start` | `10001` | Sets the  starting value of the study code counter. For example, the first study with program code `ST` would have a code of `ST-10001` by default. |
+| `study.external-code-counter-start` | `1` | Sets the  starting value of the study code counter. For example, the first study with collaborator code `CRO` would have an external code of `CRO-00001` by default. |
+| `study.assay-code-counter-start` | `1` | Sets the  starting value of the assay code counter. For example, the first assay for study `ST-10001` would have a code of `ST-10001-001` by default. |
+| `study.study-code-min-digits` | `5` | Sets the zero-padding length for the study code. A study counter value of `1` for program `ST` would get padded to `ST-00001` by default.
+| `study.external-code-min-digits` | `5` | Sets the zero-padding length for the external study code. A study counter value of `1` for collaborator `CRO` would get padded to `CRO-00001` by default.
+| `study.assay-code-min-digits` | `3` | Sets the zero-padding length for the assay code. A assay counter value of `1` for study `ST-10001` would get padded to `ST-10001-001` by default.
 
 ### Events
 

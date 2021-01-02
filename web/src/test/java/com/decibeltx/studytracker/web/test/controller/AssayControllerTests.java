@@ -70,10 +70,10 @@ public class AssayControllerTests {
 
   @Test
   public void findByIdTest() throws Exception {
-    mockMvc.perform(get("/api/assay/PPB-10001-00001"))
+    mockMvc.perform(get("/api/assay/PPB-10001-001"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is("PPB-10001-00001")))
+        .andExpect(jsonPath("$.code", is("PPB-10001-001")))
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("ACTIVE")))
         .andExpect(jsonPath("$", hasKey("assayType")))

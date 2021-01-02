@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.egnyte;
 
 import com.decibeltx.studytracker.core.config.LocalStudyStorageServiceConfiguration;
+import com.decibeltx.studytracker.core.service.NamingOptions;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteObject;
 import com.decibeltx.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import com.decibeltx.studytracker.egnyte.rest.EgnyteRestApiClient;
@@ -41,6 +42,24 @@ public class EgnyteServiceConfiguration {
 
   @Autowired
   private Environment env;
+
+  @Bean
+  public EgnyteFolderNamingService egnyteFolderNamingService() {
+    NamingOptions namingOptions = new NamingOptions();
+    if (env.containsProperty("study.study-code-counter-start")) {
+      namingOptions.setStudyCodeCounterStart(
+          env.getRequiredProperty("study.study-code-counter-start", Integer.class));
+    }
+    if (env.containsProperty("study.external-code-counter-start")) {
+      namingOptions.setExternalStudyCodeCounterStart(
+          env.getRequiredProperty("study.external-code-counter-start", Integer.class));
+    }
+    if (env.containsProperty("study.assay-code-counter-start")) {
+      namingOptions.setAssayCodeCounterStart(
+          env.getRequiredProperty("study.assay-code-counter-start", Integer.class));
+    }
+    return new EgnyteFolderNamingService(namingOptions);
+  }
 
   @Bean
   public ObjectMapper egnyteObjectMapper() throws Exception {
