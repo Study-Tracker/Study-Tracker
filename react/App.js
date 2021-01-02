@@ -39,6 +39,7 @@ import PasswordResetView from "./views/PasswordResetView";
 import AdminDashboardView from "./views/AdminDashboardView";
 import FrontPageView from "./views/FrontPageView";
 import AssayTypeFormView from "./views/AssayTypeFormView";
+import AssayListView from "./views/AssayListView";
 
 export const history = createBrowserHistory();
 
@@ -80,6 +81,11 @@ export default class App extends React.Component {
                   {/* Edit study*/}
                   <Route exact path={"/study/:studyCode/edit"}
                          render={props => <StudyFormView {...props} />}/>
+
+                  {/* Assay List */}
+                  <Route exact path={["/assays"]}
+                         render={props => <AssayListView {...props}
+                                                         title={"All Assays"}/>}/>
 
                   {/*New assay*/}
                   <Route exact path={"/study/:studyCode/assays/new"}

@@ -14,25 +14,11 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.eln;
+import * as types from '../constants';
 
-
-import com.decibeltx.studytracker.core.model.Assay;
-import com.decibeltx.studytracker.core.model.Program;
-import com.decibeltx.studytracker.core.model.Study;
-
-public class NotebookUtils {
-
-  public static String getProgramFolderName(Program program) {
-    return program.getName();
+export function setAssayTypes(assayTypes) {
+  return {
+    type: types.SET_ASSAY_TYPES,
+    payload: assayTypes
   }
-
-  public static String getStudyFolderName(Study study) {
-    return study.getName() + " (" + study.getCode() + ")";
-  }
-
-  public static String getAssayFolderName(Assay assay) {
-    return assay.getName() + " (" + assay.getCode() + ")";
-  }
-
 }

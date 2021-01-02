@@ -22,7 +22,6 @@ import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.storage.StorageFile;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
-import com.decibeltx.studytracker.core.storage.StorageUtils;
 import com.decibeltx.studytracker.core.storage.StudyStorageService;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageDuplicateException;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageException;
@@ -35,6 +34,7 @@ import com.decibeltx.studytracker.egnyte.exception.EgnyteException;
 import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.util.UriUtils;
 
 public class EgnyteStudyStorageService implements StudyStorageService {
@@ -42,47 +42,31 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   private static final Logger LOGGER = LoggerFactory.getLogger(EgnyteStudyStorageService.class);
 
   private final EgnyteClientOperations egnyteClient;
+
   private final EgnyteOptions options;
+
+  @Autowired
+  private EgnyteFolderNamingService egnyteFolderNamingService;
 
   public EgnyteStudyStorageService(EgnyteClientOperations egnyteClient, EgnyteOptions options) {
     this.egnyteClient = egnyteClient;
     this.options = options;
   }
 
-  private String getProgramFolderName(Program program) {
-    return StorageUtils.getProgramFolderName(program)
-        .replaceAll("[^A-Za-z0-9-_\\s()]+", " ")
-        .replaceAll("\\s+", " ")
-        .trim();
-  }
-
-  private String getStudyFolderName(Study study) {
-    return StorageUtils.getStudyFolderName(study)
-        .replaceAll("[^A-Za-z0-9-_\\s()]+", " ")
-        .replaceAll("\\s+", " ")
-        .trim();
-  }
-
-  private String getAssayFolderName(Assay assay) {
-    return StorageUtils.getAssayFolderName(assay)
-        .replaceAll("[^A-Za-z0-9-_\\s()]+", " ")
-        .replaceAll("\\s+", " ")
-        .trim();
-  }
-
   private String getProgramFolderPath(Program program) {
     String root = options.getRootPath();
-    return root + getProgramFolderName(program) + "/";
+    return root + egnyteFolderNamingService.getProgramStorageFolderName(program) + "/";
   }
 
   private String getStudyFolderPath(Study study) {
-    return this.getProgramFolderPath(study.getProgram()) + getStudyFolderName(study) + "/";
+    return this.getProgramFolderPath(study.getProgram())
+        + egnyteFolderNamingService.getStudyStorageFolderName(study) + "/";
   }
 
   private String getAssayFolderPath(Assay assay) {
     Study study = assay.getStudy();
     String studyPath = this.getStudyFolderPath(study);
-    return studyPath + getAssayFolderName(assay) + "/";
+    return studyPath + egnyteFolderNamingService.getAssayStorageFolderName(assay) + "/";
   }
 
   private StorageFolder convertEgnyteFolder(EgnyteFolder egnyteFolder) {

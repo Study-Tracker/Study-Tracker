@@ -28,7 +28,7 @@ public class StatisticsServiceTests {
 
   private static final long USER_COUNT = 3;
 
-  private static final long ACTIVITY_COUNT = 0;
+  private static final long ACTIVITY_COUNT = 13;
 
   @Autowired
   private StatisticsService statisticsService;

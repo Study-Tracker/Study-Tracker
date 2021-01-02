@@ -205,7 +205,8 @@ const ActivityMessage = ({activity}) => {
             <div className="bg-light text-secondary p-3">
 
               <h5>
-                <a href={"/assay/" + activity.data.assay.code}>
+                <a href={"/study/" + activity.data.study + "/assay/"
+                + activity.data.assay.code}>
                   {activity.data.assay.code}
                 </a>
               </h5>
@@ -236,7 +237,8 @@ const ActivityMessage = ({activity}) => {
             <div className="bg-light text-secondary p-3">
 
               <h5>
-                <a href={"/assay/" + activity.data.assay.code}>
+                <a href={"/study/" + activity.data.study + "/assay/"
+                + activity.data.assay.code}>
                   {activity.data.assay.code}
                 </a>
               </h5>
@@ -269,7 +271,7 @@ const ActivityMessage = ({activity}) => {
             <a href={"/users/"
             + activity.user.accountName}>{activity.user.displayName}</a>
             &nbsp;has updated the status of assay&nbsp;
-            <a href={"/assay/"
+            <a href={"/study/" + activity.data.study + "/assay/"
             + activity.data.assay.code}>{activity.data.assay.code}</a>
             &nbsp;from&nbsp;
             <StatusBadge status={activity.data.oldStatus}/>

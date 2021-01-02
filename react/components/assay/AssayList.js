@@ -17,8 +17,6 @@
 import React from "react";
 import {StatusBadge} from "../status";
 import {Button, Card, CardBody, Col, Container, Row} from "reactstrap";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -29,10 +27,10 @@ const columns = [
     dataField: "code",
     text: "Code",
     sort: true,
-    headerStyle: {width: '10%'},
+    headerStyle: {width: '15%'},
     formatter: (cell, d, index, x) => {
       return (
-          <a href={"/study/" + d.code}>
+          <a href={"/study/" + d.study.code + "/assay/" + d.code}>
             {d.code}
           </a>
       )
@@ -46,6 +44,13 @@ const columns = [
       }
       return 0;
     },
+  },
+  {
+    dataField: "assayType",
+    text: "Assay Type",
+    sort: true,
+    headerStyle: {width: '10%'},
+    formatter: (c, d, i, x) => d.assayType.name
   },
   {
     dataField: "status",
@@ -77,21 +82,21 @@ const columns = [
     sort: true,
     headerStyle: {width: '10%'},
     sortFunc: (a, b, order, dataField, rowA, rowB) => {
-      if (rowA.program.name > rowB.program.name) {
+      if (rowA.study.program.name > rowB.study.program.name) {
         return order === "desc" ? -1 : 1;
       }
-      if (rowB.program.name > rowA.program.name) {
+      if (rowB.study.program.name > rowA.study.program.name) {
         return order === "desc" ? 1 : -1;
       }
       return 0;
     },
-    formatter: (cell, d, i, x) => d.program.name
+    formatter: (cell, d, i, x) => d.study.program.name
   },
   {
     dataField: "name",
     text: "Name",
     sort: true,
-    headerStyle: {width: '25%'},
+    headerStyle: {width: '20%'},
     formatter: (c, d, i, x) => d.name
   },
   {
@@ -105,11 +110,13 @@ const columns = [
     dataField: "cro",
     text: "CRO / Collaborator",
     sort: true,
-    headerStyle: {width: '15%'},
+    headerStyle: {width: '10%'},
     sortFunc: (a, b, order, dataField, rowA, rowB) => {
-      const da = !!rowA.collaborator ? rowA.collaborator.organizationName
+      const da = !!rowA.study.collaborator
+          ? rowA.study.collaborator.organizationName
           : '';
-      const db = !!rowB.collaborator ? rowB.collaborator.organizationName
+      const db = !!rowB.study.collaborator
+          ? rowB.study.collaborator.organizationName
           : '';
       if (da > db) {
         return order === "desc" ? -1 : 1;
@@ -119,14 +126,14 @@ const columns = [
       }
       return 0;
     },
-    formatter: (c, d, i, x) => !!d.collaborator
+    formatter: (c, d, i, x) => !!d.study.collaborator
         ? (
             <div>
               <p style={{fontWeight: 'bold', marginBottom: '0.2rem'}}>
-                {d.collaborator.organizationName}
+                {d.study.collaborator.organizationName}
               </p>
               <p>
-                {d.externalCode}
+                {d.study.externalCode}
               </p>
             </div>
 
@@ -170,19 +177,21 @@ const columns = [
     hidden: true,
     formatter: (c, d, i, x) => '',
     filterValue: (c, d, i, x) => {
-      const CRO = !!d.collaborator
-          ? d.collaborator.organizationName +
+      const CRO = !!d.study.collaborator
+          ? d.study.collaborator.organizationName +
           ' ' +
-          d.collaborator.contactName
+          d.study.collaborator.contactName
           : '';
       let text =
           d.name +
+          ' ' +
+          d.assayType.name +
           ' ' +
           d.status +
           ' ' +
           d.description +
           ' ' +
-          d.program.name +
+          d.study.program.name +
           ' ' +
           d.code +
           ' ' +
@@ -192,12 +201,7 @@ const columns = [
           ' ' +
           d.owner.displayName +
           ' ' +
-          (d.externalCode || '');
-      if (d.keywords != null) {
-        d.keywords.forEach(keyword => {
-          text = text + ' ' + keyword.keyword;
-        });
-      }
+          (d.study.externalCode || '');
       return text;
     }
   }
@@ -219,26 +223,14 @@ const ExportToCsv = (props) => {
   );
 };
 
-const StudyList = ({studies, title, filters, user}) => {
+const AssayList = ({assays, title, filters, user}) => {
 
   return (
       <Container fluid className="animated fadeIn">
 
         <Row className="justify-content-between align-items-center">
-          <Col xs="8">
+          <Col>
             <h1>{title}</h1>
-          </Col>
-          <Col className="col-auto">
-            {
-              !!user
-                  ? (
-                      <a href="/studies/new">
-                        <Button color="primary" className="mr-1 mb-1">
-                          <FontAwesomeIcon icon={faPlusCircle}/> New Study
-                        </Button>
-                      </a>
-                  ) : ''
-            }
           </Col>
         </Row>
 
@@ -248,7 +240,7 @@ const StudyList = ({studies, title, filters, user}) => {
               <CardBody>
                 <ToolkitProvider
                     keyField="id"
-                    data={studies}
+                    data={assays}
                     columns={columns}
                     search
                     exportCSV
@@ -265,8 +257,6 @@ const StudyList = ({studies, title, filters, user}) => {
                         <BootstrapTable
                             bootstrap4
                             keyField="id"
-                            // data={studies}
-                            // columns={columns}
                             bordered={false}
                             pagination={paginationFactory({
                               sizePerPage: 10,
@@ -292,4 +282,4 @@ const StudyList = ({studies, title, filters, user}) => {
 
 };
 
-export default StudyList;
+export default AssayList;

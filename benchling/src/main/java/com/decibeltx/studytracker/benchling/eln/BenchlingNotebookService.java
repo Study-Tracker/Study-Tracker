@@ -19,12 +19,12 @@ package com.decibeltx.studytracker.benchling.eln;
 import com.decibeltx.studytracker.benchling.eln.entities.BenchlingFolder;
 import com.decibeltx.studytracker.benchling.exception.EntityNotFoundException;
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
-import com.decibeltx.studytracker.core.eln.NotebookUtils;
 import com.decibeltx.studytracker.core.eln.StudyNotebookService;
 import com.decibeltx.studytracker.core.exception.NotebookException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.service.NamingService;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +39,9 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
   @Autowired
   private BenchlingElnOptions options;
+
+  @Autowired
+  private NamingService namingService;
 
   private String createFolderUrl(BenchlingFolder folder) {
     return options.getRootFolderUrl() + "/" + folder.getId().replace("lib_", "") + "-"
@@ -153,7 +156,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     NotebookFolder programFolder = programFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client
-        .createFolder(NotebookUtils.getStudyFolderName(study), programFolder.getReferenceId());
+        .createFolder(namingService.getStudyNotebookFolderName(study),
+            programFolder.getReferenceId());
     NotebookFolder studyFolder = this.convertFolder(benchlingFolder);
     studyFolder.setParentFolder(programFolder);
     return studyFolder;
@@ -173,7 +177,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     NotebookFolder studyFolder = studyFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client
-        .createFolder(NotebookUtils.getAssayFolderName(assay), studyFolder.getReferenceId());
+        .createFolder(namingService.getAssayNotebookFolderName(assay),
+            studyFolder.getReferenceId());
     NotebookFolder assayFolder = this.convertFolder(benchlingFolder);
     assayFolder.setParentFolder(studyFolder);
 

@@ -94,12 +94,12 @@ public class StudyRelationshipControllerTests {
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(1, targetStudy.getStudyRelationships().size());
     Assert.assertEquals(Type.IS_BLOCKING, sourceStudy.getStudyRelationships().get(0).getType());
-    Assert.assertEquals(targetStudy.getCode(),
+    Assert.assertEquals(targetStudy.getId(),
         sourceStudy.getStudyRelationships().get(0).getStudy().getId());
     targetStudy = studyRepository.findByCode("PPB-10001")
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Type.IS_BLOCKED_BY, targetStudy.getStudyRelationships().get(0).getType());
-    Assert.assertEquals(sourceStudy.getCode(),
+    Assert.assertEquals(sourceStudy.getId(),
         targetStudy.getStudyRelationships().get(0).getStudy().getId());
 
   }
@@ -112,8 +112,7 @@ public class StudyRelationshipControllerTests {
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("type")))
         .andExpect(jsonPath("$[0].type", is("IS_BLOCKING")))
-        .andExpect(jsonPath("$[0]", hasKey("studyId")))
-        .andExpect(jsonPath("$[0].studyId", is("PPB-10001")));
+        .andExpect(jsonPath("$[0]", hasKey("studyId")));
   }
 
   @Test

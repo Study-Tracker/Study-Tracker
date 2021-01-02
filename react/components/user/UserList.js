@@ -31,7 +31,7 @@ const columns = [
     // headerStyle: {width: '20%%'},
     formatter: (c, d, i, x) => {
       return (
-          <a href={"/user/" + d.id}>{d.displayName}</a>
+          <a href={"/user/" + d.username}>{d.displayName}</a>
       )
     },
     sortFunc: (a, b, order, dataField, rowA, rowB) => {

@@ -95,7 +95,7 @@ public class StudyAssayControllerTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
-        .andExpect(jsonPath("$[0].code", is("PPB-10001-00001")));
+        .andExpect(jsonPath("$[0].code", is("PPB-10001-001")));
 
     mockMvc.perform(get("/api/study/CPA-10001/assays"))
         .andExpect(status().isOk())
@@ -107,10 +107,10 @@ public class StudyAssayControllerTests {
 
   @Test
   public void findAssayByIdTest() throws Exception {
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-00001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is("PPB-10001-00001")))
+        .andExpect(jsonPath("$.code", is("PPB-10001-001")))
         .andExpect(jsonPath("$", hasKey("assayType")))
         .andExpect(jsonPath("$.assayType", hasKey("name")))
         .andExpect(jsonPath("$.assayType.name", is("Generic")));
@@ -175,28 +175,28 @@ public class StudyAssayControllerTests {
         .andExpect(jsonPath("$", hasKey("name")))
         .andExpect(jsonPath("$.name", is("Test assay")))
         .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is("CPA-10001-00001")));
+        .andExpect(jsonPath("$.code", is("CPA-10001-001")));
 
     mockMvc.perform(get("/api/study/CPA-10001/assays"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
-        .andExpect(jsonPath("$[0].code", is("CPA-10001-00001")));
+        .andExpect(jsonPath("$[0].code", is("CPA-10001-001")));
 
   }
 
   @Test
   public void updateAssayTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-00001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status", is("ACTIVE")));
 
-    Assay assay = assayRepository.findByCode("PPB-10001-00001")
+    Assay assay = assayRepository.findByCode("PPB-10001-001")
         .orElseThrow(RecordNotFoundException::new);
     assay.setStatus(Status.COMPLETE);
 
-    mockMvc.perform(put("/api/study/PPB-10001/assays/PPB-10001-00001")
+    mockMvc.perform(put("/api/study/PPB-10001/assays/PPB-10001-001")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(assay))
         .with(user(assay.getOwner().getUsername())))
@@ -210,15 +210,15 @@ public class StudyAssayControllerTests {
   @Test
   public void deleteAssayTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-00001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(true)));
 
-    mockMvc.perform(delete("/api/study/PPB-10001/assays/PPB-10001-00001")
+    mockMvc.perform(delete("/api/study/PPB-10001/assays/PPB-10001-001")
         .with(user("jsmith")))
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-00001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(false)));
 

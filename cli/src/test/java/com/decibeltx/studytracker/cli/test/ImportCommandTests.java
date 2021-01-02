@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles({"example"})
+@ActiveProfiles({"example", "test"})
 public class ImportCommandTests {
 
   private static final Resource EXAMPLE_DATA_FILE = new ClassPathResource("example-data.yml");

@@ -28,8 +28,10 @@ import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.service.AssayService;
+import com.decibeltx.studytracker.core.service.NamingService;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
 import com.decibeltx.studytracker.core.storage.StudyStorageService;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,9 @@ public class AssayServiceImpl implements AssayService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayServiceImpl.class);
 
+  private static final SimpleDateFormat JAVASCRIPT_DATE_FORMAT = new SimpleDateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //2021-01-02T05:00:00.000Z
+
   @Autowired
   private AssayRepository assayRepository;
 
@@ -54,6 +59,9 @@ public class AssayServiceImpl implements AssayService {
 
   @Autowired(required = false)
   private StudyNotebookService notebookService;
+
+  @Autowired
+  private NamingService namingService;
 
   @Override
   public Optional<Assay> findById(String id) {
@@ -77,6 +85,7 @@ public class AssayServiceImpl implements AssayService {
 
   private boolean isValidFieldType(Object value, AssayFieldType type) {
     Class<?> clazz = value.getClass();
+    System.out.println(clazz.getName());
     switch (type) {
       case STRING:
         return String.class.isAssignableFrom(clazz);
@@ -84,12 +93,27 @@ public class AssayServiceImpl implements AssayService {
         return String.class.isAssignableFrom(clazz);
       case DATE:
         if (Date.class.isAssignableFrom(clazz)) {
+          System.out.println("Date as Date");
+          System.out.println(value.toString());
           return true;
+        } else if (String.class.isAssignableFrom(clazz)) {
+          System.out.println("Date as String");
+          System.out.println(value.toString());
+          try {
+            JAVASCRIPT_DATE_FORMAT.parse((String) value);
+            return true;
+          } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+          }
         } else {
+          System.out.println("Date as integer");
+          System.out.println(value.toString());
           try {
             new Date((long) value);
             return true;
           } catch (Exception e) {
+            e.printStackTrace();
             return false;
           }
         }
@@ -140,7 +164,7 @@ public class AssayServiceImpl implements AssayService {
         .orElseThrow(RecordNotFoundException::new);
 
     validateAssayFields(assay);
-    assay.setCode(generateAssayCode(assay));
+    assay.setCode(namingService.generateAssayCode(assay));
     assay.setActive(true);
 
     assayRepository.insert(assay);
@@ -193,14 +217,6 @@ public class AssayServiceImpl implements AssayService {
   public void updateStatus(Assay assay, Status status) {
     assay.setStatus(status);
     assayRepository.save(assay);
-  }
-
-  @Override
-  public String generateAssayCode(Assay assay) {
-    Study study = assay.getStudy();
-    String prefix = study.getProgram().getCode() + "-";
-    int count = assayRepository.findByCodePrefix(prefix).size();
-    return study.getCode() + "-" + String.format("%05d", count + 1);
   }
 
   @Override

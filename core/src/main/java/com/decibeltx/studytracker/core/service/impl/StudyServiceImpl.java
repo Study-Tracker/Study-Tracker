@@ -17,18 +17,15 @@
 package com.decibeltx.studytracker.core.service.impl;
 
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
-import com.decibeltx.studytracker.core.eln.NotebookUtils;
 import com.decibeltx.studytracker.core.eln.StudyNotebookService;
 import com.decibeltx.studytracker.core.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.core.exception.InvalidConstraintException;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
-import com.decibeltx.studytracker.core.exception.StudyTrackerException;
-import com.decibeltx.studytracker.core.model.Collaborator;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
-import com.decibeltx.studytracker.core.service.ProgramService;
+import com.decibeltx.studytracker.core.service.NamingService;
 import com.decibeltx.studytracker.core.service.StudyService;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
 import com.decibeltx.studytracker.core.storage.StudyStorageService;
@@ -39,7 +36,6 @@ import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -53,16 +49,13 @@ public class StudyServiceImpl implements StudyService {
   private StudyRepository studyRepository;
 
   @Autowired
-  private ProgramService programService;
-
-  @Autowired
   private StudyStorageService studyStorageService;
 
   @Autowired(required = false)
   private StudyNotebookService notebookService;
 
   @Autowired
-  private Environment environment;
+  private NamingService namingService;
 
   @Override
   public Optional<Study> findById(String id) {
@@ -111,13 +104,13 @@ public class StudyServiceImpl implements StudyService {
     }
 
     if (study.getCode() == null) {
-      study.setCode(this.generateStudyCode(study));
+      study.setCode(namingService.generateStudyCode(study));
     }
     study.setActive(true);
 
     // External study
     if (study.getCollaborator() != null && StringUtils.isEmpty(study.getExternalCode())) {
-      study.setExternalCode(this.generateExternalStudyCode(study));
+      study.setExternalCode(namingService.generateExternalStudyCode(study));
     }
 
     try {
@@ -147,7 +140,7 @@ public class StudyServiceImpl implements StudyService {
     if (study.isLegacy()) {
       LOGGER.warn(String.format("Legacy Study : %s", study.getCode()));
       NotebookFolder notebookFolder = study.getNotebookFolder();
-      notebookFolder.setName(NotebookUtils.getStudyFolderName(study));
+      notebookFolder.setName(namingService.getStudyNotebookFolderName(study));
       study.setNotebookFolder(notebookFolder);
       study.setUpdatedAt(new Date());
       studyRepository.save(study);
@@ -181,32 +174,6 @@ public class StudyServiceImpl implements StudyService {
   public void delete(Study study) {
     study.setActive(false);
     studyRepository.save(study);
-  }
-
-  @Override
-  public String generateStudyCode(Study study) {
-    if (study.isLegacy()) {
-      throw new StudyTrackerException("Legacy studies do not recieve new study codes.");
-    }
-    Program program = study.getProgram();
-    Integer count = environment.containsProperty("study.code-counter-start")
-        ? environment.getRequiredProperty("study.code-counter-start", Integer.class)
-        : 10001;
-    for (Program p : programService.findByCode(program.getCode())) {
-      count = count + (studyRepository.findActiveProgramStudies(p.getId())).size();
-    }
-    return program.getCode() + "-" + count.toString();
-  }
-
-  @Override
-  public String generateExternalStudyCode(Study study) {
-    Collaborator collaborator = study.getCollaborator();
-    if (collaborator == null) {
-      throw new StudyTrackerException("External studies require a valid collaborator reference.");
-    }
-    Integer count =
-        1 + studyRepository.findByExternalCodePrefix(collaborator.getCode() + "-").size();
-    return collaborator.getCode() + "-" + String.format("%05d", count);
   }
 
   @Override

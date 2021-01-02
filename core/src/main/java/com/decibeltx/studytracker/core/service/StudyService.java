@@ -97,22 +97,6 @@ public interface StudyService {
   void delete(Study study);
 
   /**
-   * Generates a study code ({@code study.code}) for the given study.
-   *
-   * @param study study
-   * @return study code
-   */
-  String generateStudyCode(Study study);
-
-  /**
-   * Generates an external study code for a {@link Study}.
-   *
-   * @param study
-   * @return
-   */
-  String generateExternalStudyCode(Study study);
-
-  /**
    * Updates the status of the study with the provided PKID to the provided status.
    *
    * @param study  study

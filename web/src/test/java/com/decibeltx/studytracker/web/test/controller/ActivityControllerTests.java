@@ -16,8 +16,10 @@
 
 package com.decibeltx.studytracker.web.test.controller;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +39,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 @SpringBootTest(classes = TestApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -64,6 +67,7 @@ public class ActivityControllerTests {
 
     mockMvc.perform(get("/api/activity"))
         .andExpect(status().isOk())
+        .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$[0]", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("eventType")))
         .andExpect(jsonPath("$[0]", hasKey("date")))
@@ -79,17 +83,20 @@ public class ActivityControllerTests {
     studyService.updateStatus(study, Status.COMPLETE);
 
     mockMvc.perform(get("/api/activity?sort=date,desc"))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
+        .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$[0]", hasKey("eventType")))
-        .andExpect(jsonPath("$[0].eventType", is("STUDY_STATUS_CHANGED")))
+        .andExpect(jsonPath("$[0].eventType", is("NEW_STUDY")))
         .andExpect(jsonPath("$[0]", hasKey("data")))
-        .andExpect(jsonPath("$[0].data", hasKey("newStatus")))
-        .andExpect(jsonPath("$[0].data.newStatus", is("COMPLETE")))
+        .andExpect(jsonPath("$[0].data", hasKey("study")))
+        .andExpect(jsonPath("$[0].data.study", hasKey("code")))
+        .andExpect(jsonPath("$[0].data.study.code", is("TID-10002")))
         .andExpect(jsonPath("$[1]", hasKey("eventType")))
         .andExpect(jsonPath("$[1].eventType", is("STUDY_STATUS_CHANGED")))
         .andExpect(jsonPath("$[1]", hasKey("data")))
         .andExpect(jsonPath("$[1].data", hasKey("newStatus")))
-        .andExpect(jsonPath("$[1].data.newStatus", is("ON_HOLD")));
+        .andExpect(jsonPath("$[1].data.newStatus", is("COMPLETE")));
 
   }
 
@@ -111,16 +118,18 @@ public class ActivityControllerTests {
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$.sort", hasKey("sorted")))
         .andExpect(jsonPath("$.sort.sorted", is(true)))
+        .andExpect(jsonPath("$.content", not(empty())))
         .andExpect(jsonPath("$.content[0]", hasKey("eventType")))
-        .andExpect(jsonPath("$.content[0].eventType", is("STUDY_STATUS_CHANGED")))
+        .andExpect(jsonPath("$.content[0].eventType", is("NEW_STUDY")))
         .andExpect(jsonPath("$.content[0]", hasKey("data")))
-        .andExpect(jsonPath("$.content[0].data", hasKey("newStatus")))
-        .andExpect(jsonPath("$.content[0].data.newStatus", is("COMPLETE")))
+        .andExpect(jsonPath("$.content[0].data", hasKey("study")))
+        .andExpect(jsonPath("$.content[0].data.study", hasKey("code")))
+        .andExpect(jsonPath("$.content[0].data.study.code", is("TID-10002")))
         .andExpect(jsonPath("$.content[1]", hasKey("eventType")))
         .andExpect(jsonPath("$.content[1].eventType", is("STUDY_STATUS_CHANGED")))
         .andExpect(jsonPath("$.content[1]", hasKey("data")))
         .andExpect(jsonPath("$.content[1].data", hasKey("newStatus")))
-        .andExpect(jsonPath("$.content[1].data.newStatus", is("ON_HOLD")));
+        .andExpect(jsonPath("$.content[1].data.newStatus", is("COMPLETE")));
 
   }
 

@@ -25,6 +25,7 @@ import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -49,7 +50,10 @@ public class AssayController extends AbstractAssayController {
 
   @GetMapping("")
   public List<Assay> findAll() {
-    return getAssayService().findAll();
+    return getAssayService().findAll().stream()
+        .filter(Assay::isActive)
+        .filter(a -> a.getStudy().isActive())
+        .collect(Collectors.toList());
   }
 
   @GetMapping("/{id}")
