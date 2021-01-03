@@ -30,6 +30,7 @@ class StudyFormView extends React.Component {
       studyLoaded: false,
       programsLoaded: false,
       collaboratorsLoaded: false,
+      keywordCategoriesLoaded: false,
       isError: false,
     };
   }
@@ -59,6 +60,29 @@ class StudyFormView extends React.Component {
         collaborators: collaborators,
         collaboratorsLoaded: true
       });
+    }).catch(error => {
+      this.setState({
+        isError: true,
+        error: error
+      });
+    });
+
+    // Keyword categories
+    fetch("/api/keyword/categories")
+    .then(response => response.json())
+    .then(keywordCategories => {
+      this.setState({
+        keywordCategories: keywordCategories.sort((a, b) => {
+          if (a > b) {
+            return 1;
+          } else if (a < b) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }),
+        keywordCategoriesLoaded: true
+      })
     }).catch(error => {
       this.setState({
         isError: true,
@@ -101,11 +125,13 @@ class StudyFormView extends React.Component {
     if (this.state.isError) {
       content = <ErrorMessage/>;
     } else if (!!this.props.user && this.state.studyLoaded
-        && this.state.programsLoaded && this.state.collaboratorsLoaded) {
+        && this.state.programsLoaded && this.state.collaboratorsLoaded
+        && this.state.keywordCategoriesLoaded) {
       content = <StudyFormStandard
           study={this.state.study}
           programs={this.state.programs}
           externalContacts={this.state.collaborators}
+          keywordCategories={this.state.keywordCategories}
           user={this.props.user}
       />;
     }

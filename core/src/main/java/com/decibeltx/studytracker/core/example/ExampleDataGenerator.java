@@ -28,6 +28,7 @@ import com.decibeltx.studytracker.core.model.Collaborator;
 import com.decibeltx.studytracker.core.model.Comment;
 import com.decibeltx.studytracker.core.model.Conclusions;
 import com.decibeltx.studytracker.core.model.ExternalLink;
+import com.decibeltx.studytracker.core.model.Keyword;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
@@ -38,6 +39,7 @@ import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
 import com.decibeltx.studytracker.core.repository.AssayTypeRepository;
 import com.decibeltx.studytracker.core.repository.CollaboratorRepository;
+import com.decibeltx.studytracker.core.repository.KeywordRepository;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
@@ -104,6 +106,9 @@ public class ExampleDataGenerator {
 
   @Autowired
   private AssayTypeRepository assayTypeRepository;
+
+  @Autowired
+  private KeywordRepository keywordRepository;
 
   public List<Program> generateExamplePrograms(List<User> users) {
     User user = users.get(0);
@@ -211,6 +216,20 @@ public class ExampleDataGenerator {
 
   }
 
+  public List<Keyword> generateExampleKeywords() {
+
+    List<Keyword> keywords = new ArrayList<>();
+    keywords.add(new Keyword("MCF7", "Cell Line"));
+    keywords.add(new Keyword("HELA", "Cell Line"));
+    keywords.add(new Keyword("A375", "Cell Line"));
+    keywords.add(new Keyword("AKT1", "Gene"));
+    keywords.add(new Keyword("AKT2", "Gene"));
+    keywords.add(new Keyword("AKT3", "Gene"));
+    keywords.add(new Keyword("PTEN", "Gene"));
+    return keywords;
+
+  }
+
   public List<Collaborator> generateExampleCollaborators() {
 
     List<Collaborator> collaborators = new ArrayList<>();
@@ -259,6 +278,12 @@ public class ExampleDataGenerator {
 
   public void generateExampleStudies() throws Exception {
 
+    List<Keyword> keywords = new ArrayList<>();
+    keywords.add(keywordRepository.findByKeywordAndCategory("AKT1", "Gene")
+        .orElseThrow(RecordNotFoundException::new));
+    keywords.add(keywordRepository.findByKeywordAndCategory("MCF7", "Cell Line")
+        .orElseThrow(RecordNotFoundException::new));
+
     // Study 1
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
@@ -282,6 +307,7 @@ public class ExampleDataGenerator {
     study.setUsers(Collections.singletonList(user));
     study.setCollaborator(collaborator);
     study.setExternalCode(collaborator.getCode() + "-00001");
+    study.setKeywords(keywords);
 
     NotebookFolder notebookEntry = new NotebookFolder();
     notebookEntry.setName("IDBS ELN");
@@ -320,6 +346,7 @@ public class ExampleDataGenerator {
     study.setStartDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
+    study.setKeywords(keywords);
 
     notebookEntry = new NotebookFolder();
     notebookEntry.setName("ELN");
@@ -375,6 +402,7 @@ public class ExampleDataGenerator {
     study.setEndDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
+    study.setKeywords(keywords);
     notebookEntry = new NotebookFolder();
     notebookEntry.setName("ELN");
     notebookEntry.setUrl(
@@ -407,6 +435,7 @@ public class ExampleDataGenerator {
     study.setStartDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
+    study.setKeywords(keywords);
     studyService.create(study);
 
     activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
@@ -435,6 +464,7 @@ public class ExampleDataGenerator {
     study.setEndDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
+    study.setKeywords(keywords);
     studyService.create(study);
     activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
     studyService.updateStatus(study, Status.COMPLETE);
@@ -460,6 +490,7 @@ public class ExampleDataGenerator {
     study.setEndDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singletonList(user));
+    study.setKeywords(keywords);
     studyService.create(study);
     activityRepository.insert(StudyActivityUtils.fromNewStudy(study, user));
 
@@ -596,6 +627,7 @@ public class ExampleDataGenerator {
       programRepository.deleteAll();
       userRepository.deleteAll();
       collaboratorRepository.deleteAll();
+      keywordRepository.deleteAll();
       studyRepository.deleteAll();
       assayRepository.deleteAll();
       activityRepository.deleteAll();
@@ -606,6 +638,7 @@ public class ExampleDataGenerator {
       programRepository.insert(generateExamplePrograms(userRepository.findAll()));
       assayTypeRepository.insert(generateExampleAssayTypes());
       createProgramFolders();
+      keywordRepository.insert(generateExampleKeywords());
       collaboratorRepository.insert(generateExampleCollaborators());
       generateExampleStudies();
 

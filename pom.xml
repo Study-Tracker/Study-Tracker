@@ -37,7 +37,6 @@
     <module>core</module>
     <module>aws</module>
     <module>egnyte</module>
-    <module>elasticsearch</module>
     <module>benchling</module>
     <module>web</module>
     <module>cli</module>

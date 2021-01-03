@@ -17,7 +17,6 @@
 package com.decibeltx.studytracker.core.model;
 
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
-import com.decibeltx.studytracker.core.keyword.Keyword;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URL;
@@ -112,6 +111,8 @@ public class Study implements Persistable<String> {
   @DBRef
   private List<User> users = new ArrayList<>();
 
+  @Linked(model = Keyword.class)
+  @DBRef
   private List<Keyword> keywords = new ArrayList<>();
 
   @Linked(model = Assay.class)

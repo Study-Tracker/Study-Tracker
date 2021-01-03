@@ -15,21 +15,17 @@
  */
 
 import React from 'react';
-import {findKeywordByType} from "../config/keywordConstants";
 
-export const KeywordTypeBadge = ({type}) => {
-  const category = findKeywordByType(type);
+export const KeywordCategoryBadge = ({category}) => {
   return (
-      <span
-          className={"badge text-lg " + category.badge}>{category.label}</span>
+      <span className="badge badge-info">{category}</span>
   );
 };
 
-export const KeywordBadge = ({type, label}) => {
-  const category = findKeywordByType(type);
+export const KeywordBadge = ({category, label}) => {
   return (
-      <span className={"badge text-lg " + category.badge}>
-        {category.label}: {label}
+      <span className="badge badge-info">
+        {category}: {label}
       </span>
   );
 };
@@ -42,7 +38,7 @@ export const KeywordBadgeList = ({keywords}) => {
     return (
         <React.Fragment key={'keyword-' + k.keyword}>
           {br}
-          <KeywordBadge type={k.type} label={k.keyword}/>
+          <KeywordBadge category={k.category} label={k.keyword}/>
         </React.Fragment>
     )
   });
