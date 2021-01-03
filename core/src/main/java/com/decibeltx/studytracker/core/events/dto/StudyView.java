@@ -1,6 +1,6 @@
 package com.decibeltx.studytracker.core.events.dto;
 
-import com.decibeltx.studytracker.core.keyword.Keyword;
+import com.decibeltx.studytracker.core.model.Keyword;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;

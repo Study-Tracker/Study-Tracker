@@ -14,19 +14,36 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.keyword;
+package com.decibeltx.studytracker.core.model;
 
+import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
+@Document(collection = "keywords")
 public class Keyword {
 
+  @Id
+  private String id;
+
+  @NotNull
   private String keyword;
 
-  private String referenceId;
+  private String category;
 
-  private String source;
+  public Keyword() {
+  }
 
-  private String type;
+  public Keyword(@NotNull String keyword, String category) {
+    this.keyword = keyword;
+    this.category = category;
+  }
 
+  public Keyword(String id, @NotNull String keyword, String category) {
+    this.id = id;
+    this.keyword = keyword;
+    this.category = category;
+  }
 }

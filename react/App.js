@@ -19,7 +19,7 @@ import StudyListView from "./views/StudyListView";
 import {Route, Router} from "react-router";
 import StudyDetailsView from "./views/StudyDetailsView";
 import {createBrowserHistory} from 'history';
-import StudyFormView from "./views/StudyForm";
+import StudyFormView from "./views/StudyFormView";
 import store from "./redux/store";
 import {Provider} from "react-redux";
 import ReduxToastr from "react-redux-toastr";

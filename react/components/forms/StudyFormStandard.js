@@ -363,10 +363,6 @@ export default class StudyForm extends React.Component {
                           <FormFeedback>
                             Description must not be empty.
                           </FormFeedback>
-                          <FormText>
-                            Provide a brief description or rationale for your
-                            study.
-                          </FormText>
                         </FormGroup>
                       </Col>
                       <Col md="5">
@@ -562,6 +558,7 @@ export default class StudyForm extends React.Component {
                       <Col md={12}>
                         <KeywordInputs
                             keywords={this.state.study.keywords || []}
+                            keywordCategories={this.props.keywordCategories}
                             onChange={this.handleFormUpdate}
                         />
                       </Col>

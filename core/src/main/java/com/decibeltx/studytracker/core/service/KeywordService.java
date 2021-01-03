@@ -14,25 +14,35 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.core.keyword;
+package com.decibeltx.studytracker.core.service;
 
+import com.decibeltx.studytracker.core.model.Keyword;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface KeywordService {
 
-  List<Keyword> findAll();
+  Optional<Keyword> findById(String id);
 
-  Optional<Keyword> findByReferenceId(String referenceId);
+  List<Keyword> findAll();
 
   List<Keyword> findByKeyword(String keyword);
 
-  List<Keyword> findBySource(String source);
+  List<Keyword> findByCategory(String category);
 
-  List<Keyword> findByType(String type);
+  Optional<Keyword> findByKeywordAndCategory(String keyword, String category);
 
   List<Keyword> search(String fragment);
 
-  List<Keyword> search(String fragment, String type);
+  List<Keyword> search(String fragment, String category);
+
+  Set<String> findAllCategories();
+
+  Keyword create(Keyword keyword);
+
+  Keyword update(Keyword keyword);
+
+  void delete(Keyword keyword);
 
 }

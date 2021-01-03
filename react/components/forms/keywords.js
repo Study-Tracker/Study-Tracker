@@ -17,8 +17,7 @@
 import React from 'react';
 import {Col, FormGroup, Label, Row} from "reactstrap";
 import Select from "react-select";
-import {keywordOptionMap, keywordOptions} from "../../config/keywordConstants";
-import {KeywordTypeBadge} from "../keywords";
+import {KeywordCategoryBadge} from "../keywords";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
 import AsyncSelect from "react-select/async";
@@ -27,7 +26,11 @@ export default class KeywordInputs extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      categories: props.keywordCategories.map(c => {
+        return {label: c, value: c}
+      })
+    };
     this.handleCategoryChange = this.handleCategoryChange.bind(this);
     this.handleKeywordSelect = this.handleKeywordSelect.bind(this);
     this.keywordAutocomplete = this.keywordAutocomplete.bind(this);
@@ -43,9 +46,7 @@ export default class KeywordInputs extends React.Component {
 
   handleRemoveKeyword(e) {
     const selected = e.currentTarget.dataset.id;
-    const keywords = this.props.keywords.filter(keyword => {
-      return (keyword.type + "-" + keyword.elasticSearchId) !== selected;
-    });
+    const keywords = this.props.keywords.filter(k => k.id !== selected);
     this.props.onChange({
       keywords: keywords
     });
@@ -61,121 +62,33 @@ export default class KeywordInputs extends React.Component {
     })
   }
 
-  getKeywordHits(json) {
-    let options = [];
-    if (json.hits.hits.length > 0) {
-      json.hits.hits.forEach(hit => {
-        switch (this.state.category) {
-
-          case "Antibody":
-            options.push({
-              elasticSearchId: hit._id,
-              value: hit._source.doc.name,
-              item_id: hit._source.doc.item_id,
-              label: hit._source.doc.name,
-              type: 'antibody',
-              keyword: hit._source.doc.name,
-              source: "TBD"
-            });
-            break;
-
-          case "Cell Line":
-            options.push({
-              elasticSearchId: hit._id,
-              value: hit._source.doc.name,
-              item_id: hit._source.doc.item_id,
-              label: hit._source.doc.name,
-              type: 'cell_line',
-              keyword: hit._source.doc.name,
-              source: "TBD"
-            });
-            break;
-
-          case "Gene":
-            options.push({
-              value: hit._source.doc.gene_id + hit._source.doc.synonyms
-                  + hit._source.doc.name,
-              label: hit._source.doc.symbol + ' : ' + hit._source.doc.organism,
-              elasticSearchId: hit._id,
-              type: 'gene',
-              keyword: hit._source.doc.symbol + ' : '
-                  + hit._source.doc.organism,
-              source: "TBD"
-            });
-            break;
-
-          case "Plasmid":
-            options.push({
-              value: hit._source.doc.plasmid_name + ' : '
-                  + (hit._source.doc.lot_name ? hit._source.doc.lot_name : ''),
-              label: hit._source.doc.plasmid_name + ' : '
-                  + (hit._source.doc.lot_name ? hit._source.doc.lot_name : ''),
-              elasticSearchId: hit._id,
-              type: 'plasmid',
-              keyword: hit._source.doc.plasmid_name + ' : '
-                  + (hit._source.doc.lot_name ? hit._source.doc.lot_name : ''),
-              source: "TBD"
-            });
-            break;
-
-          case "Primer":
-            options.push({
-              value: hit._source.doc.name,
-              primaer_id: hit._source.doc.primer_id,
-              primer_name: hit._source.doc.primer_name,
-              item_id: hit._source.doc.item_id,
-              label: hit._source.doc.primer_id + ' : '
-                  + hit._source.doc.primer_name,
-              elasticSearchId: hit._id,
-              type: 'primer',
-              keyword: hit._source.doc.name,
-              source: "TBD"
-            });
-            break;
-
-          case "qPCR Probe":
-            options.push({
-              value: hit._source.doc.name,
-              item_id: hit._source.doc.item_id,
-              label: hit._source.doc.name,
-              elasticSearchId: hit._id,
-              type: 'qpcr_probe',
-              keyword: hit._source.doc.name,
-              source: "TBD"
-            });
-            break;
-
-          case "Virus":
-            options.push({
-              value: hit._source.doc.virus_id,
-              label: hit._source.doc.virus_id + ' : '
-                  + hit._source.doc.virus_name,
-              elasticSearchId: hit._id,
-              type: 'virus',
-              keyword: hit._source.doc.virus_id + ' : '
-                  + hit._source.doc.virus_name,
-              source: "TBD"
-            });
-            break;
-        }
-      });
-    }
-    return options;
-  }
-
   keywordAutocomplete(input, callback) {
     console.log(input);
     if (input.length < 2) {
       return;
     }
-    const uri = keywordOptionMap[this.state.category].uri;
-    fetch(
-        'https://vpc-metastore-vf4djege2zqdaav66snthe5ora.us-east-1.es.amazonaws.com/'
-        + uri + '/_search?q=*' + input + '*&size=50&pretty=true')
+    fetch('/api/keyword/?q=' + input)
     .then(response => response.json())
     .then(json => {
       console.log(json);
-      callback(this.getKeywordHits(json));
+      const keywords = json.map(k => {
+        return {
+          id: k.id,
+          label: k.keyword,
+          value: k.id,
+          category: k.category,
+          keyword: k.keyword
+        }
+      }).sort((a, b) => {
+        if (a.keyword > b.keyword) {
+          return -1;
+        } else if (a.keyword < b.keyword) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+      callback(keywords);
     }).catch(e => {
       console.error(e);
     })
@@ -187,18 +100,18 @@ export default class KeywordInputs extends React.Component {
       console.log(keyword);
       return (
           <Row
-              key={"keyword-" + keyword.type + "-" + keyword.elasticSearchId}
+              key={"keyword-" + keyword.id}
               className="align-items-center justify-content-center mt-1"
           >
             <Col xs="3">
-              <KeywordTypeBadge type={keyword.type}/>
+              <KeywordCategoryBadge category={keyword.category}/>
             </Col>
             <Col xs="7">
               {keyword.keyword}
             </Col>
             <Col xs="2">
               <a onClick={this.handleRemoveKeyword}
-                 data-id={keyword.type + "-" + keyword.elasticSearchId}>
+                 data-id={keyword.id}>
                 <FontAwesomeIcon
                     icon={faTimesCircle}
                     className="align-middle mr-2 text-danger"
@@ -217,7 +130,7 @@ export default class KeywordInputs extends React.Component {
               <Select
                   className="react-select-container"
                   classNamePrefix="react-select"
-                  options={keywordOptions}
+                  options={this.state.categories}
                   onChange={this.handleCategoryChange}
               />
             </FormGroup>
