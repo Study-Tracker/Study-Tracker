@@ -1,15 +1,12 @@
 package com.decibeltx.studytracker.cli.executor;
 
 import com.decibeltx.studytracker.cli.argument.ImportArguments;
-import com.decibeltx.studytracker.core.exception.StudyTrackerException;
-import com.decibeltx.studytracker.core.model.Collaborator;
-import com.decibeltx.studytracker.core.model.Program;
-import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.cli.executor.importer.CollaboratorImporter;
+import com.decibeltx.studytracker.cli.executor.importer.KeywordImporter;
+import com.decibeltx.studytracker.cli.executor.importer.ProgramImporter;
+import com.decibeltx.studytracker.cli.executor.importer.StudyImporter;
+import com.decibeltx.studytracker.cli.executor.importer.UserImporter;
 import com.decibeltx.studytracker.core.model.User;
-import com.decibeltx.studytracker.core.service.CollaboratorService;
-import com.decibeltx.studytracker.core.service.ProgramService;
-import com.decibeltx.studytracker.core.service.StudyService;
-import com.decibeltx.studytracker.core.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
@@ -24,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,22 +33,22 @@ public class ImportExecutor {
   private final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
   @Autowired
+  private ProgramImporter programImporter;
+
+  @Autowired
+  private UserImporter userImporter;
+
+  @Autowired
+  private CollaboratorImporter collaboratorImporter;
+
+  @Autowired
+  private KeywordImporter keywordImporter;
+
+  @Autowired
+  private StudyImporter studyImporter;
+
+  @Autowired
   private MongoTemplate mongoTemplate;
-
-  @Autowired
-  private ProgramService programService;
-
-  @Autowired
-  private StudyService studyService;
-
-  @Autowired
-  private CollaboratorService collaboratorService;
-
-  @Autowired
-  private UserService userService;
-
-  @Autowired
-  private PasswordEncoder passwordEncoder;
 
   public void execute(ImportArguments args, User user) throws Exception {
 
@@ -91,67 +87,33 @@ public class ImportExecutor {
     LOGGER.info("Data import complete.");
   }
 
-  private void loadData(DatabaseRecords seeds, User createdBy) throws StudyTrackerException {
+  private void loadData(DatabaseRecords seeds, User createdBy) throws Exception {
 
     LOGGER.info("Inserting database seeds...");
 
     // Programs
     if (!seeds.getPrograms().isEmpty()) {
-      LOGGER.info("Inserting program records...");
-      for (Program program : seeds.getPrograms()) {
-        if (programService.findByName(program.getName()).isPresent()) {
-          LOGGER.warn(String.format("A program with this name %s already exists. Skipping record.",
-              program.getName()));
-        } else {
-          try {
-            program.setCreatedBy(createdBy);
-            program.setLastModifiedBy(createdBy);
-            programService.create(program);
-          } catch (Exception e) {
-            LOGGER.error("Failed to import program: " + program.toString());
-            throw e;
-          }
-        }
-      }
+      programImporter.importRecords(seeds.getPrograms(), createdBy);
     }
 
     // Users
     if (!seeds.getUsers().isEmpty()) {
-      LOGGER.info("Inserting user records...");
-      for (User user : seeds.getUsers()) {
-        if (userService.findByUsername(user.getUsername()).isPresent()
-            || userService.findByEmail(user.getEmail()).isPresent()) {
-          LOGGER.warn(String.format("A user with the username %s or email %s already exists. "
-              + "Skipping record.", user.getUsername(), user.getEmail()));
-        } else {
-          try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userService.create(user);
-          } catch (Exception e) {
-            LOGGER.error("Failed to import user: " + user.toString());
-            throw e;
-          }
-        }
-      }
+      userImporter.importRecords(seeds.getUsers());
     }
 
     // Collaborators
     if (!seeds.getCollaborators().isEmpty()) {
-      LOGGER.info("Inserting collaboraor records...");
-      for (Collaborator collaborator : seeds.getCollaborators()) {
-        collaboratorService.create(collaborator);
-      }
+      collaboratorImporter.importRecords(seeds.getCollaborators());
+    }
+
+    // Keywords
+    if (!seeds.getKeywords().isEmpty()) {
+      keywordImporter.importRecords(seeds.getKeywords());
     }
 
     // Studies
     if (!seeds.getStudies().isEmpty()) {
-      LOGGER.info("Inserting study records...");
-      for (Study study : seeds.getStudies()) {
-        if (study.getCreatedBy() == null) {
-          study.setCreatedBy(createdBy);
-        }
-        studyService.create(study);
-      }
+      studyImporter.importRecords(seeds.getStudies(), createdBy);
     }
 
     LOGGER.info("Database seeding complete.");

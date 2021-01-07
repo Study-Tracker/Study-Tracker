@@ -19,11 +19,12 @@ package com.decibeltx.studytracker.core.model;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Document(collection = "keywords")
-public class Keyword {
+public class Keyword implements Persistable<String> {
 
   @Id
   private String id;
@@ -45,5 +46,10 @@ public class Keyword {
     this.id = id;
     this.keyword = keyword;
     this.category = category;
+  }
+
+  @Override
+  public boolean isNew() {
+    return id == null;
   }
 }
