@@ -17,7 +17,7 @@
 import React from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUserCircle} from "@fortawesome/free-solid-svg-icons";
-import {KeywordTypeBadge} from "../keywords";
+import {KeywordCategoryBadge} from "../keywords";
 
 export const ProgramTeam = ({program, studies}) => {
   let users = [];
@@ -58,7 +58,7 @@ export const ProgramKeywords = ({studies}) => {
   const list = Object.values(keywords).map(keyword => {
     return (
         <li key={"keyword-" + keyword.id} className="mt-1">
-          <KeywordTypeBadge type={keyword.type}/>
+          <KeywordCategoryBadge category={keyword.type}/>
           &nbsp;&nbsp;
           {keyword.keyword}
         </li>
