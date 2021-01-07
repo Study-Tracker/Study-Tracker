@@ -14,6 +14,10 @@ import com.decibeltx.studytracker.core.repository.UserRepository;
 import com.decibeltx.studytracker.core.service.UserService;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,6 +102,18 @@ public class ImportCommandTests {
     Collaborator collaborator = collaboratorOptional.get();
     Assert.assertEquals("CRO Corp", collaborator.getOrganizationName());
 
+  }
+
+  @Test
+  public void beanValidationTest() throws Exception {
+
+    User user = new User();
+
+    Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    Set<ConstraintViolation<User>> violations = validator.validate(user);
+    for (ConstraintViolation<User> violation : violations) {
+      System.out.println(violation.getPropertyPath().toString() + " " + violation.getMessage());
+    }
   }
 
 }

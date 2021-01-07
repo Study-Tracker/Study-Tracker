@@ -65,6 +65,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class ExampleDataGenerator {
 
+  public static final int PROGRAM_COUNT = 5;
+
+  public static final int USER_COUNT = 3;
+
+  public static final int COLLABORATOR_COUNT = 4;
+
+  public static final int KEYWORD_COUNT = 7;
+
   public static final int ASSAY_TYPE_COUNT = 2;
 
   public static final int ASSAY_COUNT = 2;
@@ -618,21 +626,23 @@ public class ExampleDataGenerator {
     }
   }
 
+  public void clearDatabase() {
+    LOGGER.info("Wiping collections...");
+    programRepository.deleteAll();
+    userRepository.deleteAll();
+    collaboratorRepository.deleteAll();
+    keywordRepository.deleteAll();
+    studyRepository.deleteAll();
+    assayRepository.deleteAll();
+    activityRepository.deleteAll();
+    assayTypeRepository.deleteAll();
+  }
+
   public void populateDatabase() {
     try {
 
       LOGGER.info("Preparing to populate database with example data...");
-
-      LOGGER.info("Wiping collections...");
-      programRepository.deleteAll();
-      userRepository.deleteAll();
-      collaboratorRepository.deleteAll();
-      keywordRepository.deleteAll();
-      studyRepository.deleteAll();
-      assayRepository.deleteAll();
-      activityRepository.deleteAll();
-      assayTypeRepository.deleteAll();
-
+      this.clearDatabase();
       LOGGER.info("Inserting example data...");
       userRepository.insert(generateExampleUsers());
       programRepository.insert(generateExamplePrograms(userRepository.findAll()));
