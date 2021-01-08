@@ -114,7 +114,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       storageFolder.getFiles().add(convertEgnyteFile(file));
     }
     for (EgnyteFolder subFolder : egnyteFolder.getSubFolders()) {
-      storageFolder.getSubFolders().add(convertEgnyteFolder(subFolder));
+      storageFolder.getSubFolders().add(convertFolder(subFolder));
     }
     EgnyteFolder parentFolder = null;
     try {

@@ -31,6 +31,7 @@ import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
 import com.decibeltx.studytracker.core.storage.StorageFile;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
+import com.decibeltx.studytracker.egnyte.EgnyteOptions;
 import com.decibeltx.studytracker.egnyte.EgnyteStudyStorageService;
 import com.decibeltx.studytracker.egnyte.exception.DuplicateFolderException;
 import com.decibeltx.studytracker.egnyte.exception.ObjectNotFoundException;
@@ -76,6 +77,9 @@ public class EgnyteStudyStorageServiceTests {
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
+  @Autowired
+  private EgnyteOptions egnyteOptions;
 
   @Before
   public void doBefore() {
@@ -261,6 +265,27 @@ public class EgnyteStudyStorageServiceTests {
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
     Assert.assertNull(folder);
+  }
+
+  @Test
+  public void studyFolderDepthTest() throws Exception {
+
+    System.out.println("Read depth: " + egnyteOptions.getMaxReadDepth());
+    Study study = studyRepository.findByCode("PPB-10001")
+        .orElseThrow(RecordNotFoundException::new);
+    StorageFolder studyFolder = storageService.getStudyFolder(study, true);
+    System.out.println(studyFolder.toString());
+    Assert.assertNotNull(studyFolder);
+    Assert.assertFalse(studyFolder.getFiles().isEmpty());
+    Assert.assertFalse(studyFolder.getSubFolders().isEmpty());
+    StorageFolder assayFolder = studyFolder.getSubFolders().stream()
+        .filter(f -> f.getName().equals("PPB-10001-001 - Histology assay"))
+        .findFirst()
+        .orElseThrow(RecordNotFoundException::new);
+    Assert.assertNotNull(assayFolder);
+    System.out.println(assayFolder.toString());
+    Assert.assertFalse(assayFolder.getFiles().isEmpty());
+
   }
 
 }
