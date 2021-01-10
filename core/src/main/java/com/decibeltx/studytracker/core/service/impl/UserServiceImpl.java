@@ -20,13 +20,17 @@ import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.UserRepository;
 import com.decibeltx.studytracker.core.service.UserService;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
   @Autowired
   private UserRepository userRepository;
@@ -47,13 +51,18 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> findByAccountName(String accountName) {
-    return userRepository.findByAccountName(accountName);
+  public Optional<User> findByUsername(String username) {
+    return userRepository.findByUsername(username);
   }
 
   @Override
   public List<User> search(String keyword) {
     return userRepository.findByDisplayNameLike(keyword);
+  }
+
+  @Override
+  public long count() {
+    return userRepository.count();
   }
 
   @Override
@@ -72,4 +81,28 @@ public class UserServiceImpl implements UserService {
     userRepository.delete(user);
   }
 
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return findByUsername(username).orElse(null);
+  }
+
+  @Override
+  public long countFromDate(Date startDate) {
+    return userRepository.countByCreatedAtAfter(startDate);
+  }
+
+  @Override
+  public long countBeforeDate(Date endDate) {
+    return userRepository.countByCreatedAtBefore(endDate);
+  }
+
+  @Override
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return userRepository.countByCreatedAtBetween(startDate, endDate);
+  }
+
+  @Override
+  public long countActiveUsers() {
+    return userRepository.countByActive(true);
+  }
 }

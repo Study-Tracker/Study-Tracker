@@ -25,7 +25,12 @@ import {
 } from "reactstrap";
 import React, {useMemo} from "react";
 import {useDropzone} from 'react-dropzone';
-import {faFile, faFolder} from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretDown,
+  faCaretRight,
+  faFile,
+  faFolder
+} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {CardLoadingMessage} from "./loading";
 import {DismissableAlert} from "./errors";
@@ -76,6 +81,104 @@ const formatFileSize = (size) => {
   }
 };
 
+class Folder extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      folder: props.folder,
+      isExpanded: false,
+      depth: props.depth || 0
+    }
+    this.toggleExpanded = this.toggleExpanded.bind(this);
+  }
+
+  toggleExpanded() {
+    this.setState({
+      isExpanded: !this.state.isExpanded
+    });
+  }
+
+  render() {
+    return (
+        <li>
+          <a onClick={this.toggleExpanded}>
+            <FontAwesomeIcon
+                icon={this.state.isExpanded ? faCaretDown : faCaretRight}
+                style={{width: "10px"}}
+            />
+            &nbsp;&nbsp;
+            <FontAwesomeIcon icon={faFolder}/> {this.state.folder.name}
+          </a>
+          <div hidden={!this.state.isExpanded}>
+            <FolderContents folder={this.state.folder}
+                            depth={this.state.depth + 1}/>
+          </div>
+        </li>
+    )
+  }
+}
+
+const File = ({file}) => {
+  return (
+      <li>
+        <div className="ml-3">
+          <a href={file.url} target="_blank">
+            <FontAwesomeIcon icon={faFile}/>
+            &nbsp;
+            {file.name}
+          </a>
+        </div>
+      </li>
+  )
+}
+
+const FolderContents = ({folder, depth}) => {
+  const subFolders = folder.subFolders
+  .sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    } else if (a.name < b.name) {
+      return -1;
+    } else {
+      return 0;
+    }
+  })
+  .map(f => {
+    return <Folder key={"folder-" + f.name} folder={f} depth={depth}/>
+  });
+
+  const files = folder.files
+  .sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    } else if (a.name < b.name) {
+      return -1;
+    } else {
+      return 0;
+    }
+  })
+  .map(f => {
+    return <File key={"file-" + f.name} file={f}/>;
+  });
+
+  const items = [...subFolders, ...files];
+
+  return items.length
+      ? (
+          <div>
+            <h4>
+              <a href={folder.url} target="_blank">{folder.path}</a>
+            </h4>
+            <ul className="list-unstyled"
+                style={{marginLeft: (depth > 0 ? 1 : 0) + "em"}}>
+              {items}
+            </ul>
+          </div>
+      ) : '';
+
+}
+
 /**
  * Returns a ul list of all files and subfolders within the supplied folder.
  *
@@ -88,69 +191,18 @@ const formatFileSize = (size) => {
 export const StorageFolderFileList = ({folder, isLoaded, isError}) => {
 
   if (isError) {
-
     return <DismissableAlert color={'warning'}
                              message={'Failed to load study folder.'}/>
-
   } else if (isLoaded) {
-
-    const subFolders = folder.subFolders
-    .sort((a, b) => {
-      if (a.name > b.name) {
-        return 1;
-      } else if (a.name < b.name) {
-        return -1;
-      } else {
-        return 0;
-      }
-    })
-    .map(f => {
-      return (
-          <li key={"folder-" + f.name}>
-            <a href={f.url} target="_blank">
-              <FontAwesomeIcon icon={faFolder}/> {f.name}
-            </a>
-          </li>
-      )
-    });
-
-    const files = folder.files
-    .sort((a, b) => {
-      if (a.name > b.name) {
-        return 1;
-      } else if (a.name < b.name) {
-        return -1;
-      } else {
-        return 0;
-      }
-    })
-    .map(f => {
-      return (
-          <li key={"file-" + f.name}>
-            <a href={f.url} target="_blank">
-              <FontAwesomeIcon icon={faFile}/> {f.name} - {formatFileSize(
-                f.size)}
-            </a>
-          </li>
-      );
-    });
-
-    const items = [...subFolders, ...files];
-
-    if (items.length) {
-      return (
-          <ul className="list-unstyled">
-            {items}
-          </ul>
-      )
-    } else {
+    if (folder.subFolders.length === 0 && folder.files.length === 0) {
       return (
           <div className={"text-center"}>
             <h4>The study folder is empty.</h4>
           </div>
       );
+    } else {
+      return <FolderContents folder={folder} depth={3}/>
     }
-
   } else {
     return <CardLoadingMessage/>;
   }
@@ -230,7 +282,7 @@ export const UploadFilesModal = ({isOpen, toggleModal, handleSubmit}) => {
             <Col sm={12}></Col>
 
             <Col sm={12}>
-              <h4>To be uploaded:</h4>
+              <h4 className="mt-3">To be uploaded:</h4>
               <ul>
                 {files}
               </ul>

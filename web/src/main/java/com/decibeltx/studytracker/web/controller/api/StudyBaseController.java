@@ -16,11 +16,16 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
+import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
+import com.decibeltx.studytracker.core.model.Activity;
+import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,8 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,7 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/study")
-public class StudyBaseController extends StudyController {
+public class StudyBaseController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyBaseController.class);
 
@@ -62,12 +67,22 @@ public class StudyBaseController extends StudyController {
       @RequestParam(value = "legacy", defaultValue = "false") boolean legacy,
       @RequestParam(value = "external", defaultValue = "false") boolean external,
       @RequestParam(value = "my", defaultValue = "false") boolean my,
-      @RequestParam(value = "search", required = false) String search
+      @RequestParam(value = "search", required = false) String search,
+      @RequestParam(value = "program", required = false) String programId
   ) {
 
     // Search
     if (!StringUtils.isEmpty(search)) {
       return getStudyService().search(search);
+    }
+
+    // Find by program
+    else if (programId != null) {
+      Optional<Program> optional = getProgramService().findById(programId);
+      if (!optional.isPresent()) {
+        throw new RecordNotFoundException("Cannot find program with ID: " + programId);
+      }
+      return getStudyService().findByProgram(optional.get());
     }
 
     // Find by owner
@@ -88,18 +103,19 @@ public class StudyBaseController extends StudyController {
       if (!optional.isPresent()) {
         throw new RecordNotFoundException("Cannot find user record: " + userId);
       }
+      User user = optional.get();
       return getStudyService().findAll()
           .stream()
-          .filter(study -> study.getOwner().equals(optional.get().getId()) && study.isActive())
+          .filter(study -> study.getOwner().getId().equals(user.getId()) && study.isActive())
           .collect(Collectors.toList());
     }
 
     // My studies TODO
     else if (my) {
       try {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
-        User user = getUserService().findByAccountName(userDetails.getUsername())
+        String username = UserAuthenticationUtils
+            .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+        User user = getUserService().findByUsername(username)
             .orElseThrow(RecordNotFoundException::new);
         return getStudyService().findAll().stream()
             .filter(s -> s.getOwner().equals(user))
@@ -154,15 +170,34 @@ public class StudyBaseController extends StudyController {
     LOGGER.info(study.toString());
 
     // Get authenticated user
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
+
+    // Created by
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setCreatedBy(user);
+
+    // Study team
+    List<User> team = new ArrayList<>();
+    for (User u : study.getUsers()) {
+      team.add(getUserService().findByUsername(u.getUsername())
+          .orElseThrow(RecordNotFoundException::new));
+    }
+    study.setUsers(team);
+
+    // Owner
+    study.setOwner(getUserService().findByUsername(study.getOwner().getUsername())
+        .orElseThrow(RecordNotFoundException::new));
 
     // Save the record
     getStudyService().create(study);
     Assert.notNull(study.getId(), "Study not persisted.");
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromNewStudy(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
 
     return new ResponseEntity<>(study, HttpStatus.CREATED);
   }
@@ -171,44 +206,84 @@ public class StudyBaseController extends StudyController {
   public HttpEntity<Study> updateStudy(@PathVariable("id") String id, @RequestBody Study study) {
     LOGGER.info("Updating study");
     LOGGER.info(study.toString());
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+
+    // Last modified by
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
+
+    // Study team
+    List<User> team = new ArrayList<>();
+    for (User u : study.getUsers()) {
+      team.add(getUserService().findByUsername(u.getUsername())
+          .orElseThrow(RecordNotFoundException::new));
+    }
+    study.setUsers(team);
+
+    // Owner
+    study.setOwner(getUserService().findByUsername(study.getOwner().getUsername())
+        .orElseThrow(RecordNotFoundException::new));
+
     getStudyService().update(study);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromUpdatedStudy(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(study, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> deleteStudy(@PathVariable("id") String id) {
+
     LOGGER.info("Deleting study: " + id);
+
     Study study = getStudyFromIdentifier(id);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
+
     getStudyService().delete(study);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromDeletedStudy(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/{id}/status")
   public void updateStudyStatus(@PathVariable("id") String id,
       @RequestBody Map<String, Object> params) throws StudyTrackerException {
+
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
     }
+
     Study study = getStudyFromIdentifier(id);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    Status oldStatus = study.getStatus();
+
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
+
     String label = (String) params.get("status");
     Status status = Status.valueOf(label);
     LOGGER.info(String.format("Setting status of study %s to %s", id, label));
     getStudyService().updateStatus(study, status);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromStudyStatusChange(study, user, oldStatus, status);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
   }
 
 }

@@ -16,6 +16,7 @@
 
 import {
   Button,
+  CardTitle,
   Col,
   FormGroup,
   Input,
@@ -29,7 +30,7 @@ import {
 } from "reactstrap";
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTimesCircle} from "@fortawesome/free-solid-svg-icons";
+import {faLink, faTimesCircle} from "@fortawesome/free-solid-svg-icons";
 import swal from 'sweetalert';
 import {PlusCircle} from "react-feather";
 
@@ -136,6 +137,8 @@ class ExternalLinks extends React.Component {
     const links = this.state.links.map(link => {
       return (
           <li key={"external-link-" + link.label}>
+            <FontAwesomeIcon icon={faLink}/>
+            &nbsp;&nbsp;
             <a href={link.url} target="_blank">{link.label}</a>
             &nbsp;&nbsp;&nbsp;&nbsp;
             {
@@ -152,7 +155,7 @@ class ExternalLinks extends React.Component {
     return (
         <div>
 
-          <h6 className="details-label">
+          <CardTitle>
             External Links
             {
               !!this.props.user ? (
@@ -164,12 +167,12 @@ class ExternalLinks extends React.Component {
                 </span>
               ) : ''
             }
-          </h6>
+          </CardTitle>
 
           {
             links.length
                 ? (
-                    <ul>
+                    <ul className="list-unstyled">
                       {links}
                     </ul>
                 )

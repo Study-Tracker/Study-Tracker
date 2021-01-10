@@ -16,6 +16,7 @@
 
 import {
   Button,
+  CardTitle,
   Col,
   FormGroup,
   Label,
@@ -199,7 +200,7 @@ class StudyRelationships extends React.Component {
     return (
         <div>
 
-          <h6 className="details-label">
+          <CardTitle>
             Study Relationships
             {
               !!this.props.user ? (
@@ -211,7 +212,7 @@ class StudyRelationships extends React.Component {
                 </span>
               ) : ''
             }
-          </h6>
+          </CardTitle>
 
           {
             relationships.length

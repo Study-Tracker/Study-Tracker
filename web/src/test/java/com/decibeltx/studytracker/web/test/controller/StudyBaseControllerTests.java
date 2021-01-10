@@ -119,7 +119,7 @@ public class StudyBaseControllerTests {
 
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
@@ -135,7 +135,7 @@ public class StudyBaseControllerTests {
     study.setUsers(Collections.singletonList(user));
 
     mockMvc.perform(post("/api/study/")
-        .with(user(user.getAccountName()))
+        .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(status().isCreated())
@@ -151,7 +151,7 @@ public class StudyBaseControllerTests {
 
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
@@ -168,7 +168,7 @@ public class StudyBaseControllerTests {
     mockMvc.perform(post("/api/study/")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(study))
-        .with(user(user.getAccountName())))
+        .with(user(user.getUsername())))
         .andExpect(status().isBadRequest());
   }
 
@@ -193,7 +193,7 @@ public class StudyBaseControllerTests {
     study.setStatus(Status.ON_HOLD);
 
     mockMvc.perform(put("/api/study/CPA-XXXXX")
-        .with(user(study.getOwner().getAccountName()))
+        .with(user(study.getOwner().getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(status().isCreated());
@@ -229,7 +229,7 @@ public class StudyBaseControllerTests {
 
   @Test
   public void updateStatusTest() throws Exception {
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     mockMvc.perform(get("/api/study/CPA-10001"))
@@ -243,7 +243,7 @@ public class StudyBaseControllerTests {
     mockMvc.perform(post("/api/study/CPA-10001/status")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(params))
-        .with(user(user.getAccountName())))
+        .with(user(user.getUsername())))
         .andExpect(status().isOk());
 
     mockMvc.perform(get("/api/study/CPA-10001"))

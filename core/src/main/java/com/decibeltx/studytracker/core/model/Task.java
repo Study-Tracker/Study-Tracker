@@ -51,7 +51,7 @@ public class Task {
     this.order = 0;
   }
 
-  public Task(TaskStatus status, String label, Integer order) {
+  public Task(String label, TaskStatus status, Integer order) {
     this.status = status;
     this.label = label;
     this.order = order;

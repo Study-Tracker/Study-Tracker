@@ -27,6 +27,7 @@ import com.decibeltx.studytracker.core.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +37,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -46,31 +48,45 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest(classes = TestApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@ActiveProfiles({"test", "example"})
+@ActiveProfiles({"example"})
 public class AuthenticationTests {
 
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private Environment env;
+
   @Autowired
   private ObjectMapper objectMapper;
+
   @Autowired
   private ProgramRepository programRepository;
+
   @Autowired
   private UserRepository userRepository;
+
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    User user = new User();
-    user.setAccountName(env.getRequiredProperty("ldap.example.username"));
-    user.setDisplayName(env.getRequiredProperty("ldap.example.username"));
-    user.setActive(true);
-    user.setEmail(env.getRequiredProperty("ldap.example.username") + "@test.com");
-    userRepository.save(user);
+    String username = env.getRequiredProperty("security.example.user");
+    Optional<User> optional = userRepository.findByUsername(username);
+    if (!optional.isPresent()) {
+      User user = new User();
+      user.setUsername(username);
+      user.setPassword(
+          passwordEncoder.encode(env.getRequiredProperty("security.example.password")));
+      user.setDisplayName(username);
+      user.setActive(true);
+      user.setEmail(username + "@test.com");
+      userRepository.save(user);
+    }
   }
 
   @Test
@@ -83,7 +99,7 @@ public class AuthenticationTests {
   public void postWithoutAuthenticationTest() throws Exception {
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
@@ -109,7 +125,7 @@ public class AuthenticationTests {
 
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
@@ -126,8 +142,8 @@ public class AuthenticationTests {
 
     mockMvc.perform(MockMvcRequestBuilders.post("/api/study")
         .with(SecurityMockMvcRequestPostProcessors.httpBasic(
-            env.getRequiredProperty("ldap.example.username"),
-            env.getRequiredProperty("ldap.example.password")))
+            env.getRequiredProperty("security.example.user"),
+            env.getRequiredProperty("security.example.password")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(MockMvcResultMatchers.status().isCreated());

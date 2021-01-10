@@ -16,20 +16,20 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEvent;
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
-import com.decibeltx.studytracker.core.events.StudyEventPublisher;
+import com.decibeltx.studytracker.core.eln.NotebookFolder;
+import com.decibeltx.studytracker.core.eln.StudyNotebookService;
 import com.decibeltx.studytracker.core.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.core.exception.InvalidConstraintException;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
-import com.decibeltx.studytracker.core.exception.StudyTrackerException;
-import com.decibeltx.studytracker.core.model.Collaborator;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
-import com.decibeltx.studytracker.core.service.ProgramService;
+import com.decibeltx.studytracker.core.service.NamingService;
 import com.decibeltx.studytracker.core.service.StudyService;
+import com.decibeltx.studytracker.core.storage.StorageFolder;
+import com.decibeltx.studytracker.core.storage.StudyStorageService;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.ConstraintViolationException;
@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class StudyServiceImpl implements StudyService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyServiceImpl.class);
@@ -48,10 +49,13 @@ public class StudyServiceImpl implements StudyService {
   private StudyRepository studyRepository;
 
   @Autowired
-  private ProgramService programService;
+  private StudyStorageService studyStorageService;
+
+  @Autowired(required = false)
+  private StudyNotebookService notebookService;
 
   @Autowired
-  private StudyEventPublisher studyEventPublisher;
+  private NamingService namingService;
 
   @Override
   public Optional<Study> findById(String id) {
@@ -100,13 +104,13 @@ public class StudyServiceImpl implements StudyService {
     }
 
     if (study.getCode() == null) {
-      study.setCode(this.generateStudyCode(study));
+      study.setCode(namingService.generateStudyCode(study));
     }
     study.setActive(true);
 
     // External study
     if (study.getCollaborator() != null && StringUtils.isEmpty(study.getExternalCode())) {
-      study.setExternalCode(this.generateExternalStudyCode(study));
+      study.setExternalCode(namingService.generateExternalStudyCode(study));
     }
 
     try {
@@ -119,12 +123,43 @@ public class StudyServiceImpl implements StudyService {
       }
     }
 
+    // Create the study storage folder
+    try {
+      studyStorageService.createStudyFolder(study);
+      StorageFolder folder = studyStorageService.getStudyFolder(study);
+      study.setStorageFolder(folder);
+      study.setUpdatedAt(new Date());
+      studyRepository.save(study);
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.error("Failed to create storage folder for study: " + study.getCode());
+    }
+
+    // Create the ELN folder
+    LOGGER.warn(String.format("Creating ELN entry for study: %s", study.getCode()));
+    if (study.isLegacy()) {
+      LOGGER.warn(String.format("Legacy Study : %s", study.getCode()));
+      NotebookFolder notebookFolder = study.getNotebookFolder();
+      notebookFolder.setName(namingService.getStudyNotebookFolderName(study));
+      study.setNotebookFolder(notebookFolder);
+      study.setUpdatedAt(new Date());
+      studyRepository.save(study);
+    } else {
+      if (notebookService != null) {
+        try {
+          NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
+          study.setNotebookFolder(notebookFolder);
+          study.setUpdatedAt(new Date());
+          studyRepository.save(study);
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOGGER.error("Failed to create notebook entry for study: " + study.getCode());
+        }
+      }
+    }
+
     LOGGER.info(String.format("Successfully created new study with code %s and ID %s",
         study.getCode(), study.getId()));
-
-    // Publish events
-    studyEventPublisher
-        .publishStudyEvent(study, study.getCreatedBy(), StudyEvent.Type.NEW_STUDY, study);
 
   }
 
@@ -133,53 +168,43 @@ public class StudyServiceImpl implements StudyService {
     LOGGER.info("Attempting to update existing study with code: " + study.getCode());
     studyRepository.findById(study.getId()).orElseThrow(RecordNotFoundException::new);
     studyRepository.save(study);
-    studyEventPublisher
-        .publishStudyEvent(study, study.getLastModifiedBy(), StudyEvent.Type.UPDATED_STUDY, study);
   }
 
   @Override
   public void delete(Study study) {
     study.setActive(false);
     studyRepository.save(study);
-    studyEventPublisher
-        .publishStudyEvent(study, study.getLastModifiedBy(), StudyEvent.Type.DELETED_STUDY);
-  }
-
-  @Override
-  public String generateStudyCode(Study study) {
-    if (study.isLegacy()) {
-      throw new StudyTrackerException("Legacy studies do not recieve new study codes.");
-    }
-    Program program = study.getProgram();
-    Integer count = 10001;
-    for (Program p : programService.findByCode(program.getCode())) {
-      count = count + (studyRepository.findActiveProgramStudies(p.getId())).size();
-    }
-    return program.getCode() + "-" + count.toString();
-  }
-
-  @Override
-  public String generateExternalStudyCode(Study study) {
-    Collaborator collaborator = study.getCollaborator();
-    if (collaborator == null) {
-      throw new StudyTrackerException("External studies require a valid collaborator reference.");
-    }
-    Integer count =
-        1 + studyRepository.findByExternalCodePrefix(collaborator.getCode() + "-").size();
-    return collaborator.getCode() + "-" + String.format("%05d", count);
   }
 
   @Override
   public void updateStatus(Study study, Status status) {
     study.setStatus(status);
     studyRepository.save(study);
-    studyEventPublisher
-        .publishStudyEvent(study, study.getLastModifiedBy(), Type.STUDY_STATUS_CHANGED, status);
   }
 
   @Override
   public List<Study> search(String keyword) {
     return studyRepository.findByNameOrCodeLike(keyword);
+  }
+
+  @Override
+  public long count() {
+    return studyRepository.count();
+  }
+
+  @Override
+  public long countFromDate(Date startDate) {
+    return studyRepository.countByCreatedAtAfter(startDate);
+  }
+
+  @Override
+  public long countBeforeDate(Date endDate) {
+    return studyRepository.countByCreatedAtBefore(endDate);
+  }
+
+  @Override
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return studyRepository.countByCreatedAtBetween(startDate, endDate);
   }
 
 }

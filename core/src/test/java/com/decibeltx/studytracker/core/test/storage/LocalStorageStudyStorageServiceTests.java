@@ -25,6 +25,7 @@ import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.AssayRepository;
+import com.decibeltx.studytracker.core.repository.AssayTypeRepository;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
@@ -71,6 +72,9 @@ public class LocalStorageStudyStorageServiceTests {
   @Autowired
   private AssayRepository assayRepository;
 
+  @Autowired
+  private AssayTypeRepository assayTypeRepository;
+
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
@@ -86,7 +90,7 @@ public class LocalStorageStudyStorageServiceTests {
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();
-    Optional<User> optionalUser = userRepository.findByAccountName("jsmith");
+    Optional<User> optionalUser = userRepository.findByUsername("jsmith");
     Assert.assertTrue(optionalUser.isPresent());
     User user = optionalUser.get();
     Study study = new Study();
@@ -142,7 +146,7 @@ public class LocalStorageStudyStorageServiceTests {
   public void getInvalidStudyFolderTest() {
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByAccountName("jsmith")
+    User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setName("Test study");
@@ -167,10 +171,13 @@ public class LocalStorageStudyStorageServiceTests {
   @Test
   public void assayFolderTests() throws Exception {
 
+    AssayType assayType = assayTypeRepository.findByName("Generic")
+        .orElseThrow(RecordNotFoundException::new);
+
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();
-    Optional<User> optionalUser = userRepository.findByAccountName("jsmith");
+    Optional<User> optionalUser = userRepository.findByUsername("jsmith");
     Assert.assertTrue(optionalUser.isPresent());
     User user = optionalUser.get();
     Study study = new Study();
@@ -189,13 +196,14 @@ public class LocalStorageStudyStorageServiceTests {
     studyRepository.insert(study);
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
+    storageService.createStudyFolder(study);
 
     Assay assay = new Assay();
     assay.setName("Test assay");
     assay.setCode("CPA-12345-12345");
     assay.setStatus(Status.IN_PLANNING);
     assay.setCreatedBy(study.getOwner());
-    assay.setAssayType(AssayType.GENERIC);
+    assay.setAssayType(assayType);
     assay.setStudy(study);
     assay.setDescription("This is a test");
     assay.setStartDate(new Date());
@@ -239,10 +247,12 @@ public class LocalStorageStudyStorageServiceTests {
 
     Study study = studyRepository.findByCode("CPA-10001")
         .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType = assayTypeRepository.findByName("Generic")
+        .orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
     assay.setName("Test assay");
     assay.setCode("CPA-10001-XXXXX");
-    assay.setAssayType(AssayType.GENERIC);
+    assay.setAssayType(assayType);
     assay.setStudy(study);
 
     StorageFolder folder = null;

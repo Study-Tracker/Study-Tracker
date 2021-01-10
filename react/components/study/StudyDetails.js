@@ -39,7 +39,7 @@ import {SelectableStatusButton, StatusButton} from "../status";
 import React from "react";
 import {Book, Folder, Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faShare, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {history} from "../../App";
 import {StudyCollaborator, StudyKeywords, StudyTeam} from "../studyMetadata";
 import ExternalLinks from "../externalLinks";
@@ -49,12 +49,14 @@ import StudyFilesTab from "./StudyFilesTab";
 import StudyConclusionsTab from "./StudyConclusionsTab";
 import StudyCommentsTab from "./StudyCommentsTab";
 import StudyTimelineTab from "./StudyTimelineTab";
+import swal from "sweetalert";
 
 const StudyDetailHeader = ({study, user}) => {
   return (
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>Study {study.code}</h1>
+          <h1>{study.name}</h1>
+          <h5 className="text-muted">{study.code}</h5>
         </Col>
         <Col className="col-auto">
           {
@@ -69,7 +71,7 @@ const StudyDetailHeader = ({study, user}) => {
           }
           {
             !study.active ? <Button size="lg" className="mr-1 mb-1"
-                                    color="danger">Innactive Study</Button> : ''
+                                    color="danger">Inactive Study</Button> : ''
           }
           {
             study.legacy ? <Button size="lg" className="mr-1 mb-1"
@@ -95,6 +97,7 @@ class StudyDetails extends React.Component {
     this.state = {
       activeTab: "1"
     };
+    this.handleStudyDelete = this.handleStudyDelete.bind(this);
   }
 
   toggle(tab) {
@@ -103,6 +106,33 @@ class StudyDetails extends React.Component {
         activeTab: tab
       });
     }
+  }
+
+  handleStudyDelete() {
+    swal({
+      title: "Are you sure you want to remove this study?",
+      text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered in the admin dashboard.",
+      icon: "warning",
+      buttons: true
+    })
+    .then(val => {
+      if (val) {
+        fetch("/api/study/" + this.props.study.code, {
+          method: 'DELETE',
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }).then(response => {
+          history.push("/studies")
+        })
+        .catch(error => {
+          console.error(error);
+          this.setState({
+            modalError: "Failed to remove study. Please try again."
+          });
+        })
+      }
+    });
   }
 
   render() {
@@ -144,14 +174,14 @@ class StudyDetails extends React.Component {
                         <Menu/>
                       </DropdownToggle>
                       <DropdownMenu right>
-                        <DropdownItem onClick={() => console.log("Share!")}>
-                          <FontAwesomeIcon icon={faShare}/>
-                          &nbsp;
-                          Share
-                        </DropdownItem>
-                        {
-                          !!this.props.user ? <DropdownItem divider/> : ''
-                        }
+                        {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
+                        {/*  <FontAwesomeIcon icon={faShare}/>*/}
+                        {/*  &nbsp;*/}
+                        {/*  Share*/}
+                        {/*</DropdownItem>*/}
+                        {/*{*/}
+                        {/*  !!this.props.user ? <DropdownItem divider/> : ''*/}
+                        {/*}*/}
                         {
                           !!this.props.user ? (
                               <DropdownItem onClick={() => history.push(
@@ -164,28 +194,42 @@ class StudyDetails extends React.Component {
                         }
                         {
                           !!this.props.user ? (
-                              <DropdownItem
-                                  onClick={() => console.log("Delete!")}>
+                              <DropdownItem onClick={this.handleStudyDelete}>
                                 <FontAwesomeIcon icon={faTrash}/>
                                 &nbsp;
-                                Delete
+                                Remove
                               </DropdownItem>
                           ) : ''
                         }
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   </div>
+
                   <CardTitle tag="h5" className="mb-0 text-muted">
-                    {study.program.name}
+                    Summary
                   </CardTitle>
+
                 </CardHeader>
 
                 <CardBody>
                   <Row>
                     <Col xs={12}>
 
-                      {/*<h5 className="text-muted">{study.program.name}</h5>*/}
-                      <h3>{study.name}</h3>
+                      <h6 className="details-label">Program</h6>
+                      <p>{study.program.name}</p>
+
+                      <h6 className="details-label">Code</h6>
+                      <p>{study.code}</p>
+
+                      {
+                        !!study.externalCode
+                            ? (
+                                <React.Fragment>
+                                  <h6 className="details-label">External Code</h6>
+                                  <p>{study.externalCode}</p>
+                                </React.Fragment>
+                            ) : ''
+                      }
 
                       <h6 className="details-label">Description</h6>
                       <div dangerouslySetInnerHTML={createMarkup(
@@ -220,7 +264,7 @@ class StudyDetails extends React.Component {
                             <Row>
                               <Col xs={12}>
                                 <div>
-                                  <h6 className="details-label">CRO/Collaborator</h6>
+                                  <CardTitle>CRO/Collaborator</CardTitle>
                                   <StudyCollaborator
                                       collaborator={study.collaborator}
                                       externalCode={study.externalCode}
@@ -235,7 +279,7 @@ class StudyDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-                      <h6 className="details-label">Study Team</h6>
+                      <CardTitle>Study Team</CardTitle>
                       <StudyTeam users={study.users} owner={study.owner}/>
                     </Col>
                   </Row>
@@ -244,7 +288,7 @@ class StudyDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-                      <h6 className="details-label">Keywords</h6>
+                      <CardTitle>Keywords</CardTitle>
                       <StudyKeywords keywords={study.keywords}/>
                     </Col>
                   </Row>
@@ -253,27 +297,26 @@ class StudyDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
-
-                      <h6 className="details-label">Workspaces</h6>
+                      <CardTitle>Workspaces</CardTitle>
                       {
                         !!study.storageFolder
                             ? (
                                 <a href={study.storageFolder.url}
                                    target="_blank"
-                                   className="btn btn-info mr-2">
-                                  Egnyte
+                                   className="btn btn-outline-info mt-2 mr-2">
+                                  Study Storage Folder
                                   <Folder
                                       className="feather align-middle ml-2 mb-1"/>
                                 </a>
                             ) : ''
                       }
                       {
-                        !!study.notebookEntry
+                        !!study.notebookFolder
                             ? (
-                                <a href={study.notebookEntry.url}
+                                <a href={study.notebookFolder.url}
                                    target="_blank"
-                                   className="btn btn-info mr-2">
-                                  {study.notebookEntry.label}
+                                   className="btn btn-outline-info mt-2 mr-2">
+                                  Study ELN Folder
                                   <Book
                                       className="feather align-middle ml-2 mb-1"/>
                                 </a>

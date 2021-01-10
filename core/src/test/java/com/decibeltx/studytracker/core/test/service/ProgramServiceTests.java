@@ -18,7 +18,9 @@ package com.decibeltx.studytracker.core.test.service;
 
 import com.decibeltx.studytracker.core.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.core.model.Program;
+import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
+import com.decibeltx.studytracker.core.repository.UserRepository;
 import com.decibeltx.studytracker.core.service.ProgramService;
 import com.decibeltx.studytracker.core.test.TestConfiguration;
 import java.util.List;
@@ -47,6 +49,9 @@ public class ProgramServiceTests {
 
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
+  @Autowired
+  private UserRepository userRepository;
 
   @Before
   public void doBefore() {
@@ -91,10 +96,13 @@ public class ProgramServiceTests {
   @Test
   public void createProgramTest() {
     Assert.assertEquals(5, programRepository.count());
+    User user = userRepository.findAll().get(0);
     Program program = new Program();
     program.setActive(true);
     program.setCode("TST");
     program.setName("Test Program");
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
     programRepository.insert(program);
     Assert.assertEquals(6, programRepository.count());
     Assert.assertNotNull(program.getId());
@@ -104,9 +112,12 @@ public class ProgramServiceTests {
   @Test
   public void cannotDuplicateProgramTest() {
     Assert.assertEquals(5, programRepository.count());
+    User user = userRepository.findAll().get(0);
     Program program = new Program();
     program.setName("Clinical Program A");
     program.setCode("CPA");
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
     Exception exception = null;
     try {
       programRepository.insert(program);

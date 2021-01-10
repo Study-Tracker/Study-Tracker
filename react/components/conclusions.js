@@ -17,6 +17,7 @@
 import {
   Button,
   Col,
+  Media,
   Modal,
   ModalBody,
   ModalFooter,
@@ -26,7 +27,8 @@ import {
 import React from "react";
 import ReactQuill from "react-quill";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
+import {faEdit, faPlusCircle,} from "@fortawesome/free-solid-svg-icons";
+import {Clipboard} from "react-feather";
 
 /**
  * Displays the study conclusions or a placeholder.
@@ -46,61 +48,87 @@ export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
     };
 
     return (
-        <Row>
 
-          <Col sm={12}>
-            <div dangerouslySetInnerHTML={createMarkup(conclusions.content)}/>
-          </Col>
+        <Media className="assay-card">
 
-          <Col sm={6}>
+          <Clipboard
+              size={36}
+              className="align-middle text-primary mr-4"
+          />
 
-            <h6 className="details-label">Created By</h6>
-            <p>{conclusions.createdBy.displayName}</p>
+          <Media body>
 
-            {
-              !!conclusions.lastModifiedBy
-                  ? (
-                      <div>
-                        <h6 className="details-label">Updated By</h6>
-                        <p>{conclusions.lastModifiedBy.displayName}</p>
-                      </div>
-                  )
-                  : ''
-            }
+            <Row>
 
-          </Col>
+              <Col xs={12}>
+                <div className="mb-3" dangerouslySetInnerHTML={createMarkup(
+                    conclusions.content)}/>
+              </Col>
 
-          <Col sm={6}>
+            </Row>
 
-            <h6 className="details-label">Date Created</h6>
-            <p>{new Date(conclusions.createdAt).toLocaleString()}</p>
+            <Row className="mt-2">
 
-            {
-              !!conclusions.updatedAt
-                  ? (
-                      <div>
-                        <h6 className="details-label">Last Updated</h6>
-                        <p>{new Date(conclusions.updatedAt).toLocaleString()}</p>
-                      </div>
-                  )
-                  : ''
-            }
+              <Col sm={6}>
+                <h6 className="details-label">Created By</h6>
+                <p>{conclusions.createdBy.displayName}</p>
+              </Col>
 
-          </Col>
+              <Col sm={6}>
+                <h6 className="details-label">Date Added</h6>
+                <p>
+                  {new Date(conclusions.createdAt).toLocaleDateString()}
+                </p>
+              </Col>
 
-          {
-            isSignedIn ? (
-                <Col sm={12}>
-                  <Button color={'info'} onClick={() => toggleModal()}>
-                    Edit
-                    &nbsp;&nbsp;
-                    <FontAwesomeIcon icon={faEdit}/>
-                  </Button>
-                </Col>
-            ) : ''
-          }
+            </Row>
 
-        </Row>
+            <Row className="mt-2">
+
+              {
+                !!conclusions.lastModifiedBy
+                    ? (
+                        <Col sm={6}>
+                          <h6 className="details-label">Updated By</h6>
+                          <p>{conclusions.lastModifiedBy.displayName}</p>
+                        </Col>
+                    )
+                    : ''
+              }
+
+              {
+                !!conclusions.updatedAt
+                    ? (
+                        <Col sm={6}>
+                          <span>
+                            <h6 className="details-label">Last Updated</h6>
+                            <p>
+                              {new Date(
+                                  conclusions.updatedAt).toLocaleDateString()}
+                            </p>
+                          </span>
+                        </Col>
+                    ) : ''
+              }
+
+            </Row>
+
+            <Row className="mt-2">
+              {
+                isSignedIn ? (
+                    <Col sm={12}>
+                      <Button color={'info'} onClick={() => toggleModal()}>
+                        Edit
+                        &nbsp;&nbsp;
+                        <FontAwesomeIcon icon={faEdit}/>
+                      </Button>
+                    </Col>
+                ) : ''
+              }
+            </Row>
+
+          </Media>
+        </Media>
     );
   } else {
     return (

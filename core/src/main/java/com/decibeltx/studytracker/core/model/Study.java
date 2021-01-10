@@ -16,9 +16,9 @@
 
 package com.decibeltx.studytracker.core.model;
 
-import com.decibeltx.studytracker.core.keyword.Keyword;
-import com.decibeltx.studytracker.core.notebook.NotebookEntry;
+import com.decibeltx.studytracker.core.eln.NotebookFolder;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +74,7 @@ public class Study implements Persistable<String> {
 
   private boolean active = true;
 
-  private NotebookEntry notebookEntry;
+  private NotebookFolder notebookFolder;
 
   private StorageFolder storageFolder;
 
@@ -111,14 +111,13 @@ public class Study implements Persistable<String> {
   @DBRef
   private List<User> users = new ArrayList<>();
 
-  private List<Keyword> keywords = new ArrayList<>();
-
-  @Linked(model = Activity.class)
+  @Linked(model = Keyword.class)
   @DBRef
-  private List<Activity> activity = new ArrayList<>();
+  private List<Keyword> keywords = new ArrayList<>();
 
   @Linked(model = Assay.class)
   @DBRef(lazy = true)
+  @JsonIgnore
   private List<Assay> assays = new ArrayList<>();
 
   private Map<String, Object> attributes = new LinkedHashMap<>();

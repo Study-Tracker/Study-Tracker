@@ -16,9 +16,10 @@
 
 package com.decibeltx.studytracker.core.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -30,102 +31,90 @@ public class Activity {
   @Id
   private String id;
 
-  @Linked(model = Study.class)
-  @DBRef
-  @NotNull
-  @JsonIgnore
-  private Study study;
+  private Reference reference;
 
-  @Linked(model = Assay.class)
-  @DBRef
-  @JsonIgnore
-  private Assay assay;
+  private String referenceId;
+
+  private EventType eventType;
+
+  private Map<String, Object> data = new HashMap<>();
 
   @Linked(model = User.class)
   @NotNull
   @DBRef
-  @JsonIgnore
   private User user;
-
-  private String action;
 
   private Date date;
 
-  private Object data;
+  /* Getters and Setters */
 
-  @JsonProperty("studyCode")
-  public String getStudyCode() {
-    return study != null ? study.getCode() : null;
-  }
-
-  @JsonProperty("assayCode")
-  public String getAssayCode() {
-    return assay != null ? assay.getCode() : null;
-  }
-
-  @JsonProperty("userAccountName")
-  public String getUserAccountName() {
-    return user != null ? user.getAccountName() : null;
-  }
-
-  @JsonProperty("userDisplayName")
-  public String getUserDisplayName() {
-    return user != null ? user.getDisplayName() : null;
+  public User getUser() {
+    return user;
   }
 
   public String getId() {
     return id;
   }
 
-  public Study getStudy() {
-    return study;
-  }
-
-  public Assay getAssay() {
-    return assay;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public String getAction() {
-    return action;
-  }
-
-  public Date getDate() {
-    return date;
-  }
-
-  public Object getData() {
-    return data;
-  }
-
   public void setId(String id) {
     this.id = id;
   }
 
-  public void setStudy(Study study) {
-    this.study = study;
-  }
-
-  public void setAssay(Assay assay) {
-    this.assay = assay;
+  public Reference getReference() {
+    return reference;
   }
 
   public void setUser(User user) {
     this.user = user;
   }
 
-  public void setAction(String action) {
-    this.action = action;
+  public void setReference(Reference reference) {
+    this.reference = reference;
+  }
+
+  public String getReferenceId() {
+    return referenceId;
+  }
+
+  public void setReferenceId(String referenceId) {
+    this.referenceId = referenceId;
+  }
+
+  public EventType getEventType() {
+    return eventType;
+  }
+
+  public void setEventType(EventType eventType) {
+    this.eventType = eventType;
+  }
+
+  public Date getDate() {
+    return date;
+  }
+
+  public Map<String, Object> getData() {
+    return data;
   }
 
   public void setDate(Date date) {
     this.date = date;
   }
 
-  public void setData(Object data) {
+  public void setData(Map<String, Object> data) {
     this.data = data;
   }
+
+  @JsonProperty("triggeredBy")
+  public String triggeredBy() {
+    return user.getUsername();
+  }
+
+  public enum Reference {
+    STUDY,
+    ASSAY,
+    PROGRAM,
+    USER,
+    ASSAY_TYPE
+  }
+
 }

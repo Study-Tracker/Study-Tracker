@@ -19,12 +19,14 @@ package com.decibeltx.studytracker.core.model;
 import java.util.Date;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 @Data
 public class Conclusions implements Persistable<String> {
 
+  @Id
   private String id;
 
   @NotNull

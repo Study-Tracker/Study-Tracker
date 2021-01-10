@@ -16,11 +16,14 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
+import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.ExternalLink;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.service.StudyExternalLinkService;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +31,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/study/{id}/links")
 @RestController
-public class StudyExternalLinksController extends StudyController {
+public class StudyExternalLinksController extends AbstractStudyController {
 
   @Autowired
   private StudyExternalLinkService studyExternalLinkService;
@@ -55,12 +57,18 @@ public class StudyExternalLinksController extends StudyController {
   public HttpEntity<?> addExternalLink(@PathVariable("id") String studyId,
       @RequestBody ExternalLink externalLink) {
     Study study = getStudyFromIdentifier(studyId);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyExternalLinkService.addStudyExternalLink(study, externalLink);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromNewExternalLink(study, user, externalLink);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
@@ -68,9 +76,9 @@ public class StudyExternalLinksController extends StudyController {
   public HttpEntity<?> editExternalLink(@PathVariable("id") String studyId,
       @PathVariable("linkId") String linkId, @RequestBody ExternalLink externalLink) {
     Study study = getStudyFromIdentifier(studyId);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     Optional<ExternalLink> optional = studyExternalLinkService
@@ -79,6 +87,12 @@ public class StudyExternalLinksController extends StudyController {
       throw new RecordNotFoundException("Cannot find external link with ID: " + linkId);
     }
     studyExternalLinkService.updateStudyExternalLink(study, externalLink);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromUpdatedExternalLink(study, user, externalLink);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
@@ -86,12 +100,18 @@ public class StudyExternalLinksController extends StudyController {
   public HttpEntity<?> removeExternalLink(@PathVariable("id") String studyId,
       @PathVariable("linkId") String linkId) {
     Study study = getStudyFromIdentifier(studyId);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyExternalLinkService.deleteStudyExternalLink(study, linkId);
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromDeletedExternalLink(study, user);
+    getActivityService().create(activity);
+    getEventsService().dispatchEvent(activity);
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

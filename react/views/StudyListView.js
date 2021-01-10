@@ -15,15 +15,17 @@
  */
 
 import React from 'react';
-import MainPageWrapper from "../structure/MainPageWrapper";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import StudyList from "../components/study/StudyList";
 import {connect} from 'react-redux';
 import {compose} from 'redux';
 import crossfilter from "crossfilter2";
-import {labels as filter} from '../components/filters';
+import StudyFilters, {labels as filter} from '../components/filters/studyFilters'
 import {withRouter} from 'react-router-dom';
+import SideBar from "../structure/SideBar";
+import NavBar from "../structure/NavBar";
+import Footer from "../structure/Footer";
 
 const qs = require('qs');
 
@@ -95,6 +97,7 @@ class StudyListView extends React.Component {
 
       } else if (this.state.isLoaded) {
 
+        // Apply filters
         console.log("Filters: ");
         console.log(this.props.filters);
 
@@ -127,9 +130,19 @@ class StudyListView extends React.Component {
     }
 
     return (
-        <MainPageWrapper {...this.props}>
-          {content}
-        </MainPageWrapper>
+        <React.Fragment>
+          <div className="wrapper">
+            <SideBar/>
+            <div className="main">
+              <NavBar user={this.props.user}/>
+              <div className="content">
+                {content}
+              </div>
+              <Footer/>
+            </div>
+          </div>
+          <StudyFilters/>
+        </React.Fragment>
     );
 
   }

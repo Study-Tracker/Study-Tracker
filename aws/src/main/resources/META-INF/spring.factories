@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.decibeltx.studytracker.aws.AwsServiceConfiguration,\
+  com.decibeltx.studytracker.aws.EventBridgeConfiguration

@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,21 +36,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ActiveProfiles({"example"})
 public class EgnyteRestClientFileUploadTests {
 
-  private final static String EGNYTE_ROOT = "Shared/General/Informatics & IT/Egnyte API Testing/StudyTrackerTest/TestUpload";
-
   private static final Resource EXAMPLE_FILE = new ClassPathResource("upload-test.txt");
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private EgnyteRestApiClient client;
 
+  @Autowired
+  private Environment env;
+
   @Test
   public void fileUploadTest() throws Exception {
+    String egnyteRoot = env.getRequiredProperty("egnyte.root-path") + "/TestUpload";
     File file = EXAMPLE_FILE.getFile();
     Exception exception = null;
     try {
-      client.uploadFile(file, EGNYTE_ROOT);
-      EgnyteObject egnyteObject = client.findObjectByPath(EGNYTE_ROOT + "/upload-test.txt");
+      client.uploadFile(file, egnyteRoot);
+      EgnyteObject egnyteObject = client.findObjectByPath(egnyteRoot + "/upload-test.txt");
       Assert.assertNotNull(egnyteObject);
       Assert.assertFalse(egnyteObject.isFolder());
       EgnyteFile egnyteFile = (EgnyteFile) egnyteObject;
@@ -63,10 +66,11 @@ public class EgnyteRestClientFileUploadTests {
 
   @Test
   public void fileUploadToInvalidFolderTest() throws Exception {
+    //    String egnyteRoot = env.getRequiredProperty("egnyte.root-path") + "/TestUpload";
     //    File file = EXAMPLE_FILE.getFile();
     //    Exception exception = null;
     //    try {
-    //      egnyteService.uploadFile(file, EGNYTE_ROOT + "/bad_folder");
+    //      egnyteService.uploadFile(file, egnyteRoot + "/bad_folder");
     //    } catch (Exception ex) {
     //      exception = ex;
     //      ex.printStackTrace();
@@ -76,10 +80,11 @@ public class EgnyteRestClientFileUploadTests {
 
   @Test
   public void uploadInvalidFileTest() throws Exception {
+    String egnyteRoot = env.getRequiredProperty("egnyte.root-path") + "/TestUpload";
     File file = new File("bad_file.txt");
     Exception exception = null;
     try {
-      client.uploadFile(file, EGNYTE_ROOT);
+      client.uploadFile(file, egnyteRoot);
     } catch (Exception ex) {
       exception = ex;
       ex.printStackTrace();

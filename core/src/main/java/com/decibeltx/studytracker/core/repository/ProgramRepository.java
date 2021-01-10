@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.repository;
 
 import com.decibeltx.studytracker.core.model.Program;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -26,5 +27,11 @@ public interface ProgramRepository extends MongoRepository<Program, String> {
   Optional<Program> findByName(String name);
 
   List<Program> findByCode(String code);
+
+  long countByCreatedAtBefore(Date date);
+
+  long countByCreatedAtAfter(Date date);
+
+  long countByCreatedAtBetween(Date startDate, Date endDate);
 
 }

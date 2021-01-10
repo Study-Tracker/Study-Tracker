@@ -18,7 +18,7 @@ import React from 'react';
 import SideBar from "./SideBar";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
-import Filters from "../components/filters";
+import StudyFilters from "../components/filters/filters";
 
 const MainPageWrapper = ({children, user}) => (
     <React.Fragment>
@@ -32,7 +32,7 @@ const MainPageWrapper = ({children, user}) => (
           <Footer/>
         </div>
       </div>
-      <Filters/>
+      <StudyFilters/>
     </React.Fragment>
 );
 

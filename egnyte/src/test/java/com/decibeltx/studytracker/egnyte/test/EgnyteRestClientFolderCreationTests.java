@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,7 +31,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ActiveProfiles({"example"})
 public class EgnyteRestClientFolderCreationTests {
 
-  private final static String EGNYTE_ROOT = "Shared/General/Informatics & IT/Egnyte API Testing/StudyTrackerTest/TestCreate";
+  @Autowired
+  private Environment env;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -39,15 +41,16 @@ public class EgnyteRestClientFolderCreationTests {
   @Test
   public void createAndDeleteFolderTest() throws Exception {
 
+    String egnyteRoot = env.getRequiredProperty("egnyte.root-path") + "/TestCreate";
     System.out.println(
         "This functionality works, but the current API user account does not have permission to delete folders or files.");
     Assert.assertNotNull(client);
-    Assert.assertNotNull(EGNYTE_ROOT);
+    Assert.assertNotNull(egnyteRoot);
 //
 //    // Create the new folder
 //    Exception exception = null;
 //    EgnyteFolder folder = null;
-//    String path = EGNYTE_ROOT + "/NewFolder";
+//    String path = egnyteRoot + "/NewFolder";
 //
 //    try {
 //      folder = client.createFolder(path);

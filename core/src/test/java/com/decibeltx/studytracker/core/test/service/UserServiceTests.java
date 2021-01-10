@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,6 +39,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = TestConfiguration.class)
 @ActiveProfiles({"test", "example", "storage-local"})
 public class UserServiceTests {
+
+  private static final int USER_COUNT = 3;
 
   @Autowired
   private UserRepository userRepository;
@@ -57,7 +60,7 @@ public class UserServiceTests {
   public void findAlltest() {
     List<User> users = userService.findAll();
     Assert.assertTrue(!users.isEmpty());
-    Assert.assertEquals(3, users.size());
+    Assert.assertEquals(USER_COUNT, users.size());
     System.out.println(users.toString());
   }
 
@@ -71,18 +74,19 @@ public class UserServiceTests {
   }
 
   @Test
-  public void findByAccountNameTest() {
-    Optional<User> optional = userService.findByAccountName("jsmith");
+  public void findByUsernameTest() {
+    Optional<User> optional = userService.findByUsername("jsmith");
     Assert.assertTrue(optional.isPresent());
-    Assert.assertEquals("jsmith", optional.get().getAccountName());
-    optional = userService.findByAccountName("bad");
+    Assert.assertEquals("jsmith", optional.get().getUsername());
+    optional = userService.findByUsername("bad");
     Assert.assertTrue(!optional.isPresent());
   }
 
   @Test
   public void createNewUserTest() {
     User user = new User();
-    user.setAccountName("jperson");
+    user.setUsername("jperson");
+    user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Person");
     user.setEmail("jperson@email.com");
     user.setTitle("Director");
@@ -90,14 +94,14 @@ public class UserServiceTests {
     user.setDepartment("Chemistry");
     userService.create(user);
     Assert.assertNotNull(user.getId());
-    Assert.assertEquals(4, userService.findAll().size());
+    Assert.assertEquals(USER_COUNT + 1, userService.findAll().size());
   }
 
   @Test
   public void fieldValidationTest() {
     Exception exception = null;
     User user = new User();
-    user.setAccountName("jperson");
+    user.setUsername("jperson");
     user.setDisplayName("Joe Person");
     user.setTitle("Director");
     user.setAdmin(false);
@@ -113,11 +117,12 @@ public class UserServiceTests {
   }
 
   @Test
-  public void duplicateAccountNameTest() {
-    Assert.assertEquals(3, userRepository.count());
+  public void duplicateUsernameTest() {
+    Assert.assertEquals(USER_COUNT, userRepository.count());
     Exception exception = null;
     User user = new User();
-    user.setAccountName("jsmith");
+    user.setUsername("jsmith");
+    user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Smith");
     user.setEmail("jperson@email.com");
     user.setTitle("Director");
@@ -134,18 +139,18 @@ public class UserServiceTests {
 
   @Test
   public void userModificationTest() {
-    Assert.assertEquals(3, userRepository.count());
-    Optional<User> optional = userService.findByAccountName("jsmith");
+    Assert.assertEquals(USER_COUNT, userRepository.count());
+    Optional<User> optional = userService.findByUsername("jsmith");
     Assert.assertTrue(optional.isPresent());
     User user = optional.get();
     user.setTitle("VP");
     userService.update(user);
-    optional = userService.findByAccountName("jsmith");
+    optional = userService.findByUsername("jsmith");
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals("VP", optional.get().getTitle());
     userService.delete(optional.get());
-    Assert.assertEquals(2, userRepository.count());
-    optional = userService.findByAccountName("jsmith");
+    Assert.assertEquals(USER_COUNT - 1, userRepository.count());
+    optional = userService.findByUsername("jsmith");
     Assert.assertFalse(optional.isPresent());
   }
 
@@ -160,6 +165,12 @@ public class UserServiceTests {
     users = userService.search("frank");
     Assert.assertNotNull(users);
     Assert.assertEquals(0, users.size());
+  }
+
+  @Test
+  public void activeUserCountTest() {
+    long count = userService.countActiveUsers();
+    Assert.assertEquals(USER_COUNT, count);
   }
 
 }

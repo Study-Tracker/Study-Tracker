@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.egnyte.test;
 
-import com.decibeltx.studytracker.core.config.EventConfiguration;
 import com.decibeltx.studytracker.core.config.ExampleDataConfiguration;
 import com.decibeltx.studytracker.core.config.MongoDataSourceConfiguration;
 import com.decibeltx.studytracker.core.config.MongoRepositoryConfiguration;
@@ -30,7 +29,6 @@ import org.springframework.context.annotation.PropertySource;
 @Import({
     MongoRepositoryConfiguration.class,
     ServiceConfiguration.class,
-    EventConfiguration.class,
     MongoDataSourceConfiguration.class,
     ExampleDataConfiguration.class,
     EgnyteServiceConfiguration.class

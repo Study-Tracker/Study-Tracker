@@ -19,6 +19,7 @@ package com.decibeltx.studytracker.core.service;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,22 +97,6 @@ public interface StudyService {
   void delete(Study study);
 
   /**
-   * Generates a study code ({@code study.code}) for the given study.
-   *
-   * @param study study
-   * @return study code
-   */
-  String generateStudyCode(Study study);
-
-  /**
-   * Generates an external study code for a {@link Study}.
-   *
-   * @param study
-   * @return
-   */
-  String generateExternalStudyCode(Study study);
-
-  /**
    * Updates the status of the study with the provided PKID to the provided status.
    *
    * @param study  study
@@ -127,5 +112,16 @@ public interface StudyService {
    * @return
    */
   List<Study> search(String keyword);
+
+  /**
+   * Counting number of studies created before/after/between given dates.
+   */
+  long count();
+
+  long countFromDate(Date startDate);
+
+  long countBeforeDate(Date endDate);
+
+  long countBetweenDates(Date startDate, Date endDate);
 
 }
