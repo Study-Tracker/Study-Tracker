@@ -3,7 +3,7 @@ import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {history} from "../../App";
-import {Edit, Trash} from "react-feather";
+import {Edit} from "react-feather";
 
 const columns = [
   {
@@ -115,10 +115,10 @@ const columns = [
               <Edit className="align-middle mr-1" size={18}/>
             </a>
 
-            <a className="text-danger" title={"Disable user"}
-               onClick={() => console.log("click")}>
-              <Trash className="align-middle mr-1" size={18}/>
-            </a>
+            {/*<a className="text-danger" title={"Disable user"}*/}
+            {/*   onClick={() => console.log("click")}>*/}
+            {/*  <Trash className="align-middle mr-1" size={18}/>*/}
+            {/*</a>*/}
 
           </React.Fragment>
       )

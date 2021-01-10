@@ -67,7 +67,8 @@ export default class KeywordInputs extends React.Component {
     if (input.length < 2) {
       return;
     }
-    fetch('/api/keyword/?q=' + input)
+    fetch('/api/keyword/?q=' + input
+        + (!!this.state.category ? "&category=" + this.state.category : ''))
     .then(response => response.json())
     .then(json => {
       console.log(json);

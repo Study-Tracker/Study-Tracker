@@ -22,6 +22,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSignInAlt} from "@fortawesome/free-solid-svg-icons";
 import {StudyTeam} from "./studyMetadata";
 
+const createMarkup = (content) => {
+  return {__html: content};
+};
+
 const StudySummaryCard = ({study}) => {
   return (
       <Media className="assay-card">
@@ -47,7 +51,7 @@ const StudySummaryCard = ({study}) => {
 
             <Col xs={12}>
               <h6 className="details-label">Description</h6>
-              <p>{study.description}</p>
+              <div dangerouslySetInnerHTML={createMarkup(study.description)}/>
             </Col>
 
           </Row>

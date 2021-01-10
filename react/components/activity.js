@@ -127,8 +127,8 @@ const ActivityMessage = ({activity}) => {
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has created a new study:
             </p>
             <div className="bg-light text-secondary p-3">
@@ -150,8 +150,8 @@ const ActivityMessage = ({activity}) => {
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has made an edit to a study:
             </p>
             <div className="bg-light text-secondary p-3">
@@ -171,8 +171,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.DELETED_STUDY.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed study: {activity.data.study.code}
           </p>
       );
@@ -180,8 +180,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.STUDY_STATUS_CHANGED.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has updated the status of study&nbsp;
             <a href={"/study/"
             + activity.data.study.code}>{activity.data.study.code}</a>
@@ -197,15 +197,15 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
 
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has created a new assay:
             </p>
 
             <div className="bg-light text-secondary p-3">
 
               <h5>
-                <a href={"/study/" + activity.data.study + "/assay/"
+                <a href={"/study/" + activity.data.assay.study + "/assay/"
                 + activity.data.assay.code}>
                   {activity.data.assay.code}
                 </a>
@@ -229,15 +229,15 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
 
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has made an edit to an assay:
             </p>
 
             <div className="bg-light text-secondary p-3">
 
               <h5>
-                <a href={"/study/" + activity.data.study + "/assay/"
+                <a href={"/study/" + activity.data.assay.study + "/assay/"
                 + activity.data.assay.code}>
                   {activity.data.assay.code}
                 </a>
@@ -259,8 +259,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.DELETED_ASSAY.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed assay: {activity.data.assay.code}
           </p>
       );
@@ -268,8 +268,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.ASSAY_STATUS_CHANGED.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has updated the status of assay&nbsp;
             <a href={"/study/" + activity.data.study + "/assay/"
             + activity.data.assay.code}>{activity.data.assay.code}</a>
@@ -285,8 +285,8 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
 
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has created a new assay:
             </p>
 
@@ -311,8 +311,8 @@ const ActivityMessage = ({activity}) => {
           <React.Fragment>
 
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has made an edit to a program:
             </p>
 
@@ -335,40 +335,66 @@ const ActivityMessage = ({activity}) => {
     case studyActions.DELETED_PROGRAM.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed program: {activity.data.assay.code}
           </p>
       );
 
     case studyActions.FILE_UPLOADED.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
-              &nbsp;has attached a new file to study:&nbsp;
-              <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
-            </p>
-            <div className="bg-light text-secondary p-3">
-              <h3>
-                <a href={activity.data.file.url} target="_blank">
-                  <File size={24}/>
-                  &nbsp;
-                  {activity.data.file.name}
+      if (activity.reference === "ASSAY") {
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has attached a new file to assay:&nbsp;
+                <a href={"/study/"
+                + activity.data.assay.study}>{activity.data.assay.study
+                + "/assay/" + activity.data.assay.code}
                 </a>
-              </h3>
-            </div>
-          </React.Fragment>
+              </p>
+              <div className="bg-light text-secondary p-3">
+                <h3>
+                  <a href={activity.data.file.url} target="_blank">
+                    <File size={24}/>
+                    &nbsp;
+                    {activity.data.file.name}
+                  </a>
+                </h3>
+              </div>
+            </React.Fragment>
 
-      );
+        );
+      } else {
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has attached a new file to study:&nbsp;
+                <a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a>
+              </p>
+              <div className="bg-light text-secondary p-3">
+                <h3>
+                  <a href={activity.data.file.url} target="_blank">
+                    <File size={24}/>
+                    &nbsp;
+                    {activity.data.file.name}
+                  </a>
+                </h3>
+              </div>
+            </React.Fragment>
+
+        );
+      }
     case studyActions.NEW_STUDY_CONCLUSIONS.value:
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has added new conclusions for study:&nbsp;
               <a href={"/study/"
               + activity.data.study.code}>{activity.data.study.code}</a>
@@ -382,8 +408,8 @@ const ActivityMessage = ({activity}) => {
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has updated the conclusions for study:&nbsp;
               <a href={"/study/"
               + activity.data.study.code}>{activity.data.study.code}</a>
@@ -397,8 +423,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.DELETED_STUDY_CONCLUSIONS.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed the conclusions for study:&nbsp;
             <a href={"/study/"
             + activity.data.study.code}>{activity.data.study.code}</a>
@@ -408,8 +434,8 @@ const ActivityMessage = ({activity}) => {
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has posted a new comment to study&nbsp;
               <a href={"/study/"
               + activity.data.study.code}>{activity.data.study.code}</a>:
@@ -424,8 +450,8 @@ const ActivityMessage = ({activity}) => {
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has edited their comment to study:&nbsp;
               <a href={"/study/"
               + activity.data.study.code}>{activity.data.study.code}</a>
@@ -438,8 +464,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.DELETED_COMMENT.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed their comment to study:&nbsp;
             <a href={"/study/"
             + activity.data.study.code}>{activity.data.study.code}</a>
@@ -448,8 +474,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.NEW_STUDY_RELATIONSHIP.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has added a new study relationship:&nbsp;
             <a href={"/study/"
             + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
@@ -461,8 +487,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.UPDATED_STUDY_RELATIONSHIP.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has added a new study relationship:&nbsp;
             <a href={"/study/"
             + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
@@ -474,8 +500,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.DELETED_STUDY_RELATIONSHIP.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed a study relationship for study:&nbsp;
             <a href={"/study/"
             + activity.data.study.code}>{activity.data.study.code}</a>
@@ -485,8 +511,8 @@ const ActivityMessage = ({activity}) => {
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has added a new external link for study:&nbsp;
               <a href={"/study/"
               + activity.data.study.code}>{activity.data.study.code}</a>
@@ -503,8 +529,8 @@ const ActivityMessage = ({activity}) => {
       return (
           <React.Fragment>
             <p>
-              <a href={"/users/"
-              + activity.user.accountName}>{activity.user.displayName}</a>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has edited an external link for study:&nbsp;
               <a href={"/study/"
               + activity.data.study.code}>{activity.data.study.code}</a>
@@ -520,8 +546,8 @@ const ActivityMessage = ({activity}) => {
     case studyActions.DELETED_STUDY_EXTERNAL_LINK.value:
       return (
           <p>
-            <a href={"/users/"
-            + activity.user.accountName}>{activity.user.displayName}</a>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed an external link for study:&nbsp;
             <a href={"/study/"
             + activity.data.study.code}>{activity.data.study.code}</a>
