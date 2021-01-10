@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.service;
 
 import com.decibeltx.studytracker.core.model.Program;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,5 +30,22 @@ public interface ProgramService {
   List<Program> findAll();
 
   List<Program> findByCode(String code);
+
+  void create(Program program);
+
+  void update(Program program);
+
+  void delete(Program program);
+
+  /**
+   * Counting number of programs created before/after/between given dates.
+   */
+  long count();
+
+  long countFromDate(Date startDate);
+
+  long countBeforeDate(Date endDate);
+
+  long countBetweenDates(Date startDate, Date endDate);
 
 }

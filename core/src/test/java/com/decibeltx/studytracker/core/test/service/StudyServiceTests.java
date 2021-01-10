@@ -27,8 +27,10 @@ import com.decibeltx.studytracker.core.repository.CollaboratorRepository;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
+import com.decibeltx.studytracker.core.service.NamingService;
 import com.decibeltx.studytracker.core.service.StudyService;
 import com.decibeltx.studytracker.core.test.TestConfiguration;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -65,6 +67,9 @@ public class StudyServiceTests {
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
 
+  @Autowired
+  private NamingService namingService;
+
   private static final int STUDY_COUNT = 6;
 
   @Before
@@ -78,6 +83,12 @@ public class StudyServiceTests {
     Assert.assertNotNull(studies);
     Assert.assertTrue(!studies.isEmpty());
     Assert.assertEquals(STUDY_COUNT, studies.size());
+  }
+
+  @Test
+  public void findByCode() throws Exception {
+    Study study = studyService.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals("PPB-10001", study.getCode());
   }
 
   @Test
@@ -111,7 +122,7 @@ public class StudyServiceTests {
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();
-    Optional<User> optionalUser = userRepository.findByAccountName("jsmith");
+    Optional<User> optionalUser = userRepository.findByUsername("jsmith");
     Assert.assertTrue(optionalUser.isPresent());
     User user = optionalUser.get();
     Study study = new Study();
@@ -161,7 +172,7 @@ public class StudyServiceTests {
         .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setProgram(program);
-    String code = studyService.generateStudyCode(study);
+    String code = namingService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("CPA-10003", code);
 
@@ -169,7 +180,7 @@ public class StudyServiceTests {
         .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
-    code = studyService.generateStudyCode(study);
+    code = namingService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("PPB-10002", code);
 
@@ -177,7 +188,7 @@ public class StudyServiceTests {
         .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
-    code = studyService.generateStudyCode(study);
+    code = namingService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("TID-10003", code);
 
@@ -185,14 +196,14 @@ public class StudyServiceTests {
         .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
-    code = studyService.generateStudyCode(study);
+    code = namingService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("CPC-10001", code);
 
     Exception exception = null;
     study = new Study();
     try {
-      code = studyService.generateStudyCode(study);
+      code = namingService.generateStudyCode(study);
     } catch (Exception e) {
       exception = e;
     }
@@ -206,7 +217,7 @@ public class StudyServiceTests {
         .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setCollaborator(collaborator);
-    String code = studyService.generateExternalStudyCode(study);
+    String code = namingService.generateExternalStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("IN-00001", code);
 
@@ -214,7 +225,7 @@ public class StudyServiceTests {
         .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setCollaborator(collaborator);
-    code = studyService.generateExternalStudyCode(study);
+    code = namingService.generateExternalStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("US-00002", code);
   }
@@ -237,5 +248,19 @@ public class StudyServiceTests {
     Assert.assertEquals(Status.COMPLETE, updated.getStatus());
   }
 
+  @Test
+  public void studyCountTest() {
+
+    Date now = new Date();
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.MONTH, -1);
+    Date monthAgo = calendar.getTime();
+
+    Assert.assertEquals(STUDY_COUNT, studyService.count());
+    Assert.assertEquals(0, studyService.countBeforeDate(monthAgo));
+    Assert.assertEquals(STUDY_COUNT, studyService.countFromDate(monthAgo));
+    Assert.assertEquals(STUDY_COUNT, studyService.countBetweenDates(monthAgo, now));
+
+  }
 
 }

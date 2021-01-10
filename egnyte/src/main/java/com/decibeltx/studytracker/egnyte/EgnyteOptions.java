@@ -30,6 +30,10 @@ public class EgnyteOptions {
   private Integer qps = 1;
   private Integer sleep;
 
+  private Integer maxReadDepth = 2;
+
+  private boolean useExisting = false;
+
 
   @PostConstruct
   void init() {

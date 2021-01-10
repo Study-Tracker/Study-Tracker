@@ -47,6 +47,9 @@ public class LocalStudyStorageServiceConfiguration {
     if (env.containsProperty("storage.use-existing")) {
       service.setUseExisting(env.getRequiredProperty("storage.use-existing", Boolean.class));
     }
+    if (env.containsProperty("storage.max-folder-read-depth")) {
+      service.setMaxDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
+    }
     return service;
   }
 

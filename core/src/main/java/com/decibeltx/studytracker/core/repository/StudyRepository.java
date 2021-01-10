@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.repository;
 
 import com.decibeltx.studytracker.core.model.Study;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -48,5 +49,11 @@ public interface StudyRepository extends MongoRepository<Study, String> {
 
   @Query("{ $or: [{ name: { '$regex': ?0, '$options': 'i'  }}, { code: { '$regex': ?0, '$options': 'i'  }} ] }")
   List<Study> findByNameOrCodeLike(String keyword);
+
+  long countByCreatedAtBefore(Date date);
+
+  long countByCreatedAtAfter(Date date);
+
+  long countByCreatedAtBetween(Date startDate, Date endDate);
 
 }

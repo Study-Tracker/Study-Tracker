@@ -19,12 +19,13 @@ package com.decibeltx.studytracker.core.model;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "collaborators")
 @Data
-public class Collaborator {
+public class Collaborator implements Persistable<String> {
 
   @Id
   private String id;
@@ -47,4 +48,8 @@ public class Collaborator {
 
   private boolean active = true;
 
+  @Override
+  public boolean isNew() {
+    return id == null;
+  }
 }

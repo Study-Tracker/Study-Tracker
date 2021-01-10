@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Row} from "reactstrap";
+import {Button, Col, Row} from "reactstrap";
 import {history} from "../../App";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
@@ -25,23 +25,22 @@ const StudyAssaysTab = ({study, user}) => {
 
   return (
       <div>
-        <Row className="justify-content-between align-items-center">
-          <div className="col-6">
-            <h4>Study Assays</h4>
-          </div>
-          <div className="col-auto">
+        <Row className="justify-content-between align-items-center mb-4">
+          <Col>
             {
               !!user
                   ? (
-                      <Button color="info" onClick={() => history.push(
-                          "/study/" + study.id + "/assays/new")}>
-                        New Assay
-                        &nbsp;
-                        <FontAwesomeIcon icon={faPlusCircle}/>
-                      </Button>
+                      <span className="float-right">
+                        <Button color="info" onClick={() => history.push(
+                            "/study/" + study.code + "/assays/new")}>
+                          New Assay
+                          &nbsp;
+                          <FontAwesomeIcon icon={faPlusCircle}/>
+                        </Button>
+                      </span>
                   ) : ''
             }
-          </div>
+          </Col>
         </Row>
 
         <AssaySummaryCards studyCode={study.code}/>

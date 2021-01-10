@@ -24,14 +24,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
 @Configuration
@@ -49,13 +50,33 @@ public class WebSecurityConfiguration {
     return new UserServiceAuditor();
   }
 
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+//  @Configuration
+//  @Order(1)
+//  @ConditionalOnProperty(name = "security.mode", havingValue = "demo")
+//  public static class DemoSecurityConfiguration {
+//
+//    @Bean
+//    public UserRepositoryPopulator exampleUserRepositoryPopulator() {
+//      return new ExampleUserRepositoryPopulator();
+//    }
+//
+//  }
+
   @Configuration
-  @Order(1)
+  @Order(2)
   public static class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
-    private AuthenticationProvider authenticationProvider;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Bean
     public AuthenticationEntryPoint apiAuthenticationEntryPoint() {
@@ -65,10 +86,16 @@ public class WebSecurityConfiguration {
     }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+      auth
+          .userDetailsService(userDetailsService)
+          .passwordEncoder(passwordEncoder);
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
       http
           .antMatcher("/api/**")
-          .authenticationProvider(authenticationProvider)
           .authorizeRequests()
           .antMatchers(HttpMethod.POST).fullyAuthenticated()
           .antMatchers(HttpMethod.PUT).fullyAuthenticated()
@@ -81,7 +108,6 @@ public class WebSecurityConfiguration {
           .cors()
           .and()
           .exceptionHandling()
-          .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
           .and()
           .headers()
           .frameOptions().disable()
@@ -94,30 +120,45 @@ public class WebSecurityConfiguration {
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Configuration
-  @Order(2)
+  @Order(3)
   public static class WebAppSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Autowired
-    private AuthenticationProvider authenticationProvider;
+    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
+//    @Autowired
+//    private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+      auth
+          .userDetailsService(userDetailsService)
+          .passwordEncoder(passwordEncoder);
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
       http
-          .authenticationProvider(authenticationProvider)
           .authorizeRequests()
           .antMatchers("/studies/new", "/study/*/assays/new", "study/*/edit",
-              "study/*/assays/*/edit")
+              "study/*/assays/*/edit", "/programs/new", "/users/new", "/admin",
+              "/assaytypes/new", "/assaytypes/*/edit")
           .fullyAuthenticated()
-          .antMatchers("/", "/study/**", "/studies")
+          .antMatchers("/", "/study/**", "/studies", "/assays", "/assay/**", "/assaytypes",
+              "/assaytype/**")
           .permitAll()
-          .anyRequest().permitAll()
+          .anyRequest()
+          .permitAll()
           .and()
           .formLogin()
-          .successHandler(userAuthenticationSuccessHandler)
+          .loginPage("/login")
+          //.loginProcessingUrl("/authenticate")
+          //.failureUrl("/login?error=true")
+          //.successHandler(userAuthenticationSuccessHandler)
           .defaultSuccessUrl("/")
           .permitAll()
           .and()

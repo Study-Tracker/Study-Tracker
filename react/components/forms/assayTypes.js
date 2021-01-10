@@ -17,15 +17,23 @@
 import React from "react";
 import {FormFeedback, FormGroup, Label} from "reactstrap";
 import Select from "react-select";
-import {assayTypes} from "../../config/assayTypeConstants";
 
-export const AssayTypeDropdown = ({selectedType, onChange, isValid}) => {
+export const AssayTypeDropdown = ({assayTypes, selectedType, onChange, isValid}) => {
 
-  const options = Object.values(assayTypes)
+  const options = assayTypes
+  .sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    } else if (a.name < b.name) {
+      return -1;
+    } else {
+      return 0;
+    }
+  })
   .map(type => {
     return {
-      value: type.value,
-      label: type.label
+      value: type.id,
+      label: type.name
     };
   });
 
@@ -42,7 +50,12 @@ export const AssayTypeDropdown = ({selectedType, onChange, isValid}) => {
             options={options}
             onChange={(selected) => {
               console.log(selected);
-              onChange({"assayType": selected.value});
+              const assayType = assayTypes.filter(
+                  t => t.id === selected.value)[0];
+              onChange({
+                "assayType": assayType,
+                "tasks": assayType.tasks
+              });
             }}
         />
         <FormFeedback>Select the assay type that best corresponds to the

@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.egnyte.entity;
 
-import com.decibeltx.studytracker.core.storage.StorageFolder;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URL;
@@ -29,7 +28,7 @@ import org.springframework.data.annotation.Transient;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class EgnyteFolder implements EgnyteObject, StorageFolder {
+public class EgnyteFolder implements EgnyteObject {
 
   @JsonProperty("name")
   private String name;
@@ -70,7 +69,6 @@ public class EgnyteFolder implements EgnyteObject, StorageFolder {
   @JsonProperty("allow_links")
   private Boolean allowLinks;
 
-  @JsonProperty("folders")
   @Transient
   private List<EgnyteFolder> subFolders = new ArrayList<>();
 
@@ -88,12 +86,10 @@ public class EgnyteFolder implements EgnyteObject, StorageFolder {
     this.name = name;
   }
 
-  @Override
   public String getPath() {
     return path;
   }
 
-  @Override
   public void setPath(String path) {
     this.path = path;
   }
@@ -187,17 +183,17 @@ public class EgnyteFolder implements EgnyteObject, StorageFolder {
     this.allowLinks = allowLinks;
   }
 
-  @Override
+  @JsonProperty("subFolders")
   public List<EgnyteFolder> getSubFolders() {
     return subFolders;
   }
 
+  @JsonProperty("folders")
   public void setSubFolders(
       List<EgnyteFolder> subFolders) {
     this.subFolders = subFolders;
   }
 
-  @Override
   public List<EgnyteFile> getFiles() {
     return files;
   }
@@ -207,22 +203,18 @@ public class EgnyteFolder implements EgnyteObject, StorageFolder {
     this.files = files;
   }
 
-  @Override
   public String getUrl() {
     return url;
   }
 
-  @Override
   public void setUrl(String url) {
     this.url = url;
   }
 
-  @Override
   public void setUrl(URL url) {
     this.url = url.toString();
   }
 
-  @Override
   public void setPath(Path path) {
     this.path = path.toString();
   }

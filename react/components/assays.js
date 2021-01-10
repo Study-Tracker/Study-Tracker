@@ -23,7 +23,10 @@ import {history} from '../App';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSignInAlt} from "@fortawesome/free-solid-svg-icons";
 import {StudyTeam} from "./studyMetadata";
-import {assayTypes} from "../config/assayTypeConstants";
+
+const createMarkup = (content) => {
+  return {__html: content};
+};
 
 const AssaySummaryCard = ({studyCode, assay}) => {
   return (
@@ -38,12 +41,16 @@ const AssaySummaryCard = ({studyCode, assay}) => {
 
               <span className="float-right">
                 <h5>
-                  {assayTypes[assay.assayType].label}
+                  {assay.assayType.name}
                 </h5>
               </span>
 
-              <h6>Assay {assay.code}</h6>
-              <h4>{assay.name}</h4>
+              <h6>{assay.code}</h6>
+              <h4>
+                <a href={"/study/" + studyCode + "/assay/" + assay.code}>
+                  {assay.name}
+                </a>
+              </h4>
 
             </Col>
           </Row>
@@ -52,7 +59,7 @@ const AssaySummaryCard = ({studyCode, assay}) => {
 
             <Col xs={12}>
               <h6 className="details-label">Description</h6>
-              <p>{assay.description}</p>
+              <div dangerouslySetInnerHTML={createMarkup(assay.description)}/>
             </Col>
 
           </Row>
@@ -134,7 +141,6 @@ export class AssaySummaryCards extends React.Component {
         assays: assays,
         isLoaded: true
       });
-      console.log(assays);
     })
     .catch(error => {
       this.setState({
@@ -152,7 +158,6 @@ export class AssaySummaryCards extends React.Component {
     } else if (this.state.isLoaded) {
       content = [];
       if (this.state.assays.length === 0) {
-        content.push(<hr key={"assay-border"}/>);
         content.push(
             <Row className="text-center" key={"no-assay-message"}>
               <Col>
@@ -162,8 +167,11 @@ export class AssaySummaryCards extends React.Component {
             </Row>
         );
       } else {
-        this.state.assays.forEach(assay => {
-          content.push(<hr key={"assay-border-" + assay.id}/>);
+        for (let i = 0; i < this.state.assays.length; i++) {
+          let assay = this.state.assays[i];
+          if (i > 0) {
+            content.push(<hr key={"assay-border-" + assay.id}/>);
+          }
           content.push(
               <AssaySummaryCard
                   key={"assay-card-" + assay.id}
@@ -171,7 +179,7 @@ export class AssaySummaryCards extends React.Component {
                   assay={assay}
               />
           );
-        });
+        }
       }
     }
 

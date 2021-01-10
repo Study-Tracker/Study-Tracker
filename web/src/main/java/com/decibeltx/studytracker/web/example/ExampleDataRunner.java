@@ -17,25 +17,23 @@
 package com.decibeltx.studytracker.web.example;
 
 import com.decibeltx.studytracker.core.example.ExampleDataGenerator;
-import com.decibeltx.studytracker.ldap.LdapUserRepositoryPopulator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
 @Profile("example")
-public class ExampleDataRunner implements CommandLineRunner {
+@Order(1)
+public class ExampleDataRunner implements ApplicationRunner {
 
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private LdapUserRepositoryPopulator userRepositoryPopulator;
-
   @Override
-  public void run(String... args) throws Exception {
+  public void run(ApplicationArguments args) throws Exception {
     exampleDataGenerator.populateDatabase();
-    userRepositoryPopulator.updateUserRepository();
   }
 }

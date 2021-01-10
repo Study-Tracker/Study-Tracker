@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.repository;
 
 import com.decibeltx.studytracker.core.model.User;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -26,9 +27,17 @@ public interface UserRepository extends MongoRepository<User, String> {
 
   Optional<User> findByEmail(String email);
 
-  Optional<User> findByAccountName(String accountName);
+  Optional<User> findByUsername(String username);
 
   @Query("{ displayName: { '$regex': ?0, '$options': 'i'  }}")
   List<User> findByDisplayNameLike(String keyword);
+
+  long countByCreatedAtBefore(Date date);
+
+  long countByCreatedAtAfter(Date date);
+
+  long countByCreatedAtBetween(Date startDate, Date endDate);
+
+  long countByActive(boolean active);
 
 }

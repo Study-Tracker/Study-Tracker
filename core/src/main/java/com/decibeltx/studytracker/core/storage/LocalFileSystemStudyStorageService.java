@@ -20,6 +20,7 @@ import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.service.NamingService;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageDuplicateException;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageException;
 import com.decibeltx.studytracker.core.storage.exception.StudyStorageNotFoundException;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
@@ -41,9 +43,17 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
       .getLogger(LocalFileSystemStudyStorageService.class);
 
   private final Path rootPath;
+
   private final Path rootUrl = Paths.get("/static");
+
   private boolean overwriteExisting = false;
+
   private boolean useExisting = false;
+
+  private int maxDepth = 2;
+
+  @Autowired
+  private NamingService namingService;
 
   public LocalFileSystemStudyStorageService(Path rootPath) {
     this.rootPath = rootPath;
@@ -72,7 +82,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
       return Files.walk(path, 1)
           .filter(Files::isRegularFile)
           .map(f -> {
-            BasicStorageFile file = new BasicStorageFile();
+            StorageFile file = new StorageFile();
             file.setPath(f);
             file.setName(f.getFileName().toString());
             file.setUrl(getObjectUrl(f));
@@ -90,15 +100,20 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
    * @param path
    * @return
    */
-  private List<StorageFolder> getSubfolders(Path path) {
+  private List<StorageFolder> getSubfolders(Path path, int depth) {
     try {
       return Files.walk(path, 1)
           .filter(Files::isDirectory)
+          .filter(p -> !p.toString().equals(path.toString()))
           .map(d -> {
-            BasicStorageFolder folder = new BasicStorageFolder();
+            StorageFolder folder = new StorageFolder();
             folder.setName(d.toFile().getName());
             folder.setPath(d);
             folder.setUrl(getObjectUrl(d));
+            if (depth < maxDepth) {
+              folder.setFiles(this.getFolderFiles(d));
+              folder.setSubFolders(this.getSubfolders(d, depth + 1));
+            }
             return folder;
           })
           .collect(Collectors.toList());
@@ -109,17 +124,17 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   @Override
   public StorageFolder getProgramFolder(Program program) throws StudyStorageNotFoundException {
-    Path path = rootPath.resolve(StorageUtils.getProgramFolderName(program));
+    Path path = rootPath.resolve(namingService.getProgramStorageFolderName(program));
     File file = path.toFile();
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(program.getName());
     }
-    BasicStorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setPath(path);
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(path));
     folder.setFiles(getFolderFiles(path));
-    folder.setSubFolders(getSubfolders(path));
+    folder.setSubFolders(getSubfolders(path, 0));
     return folder;
   }
 
@@ -128,18 +143,18 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     LOGGER.info("Fetching storage folder instance for study: " + study.getCode());
     StorageFolder programFolder = this.getProgramFolder(study.getProgram());
     Path programPath = Paths.get(programFolder.getPath());
-    Path studyFolder = programPath.resolve(StorageUtils.getStudyFolderName(study));
+    Path studyFolder = programPath.resolve(namingService.getStudyStorageFolderName(study));
     LOGGER.debug(studyFolder.toString());
     File file = studyFolder.toFile();
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(study.getCode());
     }
-    BasicStorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setPath(studyFolder);
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(studyFolder));
     folder.setFiles(getFolderFiles(studyFolder));
-    folder.setSubFolders(getSubfolders(studyFolder));
+    folder.setSubFolders(getSubfolders(studyFolder, 0));
     return folder;
   }
 
@@ -148,24 +163,24 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     LOGGER.info("Fetching storage folder instance for assay: " + assay.getCode());
     StorageFolder studyFolder = this.getStudyFolder(assay.getStudy());
     Path studyPath = Paths.get(studyFolder.getPath());
-    Path assayFolder = studyPath.resolve(StorageUtils.getAssayFolderName(assay));
+    Path assayFolder = studyPath.resolve(namingService.getAssayStorageFolderName(assay));
     File file = assayFolder.toFile();
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(assay.getCode());
     }
-    BasicStorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setPath(assayFolder);
     folder.setName(file.getName());
     folder.setUrl(getObjectUrl(assayFolder));
     folder.setFiles(getFolderFiles(assayFolder));
-    folder.setSubFolders(getSubfolders(assayFolder));
+    folder.setSubFolders(getSubfolders(assayFolder, 0));
     return folder;
   }
 
   @Override
   public StorageFolder createProgramFolder(Program program) throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for program: " + program.getName());
-    String folderName = StorageUtils.getProgramFolderName(program);
+    String folderName = namingService.getProgramStorageFolderName(program);
     Path programPath = rootPath.resolve(folderName);
     File newFolder = programPath.toFile();
     if (newFolder.exists()) {
@@ -189,7 +204,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
             "Failed to create program folder: " + newFolder.getAbsolutePath());
       }
     }
-    StorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setName(newFolder.getName());
     folder.setPath(programPath);
     folder.setUrl(getObjectUrl(programPath));
@@ -201,7 +216,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     LOGGER.info("Creating storage folder instance for study: " + study.getCode());
     StorageFolder programFolder = this.getProgramFolder(study.getProgram());
     Path programPath = Paths.get(programFolder.getPath());
-    Path studyPath = programPath.resolve(StorageUtils.getStudyFolderName(study));
+    Path studyPath = programPath.resolve(namingService.getStudyStorageFolderName(study));
     File newFolder = studyPath.toFile();
     if (newFolder.exists()) {
       if (useExisting) {
@@ -224,7 +239,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
             "Failed to create study folder: " + newFolder.getAbsolutePath());
       }
     }
-    StorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setName(newFolder.getName());
     folder.setPath(studyPath);
     folder.setUrl(getObjectUrl(studyPath));
@@ -237,7 +252,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     LOGGER.info("Creating storage folder instance for assay: " + assay.getCode());
     StorageFolder studyFolder = this.getStudyFolder(assay.getStudy());
     Path studyPath = Paths.get(studyFolder.getPath());
-    Path assayPath = studyPath.resolve(StorageUtils.getAssayFolderName(assay));
+    Path assayPath = studyPath.resolve(namingService.getAssayStorageFolderName(assay));
     File newFolder = assayPath.toFile();
     if (newFolder.exists()) {
       if (useExisting) {
@@ -260,7 +275,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
             "Failed to create assay folder: " + newFolder.getAbsolutePath());
       }
     }
-    StorageFolder folder = new BasicStorageFolder();
+    StorageFolder folder = new StorageFolder();
     folder.setName(newFolder.getName());
     folder.setPath(assayPath);
     folder.setUrl(getObjectUrl(assayPath));
@@ -281,9 +296,10 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     } catch (Exception e) {
       throw new StudyTrackerException(e);
     }
-    StorageFile studyFile = new BasicStorageFile();
+    StorageFile studyFile = new StorageFile();
     studyFile.setPath(newFilePath);
     studyFile.setUrl(getObjectUrl(newFilePath));
+    studyFile.setName(newFile.getName());
     return studyFile;
   }
 
@@ -300,9 +316,10 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     } catch (Exception e) {
       throw new StudyTrackerException(e);
     }
-    StorageFile assayFile = new BasicStorageFile();
+    StorageFile assayFile = new StorageFile();
     assayFile.setPath(newFilePath);
     assayFile.setUrl(getObjectUrl(newFilePath));
+    assayFile.setName(newFile.getName());
     return assayFile;
   }
 
@@ -312,5 +329,9 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   public void setUseExisting(boolean useExisting) {
     this.useExisting = useExisting;
+  }
+
+  public void setMaxDepth(int maxDepth) {
+    this.maxDepth = maxDepth;
   }
 }

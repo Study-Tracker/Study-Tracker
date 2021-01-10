@@ -65,7 +65,8 @@ export default class StudyForm extends React.Component {
         }],
         owner: this.props.user,
         createdBy: this.props.user,
-        lastModifiedBy: this.props.user
+        lastModifiedBy: this.props.user,
+        notebookFolder: {}
       },
       validation: {
         nameIsValid: true,
@@ -335,6 +336,7 @@ export default class StudyForm extends React.Component {
                             onChange={this.handleFormUpdate}
                             isValid={this.state.validation.programIsValid}
                             disabled={!!this.state.study.id}
+                            isLegacyStudy={!!this.state.study.legacy}
                         />
                       </Col>
 
@@ -361,10 +363,6 @@ export default class StudyForm extends React.Component {
                           <FormFeedback>
                             Description must not be empty.
                           </FormFeedback>
-                          <FormText>
-                            Provide a brief description or rationale for your
-                            study.
-                          </FormText>
                         </FormGroup>
                       </Col>
                       <Col md="5">
@@ -475,9 +473,14 @@ export default class StudyForm extends React.Component {
                               <Label>Notebook URL</Label>
                               <Input
                                   type="text"
-                                  defaultValue={this.state.study.elnUrl || ''}
+                                  defaultValue={this.state.study.notebookFolder.url
+                                  || ''}
                                   onChange={(e) => this.handleFormUpdate(
-                                      {"elnUrl": e.target.value})}
+                                      {
+                                        "notebookFolder": {
+                                          url: e.target.value
+                                        }
+                                      })}
                               />
                               <FormText>If the study already has an ELN entry,
                                 provide the URL here.</FormText>
@@ -555,6 +558,7 @@ export default class StudyForm extends React.Component {
                       <Col md={12}>
                         <KeywordInputs
                             keywords={this.state.study.keywords || []}
+                            keywordCategories={this.props.keywordCategories}
                             onChange={this.handleFormUpdate}
                         />
                       </Col>

@@ -17,17 +17,22 @@
 package com.decibeltx.studytracker.web.controller.api;
 
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.core.exception.StudyTrackerException;
 import com.decibeltx.studytracker.core.model.Assay;
+import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.User;
+import com.decibeltx.studytracker.web.controller.UserAuthenticationUtils;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,63 +44,82 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/study/{studyId}/assays")
 @RestController
-public class StudyAssayController extends StudyController {
+public class StudyAssayController extends AbstractAssayController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyAssayController.class);
 
   @GetMapping("")
-  public List<Assay> getStudyAssays(@PathVariable("studyId") String studyId) {
-    return getStudyFromIdentifier(studyId).getAssays();
+  public List<Assay> findStudyAssays(@PathVariable("studyId") String studyId) {
+    return getStudyFromIdentifier(studyId).getAssays().stream()
+        .filter(Assay::isActive)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("/{assayId}")
-  public Assay getAssay(@PathVariable("assayId") String assayId) throws RecordNotFoundException {
+  public Assay findById(@PathVariable("assayId") String assayId) throws RecordNotFoundException {
     return getAssayFromIdentifier(assayId);
   }
 
   @PostMapping("")
-  public HttpEntity<Assay> createAssay(@PathVariable("studyId") String studyId,
+  public HttpEntity<Assay> create(@PathVariable("studyId") String studyId,
       @RequestBody Assay assay) {
     LOGGER.info("Creating assay");
     LOGGER.info(assay.toString());
-    Study study = getStudyService().findByCode(studyId).orElseThrow(RecordNotFoundException::new);
-    assay.setStudy(study);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    Study study = this.getStudyFromIdentifier(studyId);
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
-    assay.setCreatedBy(user);
-    getAssayService().create(assay);
-    study.getAssays().add(assay);
-    getStudyService().update(study);
-    return new ResponseEntity<>(assay, HttpStatus.CREATED);
+    Assay created = this.createAssay(assay, study, user);
+    return new ResponseEntity<>(created, HttpStatus.CREATED);
   }
 
   @PutMapping("/{assayId}")
-  public HttpEntity<Assay> updateAssay(@PathVariable("assayId") String assayId,
+  public HttpEntity<Assay> update(@PathVariable("assayId") String assayId,
       @RequestBody Assay assay) {
     LOGGER.info("Updating assay");
     LOGGER.info(assay.toString());
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
-    assay.setLastModifiedBy(user);
-    getAssayService().update(assay);
+    this.updateAssay(assay, user);
     return new ResponseEntity<>(assay, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{assayId}")
-  public HttpEntity<?> deleteAssay(@PathVariable("assayId") String id) {
+  public HttpEntity<?> delete(@PathVariable("assayId") String id) {
     LOGGER.info("Deleting assay: " + id);
-    Assay assay = getAssayService().findByCode(id).orElseThrow(RecordNotFoundException::new);
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    User user = getUserService().findByAccountName(userDetails.getUsername())
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
-    assay.setLastModifiedBy(user);
-    getAssayService().delete(assay);
+    this.deleteAssay(id, user);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @PostMapping("/{id}/status")
+  public HttpEntity<?> updateStatus(@PathVariable("id") String id,
+      @RequestBody Map<String, Object> params) throws StudyTrackerException {
+
+    if (!params.containsKey("status")) {
+      throw new StudyTrackerException("No status label provided.");
+    }
+
+    // Get authenticated user
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
+    User user = this.getUserService().findByUsername(username)
+        .orElseThrow(RecordNotFoundException::new);
+
+    String label = (String) params.get("status");
+    Status status = Status.valueOf(label);
+    LOGGER.info(String.format("Setting status of assay %s to %s", id, label));
+
+    this.updateAssayStatus(id, status, user);
+
+    return new ResponseEntity<>(HttpStatus.OK);
+
   }
 
 }

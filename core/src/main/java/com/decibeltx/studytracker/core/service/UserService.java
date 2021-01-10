@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.core.service;
 
 import com.decibeltx.studytracker.core.model.User;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public interface UserService {
 
   Optional<User> findByEmail(String email);
 
-  Optional<User> findByAccountName(String accountName);
+  Optional<User> findByUsername(String username);
 
   List<User> search(String keyword);
 
@@ -37,5 +38,18 @@ public interface UserService {
   void update(User user);
 
   void delete(User user);
+
+  /**
+   * Counting number of users created before/after/between given dates.
+   */
+  long count();
+
+  long countFromDate(Date startDate);
+
+  long countBeforeDate(Date endDate);
+
+  long countBetweenDates(Date startDate, Date endDate);
+
+  long countActiveUsers();
 
 }

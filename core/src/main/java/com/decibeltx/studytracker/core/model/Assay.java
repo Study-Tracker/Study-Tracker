@@ -16,9 +16,8 @@
 
 package com.decibeltx.studytracker.core.model;
 
-import com.decibeltx.studytracker.core.notebook.NotebookEntry;
+import com.decibeltx.studytracker.core.eln.NotebookFolder;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -46,12 +45,12 @@ public class Assay implements Persistable<String> {
   @NotNull
   private Status status;
 
-  @NotNull
+  @DBRef
+  @Linked(model = AssayType.class)
   private AssayType assayType;
 
   @Linked(model = Study.class)
-  @DBRef(lazy = true)
-  @JsonIgnore
+  @DBRef
   private Study study;
 
   @NotNull
@@ -83,7 +82,7 @@ public class Assay implements Persistable<String> {
 
   private Date endDate;
 
-  private List<NotebookEntry> notebookEntries = new ArrayList<>();
+  private NotebookFolder notebookFolder;
 
   private StorageFolder storageFolder;
 
@@ -99,11 +98,11 @@ public class Assay implements Persistable<String> {
   @DBRef
   private List<User> users = new ArrayList<>();
 
-  private Map<String, Object> attributes = new LinkedHashMap<>();
+  private Map<String, Object> fields = new LinkedHashMap<>();
+
+  private Map<String, String> attributes = new LinkedHashMap<>();
 
   private List<Task> tasks = new ArrayList<>();
-
-  private AssayDetails assayDetails;
 
   @Override
   public boolean isNew() {

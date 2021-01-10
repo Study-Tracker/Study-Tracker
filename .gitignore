@@ -8,9 +8,10 @@ security.properties
 *.log
 TODO.md
 test.properties
+internal/
 
 # To be removed
 application.properties
-application-local.properties
+application-**.properties
 study_template.pptx
 decibel-*.png

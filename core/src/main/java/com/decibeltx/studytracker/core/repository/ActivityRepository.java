@@ -17,18 +17,35 @@
 package com.decibeltx.studytracker.core.repository;
 
 import com.decibeltx.studytracker.core.model.Activity;
+import com.decibeltx.studytracker.core.model.EventType;
+import java.util.Date;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 public interface ActivityRepository extends MongoRepository<Activity, String> {
 
-  List<Activity> findByAction(String action);
+  List<Activity> findByEventType(EventType eventType);
 
-  @Query("{ 'study.id': ?0 }")
+  @Query("{ 'reference': 'STUDY', 'referenceId': ?0 }")
   List<Activity> findByStudyId(String studyId);
 
-  @Query("{ 'assay.id': ?0 }")
+  @Query("{ 'reference': 'ASSAY', 'referenceId': ?0 }")
   List<Activity> findByAssayId(String assayId);
+
+  @Query("{ 'reference': 'PROGRAM', 'referenceId': ?0 }")
+  List<Activity> findByProgramId(String programId);
+
+  @Query("{ 'user.id': ?0 }")
+  List<Activity> findByUserId(String userId);
+
+  long countByDateAfter(Date date);
+
+  long countByDateBefore(Date date);
+
+  long countByDateBetween(Date startDate, Date endDate);
+
+  @Query("{'reference': 'STUDY', 'eventType': 'STUDY_STATUS_CHANGED', 'data.newStatus': 'COMPLETE', 'date': {'$gte': ?0} }")
+  List<Activity> findCompletedStudiesAfterDate(Date date);
 
 }

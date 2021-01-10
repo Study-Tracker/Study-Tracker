@@ -21,6 +21,7 @@ import com.decibeltx.studytracker.core.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,8 +37,14 @@ public class UserServiceAuditor implements AuditorAware<User> {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.isAuthenticated()
         && !authentication.getPrincipal().toString().equals("anonymousUser")) {
-      UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-      user = userService.findByAccountName(userDetails.getUsername()).orElse(null);
+      String username;
+      if (authentication instanceof UsernamePasswordAuthenticationToken) {
+        username = authentication.getName();
+      } else {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        username = userDetails.getUsername();
+      }
+      user = userService.findByUsername(username).orElse(null);
     }
     return Optional.ofNullable(user);
   }

@@ -16,19 +16,9 @@
 
 package com.decibeltx.studytracker.web.config;
 
-import com.decibeltx.studytracker.core.notebook.NotebookEntry;
-import com.decibeltx.studytracker.core.notebook.SimpleNotebookEntry;
-import com.decibeltx.studytracker.core.storage.BasicStorageFile;
-import com.decibeltx.studytracker.core.storage.BasicStorageFolder;
-import com.decibeltx.studytracker.core.storage.StorageFile;
-import com.decibeltx.studytracker.core.storage.StorageFolder;
-import com.decibeltx.studytracker.egnyte.entity.EgnyteFile;
-import com.decibeltx.studytracker.egnyte.entity.EgnyteFolder;
-import com.decibeltx.studytracker.idbs.eln.entities.IdbsNotebookEntry;
-import com.decibeltx.studytracker.web.FileSystemStorageService;
+import com.decibeltx.studytracker.web.service.FileSystemStorageService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +31,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@ComponentScan(basePackages = {"com.decibeltx.studytracker.web.controller"})
+@ComponentScan(basePackages = {"com.decibeltx.studytracker.web.controller",
+    "com.decibeltx.studytracker.web.exception"})
 @PropertySource("classpath:web.properties")
 public class WebAppConfiguration {
 
@@ -67,20 +58,6 @@ public class WebAppConfiguration {
   @Primary
   public ObjectMapper objectMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new SimpleModule()
-        .addAbstractTypeMapping(StorageFile.class, BasicStorageFile.class));
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(StorageFile.class, EgnyteFile.class)
-    );
-    objectMapper.registerModule(new SimpleModule()
-        .addAbstractTypeMapping(StorageFolder.class, BasicStorageFolder.class));
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(StorageFolder.class, EgnyteFolder.class)
-    );
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(NotebookEntry.class, SimpleNotebookEntry.class));
-    objectMapper.registerModule(
-        new SimpleModule().addAbstractTypeMapping(NotebookEntry.class, IdbsNotebookEntry.class));
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     return objectMapper;
   }

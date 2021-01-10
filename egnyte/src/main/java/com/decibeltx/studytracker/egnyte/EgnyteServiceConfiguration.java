@@ -17,8 +17,8 @@
 package com.decibeltx.studytracker.egnyte;
 
 import com.decibeltx.studytracker.core.config.LocalStudyStorageServiceConfiguration;
+import com.decibeltx.studytracker.core.service.NamingOptions;
 import com.decibeltx.studytracker.egnyte.entity.EgnyteObject;
-import com.decibeltx.studytracker.egnyte.exception.EgnyteExceptionHandler;
 import com.decibeltx.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import com.decibeltx.studytracker.egnyte.rest.EgnyteRestApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +44,24 @@ public class EgnyteServiceConfiguration {
   private Environment env;
 
   @Bean
+  public EgnyteFolderNamingService egnyteFolderNamingService() {
+    NamingOptions namingOptions = new NamingOptions();
+    if (env.containsProperty("study.study-code-counter-start")) {
+      namingOptions.setStudyCodeCounterStart(
+          env.getRequiredProperty("study.study-code-counter-start", Integer.class));
+    }
+    if (env.containsProperty("study.external-code-counter-start")) {
+      namingOptions.setExternalStudyCodeCounterStart(
+          env.getRequiredProperty("study.external-code-counter-start", Integer.class));
+    }
+    if (env.containsProperty("study.assay-code-counter-start")) {
+      namingOptions.setAssayCodeCounterStart(
+          env.getRequiredProperty("study.assay-code-counter-start", Integer.class));
+    }
+    return new EgnyteFolderNamingService(namingOptions);
+  }
+
+  @Bean
   public ObjectMapper egnyteObjectMapper() throws Exception {
     Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
     ObjectMapper objectMapper = new ObjectMapper();
@@ -56,8 +74,7 @@ public class EgnyteServiceConfiguration {
 
   @Bean
   public RestTemplate egnyteRestTemplate() throws Exception {
-    RestTemplate restTemplate = new RestTemplateBuilder()
-        .errorHandler(new EgnyteExceptionHandler(egnyteObjectMapper())).build();
+    RestTemplate restTemplate = new RestTemplateBuilder().build();
     MappingJackson2HttpMessageConverter httpMessageConverter = new MappingJackson2HttpMessageConverter();
     httpMessageConverter.setObjectMapper(egnyteObjectMapper());
     restTemplate.getMessageConverters().add(0, httpMessageConverter);
@@ -77,6 +94,12 @@ public class EgnyteServiceConfiguration {
       options.setQps(env.getRequiredProperty("egnyte.qps", Integer.class));
     } else if (env.containsProperty("egnyte.sleep")) {
       options.setSleep(env.getRequiredProperty("egnyte.sleep", Integer.class));
+    }
+    if (env.containsProperty("storage.max-folder-read-depth")) {
+      options.setMaxReadDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
+    }
+    if (env.containsProperty("storage.use-existing")) {
+      options.setUseExisting(env.getRequiredProperty("storage.use-existing", boolean.class));
     }
     return options;
   }

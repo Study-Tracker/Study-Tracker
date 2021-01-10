@@ -16,16 +16,18 @@
 
 package com.decibeltx.studytracker.core.service.impl;
 
-import com.decibeltx.studytracker.core.events.StudyEvent.Type;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Assay;
+import com.decibeltx.studytracker.core.model.EventType;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
+import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.repository.ActivityRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.service.ActivityService;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,14 +79,20 @@ public class ActivityServiceImpl implements ActivityService {
   public List<Activity> findByProgram(Program program) {
     List<Activity> activities = new ArrayList<>();
     for (Study study : studyRepository.findByProgramId(program.getId())) {
-      activities.addAll(study.getActivity());
+      List<Activity> activityList = activityRepository.findByStudyId(study.getId());
+      activities.addAll(activityList);
     }
     return activities;
   }
 
   @Override
-  public List<Activity> findByType(Type type) {
-    return activityRepository.findByAction(type.toString());
+  public List<Activity> findByEventType(EventType type) {
+    return activityRepository.findByEventType(type);
+  }
+
+  @Override
+  public List<Activity> findByUser(User user) {
+    return activityRepository.findByUserId(user.getId());
   }
 
   @Override
@@ -111,10 +119,33 @@ public class ActivityServiceImpl implements ActivityService {
 
   @Override
   public void deleteStudyActivity(Study study) {
-    study.setActivity(new ArrayList<>());
-    studyRepository.save(study);
     for (Activity activity : this.findByStudy(study)) {
       this.delete(activity);
     }
+  }
+
+  @Override
+  public long count() {
+    return activityRepository.count();
+  }
+
+  @Override
+  public long countFromDate(Date startDate) {
+    return activityRepository.countByDateAfter(startDate);
+  }
+
+  @Override
+  public long countBeforeDate(Date endDate) {
+    return activityRepository.countByDateBefore(endDate);
+  }
+
+  @Override
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return activityRepository.countByDateBetween(startDate, endDate);
+  }
+
+  @Override
+  public long countCompletedStudiesFromDate(Date date) {
+    return activityRepository.findCompletedStudiesAfterDate(date).size();
   }
 }

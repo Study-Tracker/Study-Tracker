@@ -41,3 +41,7 @@ export const SET_FILTERS = "SET_FILTERS";
 // Programs
 export const GET_PROGRAMS = "GET_PROGRAM";
 export const SET_PROGRAMS = "SET_PROGRAMS";
+
+// Assay Types
+export const GET_ASSAY_TYPES = "GET_ASSAY_TYPES";
+export const SET_ASSAY_TYPES = "SET_ASSAY_TYPES";

@@ -15,14 +15,21 @@
  */
 
 import React from "react";
-import {Clipboard, Droplet, GitHub, Layers, Target, Users} from "react-feather";
+import {Activity, Clipboard, Layers, Target, Users} from "react-feather";
+
+const timelineRoutes = {
+  path: "/",
+  name: "Activity",
+  header: "Navigation",
+  icon: Activity,
+  containsHome: true,
+  children: null
+}
 
 const studyRoutes = {
-  path: "/",
+  path: "/studies?title=All Studies",
   name: "Studies",
-  header: "Navigation",
   icon: Clipboard,
-  containsHome: true,
   children: [
     {
       path: "/studies?title=All Studies",
@@ -54,24 +61,24 @@ const assayRoutes = {
   icon: Layers,
   children: [
     {
-      path: "/assays",
+      path: "/assays?title=All Assays",
       name: "All Assays"
     },
     {
-      path: "/assays/my",
+      path: "/assays?myAssay=true&title=My Assays",
       name: "My Assays",
       protected: true
     },
     {
-      path: "/assays/active",
+      path: "/assays?status=IN_PLANNING,ACTIVE&title=Active Assays",
       name: "Active Assays"
     },
     {
-      path: "/assays/legacy",
+      path: "/assays?legacy=true&title=Legacy Assays",
       name: "Legacy Assays"
     },
     {
-      path: "/assays/external",
+      path: "/assays?external=true&title=External Assays",
       name: "External Assays"
     }
   ]
@@ -83,37 +90,23 @@ const programRoutes = {
   icon: Target,
   children: [
     {
-      path: '/programs',
+      path: '/programs?title=All Programs',
       name: 'All Programs'
     },
     {
-      path: '/programs?my=true',
+      path: '/programs?myProgram=true&title=My Programs',
       name: 'My Programs',
       protected: true
     },
     {
-      path: '/programs?active=true',
+      path: '/programs?active=true&title=Active Programs',
       name: 'Active Programs'
     },
     {
-      path: '/programs?legacy=true',
+      path: '/programs?inactive=true&title=Legacy Programs',
       name: 'Legacy Programs'
     }
   ]
-};
-
-const animalRoutes = {
-  path: "/animals",
-  name: "Animals",
-  icon: GitHub,
-  children: null
-};
-
-const sampleRoutes = {
-  path: "/samples",
-  name: "Samples",
-  icon: Droplet,
-  children: null
 };
 
 const userRoutes = {
@@ -124,10 +117,9 @@ const userRoutes = {
 };
 
 export default [
+  timelineRoutes,
   studyRoutes,
   assayRoutes,
   programRoutes,
-  animalRoutes,
-  sampleRoutes,
   userRoutes
 ]
