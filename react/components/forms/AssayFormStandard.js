@@ -189,7 +189,7 @@ export default class AssayForm extends React.Component {
       const isUpdate = !!assay.id;
 
       const url = isUpdate
-          ? "/api/study/" + this.props.study.code + "/assay/"
+          ? "/api/study/" + this.props.study.code + "/assays/"
           + this.state.assay.id
           : "/api/study/" + this.props.study.code + "/assays/";
       this.setState({showLoadingOverlay: true});

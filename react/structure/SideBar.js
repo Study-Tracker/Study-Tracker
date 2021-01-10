@@ -161,7 +161,7 @@ class Sidebar extends React.Component {
           <div className="sidebar-content">
             <PerfectScrollbar>
               <a className="sidebar-brand" href="/">
-                <img className="img-fluid"
+                <img className="img-fluid" alt="Study Tracker"
                      src="/static/images/logo.png"/>
               </a>
 

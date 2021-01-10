@@ -37,7 +37,7 @@ import {
 import React from "react";
 import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faShare, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faEdit, faShare} from "@fortawesome/free-solid-svg-icons";
 import {history} from "../../App";
 import {SelectableUserStatusButton, UserStatusButton} from "./userStatus";
 import UserTimelineTab from "./UserTimelineTab";
@@ -128,28 +128,28 @@ class UserDetails extends React.Component {
                         {
                           !!this.props.user && !!this.props.user.admin ? (
                               <DropdownItem onClick={() => history.push(
-                                  "/user/" + targetUser.id + "/edit")}>
+                                  "/users/" + targetUser.id + "/edit")}>
                                 <FontAwesomeIcon icon={faEdit}/>
                                 &nbsp;
                                 Edit
                               </DropdownItem>
                           ) : ''
                         }
-                        {
-                          !!this.props.user && !!this.props.user.admin ? (
-                              <DropdownItem
-                                  onClick={() => console.log("Delete!")}>
-                                <FontAwesomeIcon icon={faTrash}/>
-                                &nbsp;
-                                Delete
-                              </DropdownItem>
-                          ) : ''
-                        }
+                        {/*{*/}
+                        {/*  !!this.props.user && !!this.props.user.admin ? (*/}
+                        {/*      <DropdownItem*/}
+                        {/*          onClick={() => console.log("Delete!")}>*/}
+                        {/*        <FontAwesomeIcon icon={faTrash}/>*/}
+                        {/*        &nbsp;*/}
+                        {/*        Delete*/}
+                        {/*      </DropdownItem>*/}
+                        {/*  ) : ''*/}
+                        {/*}*/}
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   </div>
                   <CardTitle tag="h5" className="mb-0 text-muted">
-                    User
+                    Summary
                   </CardTitle>
                 </CardHeader>
 
@@ -167,10 +167,10 @@ class UserDetails extends React.Component {
                       </p>
 
                       <h6 className="details-label">Department</h6>
-                      <p>{targetUser.department}</p>
+                      <p>{targetUser.department || 'n/a'}</p>
 
                       <h6 className="details-label">Title</h6>
-                      <p>{targetUser.title}</p>
+                      <p>{targetUser.title || 'n/a'}</p>
 
                     </Col>
                   </Row>

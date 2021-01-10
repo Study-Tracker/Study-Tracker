@@ -78,7 +78,7 @@ public class AssayActivityUtils {
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
     Map<String, Object> data = new HashMap<>();
-    data.put("study", AssayView.from(assay));
+    data.put("assay", AssayView.from(assay));
     data.put("file", StorageFileView.from(storageFile));
     activity.setData(data);
     return activity;
