@@ -24,6 +24,7 @@ public class AssayTypeInitializer {
     LOGGER.info("No assay types defined. Initializing base assay types...");
     AssayType assayType = new AssayType();
     assayType.setName("Generic");
+    assayType.setDescription("Generic assay type");
     assayType.setActive(true);
     assayTypeService.create(assayType);
   }
