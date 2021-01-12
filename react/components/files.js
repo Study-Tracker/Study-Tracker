@@ -133,7 +133,7 @@ const File = ({file}) => {
   )
 }
 
-const FolderContents = ({folder, depth}) => {
+const FolderContents = ({folder, depth, showHeader}) => {
   const subFolders = folder.subFolders
   .sort((a, b) => {
     if (a.name > b.name) {
@@ -167,9 +167,14 @@ const FolderContents = ({folder, depth}) => {
   return items.length
       ? (
           <div>
-            <h4>
-              <a href={folder.url} target="_blank">{folder.path}</a>
-            </h4>
+            {
+              !!showHeader
+                  ? (
+                      <h4>
+                        <a href={folder.url} target="_blank">{folder.path}</a>
+                      </h4>
+                  ) : ''
+            }
             <ul className="list-unstyled"
                 style={{marginLeft: (depth > 0 ? 1 : 0) + "em"}}>
               {items}
@@ -201,7 +206,7 @@ export const StorageFolderFileList = ({folder, isLoaded, isError}) => {
           </div>
       );
     } else {
-      return <FolderContents folder={folder} depth={3}/>
+      return <FolderContents folder={folder} depth={3} showHeader={true}/>
     }
   } else {
     return <CardLoadingMessage/>;
