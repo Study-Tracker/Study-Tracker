@@ -54,19 +54,31 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   private String getProgramFolderPath(Program program) {
-    String root = options.getRootPath();
-    return root + egnyteFolderNamingService.getProgramStorageFolderName(program) + "/";
+    if (program.getStorageFolder() != null && program.getStorageFolder().getPath() != null) {
+      return program.getStorageFolder().getPath();
+    } else {
+      String root = options.getRootPath();
+      return root + egnyteFolderNamingService.getProgramStorageFolderName(program) + "/";
+    }
   }
 
   private String getStudyFolderPath(Study study) {
-    return this.getProgramFolderPath(study.getProgram())
-        + egnyteFolderNamingService.getStudyStorageFolderName(study) + "/";
+    if (study.getStorageFolder() != null && study.getStorageFolder().getPath() != null) {
+      return study.getStorageFolder().getPath();
+    } else {
+      return this.getProgramFolderPath(study.getProgram())
+          + egnyteFolderNamingService.getStudyStorageFolderName(study) + "/";
+    }
   }
 
   private String getAssayFolderPath(Assay assay) {
-    Study study = assay.getStudy();
-    String studyPath = this.getStudyFolderPath(study);
-    return studyPath + egnyteFolderNamingService.getAssayStorageFolderName(assay) + "/";
+    if (assay.getStorageFolder() != null && assay.getStorageFolder().getPath() != null) {
+      return assay.getStorageFolder().getPath();
+    } else {
+      Study study = assay.getStudy();
+      String studyPath = this.getStudyFolderPath(study);
+      return studyPath + egnyteFolderNamingService.getAssayStorageFolderName(assay) + "/";
+    }
   }
 
   private StorageFolder convertEgnyteFolder(EgnyteFolder egnyteFolder) {
