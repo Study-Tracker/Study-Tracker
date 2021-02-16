@@ -7,6 +7,7 @@ import com.decibeltx.studytracker.core.model.Activity.Reference;
 import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.EventType;
 import com.decibeltx.studytracker.core.model.Status;
+import com.decibeltx.studytracker.core.model.Task;
 import com.decibeltx.studytracker.core.model.User;
 import com.decibeltx.studytracker.core.storage.StorageFile;
 import java.util.Date;
@@ -80,6 +81,48 @@ public class AssayActivityUtils {
     Map<String, Object> data = new HashMap<>();
     data.put("assay", AssayView.from(assay));
     data.put("file", StorageFileView.from(storageFile));
+    activity.setData(data);
+    return activity;
+  }
+
+  public static Activity fromTaskAdded(Assay assay, User triggeredBy, Task task) {
+    Activity activity = new Activity();
+    activity.setReference(Reference.ASSAY);
+    activity.setReferenceId(assay.getId());
+    activity.setEventType(EventType.ASSAY_TASK_ADDED);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    Map<String, Object> data = new HashMap<>();
+    data.put("assay", AssayView.from(assay));
+    data.put("task", task);
+    activity.setData(data);
+    return activity;
+  }
+
+  public static Activity fromTaskUpdate(Assay assay, User triggeredBy, Task task) {
+    Activity activity = new Activity();
+    activity.setReference(Reference.ASSAY);
+    activity.setReferenceId(assay.getId());
+    activity.setEventType(EventType.ASSAY_TASK_UPDATED);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    Map<String, Object> data = new HashMap<>();
+    data.put("assay", AssayView.from(assay));
+    data.put("task", task);
+    activity.setData(data);
+    return activity;
+  }
+
+  public static Activity fromTaskDeleted(Assay assay, User triggeredBy, Task task) {
+    Activity activity = new Activity();
+    activity.setReference(Reference.ASSAY);
+    activity.setReferenceId(assay.getId());
+    activity.setEventType(EventType.ASSAY_TASK_DELETED);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    Map<String, Object> data = new HashMap<>();
+    data.put("assay", AssayView.from(assay));
+    data.put("task", task);
     activity.setData(data);
     return activity;
   }

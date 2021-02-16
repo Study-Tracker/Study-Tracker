@@ -99,7 +99,6 @@ export class TaskInputs extends React.Component {
 
     this.containers = [];
 
-    // this.onContainerReady = this.onContainerReady.bind(this);
     this.handleAddTaskClick = this.handleAddTaskClick.bind(this);
     this.handleRemoveTaskClick = this.handleRemoveTaskClick.bind(this);
     this.handleTaskUpdate = this.handleTaskUpdate.bind(this);
@@ -132,7 +131,7 @@ export class TaskInputs extends React.Component {
   }
 
   handleRemoveTaskClick(index) {
-    let updated = this.state.props;
+    let updated = this.props.tasks;
     updated.splice(index, 1);
     this.props.handleUpdate(updated);
   }
