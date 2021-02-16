@@ -125,6 +125,21 @@ export const studyActions = {
     label: "Assay Status Updated",
     visible: true
   },
+  ASSAY_TASK_ADDED: {
+    value: "ASSAY_TASK_ADDED",
+    label: "New Assay Task",
+    visible: true
+  },
+  ASSAY_TASK_UPDATED: {
+    value: "ASSAY_TASK_UPDATED",
+    label: "Assay Task Update",
+    visible: true
+  },
+  ASSAY_TASK_DELETED: {
+    value: "ASSAY_TASK_DELETED",
+    label: "Assay Task Deleted",
+    visible: false
+  },
 
   // Programs
   NEW_PROGRAM: {

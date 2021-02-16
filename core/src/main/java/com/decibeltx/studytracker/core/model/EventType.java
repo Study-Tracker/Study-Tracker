@@ -30,6 +30,11 @@ public enum EventType {
   DELETED_ASSAY,
   ASSAY_STATUS_CHANGED,
 
+  // Assay Tasks
+  ASSAY_TASK_ADDED,
+  ASSAY_TASK_UPDATED,
+  ASSAY_TASK_DELETED,
+
   // Assay Type Events
   NEW_ASSAY_TYPE,
   UPDATED_ASSAY_TYPE,
