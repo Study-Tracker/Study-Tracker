@@ -131,7 +131,7 @@ export class TaskInputs extends React.Component {
   }
 
   handleRemoveTaskClick(index) {
-    let updated = this.state.props;
+    let updated = this.props.tasks;
     updated.splice(index, 1);
     this.props.handleUpdate(updated);
   }
