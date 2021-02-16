@@ -29,6 +29,7 @@ import {StudyTeam} from "../studyMetadata";
 import AssayTimelineTab from "./AssayTimelineTab";
 import AssayFilesTab from "./AssayFilesTab";
 import swal from "sweetalert";
+import {AssayTaskList} from "../assayTasks";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -140,9 +141,12 @@ export default class AssayDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab: "1"
+      activeTab: "1",
+      assay: props.assay
     }
     this.handleAssayDelete = this.handleAssayDelete.bind(this);
+    this.handleTaskUpdate = this.handleTaskUpdate.bind(this);
+    this.toggle = this.toggle.bind(this);
   }
 
   toggle(tab) {
@@ -151,6 +155,65 @@ export default class AssayDetails extends React.Component {
         activeTab: tab
       });
     }
+  }
+
+  handleTaskUpdate(task) {
+
+    let tasks = this.state.assay.tasks;
+    let oldTasks = tasks;
+    let updatedTask = null;
+    for (let i = 0; i < tasks.length; i++) {
+      if (tasks[i].order === task.order) {
+        updatedTask = tasks[i];
+        if (updatedTask.status === "TODO") {
+          updatedTask.status = "COMPLETE";
+        } else if (updatedTask.status
+            === "COMPLETE") {
+          updatedTask.status = "INCOMPLETE";
+        } else if (updatedTask.status
+            === "INCOMPLETE") {
+          updatedTask.status = "TODO";
+        }
+        updatedTask.updatedAt = new Date().getTime();
+      }
+    }
+
+    // Update before the request
+    let assay = this.state.assay;
+    assay.tasks = tasks;
+    this.setState({
+      assay: assay
+    });
+
+    const url = "/api/assay/" + this.state.assay.code + "/tasks";
+    fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updatedTask)
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log("Task successfully updated.");
+      } else {
+        throw Error("Failed to update assay tasks.");
+      }
+    })
+    .catch(e => {
+      console.error("Failed to update assay tasks.");
+      console.error(e);
+      let assay = this.state.assay;
+      assay.tasks = oldTasks;
+      this.setState({
+        assay: assay
+      });
+      swal(
+          "Task update failed",
+          "Please try updating the task again and contact Study Tracker support if the problem persists."
+      );
+    })
+
   }
 
   handleAssayDelete() {
@@ -162,7 +225,7 @@ export default class AssayDetails extends React.Component {
     })
     .then(val => {
       if (val) {
-        fetch("/api/assay/" + this.props.assay.code, {
+        fetch("/api/assay/" + this.state.assay.code, {
           method: 'DELETE',
           headers: {
             "Content-Type": "application/json"
@@ -182,7 +245,7 @@ export default class AssayDetails extends React.Component {
 
   render() {
 
-    const assay = this.props.assay;
+    const assay = this.state.assay;
     const study = this.props.study;
 
     return (
@@ -300,6 +363,32 @@ export default class AssayDetails extends React.Component {
                           </CardBody>
                       )
                       : ''
+                }
+
+                {
+                  assay.tasks.length > 0
+                      ? (
+                          <CardBody>
+                            <CardTitle>
+                              Tasks
+                              {
+                                !!this.props.user
+                                    ? (
+                                        <small
+                                            className="float-right text-muted font-italic">
+                                          Click to toggle status
+                                        </small>
+                                    )
+                                    : ''
+                              }
+                            </CardTitle>
+                            <AssayTaskList
+                                tasks={assay.tasks}
+                                user={this.props.user}
+                                handleUpdate={this.handleTaskUpdate}
+                            />
+                          </CardBody>
+                      ) : ''
                 }
 
                 {
