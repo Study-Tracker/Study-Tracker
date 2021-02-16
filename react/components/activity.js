@@ -18,6 +18,7 @@ import React from "react";
 import {Media, Table} from 'reactstrap';
 import {
   Bell,
+  CheckSquare,
   Edit,
   ExternalLink,
   File,
@@ -31,6 +32,7 @@ import {
 import {studyActions} from "../config/activityConstants";
 import {StatusBadge} from "./status";
 import {KeywordBadgeList} from "./keywords";
+import {AssayTaskCard} from "./assayTasks";
 
 const dateFormat = require('dateformat');
 
@@ -113,6 +115,12 @@ const ActivityIcon = ({action}) => {
 
     case studyActions.DELETED_STUDY_EXTERNAL_LINK.value:
       return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+
+    case studyActions.ASSAY_TASK_ADDED.value:
+      return <CheckSquare size={36} className="align-middle text-info mr-4"/>;
+
+    case studyActions.ASSAY_TASK_UPDATED.value:
+      return <CheckSquare size={36} className="align-middle text-info mr-4"/>;
 
     default:
       return <Bell size={36} className="align-middle text-info mr-4"/>;
@@ -278,6 +286,44 @@ const ActivityMessage = ({activity}) => {
             &nbsp;to&nbsp;
             <StatusBadge status={activity.data.newStatus}/>
           </p>
+      );
+
+    case studyActions.ASSAY_TASK_ADDED.value:
+      return (
+          <React.Fragment>
+
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has added a new task to assay&nbsp;
+              <a href={"/study/" + activity.data.assay.study + "/assay/"
+              + activity.data.assay.code}>
+                {activity.data.assay.code}
+              </a>:
+            </p>
+
+            <AssayTaskCard task={activity.data.task}/>
+
+          </React.Fragment>
+      );
+
+    case studyActions.ASSAY_TASK_UPDATED.value:
+      return (
+          <React.Fragment>
+
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has updated a task in assay&nbsp;
+              <a href={"/study/" + activity.data.assay.study + "/assay/"
+              + activity.data.assay.code}>
+                {activity.data.assay.code}
+              </a>:
+            </p>
+
+            <AssayTaskCard task={activity.data.task}/>
+
+          </React.Fragment>
       );
 
     case studyActions.NEW_PROGRAM.value:
@@ -598,7 +644,8 @@ export const Timeline = ({activities}) => {
   }
   let flag = false;
   const elements = activities
-  .filter(a => studyActions[a.eventType].visible)
+  .filter(a => studyActions.hasOwnProperty(a.eventType)
+      && studyActions[a.eventType].visible)
   .sort((a, b) => {
     if (a.date > b.date) {
       return -1;
