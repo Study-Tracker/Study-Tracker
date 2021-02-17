@@ -67,7 +67,11 @@ public class ActivityServiceImpl implements ActivityService {
 
   @Override
   public List<Activity> findByStudy(Study study) {
-    return activityRepository.findByStudyId(study.getId());
+    List<Activity> activityList = activityRepository.findByStudyId(study.getId());
+    for (Assay assay : study.getAssays()) {
+      activityList.addAll(this.findByAssay(assay));
+    }
+    return activityList;
   }
 
   @Override
@@ -79,7 +83,7 @@ public class ActivityServiceImpl implements ActivityService {
   public List<Activity> findByProgram(Program program) {
     List<Activity> activities = new ArrayList<>();
     for (Study study : studyRepository.findByProgramId(program.getId())) {
-      List<Activity> activityList = activityRepository.findByStudyId(study.getId());
+      List<Activity> activityList = this.findByStudy(study);
       activities.addAll(activityList);
     }
     return activities;
