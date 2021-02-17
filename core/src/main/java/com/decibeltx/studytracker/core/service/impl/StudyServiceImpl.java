@@ -179,6 +179,9 @@ public class StudyServiceImpl implements StudyService {
   @Override
   public void updateStatus(Study study, Status status) {
     study.setStatus(status);
+    if (status.equals(Status.COMPLETE) && study.getEndDate() == null) {
+      study.setEndDate(new Date());
+    }
     studyRepository.save(study);
   }
 

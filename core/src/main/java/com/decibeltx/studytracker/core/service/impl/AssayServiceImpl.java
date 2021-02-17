@@ -216,6 +216,9 @@ public class AssayServiceImpl implements AssayService {
   @Override
   public void updateStatus(Assay assay, Status status) {
     assay.setStatus(status);
+    if (status.equals(Status.COMPLETE) && assay.getEndDate() == null) {
+      assay.setEndDate(new Date());
+    }
     assayRepository.save(assay);
   }
 
