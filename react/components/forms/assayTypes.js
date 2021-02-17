@@ -49,13 +49,22 @@ export const AssayTypeDropdown = ({assayTypes, selectedType, onChange, isValid})
             })}
             options={options}
             onChange={(selected) => {
+
               console.log(selected);
               const assayType = assayTypes.filter(
                   t => t.id === selected.value)[0];
+
+              const fields = {};
+              for (let f of assayType.fields) {
+                fields[f.fieldName] = f.type === "BOOLEAN" ? false : null;
+              }
+
               onChange({
                 "assayType": assayType,
-                "tasks": assayType.tasks
+                "tasks": assayType.tasks,
+                "fields": fields
               });
+
             }}
         />
         <FormFeedback>Select the assay type that best corresponds to the
