@@ -59,13 +59,6 @@ class AssayFormView extends React.Component {
         });
       });
 
-      if (!!assay.startDate) {
-        assay.startDate = Date.parse(assay.startDate);
-      }
-      if (!!assay.endDate) {
-        assay.endDate = Date.parse(assay.endDate);
-      }
-
     }
 
     const assayTypes = await fetch("/api/assaytype/")
