@@ -46,6 +46,7 @@ import ExternalLinks from "../externalLinks";
 import StudyRelationships from "../studyRelationships";
 import StudyAssaysTab from "./StudyAssaysTab";
 import StudyFilesTab from "./StudyFilesTab";
+import StudyNotebookTab from './StudyNotebookTab';
 import StudyConclusionsTab from "./StudyConclusionsTab";
 import StudyCommentsTab from "./StudyCommentsTab";
 import StudyTimelineTab from "./StudyTimelineTab";
@@ -400,7 +401,7 @@ class StudyDetails extends React.Component {
                           this.toggle("4");
                         }}
                     >
-                      Conclusions
+                      Notebook
                     </NavLink>
                   </NavItem>
 
@@ -409,6 +410,17 @@ class StudyDetails extends React.Component {
                         className={this.state.activeTab === "5" ? "active" : ''}
                         onClick={() => {
                           this.toggle("5");
+                        }}
+                    >
+                      Conclusions
+                    </NavLink>
+                  </NavItem>
+
+                  <NavItem>
+                    <NavLink
+                        className={this.state.activeTab === "6" ? "active" : ''}
+                        onClick={() => {
+                          this.toggle("6");
                         }}
                     >
                       Comments
@@ -433,10 +445,14 @@ class StudyDetails extends React.Component {
                   </TabPane>
 
                   <TabPane tabId="4">
-                    <StudyConclusionsTab study={study} user={this.props.user}/>
+                    <StudyNotebookTab study={study} user={this.props.user}/>
                   </TabPane>
 
                   <TabPane tabId="5">
+                    <StudyConclusionsTab study={study} user={this.props.user}/>
+                  </TabPane>
+
+                  <TabPane tabId="6">
                     <StudyCommentsTab study={study} user={this.props.user}/>
                   </TabPane>
 

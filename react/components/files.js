@@ -81,12 +81,15 @@ const formatFileSize = (size) => {
   }
 };
 
+const DEFAULT_FOLDER_FILE_KEY = 'files';
+const DEfAULT_ERROR_MESSAGE = 'Failed to load files folder.';
 class Folder extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       folder: props.folder,
+      folderFileKey: props.folderFileKey || DEFAULT_FOLDER_FILE_KEY,
       isExpanded: false,
       depth: props.depth || 0
     }
@@ -112,7 +115,8 @@ class Folder extends React.Component {
           </a>
           <div hidden={!this.state.isExpanded}>
             <FolderContents folder={this.state.folder}
-                            depth={this.state.depth + 1}/>
+                            depth={this.state.depth + 1}
+                            folderFileKey={this.state.folderFileKey}/>
           </div>
         </li>
     )
@@ -133,7 +137,7 @@ const File = ({file}) => {
   )
 }
 
-const FolderContents = ({folder, depth, showHeader}) => {
+const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth, showHeader}) => {
   const subFolders = folder.subFolders
   .sort((a, b) => {
     if (a.name > b.name) {
@@ -145,10 +149,10 @@ const FolderContents = ({folder, depth, showHeader}) => {
     }
   })
   .map(f => {
-    return <Folder key={"folder-" + f.name} folder={f} depth={depth}/>
+    return <Folder key={"folder-" + f.name} folder={f} depth={depth} folderFileKey={folderFileKey} />
   });
 
-  const files = folder.files
+  const files = folder[folderFileKey]
   .sort((a, b) => {
     if (a.name > b.name) {
       return 1;
@@ -186,27 +190,33 @@ const FolderContents = ({folder, depth, showHeader}) => {
 
 /**
  * Returns a ul list of all files and subfolders within the supplied folder.
- *
+ * 
  * @param folder
  * @param isError
  * @param isLoaded
+ * @param folderFileKey
  * @returns {*}
  * @constructor
  */
-export const StorageFolderFileList = ({folder, isLoaded, isError}) => {
+export const StorageFolderFileList = ({
+  folder,
+  isLoaded,
+  isError,
+  folderFileKey = DEFAULT_FOLDER_FILE_KEY,
+  errorMessage = DEfAULT_ERROR_MESSAGE,
+}) => {
 
   if (isError) {
-    return <DismissableAlert color={'warning'}
-                             message={'Failed to load study folder.'}/>
+    return <DismissableAlert color={'warning'} message={errorMessage}/>
   } else if (isLoaded) {
-    if (folder.subFolders.length === 0 && folder.files.length === 0) {
+    if (folder.subFolders.length === 0 && folder[folderFileKey].length === 0) {
       return (
           <div className={"text-center"}>
             <h4>The study folder is empty.</h4>
           </div>
       );
     } else {
-      return <FolderContents folder={folder} depth={3} showHeader={true}/>
+      return <FolderContents folder={folder} depth={3} showHeader={true} folderFileKey={folderFileKey}/>
     }
   } else {
     return <CardLoadingMessage/>;

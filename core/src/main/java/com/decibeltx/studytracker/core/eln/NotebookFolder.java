@@ -38,6 +38,9 @@ public class NotebookFolder {
   private String name;
 
   @NotNull
+  private String path;
+
+  @NotNull
   private String referenceId;
 
   @Transient

@@ -28,6 +28,7 @@ import {history} from "../../App";
 import {StudyTeam} from "../studyMetadata";
 import AssayTimelineTab from "./AssayTimelineTab";
 import AssayFilesTab from "./AssayFilesTab";
+import AssayNotebookTab from "./AssayNotebookTab";
 import swal from "sweetalert";
 import {AssayTaskList} from "../assayTasks";
 
@@ -476,6 +477,17 @@ export default class AssayDetails extends React.Component {
                     </NavLink>
                   </NavItem>
 
+                  <NavItem>
+                    <NavLink
+                        className={this.state.activeTab === "3" ? "active" : ''}
+                        onClick={() => {
+                          this.toggle("3");
+                        }}
+                    >
+                      Notebook
+                    </NavLink>
+                  </NavItem>
+
                   {/*TODO*/}
                   {/*<NavItem>*/}
                   {/*  <NavLink*/}
@@ -499,6 +511,10 @@ export default class AssayDetails extends React.Component {
 
                   <TabPane tabId="2">
                     <AssayFilesTab assay={assay} user={this.props.user}/>
+                  </TabPane>
+
+                  <TabPane tabId="3">
+                    <AssayNotebookTab assay={assay} user={this.props.user}/>
                   </TabPane>
 
                   {/*TODO*/}
