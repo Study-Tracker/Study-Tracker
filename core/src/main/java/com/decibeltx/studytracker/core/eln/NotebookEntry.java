@@ -36,7 +36,7 @@ public class NotebookEntry {
     this.url = url.toString();
   }
 
-  public void setUrl(String string) {
+  public void setUrl(String url) {
     this.url = url;
   }
 

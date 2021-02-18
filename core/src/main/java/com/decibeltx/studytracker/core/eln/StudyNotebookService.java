@@ -35,5 +35,5 @@ public interface StudyNotebookService {
   NotebookFolder createStudyFolder(Study study) throws NotebookException;
 
   NotebookFolder createAssayFolder(Assay assay) throws NotebookException;
-
+  
 }
