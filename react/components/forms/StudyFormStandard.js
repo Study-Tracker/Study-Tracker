@@ -379,9 +379,7 @@ export default class StudyForm extends React.Component {
                               className={"form-control"}
                               invalid={!this.state.validation.startDateIsValid}
                               wrapperClassName="form-control"
-                              selected={!!this.state.study.startDate
-                                  ? new Date(this.state.study.startDate)
-                                  : null}
+                              selected={this.state.study.startDate || null}
                               onChange={(date) => this.handleFormUpdate(
                                   {"startDate": date})}
                               isClearable={true}
@@ -400,9 +398,7 @@ export default class StudyForm extends React.Component {
                               maxlength="2"
                               className="form-control"
                               wrapperClassName="form-control"
-                              selected={!!this.state.study.endDate
-                                  ? new Date(this.state.study.endDate)
-                                  : null}
+                              selected={this.state.study.endDate || null}
                               onChange={(date) => this.handleFormUpdate(
                                   {"endDate": date})}
                               isClearable={true}

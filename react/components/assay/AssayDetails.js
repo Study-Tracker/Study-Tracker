@@ -77,14 +77,15 @@ const AssayFieldData = ({assay}) => {
         fields.push(
             <div key={"assay-field-display-" + f.fieldName}>
               <h6 className="details-label">{f.displayName}</h6>
-              <p>{value}</p>
+              <p>{value || 'n/a'}</p>
             </div>
         );
       } else if (f.type === "TEXT") {
         fields.push(
             <div key={"assay-field-display-" + f.fieldName}>
               <h6 className="details-label">{f.displayName}</h6>
-              <div dangerouslySetInnerHTML={createMarkup(value)}/>
+              <div dangerouslySetInnerHTML={createMarkup(
+                  !!value ? value : 'n/a')}/>
             </div>
         )
       } else if (f.type === "BOOLEAN") {
@@ -98,7 +99,7 @@ const AssayFieldData = ({assay}) => {
         fields.push(
             <div key={"assay-field-display-" + f.fieldName}>
               <h6 className="details-label">{f.displayName}</h6>
-              <p>{new Date(value).toLocaleString()}</p>
+              <p>{!!value ? new Date(value).toLocaleString() : 'n/a'}</p>
             </div>
         );
       }
