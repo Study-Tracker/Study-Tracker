@@ -96,12 +96,6 @@ class StudyFormView extends React.Component {
       .then(response => response.json())
       .then(study => {
         console.log(study);
-        if (!!study.startDate) {
-          study.startDate = Date.parse(study.startDate);
-        }
-        if (!!study.endDate) {
-          study.endDate = Date.parse(study.endDate);
-        }
         this.setState({
           study: study,
           studyLoaded: true
