@@ -91,6 +91,7 @@ export default class AssayForm extends React.Component {
    * @param data
    */
   handleFormUpdate(data) {
+    console.log(data);
     const assay = {
       ...this.state.assay,
       ...data

@@ -141,7 +141,7 @@ public class AssayServiceImpl implements AssayService {
             String.format("Assay %s does not have required field %s set in fields attribute.",
                 assay.getName(), assayTypeField.getFieldName()));
       }
-      if (!isValidFieldType(value, assayTypeField.getType())) {
+      if (value != null && !isValidFieldType(value, assayTypeField.getType())) {
         throw new InvalidConstraintException(
             String.format(
                 "Assay %s field %s does not have the appropriate value set for it's required type "
@@ -216,6 +216,9 @@ public class AssayServiceImpl implements AssayService {
   @Override
   public void updateStatus(Assay assay, Status status) {
     assay.setStatus(status);
+    if (status.equals(Status.COMPLETE) && assay.getEndDate() == null) {
+      assay.setEndDate(new Date());
+    }
     assayRepository.save(assay);
   }
 
