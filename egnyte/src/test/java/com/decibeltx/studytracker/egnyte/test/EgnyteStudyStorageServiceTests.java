@@ -87,6 +87,34 @@ public class EgnyteStudyStorageServiceTests {
   }
 
   @Test
+  public void folderPathNameTest() {
+    Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
+    Assert.assertTrue(optionalProgram.isPresent());
+    Program program = optionalProgram.get();
+    String path = storageService.getProgramFolderPath(program);
+    System.out.println(path);
+    Assert.assertTrue(path.endsWith("/Clinical Program A/"));
+
+    Study study = new Study();
+    study.setProgram(program);
+    study.setName("Test Study");
+    study.setCode(program.getCode() + "-12345");
+    path = storageService.getStudyFolderPath(study);
+    System.out.println(path);
+    Assert.assertTrue(path.endsWith("/Clinical Program A/" + study.getCode() + " - "
+        + study.getName() + "/"));
+
+    Assay assay = new Assay();
+    assay.setStudy(study);
+    assay.setName("Test Assay");
+    assay.setCode(program.getCode() + "-12345-123");
+    path = storageService.getAssayFolderPath(assay);
+    System.out.println(path);
+    Assert.assertTrue(path.endsWith("/Clinical Program A/" + study.getCode() + " - "
+        + study.getName() + "/" + assay.getCode() + " - " + assay.getName() + "/"));
+  }
+
+  @Test
   public void studyFolderTests() throws Exception {
 
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
