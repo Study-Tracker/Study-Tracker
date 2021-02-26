@@ -17,18 +17,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from "./App";
-import Error from "./views/Error";
 
-export function renderApp(props) {
-  ReactDOM.render(
-      <App {...props} />,
-      document.getElementById("root")
-  );
-}
-
-export function renderError(props) {
-  ReactDOM.render(
-      <Error {...props} />,
-      document.getElementById("root")
-  );
-}
+ReactDOM.render(
+    <App/>,
+    document.getElementById("root")
+);
