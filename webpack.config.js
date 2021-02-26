@@ -18,8 +18,7 @@ module.exports = {
   entry: './react/index.js',
   output: {
     path: __dirname + '/web/src/main/resources/static/js',
-    filename: 'bundle.js',
-    library: 'dtx'
+    filename: 'bundle.js'
   },
   module: {
     rules: [
