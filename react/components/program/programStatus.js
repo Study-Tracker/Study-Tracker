@@ -29,7 +29,7 @@ export class SelectableProgramStatusButton extends React.Component {
   }
 
   handleChange(e) {
-    const active = e.target.dataset.value === statuses.ACTIVE;
+    const active = e.target.dataset.value === statuses.ACTIVE.value;
     fetch("/api/program/" + this.props.programId + "/status?active=" + active, {
       method: "POST",
       headers: {
