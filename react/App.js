@@ -155,6 +155,10 @@ export default class App extends React.Component {
                   <Route exact path={"/admin"}
                          render={props => <AdminDashboardView {...props} />}/>
 
+                  {/* Error */}
+                  <Route exact path={"/error"}
+                         render={props => <Error {...props} />}/>
+
                   {/*404*/}
                   <Route render={props => <Error {...props} code={404}/>}/>
 
