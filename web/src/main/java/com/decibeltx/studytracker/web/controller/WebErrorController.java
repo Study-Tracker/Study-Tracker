@@ -34,7 +34,7 @@ public class WebErrorController implements ErrorController {
       code = Integer.valueOf(status.toString());
     }
     modelMap.addAttribute("code", code);
-    return "error";
+    return "index";
   }
 
   @Override
