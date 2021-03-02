@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -61,6 +63,8 @@ public class User implements Persistable<String>, UserDetails {
 
   @LastModifiedDate
   private Date updatedAt;
+
+  private Map<String, String> attributes = new LinkedHashMap<>();
 
   private boolean admin = false;
 

@@ -120,6 +120,7 @@ public class UserController {
     user.setAdmin(updatedUser.isAdmin());
     user.setDepartment(updatedUser.getDepartment());
     user.setTitle(updatedUser.getTitle());
+    user.setAttributes(updatedUser.getAttributes());
     userService.update(user);
     return new ResponseEntity<>(user, HttpStatus.CREATED);
 

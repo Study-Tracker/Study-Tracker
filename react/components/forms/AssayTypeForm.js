@@ -38,7 +38,7 @@ import swal from 'sweetalert';
 import {history} from '../../App';
 import {LoadingOverlay} from "../loading";
 import Select from "react-select";
-import Attributes from "./attributes";
+import AttributeInputs from "./attributes";
 import {AssayTypeFieldInputs} from "./assayTypeFieldCreation";
 import {TaskInputs} from "./tasks";
 
@@ -425,7 +425,7 @@ export default class AssayTypeForm extends React.Component {
 
                     </Row>
 
-                    <Attributes
+                    <AttributeInputs
                         handleUpdate={(attributes) => {
                           this.handleFormUpdate({
                             attributes: attributes

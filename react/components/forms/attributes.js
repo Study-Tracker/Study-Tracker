@@ -23,7 +23,7 @@ const arrayToAttributeMap = (array) => {
   return map;
 }
 
-class Attributes extends React.Component {
+class AttributeInputs extends React.Component {
 
   constructor(props) {
     super(props);
@@ -143,4 +143,4 @@ class Attributes extends React.Component {
 
 }
 
-export default Attributes;
+export default AttributeInputs;
