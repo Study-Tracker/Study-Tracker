@@ -39,7 +39,7 @@ import {history} from '../../App';
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../loading";
 import Select from "react-select";
-import Attributes from "./attributes";
+import AttributeInputs from "./attributes";
 
 export default class ProgramForm extends React.Component {
 
@@ -509,7 +509,7 @@ export default class ProgramForm extends React.Component {
 
                     </Row>
 
-                    <Attributes
+                    <AttributeInputs
                         attributes={this.state.program.attributes}
                         handleUpdate={(attributes) => this.handleFormUpdate({
                           attributes: attributes

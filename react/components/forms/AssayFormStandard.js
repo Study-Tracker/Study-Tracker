@@ -42,7 +42,7 @@ import swal from 'sweetalert';
 import {history} from '../../App';
 import {AssayTypeDropdown} from "./assayTypes";
 import {AssayTypeFieldCaptureInputList} from "./assayTypeFieldCapture";
-import Attributes from "./attributes";
+import AttributeInputs from "./attributes";
 import {TaskInputs} from "./tasks";
 import {LoadingOverlay} from "../loading";
 import ReactQuill from "react-quill";
@@ -583,7 +583,7 @@ export default class AssayForm extends React.Component {
 
                     </Row>
 
-                    <Attributes
+                    <AttributeInputs
                         attributes={this.state.assay.attributes}
                         handleUpdate={(attributes) => this.handleFormUpdate({
                           attributes: attributes
