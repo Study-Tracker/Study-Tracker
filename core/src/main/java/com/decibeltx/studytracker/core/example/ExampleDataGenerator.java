@@ -17,32 +17,36 @@
 package com.decibeltx.studytracker.core.example;
 
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
+import com.decibeltx.studytracker.core.events.util.EntryTemplateActivityUtils;
 import com.decibeltx.studytracker.core.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.exception.StudyTrackerException;
-import com.decibeltx.studytracker.core.model.Assay;
-import com.decibeltx.studytracker.core.model.AssayType;
-import com.decibeltx.studytracker.core.model.AssayTypeField;
-import com.decibeltx.studytracker.core.model.AssayTypeField.AssayFieldType;
 import com.decibeltx.studytracker.core.model.Collaborator;
 import com.decibeltx.studytracker.core.model.Comment;
 import com.decibeltx.studytracker.core.model.Conclusions;
 import com.decibeltx.studytracker.core.model.ExternalLink;
 import com.decibeltx.studytracker.core.model.Keyword;
+import com.decibeltx.studytracker.core.model.Activity;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Status;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.model.Task;
-import com.decibeltx.studytracker.core.model.Task.TaskStatus;
 import com.decibeltx.studytracker.core.model.User;
-import com.decibeltx.studytracker.core.repository.ActivityRepository;
-import com.decibeltx.studytracker.core.repository.AssayRepository;
-import com.decibeltx.studytracker.core.repository.AssayTypeRepository;
+import com.decibeltx.studytracker.core.model.NotebookEntryTemplate;
+import com.decibeltx.studytracker.core.model.Assay;
+import com.decibeltx.studytracker.core.model.AssayTypeField.AssayFieldType;
+import com.decibeltx.studytracker.core.model.AssayType;
+import com.decibeltx.studytracker.core.model.AssayTypeField;
+import com.decibeltx.studytracker.core.model.Task.TaskStatus;
 import com.decibeltx.studytracker.core.repository.CollaboratorRepository;
-import com.decibeltx.studytracker.core.repository.KeywordRepository;
 import com.decibeltx.studytracker.core.repository.ProgramRepository;
 import com.decibeltx.studytracker.core.repository.StudyRepository;
 import com.decibeltx.studytracker.core.repository.UserRepository;
+import com.decibeltx.studytracker.core.repository.AssayRepository;
+import com.decibeltx.studytracker.core.repository.ActivityRepository;
+import com.decibeltx.studytracker.core.repository.AssayTypeRepository;
+import com.decibeltx.studytracker.core.repository.KeywordRepository;
+import com.decibeltx.studytracker.core.repository.EntryTemplateRepository;
 import com.decibeltx.studytracker.core.service.StudyCommentService;
 import com.decibeltx.studytracker.core.service.StudyConclusionsService;
 import com.decibeltx.studytracker.core.service.StudyExternalLinkService;
@@ -76,6 +80,8 @@ public class ExampleDataGenerator {
   public static final int ASSAY_TYPE_COUNT = 2;
 
   public static final int ASSAY_COUNT = 2;
+
+  public static final int ENTRY_TEMPLATE_COUNT = 2;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 
@@ -117,6 +123,26 @@ public class ExampleDataGenerator {
 
   @Autowired
   private KeywordRepository keywordRepository;
+
+  @Autowired
+  private EntryTemplateRepository entryTemplateRepository;
+
+  public List<NotebookEntryTemplate> generateExampleEntryTemplates(List<User> users) {
+    User user = users.get(0);
+    List<NotebookEntryTemplate> templates = new ArrayList<>();
+    createEntryTemplate(user, templates, "id1", "table1", new Date());
+    createEntryTemplate(user, templates, "id2", "table2", new Date());
+    return templates;
+  }
+
+  private void createEntryTemplate(User user, List<NotebookEntryTemplate> templates,
+                                   String templateId, String name, Date timeStamp) {
+    NotebookEntryTemplate notebookEntryTemplate = NotebookEntryTemplate.of(user, templateId, name, timeStamp);
+    Activity activity = EntryTemplateActivityUtils
+            .fromNewEntryTemplate(notebookEntryTemplate, user);
+    activityRepository.insert(activity);
+    templates.add(notebookEntryTemplate);
+  }
 
   public List<Program> generateExamplePrograms(List<User> users) {
     User user = users.get(0);
@@ -628,6 +654,7 @@ public class ExampleDataGenerator {
 
   public void clearDatabase() {
     LOGGER.info("Wiping collections...");
+    entryTemplateRepository.deleteAll();
     programRepository.deleteAll();
     userRepository.deleteAll();
     collaboratorRepository.deleteAll();
@@ -651,6 +678,7 @@ public class ExampleDataGenerator {
       keywordRepository.insert(generateExampleKeywords());
       collaboratorRepository.insert(generateExampleCollaborators());
       generateExampleStudies();
+      entryTemplateRepository.insert(generateExampleEntryTemplates(userRepository.findAll()));
 
       for (Assay assay : generateExampleAssays(studyRepository.findAll())) {
         assayRepository.insert(assay);

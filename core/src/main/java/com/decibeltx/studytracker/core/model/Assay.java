@@ -25,11 +25,7 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.*;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -87,6 +83,9 @@ public class Assay implements Persistable<String> {
   private StorageFolder storageFolder;
 
   private boolean active;
+
+  @Transient
+  private String entryTemplateId;
 
   @CreatedDate
   private Date createdAt;

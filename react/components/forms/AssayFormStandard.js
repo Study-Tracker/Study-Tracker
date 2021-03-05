@@ -41,6 +41,7 @@ import {UserInputs} from "./users";
 import swal from 'sweetalert';
 import {history} from '../../App';
 import {AssayTypeDropdown} from "./assayTypes";
+import {AssayNotebookTemplatesDropdown} from './assayNotebookTemplates';
 import {AssayTypeFieldCaptureInputList} from "./assayTypeFieldCapture";
 import AttributeInputs from "./attributes";
 import {TaskInputs} from "./tasks";
@@ -61,7 +62,8 @@ export default class AssayForm extends React.Component {
       lastModifiedBy: this.props.user,
       fields: {},
       tasks: [],
-      attributes: {}
+      attributes: {},
+      entryTemplateId: '',
     };
     assay.lastModifiedBy = this.props.user;
 
@@ -74,15 +76,30 @@ export default class AssayForm extends React.Component {
         usersIsValid: true,
         ownerIsValid: true
       },
-      showLoadingOverlay: false
+      showLoadingOverlay: false,
+
+      isUpdateModeOn: !!assay.id,
+      baseUrl: '/api/study/' + this.props.study.code + '/assays/',
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
     this.handleFormUpdate = this.handleFormUpdate.bind(this);
+    this.handleTemplateSelection = this.handleTemplateSelection.bind(this);
     this.validateForm = this.validateForm.bind(this);
     this.handleFieldUpdate = this.handleFieldUpdate.bind(this);
+  }
 
+  get submitUrl() {
+    return this.state.isUpdateModeOn
+      ? this.state.baseUrl + this.state.assay.id
+      : this.state.baseUrl
+  }
+
+  get submitMethod() {
+    return this.state.isUpdateModeOn
+      ? 'PUT'
+      : 'POST';
   }
 
   /**
@@ -99,6 +116,17 @@ export default class AssayForm extends React.Component {
     console.log(assay);
     this.setState({
       assay: assay
+    })
+  }
+
+  handleTemplateSelection(selectedItem) {
+    this.setState({
+      assay: {
+        ...this.state.assay,
+        entryTemplateId: selectedItem
+          ? selectedItem.value
+          : '',
+      },
     })
   }
 
@@ -187,16 +215,10 @@ export default class AssayForm extends React.Component {
         }
       }
 
-      const isUpdate = !!assay.id;
-
-      const url = isUpdate
-          ? "/api/study/" + this.props.study.code + "/assays/"
-          + this.state.assay.id
-          : "/api/study/" + this.props.study.code + "/assays/";
       this.setState({showLoadingOverlay: true});
 
-      fetch(url, {
-        method: isUpdate ? "PUT" : "POST",
+      fetch(this.submitUrl, {
+        method: this.submitMethod,
         headers: {
           "Content-Type": "application/json"
         },
@@ -360,6 +382,12 @@ export default class AssayForm extends React.Component {
                         </FormGroup>
                       </Col>
                       <Col sm="5">
+                        { !this.state.isUpdateModeOn &&
+                          <AssayNotebookTemplatesDropdown
+                            notebookTemplates={this.props.notebookTemplates}
+                            onChange={this.handleTemplateSelection}
+                          />
+                        }
 
                         <StatusDropdown
                             selected={this.state.assay.status}

@@ -132,7 +132,7 @@ class Sidebar extends React.Component {
     }));
   };
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     /* Open collapse element that matches current url */
     const pathName = this.props.location.pathname;
 
