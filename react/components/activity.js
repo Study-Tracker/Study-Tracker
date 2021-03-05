@@ -27,7 +27,7 @@ import {
   Link,
   MessageCircle,
   Star,
-  Trash2
+  Trash2,
 } from 'react-feather';
 import {studyActions} from "../config/activityConstants";
 import {StatusBadge} from "./status";
@@ -42,6 +42,11 @@ const createMarkup = (content) => {
 
 const ActivityIcon = ({action}) => {
   switch (action) {
+    case studyActions.NEW_ENTRY_TEMPLATE.value:
+      return <Star size={36} className="align-middle text-warning mr-4"/>;
+
+    case studyActions.UPDATED_ENTRY_TEMPLATE.value:
+      return <Edit size={36} className="align-middle text-warning mr-4"/>;
 
     case studyActions.NEW_STUDY.value:
       return <Star size={36} className="align-middle text-warning mr-4"/>;
@@ -130,6 +135,38 @@ const ActivityIcon = ({action}) => {
 
 const ActivityMessage = ({activity}) => {
   switch (activity.eventType) {
+    case studyActions.NEW_ENTRY_TEMPLATE.value:
+      return (
+        <>
+          <p>
+            <a href={"/user/" + activity.user.username}>
+              {activity.user.displayName}
+            </a>
+            &nbsp;has created a new template:
+          </p>
+          <div className="bg-light text-secondary p-3">
+            <h5>TemplateId: { activity.data.entryTemplate.templateId }</h5>
+            <h3>Name: { activity.data.entryTemplate.name }</h3>
+            <p>Active: { String(activity.data.entryTemplate.active) }</p>
+          </div>
+        </>
+      );
+
+    case studyActions.UPDATED_ENTRY_TEMPLATE.value:
+      return (
+        <>
+          <p>
+            <a href={"/user/"
+            + activity.user.username}>{activity.user.displayName}</a>
+            &nbsp;has edited a template:
+          </p>
+          <div className="bg-light text-secondary p-3">
+            <h5>TemplateId: { activity.data.entryTemplate.templateId }</h5>
+            <h3>Name: { activity.data.entryTemplate.name }</h3>
+            <p>Active: { String(activity.data.entryTemplate.active) }</p>
+          </div>
+        </>
+      );
 
     case studyActions.NEW_STUDY.value:
       return (

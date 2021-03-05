@@ -217,7 +217,7 @@ public class BenchlingElnRestClient implements BenchlingElnClientOperations {
 
   @Override
   public BenchlingEntry createEntry(BenchlingEntryRequest entryRequest) {
-    URL url = joinUrls(rootUrl, "/api/v2/folders");
+    URL url = joinUrls(rootUrl, "/api/v2/entries");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Basic " + authenticationToken);
     headers.set("Accept", "application/json");

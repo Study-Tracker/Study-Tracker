@@ -175,6 +175,18 @@ export const studyActions = {
     visible: false
   },
 
+  // Template Type
+  NEW_ENTRY_TEMPLATE: {
+    value: "NEW_ENTRY_TEMPLATE",
+    label: "NEW_ENTRY_TEMPLATE",
+    visible: false,
+  },
+  UPDATED_ENTRY_TEMPLATE : {
+    value: "UPDATED_ENTRY_TEMPLATE",
+    label: "UPDATED_ENTRY_TEMPLATE",
+    visible: false,
+  },
+
   // Users
   NEW_USER: {
     value: "NEW_USER",
