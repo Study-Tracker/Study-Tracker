@@ -1,17 +1,46 @@
 import React from 'react';
-import {Button, Card, CardBody, CardHeader, CardTitle} from "reactstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row,
+  Table
+} from "reactstrap";
 import {history} from "../../App";
-import {CheckCircle, Edit, PlusCircle, Trash} from "react-feather";
+import {CheckCircle, Edit, Info, PlusCircle, Trash} from "react-feather";
 import ToolkitProvider from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
+import {AssayTaskList} from "../assayTasks";
 
 class AssayTypeSettings extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      assayTypes: []
+      assayTypes: [],
+      showModal: false
+    };
+    this.toggleModal = this.toggleModal.bind(this);
+  }
+
+  toggleModal(selected) {
+    if (!!selected) {
+      this.setState({
+        showModal: true,
+        selectedAssayType: selected
+      });
+    } else {
+      this.setState({
+        showModal: false
+      })
     }
   }
 
@@ -36,7 +65,12 @@ class AssayTypeSettings extends React.Component {
   render() {
     return (
         <React.Fragment>
-          <AssayTypeListCard assayTypes={this.state.assayTypes}/>
+          <AssayTypeListCard
+              assayTypes={this.state.assayTypes}
+              showModal={this.state.showModal}
+              selectedAssayType={this.state.selectedAssayType}
+              toggleModal={this.toggleModal}
+          />
         </React.Fragment>
     )
   }
@@ -45,75 +79,85 @@ class AssayTypeSettings extends React.Component {
 
 export default AssayTypeSettings;
 
-const columns = [
-  {
-    dataField: "name",
-    text: "Name",
-    sort: true,
-    headerStyle: {width: '20%'},
-    formatter: (c, d, i, x) => <a href={"/assaytypes/" + d.id}>{d.name}</a>,
-    sortFunc: (a, b, order, dataField, rowA, rowB) => {
-      if (rowA.name > rowB.name) {
-        return order === "desc" ? -1 : 1;
-      }
-      if (rowB.name > rowA.name) {
-        return order === "desc" ? 1 : -1;
-      }
-      return 0;
-    }
-  },
-  {
-    dataField: "description",
-    text: "Description",
-    sort: false,
-    headerStyle: {width: '40%'},
-    formatter: (c, d, i, x) => d.description
-  },
-  {
-    dataField: "active",
-    text: "Status",
-    sort: false,
-    headerStyle: {width: '20%'},
-    formatter: (c, d, i, x) => {
-      return !!d.active
-          ? <span className="badge badge-success">Active</span>
-          : <span className="badge badge-warning">Inactive</span>
-    }
-  },
-  {
-    dataField: "controls",
-    text: "Options",
-    sort: false,
-    headerStyle: {width: '20%'},
-    formatter: (c, d, i, x) => {
-      return (
-          <React.Fragment>
-            <a className="text-warning" title={"Edit assay type"}
-               onClick={() => history.push("/assaytypes/" + d.id + "/edit")}>
-              <Edit className="align-middle mr-1" size={18}/>
-            </a>
-            {
-              !!d.active
-                  ? (
-                      <a className="text-danger" title={"Disable assay type"}
-                         onClick={() => console.log("click")}>
-                        <Trash className="align-middle mr-1" size={18}/>
-                      </a>
-                  )
-                  : (
-                      <a className="text-info" title={"Enable assay type"}
-                         onClick={() => console.log("click")}>
-                        <CheckCircle className="align-middle mr-1" size={18}/>
-                      </a>
-                  )
-            }
-          </React.Fragment>
-      )
-    }
-  }
-];
+const AssayTypeListCard = ({
+  assayTypes,
+  showModal,
+  selectedAssayType,
+  toggleModal
+}) => {
 
-const AssayTypeListCard = ({assayTypes}) => {
+  const columns = [
+    {
+      dataField: "name",
+      text: "Name",
+      sort: true,
+      headerStyle: {width: '20%'},
+      formatter: (c, d, i, x) => <a href="#"
+                                    onClick={() => toggleModal(d)}>{d.name}</a>,
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (rowA.name > rowB.name) {
+          return order === "desc" ? -1 : 1;
+        }
+        if (rowB.name > rowA.name) {
+          return order === "desc" ? 1 : -1;
+        }
+        return 0;
+      }
+    },
+    {
+      dataField: "description",
+      text: "Description",
+      sort: false,
+      headerStyle: {width: '40%'},
+      formatter: (c, d, i, x) => d.description
+    },
+    {
+      dataField: "active",
+      text: "Status",
+      sort: false,
+      headerStyle: {width: '20%'},
+      formatter: (c, d, i, x) => {
+        return !!d.active
+            ? <span className="badge badge-success">Active</span>
+            : <span className="badge badge-warning">Inactive</span>
+      }
+    },
+    {
+      dataField: "controls",
+      text: "Options",
+      sort: false,
+      headerStyle: {width: '20%'},
+      formatter: (c, d, i, x) => {
+        return (
+            <React.Fragment>
+              <a className="text-info" title={"Details"}
+                 onClick={() => toggleModal(d)}>
+                <Info className="align-middle mr-1" size={18}/>
+              </a>
+              <a className="text-warning" title={"Edit assay type"}
+                 onClick={() => history.push("/assaytypes/" + d.id + "/edit")}>
+                <Edit className="align-middle mr-1" size={18}/>
+              </a>
+              {
+                !!d.active
+                    ? (
+                        <a className="text-danger" title={"Set inactive"}
+                           onClick={() => console.log("click")}>
+                          <Trash className="align-middle mr-1" size={18}/>
+                        </a>
+                    )
+                    : (
+                        <a className="text-info" title={"Set active"}
+                           onClick={() => console.log("click")}>
+                          <CheckCircle className="align-middle mr-1" size={18}/>
+                        </a>
+                    )
+              }
+            </React.Fragment>
+        )
+      }
+    }
+  ];
 
   return (
       <Card>
@@ -158,7 +202,123 @@ const AssayTypeListCard = ({assayTypes}) => {
                 </div>
             )}
           </ToolkitProvider>
+          <AssayTypeDetailsModal
+              assayType={selectedAssayType}
+              isOpen={showModal}
+              toggle={toggleModal}
+          />
         </CardBody>
       </Card>
+  )
+}
+
+const AssayTypeDetailsModal = ({assayType, isOpen, toggle}) => {
+
+  if (!assayType) {
+    return "";
+  }
+
+  const fields = assayType.fields.map(f => {
+    return (
+        <tr key={"assay-type-field-" + f.fieldName}>
+          <td>{f.displayName}</td>
+          <td><code>{f.fieldName}</code></td>
+          <td>{f.type}</td>
+          <td>{!!f.required ? "Yes" : "No"}</td>
+          <td>{f.description}</td>
+        </tr>
+    )
+  });
+
+  const attributes = Object.keys(assayType.attributes).map(k => {
+    return (
+        <tr key={"assay-type-attribute-" + k}>
+          <td>{k}</td>
+          <td>{assayType.attributes[k]}</td>
+        </tr>
+    )
+  })
+
+  return (
+      <Modal
+          isOpen={isOpen}
+          toggle={() => toggle()}
+          size={"lg"}
+      >
+        <ModalHeader toggle={() => toggle()}>
+          Assay Type: {assayType.name}
+        </ModalHeader>
+        <ModalBody>
+          <Row>
+
+            <Col xs={12}>
+              <h4>Description</h4>
+              <p>{assayType.description}</p>
+            </Col>
+
+            <Col xs={12}>
+              <h4>Fields</h4>
+              {
+                fields.length > 0
+                    ? (
+                        <Table style={{fontSize: "0.8rem"}}>
+                          <thead>
+                          <tr>
+                            <th>Display Name</th>
+                            <th>Field Name</th>
+                            <th>Data Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          {fields}
+                          </tbody>
+                        </Table>
+                    ) : (
+                        <p className="text-muted">n/a</p>
+                    )
+              }
+            </Col>
+
+            <Col xs={12}>
+              <h4>Default Tasks</h4>
+              {
+                !!assayType.tasks && assayType.tasks.length > 0
+                    ? <AssayTaskList tasks={assayType.tasks}/>
+                    : <p className="text-muted">n/a</p>
+              }
+
+            </Col>
+
+            <Col xs={12}>
+              <h4>Attributes</h4>
+              {
+                attributes.length > 0
+                    ? (
+                        <Table style={{fontSize: "0.8rem"}}>
+                          <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          {attributes}
+                          </tbody>
+                        </Table>
+                    ) : <p className="text-muted">n/a</p>
+              }
+            </Col>
+
+          </Row>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={() => toggle()}>
+            Close
+          </Button>
+        </ModalFooter>
+
+      </Modal>
   )
 }
