@@ -164,9 +164,32 @@ public class StudyServiceImpl implements StudyService {
   }
 
   @Override
-  public void update(Study study) {
-    LOGGER.info("Attempting to update existing study with code: " + study.getCode());
-    studyRepository.findById(study.getId()).orElseThrow(RecordNotFoundException::new);
+  public void update(Study updated) {
+    LOGGER.info("Attempting to update existing study with code: " + updated.getCode());
+    Study study = studyRepository.findById(updated.getId())
+        .orElseThrow(RecordNotFoundException::new);
+
+    study.setDescription(updated.getDescription());
+    study.setStatus(updated.getStatus());
+    study.setStartDate(updated.getStartDate());
+    study.setEndDate(updated.getEndDate());
+    study.setOwner(updated.getOwner());
+    study.setUsers(updated.getUsers());
+    study.setKeywords(updated.getKeywords());
+
+    // Collaborator changes
+    if (study.getCollaborator() == null && updated.getCollaborator() != null) {
+      study.setCollaborator(updated.getCollaborator());
+      if (StringUtils.isEmpty(updated.getExternalCode())) {
+        study.setExternalCode(namingService.generateExternalStudyCode(study));
+      } else {
+        study.setExternalCode(updated.getExternalCode());
+      }
+    } else if (study.getCollaborator() != null && updated.getCollaborator() == null) {
+      study.setCollaborator(null);
+      study.setExternalCode(null);
+    }
+
     studyRepository.save(study);
   }
 
