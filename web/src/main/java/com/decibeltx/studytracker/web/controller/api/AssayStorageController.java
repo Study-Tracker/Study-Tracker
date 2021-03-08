@@ -64,7 +64,7 @@ public class AssayStorageController extends AbstractAssayController {
   }
 
   @PostMapping("")
-  public HttpEntity<?> uploadFile(@PathVariable("assayId") String assayId,
+  public HttpEntity<StorageFile> uploadFile(@PathVariable("assayId") String assayId,
       @RequestParam("file") MultipartFile file) throws Exception {
     LOGGER.info("Uploaded file: " + file.getOriginalFilename());
     String username = UserAuthenticationUtils

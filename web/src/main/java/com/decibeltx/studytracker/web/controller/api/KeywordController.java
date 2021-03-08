@@ -89,7 +89,7 @@ public class KeywordController {
     LOGGER.info("Updating assay type");
     LOGGER.info(keyword.toString());
     keywordService.update(keyword);
-    return new ResponseEntity<>(keyword, HttpStatus.CREATED);
+    return new ResponseEntity<>(keyword, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
