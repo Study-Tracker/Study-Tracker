@@ -33,6 +33,7 @@ import {studyActions} from "../config/activityConstants";
 import {StatusBadge} from "./status";
 import {KeywordBadgeList} from "./keywords";
 import {AssayTaskCard} from "./assayTasks";
+import {relationshipTypes} from "../config/studyRelationshipConstants";
 
 const dateFormat = require('dateformat');
 
@@ -562,7 +563,7 @@ const ActivityMessage = ({activity}) => {
             &nbsp;has added a new study relationship:&nbsp;
             <a href={"/study/"
             + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
-            &nbsp;{activity.data.relationship.type}&nbsp;
+            &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
             <a href={"/study/"
             + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
           </p>
@@ -575,7 +576,7 @@ const ActivityMessage = ({activity}) => {
             &nbsp;has added a new study relationship:&nbsp;
             <a href={"/study/"
             + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
-            &nbsp;{activity.data.relationship.type}&nbsp;
+            &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
             <a href={"/study/"
             + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
           </p>
