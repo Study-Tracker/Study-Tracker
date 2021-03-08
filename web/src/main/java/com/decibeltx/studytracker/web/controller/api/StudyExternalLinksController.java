@@ -54,7 +54,7 @@ public class StudyExternalLinksController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<?> addExternalLink(@PathVariable("id") String studyId,
+  public HttpEntity<ExternalLink> addExternalLink(@PathVariable("id") String studyId,
       @RequestBody ExternalLink externalLink) {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
@@ -69,11 +69,11 @@ public class StudyExternalLinksController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(externalLink, HttpStatus.CREATED);
   }
 
   @PutMapping("/{linkId}")
-  public HttpEntity<?> editExternalLink(@PathVariable("id") String studyId,
+  public HttpEntity<ExternalLink> editExternalLink(@PathVariable("id") String studyId,
       @PathVariable("linkId") String linkId, @RequestBody ExternalLink externalLink) {
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
@@ -93,7 +93,7 @@ public class StudyExternalLinksController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(externalLink, HttpStatus.OK);
   }
 
   @DeleteMapping("/{linkId}")
