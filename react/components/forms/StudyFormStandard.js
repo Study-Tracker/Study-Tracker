@@ -74,7 +74,8 @@ export default class StudyForm extends React.Component {
         programIsValid: true,
         startDateIsValid: true,
         usersIsValid: true,
-        ownerIsValid: true
+        ownerIsValid: true,
+        collaboratorIsValid: true
       },
       showLoadingOverlay: false
     };
@@ -170,6 +171,14 @@ export default class StudyForm extends React.Component {
     } else {
       isError = true;
       validation.ownerIsValid = false;
+    }
+
+    // Collaborator
+    if (study.collaborator === -1) {
+      validation.collaboratorIsValid = false
+      isError = true;
+    } else {
+      validation.collaboratorIsValid = true;
     }
 
     this.setState({
