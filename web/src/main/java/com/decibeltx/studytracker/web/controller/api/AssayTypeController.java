@@ -24,6 +24,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,19 +61,21 @@ public class AssayTypeController {
   }
 
   @PostMapping("")
-  public AssayType create(@RequestBody AssayType assayType) {
+  public HttpEntity<AssayType> create(@RequestBody AssayType assayType) {
     LOGGER.info("Creating assay type");
     LOGGER.info(assayType.toString());
     assayType.setActive(true);
     assayTypeService.create(assayType);
-    return assayType;
+    return new ResponseEntity<>(assayType, HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public void update(@PathVariable("id") String id, @RequestBody AssayType assayType) {
+  public HttpEntity<AssayType> update(@PathVariable("id") String id,
+      @RequestBody AssayType assayType) {
     LOGGER.info("Updating assay type");
     LOGGER.info(assayType.toString());
     assayTypeService.update(assayType);
+    return new ResponseEntity<>(assayType, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")

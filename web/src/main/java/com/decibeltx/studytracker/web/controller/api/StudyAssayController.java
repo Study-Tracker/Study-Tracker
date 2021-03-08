@@ -99,7 +99,7 @@ public class StudyAssayController extends AbstractAssayController {
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
     this.updateAssay(assay, user);
-    return new ResponseEntity<>(assay, HttpStatus.CREATED);
+    return new ResponseEntity<>(assay, HttpStatus.OK);
   }
 
   @DeleteMapping("/{assayId}")

@@ -40,7 +40,7 @@ public class AssayTasksController extends AbstractAssayController {
   }
 
   @PostMapping("")
-  public HttpEntity<?> addTask(@PathVariable("assayId") String assayId, @RequestBody Task task) {
+  public HttpEntity<Task> addTask(@PathVariable("assayId") String assayId, @RequestBody Task task) {
 
     LOGGER.info("Adding new task to assay: " + task.toString());
     Assay assay = this.getAssayFromIdentifier(assayId);
@@ -57,12 +57,13 @@ public class AssayTasksController extends AbstractAssayController {
     this.getActivityService().create(activity);
     this.getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(task, HttpStatus.OK);
 
   }
 
   @PutMapping("")
-  public HttpEntity<?> updateTask(@PathVariable("assayId") String assayId, @RequestBody Task task) {
+  public HttpEntity<Task> updateTask(@PathVariable("assayId") String assayId,
+      @RequestBody Task task) {
 
     LOGGER.info("Updating task: " + task.toString());
 
@@ -80,7 +81,7 @@ public class AssayTasksController extends AbstractAssayController {
     this.getActivityService().create(activity);
     this.getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(task, HttpStatus.OK);
 
   }
 
