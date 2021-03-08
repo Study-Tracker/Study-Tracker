@@ -64,7 +64,7 @@ public class StudyStorageController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<?> uploadStudyFile(@PathVariable("studyId") String studyId,
+  public HttpEntity<StorageFile> uploadStudyFile(@PathVariable("studyId") String studyId,
       @RequestParam("file") MultipartFile file) throws Exception {
     LOGGER.info("Uploaded file: " + file.getOriginalFilename());
     String username = UserAuthenticationUtils

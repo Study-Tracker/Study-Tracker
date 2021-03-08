@@ -233,7 +233,7 @@ public class StudyBaseController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(study, HttpStatus.CREATED);
+    return new ResponseEntity<>(study, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")

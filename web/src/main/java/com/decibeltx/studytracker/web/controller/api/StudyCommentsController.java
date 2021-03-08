@@ -110,7 +110,7 @@ public class StudyCommentsController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(comment, HttpStatus.CREATED);
+    return new ResponseEntity<>(comment, HttpStatus.OK);
   }
 
   @DeleteMapping("/{commentId}")

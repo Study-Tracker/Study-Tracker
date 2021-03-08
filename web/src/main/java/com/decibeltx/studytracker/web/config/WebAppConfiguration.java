@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -42,10 +43,27 @@ public class WebAppConfiguration {
   @Bean
   public WebMvcConfigurer webMvcConfigurer() {
     return new WebMvcConfigurer() {
+
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**");
       }
+
+      @Override
+      public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+        // Swagger webjars
+        registry.addResourceHandler("swagger-ui.html")
+            .addResourceLocations("classpath:/META-INF/resources/")
+            .resourceChain(false);
+        registry.addResourceHandler("/webjars/**")
+            .addResourceLocations("classpath:/META-INF/resources/webjars/")
+            .resourceChain(false);
+        registry.setOrder(1);
+
+
+      }
+
     };
   }
 
