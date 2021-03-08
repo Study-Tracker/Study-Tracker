@@ -61,6 +61,7 @@ export default class CollaboratorInputs extends React.Component {
         this);
     this.handleNewCollaboratorSubmit = this.handleNewCollaboratorSubmit.bind(
         this);
+    this.handleShowInputs = this.handleShowInputs.bind(this);
   }
 
   componentDidMount() {
@@ -85,6 +86,18 @@ export default class CollaboratorInputs extends React.Component {
     this.setState({
       modalIsOpen: !this.state.modalIsOpen
     })
+  }
+
+  handleShowInputs() {
+    const visible = !this.state.isVisible;
+    this.setState({
+      isVisible: visible
+    });
+    if (!this.state.selectedCollaborator) {
+      this.props.onChange({
+        "collaborator": !!visible ? -1 : null
+      });
+    }
   }
 
   handleExternalCodeChange(e) {
@@ -190,8 +203,7 @@ export default class CollaboratorInputs extends React.Component {
                   id="cro-check"
                   type="checkbox"
                   label="Is this study being performed externally?"
-                  onChange={() => this.setState(
-                      {isVisible: !this.state.isVisible})}
+                  onChange={() => this.handleShowInputs()}
                   defaultChecked={this.state.isVisible}
               />
             </FormGroup>
