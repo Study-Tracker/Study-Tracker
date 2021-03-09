@@ -367,14 +367,6 @@ export default class AssayForm extends React.Component {
                               onChange={content => this.handleFormUpdate(
                                   {"description": content})}
                           />
-                          {/*<Input*/}
-                          {/*    type="textarea"*/}
-                          {/*    invalid={!this.state.validation.descriptionIsValid}*/}
-                          {/*    rows="5"*/}
-                          {/*    defaultValue={this.state.assay.description || ''}*/}
-                          {/*    onChange={(e) => this.handleFormUpdate(*/}
-                          {/*        {"description": e.target.value})}*/}
-                          {/*/>*/}
                           <FormFeedback>Description must not be
                             empty.</FormFeedback>
                           <FormText>Provide a brief description of your
