@@ -187,7 +187,7 @@ const DateFieldInput = ({field, value, handleUpdate, isValid, error}) => {
             className="form-control"
             invalid={!isValid}
             wrapperClassName="form-control"
-            selected={value}
+            selected={new Date(value)}
             onChange={(date) => handleUpdate(
                 {
                   [field.fieldName]: date
