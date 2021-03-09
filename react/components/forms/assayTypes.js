@@ -18,7 +18,13 @@ import React from "react";
 import {FormFeedback, FormGroup, Label} from "reactstrap";
 import Select from "react-select";
 
-export const AssayTypeDropdown = ({assayTypes, selectedType, onChange, isValid}) => {
+export const AssayTypeDropdown = ({
+  assayTypes,
+  selectedType,
+  onChange,
+  isValid,
+  disabled
+}) => {
 
   const options = assayTypes
   .sort((a, b) => {
@@ -47,6 +53,7 @@ export const AssayTypeDropdown = ({assayTypes, selectedType, onChange, isValid})
             defaultValue={options.filter(option => {
               return option.value === selectedType
             })}
+            isDisabled={disabled}
             options={options}
             onChange={(selected) => {
 
