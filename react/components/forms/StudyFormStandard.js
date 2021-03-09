@@ -352,14 +352,6 @@ export default class StudyForm extends React.Component {
                               onChange={content => this.handleFormUpdate(
                                   {"description": content})}
                           />
-                          {/*<Input*/}
-                          {/*    type="textarea"*/}
-                          {/*    invalid={!this.state.validation.descriptionIsValid}*/}
-                          {/*    rows="5"*/}
-                          {/*    defaultValue={this.state.study.description || ''}*/}
-                          {/*    onChange={(e) => this.handleFormUpdate(*/}
-                          {/*        {"description": e.target.value})}*/}
-                          {/*/>*/}
                           <FormFeedback>
                             Description must not be empty.
                           </FormFeedback>
@@ -419,81 +411,106 @@ export default class StudyForm extends React.Component {
                     </Row>
 
                     {/*Legacy studies*/}
-                    <Row form>
+                    {
+                      !!this.state.study.id && !this.state.study.legacy
+                          ? ""
+                          : (
+                              <React.Fragment>
+                                <Row form>
 
-                      <Col md="12">
-                        <h5 className="card-title">Legacy Study</h5>
-                        <h6 className="card-subtitle text-muted">Studies created
-                          prior to the introduction of Study Tracker are
-                          considered legacy. Enabling this option allows you to
-                          specify certain attributes that would otherwise be
-                          automatically generated.</h6>
-                        <br/>
-                      </Col>
+                                  <Col md="12">
+                                    <h5 className="card-title">Legacy Study</h5>
+                                    <h6 className="card-subtitle text-muted">Studies
+                                      created
+                                      prior to the introduction of Study Tracker are
+                                      considered legacy. Enabling this option allows
+                                      you to
+                                      specify certain attributes that would
+                                      otherwise be
+                                      automatically generated.</h6>
+                                    <br/>
+                                  </Col>
 
-                      <Col md="12">
-                        <FormGroup>
-                          <CustomInput
-                              id="legacy-check"
-                              type="checkbox"
-                              label="Is this a legacy study?"
-                              onChange={this.handleLegacyToggle}
-                          />
-                        </FormGroup>
-                      </Col>
+                                  <Col md="12">
+                                    <FormGroup>
+                                      <CustomInput
+                                          id="legacy-check"
+                                          type="checkbox"
+                                          label="Is this a legacy study?"
+                                          onChange={this.handleLegacyToggle}
+                                          disabled={!!this.state.study.id}
+                                          defaultChecked={!!this.state.study.id
+                                          && !!this.state.study.legacy}
+                                      />
+                                    </FormGroup>
+                                  </Col>
 
-                      <Col md="12" id="legacy-input-container"
-                           style={{display: "none"}}>
+                                  <Col md="12" id="legacy-input-container"
+                                       style={{
+                                         display: !!this.state.study.id
+                                         && !!this.state.study.legacy ? "block"
+                                             : "none"
+                                       }}>
 
-                        <Row form>
+                                    <Row form>
 
-                          <Col md="6">
-                            <FormGroup>
-                              <Label>Study Code *</Label>
-                              <Input
-                                  type="text"
-                                  invalid={false}
-                                  defaultValue={this.state.study.code || ''}
-                                  onChange={(e) => this.handleFormUpdate(
-                                      {"code": e.target.value})}
-                              />
-                              <FormFeedback>Legacy studies must be provided a
-                                Study Code.</FormFeedback>
-                              <FormText>Provide the existing code or ID for the
-                                study.</FormText>
-                            </FormGroup>
-                          </Col>
+                                      <Col md="6">
+                                        <FormGroup>
+                                          <Label>Study Code *</Label>
+                                          <Input
+                                              type="text"
+                                              invalid={false}
+                                              disabled={!!this.state.study.id}
+                                              defaultValue={this.state.study.code
+                                              || ''}
+                                              onChange={(e) => this.handleFormUpdate(
+                                                  {"code": e.target.value})}
+                                          />
+                                          <FormFeedback>Legacy studies must be
+                                            provided a
+                                            Study Code.</FormFeedback>
+                                          <FormText>Provide the existing code or ID
+                                            for the
+                                            study.</FormText>
+                                        </FormGroup>
+                                      </Col>
 
-                          <Col md="6">
-                            <FormGroup>
-                              <Label>Notebook URL</Label>
-                              <Input
-                                  type="text"
-                                  defaultValue={this.state.study.notebookFolder.url
-                                  || ''}
-                                  onChange={(e) => this.handleFormUpdate(
-                                      {
-                                        "notebookFolder": {
-                                          url: e.target.value
-                                        }
-                                      })}
-                              />
-                              <FormText>If the study already has an ELN entry,
-                                provide the URL here.</FormText>
-                            </FormGroup>
-                          </Col>
+                                      <Col md="6">
+                                        <FormGroup>
+                                          <Label>Notebook URL</Label>
+                                          <Input
+                                              type="text"
+                                              disabled={!!this.state.study.id}
+                                              defaultValue={this.state.study.notebookFolder.url
+                                              || ''}
+                                              onChange={(e) => this.handleFormUpdate(
+                                                  {
+                                                    "notebookFolder": {
+                                                      url: e.target.value
+                                                    }
+                                                  })}
+                                          />
+                                          <FormText>If the study already has an ELN
+                                            entry,
+                                            provide the URL here.</FormText>
+                                        </FormGroup>
+                                      </Col>
 
-                        </Row>
+                                    </Row>
 
-                      </Col>
+                                  </Col>
 
-                    </Row>
+                                </Row>
 
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
+                                <Row>
+                                  <Col>
+                                    <hr/>
+                                  </Col>
+                                </Row>
+                              </React.Fragment>
+                          )
+                    }
+
 
                     {/*CRO*/}
 
