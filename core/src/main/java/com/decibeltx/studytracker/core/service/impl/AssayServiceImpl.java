@@ -202,9 +202,20 @@ public class AssayServiceImpl implements AssayService {
   @Override
   public void update(Assay updated) {
     LOGGER.info("Updating assay record with code: " + updated.getCode());
-    assayRepository.findById(updated.getId())
+    Assay assay = assayRepository.findById(updated.getId())
         .orElseThrow(RecordNotFoundException::new);
-    assayRepository.save(updated);
+
+    assay.setDescription(updated.getDescription());
+    assay.setStartDate(updated.getStartDate());
+    assay.setEndDate(updated.getEndDate());
+    assay.setStatus(updated.getStatus());
+    assay.setOwner(updated.getOwner());
+    assay.setUsers(updated.getUsers());
+    assay.setAttributes(updated.getAttributes());
+    assay.setFields(updated.getFields());
+    assay.setTasks(updated.getTasks());
+
+    assayRepository.save(assay);
   }
 
   @Override
