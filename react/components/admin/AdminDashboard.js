@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Link, useLocation} from 'react-router-dom';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,7 +15,31 @@ import {
 import UserSettings from "./UserSettings";
 import AssayTypeSettings from "./AssayTypeSettings";
 import TemplateTypesSettings from './TemplateTypesSettings';
-import { history } from '../../App';
+import {history} from '../../App';
+import KeywordSettings from "./KeywordSettings";
+
+const settings = {
+  "users": {
+    id: "users",
+    label: "Users",
+    tag: UserSettings
+  },
+  "assay-types": {
+    id: "assay-types",
+    label: "Assay Types",
+    tag: AssayTypeSettings
+  },
+  "eln-entry-templates": {
+    id: "eln-entry-templates",
+    label: "ELN Entry Templates",
+    tag: TemplateTypesSettings
+  },
+  "keywords": {
+    id: "keywords",
+    label: "Keywords",
+    tag: KeywordSettings
+  }
+};
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -27,42 +51,63 @@ export const AdminDashboard = () => {
   const activeTabQuery = useQuery().get('active');
 
   useEffect(() => {
-    if ( ['users', 'assay-types', 'template-types'].includes(activeTabQuery) && activeTab !== activeTabQuery ) {
+    if (Object.keys(settings).includes(activeTabQuery) && activeTab
+        !== activeTabQuery) {
       setActiveTab(activeTabQuery);
-    }
-    else {
-      setActiveTab('users');
+    } else {
+      setActiveTab(Object.keys(settings).sort()[0]);
     }
   }, [location]);
 
   const getDashboardContent = () => {
-    switch(activeTab) {
-      case 'users':
-        return <UserSettings />
-      case 'assay-types':
-        return <AssayTypeSettings />
-      case 'template-types':
-        return <TemplateTypesSettings />
+    if (!!activeTab) {
+      const Tag = settings[activeTab].tag;
+      return <Tag/>;
+    } else {
+      return '';
     }
   }
 
   const onSetActiveTab = (tabName) => {
     history.push({
       pathname: '/admin',
-      search: `?active=${ tabName }`,
+      search: `?active=${tabName}`,
     });
   }
 
+  const controls = Object.values(settings)
+  .sort((a, b) => {
+    if (a.label > b.label) {
+      return 1;
+    } else if (a.label < b.label) {
+      return -1;
+    } else {
+      return 0;
+    }
+  })
+  .map(s => {
+    return (
+        <ListGroupItem
+            key={'setting-tab-' + s.id}
+            action
+            active={activeTab === s.id}
+            onClick={() => onSetActiveTab(s.id)}
+        >
+          {s.label}
+        </ListGroupItem>
+    )
+  })
+
   return (
-    <Container fluid>
-      <Row>
-        <Col>
-          <Breadcrumb>
-            <BreadcrumbItem>
-              <Link to="/">Home</Link>
-            </BreadcrumbItem>
-            <BreadcrumbItem active>Admin Dashboard</BreadcrumbItem>
-          </Breadcrumb>
+      <Container fluid>
+        <Row>
+          <Col>
+            <Breadcrumb>
+              <BreadcrumbItem>
+                <Link to="/">Home</Link>
+              </BreadcrumbItem>
+              <BreadcrumbItem active>Admin Dashboard</BreadcrumbItem>
+            </Breadcrumb>
         </Col>
       </Row>
 
@@ -81,27 +126,7 @@ export const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <ListGroup flush>
-              <ListGroupItem
-                action
-                active={activeTab === 'users'}
-                onClick={() => onSetActiveTab('users')}
-              >
-                Users
-              </ListGroupItem>
-              <ListGroupItem
-                action
-                active={activeTab === 'assay-types'}
-                onClick={() => onSetActiveTab('assay-types')}
-              >
-                Assay Types
-              </ListGroupItem>
-              <ListGroupItem
-                action
-                active={activeTab === 'template-types'}
-                onClick={() => onSetActiveTab('template-types')}
-              >
-                ELN Entry Templates
-              </ListGroupItem>
+              {controls}
             </ListGroup>
           </Card>
         </Col>

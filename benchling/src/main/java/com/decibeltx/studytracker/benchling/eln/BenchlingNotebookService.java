@@ -29,11 +29,8 @@ import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.service.NamingService;
-
 import java.util.List;
 import java.util.Optional;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -221,7 +218,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     LOGGER.info("Creating Benchling folder for study: " + study.getCode());
 
     Optional<NotebookFolder> programFolderOptional = this.findProgramFolder(study.getProgram());
-    if (programFolderOptional.isEmpty()) {
+    if (!programFolderOptional.isPresent()) {
       throw new EntityNotFoundException(
           "Could not find folder for program: " + study.getProgram().getName());
     }
@@ -242,7 +239,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     LOGGER.info("Creating Benchling folder for assay: " + assay.getCode());
 
     Optional<NotebookFolder> studyFolderOptional = this.findStudyFolder(assay.getStudy(), false);
-    if (studyFolderOptional.isEmpty()) {
+    if (!studyFolderOptional.isPresent()) {
       throw new EntityNotFoundException(
           "Could not find folder for study: " + assay.getStudy().getCode());
     }

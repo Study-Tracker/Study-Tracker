@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.web.controller.api;
 
+import com.decibeltx.studytracker.core.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.core.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.core.model.Keyword;
 import com.decibeltx.studytracker.core.service.KeywordService;
@@ -80,16 +81,31 @@ public class KeywordController {
   public HttpEntity<Keyword> create(@RequestBody Keyword keyword) {
     LOGGER.info("Creating keyword");
     LOGGER.info(keyword.toString());
+    Optional<Keyword> optional = keywordService
+        .findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
+    if (optional.isPresent()) {
+      throw new DuplicateRecordException(String.format("Keyword already exists: %s %s",
+          keyword.getCategory(), keyword.getKeyword()));
+    }
     keywordService.create(keyword);
     return new ResponseEntity<>(keyword, HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<Keyword> update(@PathVariable("id") String id, @RequestBody Keyword keyword) {
-    LOGGER.info("Updating assay type");
-    LOGGER.info(keyword.toString());
-    keywordService.update(keyword);
-    return new ResponseEntity<>(keyword, HttpStatus.OK);
+  public HttpEntity<Keyword> update(@PathVariable("id") String id, @RequestBody Keyword updated) {
+    LOGGER.info("Updating keyword");
+    LOGGER.info(updated.toString());
+    Optional<Keyword> optional = keywordService
+        .findByKeywordAndCategory(updated.getKeyword(), updated.getCategory());
+    if (optional.isPresent()) {
+      Keyword keyword = optional.get();
+      if (!keyword.getId().equals(id)) {
+        throw new DuplicateRecordException(String.format("Keyword already exists: %s %s",
+            updated.getCategory(), updated.getKeyword()));
+      }
+    }
+    keywordService.update(updated);
+    return new ResponseEntity<>(updated, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
