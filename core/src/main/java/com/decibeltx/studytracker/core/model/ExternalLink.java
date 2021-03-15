@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URL;
 import lombok.Data;
 import org.springframework.data.domain.Persistable;
@@ -28,6 +29,7 @@ public class ExternalLink implements Persistable<String> {
   private URL url;
 
   @Override
+  @JsonIgnore
   public boolean isNew() {
     return id == null;
   }

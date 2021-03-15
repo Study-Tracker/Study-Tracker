@@ -131,6 +131,7 @@ public class Study implements Persistable<String> {
   private List<Comment> comments = new ArrayList<>();
 
   @Override
+  @JsonIgnore
   public boolean isNew() {
     return id == null;
   }

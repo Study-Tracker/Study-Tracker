@@ -89,6 +89,7 @@ public class User implements Persistable<String>, UserDetails {
   }
 
   @Override
+  @JsonIgnore
   public boolean isNew() {
     return id == null;
   }
