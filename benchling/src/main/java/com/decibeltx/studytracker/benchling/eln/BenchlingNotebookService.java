@@ -29,6 +29,7 @@ import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.service.NamingService;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -256,12 +257,15 @@ public final class BenchlingNotebookService implements StudyNotebookService {
   }
 
   @Override
-  public NotebookEntry createAssayNotebookEntry(Assay assay, String templateId) throws NotebookException {
+  public NotebookEntry createAssayNotebookEntry(Assay assay, String templateId, String benchlingUserId) throws NotebookException {
     NotebookFolder assayFolder = assay.getNotebookFolder();
     BenchlingEntryRequest request = new BenchlingEntryRequest();
     request.setFolderId(assayFolder.getReferenceId());
     request.setName(assay.getName());
     request.setEntryTemplateId(templateId);
+    if (benchlingUserId != null) {
+      request.setAuthorIds(Collections.singletonList(benchlingUserId));
+    }
     try {
       return convertBenchlingEntry(client.createEntry(request));
     } catch (Exception e) {
