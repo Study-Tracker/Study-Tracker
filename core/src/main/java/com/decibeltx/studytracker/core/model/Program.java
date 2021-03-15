@@ -18,6 +18,7 @@ package com.decibeltx.studytracker.core.model;
 
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
 import com.decibeltx.studytracker.core.storage.StorageFolder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -76,6 +77,7 @@ public class Program implements Persistable<String> {
   private Map<String, Object> attributes = new LinkedHashMap<>();
 
   @Override
+  @JsonIgnore
   public boolean isNew() {
     return id == null;
   }

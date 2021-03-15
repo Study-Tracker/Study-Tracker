@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
@@ -40,6 +41,7 @@ public class Comment implements Persistable<String> {
   private Date updatedAt;
 
   @Override
+  @JsonIgnore
   public boolean isNew() {
     return id == null;
   }

@@ -1,14 +1,18 @@
 package com.decibeltx.studytracker.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.data.annotation.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 @Document(collection = "notebook_entry_templates")
 @Data
@@ -58,6 +62,7 @@ public class NotebookEntryTemplate implements Persistable<String> {
     }
 
     @Override
+    @JsonIgnore
     public boolean isNew() {
         return id == null;
     }
