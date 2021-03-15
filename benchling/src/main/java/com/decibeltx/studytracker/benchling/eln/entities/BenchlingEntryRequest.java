@@ -1,6 +1,7 @@
 package com.decibeltx.studytracker.benchling.eln.entities;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
@@ -14,6 +15,8 @@ public class BenchlingEntryRequest {
   private String entryTemplateId;
 
   private String schemaId;
+
+  private List<String> authorIds;
 
   private Map<String, CustomField> customFields = new LinkedHashMap<>();
 
