@@ -159,86 +159,62 @@ export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
 /**
  * Modal for adding conclusions.
  */
-export class ConclusionsModal extends React.Component {
+export const ConclusionsModal = ({
+  conclusions,
+  isOpen,
+  toggleModal,
+  handleUpdate,
+  handleSubmit
+}) => {
 
-  constructor(props) {
-    super(props);
-    const conclusions = !!props.conclusions ? {
-      ...props.conclusions,
-      lastModifiedBy: props.user
-    } : {
-      content: '',
-      createdBy: props.user
-    };
-    this.state = {
-      conclusions: conclusions
-    };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleUpdate = this.handleUpdate.bind(this);
-  }
+  console.log(conclusions)
+  return (
+      <Modal
+          isOpen={isOpen}
+          toggle={() => toggleModal()}
+          size={"lg"}
+      >
 
-  handleSubmit() {
-    this.props.handleSubmit(this.state.conclusions);
-  }
+        <ModalHeader toggle={() => toggleModal()}>
+          Add Conclusions
+        </ModalHeader>
 
-  handleUpdate(content) {
-    this.setState({
-      conclusions: {
-        ...this.state.conclusions,
-        content: content
-      }
-    })
-  }
+        <ModalBody className="m-3">
 
-  render() {
-    return (
-        <Modal
-            isOpen={this.props.isOpen}
-            toggle={() => this.props.toggleModal()}
-            size={"lg"}
-        >
+          <Row form>
 
-          <ModalHeader toggle={() => this.props.toggleModal()}>
-            Add Conclusions
-          </ModalHeader>
+            <Col sm={12}>
+              <p>
+                Add a brief summary of your study's conclusions. Supporting
+                documents may be uploaded as attachments.
+              </p>
+            </Col>
 
-          <ModalBody className="m-3">
+            <Col sm={12}>
+              <ReactQuill
+                  theme="snow"
+                  defaultValue={conclusions.content}
+                  onChange={(content, delta, source, editor) => {
+                    handleUpdate(content);
+                  }}
+              />
+            </Col>
 
-            <Row form>
+          </Row>
 
-              <Col sm={12}>
-                <p>
-                  Add a brief summary of your study's conclusions. Supporting
-                  documents may be uploaded as attachments.
-                </p>
-              </Col>
+        </ModalBody>
 
-              <Col sm={12}>
-                <ReactQuill
-                    theme="snow"
-                    defaultValue={this.state.conclusions.content}
-                    onChange={(content, delta, source, editor) => {
-                      this.handleUpdate(content);
-                    }}
-                />
-              </Col>
+        <ModalFooter>
+          <Button color={"secondary"}
+                  onClick={() => toggleModal()}>
+            Cancel
+          </Button>
+          <Button color={"primary"} onClick={() => handleSubmit()}>
+            Save
+          </Button>
+        </ModalFooter>
 
-            </Row>
-
-          </ModalBody>
-
-          <ModalFooter>
-            <Button color={"secondary"}
-                    onClick={() => this.props.toggleModal()}>
-              Cancel
-            </Button>
-            <Button color={"primary"} onClick={this.handleSubmit}>
-              Save
-            </Button>
-          </ModalFooter>
-
-        </Modal>
-    )
-  }
+      </Modal>
+  );
 
 }

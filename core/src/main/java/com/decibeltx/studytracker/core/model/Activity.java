@@ -114,7 +114,8 @@ public class Activity {
     ASSAY,
     PROGRAM,
     USER,
-    ASSAY_TYPE
+    ASSAY_TYPE,
+    ENTRY_TEMPLATE
   }
 
 }

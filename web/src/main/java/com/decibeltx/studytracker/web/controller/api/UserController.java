@@ -89,14 +89,13 @@ public class UserController {
   }
 
   @GetMapping("/{id}/activity")
-  public HttpEntity<List<Activity>> getUserActivity(@PathVariable("id") String userId) {
+  public List<Activity> getUserActivity(@PathVariable("id") String userId) {
     Optional<User> optional = userService.findById(userId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("User not found: " + userId);
     }
     User user = optional.get();
-    List<Activity> activities = activityService.findByUser(user);
-    return new ResponseEntity<>(activities, HttpStatus.OK);
+    return activityService.findByUser(user);
   }
 
   @PostMapping("")
@@ -120,6 +119,7 @@ public class UserController {
     user.setAdmin(updatedUser.isAdmin());
     user.setDepartment(updatedUser.getDepartment());
     user.setTitle(updatedUser.getTitle());
+    user.setAttributes(updatedUser.getAttributes());
     userService.update(user);
     return new ResponseEntity<>(user, HttpStatus.CREATED);
 

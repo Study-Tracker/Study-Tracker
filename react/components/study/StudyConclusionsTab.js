@@ -23,10 +23,18 @@ class StudyConclusionsTab extends React.Component {
     super(props);
     this.state = {
       modalIsOpen: false,
-      conclusions: this.props.study.conclusions
+      conclusions: props.study.conclusions,
+      updatedConclusions: !!props.study.conclusions ? {
+        ...props.study.conclusions,
+        lastModifiedBy: props.user
+      } : {
+        content: '',
+        createdBy: props.user
+      }
     };
     this.toggleModal = this.toggleModal.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
 
   toggleModal() {
@@ -35,21 +43,31 @@ class StudyConclusionsTab extends React.Component {
     })
   }
 
-  handleSubmit(conclusions) {
+  handleUpdate(content) {
+    this.setState({
+      updatedConclusions: {
+        ...this.state.updatedConclusions,
+        content: content
+      }
+    })
+  }
+
+  handleSubmit() {
     fetch("/api/study/" + this.props.study.code + "/conclusions", {
-      method: !!conclusions.id ? 'PUT' : 'POST',
+      method: !!this.state.conclusions ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(conclusions)
-    }).then(response => {
-      if (response.ok) {
-        this.setState({
-          conclusions
-        });
-        this.toggleModal();
-      }
+      body: JSON.stringify(this.state.updatedConclusions)
+    })
+    .then(response => response.json())
+    .then(json => {
+      this.setState({
+        conclusions: json,
+        updatedConclusions: json
+      });
+      this.toggleModal();
     }).catch(e => {
       console.error(e);
     })
@@ -69,8 +87,9 @@ class StudyConclusionsTab extends React.Component {
           <ConclusionsModal
               isOpen={this.state.modalIsOpen}
               toggleModal={this.toggleModal}
-              conclusions={this.state.conclusions}
+              conclusions={this.state.updatedConclusions}
               handleSubmit={this.handleSubmit}
+              handleUpdate={this.handleUpdate}
               user={this.props.user}
           />
 

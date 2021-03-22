@@ -38,6 +38,7 @@ import swal from 'sweetalert';
 import {history} from '../../App';
 import {LoadingOverlay} from "../loading";
 import Select from "react-select";
+import AttributeInputs from "./attributes";
 
 export default class UserForm extends React.Component {
 
@@ -47,6 +48,7 @@ export default class UserForm extends React.Component {
     this.state = {
       user: props.user || {
         admin: false,
+        attributes: {},
         credentialsExpired: true
       },
       validation: {
@@ -394,6 +396,44 @@ export default class UserForm extends React.Component {
                         </FormGroup>
                       </Col>
 
+                    </Row>
+
+                    <Row>
+                      <Col>
+                        <hr/>
+                      </Col>
+                    </Row>
+
+                    <Row form>
+
+                      <Col md="12">
+                        <h5 className="card-title">User Attributes</h5>
+                        <h6 className="card-subtitle text-muted">
+                          Key-value attributes for adding additional information
+                          about the user, or for adding application-aware
+                          attributes for external integrations (for example, ELN
+                          user names or identifiers). You can add as many or as
+                          few attributes
+                          as you'd like. Attribute values should not be left
+                          empty. All values are saved as simple character
+                          strings.
+                        </h6>
+                        <br/>
+                      </Col>
+
+                    </Row>
+
+                    <AttributeInputs
+                        attributes={this.state.user.attributes}
+                        handleUpdate={(attributes) => this.handleFormUpdate({
+                          attributes: attributes
+                        })}
+                    />
+
+                    <Row>
+                      <Col>
+                        <hr/>
+                      </Col>
                     </Row>
 
                     {/*Buttons*/}

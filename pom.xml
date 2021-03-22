@@ -29,7 +29,7 @@
 
   <groupId>com.decibeltx</groupId>
   <artifactId>study-tracker-parent</artifactId>
-  <version>0.2.5</version>
+  <version>0.3.0</version>
   <name>Study Tracker: Parent</name>
   <packaging>pom</packaging>
 
@@ -72,45 +72,6 @@
   </scm>
 
   <url>https://github.com/Decibel-Therapeutics/Study-Tracker</url>
-
-  <!-- TODO
-  <distributionManagement>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
-  -->
-
-  <properties>
-    <poi.version>3.17</poi.version>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-
-      <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi</artifactId>
-        <version>${poi.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi-ooxml</artifactId>
-        <version>${poi.version}</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
-
-  <dependencies>
-
-  </dependencies>
 
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>

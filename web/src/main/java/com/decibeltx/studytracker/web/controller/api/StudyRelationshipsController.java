@@ -57,7 +57,8 @@ public class StudyRelationshipsController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<?> createStudyRelationship(@PathVariable("id") String sourceStudyId,
+  public HttpEntity<StudyRelationship> createStudyRelationship(
+      @PathVariable("id") String sourceStudyId,
       @RequestBody StudyRelationship studyRelationship) {
 
     LOGGER
@@ -89,7 +90,7 @@ public class StudyRelationshipsController extends AbstractStudyController {
     this.getActivityService().create(targetActivity);
     this.getEventsService().dispatchEvent(targetActivity);
 
-    return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(studyRelationship, HttpStatus.CREATED);
 
   }
 

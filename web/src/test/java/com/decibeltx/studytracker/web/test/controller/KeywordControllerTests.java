@@ -43,6 +43,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 @SpringBootTest(classes = TestApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -114,6 +115,19 @@ public class KeywordControllerTests {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(keyword)))
         .andExpect(status().isCreated());
+  }
+
+  @Test
+  public void duplicateKeywordTest() throws Exception {
+    User user = userRepository.findByUsername("jsmith")
+        .orElseThrow(RecordNotFoundException::new);
+    Keyword keyword = new Keyword("AKT1", "Gene");
+    mockMvc.perform(post("/api/keyword")
+        .with(user(user.getUsername()))
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsBytes(keyword)))
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isBadRequest());
   }
 
 

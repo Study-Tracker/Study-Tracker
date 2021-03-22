@@ -46,6 +46,7 @@ import {
 import {ProgramTeam} from "./programMetadata";
 import ProgramTimelineTab from "./ProgramTimelineTab";
 import ProgramStudiesTab from "./ProgramStudiesTab";
+import {ModelDetailsAttributeList} from "../attributes";
 
 const ProgramDetailHeader = ({program, user}) => {
   return (
@@ -90,16 +91,6 @@ class ProgramDetails extends React.Component {
     const createMarkup = (content) => {
       return {__html: content};
     };
-
-    let attributes = [];
-    for (let key of Object.keys(program.attributes)) {
-      attributes.push(
-          <React.Fragment key={'attribute-' + key}>
-            <h6 className="details-label">{key}</h6>
-            <p>{program.attributes[key]}</p>
-          </React.Fragment>
-      )
-    }
 
     return (
         <Container fluid className="animated fadeIn">
@@ -187,7 +178,8 @@ class ProgramDetails extends React.Component {
                       <h6 className="details-label">Last Updated</h6>
                       <p>{new Date(program.updatedAt).toLocaleString()}</p>
 
-                      {attributes}
+                      <ModelDetailsAttributeList
+                          attributes={program.attributes}/>
 
                     </Col>
                   </Row>

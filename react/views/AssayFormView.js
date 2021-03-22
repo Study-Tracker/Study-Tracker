@@ -71,10 +71,21 @@ class AssayFormView extends React.Component {
       });
     });
 
+    const notebookTemplates = await fetch("/api/entryTemplate/active")
+    .then(async response => await response.json())
+    .catch(error => {
+      console.error(error);
+      this.setState({
+        isError: true,
+        error: error
+      });
+    });
+
     this.setState({
       study: study,
       assay: assay,
       assayTypes: assayTypes,
+      notebookTemplates: notebookTemplates,
       isLoaded: true
     });
 
@@ -92,6 +103,7 @@ class AssayFormView extends React.Component {
           assay={this.state.assay}
           user={this.props.user}
           assayTypes={this.state.assayTypes}
+          notebookTemplates={this.state.notebookTemplates}
       />;
     }
     return (

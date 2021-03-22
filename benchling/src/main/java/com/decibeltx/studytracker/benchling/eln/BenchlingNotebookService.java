@@ -16,8 +16,12 @@
 
 package com.decibeltx.studytracker.benchling.eln;
 
+import com.decibeltx.studytracker.benchling.eln.entities.BenchlingEntry;
+import com.decibeltx.studytracker.benchling.eln.entities.BenchlingEntryRequest;
 import com.decibeltx.studytracker.benchling.eln.entities.BenchlingFolder;
+import com.decibeltx.studytracker.benchling.eln.entities.BenchlingProject;
 import com.decibeltx.studytracker.benchling.exception.EntityNotFoundException;
+import com.decibeltx.studytracker.core.eln.NotebookEntry;
 import com.decibeltx.studytracker.core.eln.NotebookFolder;
 import com.decibeltx.studytracker.core.eln.StudyNotebookService;
 import com.decibeltx.studytracker.core.exception.NotebookException;
@@ -25,6 +29,8 @@ import com.decibeltx.studytracker.core.model.Assay;
 import com.decibeltx.studytracker.core.model.Program;
 import com.decibeltx.studytracker.core.model.Study;
 import com.decibeltx.studytracker.core.service.NamingService;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,12 +58,79 @@ public final class BenchlingNotebookService implements StudyNotebookService {
         .trim();
   }
 
-  private NotebookFolder convertFolder(BenchlingFolder folder) {
+  private NotebookEntry convertBenchlingEntry(BenchlingEntry benchlingEntry) {
+    NotebookEntry notebookEntry = new NotebookEntry();
+    notebookEntry.setName(benchlingEntry.getName());
+    notebookEntry.setReferenceId(benchlingEntry.getId());
+    notebookEntry.setUrl(benchlingEntry.getWebURL());
+    notebookEntry.getAttributes().put("folderId", benchlingEntry.getFolderId());
+    return notebookEntry;
+  }
+
+  private NotebookFolder convertBenchlingFolder(BenchlingFolder benchlingFolder) {
     NotebookFolder notebookFolder = new NotebookFolder();
-    notebookFolder.setName(folder.getName());
-    notebookFolder.setReferenceId(folder.getId());
-    notebookFolder.setUrl(this.createFolderUrl(folder));
-    notebookFolder.getAttributes().put("projectId", folder.getProjectId());
+    notebookFolder.setName(benchlingFolder.getName());
+    notebookFolder.setUrl(this.createFolderUrl(benchlingFolder));
+    notebookFolder.setReferenceId(benchlingFolder.getId());
+    notebookFolder.getAttributes().put("projectId", benchlingFolder.getProjectId());
+    return notebookFolder;
+  }
+
+  private NotebookFolder convertFolder(BenchlingFolder benchlingFolder) {
+    return convertFolder(benchlingFolder, null);
+  }
+
+  private NotebookFolder convertFolder(BenchlingFolder benchlingFolder, List<BenchlingEntry> entries) {
+    NotebookFolder notebookFolder = convertBenchlingFolder(benchlingFolder);
+    if (entries != null) {
+      loadContents(benchlingFolder, notebookFolder, entries);
+    }
+    return notebookFolder;
+  }
+
+  private void loadContents(BenchlingFolder benchlingFolder, NotebookFolder notebookFolder, List<BenchlingEntry> entries) {
+    entries.stream()
+            .filter(entry -> entry.getFolderId().equals(benchlingFolder.getId()))
+            .forEach(entry -> notebookFolder.getEntries().add(convertBenchlingEntry(entry)));
+    List<BenchlingFolder> childrenFolders = client.findFolderChildren(benchlingFolder.getId());
+    childrenFolders.forEach(folder -> notebookFolder.getSubFolders().add(convertFolder(folder, entries)));
+  }
+
+  private String getProjectPath(NotebookFolder folder) {
+    return client.findFolderById(folder.getReferenceId())
+            .flatMap(benchlingFolder -> client.findProjectById(benchlingFolder.getProjectId()))
+            .map(BenchlingProject::getName).map(name -> name + "/").orElse("");
+  }
+
+  private String getNotebookFolderPath(Study study) {
+    StringBuilder path = new StringBuilder("/");
+    NotebookFolder studyFolder = study.getNotebookFolder();
+    path.append(getProjectPath(studyFolder));
+    path.append(study.getProgram().getName()).append("/").append(study.getName());
+    return path.toString();
+  }
+
+  private String getNotebookFolderPath(Assay assay) {
+    StringBuilder path = new StringBuilder("/");
+    NotebookFolder assayFolder = assay.getNotebookFolder();
+    path.append(getProjectPath(assayFolder));
+    Study study = assay.getStudy();
+    Program program = study.getProgram();
+    path.append(program.getName()).append("/").append(study.getName()).append("/").append(assay.getName());
+    return path.toString();
+  }
+
+  private NotebookFolder getContentFullNotebookFolder(BenchlingFolder benchlingFolder, Assay assay) {
+    NotebookFolder notebookFolder = convertFolder(benchlingFolder, client.findProjectEntries(benchlingFolder.getProjectId()));
+    String path = getNotebookFolderPath(assay);
+    notebookFolder.setPath(path);
+    return notebookFolder;
+  }
+
+  private NotebookFolder getContentFullNotebookFolder(BenchlingFolder benchlingFolder, Study study) {
+    NotebookFolder notebookFolder = convertFolder(benchlingFolder, client.findProjectEntries(benchlingFolder.getProjectId()));
+    String path = getNotebookFolderPath(study);
+    notebookFolder.setPath(path);
     return notebookFolder;
   }
 
@@ -67,13 +140,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     LOGGER.info("Fetching benchling notebook entry for program: " + program.getName());
 
     if (program.getNotebookFolder() != null) {
-      Optional<BenchlingFolder> optional = client
-          .findFolderById(program.getNotebookFolder().getReferenceId());
-      if (optional.isPresent()) {
-        return Optional.of(this.convertFolder(optional.get()));
-      } else {
-        return Optional.empty();
-      }
+      Optional<BenchlingFolder> optional = client.findFolderById(program.getNotebookFolder().getReferenceId());
+      return optional.map(this::convertFolder);
     } else {
       LOGGER.warn(
           String.format("Program %s does not have a notebook folder set.", program.getName()));
@@ -84,6 +152,10 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
   @Override
   public Optional<NotebookFolder> findStudyFolder(Study study) {
+      return findStudyFolder(study, true);
+  }
+
+  private Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents) {
 
     LOGGER.info("Fetching notebook entry for study: " + study.getCode());
 
@@ -91,11 +163,13 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     if (study.getNotebookFolder() != null) {
       NotebookFolder studyFolder = study.getNotebookFolder();
       Optional<BenchlingFolder> optional = client.findFolderById(studyFolder.getReferenceId());
-      if (optional.isPresent()) {
-        return Optional.of(this.convertFolder(optional.get()));
-      } else {
-        return Optional.empty();
-      }
+      return optional.flatMap(folder -> {
+          if (includeContents) {
+              return Optional.of(getContentFullNotebookFolder(folder, study));
+          } else {
+              return Optional.of(this.convertFolder(folder));
+          }
+      });
     } else {
       LOGGER.warn(String.format("Study %s does not have a notebook folder set.", study.getName()));
       return Optional.empty();
@@ -111,11 +185,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     if (assay.getNotebookFolder() != null) {
       NotebookFolder assayFolder = assay.getNotebookFolder();
       Optional<BenchlingFolder> optional = client.findFolderById(assayFolder.getReferenceId());
-      if (optional.isPresent()) {
-        return Optional.of(this.convertFolder(optional.get()));
-      } else {
-        return Optional.empty();
-      }
+      return optional.flatMap(folder -> Optional.of(getContentFullNotebookFolder(folder, assay)));
     } else {
       LOGGER.warn(String.format("Assay %s does not have a notebook folder set.", assay.getName()));
       return Optional.empty();
@@ -145,7 +215,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
   }
 
   @Override
-  public NotebookFolder createStudyFolder(Study study) throws NotebookException {
+  public NotebookFolder createStudyFolder(Study study) {
     LOGGER.info("Creating Benchling folder for study: " + study.getCode());
 
     Optional<NotebookFolder> programFolderOptional = this.findProgramFolder(study.getProgram());
@@ -166,10 +236,10 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
 
   @Override
-  public NotebookFolder createAssayFolder(Assay assay) throws NotebookException {
+  public NotebookFolder createAssayFolder(Assay assay) {
     LOGGER.info("Creating Benchling folder for assay: " + assay.getCode());
 
-    Optional<NotebookFolder> studyFolderOptional = this.findStudyFolder(assay.getStudy());
+    Optional<NotebookFolder> studyFolderOptional = this.findStudyFolder(assay.getStudy(), false);
     if (!studyFolderOptional.isPresent()) {
       throw new EntityNotFoundException(
           "Could not find folder for study: " + assay.getStudy().getCode());
@@ -184,5 +254,22 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
     return assayFolder;
 
+  }
+
+  @Override
+  public NotebookEntry createAssayNotebookEntry(Assay assay, String templateId, String benchlingUserId) throws NotebookException {
+    NotebookFolder assayFolder = assay.getNotebookFolder();
+    BenchlingEntryRequest request = new BenchlingEntryRequest();
+    request.setFolderId(assayFolder.getReferenceId());
+    request.setName(assay.getName());
+    request.setEntryTemplateId(templateId);
+    if (benchlingUserId != null) {
+      request.setAuthorIds(Collections.singletonList(benchlingUserId));
+    }
+    try {
+      return convertBenchlingEntry(client.createEntry(request));
+    } catch (Exception e) {
+      throw new NotebookException("Could not create notebook for templateId: " + templateId);
+    }
   }
 }

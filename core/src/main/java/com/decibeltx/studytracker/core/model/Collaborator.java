@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -49,6 +50,7 @@ public class Collaborator implements Persistable<String> {
   private boolean active = true;
 
   @Override
+  @JsonIgnore
   public boolean isNew() {
     return id == null;
   }

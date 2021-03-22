@@ -125,7 +125,7 @@ public class ProgramController {
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 
-    return new ResponseEntity<>(program, HttpStatus.CREATED);
+    return new ResponseEntity<>(program, HttpStatus.OK);
 
   }
 

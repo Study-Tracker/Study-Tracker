@@ -62,7 +62,7 @@ public class StudyConclusionsController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<?> newStudyConclusions(@PathVariable("studyId") String studyId,
+  public HttpEntity<Conclusions> newStudyConclusions(@PathVariable("studyId") String studyId,
       @RequestBody Conclusions conclusions) {
     Study study = getStudyFromIdentifier(studyId);
     if (conclusions.getId() != null || study.getConclusions() != null) {
@@ -84,11 +84,11 @@ public class StudyConclusionsController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(conclusions, HttpStatus.CREATED);
   }
 
   @PutMapping("")
-  public HttpEntity<?> editStudyConclusions(@PathVariable("studyId") String studyId,
+  public HttpEntity<Conclusions> editStudyConclusions(@PathVariable("studyId") String studyId,
       @RequestBody Conclusions conclusions) {
     LOGGER.info(
         String.format("Updating conclusions for study %s: %s", studyId, conclusions.toString()));
@@ -105,7 +105,7 @@ public class StudyConclusionsController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(conclusions, HttpStatus.OK);
   }
 
   @DeleteMapping("")
