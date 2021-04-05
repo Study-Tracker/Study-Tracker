@@ -17,7 +17,7 @@
 module.exports = {
   entry: './react/index.js',
   output: {
-    path: __dirname + '/web/src/main/resources/static/js',
+    path: __dirname + '/src/main/resources/static/js',
     filename: 'bundle.js'
   },
   module: {

@@ -2,13 +2,14 @@
 .idea/
 target/
 node_modules/
-/web/src/main/resources/static/js/bundle.js
-/web/src/main/resources/static/css/app.css
+src/main/resources/static/js/bundle.js
+src/main/resources/static/css/app.css
 security.properties
 *.log
 TODO.md
 test.properties
 internal/
+src/test/resources/*.properties
 
 # To be removed
 application.properties
