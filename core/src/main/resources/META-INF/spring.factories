@@ -1,7 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.decibeltx.studytracker.core.config.MongoDataSourceConfiguration,\
-  com.decibeltx.studytracker.core.config.MongoRepositoryConfiguration,\
-  com.decibeltx.studytracker.core.config.ServiceConfiguration,\
-  com.decibeltx.studytracker.core.config.LocalStudyStorageServiceConfiguration,\
-  com.decibeltx.studytracker.core.config.ExampleDataConfiguration,\
-  com.decibeltx.studytracker.core.config.LocalEventsConfiguration
