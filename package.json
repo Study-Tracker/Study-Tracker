@@ -11,7 +11,7 @@
     "build:js": "react-scripts build",
     "watch:css": "chokidar \"react/appstack/assets/scss/**/*\" -c \"npm run build:css\"",
     "watch:js": "react-scripts start",
-    "build:less": "less-watch-compiler --run-once --main-file=app.less react/less/ web/src/main/resources/static/css/",
+    "build:less": "less-watch-compiler --run-once --main-file=app.less react/less/ src/main/resources/static/css/",
     "watch:less": "npm run build:less && less-watch-compiler --main-file=index.less react/less/ react/less/",
     "start": "npm-run-all -p build:less watch:js watch:less",
     "build:all": "npm-run-all -p build:js build:less",
