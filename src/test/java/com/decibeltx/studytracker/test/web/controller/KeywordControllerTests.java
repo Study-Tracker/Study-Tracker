@@ -67,14 +67,18 @@ public class KeywordControllerTests {
   @Autowired
   private UserRepository userRepository;
 
+  private String username;
+
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userRepository.findAll().get(0).getUsername();
   }
 
   @Test
   public void getAllKeywordsTest() throws Exception {
-    mockMvc.perform(get("/api/keyword"))
+    mockMvc.perform(get("/api/keyword")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(KEYWORD_COUNT)));
@@ -82,7 +86,8 @@ public class KeywordControllerTests {
 
   @Test
   public void getAllKeywordCategoryTest() throws Exception {
-    mockMvc.perform(get("/api/keyword/categories"))
+    mockMvc.perform(get("/api/keyword/categories")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(CATEGORY_COUNT)));
@@ -90,17 +95,20 @@ public class KeywordControllerTests {
 
   @Test
   public void keywordSearchTest() throws Exception {
-    mockMvc.perform(get("/api/keyword?q=akt"))
+    mockMvc.perform(get("/api/keyword?q=akt")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
-    mockMvc.perform(get("/api/keyword?q=akt&category=Gene"))
+    mockMvc.perform(get("/api/keyword?q=akt&category=Gene")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
-    mockMvc.perform(get("/api/keyword?q=akt&category=Cell Line"))
+    mockMvc.perform(get("/api/keyword?q=akt&category=Cell Line")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", empty()));
   }

@@ -93,7 +93,7 @@ public class AuthenticationTests {
   @Test
   public void accessOpenEndpointTest() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get("/api/study/"))
-        .andExpect(MockMvcResultMatchers.status().isOk());
+        .andExpect(MockMvcResultMatchers.status().isUnauthorized());
   }
 
   @Test

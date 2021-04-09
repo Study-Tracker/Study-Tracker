@@ -72,16 +72,20 @@ public class ProgramControllerTests {
   @Autowired
   private ObjectMapper objectMapper;
 
+  private String username;
+
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userRepository.findAll().get(0).getUsername();
   }
 
   // Study methods
 
   @Test
   public void allProgramsTest() throws Exception {
-    mockMvc.perform(get("/api/program"))
+    mockMvc.perform(get("/api/program")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(NUM_PROGRAMS)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -96,7 +100,8 @@ public class ProgramControllerTests {
     Program program = programRepository.findByName("Clinical Program A")
         .orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/program/" + program.getId()))
+    mockMvc.perform(get("/api/program/" + program.getId())
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("CPA")))
@@ -108,7 +113,8 @@ public class ProgramControllerTests {
 
   @Test
   public void findNonExistantProgramTest() throws Exception {
-    mockMvc.perform(get("/api/program/XXXX"))
+    mockMvc.perform(get("/api/program/XXXX")
+        .with(user(username)))
         .andExpect(status().isNotFound());
   }
 
@@ -151,7 +157,8 @@ public class ProgramControllerTests {
     User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/program/" + program.getId()))
+    mockMvc.perform(get("/api/program/" + program.getId())
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("active")))
         .andExpect(jsonPath("$.active", is(true)));

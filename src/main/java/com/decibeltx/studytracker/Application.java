@@ -19,6 +19,7 @@ package com.decibeltx.studytracker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,10 @@ import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = {
+    DataSourceAutoConfiguration.class,
+    UserDetailsServiceAutoConfiguration.class
+})
 @PropertySource("classpath:defaults.properties")
 @EnableSwagger2
 public class Application extends SpringBootServletInitializer {

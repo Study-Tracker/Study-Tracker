@@ -33,6 +33,7 @@ import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.StudyRelationship;
 import com.decibeltx.studytracker.model.StudyRelationship.Type;
 import com.decibeltx.studytracker.repository.StudyRepository;
+import com.decibeltx.studytracker.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,22 +56,32 @@ public class StudyRelationshipControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
   @Autowired
   private StudyRepository studyRepository;
+
   @Autowired
   private ObjectMapper objectMapper;
+
+  @Autowired
+  private UserRepository userRepository;
+
+  private String username;
 
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userRepository.findAll().get(0).getUsername();
   }
 
   @Test
   public void createStudyRelationshipTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001/relationships"))
+    mockMvc.perform(get("/api/study/CPA-10001/relationships")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 
@@ -107,7 +118,8 @@ public class StudyRelationshipControllerTests {
   @Test
   public void fetchStudyRelationshipsTest() throws Exception {
     this.createStudyRelationshipTest();
-    mockMvc.perform(get("/api/study/CPA-10001/relationships"))
+    mockMvc.perform(get("/api/study/CPA-10001/relationships")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("type")))

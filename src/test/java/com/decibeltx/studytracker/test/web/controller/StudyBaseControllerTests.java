@@ -64,29 +64,38 @@ public class StudyBaseControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
   @Autowired
   private StudyRepository studyRepository;
+
   @Autowired
   private ProgramRepository programRepository;
+
   @Autowired
   private UserRepository userRepository;
+
   @Autowired
   private ObjectMapper objectMapper;
+
+  private String username;
 
   private static final int NUM_STUDIES = 6;
 
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userRepository.findAll().get(0).getUsername();
   }
 
   // Study methods
 
   @Test
   public void allStudiesTest() throws Exception {
-    mockMvc.perform(get("/api/study"))
+    mockMvc.perform(get("/api/study")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(NUM_STUDIES)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -97,7 +106,8 @@ public class StudyBaseControllerTests {
 
   @Test
   public void findStudyByIdTest() throws Exception {
-    mockMvc.perform(get("/api/study/CPA-10001"))
+    mockMvc.perform(get("/api/study/CPA-10001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("CPA-10001")))
@@ -110,7 +120,8 @@ public class StudyBaseControllerTests {
 
   @Test
   public void findNonExistantStudyTest() throws Exception {
-    mockMvc.perform(get("/api/study/CPA-XXXX"))
+    mockMvc.perform(get("/api/study/CPA-XXXX")
+        .with(user(username)))
         .andExpect(status().isNotFound());
   }
 
@@ -183,7 +194,8 @@ public class StudyBaseControllerTests {
   @Test
   public void updateStudyTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001"))
+    mockMvc.perform(get("/api/study/CPA-10001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("IN_PLANNING")));
@@ -232,7 +244,8 @@ public class StudyBaseControllerTests {
     User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/study/CPA-10001"))
+    mockMvc.perform(get("/api/study/CPA-10001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("IN_PLANNING")));
@@ -246,7 +259,8 @@ public class StudyBaseControllerTests {
         .with(user(user.getUsername())))
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/study/CPA-10001"))
+    mockMvc.perform(get("/api/study/CPA-10001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("ON_HOLD")));
