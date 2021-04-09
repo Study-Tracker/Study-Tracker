@@ -32,11 +32,10 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Document(collection = "users")
 @Data
-public class User implements Persistable<String>, UserDetails {
+public class User implements Persistable<String> {
 
   @Id
   private String id;
@@ -94,23 +93,4 @@ public class User implements Persistable<String>, UserDetails {
     return id == null;
   }
 
-  @Override
-  public boolean isAccountNonExpired() {
-    return !expired;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return !locked;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return !credentialsExpired;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return active;
-  }
 }

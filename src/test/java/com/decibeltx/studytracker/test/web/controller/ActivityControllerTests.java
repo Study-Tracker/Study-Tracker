@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +30,7 @@ import com.decibeltx.studytracker.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.model.Status;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.service.StudyService;
+import com.decibeltx.studytracker.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,14 +51,22 @@ public class ActivityControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
   @Autowired
   private StudyService studyService;
+
+  @Autowired
+  private UserService userService;
+
+  private String username;
 
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userService.findAll().get(0).getUsername();
   }
 
   @Test
@@ -65,7 +75,8 @@ public class ActivityControllerTests {
     Study study = studyService.findAll().get(0);
     studyService.updateStatus(study, Status.ON_HOLD);
 
-    mockMvc.perform(get("/api/activity"))
+    mockMvc.perform(get("/api/activity")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content", not(empty())))
         .andExpect(jsonPath("$.content[0]", hasKey("id")))
@@ -82,7 +93,8 @@ public class ActivityControllerTests {
     studyService.updateStatus(study, Status.ON_HOLD);
     studyService.updateStatus(study, Status.COMPLETE);
 
-    mockMvc.perform(get("/api/activity?sort=date,desc"))
+    mockMvc.perform(get("/api/activity?sort=date,desc")
+        .with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
@@ -108,7 +120,8 @@ public class ActivityControllerTests {
     studyService.updateStatus(study, Status.ON_HOLD);
     studyService.updateStatus(study, Status.COMPLETE);
 
-    mockMvc.perform(get("/api/activity?size=2&page=0&sort=date,desc"))
+    mockMvc.perform(get("/api/activity?size=2&page=0&sort=date,desc")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$", hasKey("pageable")))

@@ -57,23 +57,31 @@ public class StudyLinkControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
   @Autowired
   private UserRepository userRepository;
+
   @Autowired
   private ObjectMapper objectMapper;
+
   @Autowired
   private StudyService studyService;
+
+  private String username;
 
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userRepository.findAll().get(0).getUsername();
   }
 
   @Test
   public void fetchStudyLinksTest() throws Exception {
-    mockMvc.perform(get("/api/study/CPA-10001/links"))
+    mockMvc.perform(get("/api/study/CPA-10001/links")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("label")))
@@ -81,10 +89,12 @@ public class StudyLinkControllerTests {
         .andExpect(jsonPath("$[0]", hasKey("url")))
         .andExpect(jsonPath("$[0].url", is("https://google.com")));
 
-    mockMvc.perform(get("/api/study/CPA-XXXX/links"))
+    mockMvc.perform(get("/api/study/CPA-XXXX/links")
+        .with(user(username)))
         .andExpect(status().isNotFound());
 
-    mockMvc.perform(get("/api/study/PPB-10001/links"))
+    mockMvc.perform(get("/api/study/PPB-10001/links")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }
@@ -92,7 +102,8 @@ public class StudyLinkControllerTests {
   @Test
   public void createStudyLinkTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001/links"))
+    mockMvc.perform(get("/api/study/CPA-10001/links")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
@@ -108,7 +119,8 @@ public class StudyLinkControllerTests {
         .with(user(user.getUsername())))
         .andExpect(status().isCreated());
 
-    mockMvc.perform(get("/api/study/CPA-10001/links"))
+    mockMvc.perform(get("/api/study/CPA-10001/links")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
@@ -116,7 +128,8 @@ public class StudyLinkControllerTests {
   @Test
   public void deleteStudyLinkTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001/links"))
+    mockMvc.perform(get("/api/study/CPA-10001/links")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
@@ -132,7 +145,8 @@ public class StudyLinkControllerTests {
         .with(user(user.getUsername())))
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/study/CPA-10001/links"))
+    mockMvc.perform(get("/api/study/CPA-10001/links")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }

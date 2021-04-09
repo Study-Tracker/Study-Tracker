@@ -24,13 +24,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
   @Autowired
   private UserRepository userRepository;
@@ -79,11 +76,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public void delete(User user) {
     userRepository.delete(user);
-  }
-
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return findByUsername(username).orElse(null);
   }
 
   @Override

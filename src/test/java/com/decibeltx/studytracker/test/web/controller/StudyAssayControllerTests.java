@@ -39,6 +39,7 @@ import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.repository.AssayRepository;
 import com.decibeltx.studytracker.repository.AssayTypeRepository;
 import com.decibeltx.studytracker.repository.StudyRepository;
+import com.decibeltx.studytracker.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.Date;
@@ -84,30 +85,40 @@ public class StudyAssayControllerTests {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private UserRepository userRepository;
+
+  private String username;
+
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userRepository.findAll().get(0).getUsername();
   }
 
   @Test
   public void findStudyAssaysTest() throws Exception {
-    mockMvc.perform(get("/api/study/PPB-10001/assays"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
         .andExpect(jsonPath("$[0].code", is("PPB-10001-001")));
 
-    mockMvc.perform(get("/api/study/CPA-10001/assays"))
+    mockMvc.perform(get("/api/study/CPA-10001/assays")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 
-    mockMvc.perform(get("/api/study/PPB-XXXX/assays"))
+    mockMvc.perform(get("/api/study/PPB-XXXX/assays")
+        .with(user(username)))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void findAssayByIdTest() throws Exception {
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("PPB-10001-001")))
@@ -115,7 +126,8 @@ public class StudyAssayControllerTests {
         .andExpect(jsonPath("$.assayType", hasKey("name")))
         .andExpect(jsonPath("$.assayType.name", is("Generic")));
 
-    mockMvc.perform(get("/api/study/PPB-10001/assay/PPB-10001-XXXXX"))
+    mockMvc.perform(get("/api/study/PPB-10001/assay/PPB-10001-XXXXX")
+        .with(user(username)))
         .andExpect(status().isNotFound());
   }
 
@@ -177,7 +189,8 @@ public class StudyAssayControllerTests {
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("CPA-10001-001")));
 
-    mockMvc.perform(get("/api/study/CPA-10001/assays"))
+    mockMvc.perform(get("/api/study/CPA-10001/assays")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
@@ -188,7 +201,8 @@ public class StudyAssayControllerTests {
   @Test
   public void updateAssayTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status", is("ACTIVE")));
 
@@ -210,15 +224,17 @@ public class StudyAssayControllerTests {
   @Test
   public void deleteAssayTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(true)));
 
     mockMvc.perform(delete("/api/study/PPB-10001/assays/PPB-10001-001")
-        .with(user("jsmith")))
+        .with(user(username)))
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001"))
+    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(false)));
 

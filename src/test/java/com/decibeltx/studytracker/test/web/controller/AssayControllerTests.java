@@ -19,12 +19,14 @@ package com.decibeltx.studytracker.test.web.controller;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.decibeltx.studytracker.Application;
 import com.decibeltx.studytracker.example.ExampleDataGenerator;
+import com.decibeltx.studytracker.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,16 +52,23 @@ public class AssayControllerTests {
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
 
+  @Autowired
+  private UserService userService;
+
+  private String username;
+
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userService.findAll().get(0).getUsername();
   }
 
   // Study methods
 
   @Test
   public void findAllTest() throws Exception {
-    mockMvc.perform(get("/api/assay"))
+    mockMvc.perform(get("/api/assay")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(NUM_ASSAYS)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -70,7 +79,8 @@ public class AssayControllerTests {
 
   @Test
   public void findByIdTest() throws Exception {
-    mockMvc.perform(get("/api/assay/PPB-10001-001"))
+    mockMvc.perform(get("/api/assay/PPB-10001-001")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("PPB-10001-001")))
@@ -83,7 +93,8 @@ public class AssayControllerTests {
 
   @Test
   public void findNonExistentAssayTest() throws Exception {
-    mockMvc.perform(get("/api/assay/CPA-XXXX-XXXX"))
+    mockMvc.perform(get("/api/assay/CPA-XXXX-XXXX")
+        .with(user(username)))
         .andExpect(status().isNotFound());
   }
 

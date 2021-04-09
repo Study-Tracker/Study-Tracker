@@ -18,6 +18,7 @@ import com.decibeltx.studytracker.model.NotebookEntryTemplate;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.repository.EntryTemplateRepository;
 import com.decibeltx.studytracker.repository.UserRepository;
+import com.decibeltx.studytracker.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Date;
 import java.util.List;
@@ -57,14 +58,21 @@ public class NotebookEntryTemplateControllerTest {
     @Autowired
     private EntryTemplateRepository entryTemplateRepository;
 
+    @Autowired
+    private UserService userService;
+
+    private String username;
+
     @Before
     public void doBefore() {
         exampleDataGenerator.populateDatabase();
+        username = userService.findAll().get(0).getUsername();
     }
 
     @Test
     public void allEntryTemplateTest() throws Exception {
-        mockMvc.perform(get("/api/entryTemplate"))
+        mockMvc.perform(get("/api/entryTemplate")
+            .with(user(username)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(ENTRY_TEMPLATE_COUNT)))
                 .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -158,7 +166,8 @@ public class NotebookEntryTemplateControllerTest {
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/api/entryTemplate/active"))
+        mockMvc.perform(get("/api/entryTemplate/active")
+            .with(user(username)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(ENTRY_TEMPLATE_COUNT-1)));
     }

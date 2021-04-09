@@ -35,6 +35,7 @@ import com.decibeltx.studytracker.model.Task;
 import com.decibeltx.studytracker.model.Task.TaskStatus;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.repository.AssayRepository;
+import com.decibeltx.studytracker.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,9 +68,15 @@ public class AssayTaskControllerTests {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private UserService userService;
+
+  private String username;
+
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
+    username = userService.findAll().get(0).getUsername();
   }
 
   @Test
@@ -77,7 +84,8 @@ public class AssayTaskControllerTests {
     Assay assay = assayRepository.findByCode("PPB-10001-001")
         .orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks"))
+    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("label")))
@@ -119,7 +127,8 @@ public class AssayTaskControllerTests {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks"))
+    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
 
@@ -154,7 +163,8 @@ public class AssayTaskControllerTests {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks"))
+    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("status")))
@@ -191,7 +201,8 @@ public class AssayTaskControllerTests {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks"))
+    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
+        .with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 

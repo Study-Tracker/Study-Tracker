@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.test.web.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,8 +45,10 @@ public class StudyActivityControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
+
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
   @Autowired
   private StudyService studyService;
 
@@ -60,7 +63,8 @@ public class StudyActivityControllerTests {
     Study study = studyService.findAll().get(0);
     studyService.updateStatus(study, Status.ON_HOLD);
 
-    mockMvc.perform(get("/api/study/" + study.getCode() + "/activity"))
+    mockMvc.perform(get("/api/study/" + study.getCode() + "/activity")
+        .with(user(study.getOwner().getUsername())))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
