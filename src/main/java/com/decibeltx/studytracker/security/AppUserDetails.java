@@ -60,7 +60,8 @@ public class AppUserDetails implements UserDetails {
   }
 
   public enum AuthMethod {
-    DATABASE
+    DATABASE,
+    SAML
   }
 
 }
