@@ -64,6 +64,7 @@
   <url>https://github.com/Decibel-Therapeutics/Study-Tracker</url>
 
   <repositories>
+
     <repository>
       <id>spring-snapshots</id>
       <name>Spring Snapshots</name>
@@ -72,6 +73,7 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+
     <repository>
       <id>spring-milestones</id>
       <name>Spring Milestones</name>
@@ -80,6 +82,13 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+
+    <repository>
+      <id>Shibboleth</id>
+      <name>Shibboleth</name>
+      <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
+    </repository>
+
   </repositories>
 
   <pluginRepositories>
@@ -185,6 +194,12 @@
       <groupId>org.passay</groupId>
       <artifactId>passay</artifactId>
       <version>1.6.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security.extensions</groupId>
+      <artifactId>spring-security-saml2-core</artifactId>
+      <version>1.0.10.RELEASE</version>
     </dependency>
 
     <!-- Testing -->

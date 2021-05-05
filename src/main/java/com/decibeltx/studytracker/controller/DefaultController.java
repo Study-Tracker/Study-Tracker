@@ -24,7 +24,6 @@ public class DefaultController {
 
   @GetMapping({
       "/",
-      "/login",
       "/study/**", "/studies/**",
       "/assay/**", "/assays/**",
       "/programs/**", "/program/**",

@@ -10,6 +10,8 @@ TODO.md
 test.properties
 internal/
 src/test/resources/*.properties
+*.jks
+*.p12
 
 # To be removed
 application.properties
