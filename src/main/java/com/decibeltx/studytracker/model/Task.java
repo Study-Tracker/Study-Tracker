@@ -17,44 +17,94 @@
 package com.decibeltx.studytracker.model;
 
 import java.util.Date;
-import lombok.Data;
+import javax.persistence.Column;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Data
-public class Task {
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class Task {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  @Column(name = "status", nullable = false)
+  @Enumerated(EnumType.STRING)
   private TaskStatus status;
 
+  @Column(name = "label", nullable = false)
   private String label;
 
+  @Column(name = "task_order", nullable = false)
   private Integer order;
 
+  @Column(name = "created_at", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  @CreatedDate
   private Date createdAt = new Date();
 
+  @Column(name = "updated_at", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  @LastModifiedDate
   private Date updatedAt = new Date();
 
-  public enum TaskStatus {
-    TODO, COMPLETE, INCOMPLETE
+  public Long getId() {
+    return id;
   }
 
-  public Task() {
+  public void setId(Long id) {
+    this.id = id;
   }
 
-  public Task(String label) {
-    this.status = TaskStatus.TODO;
-    this.label = label;
-    this.order = 0;
+  public TaskStatus getStatus() {
+    return status;
   }
 
-  public Task(String label, TaskStatus status) {
+  public void setStatus(TaskStatus status) {
     this.status = status;
-    this.label = label;
-    this.order = 0;
   }
 
-  public Task(String label, TaskStatus status, Integer order) {
-    this.status = status;
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
     this.label = label;
+  }
+
+  public Integer getOrder() {
+    return order;
+  }
+
+  public void setOrder(Integer order) {
     this.order = order;
+  }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Date getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Date updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
 }

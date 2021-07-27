@@ -4,11 +4,10 @@ import com.decibeltx.studytracker.model.Keyword;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.data.mongodb.repository.Aggregation;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface KeywordRepository extends MongoRepository<Keyword, String> {
+public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
   List<Keyword> findByKeyword(String keyword);
 
@@ -16,17 +15,13 @@ public interface KeywordRepository extends MongoRepository<Keyword, String> {
 
   Optional<Keyword> findByKeywordAndCategory(String keyword, String category);
 
-//  List<Keyword> findByKeywordLike(String keyword);
-
-//  List<Keyword> findByCategoryAndKeywordLike(String category, String keyword);
-
-  @Aggregation("{ '$project': { '_id': '$category' } }")
+  @Query("select distinct(k.category) from Keyword k")
   Set<String> findAllCategories();
 
-  @Query("{ 'keyword': { '$regex': ?0, '$options': 'i'  }}")
+  @Query("select k from Keyword k where lower(k.keyword) like lower(concat('%', ?1, '%'))")
   List<Keyword> search(String fragment);
 
-  @Query("{ 'keyword': { '$regex': ?0, '$options': 'i'  }, 'category': ?1}")
+  @Query("select k from Keyword k where lower(k.keyword) like lower(concat('%', ?1, '%')) and k.category = ?2")
   List<Keyword> search(String fragment, String category);
 
 }

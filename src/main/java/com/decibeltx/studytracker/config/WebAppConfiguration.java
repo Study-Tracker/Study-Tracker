@@ -18,7 +18,9 @@ package com.decibeltx.studytracker.config;
 
 import com.decibeltx.studytracker.service.FileSystemStorageService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +35,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @ComponentScan(basePackages = {"com.decibeltx.studytracker.controller",
-    "com.decibeltx.studytracker.web.exception"})
+    "com.decibeltx.studytracker.exception"})
 @PropertySource("classpath:web.properties")
 public class WebAppConfiguration {
 
@@ -77,7 +79,13 @@ public class WebAppConfiguration {
   public ObjectMapper objectMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    objectMapper.registerModule(hibernate5Module());
     return objectMapper;
+  }
+
+  @Bean
+  public Module hibernate5Module() {
+    return new Hibernate5Module();
   }
 
 }

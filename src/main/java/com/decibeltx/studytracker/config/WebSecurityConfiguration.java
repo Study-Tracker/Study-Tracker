@@ -206,6 +206,7 @@ public class WebSecurityConfiguration {
             .antMatchers("/static/**").permitAll()
             .antMatchers("/error").permitAll()
             .antMatchers("/login").permitAll()
+            .antMatchers("/auth/passwordreset").permitAll()
            .anyRequest().fullyAuthenticated()
             .and()
           .formLogin()

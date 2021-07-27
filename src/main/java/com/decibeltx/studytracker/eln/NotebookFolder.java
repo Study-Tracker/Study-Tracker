@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.eln;
 
+import com.decibeltx.studytracker.model.ELNFolder;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +51,15 @@ public class NotebookFolder {
   private List<NotebookEntry> entries = new ArrayList<>();
 
   private Map<String, Object> attributes = new HashMap<>();
+
+  public static NotebookFolder from(ELNFolder folder) {
+    NotebookFolder f = new NotebookFolder();
+    f.setName(folder.getName());
+    f.setPath(folder.getPath());
+    f.setUrl(folder.getUrl());
+    f.setReferenceId(folder.getReferenceId());
+    return f;
+  }
 
   public void setUrl(URL url) {
     this.url = url.toString();

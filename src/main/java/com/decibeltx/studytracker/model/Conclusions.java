@@ -16,39 +16,100 @@
 
 package com.decibeltx.studytracker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import javax.persistence.Column;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Data
-public class Conclusions implements Persistable<String> {
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class Conclusions {
 
   @Id
-  private String id;
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-  @NotNull
+  @Column(name = "content", nullable = false, columnDefinition = "TEXT")
   private String content;
 
-  @Linked(model = User.class)
-  @NotNull
-  @DBRef
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "created_by", nullable = false)
+  @CreatedBy
   private User createdBy;
 
-  @Linked(model = User.class)
-  @DBRef
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "last_modified_by", nullable = false)
+  @LastModifiedBy
   private User lastModifiedBy;
 
+  @Column(name = "created_at", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  @CreatedDate
   private Date createdAt;
 
+  @Column(name = "updated_at")
+  @Temporal(TemporalType.TIMESTAMP)
+  @LastModifiedDate
   private Date updatedAt;
 
-  @Override
-  @JsonIgnore
-  public boolean isNew() {
-    return id == null;
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getContent() {
+    return content;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+  public User getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(User createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public User getLastModifiedBy() {
+    return lastModifiedBy;
+  }
+
+  public void setLastModifiedBy(User lastModifiedBy) {
+    this.lastModifiedBy = lastModifiedBy;
+  }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Date getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Date updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }

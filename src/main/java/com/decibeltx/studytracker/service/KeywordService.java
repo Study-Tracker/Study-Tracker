@@ -16,33 +16,83 @@
 
 package com.decibeltx.studytracker.service;
 
+import com.decibeltx.studytracker.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.model.Keyword;
+import com.decibeltx.studytracker.repository.KeywordRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface KeywordService {
+@Service
+public class KeywordService {
 
-  Optional<Keyword> findById(String id);
+  private static final Logger LOGGER = LoggerFactory.getLogger(KeywordService.class);
 
-  List<Keyword> findAll();
+  @Autowired
+  private KeywordRepository keywordRepository;
 
-  List<Keyword> findByKeyword(String keyword);
+  public Optional<Keyword> findById(Long id) {
+    return keywordRepository.findById(id);
+  }
 
-  List<Keyword> findByCategory(String category);
+  public List<Keyword> findAll() {
+    return keywordRepository.findAll();
+  }
 
-  Optional<Keyword> findByKeywordAndCategory(String keyword, String category);
+  public List<Keyword> findByKeyword(String keyword) {
+    return keywordRepository.findByKeyword(keyword);
+  }
 
-  List<Keyword> search(String fragment);
+  public List<Keyword> findByCategory(String category) {
+    return keywordRepository.findByCategory(category);
+  }
 
-  List<Keyword> search(String fragment, String category);
+  public Optional<Keyword> findByKeywordAndCategory(String keyword, String category) {
+    return keywordRepository.findByKeywordAndCategory(keyword, category);
+  }
 
-  Set<String> findAllCategories();
+  public List<Keyword> search(String fragment) {
+    return keywordRepository.search(fragment);
+  }
 
-  Keyword create(Keyword keyword);
+  public List<Keyword> search(String fragment, String category) {
+    return keywordRepository.search(fragment, category);
+  }
 
-  Keyword update(Keyword keyword);
+  public Set<String> findAllCategories() {
+    return keywordRepository.findAllCategories();
+  }
 
-  void delete(Keyword keyword);
+  @Transactional
+  public Keyword create(Keyword keyword) {
+    LOGGER.info("Registering new keyword: " + keyword.toString());
+    Optional<Keyword> optional
+        = this.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
+    if (optional.isPresent()) {
+      throw new DuplicateRecordException(
+          String.format("Keyword '%s' already exists in category '%s'",
+              keyword.getKeyword(), keyword.getCategory()));
+    } else {
+      return keywordRepository.save(keyword);
+    }
+  }
+
+  @Transactional
+  public Keyword update(Keyword keyword) {
+    Keyword k = keywordRepository.getOne(keyword.getId());
+    k.setKeyword(keyword.getKeyword());
+    k.setCategory(keyword.getCategory());
+    return keywordRepository.save(k);
+  }
+
+  @Transactional
+  public void delete(Keyword keyword) {
+    keywordRepository.delete(keyword);
+  }
 
 }

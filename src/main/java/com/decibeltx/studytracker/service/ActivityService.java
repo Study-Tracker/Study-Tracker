@@ -17,58 +17,125 @@
 package com.decibeltx.studytracker.service;
 
 
+import com.decibeltx.studytracker.events.EventType;
+import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.model.Activity;
 import com.decibeltx.studytracker.model.Assay;
-import com.decibeltx.studytracker.model.EventType;
 import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.User;
+import com.decibeltx.studytracker.repository.ActivityRepository;
+import com.decibeltx.studytracker.repository.ProgramRepository;
+import com.decibeltx.studytracker.repository.StudyRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface ActivityService {
+@Service
+public class ActivityService {
 
-  List<Activity> findAll();
+  @Autowired
+  private ActivityRepository activityRepository;
 
-  List<Activity> findAll(Sort sort);
+  @Autowired
+  private StudyRepository studyRepository;
 
-  Page<Activity> findAll(Pageable pageable);
+  @Autowired
+  private ProgramRepository programRepository;
 
-  Optional<Activity> findById(String id);
+  public List<Activity> findAll() {
+    return activityRepository.findAll();
+  }
 
-  List<Activity> findByStudy(Study study);
+  public List<Activity> findAll(Sort sort) {
+    return activityRepository.findAll(sort);
+  }
 
-  List<Activity> findByAssay(Assay assay);
+  public Page<Activity> findAll(Pageable pageable) {
+    return activityRepository.findAll(pageable);
+  }
 
-  List<Activity> findByProgram(Program program);
+  public Optional<Activity> findById(Long id) {
+    return activityRepository.findById(id);
+  }
 
-  List<Activity> findByEventType(EventType type);
+  public List<Activity> findByStudy(Study study) {
+    return activityRepository.findByStudyId(study.getId());
+  }
 
-  List<Activity> findByUser(User user);
+  public List<Activity> findByAssay(Assay assay) {
+    return activityRepository.findByAssayId(assay.getId());
+  }
 
-  Activity create(Activity activity);
+  public List<Activity> findByProgram(Program program) {
+    return activityRepository.findByProgramId(program.getId());
+  }
 
-  Activity update(Activity activity);
+  public List<Activity> findByEventType(EventType type) {
+    return activityRepository.findByEventType(type);
+  }
 
-  void delete(Activity activity);
+  public List<Activity> findByUser(User user) {
+    return activityRepository.findByUserId(user.getId());
+  }
 
-  void deleteStudyActivity(Study study);
+  @Transactional
+  public Activity create(Activity activity) {
+    if (activity.getAssay() != null && activity.getStudy() == null) {
+      Study study = studyRepository.findByAssayId(activity.getAssay().getId())
+          .orElseThrow(() -> new RecordNotFoundException("Could not find study: " + activity.getAssay().getId()));
+      activity.setStudy(study);
+    }
+    if (activity.getStudy() != null && activity.getProgram() == null) {
+      Program program = programRepository.findByStudyId(activity.getStudy().getId())
+          .orElseThrow(() -> new RecordNotFoundException("Could not find program: " + activity.getStudy().getId()));
+      activity.setProgram(program);
+    }
+    return activityRepository.save(activity);
+  }
 
-  /**
-   * Counting instances of activity before/after/between given dates
-   */
-  long count();
+  @Transactional
+  public void delete(Activity activity) {
+    if (activityRepository.existsById(activity.getId())) {
+      activityRepository.delete(activity);
+    }
+    throw new RecordNotFoundException("Activity record not found: " + activity.getId().toString());
+  }
 
-  long countFromDate(Date startDate);
+  @Transactional
+  public void deleteStudyActivity(Study study) {
+    for (Activity activity : this.findByStudy(study)) {
+      this.delete(activity);
+    }
+  }
 
-  long countBeforeDate(Date endDate);
+  public long count() {
+    return activityRepository.count();
+  }
 
-  long countBetweenDates(Date startDate, Date endDate);
+  public long countFromDate(Date startDate) {
+    return activityRepository.countByDateAfter(startDate);
+  }
 
-  long countCompletedStudiesFromDate(Date date);
+  public long countBeforeDate(Date endDate) {
+    return activityRepository.countByDateBefore(endDate);
+  }
+
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return activityRepository.countByDateBetween(startDate, endDate);
+  }
+
+  public long countCompletedStudiesFromDate(Date date) {
+    return activityRepository.findStatusChangeStudiesAfterDate(date)
+        .stream()
+        .filter(a -> a.getData().containsKey("newStatus") && a.getData().get("newStatus").equals("COMPLETE"))
+        .count();
+  }
 
 }

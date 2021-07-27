@@ -17,7 +17,9 @@
 package com.decibeltx.studytracker.controller.api;
 
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
-import com.decibeltx.studytracker.model.Activity;
+import com.decibeltx.studytracker.mapstruct.dto.ActivityDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.ActivitySummaryDto;
+import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
 import com.decibeltx.studytracker.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,14 +36,18 @@ public class ActivityController {
   @Autowired
   private ActivityService activityService;
 
+  @Autowired
+  private ActivityMapper activityMapper;
+
   @GetMapping("/{id}")
-  public Activity findById(@PathVariable String id) {
-    return activityService.findById(id).orElseThrow(RecordNotFoundException::new);
+  public ActivityDetailsDto findById(@PathVariable Long id) {
+    return activityMapper.toActivityDetails(activityService.findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Could not find activity record: " + id)));
   }
 
   @GetMapping(value = "")
-  public Page<Activity> getActivity(Pageable pageable) {
-    return activityService.findAll(pageable);
+  public Page<ActivitySummaryDto> getActivity(Pageable pageable) {
+    return activityMapper.toActivitySummaryPage(activityService.findAll(pageable));
   }
 
 }

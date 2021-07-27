@@ -16,42 +16,62 @@
 
 package com.decibeltx.studytracker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.mongodb.core.mapping.Document;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Data
-@Document(collection = "keywords")
-public class Keyword implements Persistable<String> {
+@Entity
+@Table(name = "keywords")
+public class Keyword {
 
   @Id
-  private String id;
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-  @NotNull
+  @Column(name = "keyword", nullable = false)
   private String keyword;
 
+  @Column(name = "category", nullable = false)
   private String category;
 
   public Keyword() {
   }
 
-  public Keyword(@NotNull String keyword, String category) {
+  public Keyword(String keyword, String category) {
     this.keyword = keyword;
     this.category = category;
   }
 
-  public Keyword(String id, @NotNull String keyword, String category) {
+  public Keyword(Long id, String keyword, String category) {
     this.id = id;
     this.keyword = keyword;
     this.category = category;
   }
 
-  @Override
-  @JsonIgnore
-  public boolean isNew() {
-    return id == null;
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getKeyword() {
+    return keyword;
+  }
+
+  public void setKeyword(String keyword) {
+    this.keyword = keyword;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 }

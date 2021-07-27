@@ -19,9 +19,9 @@ package com.decibeltx.studytracker.repository;
 import com.decibeltx.studytracker.model.Collaborator;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CollaboratorRepository extends MongoRepository<Collaborator, String> {
+public interface CollaboratorRepository extends JpaRepository<Collaborator, Long> {
 
   Optional<Collaborator> findByLabel(String label);
 

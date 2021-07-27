@@ -113,7 +113,7 @@ public class AuthenticationTests {
     study.setLastModifiedBy(user);
     study.setStartDate(new Date());
     study.setOwner(user);
-    study.setUsers(Collections.singletonList(user));
+    study.setUsers(Collections.singleton(user));
 
     mockMvc.perform(MockMvcRequestBuilders.post("/api/study")
         .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +139,7 @@ public class AuthenticationTests {
     study.setLastModifiedBy(user);
     study.setStartDate(new Date());
     study.setOwner(user);
-    study.setUsers(Collections.singletonList(user));
+    study.setUsers(Collections.singleton(user));
 
     mockMvc.perform(MockMvcRequestBuilders.post("/api/study")
         .with(SecurityMockMvcRequestPostProcessors.httpBasic(

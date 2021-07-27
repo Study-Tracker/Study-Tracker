@@ -66,9 +66,18 @@ export const AssayTypeDropdown = ({
                 fields[f.fieldName] = f.type === "BOOLEAN" ? false : null;
               }
 
+              const tasks = [];
+              for (let t of assayType.tasks) {
+                tasks.push({
+                  "label": t.label,
+                  "status": t.status,
+                  "order": t.order
+                });
+              }
+
               onChange({
                 "assayType": assayType,
-                "tasks": assayType.tasks,
+                "tasks": tasks,
                 "fields": fields
               });
 

@@ -1,0 +1,3 @@
+flyway.user=studytracker
+flyway.password=studytracker
+flyway.url=jdbc:postgresql://localhost:5432/study-tracker

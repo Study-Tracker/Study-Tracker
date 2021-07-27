@@ -18,11 +18,14 @@ package com.decibeltx.studytracker.controller.api;
 
 import com.decibeltx.studytracker.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.mapstruct.dto.KeywordDto;
+import com.decibeltx.studytracker.mapstruct.mapper.KeywordMapper;
 import com.decibeltx.studytracker.model.Keyword;
 import com.decibeltx.studytracker.service.KeywordService;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,25 +51,30 @@ public class KeywordController {
   @Autowired
   private KeywordService keywordService;
 
+  @Autowired
+  private KeywordMapper keywordMapper;
+
   @GetMapping("")
-  public List<Keyword> findAll(@RequestParam(required = false) String category,
+  public List<KeywordDto> findAll(@RequestParam(required = false) String category,
       @RequestParam(required = false, value = "q") String query) {
+    List<Keyword> keywords;
     if (query != null && category != null) {
-      return keywordService.search(query, category);
+      keywords = keywordService.search(query, category);
     } else if (query != null) {
-      return keywordService.search(query);
+      keywords = keywordService.search(query);
     } else if (category != null) {
-      return keywordService.findByCategory(category);
+      keywords = keywordService.findByCategory(category);
     } else {
-      return keywordService.findAll();
+      keywords = keywordService.findAll();
     }
+    return keywordMapper.toDtoList(keywords);
   }
 
   @GetMapping("/{id}")
-  public Keyword findById(@PathVariable("id") String assayId) throws RecordNotFoundException {
-    Optional<Keyword> optional = keywordService.findById(assayId);
+  public KeywordDto findById(@PathVariable("id") Long keywordId) throws RecordNotFoundException {
+    Optional<Keyword> optional = keywordService.findById(keywordId);
     if (optional.isPresent()) {
-      return optional.get();
+      return keywordMapper.toDto(optional.get());
     } else {
       throw new RecordNotFoundException();
     }
@@ -78,9 +86,10 @@ public class KeywordController {
   }
 
   @PostMapping("")
-  public HttpEntity<Keyword> create(@RequestBody Keyword keyword) {
+  public HttpEntity<KeywordDto> create(@RequestBody @Valid KeywordDto dto) {
     LOGGER.info("Creating keyword");
-    LOGGER.info(keyword.toString());
+    LOGGER.info(dto.toString());
+    Keyword keyword = keywordMapper.fromDto(dto);
     Optional<Keyword> optional = keywordService
         .findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
     if (optional.isPresent()) {
@@ -88,13 +97,15 @@ public class KeywordController {
           keyword.getCategory(), keyword.getKeyword()));
     }
     keywordService.create(keyword);
-    return new ResponseEntity<>(keyword, HttpStatus.CREATED);
+    return new ResponseEntity<>(keywordMapper.toDto(keyword), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<Keyword> update(@PathVariable("id") String id, @RequestBody Keyword updated) {
+  public HttpEntity<KeywordDto> update(@PathVariable("id") Long id,
+      @RequestBody @Valid KeywordDto dto) {
     LOGGER.info("Updating keyword");
-    LOGGER.info(updated.toString());
+    LOGGER.info(dto.toString());
+    Keyword updated = keywordMapper.fromDto(dto);
     Optional<Keyword> optional = keywordService
         .findByKeywordAndCategory(updated.getKeyword(), updated.getCategory());
     if (optional.isPresent()) {
@@ -105,13 +116,14 @@ public class KeywordController {
       }
     }
     keywordService.update(updated);
-    return new ResponseEntity<>(updated, HttpStatus.OK);
+    return new ResponseEntity<>(keywordMapper.toDto(updated), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
-  public HttpEntity<?> delete(@PathVariable("id") String id) {
+  public HttpEntity<?> delete(@PathVariable("id") Long id) {
     LOGGER.info("Deleting assay type: " + id);
-    Keyword keyword = keywordService.findById(id).orElseThrow(RecordNotFoundException::new);
+    Keyword keyword = keywordService.findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Cannot find keyword with ID: " + id));
     keywordService.delete(keyword);
     return new ResponseEntity<>(HttpStatus.OK);
   }

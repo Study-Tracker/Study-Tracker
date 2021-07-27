@@ -1,8 +1,8 @@
 package com.decibeltx.studytracker.config;
 
 import com.decibeltx.studytracker.aws.EventBridgeService;
+import com.decibeltx.studytracker.events.EventsService;
 import com.decibeltx.studytracker.events.LocalEventsService;
-import com.decibeltx.studytracker.service.EventsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

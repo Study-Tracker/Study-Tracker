@@ -16,21 +16,72 @@
 
 package com.decibeltx.studytracker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URL;
-import lombok.Data;
-import org.springframework.data.domain.Persistable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.Table;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Data
-public class ExternalLink implements Persistable<String> {
+@Entity
+@Table(name = "external_links")
+@EntityListeners(AuditingEntityListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(name = "link-only", attributeNodes = {})
+})
+public class ExternalLink {
 
-  private String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  @Column(name = "label", nullable = false)
   private String label;
+
+  @Column(name = "url", nullable = false, length = 1024)
   private URL url;
 
-  @Override
-  @JsonIgnore
-  public boolean isNew() {
-    return id == null;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "study_id", nullable = false)
+  private Study study;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public URL getUrl() {
+    return url;
+  }
+
+  public void setUrl(URL url) {
+    this.url = url;
+  }
+
+  public Study getStudy() {
+    return study;
+  }
+
+  public void setStudy(Study study) {
+    this.study = study;
   }
 }

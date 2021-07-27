@@ -16,68 +16,124 @@
 
 package com.decibeltx.studytracker.model;
 
+import com.decibeltx.studytracker.events.EventType;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Document(collection = "activity")
+@Entity
+@Table(name = "activity")
+@EntityListeners(AuditingEntityListener.class)
+@TypeDef(name = "json", typeClass = JsonBinaryType.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(name = "activity-with-user",
+        attributeNodes = { @NamedAttributeNode("user") }),
+    @NamedEntityGraph(name = "activity-details", attributeNodes = {
+        @NamedAttributeNode("user") ,
+        @NamedAttributeNode("program"),
+        @NamedAttributeNode("study"),
+        @NamedAttributeNode("assay")
+    })
+})
 public class Activity {
 
   @Id
-  private String id;
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-  private Reference reference;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "program_id")
+  private Program program;
 
-  private String referenceId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "study_id")
+  private Study study;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "assay_id")
+  private Assay assay;
+
+  @Column(name = "event_type", nullable = false)
+  @Enumerated(EnumType.STRING)
   private EventType eventType;
 
+  @Column(name = "data", columnDefinition = "json")
+  @Type(type = "json")
   private Map<String, Object> data = new HashMap<>();
 
-  @Linked(model = User.class)
-  @NotNull
-  @DBRef
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
+  @Column(name = "date", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date date;
 
-  /* Getters and Setters */
+  public Activity() { }
 
-  public User getUser() {
-    return user;
+  public Activity(EventType type, User user) {
+    this.eventType = type;
+    this.user = user;
+    this.date = new Date();
   }
 
-  public String getId() {
+  @JsonProperty("triggeredBy")
+  public String triggeredBy() {
+    return user.getUsername();
+  }
+
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public Reference getReference() {
-    return reference;
+  public Program getProgram() {
+    return program;
   }
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setProgram(Program program) {
+    this.program = program;
   }
 
-  public void setReference(Reference reference) {
-    this.reference = reference;
+  public Study getStudy() {
+    return study;
   }
 
-  public String getReferenceId() {
-    return referenceId;
+  public void setStudy(Study study) {
+    this.study = study;
   }
 
-  public void setReferenceId(String referenceId) {
-    this.referenceId = referenceId;
+  public Assay getAssay() {
+    return assay;
+  }
+
+  public void setAssay(Assay assay) {
+    this.assay = assay;
   }
 
   public EventType getEventType() {
@@ -88,34 +144,36 @@ public class Activity {
     this.eventType = eventType;
   }
 
-  public Date getDate() {
-    return date;
-  }
-
   public Map<String, Object> getData() {
     return data;
-  }
-
-  public void setDate(Date date) {
-    this.date = date;
   }
 
   public void setData(Map<String, Object> data) {
     this.data = data;
   }
 
-  @JsonProperty("triggeredBy")
-  public String triggeredBy() {
-    return user.getUsername();
+  public User getUser() {
+    return user;
   }
 
-  public enum Reference {
-    STUDY,
-    ASSAY,
-    PROGRAM,
-    USER,
-    ASSAY_TYPE,
-    ENTRY_TEMPLATE
+  public void setUser(User user) {
+    this.user = user;
+  }
+
+  public Date getDate() {
+    return date;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
+  }
+
+  public void addData(String key, Object value) {
+    this.data.put(key, value);
+  }
+
+  public void removeData(String key) {
+    this.data.remove(key);
   }
 
 }

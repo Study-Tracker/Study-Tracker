@@ -18,7 +18,6 @@ package com.decibeltx.studytracker.config;
 
 import com.decibeltx.studytracker.service.NamingOptions;
 import com.decibeltx.studytracker.service.NamingService;
-import com.decibeltx.studytracker.service.impl.NamingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,7 +58,7 @@ public class ServiceConfiguration {
       namingOptions.setAssayCodeMinimumDigits(
           env.getRequiredProperty("study.assay-code-min-digits", Integer.class));
     }
-    return new NamingServiceImpl(namingOptions);
+    return new NamingService(namingOptions);
   }
 
 }

@@ -29,6 +29,7 @@ class AssayTypeSettings extends React.Component {
       showModal: false
     };
     this.toggleModal = this.toggleModal.bind(this);
+    this.toggleActive = this.toggleActive.bind(this);
   }
 
   toggleModal(selected) {
@@ -42,6 +43,27 @@ class AssayTypeSettings extends React.Component {
         showModal: false
       })
     }
+  }
+
+  toggleActive(selected) {
+    fetch("/api/assaytype/" + selected.id, {
+      method: "PATCH"
+    })
+    .then(response => {
+      if (response.ok) {
+        let assayTypes = this.state.assayTypes;
+        const i = assayTypes.findIndex(d => d.id === selected.id);
+        assayTypes[i].active = !assayTypes[i].active;
+        this.setState({assayTypes})
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      this.setState({
+        isError: true,
+        error: error
+      });
+    });
   }
 
   componentDidMount() {
@@ -70,6 +92,7 @@ class AssayTypeSettings extends React.Component {
               showModal={this.state.showModal}
               selectedAssayType={this.state.selectedAssayType}
               toggleModal={this.toggleModal}
+              toggleActive={this.toggleActive}
           />
         </React.Fragment>
     )
@@ -83,7 +106,8 @@ const AssayTypeListCard = ({
   assayTypes,
   showModal,
   selectedAssayType,
-  toggleModal
+  toggleModal,
+  toggleActive
 }) => {
 
   const columns = [
@@ -92,7 +116,7 @@ const AssayTypeListCard = ({
       text: "Name",
       sort: true,
       headerStyle: {width: '20%'},
-      formatter: (c, d, i, x) => <a href="#"
+      formatter: (c, d, i, x) => <a href="javascript:void(0)"
                                     onClick={() => toggleModal(d)}>{d.name}</a>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (rowA.name > rowB.name) {
@@ -134,24 +158,30 @@ const AssayTypeListCard = ({
                  onClick={() => toggleModal(d)}>
                 <Info className="align-middle mr-1" size={18}/>
               </a>
-              <a className="text-warning" title={"Edit assay type"}
-                 onClick={() => history.push("/assaytypes/" + d.id + "/edit")}>
-                <Edit className="align-middle mr-1" size={18}/>
-              </a>
               {
-                !!d.active
-                    ? (
-                        <a className="text-danger" title={"Set inactive"}
-                           onClick={() => console.log("click")}>
-                          <Trash className="align-middle mr-1" size={18}/>
-                        </a>
-                    )
-                    : (
-                        <a className="text-info" title={"Set active"}
-                           onClick={() => console.log("click")}>
-                          <CheckCircle className="align-middle mr-1" size={18}/>
-                        </a>
-                    )
+                d.name === "Generic" ? "" : (
+                    <a className="text-warning" title={"Edit assay type"}
+                       onClick={() => history.push("/assaytypes/" + d.id + "/edit")}>
+                      <Edit className="align-middle mr-1" size={18}/>
+                    </a>
+                )
+              }
+              {
+                d.name === "Generic" ? "" : (
+                  !!d.active
+                      ? (
+                          <a className="text-danger" title={"Set inactive"}
+                             onClick={() => toggleActive(d)}>
+                            <Trash className="align-middle mr-1" size={18}/>
+                          </a>
+                      )
+                      : (
+                          <a className="text-info" title={"Set active"}
+                             onClick={() => toggleActive(d)}>
+                            <CheckCircle className="align-middle mr-1" size={18}/>
+                          </a>
+                      )
+                )
               }
             </React.Fragment>
         )

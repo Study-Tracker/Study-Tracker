@@ -1,18 +1,11 @@
 package com.decibeltx.studytracker.events;
 
-import com.decibeltx.studytracker.model.Activity;
-import org.springframework.context.ApplicationEvent;
+import java.util.Date;
+import java.util.Map;
 
-public class StudyTrackerEvent extends ApplicationEvent {
-
-  private final Activity activity;
-
-  public StudyTrackerEvent(Object source, Activity activity) {
-    super(source);
-    this.activity = activity;
-  }
-
-  public Activity getActivity() {
-    return activity;
-  }
+public interface StudyTrackerEvent {
+  EventType getEventType();
+  Map<String, Object> getData();
+  String getTriggeredBy();
+  Date getDate();
 }

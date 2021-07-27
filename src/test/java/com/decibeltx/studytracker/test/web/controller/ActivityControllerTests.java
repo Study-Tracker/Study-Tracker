@@ -77,6 +77,7 @@ public class ActivityControllerTests {
 
     mockMvc.perform(get("/api/activity")
         .with(user(username)))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content", not(empty())))
         .andExpect(jsonPath("$.content[0]", hasKey("id")))

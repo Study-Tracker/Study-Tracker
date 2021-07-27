@@ -46,15 +46,15 @@ export default class ProgramForm extends React.Component {
   constructor(props) {
     super(props);
 
-    if (!!props.program) {
-      props.program.lastModifiedBy = this.props.user;
-    }
+    // if (!!props.program) {
+    //   props.program.lastModifiedBy = this.props.user;
+    // }
 
     this.state = {
       program: props.program || {
         active: true,
-        createdBy: this.props.user,
-        lastModifiedBy: this.props.user,
+        // createdBy: this.props.user,
+        // lastModifiedBy: this.props.user,
         attributes: {},
         notebookFolder: {}
       },

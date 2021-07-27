@@ -2,12 +2,12 @@ package com.decibeltx.studytracker.test.aws;
 
 import com.decibeltx.studytracker.Application;
 import com.decibeltx.studytracker.aws.EventBridgeService;
+import com.decibeltx.studytracker.events.EventType;
+import com.decibeltx.studytracker.events.EventsService;
 import com.decibeltx.studytracker.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.model.Activity;
-import com.decibeltx.studytracker.model.EventType;
 import com.decibeltx.studytracker.model.Study;
-import com.decibeltx.studytracker.service.EventsService;
 import com.decibeltx.studytracker.service.StudyService;
 import org.junit.Assert;
 import org.junit.Test;

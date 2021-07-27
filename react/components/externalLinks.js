@@ -83,14 +83,18 @@ class ExternalLinks extends React.Component {
       },
       body: JSON.stringify(l)
     }).then(response => {
-      this.setState({
-        links: [...this.state.links, l],
-        newLink: {
-          label: '',
-          url: ''
-        },
-        modalError: null
-      });
+      if (response.ok) {
+        this.setState({
+          links: [...this.state.links, l],
+          newLink: {
+            label: '',
+            url: ''
+          },
+          modalError: null
+        });
+      } else {
+        throw new Error("Failed to add external link");
+      }
       this.toggleModal();
     })
     .catch(error => {

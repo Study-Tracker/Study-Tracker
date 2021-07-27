@@ -20,16 +20,16 @@ import com.decibeltx.studytracker.model.User;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findByEmail(String email);
 
   Optional<User> findByUsername(String username);
 
-  @Query("{ displayName: { '$regex': ?0, '$options': 'i'  }}")
+  @Query("select u from User u where lower(u.displayName) like lower(concat('%', ?1, '%'))")
   List<User> findByDisplayNameLike(String keyword);
 
   long countByCreatedAtBefore(Date date);

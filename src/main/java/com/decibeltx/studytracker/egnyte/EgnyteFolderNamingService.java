@@ -4,9 +4,9 @@ import com.decibeltx.studytracker.model.Assay;
 import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.service.NamingOptions;
-import com.decibeltx.studytracker.service.impl.NamingServiceImpl;
+import com.decibeltx.studytracker.service.NamingService;
 
-public class EgnyteFolderNamingService extends NamingServiceImpl {
+public class EgnyteFolderNamingService extends NamingService {
 
   public EgnyteFolderNamingService(NamingOptions options) {
     super(options);

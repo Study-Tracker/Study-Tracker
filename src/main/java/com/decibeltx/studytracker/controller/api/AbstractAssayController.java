@@ -1,6 +1,9 @@
 package com.decibeltx.studytracker.controller.api;
 
+import com.decibeltx.studytracker.eln.StudyNotebookService;
+import com.decibeltx.studytracker.events.EventsService;
 import com.decibeltx.studytracker.events.util.AssayActivityUtils;
+import com.decibeltx.studytracker.exception.NotebookException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.model.Activity;
 import com.decibeltx.studytracker.model.Assay;
@@ -10,16 +13,20 @@ import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.service.ActivityService;
 import com.decibeltx.studytracker.service.AssayService;
 import com.decibeltx.studytracker.service.AssayTypeService;
-import com.decibeltx.studytracker.service.EventsService;
 import com.decibeltx.studytracker.service.StudyService;
 import com.decibeltx.studytracker.service.UserService;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 public abstract class AbstractAssayController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAssayController.class);
 
   private AssayService assayService;
 
@@ -33,6 +40,17 @@ public abstract class AbstractAssayController {
 
   private ActivityService activityService;
 
+  private StudyNotebookService studyNotebookService;
+
+  private boolean isLong(String value) {
+    try {
+      Long.parseLong(value);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
+  }
+
   /**
    * Looks up an {@link Assay} given an ID or code.
    *
@@ -40,19 +58,17 @@ public abstract class AbstractAssayController {
    * @return
    */
   protected Assay getAssayFromIdentifier(String id) {
-    Assay assay;
-    Optional<Assay> optional = assayService.findById(id);
-    if (optional.isPresent()) {
-      assay = optional.get();
+    Optional<Assay> optional;
+    if (isLong(id)) {
+      optional = assayService.findById(Long.parseLong(id));
     } else {
       optional = assayService.findByCode(id);
-      if (optional.isPresent()) {
-        assay = optional.get();
-      } else {
-        throw new RecordNotFoundException("Cannot identify assay: " + id);
-      }
     }
-    return assay;
+    if (optional.isPresent()) {
+      return optional.get();
+    } else {
+      throw new RecordNotFoundException();
+    }
   }
 
   /**
@@ -62,19 +78,17 @@ public abstract class AbstractAssayController {
    * @return
    */
   protected Study getStudyFromIdentifier(String id) {
-    Study study;
-    Optional<Study> optional = studyService.findById(id);
-    if (optional.isPresent()) {
-      study = optional.get();
+    Optional<Study> optional;
+    if (isLong(id)) {
+      optional = studyService.findById(Long.parseLong(id));
     } else {
       optional = studyService.findByCode(id);
-      if (optional.isPresent()) {
-        study = optional.get();
-      } else {
-        throw new RecordNotFoundException("Cannot identify study: " + id);
-      }
     }
-    return study;
+    if (optional.isPresent()) {
+      return optional.get();
+    } else {
+      throw new RecordNotFoundException();
+    }
   }
 
   /**
@@ -85,28 +99,44 @@ public abstract class AbstractAssayController {
    * @param user
    * @return
    */
-  protected Assay createAssay(Assay assay, Study study, User user) {
+  protected Assay createAssay(Assay assay, Study study, User user, String notebookTemplateId) {
 
-    assay.setCreatedBy(user);
+//    assay.setCreatedBy(user);
     assay.setStudy(study);
 
     // Assay team
-    List<User> team = new ArrayList<>();
+    Set<User> team = new HashSet<>();
     for (User u : assay.getUsers()) {
-      team.add(userService.findByUsername(u.getUsername())
-          .orElseThrow(RecordNotFoundException::new));
+      team.add(userService.findById(u.getId())
+          .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
     }
     assay.setUsers(team);
 
     // Owner
-    assay.setOwner(userService.findByUsername(assay.getOwner().getUsername())
-        .orElseThrow(RecordNotFoundException::new));
+    assay.setOwner(userService.findById(assay.getOwner().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
 
     assayService.create(assay);
     Assert.notNull(assay.getId(), "Assay not persisted.");
 
-    study.getAssays().add(assay);
-    studyService.update(study);
+    if (notebookTemplateId != null) {
+      if (studyNotebookService == null) {
+        LOGGER.warn("StudyNotebookService is not defined, cannot create notebook entry.");
+      } else {
+        Map<String, String> userAttributes = user.getAttributes();
+        String benchlingUserId =
+            userAttributes != null ? userAttributes.get("benchlingUserId") : null;
+        try {
+          studyNotebookService
+              .createAssayNotebookEntry(assay, notebookTemplateId, benchlingUserId);
+        } catch (NotebookException e) {
+          e.printStackTrace();
+          LOGGER.error("Failed to create notebook entry");
+        }
+      }
+    }
+
+    studyService.markAsUpdated(study, user);
 
     Activity activity = AssayActivityUtils.fromNewAssay(assay, user);
     activityService.create(activity);
@@ -114,6 +144,10 @@ public abstract class AbstractAssayController {
 
     return assay;
 
+  }
+
+  protected Assay createAssay(Assay assay, Study study, User user) {
+    return this.createAssay(assay, study, user, null);
   }
 
   /**
@@ -125,19 +159,17 @@ public abstract class AbstractAssayController {
    */
   protected Assay updateAssay(Assay assay, User user) {
 
-    assay.setLastModifiedBy(user);
-
     // Assay team
-    List<User> team = new ArrayList<>();
+    Set<User> team = new HashSet<>();
     for (User u : assay.getUsers()) {
-      team.add(userService.findByUsername(u.getUsername())
-          .orElseThrow(RecordNotFoundException::new));
+      team.add(userService.findById(u.getId())
+          .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
     }
     assay.setUsers(team);
 
     // Owner
-    assay.setOwner(userService.findByUsername(assay.getOwner().getUsername())
-        .orElseThrow(RecordNotFoundException::new));
+    assay.setOwner(userService.findById(assay.getOwner().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
 
     assayService.update(assay);
 
@@ -158,7 +190,6 @@ public abstract class AbstractAssayController {
   protected void deleteAssay(String id, User user) {
 
     Assay assay = this.getAssayFromIdentifier(id);
-    assay.setLastModifiedBy(user);
     assayService.delete(assay);
 
     Activity activity = AssayActivityUtils.fromDeletedAssay(assay, user);
@@ -174,7 +205,7 @@ public abstract class AbstractAssayController {
    * @param status
    * @param user
    */
-  protected void updateAssayStatus(String assayId, Status status, User user) {
+  protected void updateAssayStatus(Long assayId, Status status, User user) {
 
     Assay assay = assayService.findById(assayId).orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
@@ -243,5 +274,15 @@ public abstract class AbstractAssayController {
   @Autowired
   public void setActivityService(ActivityService activityService) {
     this.activityService = activityService;
+  }
+
+  public StudyNotebookService getStudyNotebookService() {
+    return studyNotebookService;
+  }
+
+  @Autowired(required = false)
+  public void setStudyNotebookService(
+      StudyNotebookService studyNotebookService) {
+    this.studyNotebookService = studyNotebookService;
   }
 }

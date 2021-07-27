@@ -1,6 +1,6 @@
 package com.decibeltx.studytracker.exception;
 
-public class UnauthorizedException extends RuntimeException {
+public class UnauthorizedException extends StudyTrackerException {
 
   public UnauthorizedException() {
   }

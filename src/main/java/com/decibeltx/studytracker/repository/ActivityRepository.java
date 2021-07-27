@@ -16,28 +16,49 @@
 
 package com.decibeltx.studytracker.repository;
 
+import com.decibeltx.studytracker.events.EventType;
 import com.decibeltx.studytracker.model.Activity;
-import com.decibeltx.studytracker.model.EventType;
 import java.util.Date;
 import java.util.List;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface ActivityRepository extends MongoRepository<Activity, String> {
+public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
+  @Override
+  @EntityGraph("activity-details")
+  Page<Activity> findAll(Pageable pageable);
+
+  @Override
+  @EntityGraph("activity-details")
+  List<Activity> findAll();
+
+  @Override
+  @EntityGraph("activity-details")
+  Optional<Activity> findById(Long id);
+
+  @EntityGraph("activity-details")
   List<Activity> findByEventType(EventType eventType);
 
-  @Query("{ 'reference': 'STUDY', 'referenceId': ?0 }")
-  List<Activity> findByStudyId(String studyId);
+  @EntityGraph("activity-details")
+  @Query("select a from Activity a where a.study.id = ?1 ")
+  List<Activity> findByStudyId(Long studyId);
 
-  @Query("{ 'reference': 'ASSAY', 'referenceId': ?0 }")
-  List<Activity> findByAssayId(String assayId);
+  @EntityGraph("activity-details")
+  @Query("select a from Activity a where a.assay.id = ?1 ")
+  List<Activity> findByAssayId(Long assayId);
 
-  @Query("{ 'reference': 'PROGRAM', 'referenceId': ?0 }")
-  List<Activity> findByProgramId(String programId);
+  @EntityGraph("activity-details")
+  @Query("select a from Activity a where a.program.id = ?1 ")
+  List<Activity> findByProgramId(Long programId);
 
-  @Query("{ 'user.id': ?0 }")
-  List<Activity> findByUserId(String userId);
+  @EntityGraph("activity-details")
+  @Query("select a from Activity a where a.user.id = ?1 ")
+  List<Activity> findByUserId(Long userId);
 
   long countByDateAfter(Date date);
 
@@ -45,7 +66,7 @@ public interface ActivityRepository extends MongoRepository<Activity, String> {
 
   long countByDateBetween(Date startDate, Date endDate);
 
-  @Query("{'reference': 'STUDY', 'eventType': 'STUDY_STATUS_CHANGED', 'data.newStatus': 'COMPLETE', 'date': {'$gte': ?0} }")
-  List<Activity> findCompletedStudiesAfterDate(Date date);
+  @Query("select a from Activity a where a.eventType = 'STUDY_STATUS_CHANGED' and a.date >= ?1")
+  List<Activity> findStatusChangeStudiesAfterDate(Date date);
 
 }

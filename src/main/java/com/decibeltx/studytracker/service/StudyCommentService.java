@@ -18,19 +18,50 @@ package com.decibeltx.studytracker.service;
 
 import com.decibeltx.studytracker.model.Comment;
 import com.decibeltx.studytracker.model.Study;
+import com.decibeltx.studytracker.repository.CommentRepository;
+import com.decibeltx.studytracker.repository.StudyRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface StudyCommentService {
+@Service
+public class StudyCommentService {
 
-  Optional<Comment> findStudyCommentById(Study study, String id);
+  @Autowired
+  private CommentRepository commentRepository;
 
-  List<Comment> findStudyComments(Study study);
+  @Autowired
+  private StudyRepository studyRepository;
 
-  Comment addStudyComment(Study study, Comment comment);
+  public Optional<Comment> findStudyCommentById(Long id) {
+    return commentRepository.findById(id);
+  }
 
-  Comment updateStudyComment(Study study, Comment comment);
+  public List<Comment> findStudyComments(Study study) {
+    return commentRepository.findByStudyId(study.getId());
+  }
 
-  void deleteStudyComment(Study study, String id);
+  @Transactional
+  public Comment addStudyComment(Study study, Comment comment) {
+    comment.setStudy(study);
+    commentRepository.save(comment);
+    return comment;
+  }
+
+  @Transactional
+  public Comment updateStudyComment(Comment comment) {
+    Comment c = commentRepository.getOne(comment.getId());
+    c.setText(comment.getText());
+    commentRepository.save(c);
+    return c;
+  }
+
+  @Transactional
+  public void deleteStudyComment(Study study, Comment comment) {
+    study.removeComment(comment);
+    studyRepository.save(study);
+  }
 
 }

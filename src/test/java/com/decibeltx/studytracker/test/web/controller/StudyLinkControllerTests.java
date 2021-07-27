@@ -48,6 +48,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -82,6 +83,7 @@ public class StudyLinkControllerTests {
   public void fetchStudyLinksTest() throws Exception {
     mockMvc.perform(get("/api/study/CPA-10001/links")
         .with(user(username)))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("label")))
@@ -131,17 +133,17 @@ public class StudyLinkControllerTests {
     mockMvc.perform(get("/api/study/CPA-10001/links")
         .with(user(username)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)));
+         .andExpect(jsonPath("$", hasSize(1)));
 
     User user = userRepository.findByUsername("jsmith")
         .orElseThrow(RecordNotFoundException::new);
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(study.getExternalLinks().isEmpty());
-    ExternalLink link = study.getExternalLinks().get(0);
+    ExternalLink link = study.getExternalLinks().stream().findFirst().get();
 
     mockMvc.perform(delete("/api/study/CPA-10001/links/" + link.getId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(link))
+//        .contentType(MediaType.APPLICATION_JSON)
+//        .content(objectMapper.writeValueAsBytes(link))
         .with(user(user.getUsername())))
         .andExpect(status().isOk());
 

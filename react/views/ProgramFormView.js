@@ -39,7 +39,7 @@ class ProgramFormView extends React.Component {
     .then(response => response.json())
     .then(programs => {
       if (!!this.state.programId) {
-        const program = programs.find(p => p.id === this.state.programId);
+        const program = programs.find(p => String(p.id) === this.state.programId);
         this.setState({
           program: program,
           programs: programs,

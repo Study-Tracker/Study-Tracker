@@ -137,8 +137,8 @@ public class EgnyteStudyStorageServiceTests {
     study.setLastModifiedBy(user);
     study.setStartDate(new Date());
     study.setOwner(user);
-    study.setUsers(Collections.singletonList(user));
-    studyRepository.insert(study);
+    study.setUsers(Collections.singleton(user));
+    studyRepository.save(study);
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
 
@@ -223,8 +223,8 @@ public class EgnyteStudyStorageServiceTests {
     study.setLastModifiedBy(user);
     study.setStartDate(new Date());
     study.setOwner(user);
-    study.setUsers(Collections.singletonList(user));
-    studyRepository.insert(study);
+    study.setUsers(Collections.singleton(user));
+    studyRepository.save(study);
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
 
@@ -233,11 +233,13 @@ public class EgnyteStudyStorageServiceTests {
     assay.setCode("CPA-12345-12345");
     assay.setStatus(Status.IN_PLANNING);
     assay.setCreatedBy(study.getOwner());
+    assay.setOwner(study.getOwner());
+    assay.setLastModifiedBy(study.getOwner());
     assay.setAssayType(assayType);
     assay.setStudy(study);
     assay.setDescription("This is a test");
     assay.setStartDate(new Date());
-    assayRepository.insert(assay);
+    assayRepository.save(assay);
     Assert.assertNotNull(assay.getId());
 
     StorageFolder folder = null;

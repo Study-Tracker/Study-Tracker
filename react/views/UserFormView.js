@@ -39,7 +39,7 @@ class UserFormView extends React.Component {
     .then(response => response.json())
     .then(users => {
       if (!!this.state.userId) {
-        const user = users.find(p => p.id === this.state.userId);
+        const user = users.find(p => p.id === parseInt(this.state.userId));
         this.setState({
           selectedUser: user,
           users: users,

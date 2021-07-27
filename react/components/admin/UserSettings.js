@@ -74,11 +74,7 @@ class UserSettings extends React.Component {
         text: "Username",
         sort: true,
         headerStyle: {width: '20%%'},
-        formatter: (c, d, i, x) => {
-          return (
-              <a href={"#"} onClick={() => this.toggleModal(d)}>{d.username}</a>
-          )
-        },
+        formatter: (c, d, i, x) => <a href={"javascript:void(0)"} onClick={() => this.toggleModal(d)}>{d.username}</a>,
         sortFunc: (a, b, order, dataField, rowA, rowB) => {
           if (rowA.username > rowB.username) {
             return order === "desc" ? -1 : 1;
@@ -94,12 +90,7 @@ class UserSettings extends React.Component {
         text: "Display Name",
         sort: true,
         headerStyle: {width: '25%%'},
-        formatter: (c, d, i, x) => {
-          return (
-              <a href={"#"}
-                 onClick={() => this.toggleModal(d)}>{d.displayName}</a>
-          )
-        },
+        formatter: (cell, d, index, x) => d.displayName,
         sortFunc: (a, b, order, dataField, rowA, rowB) => {
           if (rowA.displayName > rowB.displayName) {
             return order === "desc" ? -1 : 1;

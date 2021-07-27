@@ -16,42 +16,106 @@
 
 package com.decibeltx.studytracker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Document(collection = "collaborators")
-@Data
-public class Collaborator implements Persistable<String> {
+@Entity
+@Table(name = "collaborators")
+@EntityListeners(AuditingEntityListener.class)
+public class Collaborator {
 
   @Id
-  private String id;
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-  @Indexed(unique = true)
-  @NotNull
+  @Column(name = "label", unique = true, nullable = false)
   private String label;
 
-  @NotNull
+  @Column(name = "organization_name", nullable = false)
   private String organizationName;
 
+  @Column(name = "organization_location")
   private String organizationLocation;
 
+  @Column(name = "contact_person_name")
   private String contactPersonName;
 
+  @Column(name = "contact_email")
   private String contactEmail;
 
-  @NotNull
+  @Column(name = "code", nullable = false)
   private String code;
 
+  @Column(name = "active", nullable = false)
   private boolean active = true;
 
-  @Override
-  @JsonIgnore
-  public boolean isNew() {
-    return id == null;
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public String getOrganizationName() {
+    return organizationName;
+  }
+
+  public void setOrganizationName(String organizationName) {
+    this.organizationName = organizationName;
+  }
+
+  public String getOrganizationLocation() {
+    return organizationLocation;
+  }
+
+  public void setOrganizationLocation(String organizationLocation) {
+    this.organizationLocation = organizationLocation;
+  }
+
+  public String getContactPersonName() {
+    return contactPersonName;
+  }
+
+  public void setContactPersonName(String contactPersonName) {
+    this.contactPersonName = contactPersonName;
+  }
+
+  public String getContactEmail() {
+    return contactEmail;
+  }
+
+  public void setContactEmail(String contactEmail) {
+    this.contactEmail = contactEmail;
+  }
+
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 }

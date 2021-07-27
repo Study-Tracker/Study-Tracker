@@ -477,16 +477,20 @@ export default class AssayDetails extends React.Component {
                     </NavLink>
                   </NavItem>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "3" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("3");
-                        }}
-                    >
-                      Notebook
-                    </NavLink>
-                  </NavItem>
+                  {
+                    !!assay.notebookFolder ? (
+                        <NavItem>
+                          <NavLink
+                              className={this.state.activeTab === "3" ? "active" : ''}
+                              onClick={() => {
+                                this.toggle("3");
+                              }}
+                          >
+                            Notebook
+                          </NavLink>
+                        </NavItem>
+                    ) : ""
+                  }
 
                   {/*TODO*/}
                   {/*<NavItem>*/}
@@ -513,9 +517,13 @@ export default class AssayDetails extends React.Component {
                     <AssayFilesTab assay={assay} user={this.props.user}/>
                   </TabPane>
 
-                  <TabPane tabId="3">
-                    <AssayNotebookTab assay={assay} user={this.props.user}/>
-                  </TabPane>
+                  {
+                    !!assay.notebookFolder ? (
+                        <TabPane tabId="3">
+                          <AssayNotebookTab assay={assay} user={this.props.user}/>
+                        </TabPane>
+                    ) : ""
+                  }
 
                   {/*TODO*/}
                   {/*<TabPane tabId="3">*/}
