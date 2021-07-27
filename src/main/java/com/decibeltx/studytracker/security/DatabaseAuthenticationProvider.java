@@ -33,6 +33,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
     String username = authentication.getPrincipal().toString();
+    LOGGER.info("Attempting to authenticate user: " + username);
     AppUserDetails userDetails = userDetailsService.loadUserByUsername(username);
     String pw =
         authentication.getCredentials() == null ? null : authentication.getCredentials().toString();

@@ -19,6 +19,8 @@ package com.decibeltx.studytracker.controller.api;
 import com.decibeltx.studytracker.controller.UserAuthenticationUtils;
 import com.decibeltx.studytracker.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.mapstruct.dto.CommentDto;
+import com.decibeltx.studytracker.mapstruct.mapper.CommentMapper;
 import com.decibeltx.studytracker.model.Activity;
 import com.decibeltx.studytracker.model.Comment;
 import com.decibeltx.studytracker.model.Study;
@@ -26,6 +28,7 @@ import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.service.StudyCommentService;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,18 +54,23 @@ public class StudyCommentsController extends AbstractStudyController {
   @Autowired
   private StudyCommentService studyCommentService;
 
+  @Autowired
+  private CommentMapper commentMapper;
+
   @GetMapping("")
-  public List<Comment> getStudyComments(@PathVariable("studyId") String studyId) {
+  public List<CommentDto> getStudyComments(@PathVariable("studyId") String studyId) {
     Study study = getStudyFromIdentifier(studyId);
-    return study.getComments();
+    return commentMapper.toDtoList(studyCommentService.findStudyComments(study));
   }
 
   @PostMapping("")
-  public HttpEntity<Comment> addStudyComment(@PathVariable("studyId") String studyId,
-      @RequestBody Comment comment) {
+  public HttpEntity<CommentDto> addStudyComment(@PathVariable("studyId") String studyId,
+      @RequestBody @Valid CommentDto dto) {
 
     LOGGER
-        .info(String.format("Creating new comment for study %s: %s", studyId, comment.toString()));
+        .info(String.format("Creating new comment for study %s: %s", studyId, dto.toString()));
+
+    Comment comment = commentMapper.fromDto(dto);
 
     Study study = getStudyFromIdentifier(studyId);
     String username = UserAuthenticationUtils
@@ -70,7 +78,6 @@ public class StudyCommentsController extends AbstractStudyController {
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
 
-    study.setLastModifiedBy(user);
     studyCommentService.addStudyComment(study, comment);
 
     // Publish events
@@ -78,14 +85,14 @@ public class StudyCommentsController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(comment, HttpStatus.CREATED);
+    return new ResponseEntity<>(commentMapper.toDto(comment), HttpStatus.CREATED);
   }
 
   @PutMapping("/{commentId}")
-  public HttpEntity<Comment> editedStudyComment(@PathVariable("studyId") String studyId,
-      @PathVariable("commentId") String commentId, @RequestBody Comment updated) {
+  public HttpEntity<CommentDto> editedStudyComment(@PathVariable("studyId") String studyId,
+      @PathVariable("commentId") Long commentId, @RequestBody @Valid CommentDto dto) {
 
-    LOGGER.info(String.format("Editing comment for study %s: %s", studyId, updated.toString()));
+    LOGGER.info(String.format("Editing comment for study %s: %s", studyId, dto.toString()));
 
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
@@ -93,29 +100,22 @@ public class StudyCommentsController extends AbstractStudyController {
         .orElseThrow(RecordNotFoundException::new);
 
     Study study = getStudyFromIdentifier(studyId);
-    Optional<Comment> optional = studyCommentService.findStudyCommentById(study, commentId);
-    if (!optional.isPresent()) {
-      throw new RecordNotFoundException(String.format("No comment with ID %s found for study %s",
-          commentId, study.getCode()));
-    }
-    Comment comment = optional.get();
+    Comment comment = commentMapper.fromDto(dto);
 
-    comment.setText(updated.getText());
-    study.setLastModifiedBy(user);
-
-    studyCommentService.updateStudyComment(study, comment);
+    studyCommentService.updateStudyComment(comment);
+    this.getStudyService().markAsUpdated(study, user);
 
     // Publish events
     Activity activity = StudyActivityUtils.fromEditiedComment(study, user, comment);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(comment, HttpStatus.OK);
+    return new ResponseEntity<>(commentMapper.toDto(comment), HttpStatus.OK);
   }
 
   @DeleteMapping("/{commentId}")
   public HttpEntity<?> deleteStudyComment(@PathVariable("studyId") String studyId,
-      @PathVariable("commentId") String commentId) {
+      @PathVariable("commentId") Long commentId) {
 
     LOGGER.info(String.format("Removing comment %s for study %s", commentId, studyId));
 
@@ -125,14 +125,13 @@ public class StudyCommentsController extends AbstractStudyController {
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
 
-    study.setLastModifiedBy(user);
-    Optional<Comment> optional = studyCommentService.findStudyCommentById(study, commentId);
+    Optional<Comment> optional = studyCommentService.findStudyCommentById(commentId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException(String.format("No comment with ID %s found for study %s",
           commentId, study.getCode()));
     }
 
-    studyCommentService.deleteStudyComment(study, commentId);
+    studyCommentService.deleteStudyComment(study, optional.get());
 
     // Publish events
     Activity activity = StudyActivityUtils.fromDeletedComment(study, user);

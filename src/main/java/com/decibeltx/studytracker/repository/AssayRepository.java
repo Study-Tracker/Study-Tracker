@@ -20,17 +20,31 @@ import com.decibeltx.studytracker.model.Assay;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface AssayRepository extends MongoRepository<Assay, String> {
+public interface AssayRepository extends JpaRepository<Assay, Long> {
 
+  @Override
+  @EntityGraph("assay-with-parents")
+  List<Assay> findAll();
+
+  @Override
+  @EntityGraph("assay-with-attributes")
+  Optional<Assay> findById(Long id);
+
+  @EntityGraph("assay-with-attributes")
   Optional<Assay> findByCode(String code);
 
-  List<Assay> findByStudyId(String studyId);
+  @EntityGraph("assay-summary")
+  List<Assay> findByStudyId(Long studyId);
 
-  @Query("{ 'code': { '$regex': ?0, '$options': 'i' } }")
+  @Query("select a from Assay a where lower(a.code) like lower(concat(?1, '%'))")
   List<Assay> findByCodePrefix(String prefix);
+
+  @Query("select count(a) from Assay a where lower(a.code) like lower(concat(?1, '%'))")
+  long countByCodePrefix(String prefix);
 
   long countByCreatedAtBefore(Date date);
 

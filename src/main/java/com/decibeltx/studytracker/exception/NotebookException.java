@@ -16,7 +16,7 @@
 
 package com.decibeltx.studytracker.exception;
 
-public class NotebookException extends Exception {
+public class NotebookException extends StudyTrackerException {
 
   public NotebookException() {
   }

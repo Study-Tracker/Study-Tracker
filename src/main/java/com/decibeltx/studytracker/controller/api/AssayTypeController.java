@@ -17,10 +17,13 @@
 package com.decibeltx.studytracker.controller.api;
 
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.mapstruct.dto.AssayTypeDetailsDto;
+import com.decibeltx.studytracker.mapstruct.mapper.AssayTypeMapper;
 import com.decibeltx.studytracker.model.AssayType;
 import com.decibeltx.studytracker.service.AssayTypeService;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,41 +49,54 @@ public class AssayTypeController {
   @Autowired
   private AssayTypeService assayTypeService;
 
+  @Autowired
+  private AssayTypeMapper assayTypeMapper;
+
   @GetMapping("")
-  public List<AssayType> findAll() {
-    return assayTypeService.findAll();
+  public List<AssayTypeDetailsDto> findAll() {
+    return assayTypeMapper.toDetailsDtoList(assayTypeService.findAll());
   }
 
   @GetMapping("/{id}")
-  public AssayType findById(@PathVariable("id") String assayId) throws RecordNotFoundException {
-    Optional<AssayType> optional = assayTypeService.findById(assayId);
+  public AssayTypeDetailsDto findById(@PathVariable("id") Long assayTypeId) throws RecordNotFoundException {
+    Optional<AssayType> optional = assayTypeService.findById(assayTypeId);
     if (optional.isPresent()) {
-      return optional.get();
+      return assayTypeMapper.toDetailsDto(optional.get());
     } else {
       throw new RecordNotFoundException();
     }
   }
 
   @PostMapping("")
-  public HttpEntity<AssayType> create(@RequestBody AssayType assayType) {
+  public HttpEntity<AssayTypeDetailsDto> create(@RequestBody @Valid AssayTypeDetailsDto dto) {
     LOGGER.info("Creating assay type");
-    LOGGER.info(assayType.toString());
+    LOGGER.info(dto.toString());
+    AssayType assayType = assayTypeMapper.fromDetailsDto(dto);
     assayType.setActive(true);
     assayTypeService.create(assayType);
-    return new ResponseEntity<>(assayType, HttpStatus.CREATED);
+    return new ResponseEntity<>(assayTypeMapper.toDetailsDto(assayType), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
   public HttpEntity<AssayType> update(@PathVariable("id") String id,
-      @RequestBody AssayType assayType) {
+      @RequestBody @Valid AssayTypeDetailsDto dto) {
     LOGGER.info("Updating assay type");
-    LOGGER.info(assayType.toString());
+    LOGGER.info(dto.toString());
+    AssayType assayType = assayTypeMapper.fromDetailsDto(dto);
     assayTypeService.update(assayType);
     return new ResponseEntity<>(assayType, HttpStatus.OK);
   }
 
+  @PatchMapping("/{id}")
+  public HttpEntity<?> toggleActive(@PathVariable("id") Long id) {
+    AssayType assayType = assayTypeService.findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Cannot find assay type: " + id));
+    assayTypeService.toggleActive(assayType);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
   @DeleteMapping("/{id}")
-  public void delete(@PathVariable("id") String id) {
+  public void delete(@PathVariable("id") Long id) {
     LOGGER.info("Deleting assay type: " + id);
     AssayType assayType = assayTypeService.findById(id).orElseThrow(RecordNotFoundException::new);
     assayTypeService.delete(assayType);

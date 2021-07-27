@@ -16,7 +16,8 @@
 
 package com.decibeltx.studytracker.controller.api;
 
-import com.decibeltx.studytracker.model.Activity;
+import com.decibeltx.studytracker.mapstruct.dto.ActivitySummaryDto;
+import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.service.ActivityService;
 import java.util.List;
@@ -33,10 +34,13 @@ public class StudyActivityController extends AbstractStudyController {
   @Autowired
   private ActivityService activityService;
 
+  @Autowired
+  private ActivityMapper activityMapper;
+
   @GetMapping("")
-  public List<Activity> getStudyActivity(@PathVariable("studyId") String studyId) {
+  public List<ActivitySummaryDto> getStudyActivity(@PathVariable("studyId") String studyId) {
     Study study = this.getStudyFromIdentifier(studyId);
-    return activityService.findByStudy(study);
+    return activityMapper.toActivitySummaryList(activityService.findByStudy(study));
   }
 
 }

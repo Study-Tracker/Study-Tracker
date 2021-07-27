@@ -16,35 +16,92 @@
 
 package com.decibeltx.studytracker.service;
 
+import com.decibeltx.studytracker.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.model.RelationshipType;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.StudyRelationship;
+import com.decibeltx.studytracker.repository.StudyRelationshipRepository;
 import java.util.List;
+import java.util.Optional;
+import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface StudyRelationshipService {
+@Service
+public class StudyRelationshipService {
 
-  /**
-   * Fetches all {@link StudyRelationship} records for the given study.
-   *
-   * @param study
-   * @return
-   */
-  List<StudyRelationship> getStudyRelationships(Study study);
+  @Autowired
+  private StudyRelationshipRepository studyRelationshipRepository;
 
-  /**
-   * Creates a relationship between two studies.
-   *
-   * @param sourceStudy
-   * @param targetStudy
-   * @param type
-   */
-  void addStudyRelationship(Study sourceStudy, Study targetStudy, StudyRelationship.Type type);
+  public Optional<StudyRelationship> findById(Long id) {
+    return studyRelationshipRepository.findById(id);
+  }
 
-  /**
-   * Removes the bidirectional relationship between two studies.
-   *
-   * @param sourceStudy
-   * @param targetStudy
-   */
-  void removeStudyRelationship(Study sourceStudy, Study targetStudy);
+  @Transactional(readOnly = true)
+  public List<StudyRelationship> findStudyRelationships(Study study) {
+    List<StudyRelationship> relationships = studyRelationshipRepository.findBySourceStudyId(study.getId());
+    for (StudyRelationship relationship: relationships) {
+      Hibernate.initialize(relationship.getSourceStudy());
+      Hibernate.initialize(relationship.getTargetStudy());
+    }
+    return relationships;
+  }
+
+  @Transactional
+  public StudyRelationship addStudyRelationship(Study sourceStudy, Study targetStudy, RelationshipType type) {
+
+    StudyRelationship sourceRelationship;
+    StudyRelationship targetRelationship;
+
+    Optional<StudyRelationship> optional = studyRelationshipRepository
+        .findBySourceAndTargetStudyIds(sourceStudy.getId(), targetStudy.getId());
+    if (optional.isPresent()) {
+      sourceRelationship = optional.get();
+      sourceRelationship.setType(type);
+      targetRelationship = studyRelationshipRepository
+          .findBySourceAndTargetStudyIds(targetStudy.getId(), sourceStudy.getId())
+          .orElseThrow(RecordNotFoundException::new);
+      targetRelationship.setType(RelationshipType.getInverse(type));
+    } else {
+      sourceRelationship = new StudyRelationship(type, sourceStudy, targetStudy);
+      targetRelationship = new StudyRelationship(RelationshipType.getInverse(type), targetStudy, sourceStudy);
+    }
+
+    studyRelationshipRepository.save(sourceRelationship);
+    studyRelationshipRepository.save(targetRelationship);
+
+    return sourceRelationship;
+
+  }
+
+  @Transactional
+  public void removeStudyRelationship(Study sourceStudy, Study targetStudy) {
+
+    Optional<StudyRelationship> optional = studyRelationshipRepository.findBySourceAndTargetStudyIds(
+        sourceStudy.getId(), targetStudy.getId());
+    if (optional.isPresent()) {
+      StudyRelationship relationship = optional.get();
+      sourceStudy.removeStudyRelationship(relationship);
+      targetStudy.removeStudyRelationship(relationship);
+      studyRelationshipRepository.deleteById(relationship.getId());
+    } else {
+      throw new RecordNotFoundException(String.format("No study relationship found for source study "
+          + "%s and target study %s", sourceStudy.getCode(), targetStudy.getCode()));
+    }
+
+    optional = studyRelationshipRepository.findBySourceAndTargetStudyIds(
+        targetStudy.getId(), sourceStudy.getId());
+    if (optional.isPresent()) {
+      StudyRelationship relationship = optional.get();
+      sourceStudy.removeStudyRelationship(relationship);
+      targetStudy.removeStudyRelationship(relationship);
+      studyRelationshipRepository.deleteById(relationship.getId());
+    } else {
+      throw new RecordNotFoundException(String.format("No study relationship found for source study "
+          + "%s and target study %s", targetStudy.getCode(), sourceStudy.getCode()));
+    }
+
+  }
 
 }

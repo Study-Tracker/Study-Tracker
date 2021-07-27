@@ -17,5 +17,10 @@
 package com.decibeltx.studytracker.model;
 
 public enum Status {
-  IN_PLANNING, ACTIVE, COMPLETE, ON_HOLD, NEEDS_ATTENTION, DEPRIORITIZED
+  IN_PLANNING,
+  ACTIVE,
+  COMPLETE,
+  ON_HOLD,
+  NEEDS_ATTENTION,
+  DEPRIORITIZED
 }

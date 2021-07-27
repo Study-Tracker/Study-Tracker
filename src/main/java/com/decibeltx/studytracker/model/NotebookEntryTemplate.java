@@ -1,52 +1,69 @@
 package com.decibeltx.studytracker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Document(collection = "notebook_entry_templates")
-@Data
-public class NotebookEntryTemplate implements Persistable<String> {
+@Entity
+@Table(name = "notebook_entry_templates")
+@EntityListeners(AuditingEntityListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(name = "entry-template-details", attributeNodes = {
+        @NamedAttributeNode("createdBy"),
+        @NamedAttributeNode("lastModifiedBy")
+    })
+})
+public class NotebookEntryTemplate {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    @Indexed(unique = true)
-    @NotNull(message = "Template name must not be empty")
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Indexed(unique = true)
-    @NotNull(message = "Template id must not be empty")
+    @Column(name = "template_id", nullable = false, unique = true)
     private String templateId;
 
     @CreatedBy
-    @Linked(model = NotebookEntryTemplate.class)
-    @NotNull
-    @DBRef
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
     @LastModifiedBy
-    @Linked(model = NotebookEntryTemplate.class)
-    @NotNull
-    @DBRef
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_modified_by", nullable = false)
     private User lastModifiedBy;
 
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date createdAt;
 
+    @Column(name = "updated_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
 
+    @Column(name = "active", nullable = false)
     private boolean active = true;
 
     public static NotebookEntryTemplate of(User user, String templateId,
@@ -61,9 +78,67 @@ public class NotebookEntryTemplate implements Persistable<String> {
         return notebookEntryTemplate;
     }
 
-    @Override
-    @JsonIgnore
-    public boolean isNew() {
-        return id == null;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public User getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(User lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -17,39 +17,98 @@
 package com.decibeltx.studytracker.service;
 
 import com.decibeltx.studytracker.model.User;
+import com.decibeltx.studytracker.repository.UserRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface UserService {
+@Service
+public class UserService {
 
-  Optional<User> findById(String id);
+  @Autowired
+  private UserRepository userRepository;
 
-  List<User> findAll();
+  public Optional<User> findById(Long id) {
+    return userRepository.findById(id);
+  }
 
-  Optional<User> findByEmail(String email);
+  public List<User> findAll() {
+    return userRepository.findAll();
+  }
 
-  Optional<User> findByUsername(String username);
+  public Optional<User> findByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
 
-  List<User> search(String keyword);
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Optional<User> findByUsername(String username) {
+    return userRepository.findByUsername(username);
+  }
 
-  void create(User user);
+  public List<User> search(String keyword) {
+    return userRepository.findByDisplayNameLike(keyword);
+  }
 
-  void update(User user);
+  public long count() {
+    return userRepository.count();
+  }
 
-  void delete(User user);
+  @Transactional
+  public void create(User user) {
+    userRepository.save(user);
+  }
 
-  /**
-   * Counting number of users created before/after/between given dates.
-   */
-  long count();
+  @Transactional
+  public void update(User user) {
+    User u = userRepository.getOne(user.getId());
+    u.setDisplayName(user.getDisplayName());
+    u.setEmail(user.getEmail());
+    u.setActive(user.isActive());
+    u.setTitle(user.getTitle());
+    u.setDepartment(user.getDepartment());
+    u.setAttributes(user.getAttributes());
+    userRepository.save(u);
+  }
 
-  long countFromDate(Date startDate);
+  @Transactional
+  public void updatePassword(User user, String password) {
+    User u = userRepository.getOne(user.getId());
+    u.setPassword(password);
+    u.setCredentialsExpired(false);
+    userRepository.save(u);
+  }
 
-  long countBeforeDate(Date endDate);
+  @Transactional
+  public void delete(User user) {
+    userRepository.delete(user);
+  }
 
-  long countBetweenDates(Date startDate, Date endDate);
+  public boolean exists(User user) {
+    return this.exists(user.getId());
+  }
 
-  long countActiveUsers();
+  public boolean exists(Long id) {
+    return userRepository.existsById(id);
+  }
+
+  public long countFromDate(Date startDate) {
+    return userRepository.countByCreatedAtAfter(startDate);
+  }
+
+  public long countBeforeDate(Date endDate) {
+    return userRepository.countByCreatedAtBefore(endDate);
+  }
+
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return userRepository.countByCreatedAtBetween(startDate, endDate);
+  }
+
+  public long countActiveUsers() {
+    return userRepository.countByActive(true);
+  }
 
 }

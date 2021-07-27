@@ -64,8 +64,8 @@ export default class StudyForm extends React.Component {
           owner: true
         }],
         owner: this.props.user,
-        createdBy: this.props.user,
-        lastModifiedBy: this.props.user,
+        // createdBy: this.props.user,
+        // lastModifiedBy: this.props.user,
         notebookFolder: {}
       },
       validation: {

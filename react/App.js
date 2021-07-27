@@ -40,7 +40,7 @@ import AdminDashboardView from "./views/AdminDashboardView";
 import FrontPageView from "./views/FrontPageView";
 import AssayTypeFormView from "./views/AssayTypeFormView";
 import AssayListView from "./views/AssayListView";
-import { TemplateFormView } from './views/TemplateFormView';
+import {TemplateFormView} from './views/TemplateFormView';
 
 export const history = createBrowserHistory();
 
@@ -145,6 +145,7 @@ export default class App extends React.Component {
                   <Route exact path={"/auth/passwordreset"}
                          render={props => <PasswordResetView {...props} />}/>
 
+                  {/* Assay Type Form */}
                   <Route exact path={"/assaytypes/new"}
                          render={props => <AssayTypeFormView {...props} />}/>
 

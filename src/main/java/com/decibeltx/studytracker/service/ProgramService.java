@@ -16,36 +16,124 @@
 
 package com.decibeltx.studytracker.service;
 
+import com.decibeltx.studytracker.eln.NotebookFolder;
+import com.decibeltx.studytracker.eln.StudyNotebookService;
+import com.decibeltx.studytracker.exception.StudyTrackerException;
+import com.decibeltx.studytracker.model.ELNFolder;
+import com.decibeltx.studytracker.model.FileStoreFolder;
 import com.decibeltx.studytracker.model.Program;
+import com.decibeltx.studytracker.repository.ProgramRepository;
+import com.decibeltx.studytracker.storage.StorageFolder;
+import com.decibeltx.studytracker.storage.StudyStorageService;
+import com.decibeltx.studytracker.storage.exception.StudyStorageException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface ProgramService {
+@Service
+public class ProgramService {
 
-  Optional<Program> findById(String id);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProgramService.class);
 
-  Optional<Program> findByName(String name);
+  @Autowired
+  private ProgramRepository programRepository;
 
-  List<Program> findAll();
+  @Autowired
+  private StudyStorageService studyStorageService;
 
-  List<Program> findByCode(String code);
+  @Autowired(required = false)
+  private StudyNotebookService studyNotebookService;
 
-  void create(Program program);
+  public Optional<Program> findById(Long id) {
+    return programRepository.findById(id);
+  }
 
-  void update(Program program);
+  public Optional<Program> findByName(String name) {
+    return programRepository.findByName(name);
+  }
 
-  void delete(Program program);
+  public List<Program> findAll() {
+    return programRepository.findAll();
+  }
 
-  /**
-   * Counting number of programs created before/after/between given dates.
-   */
-  long count();
+  public List<Program> findByCode(String code) {
+    return programRepository.findByCode(code);
+  }
 
-  long countFromDate(Date startDate);
+  @Transactional
+  public void create(Program program) {
+    LOGGER.info("Creating new program with name: " + program.getName());
 
-  long countBeforeDate(Date endDate);
+    program.setCreatedAt(new Date());
+    program.setUpdatedAt(new Date());
 
-  long countBetweenDates(Date startDate, Date endDate);
+    // Create the storage folder
+    try {
+      StorageFolder storageFolder = studyStorageService.createProgramFolder(program);
+      program.setStorageFolder(FileStoreFolder.from(storageFolder));
+    } catch (StudyStorageException e) {
+      throw new StudyTrackerException(e);
+    }
+
+    // Create the notebook folder
+    if (studyNotebookService != null) {
+      try {
+        NotebookFolder notebookFolder = studyNotebookService.createProgramFolder(program);
+        program.setNotebookFolder(ELNFolder.from(notebookFolder));
+      } catch (Exception e) {
+        throw new StudyTrackerException(e);
+      }
+    }
+
+    programRepository.save(program);
+  }
+
+  @Transactional
+  public void update(Program program) {
+    LOGGER.info("Updating program with name: " + program.getName());
+    Program p = programRepository.getOne(program.getId());
+    p.setDescription(program.getDescription());
+    p.setActive(program.isActive());
+    p.setAttributes(program.getAttributes());
+    programRepository.save(p);
+  }
+
+  @Transactional
+  public void delete(Program program) {
+    LOGGER.info("Innactivating program with name: " + program.getName());
+    this.delete(program.getId());
+  }
+
+  @Transactional
+  public void delete(Long programId) {
+    Program program = programRepository.getOne(programId);
+    program.setActive(false);
+    programRepository.save(program);
+  }
+
+  public boolean exists(Long id) {
+    return programRepository.existsById(id);
+  }
+
+  public long count() {
+    return programRepository.count();
+  }
+
+  public long countFromDate(Date startDate) {
+    return programRepository.countByCreatedAtAfter(startDate);
+  }
+
+  public long countBeforeDate(Date endDate) {
+    return programRepository.countByCreatedAtBefore(endDate);
+  }
+
+  public long countBetweenDates(Date startDate, Date endDate) {
+    return programRepository.countByCreatedAtBetween(startDate, endDate);
+  }
 
 }

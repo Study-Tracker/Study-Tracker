@@ -12,6 +12,7 @@ internal/
 src/test/resources/*.properties
 *.jks
 *.p12
+.jpb/
 
 # To be removed
 application.properties

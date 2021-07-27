@@ -87,14 +87,18 @@ const StudySummaryCard = ({study}) => {
 
           </Row>
 
-          <Row className="mt-2">
+          {
+            !!study.users ? (
+                <Row className="mt-2">
 
-            <Col xs={12} sm={6}>
-              <h6 className="details-label">Study Team</h6>
-              <StudyTeam users={study.users} owner={study.owner}/>
-            </Col>
+                  <Col xs={12} sm={6}>
+                    <h6 className="details-label">Study Team</h6>
+                    <StudyTeam users={study.users} owner={study.owner}/>
+                  </Col>
 
-          </Row>
+                </Row>
+            ) : ""
+          }
 
           <Row className="mt-2">
             <Col>

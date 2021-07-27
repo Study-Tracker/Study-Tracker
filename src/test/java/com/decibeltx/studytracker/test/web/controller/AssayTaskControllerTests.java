@@ -30,9 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.decibeltx.studytracker.Application;
 import com.decibeltx.studytracker.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.mapstruct.mapper.AssayTaskMapper;
 import com.decibeltx.studytracker.model.Assay;
-import com.decibeltx.studytracker.model.Task;
-import com.decibeltx.studytracker.model.Task.TaskStatus;
+import com.decibeltx.studytracker.model.AssayTask;
+import com.decibeltx.studytracker.model.TaskStatus;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.repository.AssayRepository;
 import com.decibeltx.studytracker.service.UserService;
@@ -71,6 +72,9 @@ public class AssayTaskControllerTests {
   @Autowired
   private UserService userService;
 
+  @Autowired
+  private AssayTaskMapper mapper;
+
   private String username;
 
   @Before
@@ -103,27 +107,27 @@ public class AssayTaskControllerTests {
         .orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
-    Task task = new Task();
+    AssayTask task = new AssayTask();
     task.setLabel("New task");
     task.setStatus(TaskStatus.TODO);
 
     mockMvc.perform(post("/api/assay/xxxxxxx/tasks")
         .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
     mockMvc.perform(post("/api/assay/" + assay.getCode() + "/tasks")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isUnauthorized());
 
     mockMvc.perform(post("/api/assay/" + assay.getCode() + "/tasks")
         .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
@@ -140,26 +144,26 @@ public class AssayTaskControllerTests {
         .orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
-    Task task = assay.getTasks().get(0);
+    AssayTask task = assay.getTasks().stream().findFirst().get();
     task.setStatus(TaskStatus.COMPLETE);
 
     mockMvc.perform(put("/api/assay/xxxxxxx/tasks")
         .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
     mockMvc.perform(put("/api/assay/" + assay.getCode() + "/tasks")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isUnauthorized());
 
     mockMvc.perform(put("/api/assay/" + assay.getCode() + "/tasks")
         .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
@@ -179,25 +183,25 @@ public class AssayTaskControllerTests {
         .orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
-    Task task = assay.getTasks().get(0);
+    AssayTask task = assay.getTasks().stream().findFirst().get();
 
     mockMvc.perform(delete("/api/assay/xxxxxxx/tasks")
         .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
     mockMvc.perform(delete("/api/assay/" + assay.getCode() + "/tasks")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isUnauthorized());
 
     mockMvc.perform(delete("/api/assay/" + assay.getCode() + "/tasks")
         .with(user(user.getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(task)))
+        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 

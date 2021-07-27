@@ -17,25 +17,68 @@
 package com.decibeltx.studytracker.service;
 
 import com.decibeltx.studytracker.model.Collaborator;
+import com.decibeltx.studytracker.repository.CollaboratorRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public interface CollaboratorService {
+@Service
+public class CollaboratorService {
 
-  List<Collaborator> findAll();
+  @Autowired
+  private CollaboratorRepository collaboratorRepository;
 
-  Optional<Collaborator> findById(String id);
+  public List<Collaborator> findAll() {
+    return collaboratorRepository.findAll();
+  }
 
-  Optional<Collaborator> findByLabel(String name);
+  public Optional<Collaborator> findById(Long id) {
+    return collaboratorRepository.findById(id);
+  }
 
-  List<Collaborator> findByOrganizationName(String name);
+  public Optional<Collaborator> findByLabel(String label) {
+    return collaboratorRepository.findByLabel(label);
+  }
 
-  List<Collaborator> findByCode(String code);
+  public List<Collaborator> findByOrganizationName(String name) {
+    return collaboratorRepository.findByOrganizationName(name);
+  }
 
-  void create(Collaborator collaborator);
+  public List<Collaborator> findByCode(String code) {
+    return collaboratorRepository.findByCode(code);
+  }
 
-  void update(Collaborator collaborator);
+  public void create(Collaborator collaborator) {
+    collaboratorRepository.save(collaborator);
+  }
 
-  void delete(Collaborator collaborator);
+  public void update(Collaborator collaborator) {
+    Collaborator c = collaboratorRepository.getOne(collaborator.getId());
+    c.setActive(collaborator.isActive());
+    c.setCode(collaborator.getCode());
+    c.setContactEmail(collaborator.getContactEmail());
+    c.setLabel(collaborator.getLabel());
+    c.setContactPersonName(collaborator.getContactPersonName());
+    c.setOrganizationName(collaborator.getOrganizationName());
+    c.setOrganizationLocation(collaborator.getOrganizationLocation());
+    collaboratorRepository.save(c);
+  }
+
+  public void delete(Collaborator collaborator) {
+    Collaborator c = collaboratorRepository.getOne(collaborator.getId());
+    c.setActive(false);
+    collaboratorRepository.save(c);
+  }
+
+  public void delete(Long id) {
+    Collaborator c = collaboratorRepository.getOne(id);
+    c.setActive(false);
+    collaboratorRepository.save(c);
+  }
+
+  public boolean exists(Long id) {
+    return collaboratorRepository.existsById(id);
+  }
 
 }

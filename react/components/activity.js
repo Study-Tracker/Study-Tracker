@@ -136,6 +136,9 @@ const ActivityIcon = ({action}) => {
 
 const ActivityMessage = ({activity}) => {
   switch (activity.eventType) {
+
+    // Notebook entry templates
+
     case studyActions.NEW_ENTRY_TEMPLATE.value:
       return (
         <>
@@ -208,7 +211,7 @@ const ActivityMessage = ({activity}) => {
               <div dangerouslySetInnerHTML={createMarkup(
                   activity.data.study.description)}/>
               <p>
-                <KeywordBadgeList keywords={activity.data.study.keywords}/>
+                <KeywordBadgeList keywords={activity.data.study.keywords || []}/>
               </p>
             </div>
           </React.Fragment>
@@ -251,7 +254,7 @@ const ActivityMessage = ({activity}) => {
             <div className="bg-light text-secondary p-3">
 
               <h5>
-                <a href={"/study/" + activity.data.assay.study + "/assay/"
+                <a href={"/study/" + activity.studyId + "/assay/"
                 + activity.data.assay.code}>
                   {activity.data.assay.code}
                 </a>
@@ -283,7 +286,7 @@ const ActivityMessage = ({activity}) => {
             <div className="bg-light text-secondary p-3">
 
               <h5>
-                <a href={"/study/" + activity.data.assay.study + "/assay/"
+                <a href={"/study/" + activity.studyId + "/assay/"
                 + activity.data.assay.code}>
                   {activity.data.assay.code}
                 </a>
@@ -334,7 +337,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/user/"
               + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has added a new task to assay&nbsp;
-              <a href={"/study/" + activity.data.assay.study + "/assay/"
+              <a href={"/study/" + activity.studyId + "/assay/"
               + activity.data.assay.code}>
                 {activity.data.assay.code}
               </a>:
@@ -353,7 +356,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/user/"
               + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has updated a task in assay&nbsp;
-              <a href={"/study/" + activity.data.assay.study + "/assay/"
+              <a href={"/study/" + activity.studyId + "/assay/"
               + activity.data.assay.code}>
                 {activity.data.assay.code}
               </a>:
@@ -371,7 +374,7 @@ const ActivityMessage = ({activity}) => {
             <p>
               <a href={"/user/"
               + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has created a new assay:
+              &nbsp;has created a new program:
             </p>
 
             <div className="bg-light text-secondary p-3">
@@ -426,16 +429,15 @@ const ActivityMessage = ({activity}) => {
       );
 
     case studyActions.FILE_UPLOADED.value:
-      if (activity.reference === "ASSAY") {
+      if (!!activity.data.assay) {
         return (
             <React.Fragment>
               <p>
                 <a href={"/user/"
                 + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has attached a new file to assay:&nbsp;
-                <a href={"/study/"
-                + activity.data.assay.study}>{activity.data.assay.study
-                + "/assay/" + activity.data.assay.code}
+                <a href={"/assay/" + activity.data.assay.code}>
+                  {activity.data.assay.code}
                 </a>
               </p>
               <div className="bg-light text-secondary p-3">
@@ -457,8 +459,9 @@ const ActivityMessage = ({activity}) => {
                 <a href={"/user/"
                 + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has attached a new file to study:&nbsp;
-                <a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a>
+                <a href={"/study/" + activity.data.study.code}>
+                  {activity.data.study.code}
+                </a>
               </p>
               <div className="bg-light text-secondary p-3">
                 <h3>

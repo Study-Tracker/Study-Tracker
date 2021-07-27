@@ -38,7 +38,7 @@ class AssayTypeFormView extends React.Component {
     .then(response => response.json())
     .then(assayTypes => {
       if (!!this.state.assayTypeId) {
-        const assayType = assayTypes.find(p => p.id === this.state.assayTypeId);
+        const assayType = assayTypes.find(p => p.id === parseInt(this.state.assayTypeId));
         this.setState({
           selectedAssayType: assayType,
           assayTypes: assayTypes,

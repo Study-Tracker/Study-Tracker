@@ -123,9 +123,7 @@ public class AuthenticationController {
       throw new InvalidConstraintException("Passwords do not match.");
     }
     User user = optional.get();
-    user.setPassword(passwordEncoder.encode(password));
-    user.setCredentialsExpired(false);
-    userService.update(user);
+    userService.updatePassword(user, passwordEncoder.encode(password));
     return "redirect:/login?message=Password successfully updated.";
   }
 

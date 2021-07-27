@@ -1,6 +1,6 @@
 package com.decibeltx.studytracker.controller.api;
 
-import com.decibeltx.studytracker.model.Statistics;
+import com.decibeltx.studytracker.mapstruct.dto.StatisticsDto;
 import com.decibeltx.studytracker.service.StatisticsService;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class StatisticsController {
   private StatisticsService statisticsService;
 
   @GetMapping("")
-  public Statistics getCurrentStats(
+  public StatisticsDto getCurrentStats(
       @RequestParam(required = false, name = "startDate") Date startDate,
       @RequestParam(required = false, name = "endDate") Date endDate
   ) {
@@ -35,7 +35,7 @@ public class StatisticsController {
   }
 
   @GetMapping("/frontpage")
-  public Statistics getFrontPageStats() {
+  public StatisticsDto getFrontPageStats() {
     return statisticsService.mainPageSummary();
   }
 

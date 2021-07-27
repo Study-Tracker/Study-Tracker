@@ -16,12 +16,15 @@
 
 package com.decibeltx.studytracker.controller.api;
 
+import com.decibeltx.studytracker.events.EventsService;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
+import com.decibeltx.studytracker.mapstruct.mapper.AssayMapper;
+import com.decibeltx.studytracker.mapstruct.mapper.StudyMapper;
 import com.decibeltx.studytracker.model.Assay;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.service.ActivityService;
 import com.decibeltx.studytracker.service.AssayService;
-import com.decibeltx.studytracker.service.EventsService;
 import com.decibeltx.studytracker.service.ProgramService;
 import com.decibeltx.studytracker.service.StudyService;
 import com.decibeltx.studytracker.service.UserService;
@@ -42,36 +45,47 @@ public abstract class AbstractStudyController {
 
   private EventsService eventsService;
 
+  private StudyMapper studyMapper;
+
+  private AssayMapper assayMapper;
+
+  private ActivityMapper activityMapper;
+
+  private boolean isLong(String value) {
+    try {
+      Long.parseLong(value);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
+  }
+
   protected Study getStudyFromIdentifier(String id) {
-    Study study;
-    Optional<Study> optional = studyService.findById(id);
-    if (optional.isPresent()) {
-      study = optional.get();
+    Optional<Study> optional;
+    if (isLong(id)) {
+      optional = studyService.findById(Long.parseLong(id));
     } else {
       optional = studyService.findByCode(id);
-      if (optional.isPresent()) {
-        study = optional.get();
-      } else {
-        throw new RecordNotFoundException();
-      }
     }
-    return study;
+    if (optional.isPresent()) {
+      return optional.get();
+    } else {
+      throw new RecordNotFoundException("Cannot find study: " + id);
+    }
   }
 
   protected Assay getAssayFromIdentifier(String id) {
-    Assay assay;
-    Optional<Assay> optional = assayService.findById(id);
-    if (optional.isPresent()) {
-      assay = optional.get();
+    Optional<Assay> optional;
+    if (isLong(id)) {
+      optional = assayService.findById(Long.parseLong(id));
     } else {
       optional = assayService.findByCode(id);
-      if (optional.isPresent()) {
-        assay = optional.get();
-      } else {
-        throw new RecordNotFoundException();
-      }
     }
-    return assay;
+    if (optional.isPresent()) {
+      return optional.get();
+    } else {
+      throw new RecordNotFoundException("Cannot find assay: " + id);
+    }
   }
 
   public StudyService getStudyService() {
@@ -126,5 +140,32 @@ public abstract class AbstractStudyController {
   @Autowired
   public void setEventsService(EventsService eventsService) {
     this.eventsService = eventsService;
+  }
+
+  public StudyMapper getStudyMapper() {
+    return studyMapper;
+  }
+
+  @Autowired
+  public void setStudyMapper(StudyMapper studyMapper) {
+    this.studyMapper = studyMapper;
+  }
+
+  public AssayMapper getAssayMapper() {
+    return assayMapper;
+  }
+
+  @Autowired
+  public void setAssayMapper(AssayMapper assayMapper) {
+    this.assayMapper = assayMapper;
+  }
+
+  public ActivityMapper getActivityMapper() {
+    return activityMapper;
+  }
+
+  @Autowired
+  public void setActivityMapper(ActivityMapper activityMapper) {
+    this.activityMapper = activityMapper;
   }
 }

@@ -6,19 +6,54 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+#    container: adoptopenjdk/maven-openjdk11
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: studytracker
+          POSTGRES_PASSWORD: studytracker
+          POSTGRES_DB: study-tracker-test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
 
       # Checks-out the repository
       - uses: actions/checkout@v2
 
+      # Install JDK
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
 
+      # Get the test properties
+      - name: Test properties
+        run: 'echo "$TEST_PROPERTIES" > application.properties'
+        shell: bash
+        env:
+          TEST_PROPERTIES: ${{secrets.TEST_PROPERTIES}}
+
+      # Build the application
       - name: Maven Package
         run: mvn -B clean package -DskipTests
+
+      # Run tests
+      - name: Repository tests
+        run: mvn -Dtest="com.decibeltx.studytracker.test.repository.**" test
+
+      - name: Service tests
+        run: mvn -Dtest="com.decibeltx.studytracker.test.service.**" test
+
+      - name: Web tests
+        run: mvn -Dtest="com.decibeltx.studytracker.test.web.**" test
 
       #- name: Maven Verify
       #  run: mvn -B clean verify

@@ -16,8 +16,10 @@
 
 package com.decibeltx.studytracker.controller;
 
-import com.decibeltx.studytracker.model.Study;
-import com.decibeltx.studytracker.model.User;
+import com.decibeltx.studytracker.mapstruct.dto.StudySlimDto;
+import com.decibeltx.studytracker.mapstruct.dto.UserSlimDto;
+import com.decibeltx.studytracker.mapstruct.mapper.StudyMapper;
+import com.decibeltx.studytracker.mapstruct.mapper.UserMapper;
 import com.decibeltx.studytracker.service.StudyService;
 import com.decibeltx.studytracker.service.UserService;
 import java.util.List;
@@ -37,16 +39,22 @@ public class AutocompleteController {
   private UserService userService;
 
   @Autowired
+  private UserMapper userMapper;
+
+  @Autowired
   private StudyService studyService;
 
+  @Autowired
+  private StudyMapper studyMapper;
+
   @GetMapping("/user")
-  public List<User> userSearch(@RequestParam("q") String keyword) {
-    return userService.search(keyword);
+  public List<UserSlimDto> userSearch(@RequestParam("q") String keyword) {
+    return userMapper.toUserSlimList(userService.search(keyword));
   }
 
   @GetMapping("/study")
-  public List<Study> studySearch(@RequestParam("q") String keyword) {
-    return studyService.search(keyword);
+  public List<StudySlimDto> studySearch(@RequestParam("q") String keyword) {
+    return studyMapper.toStudySlimList(studyService.search(keyword));
   }
 
 }

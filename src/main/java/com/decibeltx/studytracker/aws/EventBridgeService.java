@@ -1,8 +1,9 @@
 package com.decibeltx.studytracker.aws;
 
+import com.decibeltx.studytracker.events.EventsService;
+import com.decibeltx.studytracker.events.StudyTrackerEvent;
 import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.model.Activity;
-import com.decibeltx.studytracker.service.EventsService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -31,9 +32,15 @@ public class EventBridgeService implements EventsService {
 
   @Override
   public void dispatchEvent(Activity activity) {
+    EventBridgeEvent event = new EventBridgeEvent(activity);
+    this.dispatchEvent(event);
+  }
+
+  @Override
+  public void dispatchEvent(StudyTrackerEvent event) {
     String json;
     try {
-      json = objectMapper.writeValueAsString(activity);
+      json = objectMapper.writeValueAsString(event);
     } catch (JsonProcessingException e) {
       throw new StudyTrackerException(e);
     }
@@ -41,7 +48,7 @@ public class EventBridgeService implements EventsService {
     PutEventsRequestEntry entry = PutEventsRequestEntry.builder()
         .eventBusName(eventBusName)
         .source("study-tracker")
-        .detailType(activity.getEventType().toString())
+        .detailType(event.getEventType().toString())
         .detail(json)
         .build();
     PutEventsRequest request = PutEventsRequest.builder()
@@ -51,6 +58,5 @@ public class EventBridgeService implements EventsService {
     for (PutEventsResultEntry resultEntry : response.entries()) {
       System.out.println(resultEntry.toString());
     }
-
   }
 }

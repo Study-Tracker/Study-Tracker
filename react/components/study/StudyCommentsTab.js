@@ -120,9 +120,7 @@ class StudyCommentsTab extends React.Component {
       }
     }).then(response => {
       if (response.ok) {
-        const comments = this.state.comments.filter(
-            c => c.createdAt !== comment.createdAt && c.createdBy.accountName
-                !== comment.createdBy.accountName);
+        const comments = this.state.comments.filter(c => c.id !== comment.id);
         this.setState({
           comments: comments
         });
@@ -136,40 +134,67 @@ class StudyCommentsTab extends React.Component {
 
   render() {
 
-    let content = null;
-    let comments = [];
-
-    for (let i = 0; i < this.state.comments.length; i++) {
-      let comment = this.state.comments[i];
-      if (i > 0) {
-        comments.push(
-            <Col key={'hr-' + i} sm={12}>
-              <hr/>
-            </Col>
-        );
-      }
-      comments.push(
-          <Col key={'thread-' + comment.createdAt} sm={12}>
-            <Comment
-                comment={comment} user={this.props.user}
-                handleUpdate={this.updateComment}
-                handleDelete={this.deleteComment}
-            />
-          </Col>
-      )
-    }
-
-    comments = comments.sort((a, b) => {
+    let comments = this.state.comments.sort((a, b) => {
       if (a.createdAt > b.createdAt) {
-        return -1;
-      } else if (a.createdAt < b.createdAt) {
         return 1;
+      } else if (a.createdAt < b.createdAt) {
+        return -1;
       } else {
         return 0;
       }
-    });
+    }).map((comment, i) => {
+      return (
+          <React.Fragment key={'hr-' + i}>
+            {
+              i > 0
+                ? (
+                    <Col sm={12}>
+                      <hr/>
+                    </Col>
+                ) : ""
+            }
+            <Col key={'thread-' + comment.createdAt} sm={12}>
+              <Comment
+                  comment={comment} user={this.props.user}
+                  handleUpdate={this.updateComment}
+                  handleDelete={this.deleteComment}
+              />
+            </Col>
+          </React.Fragment>
+      )
+    })
 
-    content = comments.length > 0 ? comments : (
+    // for (let i = 0; i < this.state.comments.length; i++) {
+    //   let comment = this.state.comments[i];
+    //   if (i > 0) {
+    //     comments.push(
+    //         <Col key={'hr-' + i} sm={12}>
+    //           <hr/>
+    //         </Col>
+    //     );
+    //   }
+    //   comments.push(
+    //       <Col key={'thread-' + comment.createdAt} sm={12}>
+    //         <Comment
+    //             comment={comment} user={this.props.user}
+    //             handleUpdate={this.updateComment}
+    //             handleDelete={this.deleteComment}
+    //         />
+    //       </Col>
+    //   )
+    // }
+
+    // comments = comments.sort((a, b) => {
+    //   if (a.createdAt > b.createdAt) {
+    //     return -1;
+    //   } else if (a.createdAt < b.createdAt) {
+    //     return 1;
+    //   } else {
+    //     return 0;
+    //   }
+    // });
+
+    let content = comments.length > 0 ? comments : (
         <Col sm={12}>
           <div className={"text-center"}>
             <h4>No comments have been added.</h4>

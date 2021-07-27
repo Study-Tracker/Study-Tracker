@@ -124,7 +124,9 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   @Override
   public StorageFolder getProgramFolder(Program program) throws StudyStorageNotFoundException {
+    LOGGER.info("Fetching storage folder instance for program: " + program.getName());
     Path path = rootPath.resolve(namingService.getProgramStorageFolderName(program));
+    LOGGER.info(path.toString());
     File file = path.toFile();
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(program.getName());
@@ -144,7 +146,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     StorageFolder programFolder = this.getProgramFolder(study.getProgram());
     Path programPath = Paths.get(programFolder.getPath());
     Path studyFolder = programPath.resolve(namingService.getStudyStorageFolderName(study));
-    LOGGER.debug(studyFolder.toString());
+    LOGGER.info(studyFolder.toString());
     File file = studyFolder.toFile();
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(study.getCode());
@@ -164,6 +166,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     StorageFolder studyFolder = this.getStudyFolder(assay.getStudy());
     Path studyPath = Paths.get(studyFolder.getPath());
     Path assayFolder = studyPath.resolve(namingService.getAssayStorageFolderName(assay));
+    LOGGER.info(assayFolder.toString());
     File file = assayFolder.toFile();
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException(assay.getCode());

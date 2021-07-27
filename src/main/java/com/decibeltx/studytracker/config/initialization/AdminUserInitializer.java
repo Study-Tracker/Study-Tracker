@@ -36,12 +36,12 @@ public class AdminUserInitializer {
     user.setActive(true);
     user.setDisplayName("Study Tracker Admin");
     user.setUsername(username);
-    user.setEmail("admin@stucytracker.com");
+    user.setEmail("admin@studytracker.com");
     user.setAdmin(true);
     user.setPassword(passwordEncoder.encode(password));
     userService.create(user);
     LOGGER.info(String
-        .format("Created admin user with username '%s' and password '%s'", username, password));
+        .format("Created admin user with username '%s' and password '%s'. You should change this password from the login page as soon as possible.", username, password));
   }
 
 }

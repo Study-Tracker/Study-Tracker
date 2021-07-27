@@ -16,19 +16,27 @@
 
 package com.decibeltx.studytracker.controller.api;
 
+import com.decibeltx.studytracker.controller.UserAuthenticationUtils;
+import com.decibeltx.studytracker.exception.InsufficientPrivilegesException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
-import com.decibeltx.studytracker.model.Activity;
+import com.decibeltx.studytracker.mapstruct.dto.ActivityDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.UserDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.UserSummaryDto;
+import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
+import com.decibeltx.studytracker.mapstruct.mapper.UserMapper;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.service.ActivityService;
 import com.decibeltx.studytracker.service.UserService;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,35 +57,52 @@ public class UserController {
   private UserService userService;
 
   @Autowired
+  private UserMapper userMapper;
+
+  @Autowired
+  private ActivityMapper activityMapper;
+
+  @Autowired
   private ActivityService activityService;
 
-  private Optional<User> findByIdentifier(String id) {
-    Optional<User> optional = userService.findById(id);
-    if (optional.isPresent()) {
-      return optional;
-    } else {
-      return userService.findByUsername(id);
-    }
-  }
-
   @GetMapping("")
-  public List<User> getAllUsers() throws Exception {
-    return userService.findAll();
+  public List<UserSummaryDto> getAllUsers() throws Exception {
+    return userMapper.toUserSummaryList(userService.findAll());
   }
 
   @GetMapping("/{id}")
-  public User getUser(@PathVariable("id") String id) throws Exception {
-    Optional<User> optional = this.findByIdentifier(id);
+  public UserDetailsDto getUser(@PathVariable("id") String username) throws Exception {
+    Optional<User> optional = userService.findByUsername(username);
+    User user;
     if (optional.isPresent()) {
-      return optional.get();
+      user = optional.get();
     } else {
-      throw new RecordNotFoundException();
+      try {
+        optional = userService.findById(Long.parseLong(username));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      if (optional.isPresent()) {
+        user = optional.get();
+      } else {
+        throw new RecordNotFoundException("User not found: " + username);
+      }
     }
+    return userMapper.toUserDetails(user);
   }
 
   @PostMapping("/{id}/status")
-  public HttpEntity<?> updateUserStatus(@PathVariable("id") String userId,
+  public HttpEntity<UserDetailsDto> updateUserStatus(@PathVariable("id") Long userId,
       @RequestParam("active") boolean active) {
+
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User currentUser = userService.findByUsername(username)
+        .orElseThrow(RecordNotFoundException::new);
+    if (!currentUser.isAdmin()) {
+      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+    }
+
     Optional<User> optional = userService.findById(userId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("User not found: " + userId);
@@ -86,42 +111,56 @@ public class UserController {
     user.setActive(active);
     userService.update(user);
     return new ResponseEntity<>(HttpStatus.OK);
+
   }
 
   @GetMapping("/{id}/activity")
-  public List<Activity> getUserActivity(@PathVariable("id") String userId) {
+  public List<ActivityDetailsDto> getUserActivity(@PathVariable("id") Long userId) {
     Optional<User> optional = userService.findById(userId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("User not found: " + userId);
     }
     User user = optional.get();
-    return activityService.findByUser(user);
+    return activityMapper.toActivityDetailsList(activityService.findByUser(user));
   }
 
   @PostMapping("")
-  public HttpEntity<User> createUser(@RequestBody User user) {
-    LOGGER.info("Registering new user: " + user.toString());
+  public HttpEntity<UserDetailsDto> createUser(@RequestBody @Valid UserDetailsDto dto) {
+
+    LOGGER.info("Registering new user: " + dto.toString());
+
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User currentUser = userService.findByUsername(username)
+        .orElseThrow(RecordNotFoundException::new);
+    if (!currentUser.isAdmin()) {
+      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+    }
+
+    User user = userMapper.fromUserDetails(dto);
     userService.create(user);
-    return new ResponseEntity<>(user, HttpStatus.CREATED);
+    return new ResponseEntity<>(userMapper.toUserDetails(user), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<User> updateUser(@PathVariable("id") String userId,
-      @RequestBody User updatedUser) {
+  public HttpEntity<UserDetailsDto> updateUser(@PathVariable("id") Long userId,
+      @RequestBody UserDetailsDto dto) {
 
-    Optional<User> optional = userService.findById(userId);
-    if (!optional.isPresent()) {
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User currentUser = userService.findByUsername(username)
+        .orElseThrow(RecordNotFoundException::new);
+    if (!currentUser.isAdmin()) {
+      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+    }
+
+    if (!userService.exists(userId)) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    User user = optional.get();
-    user.setDisplayName(updatedUser.getDisplayName());
-    user.setActive(updatedUser.isActive());
-    user.setAdmin(updatedUser.isAdmin());
-    user.setDepartment(updatedUser.getDepartment());
-    user.setTitle(updatedUser.getTitle());
-    user.setAttributes(updatedUser.getAttributes());
-    userService.update(user);
-    return new ResponseEntity<>(user, HttpStatus.CREATED);
+    userService.update(userMapper.fromUserDetails(dto));
+    User user = userService.findById(userId)
+        .orElseThrow(RecordNotFoundException::new);
+    return new ResponseEntity<>(userMapper.toUserDetails(user), HttpStatus.CREATED);
 
   }
 

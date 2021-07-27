@@ -65,18 +65,36 @@ const StudyDetailHeader = ({study, user}) => {
                 ? <Button
                     size="lg"
                     className="mr-1 mb-1"
-                    color="info">
+                    color="info"
+                    outline
+                >
                   External Study
                 </Button>
                 : ''
           }
           {
-            !study.active ? <Button size="lg" className="mr-1 mb-1"
-                                    color="danger">Inactive Study</Button> : ''
+            !study.active
+                ? <Button
+                    size="lg"
+                    className="mr-1 mb-1"
+                    outline
+                    color="danger"
+                  >
+                    Inactive Study
+                  </Button>
+                : ''
           }
           {
-            study.legacy ? <Button size="lg" className="mr-1 mb-1"
-                                   color="warning">Legacy Study</Button> : ''
+            study.legacy
+                ? <Button
+                    size="lg"
+                    className="mr-1 mb-1"
+                    outline
+                    color="warning"
+                >
+                  Legacy Study
+                </Button>
+                : ''
           }
           {
             !!user
@@ -394,16 +412,20 @@ class StudyDetails extends React.Component {
                     </NavLink>
                   </NavItem>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "4" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("4");
-                        }}
-                    >
-                      Notebook
-                    </NavLink>
-                  </NavItem>
+                  {
+                    !!study.notebookFolder ? (
+                        <NavItem>
+                          <NavLink
+                              className={this.state.activeTab === "4" ? "active" : ''}
+                              onClick={() => {
+                                this.toggle("4");
+                              }}
+                          >
+                            Notebook
+                          </NavLink>
+                        </NavItem>
+                    ) : ""
+                  }
 
                   <NavItem>
                     <NavLink
@@ -444,9 +466,14 @@ class StudyDetails extends React.Component {
                     <StudyFilesTab study={study} user={this.props.user}/>
                   </TabPane>
 
-                  <TabPane tabId="4">
-                    <StudyNotebookTab study={study} user={this.props.user}/>
-                  </TabPane>
+                  {
+                    !!study.notebookFolder ? (
+                        <TabPane tabId="4">
+                          <StudyNotebookTab study={study}
+                                            user={this.props.user}/>
+                        </TabPane>
+                    ) : ""
+                  }
 
                   <TabPane tabId="5">
                     <StudyConclusionsTab study={study} user={this.props.user}/>

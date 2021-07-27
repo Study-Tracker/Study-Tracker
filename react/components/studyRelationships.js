@@ -44,7 +44,7 @@ class StudyRelationships extends React.Component {
       relationships: props.relationships,
       modalIsOpen: false,
       newRelationship: {
-        studyId: '',
+        targetStudyId: '',
         type: ''
       },
       modalError: null
@@ -109,7 +109,7 @@ class StudyRelationships extends React.Component {
 
   handleNewRelationshipSubmit() {
     let r = this.state.newRelationship;
-    if (!r.type || !r.studyId) {
+    if (!r.type || !r.targetStudyId) {
       this.setState({
         modalError: "One or more required fields are missing. Please check your inputs and then try again."
       });
@@ -121,12 +121,14 @@ class StudyRelationships extends React.Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(r)
-    }).then(response => {
+    })
+    .then(response => response.json())
+    .then(json => {
       this.setState({
-        relationships: [...this.state.relationships, r],
+        relationships: [...this.state.relationships, json],
         newRelationship: {
           type: '',
-          studyId: ''
+          targetStudyId: ''
         },
         modalError: null
       });
@@ -149,17 +151,14 @@ class StudyRelationships extends React.Component {
     })
     .then(val => {
       if (val) {
-        fetch("/api/study/" + this.props.studyCode + "/relationships", {
+        fetch("/api/study/" + this.props.studyCode + "/relationships/" + relationship.id, {
           method: 'DELETE',
           headers: {
             "Content-Type": "application/json"
-          },
-          body: JSON.stringify(relationship)
+          }
         }).then(response => {
           this.setState({
-            relationships: this.state.relationships.filter(
-                r => r.type !== relationship.type && r.studyId
-                    !== relationship.studyId)
+            relationships: this.state.relationships.filter(r => r.id !== relationship.id)
           });
         })
         .catch(error => {
@@ -177,11 +176,11 @@ class StudyRelationships extends React.Component {
     const relationships = this.state.relationships.map(relationship => {
       const type = relationshipTypes[relationship.type];
       return (
-          <li key={"study-relationship-" + relationship.studyId}>
+          <li key={"study-relationship-" + relationship.targetStudy.id}>
             {type.label}
             &nbsp;&nbsp;
             <a href={"/study/"
-            + relationship.studyId}>{relationship.studyId}</a>
+            + relationship.targetStudy.code}>{relationship.targetStudy.code}</a>
             &nbsp;&nbsp;&nbsp;&nbsp;
             {
               !!this.props.user ? (
@@ -274,7 +273,7 @@ class StudyRelationships extends React.Component {
                         loadOptions={this.studyAutocomplete}
                         onChange={(selected) => this.handleNewRelationshipChange(
                             {
-                              studyId: selected.obj.code
+                              targetStudyId: selected.obj.id
                             })}
                     />
                   </FormGroup>
