@@ -24,8 +24,10 @@ import com.decibeltx.studytracker.mapstruct.dto.UserDetailsDto;
 import com.decibeltx.studytracker.mapstruct.dto.UserSummaryDto;
 import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
 import com.decibeltx.studytracker.mapstruct.mapper.UserMapper;
+import com.decibeltx.studytracker.model.PasswordResetToken;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.service.ActivityService;
+import com.decibeltx.studytracker.service.EmailService;
 import com.decibeltx.studytracker.service.UserService;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +66,9 @@ public class UserController {
 
   @Autowired
   private ActivityService activityService;
+
+  @Autowired
+  private EmailService emailService;
 
   @GetMapping("")
   public List<UserSummaryDto> getAllUsers() throws Exception {
@@ -137,8 +142,14 @@ public class UserController {
       throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
     }
 
+    // Save the new user record
     User user = userMapper.fromUserDetails(dto);
     userService.create(user);
+
+    // Create a password reset token and send email to new user
+    PasswordResetToken token = userService.createPasswordResetToken(user, 30);
+    emailService.sendNewUserEmail(user.getEmail(), token.getToken());
+
     return new ResponseEntity<>(userMapper.toUserDetails(user), HttpStatus.CREATED);
   }
 

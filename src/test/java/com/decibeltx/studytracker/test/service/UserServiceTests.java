@@ -18,7 +18,10 @@ package com.decibeltx.studytracker.test.service;
 
 import com.decibeltx.studytracker.Application;
 import com.decibeltx.studytracker.example.ExampleDataGenerator;
+import com.decibeltx.studytracker.exception.RecordNotFoundException;
+import com.decibeltx.studytracker.model.PasswordResetToken;
 import com.decibeltx.studytracker.model.User;
+import com.decibeltx.studytracker.repository.PasswordResetTokenRepository;
 import com.decibeltx.studytracker.repository.UserRepository;
 import com.decibeltx.studytracker.service.UserService;
 import java.util.List;
@@ -44,6 +47,9 @@ public class UserServiceTests {
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private PasswordResetTokenRepository passwordResetTokenRepository;
 
   @Autowired
   private UserService userService;
@@ -173,6 +179,18 @@ public class UserServiceTests {
   public void activeUserCountTest() {
     long count = userService.countActiveUsers();
     Assert.assertEquals(USER_COUNT, count);
+  }
+
+  @Test
+  public void passwordResetTest() {
+    User user = userService.findByEmail("jsmith@email.com")
+        .orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(0, passwordResetTokenRepository.count());
+    PasswordResetToken token = userService.createPasswordResetToken(user);
+    Assert.assertNotNull(token);
+    Assert.assertEquals(1, passwordResetTokenRepository.count());
+    Assert.assertTrue(userService.validatePasswordResetToken(user.getEmail(), token.getToken()));
+    Assert.assertFalse(userService.validatePasswordResetToken("another@email.com", token.getToken()));
   }
 
 }

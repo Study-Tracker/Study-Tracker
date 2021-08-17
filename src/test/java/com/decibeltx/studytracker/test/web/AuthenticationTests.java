@@ -23,19 +23,28 @@ import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Status;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.User;
+import com.decibeltx.studytracker.repository.PasswordResetTokenRepository;
 import com.decibeltx.studytracker.repository.ProgramRepository;
 import com.decibeltx.studytracker.repository.UserRepository;
+import com.decibeltx.studytracker.service.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,10 +77,16 @@ public class AuthenticationTests {
   private UserRepository userRepository;
 
   @Autowired
+  private PasswordResetTokenRepository passwordResetTokenRepository;
+
+  @Autowired
   private ExampleDataGenerator exampleDataGenerator;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
+
+  @MockBean
+  private EmailService emailService;
 
   @Before
   public void doBefore() {
@@ -148,6 +163,26 @@ public class AuthenticationTests {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(MockMvcResultMatchers.status().isCreated());
+  }
+
+  @Test
+  public void passwordResetRequestTest() throws Exception {
+
+    Mockito.doNothing().when(emailService).sendPasswordResetEmail(Mockito.anyString(), Mockito.anyString());
+
+    User user = userRepository.findByUsername("jsmith")
+        .orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(0, passwordResetTokenRepository.findByUserId(user.getId()).size());
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/auth/passwordresetrequest")
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
+            new BasicNameValuePair("email", user.getEmail())
+        )))))
+        .andExpect(MockMvcResultMatchers.status().isFound());
+
+    Assert.assertEquals(1, passwordResetTokenRepository.findByUserId(user.getId()).size());
+
   }
 
 }

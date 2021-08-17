@@ -51,6 +51,7 @@ import com.decibeltx.studytracker.repository.CommentRepository;
 import com.decibeltx.studytracker.repository.ExternalLinkRepository;
 import com.decibeltx.studytracker.repository.KeywordRepository;
 import com.decibeltx.studytracker.repository.NotebookEntryTemplateRepository;
+import com.decibeltx.studytracker.repository.PasswordResetTokenRepository;
 import com.decibeltx.studytracker.repository.ProgramRepository;
 import com.decibeltx.studytracker.repository.StudyConclusionsRepository;
 import com.decibeltx.studytracker.repository.StudyRelationshipRepository;
@@ -144,6 +145,9 @@ public class ExampleDataGenerator {
 
   @Autowired
   private ExternalLinkRepository externalLinkRepository;
+
+  @Autowired
+  private PasswordResetTokenRepository passwordResetTokenRepository;
 
   public List<NotebookEntryTemplate> generateExampleEntryTemplates(List<User> users) {
     User user = users.get(0);
@@ -755,6 +759,7 @@ public class ExampleDataGenerator {
 
   public void clearDatabase() {
     LOGGER.info("Wiping collections...");
+    passwordResetTokenRepository.deleteAll();
     externalLinkRepository.deleteAll();
     commentRepository.deleteAll();
     assayTaskRepository.deleteAll();
