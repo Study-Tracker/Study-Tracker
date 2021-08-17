@@ -207,6 +207,7 @@ public class WebSecurityConfiguration {
             .antMatchers("/error").permitAll()
             .antMatchers("/login").permitAll()
             .antMatchers("/auth/passwordreset").permitAll()
+            .antMatchers("/auth/passwordresetrequest").permitAll()
            .anyRequest().fullyAuthenticated()
             .and()
           .formLogin()

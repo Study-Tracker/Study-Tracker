@@ -41,6 +41,7 @@ import FrontPageView from "./views/FrontPageView";
 import AssayTypeFormView from "./views/AssayTypeFormView";
 import AssayListView from "./views/AssayListView";
 import {TemplateFormView} from './views/TemplateFormView';
+import PasswordResetRequestView from "./views/PasswordResetRequestView";
 
 export const history = createBrowserHistory();
 
@@ -141,6 +142,9 @@ export default class App extends React.Component {
                   {/* Sign in */}
                   <Route exact path={"/login"}
                          render={props => <SignInView {...props} />}/>
+
+                  <Route exact path={"/auth/passwordresetrequest"}
+                         render={props => <PasswordResetRequestView {...props} />}/>
 
                   <Route exact path={"/auth/passwordreset"}
                          render={props => <PasswordResetView {...props} />}/>

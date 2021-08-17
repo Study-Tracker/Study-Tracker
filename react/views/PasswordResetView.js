@@ -39,10 +39,26 @@ export default class PasswordResetView extends React.Component {
     super(props);
     this.state = {
       auth: {},
-      inputIsValid: false
+      inputIsValid: false,
+      isLoaded: false,
+      isError: false
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    const params = qs.parse(this.props.location.search,
+        {ignoreQueryPrefix: true});
+    if (params.hasOwnProperty("token") && params.hasOwnProperty("email")) {
+      this.setState({
+        auth: {
+          email: params.email,
+          token: params.token
+        },
+        isLoaded: true
+      })
+    }
   }
 
   handleInputChange(data) {
@@ -51,9 +67,9 @@ export default class PasswordResetView extends React.Component {
       ...data
     };
     let inputIsValid = false;
-    if (auth.username != null && auth.username !== '' && auth.password != null
-        && auth.password !== '' && auth.passwordAgain != null
-        && auth.passwordAgain !== '' && auth.password === auth.passwordAgain) {
+    if (auth.password != null && auth.password !== ''
+        && auth.passwordAgain != null && auth.passwordAgain !== ''
+        && auth.password === auth.passwordAgain) {
       inputIsValid = true;
     }
     this.setState({
@@ -80,8 +96,9 @@ export default class PasswordResetView extends React.Component {
 
                 <div className="text-center mt-4">
                   <h2>Password Reset</h2>
-                  <p className="lead">Please enter your username and a new
-                    password.</p>
+                  <p className="lead">
+                    Please enter your username and a new password.
+                  </p>
                 </div>
 
                 <Card>
@@ -94,15 +111,25 @@ export default class PasswordResetView extends React.Component {
 
                       <Form action={"/auth/passwordreset"} method={"post"}>
 
-                        <FormGroup>
-                          <Label>Username</Label>
+                        <FormGroup hidden>
+                          <Label>Email</Label>
                           <Input
                               bsSize="lg"
                               type="text"
-                              name="username"
-                              placeholder="Enter your username"
-                              onChange={e => this.handleInputChange(
-                                  {username: e.target.value})}
+                              name="email"
+                              defaultValue={this.state.auth.email}
+                              // disabled={true}
+                          />
+                        </FormGroup>
+
+                        <FormGroup hidden>
+                          <Input
+                              bsSize="lg"
+                              type="text"
+                              name="token"
+                              defaultValue={this.state.auth.token}
+                              // disabled={true}
+                              style={{display: "none"}}
                           />
                         </FormGroup>
 
@@ -151,7 +178,7 @@ export default class PasswordResetView extends React.Component {
                           <button
                               className="btn btn-lg btn-primary"
                               type="submit"
-                              disabled={!this.state.inputIsValid}
+                              disabled={!this.state.inputIsValid && !this.state.isLoaded}
                           >
                             Submit
                           </button>

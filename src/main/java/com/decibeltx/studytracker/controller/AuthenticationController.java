@@ -20,9 +20,11 @@ import com.decibeltx.studytracker.exception.InvalidConstraintException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.exception.UnauthorizedException;
 import com.decibeltx.studytracker.exception.UnknownUserException;
+import com.decibeltx.studytracker.model.PasswordResetToken;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.security.AppUserDetails;
 import com.decibeltx.studytracker.security.AuthCredentials;
+import com.decibeltx.studytracker.service.EmailService;
 import com.decibeltx.studytracker.service.UserService;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +59,9 @@ public class AuthenticationController {
 
   @Autowired
   private AuthenticationManager authenticationManager;
+
+  @Autowired
+  private EmailService emailService;
 
   @GetMapping("/login")
   public String login() {
@@ -107,24 +112,53 @@ public class AuthenticationController {
     return new ResponseEntity<>(payload, HttpStatus.OK);
   }
 
-  @GetMapping("/auth/passwordreset")
-  public String passwordReset() {
+  @GetMapping("/auth/passwordresetrequest")
+  public String passwordResetRequest() {
     return "index";
   }
 
-  @PostMapping("/auth/passwordreset")
-  public String updatePassword(@RequestParam String username, @RequestParam String password,
-      @RequestParam String passwordAgain) {
-    Optional<User> optional = userService.findByUsername(username);
+  @PostMapping("/auth/passwordresetrequest")
+  public String updatePasswordRequest(@RequestParam String email) {
+    Optional<User> optional = userService.findByEmail(email);
     if (!optional.isPresent()) {
-      throw new RecordNotFoundException("Cannot find user: " + username);
+      throw new RecordNotFoundException("Cannot find user with email: " + email);
+    }
+    User user = optional.get();
+    PasswordResetToken token = userService.createPasswordResetToken(user);
+    emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
+    return "redirect:/login?message=Password reset request successfully sent.";
+  }
+
+  @GetMapping("/auth/passwordreset")
+  public String passwordReset(@RequestParam("token") String token,
+      @RequestParam("email") String email) {
+    boolean valid = userService.validatePasswordResetToken(email, token);
+    if (valid) {
+      return "index";
+    } else {
+      return "redirect:/login?message=The password reset token is invalid or expired. Please try again.";
+    }
+  }
+
+  @PostMapping("/auth/passwordreset")
+  public String updatePassword(@RequestParam String email, @RequestParam String password,
+      @RequestParam String passwordAgain, @RequestParam String token) {
+    Optional<User> optional = userService.findByEmail(email);
+    if (!optional.isPresent()) {
+      throw new RecordNotFoundException("Cannot find user: " + email);
     }
     if (!password.equals(passwordAgain)) {
       throw new InvalidConstraintException("Passwords do not match.");
     }
     User user = optional.get();
-    userService.updatePassword(user, passwordEncoder.encode(password));
-    return "redirect:/login?message=Password successfully updated.";
+    boolean valid = userService.validatePasswordResetToken(email, token);
+    if (valid) {
+      userService.updatePassword(user, passwordEncoder.encode(password));
+      userService.deletePasswordResetToken(token);
+      return "redirect:/login?message=Password successfully updated.";
+    } else {
+      return "redirect:/login?message=The password reset token is invalid or expired. Please try again.";
+    }
   }
 
 }
