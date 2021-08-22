@@ -28,6 +28,7 @@ public class DefaultController {
       "/assay/**", "/assays/**",
       "/programs/**", "/program/**",
       "/user/**", "/users/**",
+      "/collection/**", "/collections/**",
       "/admin/**"
   })
   public String index() {

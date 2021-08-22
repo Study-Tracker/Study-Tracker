@@ -15,7 +15,7 @@
  */
 
 import React from "react";
-import {Activity, Clipboard, Layers, Target, Users} from "react-feather";
+import {Activity, Clipboard, Layers, List, Target, Users} from "react-feather";
 
 const timelineRoutes = {
   path: "/",
@@ -116,10 +116,18 @@ const userRoutes = {
   children: null
 };
 
+const studyCollectionRoutes = {
+  path: "/collections",
+  name: "Collections",
+  icon: List,
+  children: null
+};
+
 export default [
   timelineRoutes,
   studyRoutes,
   assayRoutes,
   programRoutes,
-  userRoutes
+  userRoutes,
+  studyCollectionRoutes
 ]

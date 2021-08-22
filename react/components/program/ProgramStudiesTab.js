@@ -43,7 +43,7 @@ const ProgramStudiesTab = ({studies, user}) => {
           </Col>
         </Row>
 
-        <StudySummaryCards studies={studies}/>
+        <StudySummaryCards studies={studies} showDetails={true}/>
       </React.Fragment>
   );
 

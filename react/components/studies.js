@@ -116,7 +116,69 @@ const StudySummaryCard = ({study}) => {
   );
 };
 
-export const StudySummaryCards = ({studies}) => {
+const StudySlimCard = ({study}) => {
+  return (
+      <Media className="assay-card">
+
+        <StatusIcon status={study.status}/>
+
+        <Media body>
+
+          <Row>
+
+            <Col xs={12}>
+
+              <h6 className="text-muted">{study.program.name}</h6>
+
+              <h4>
+                <a href={"/study/" + study.code}>{study.code}: {study.name}</a>
+              </h4>
+
+            </Col>
+
+            <Col xs={12}>
+              <div dangerouslySetInnerHTML={createMarkup(study.description)}/>
+            </Col>
+
+          </Row>
+
+          <Row className="mt-2">
+
+            <Col sm={4}>
+              <h6 className="details-label">Start Date</h6>
+              <p>
+                {new Date(study.startDate).toLocaleDateString()}
+              </p>
+            </Col>
+
+            {
+              !!study.endDate ? (
+                  <Col sm={4}>
+                    <span>
+                      <h6 className="details-label">End Date</h6>
+                      <p>
+                        {new Date(study.endDate).toLocaleDateString()}
+                      </p>
+                    </span>
+                  </Col>
+              ) : ''
+            }
+
+            <Col sm={4}>
+              <h6 className="details-label">Last Updated</h6>
+              <p>
+                {new Date(study.updatedAt).toLocaleDateString()}
+              </p>
+            </Col>
+
+          </Row>
+
+        </Media>
+      </Media>
+  );
+};
+
+export const StudySummaryCards = ({studies, showDetails}) => {
   let content = [];
   if (studies.length === 0) {
     content.push(<hr key={"study-border"}/>);
@@ -128,18 +190,24 @@ export const StudySummaryCards = ({studies}) => {
         </Row>
     );
   } else {
-    for (let i = 0; i < studies.length; i++) {
-      let study = studies[i];
-      if (i > 0) {
-        content.push(<hr key={"study-border-" + study.id}/>);
+    content = studies.sort((a,b) => {
+      if (a.updatedAt > b.updatedAt) return -1;
+      else if (a.updatedAt < b.updatedAt) return 1;
+      else return 0;
+    }).map((study, i) => {
+      let card;
+      if (!!showDetails) {
+        card = <StudySummaryCard key={"study-card-" + study.id} study={study} />;
+      } else {
+        card = <StudySlimCard key={"study-card-" + study.id} study={study} />;
       }
-      content.push(
-          <StudySummaryCard
-              key={"study-card-" + study.id}
-              study={study}
-          />
-      );
-    }
+      return (
+          <React.Fragment>
+            {i > 0 ? <hr key={"study-border-" + study.id}/> : '' }
+            {card}
+          </React.Fragment>
+      )
+    });
   }
 
   return (

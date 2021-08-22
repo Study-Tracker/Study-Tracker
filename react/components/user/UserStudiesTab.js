@@ -41,7 +41,7 @@ const UserStudiesTab = ({studies, user}) => {
           {/*</div>*/}
         </Row>
 
-        <StudySummaryCards studies={studies}/>
+        <StudySummaryCards studies={studies} showDetails={true}/>
       </div>
   );
 

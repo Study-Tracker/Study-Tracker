@@ -8,6 +8,7 @@ import com.decibeltx.studytracker.model.ExternalLink;
 import com.decibeltx.studytracker.model.Keyword;
 import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Study;
+import com.decibeltx.studytracker.model.StudyCollection;
 import com.decibeltx.studytracker.model.StudyConclusions;
 import com.decibeltx.studytracker.model.StudyRelationship;
 import com.decibeltx.studytracker.model.User;
@@ -161,6 +162,18 @@ public class EntityViewUtils {
     view.put("id", link.getId());
     view.put("label", link.getLabel());
     view.put("url", link.getUrl());
+    return view;
+  }
+
+  public static Map<String, Object> createStudyCollectionView(StudyCollection collection) {
+    Map<String, Object> view = new HashMap<>();
+    view.put("id", collection.getId());
+    view.put("name", collection.getName());
+    view.put("description", collection.getDescription());
+    view.put("createdBy", collection.getCreatedBy().getDisplayName());
+    view.put("lastModifiedBy", collection.getLastModifiedBy().getDisplayName());
+    view.put("createdAt", collection.getCreatedAt());
+    view.put("updatedAt", collection.getUpdatedAt());
     return view;
   }
 
