@@ -84,7 +84,7 @@ export class UserInputs extends React.Component {
   }
 
   handleRemoveUser(e) {
-    const selected = e.currentTarget.dataset.id;
+    const selected = parseInt(e.currentTarget.dataset.id);
     const users = this.props.users.filter(user => user.id !== selected);
     let owner = this.props.owner;
     if (selected.id === owner.id) {

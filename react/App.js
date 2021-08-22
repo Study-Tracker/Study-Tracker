@@ -41,6 +41,9 @@ import FrontPageView from "./views/FrontPageView";
 import AssayTypeFormView from "./views/AssayTypeFormView";
 import AssayListView from "./views/AssayListView";
 import {TemplateFormView} from './views/TemplateFormView';
+import StudyCollectionFormView from "./views/StudyCollectionFormView";
+import StudyCollectionDetailsView from "./views/StudyCollectionDetailsView";
+import StudyCollectionListView from "./views/StudyCollectionListView";
 import PasswordResetRequestView from "./views/PasswordResetRequestView";
 
 export const history = createBrowserHistory();
@@ -138,6 +141,25 @@ export default class App extends React.Component {
                   {/*Edit User*/}
                   <Route exact path={"/users/:userId/edit"}
                          render={props => <UserFormView {...props} />}/>
+
+                  {/* Collection list */}
+                  <Route
+                      exact
+                      path={"/collections"}
+                      render={props => <StudyCollectionListView {...props} />}
+                  />
+
+                  {/*New Collection*/}
+                  <Route exact path={"/collections/new"}
+                         render={props => <StudyCollectionFormView {...props} />}/>
+
+                  {/*Edit Collection*/}
+                  <Route exact path={"/collection/:collectionId/edit"}
+                         render={props => <StudyCollectionFormView {...props} />}/>
+
+                  {/*Collection details*/}
+                  <Route exact path={"/collection/:collectionId"}
+                         render={props => <StudyCollectionDetailsView {...props} />}/>
 
                   {/* Sign in */}
                   <Route exact path={"/login"}

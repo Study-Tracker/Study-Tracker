@@ -22,7 +22,7 @@ import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
-import {File} from "react-feather";
+import {ExportToCsv} from "../tables";
 
 const columns = [
   {
@@ -188,9 +188,9 @@ const columns = [
           ' ' +
           CRO +
           ' ' +
-          d.createdBy.displayName +
+          (d.createdBy.displayName || '') +
           ' ' +
-          d.owner.displayName +
+          (d.owner.displayName || '') +
           ' ' +
           (d.externalCode || '');
       if (d.keywords != null) {
@@ -203,21 +203,44 @@ const columns = [
   }
 ];
 
-const ExportToCsv = (props) => {
-  const handleClick = () => {
-    props.onExport();
-  };
+export const StudyListTable = ({studies}) => {
   return (
-      <span>
-        <Button color={'primary'} onClick={handleClick}>
-          Export to CSV
-          &nbsp;
-          {/*<FontAwesomeIcon icon={faFile} />*/}
-          <File className="feather align-middle ml-2 mb-1"/>
-        </Button>
-      </span>
-  );
-};
+      <ToolkitProvider
+          keyField="id"
+          data={studies}
+          columns={columns}
+          search
+          exportCSV
+      >
+        {props => (
+            <div>
+              <div className="float-right">
+                <ExportToCsv{...props.csvProps} />
+                &nbsp;&nbsp;
+                <Search.SearchBar
+                    {...props.searchProps}
+                />
+              </div>
+              <BootstrapTable
+                  bootstrap4
+                  keyField="id"
+                  bordered={false}
+                  pagination={paginationFactory({
+                    sizePerPage: 10,
+                    sizePerPageList: [10, 20, 40, 80]
+                  })}
+                  defaultSorted={[{
+                    dataField: "updatedAt",
+                    order: "desc"
+                  }]}
+                  {...props.baseProps}
+              >
+              </BootstrapTable>
+            </div>
+        )}
+      </ToolkitProvider>
+  )
+}
 
 const StudyList = ({studies, title, filters, user}) => {
 
@@ -246,42 +269,43 @@ const StudyList = ({studies, title, filters, user}) => {
           <Col lg="12">
             <Card>
               <CardBody>
-                <ToolkitProvider
-                    keyField="id"
-                    data={studies}
-                    columns={columns}
-                    search
-                    exportCSV
-                >
-                  {props => (
-                      <div>
-                        <div className="float-right">
-                          <ExportToCsv{...props.csvProps} />
-                          &nbsp;&nbsp;
-                          <Search.SearchBar
-                              {...props.searchProps}
-                          />
-                        </div>
-                        <BootstrapTable
-                            bootstrap4
-                            keyField="id"
-                            // data={studies}
-                            // columns={columns}
-                            bordered={false}
-                            pagination={paginationFactory({
-                              sizePerPage: 10,
-                              sizePerPageList: [10, 20, 40, 80]
-                            })}
-                            defaultSorted={[{
-                              dataField: "updatedAt",
-                              order: "desc"
-                            }]}
-                            {...props.baseProps}
-                        >
-                        </BootstrapTable>
-                      </div>
-                  )}
-                </ToolkitProvider>
+                <StudyListTable studies={studies} />
+                {/*<ToolkitProvider*/}
+                {/*    keyField="id"*/}
+                {/*    data={studies}*/}
+                {/*    columns={columns}*/}
+                {/*    search*/}
+                {/*    exportCSV*/}
+                {/*>*/}
+                {/*  {props => (*/}
+                {/*      <div>*/}
+                {/*        <div className="float-right">*/}
+                {/*          <ExportToCsv{...props.csvProps} />*/}
+                {/*          &nbsp;&nbsp;*/}
+                {/*          <Search.SearchBar*/}
+                {/*              {...props.searchProps}*/}
+                {/*          />*/}
+                {/*        </div>*/}
+                {/*        <BootstrapTable*/}
+                {/*            bootstrap4*/}
+                {/*            keyField="id"*/}
+                {/*            // data={studies}*/}
+                {/*            // columns={columns}*/}
+                {/*            bordered={false}*/}
+                {/*            pagination={paginationFactory({*/}
+                {/*              sizePerPage: 10,*/}
+                {/*              sizePerPageList: [10, 20, 40, 80]*/}
+                {/*            })}*/}
+                {/*            defaultSorted={[{*/}
+                {/*              dataField: "updatedAt",*/}
+                {/*              order: "desc"*/}
+                {/*            }]}*/}
+                {/*            {...props.baseProps}*/}
+                {/*        >*/}
+                {/*        </BootstrapTable>*/}
+                {/*      </div>*/}
+                {/*  )}*/}
+                {/*</ToolkitProvider>*/}
               </CardBody>
             </Card>
           </Col>
