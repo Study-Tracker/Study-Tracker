@@ -55,7 +55,7 @@ public class Comment {
   @JoinColumn(name = "study_id", nullable = false)
   private Study study;
 
-  @Column(name = "text", nullable = false)
+  @Column(name = "text", nullable = false, columnDefinition = "TEXT")
   private String text;
 
   @ManyToOne(fetch = FetchType.LAZY)
