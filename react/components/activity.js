@@ -41,6 +41,21 @@ const createMarkup = (content) => {
   return {__html: content};
 };
 
+const LegacyStudyLabel = ({user, legacyStudy, text}) => {
+  return (
+      <React.Fragment>
+        <p>
+          <a href={"/user/" + user.username}>{user.displayName}</a>
+          &nbsp;{text}:&nbsp;
+        </p>
+        <div className="bg-light text-secondary p-3">
+          <h5><a href={"/study/" + legacyStudy.code}>{legacyStudy.code}</a></h5>
+          <h3>{legacyStudy.name}</h3>
+        </div>
+      </React.Fragment>
+  )
+}
+
 const ActivityIcon = ({action}) => {
   switch (action) {
     case studyActions.NEW_ENTRY_TEMPLATE.value:
@@ -173,161 +188,282 @@ const ActivityMessage = ({activity}) => {
       );
 
     case studyActions.NEW_STUDY.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has created a new study:
-            </p>
-            <div className="bg-light text-secondary p-3">
-              <h5><a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a></h5>
-              <h3>{activity.data.study.name}</h3>
-              <h5 className="text-muted">{activity.data.study.program}</h5>
-              <div dangerouslySetInnerHTML={createMarkup(
-                  activity.data.study.description)}/>
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+              legacyStudy={activity.data.legacyStudy}
+              user={activity.user}
+              text={"has created a new study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
               <p>
-                <KeywordBadgeList
-                    keywords={activity.data.study.keywords || []}/>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has created a new study:
               </p>
-            </div>
-          </React.Fragment>
-      );
+              <div className="bg-light text-secondary p-3">
+                <h5><a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a></h5>
+                <h3>{activity.data.study.name}</h3>
+                <h5 className="text-muted">{activity.data.study.program}</h5>
+                <div dangerouslySetInnerHTML={createMarkup(
+                    activity.data.study.description)}/>
+                <p>
+                  <KeywordBadgeList
+                      keywords={activity.data.study.keywords || []}/>
+                </p>
+              </div>
+            </React.Fragment>
+        );
+
+      }
 
     case studyActions.UPDATED_STUDY.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has made an edit to a study:
-            </p>
-            <div className="bg-light text-secondary p-3">
-              <h5><a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a></h5>
-              <h3>{activity.data.study.name}</h3>
-              <h5 className="text-muted">{activity.data.study.program}</h5>
-              <div dangerouslySetInnerHTML={createMarkup(
-                  activity.data.study.description)}/>
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has made an edit to a study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
               <p>
-                <KeywordBadgeList keywords={activity.data.study.keywords || []}/>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has made an edit to a study:
               </p>
-            </div>
-          </React.Fragment>
-      );
+              <div className="bg-light text-secondary p-3">
+                <h5><a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a></h5>
+                <h3>{activity.data.study.name}</h3>
+                <h5 className="text-muted">{activity.data.study.program}</h5>
+                <div dangerouslySetInnerHTML={createMarkup(
+                    activity.data.study.description)}/>
+                <p>
+                  <KeywordBadgeList
+                      keywords={activity.data.study.keywords || []}/>
+                </p>
+              </div>
+            </React.Fragment>
+        );
+
+      }
 
     case studyActions.DELETED_STUDY.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has removed study: {activity.data.study.code}
-          </p>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has removed study study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has removed study: {activity.data.study.code}
+            </p>
+        );
+
+      }
 
     case studyActions.STUDY_STATUS_CHANGED.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has updated the status of study&nbsp;
-            <a href={"/study/"
-            + activity.data.study.code}>{activity.data.study.code}</a>
-            &nbsp;from&nbsp;
-            <StatusBadge status={activity.data.oldStatus}/>
-            &nbsp;to&nbsp;
-            <StatusBadge status={activity.data.newStatus}/>
-          </p>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has updated the status of study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has updated the status of study&nbsp;
+              <a href={"/study/"
+              + activity.data.study.code}>{activity.data.study.code}</a>
+              &nbsp;from&nbsp;
+              <StatusBadge status={activity.data.oldStatus}/>
+              &nbsp;to&nbsp;
+              <StatusBadge status={activity.data.newStatus}/>
+            </p>
+        );
+
+      }
 
     case studyActions.NEW_ASSAY.value:
-      return (
-          <React.Fragment>
 
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has created a new assay:
-            </p>
+      if (!!activity.data.legacyStudy) {
 
-            <div className="bg-light text-secondary p-3">
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has created a new assay in study"}
+            />
+        );
 
-              <h5>
-                <a href={"/study/" + activity.studyId + "/assay/"
-                + activity.data.assay.code}>
-                  {activity.data.assay.code}
-                </a>
-              </h5>
+      } else {
 
-              <h3>{activity.data.assay.name}</h3>
+        return (
+            <React.Fragment>
 
-              <h5 className="text-muted">
-                {activity.data.assay.assayType.name}
-              </h5>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has created a new assay:
+              </p>
 
-              <div dangerouslySetInnerHTML={createMarkup(
-                  activity.data.assay.description)}/>
+              <div className="bg-light text-secondary p-3">
 
-            </div>
-          </React.Fragment>
-      );
+                <h5>
+                  <a href={"/study/" + activity.studyId + "/assay/"
+                  + activity.data.assay.code}>
+                    {activity.data.assay.code}
+                  </a>
+                </h5>
+
+                <h3>{activity.data.assay.name}</h3>
+
+                <h5 className="text-muted">
+                  {activity.data.assay.assayType.name}
+                </h5>
+
+                <div dangerouslySetInnerHTML={createMarkup(
+                    activity.data.assay.description)}/>
+
+              </div>
+            </React.Fragment>
+        );
+
+      }
 
     case studyActions.UPDATED_ASSAY.value:
-      return (
-          <React.Fragment>
 
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has updated an assay in study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
+
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has made an edit to an assay:
+              </p>
+
+              <div className="bg-light text-secondary p-3">
+
+                <h5>
+                  <a href={"/study/" + activity.studyId + "/assay/"
+                  + activity.data.assay.code}>
+                    {activity.data.assay.code}
+                  </a>
+                </h5>
+
+                <h3>{activity.data.assay.name}</h3>
+
+                <h5 className="text-muted">
+                  {activity.data.assay.assayType.name}
+                </h5>
+
+                <div dangerouslySetInnerHTML={createMarkup(
+                    activity.data.assay.description)}/>
+
+              </div>
+            </React.Fragment>
+        );
+
+      }
+
+    case studyActions.DELETED_ASSAY.value:
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has removed an assay from study"}
+            />
+        );
+
+      } else {
+
+        return (
             <p>
               <a href={"/user/"
               + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has made an edit to an assay:
+              &nbsp;has removed assay: {activity.data.assay.code}
             </p>
+        );
 
-            <div className="bg-light text-secondary p-3">
-
-              <h5>
-                <a href={"/study/" + activity.studyId + "/assay/"
-                + activity.data.assay.code}>
-                  {activity.data.assay.code}
-                </a>
-              </h5>
-
-              <h3>{activity.data.assay.name}</h3>
-
-              <h5 className="text-muted">
-                {activity.data.assay.assayType.name}
-              </h5>
-
-              <div dangerouslySetInnerHTML={createMarkup(
-                  activity.data.assay.description)}/>
-
-            </div>
-          </React.Fragment>
-      );
-
-    case studyActions.DELETED_ASSAY.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has removed assay: {activity.data.assay.code}
-          </p>
-      );
+      }
 
     case studyActions.ASSAY_STATUS_CHANGED.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has updated the status of assay&nbsp;
-            <a href={"/study/" + activity.data.study + "/assay/"
-            + activity.data.assay.code}>{activity.data.assay.code}</a>
-            &nbsp;from&nbsp;
-            <StatusBadge status={activity.data.oldStatus}/>
-            &nbsp;to&nbsp;
-            <StatusBadge status={activity.data.newStatus}/>
-          </p>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has updated the status of an assay in study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has updated the status of assay&nbsp;
+              <a href={"/study/" + activity.data.study + "/assay/"
+              + activity.data.assay.code}>{activity.data.assay.code}</a>
+              &nbsp;from&nbsp;
+              <StatusBadge status={activity.data.oldStatus}/>
+              &nbsp;to&nbsp;
+              <StatusBadge status={activity.data.newStatus}/>
+            </p>
+        );
+
+      }
 
     case studyActions.ASSAY_TASK_ADDED.value:
       return (
@@ -429,7 +565,18 @@ const ActivityMessage = ({activity}) => {
       );
 
     case studyActions.FILE_UPLOADED.value:
-      if (!!activity.data.assay) {
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has uploaded a file to study"}
+            />
+        );
+
+      } else if (!!activity.data.assay) {
         return (
             <React.Fragment>
               <p>
@@ -476,174 +623,367 @@ const ActivityMessage = ({activity}) => {
 
         );
       }
+
     case studyActions.NEW_STUDY_CONCLUSIONS.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has added new conclusions for study:&nbsp;
-              <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
-            </p>
-            <div className="bg-light font-italic text-secondary p-3"
-                 dangerouslySetInnerHTML={createMarkup(
-                     activity.data.conclusions.content)}/>
-          </React.Fragment>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has added new conclusions for study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has added new conclusions for study:&nbsp;
+                <a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a>
+              </p>
+              <div className="bg-light font-italic text-secondary p-3"
+                   dangerouslySetInnerHTML={createMarkup(
+                       activity.data.conclusions.content)}/>
+            </React.Fragment>
+        );
+
+      }
+
     case studyActions.EDITED_STUDY_CONCLUSIONS.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has updated the conclusions for study:&nbsp;
-              <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
-            </p>
-            <div className="bg-light font-italic text-secondary p-3"
-                 dangerouslySetInnerHTML={createMarkup(
-                     activity.data.conclusions.content)}/>
-          </React.Fragment>
 
-      );
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has updated conclusions for study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has updated the conclusions for study:&nbsp;
+                <a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a>
+              </p>
+              <div className="bg-light font-italic text-secondary p-3"
+                   dangerouslySetInnerHTML={createMarkup(
+                       activity.data.conclusions.content)}/>
+            </React.Fragment>
+
+        );
+
+      }
+
     case studyActions.DELETED_STUDY_CONCLUSIONS.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has removed the conclusions for study:&nbsp;
-            <a href={"/study/"
-            + activity.data.study.code}>{activity.data.study.code}</a>
-          </p>
-      );
-    case studyActions.NEW_COMMENT.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has posted a new comment to study&nbsp;
-              <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>:
-            </p>
-            <p className="bg-light font-italic text-secondary p-3">
-              "{activity.data.comment.text}"
-            </p>
-          </React.Fragment>
 
-      );
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has removed conclusions for study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has removed the conclusions for study:&nbsp;
+              <a href={"/study/"
+              + activity.data.study.code}>{activity.data.study.code}</a>
+            </p>
+        );
+
+      }
+
+    case studyActions.NEW_COMMENT.value:
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has added a comment to study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has posted a new comment to study&nbsp;
+                <a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a>:
+              </p>
+              <p className="bg-light font-italic text-secondary p-3">
+                "{activity.data.comment.text}"
+              </p>
+            </React.Fragment>
+
+        );
+
+      }
+
     case studyActions.EDITED_COMMENT.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has edited their comment to study:&nbsp;
-              <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
-            </p>
-            <p className="bg-light font-italic text-secondary p-3">
-              "{activity.data.comment.text}"
-            </p>
-          </React.Fragment>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has edited a comment for study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has edited their comment to study:&nbsp;
+                <a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a>
+              </p>
+              <p className="bg-light font-italic text-secondary p-3">
+                "{activity.data.comment.text}"
+              </p>
+            </React.Fragment>
+        );
+
+      }
+
     case studyActions.DELETED_COMMENT.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has removed their comment to study:&nbsp;
-            <a href={"/study/"
-            + activity.data.study.code}>{activity.data.study.code}</a>
-          </p>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has removed a comment from study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has removed their comment to study:&nbsp;
+              <a href={"/study/"
+              + activity.data.study.code}>{activity.data.study.code}</a>
+            </p>
+        );
+
+      }
+
     case studyActions.NEW_STUDY_RELATIONSHIP.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has added a new study relationship:&nbsp;
-            <a href={"/study/"
-            + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
-            &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
-            <a href={"/study/"
-            + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
-          </p>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has added a new study relationship to study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has added a new study relationship:&nbsp;
+              <a href={"/study/"
+              + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
+              &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
+              <a href={"/study/"
+              + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
+            </p>
+        );
+
+      }
+
     case studyActions.UPDATED_STUDY_RELATIONSHIP.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has added a new study relationship:&nbsp;
-            <a href={"/study/"
-            + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
-            &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
-            <a href={"/study/"
-            + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
-          </p>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has updated a study relationship for study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has added a new study relationship:&nbsp;
+              <a href={"/study/"
+              + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
+              &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
+              <a href={"/study/"
+              + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
+            </p>
+        );
+
+      }
+
     case studyActions.DELETED_STUDY_RELATIONSHIP.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has removed a study relationship for study:&nbsp;
-            <a href={"/study/"
-            + activity.data.study.code}>{activity.data.study.code}</a>
-          </p>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has removed a study relationship from study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/"
+              + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has removed a study relationship for study:&nbsp;
+              <a href={"/study/"
+              + activity.data.study.code}>{activity.data.study.code}</a>
+            </p>
+        );
+
+      }
+
     case studyActions.NEW_STUDY_EXTERNAL_LINK.value:
-      return (
-          <React.Fragment>
-            <p>
-              <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has added a new external link for study:&nbsp;
-              <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
-            </p>
-            <p className="bg-light text-secondary p-3">
-              <Link size={16}/>
-              &nbsp;
-              <a href={activity.data.link.url}
-                 target="_blank">{activity.data.link.label}</a>
-            </p>
-          </React.Fragment>
-      );
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has added an external link to study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has added a new external link for study:&nbsp;
+                <a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a>
+              </p>
+              <p className="bg-light text-secondary p-3">
+                <Link size={16}/>
+                &nbsp;
+                <a href={activity.data.link.url}
+                   target="_blank">{activity.data.link.label}</a>
+              </p>
+            </React.Fragment>
+        );
+
+      }
+
     case studyActions.UPDATED_STUDY_EXTERNAL_LINK.value:
-      return (
-          <React.Fragment>
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has updated an external link in study"}
+            />
+        );
+
+      } else {
+
+        return (
+            <React.Fragment>
+              <p>
+                <a href={"/user/"
+                + activity.user.username}>{activity.user.displayName}</a>
+                &nbsp;has edited an external link for study:&nbsp;
+                <a href={"/study/"
+                + activity.data.study.code}>{activity.data.study.code}</a>
+              </p>
+              <p className="bg-light text-secondary p-3">
+                <Link size={16}/>
+                &nbsp;
+                <a href={activity.data.link.url}
+                   target="_blank">{activity.data.link.label}</a>
+              </p>
+            </React.Fragment>
+        );
+
+      }
+
+    case studyActions.DELETED_STUDY_EXTERNAL_LINK.value:
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has removed an external link from study"}
+            />
+        );
+
+      } else {
+
+        return (
             <p>
               <a href={"/user/"
               + activity.user.username}>{activity.user.displayName}</a>
-              &nbsp;has edited an external link for study:&nbsp;
+              &nbsp;has removed an external link for study:&nbsp;
               <a href={"/study/"
               + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
-            <p className="bg-light text-secondary p-3">
-              <Link size={16}/>
-              &nbsp;
-              <a href={activity.data.link.url}
-                 target="_blank">{activity.data.link.label}</a>
-            </p>
-          </React.Fragment>
-      );
-    case studyActions.DELETED_STUDY_EXTERNAL_LINK.value:
-      return (
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has removed an external link for study:&nbsp;
-            <a href={"/study/"
-            + activity.data.study.code}>{activity.data.study.code}</a>
-          </p>
-      );
+        );
+
+      }
+
     default:
       return (
           <p>
-            {activity.user.displayName}
+            {activity.user.displayName} has new activity.
           </p>
       );
   }
