@@ -22,7 +22,7 @@ public class ELNFolder {
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "path")
+  @Column(name = "path", length = 1024)
   private String path;
 
   @Column(name = "reference_id")

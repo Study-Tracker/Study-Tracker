@@ -16,13 +16,13 @@ public class FileStoreFolder {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @Column(name = "url", length = 1034)
+  @Column(name = "url", length = 1024)
   private String url;
 
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "path", nullable = false)
+  @Column(name = "path", nullable = false, length = 1024)
   private String path;
 
   @Column(name = "reference_id")
