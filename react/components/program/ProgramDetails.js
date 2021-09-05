@@ -43,7 +43,6 @@ import {
   ProgramStatusButton,
   SelectableProgramStatusButton
 } from "./programStatus";
-import {ProgramTeam} from "./programMetadata";
 import ProgramTimelineTab from "./ProgramTimelineTab";
 import ProgramStudiesTab from "./ProgramStudiesTab";
 import {ModelDetailsAttributeList} from "../attributes";
@@ -185,14 +184,14 @@ class ProgramDetails extends React.Component {
                   </Row>
                 </CardBody>
 
-                <CardBody>
-                  <Row>
-                    <Col xs={12}>
-                      <CardTitle>Program Team</CardTitle>
-                      <ProgramTeam program={program} studies={studies}/>
-                    </Col>
-                  </Row>
-                </CardBody>
+                {/*<CardBody>*/}
+                {/*  <Row>*/}
+                {/*    <Col xs={12}>*/}
+                {/*      <CardTitle>Program Team</CardTitle>*/}
+                {/*      <ProgramTeam program={program} studies={studies}/>*/}
+                {/*    </Col>*/}
+                {/*  </Row>*/}
+                {/*</CardBody>*/}
 
                 {/*<CardBody>*/}
                 {/*  <Row>*/}

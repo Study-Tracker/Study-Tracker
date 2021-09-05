@@ -80,6 +80,7 @@ public class UserService {
     u.setDisplayName(user.getDisplayName());
     u.setEmail(user.getEmail());
     u.setActive(user.isActive());
+    u.setAdmin(user.isAdmin());
     u.setTitle(user.getTitle());
     u.setDepartment(user.getDepartment());
     u.setAttributes(user.getAttributes());

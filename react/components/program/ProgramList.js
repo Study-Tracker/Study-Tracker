@@ -16,8 +16,6 @@
 
 import React from "react";
 import {Button, Card, CardBody, Col, Container, Row,} from "reactstrap";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -97,18 +95,6 @@ const ProgramList = ({title, user, programs}) => {
         <Row className="justify-content-between align-items-center">
           <Col xs="8">
             <h1>{title}</h1>
-          </Col>
-          <Col className="col-auto">
-            {
-              !!user && !!user.admin
-                  ? (
-                      <a href={"/programs/new"}>
-                        <Button color="primary" className="mr-1 mb-1">
-                          <FontAwesomeIcon icon={faPlusCircle}/> New Program
-                        </Button>
-                      </a>
-                  ) : ''
-            }
           </Col>
         </Row>
 

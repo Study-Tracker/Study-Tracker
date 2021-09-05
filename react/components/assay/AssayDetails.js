@@ -21,7 +21,7 @@ import {
   UncontrolledDropdown
 } from "reactstrap";
 import {SelectableStatusButton, StatusButton} from "../status";
-import {Book, Folder, Menu} from "react-feather";
+import {Book, Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {history} from "../../App";
@@ -31,6 +31,7 @@ import AssayFilesTab from "./AssayFilesTab";
 import AssayNotebookTab from "./AssayNotebookTab";
 import swal from "sweetalert";
 import {AssayTaskList} from "../assayTasks";
+import {RepairableStorageFolderButton} from "../files";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -417,18 +418,10 @@ export default class AssayDetails extends React.Component {
                   <Row>
                     <Col xs={12}>
                       <CardTitle>Workspaces</CardTitle>
-                      {
-                        !!assay.storageFolder
-                            ? (
-                                <a href={assay.storageFolder.url}
-                                   target="_blank"
-                                   className="btn btn-outline-info mb-2 mr-2">
-                                  Assay Storage Folder
-                                  <Folder
-                                      className="feather align-middle ml-2 mb-1"/>
-                                </a>
-                            ) : ''
-                      }
+                      <RepairableStorageFolderButton
+                          folder={assay.storageFolder}
+                          repairUrl={"/api/assay/" + assay.id + "/storage"}
+                      />
                       {
                         !!assay.notebookFolder
                             ? (
