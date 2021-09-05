@@ -19,6 +19,7 @@ package com.decibeltx.studytracker.service;
 import com.decibeltx.studytracker.eln.NotebookFolder;
 import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.exception.InvalidConstraintException;
+import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.model.Assay;
 import com.decibeltx.studytracker.model.AssayTask;
 import com.decibeltx.studytracker.model.AssayTypeField;
@@ -28,8 +29,10 @@ import com.decibeltx.studytracker.model.FileStoreFolder;
 import com.decibeltx.studytracker.model.Status;
 import com.decibeltx.studytracker.repository.AssayRepository;
 import com.decibeltx.studytracker.repository.AssayTaskRepository;
+import com.decibeltx.studytracker.repository.FileStoreFolderRepository;
 import com.decibeltx.studytracker.storage.StorageFolder;
 import com.decibeltx.studytracker.storage.StudyStorageService;
+import com.decibeltx.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +65,9 @@ public class AssayService {
 
   @Autowired
   private NamingService namingService;
+
+  @Autowired
+  private FileStoreFolderRepository fileStoreFolderRepository;
 
   public Optional<Assay> findById(Long id) {
     return assayRepository.findById(id);
@@ -256,6 +262,29 @@ public class AssayService {
 
   public long countBetweenDates(Date startDate, Date endDate) {
     return assayRepository.countByCreatedAtBetween(startDate, endDate);
+  }
+
+  @Transactional
+  public void repairStorageFolder(Assay assay) {
+
+    // Find or create the storage folder
+    StorageFolder folder;
+    try {
+      folder = storageService.getAssayFolder(assay);
+    } catch (StudyStorageNotFoundException e) {
+      try {
+        folder = storageService.createAssayFolder(assay);
+      } catch (Exception ex) {
+        throw new StudyTrackerException(ex);
+      }
+    }
+
+    // Update the  program record
+    FileStoreFolder f = fileStoreFolderRepository.getOne(assay.getStorageFolder().getId());
+    f.setName(folder.getName());
+    f.setPath(folder.getPath());
+    f.setUrl(folder.getUrl());
+    fileStoreFolderRepository.save(f);
   }
 
 }

@@ -23,7 +23,6 @@ import com.decibeltx.studytracker.exception.InsufficientPrivilegesException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.mapstruct.dto.ActivityDetailsDto;
 import com.decibeltx.studytracker.mapstruct.dto.ProgramDetailsDto;
-import com.decibeltx.studytracker.mapstruct.dto.ProgramSummaryDto;
 import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
 import com.decibeltx.studytracker.mapstruct.mapper.ProgramMapper;
 import com.decibeltx.studytracker.model.Activity;
@@ -32,6 +31,9 @@ import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.service.ActivityService;
 import com.decibeltx.studytracker.service.ProgramService;
 import com.decibeltx.studytracker.service.UserService;
+import com.decibeltx.studytracker.storage.StorageFolder;
+import com.decibeltx.studytracker.storage.StudyStorageService;
+import com.decibeltx.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -44,6 +46,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -77,9 +80,19 @@ public class ProgramController {
   @Autowired
   private ActivityMapper activityMapper;
 
+  @Autowired
+  private StudyStorageService storageService;
+
   @GetMapping("")
-  public List<ProgramSummaryDto> getAllPrograms() throws Exception {
-    return programMapper.toProgramSummaryList(programService.findAll());
+  public List<?> getAllPrograms(
+      @RequestParam(required = false, name = "details") boolean showDetails
+  ) throws Exception {
+    List<Program> programs = programService.findAll();
+    if (showDetails) {
+      return programMapper.toProgramDetailsList(programs);
+    } else {
+      return programMapper.toProgramSummaryList(programs);
+    }
   }
 
   @GetMapping("/{id}")
@@ -217,6 +230,45 @@ public class ProgramController {
     Program program = optional.get();
     List<Activity> activities = activityService.findByProgram(program);
     return new ResponseEntity<>(activityMapper.toActivityDetailsList(activities), HttpStatus.OK);
+  }
+
+  @GetMapping("/{id}/storage")
+  public HttpEntity<StorageFolder> getProgramStorageFolder(@PathVariable("id") Long programId) {
+    Optional<Program> optional = programService.findById(programId);
+    if (!optional.isPresent()) {
+      throw new RecordNotFoundException("Program not found: " + programId);
+    }
+    Program program = optional.get();
+    try {
+      return new ResponseEntity<>(storageService.getProgramFolder(program), HttpStatus.OK);
+    } catch (StudyStorageNotFoundException e) {
+      throw new RecordNotFoundException("Program folder not found:" + programId);
+    }
+  }
+
+  @PatchMapping("/{id}/storage")
+  public HttpEntity<?> repairProgramStorageFolder(@PathVariable("id") Long programId) {
+
+    // Check user privileges
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = userService.findByUsername(username)
+        .orElseThrow(RecordNotFoundException::new);
+    if (!user.isAdmin()) {
+      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+    }
+
+    // Check that the program exists
+    Optional<Program> optional = programService.findById(programId);
+    if (!optional.isPresent()) {
+      throw new RecordNotFoundException("Program not found: " + programId);
+    }
+    Program program = optional.get();
+
+    // Repair the storage folder
+    programService.repairStorageFolder(program);
+    return new ResponseEntity<>(HttpStatus.OK);
+
   }
 
 }

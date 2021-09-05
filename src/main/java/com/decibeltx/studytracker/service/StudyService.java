@@ -20,15 +20,18 @@ import com.decibeltx.studytracker.eln.NotebookFolder;
 import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.exception.InvalidConstraintException;
+import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.model.ELNFolder;
 import com.decibeltx.studytracker.model.FileStoreFolder;
 import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Status;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.User;
+import com.decibeltx.studytracker.repository.FileStoreFolderRepository;
 import com.decibeltx.studytracker.repository.StudyRepository;
 import com.decibeltx.studytracker.storage.StorageFolder;
 import com.decibeltx.studytracker.storage.StudyStorageService;
+import com.decibeltx.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +64,9 @@ public class StudyService {
 
   @Autowired
   private NamingService namingService;
+
+  @Autowired
+  private FileStoreFolderRepository fileStoreFolderRepository;
 
   /**
    * Finds a single study, identified by its primary key ID
@@ -333,6 +339,29 @@ public class StudyService {
 
   public long countBetweenDates(Date startDate, Date endDate) {
     return studyRepository.countByCreatedAtBetween(startDate, endDate);
+  }
+
+  @Transactional
+  public void repairStorageFolder(Study study) {
+
+    // Find or create the storage folder
+    StorageFolder folder;
+    try {
+      folder = studyStorageService.getStudyFolder(study);
+    } catch (StudyStorageNotFoundException e) {
+      try {
+        folder = studyStorageService.createStudyFolder(study);
+      } catch (Exception ex) {
+        throw new StudyTrackerException(ex);
+      }
+    }
+
+    // Update the  program record
+    FileStoreFolder f = fileStoreFolderRepository.getOne(study.getStorageFolder().getId());
+    f.setName(folder.getName());
+    f.setPath(folder.getPath());
+    f.setUrl(folder.getUrl());
+    fileStoreFolderRepository.save(f);
   }
 
 }

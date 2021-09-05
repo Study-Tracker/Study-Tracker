@@ -37,7 +37,7 @@ import {
 } from "reactstrap";
 import {SelectableStatusButton, StatusButton} from "../status";
 import React from "react";
-import {Book, Folder, Menu} from "react-feather";
+import {Book, Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faFolderPlus, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {history} from "../../App";
@@ -53,6 +53,7 @@ import StudyTimelineTab from "./StudyTimelineTab";
 import swal from "sweetalert";
 import AddToStudyCollectionModal from "../modals/AddToStudyCollectionModal";
 import StudyCollectionsTab from "./StudyCollectionsTab";
+import {RepairableStorageFolderButton} from "../files";
 
 const StudyDetailHeader = ({study, user}) => {
   return (
@@ -334,19 +335,14 @@ class StudyDetails extends React.Component {
                 <CardBody>
                   <Row>
                     <Col xs={12}>
+
                       <CardTitle>Workspaces</CardTitle>
-                      {
-                        !!study.storageFolder
-                            ? (
-                                <a href={study.storageFolder.url}
-                                   target="_blank"
-                                   className="btn btn-outline-info mt-2 mr-2">
-                                  Study Storage Folder
-                                  <Folder
-                                      className="feather align-middle ml-2 mb-1"/>
-                                </a>
-                            ) : ''
-                      }
+
+                      <RepairableStorageFolderButton
+                          folder={study.storageFolder}
+                          repairUrl={"/api/study/" + study.id + "/storage"}
+                      />
+
                       {
                         !!study.notebookFolder
                             ? (

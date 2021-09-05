@@ -17,6 +17,7 @@ import AssayTypeSettings from "./AssayTypeSettings";
 import TemplateTypesSettings from './TemplateTypesSettings';
 import {history} from '../../App';
 import KeywordSettings from "./KeywordSettings";
+import ProgramSettings from "./ProgramSettings";
 
 const settings = {
   "users": {
@@ -38,6 +39,11 @@ const settings = {
     id: "keywords",
     label: "Keywords",
     tag: KeywordSettings
+  },
+  "programs": {
+    id: "programs",
+    label: "Programs",
+    tag: ProgramSettings
   }
 };
 
