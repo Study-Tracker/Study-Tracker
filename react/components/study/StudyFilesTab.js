@@ -92,7 +92,7 @@ class StudyFilesTabContent extends React.Component {
     return (
         <div>
 
-          <Row className="justify-content-between align-items-center">
+          <Row className="justify-content-between align-items-center mb-2">
             <Col>
               {
                 !!this.props.user
