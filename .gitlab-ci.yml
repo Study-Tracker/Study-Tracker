@@ -16,7 +16,8 @@ run_tests:
   stage: test
   script:
     - cat $RUN_TESTS_SCRIPT >> run_tests.sh
-    - ./run_tests.sh
+    - chmod +x run_tests.sh
+    - source run_tests.sh
 
 run_deploy_staging:
   stage: deploy-staging
@@ -26,7 +27,8 @@ run_deploy_staging:
     - schedules
   script:
     - cat $RUN_DEPLOY_STAGING_SCRIPT >> run_deploy_staging.sh
-    - ./run_deploy_staging.sh
+    - chmod +x run_deploy_staging.sh
+    - source run_deploy_staging.sh
 
 run_deploy_production:
   stage: deploy-production
@@ -36,5 +38,6 @@ run_deploy_production:
     - schedules
   script:
     - cat $RUN_DEPLOY_PRODUCTION_SCRIPT >> run_deploy_production.sh
-    - ./run_deploy_production.sh
+    - chmod +x run_deploy_production.sh
+    - source run_deploy_production.sh
 
