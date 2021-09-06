@@ -43,6 +43,7 @@
     "chokidar-cli": "^2.1.0",
     "classnames": "2.2.6",
     "crossfilter2": "^1.5.2",
+    "css-loader": "^3.4.2",
     "dateformat": "^3.0.3",
     "formik": "^2.2.6",
     "fullcalendar": "3.10.0",
@@ -77,9 +78,9 @@
     "react-redux-toastr": "7.5.1",
     "react-router-dom": "5.1.2",
     "react-scripts": "3.1.0",
-    "react-select": "3.0.4",
+    "react-select": "4.3.1",
     "react-transition-group": "4.2.2",
-    "reactstrap": "8.0.1",
+    "reactstrap": "8.10.0",
     "redux": "4.0.4",
     "smartwizard": "4.3.1",
     "sweetalert": "^2.1.2"
@@ -91,7 +92,6 @@
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
-    "css-loader": "^3.4.2",
     "less-watch-compiler": "^1.14.1",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7"
