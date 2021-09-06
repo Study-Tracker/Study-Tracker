@@ -16,7 +16,7 @@
     "start": "npm-run-all -p build:less watch:js watch:less",
     "build:all": "npm-run-all -p build:js build:less",
     "build:webpack": "webpack --mode development --display-error-details",
-    "build:webpack-prd": "webpack --mode production",
+    "build:webpack-prd": "webpack --mode production --no-stats",
     "build": "npm-run-all build:less build:webpack",
     "build:production": "npm-run-all build:less build:webpack-prd"
   },
