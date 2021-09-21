@@ -133,7 +133,7 @@ class ProgramSettings extends React.Component {
         // headerStyle: {width: '40%'},
         formatter: (c, d, i, x) => {
           if (!!d.notebookFolder) {
-            if (!!d.notebookFolder.url) {
+            if (!!d.notebookFolder.url && d.notebookFolder.url !== "ERROR") {
               return <a href={d.notebookFolder.url} target="_blank">ELN Folder</a>
             } else {
               return <span className="badge badge-warning">ERROR</span>
