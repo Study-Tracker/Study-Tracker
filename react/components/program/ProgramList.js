@@ -127,8 +127,8 @@ const ProgramList = ({title, user, programs}) => {
                               sizePerPageList: [10, 20, 40, 80]
                             })}
                             defaultSorted={[{
-                              dataField: "updatedAt",
-                              order: "desc"
+                              dataField: "name",
+                              order: "asc"
                             }]}
                             {...props.baseProps}
                         >

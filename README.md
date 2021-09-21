@@ -35,6 +35,8 @@ Tracker, [see the wiki](https://github.com/Decibel-Therapeutics/Study-Tracker/wi
 
 ## Quick Start
 
+For a rapid build and deployment in development mode, follow the steps below. For production deployment, see the wiki.
+
 1. Make sure you have all requirements installed.
 2. Create a new PostgreSQL database.
 3. Create a new file, `src/main/resources/application.properties`. Use the
@@ -53,8 +55,8 @@ Tracker, [see the wiki](https://github.com/Decibel-Therapeutics/Study-Tracker/wi
 6. Run the Flyway plugin to import the Study Tracker database schema and default data:
    
    ```bash
-   mvn flyway:clean
-   mvn flyway:migrate
+   mvn -Dflyway.configFiles=flyway.conf flyway:clean
+   mvn -Dflyway.configFiles=flyway.conf flyway:migrate
    ```
    
 7. You can run the application with Maven:

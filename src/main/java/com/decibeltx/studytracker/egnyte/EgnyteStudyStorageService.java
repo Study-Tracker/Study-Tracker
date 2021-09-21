@@ -160,6 +160,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     return this.getProgramFolder(program, true);
   }
 
+  @Override
   public StorageFolder getProgramFolder(Program program, boolean includeContents)
       throws StudyStorageNotFoundException {
     String path = getProgramFolderPath(program);
@@ -184,6 +185,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     return this.getStudyFolder(study, true);
   }
 
+  @Override
   public StorageFolder getStudyFolder(Study study, boolean includeContents)
       throws StudyStorageNotFoundException {
     String path = getStudyFolderPath(study);
@@ -208,6 +210,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     return this.getAssayFolder(assay, true);
   }
 
+  @Override
   public StorageFolder getAssayFolder(Assay assay, boolean includeContents)
       throws StudyStorageNotFoundException {
     String path = getAssayFolderPath(assay);
