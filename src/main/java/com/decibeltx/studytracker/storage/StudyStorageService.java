@@ -39,6 +39,17 @@ public interface StudyStorageService {
   StorageFolder getProgramFolder(Program program) throws StudyStorageNotFoundException;
 
   /**
+   * Returns reference to a {@link Program} instance's storage folder, optionally including its
+   *    contents. Throws a {@link StudyStorageNotFoundException} if the folder does not exist;
+   *
+   * @param program
+   * @param includeContents
+   * @return
+   * @throws StudyStorageNotFoundException
+   */
+  StorageFolder getProgramFolder(Program program, boolean includeContents) throws StudyStorageNotFoundException;
+
+  /**
    * Returns reference to a {@link Study} instance's storage folder. Throws a {@link
    * StudyStorageNotFoundException} if the folder does not exist;
    *
@@ -48,6 +59,15 @@ public interface StudyStorageService {
   StorageFolder getStudyFolder(Study study) throws StudyStorageNotFoundException;
 
   /**
+   * Returns reference to a {@link Study} instance's storage folder, optionally including its
+   * contents. Throws a {@link StudyStorageNotFoundException} if the folder does not exist;
+   *
+   * @param study
+   * @return
+   */
+  StorageFolder getStudyFolder(Study study, boolean includeContents) throws StudyStorageNotFoundException;
+
+  /**
    * Returns reference to a {@link Assay} instance's storage folder. Throws a {@link
    * StudyStorageNotFoundException} if the folder does not exist;
    *
@@ -55,6 +75,15 @@ public interface StudyStorageService {
    * @return
    */
   StorageFolder getAssayFolder(Assay assay) throws StudyStorageNotFoundException;
+
+  /**
+   * Returns reference to a {@link Assay} instance's storage folder, optionally including its
+   * contents. Throws a {@link StudyStorageNotFoundException} if the folder does not exist;
+   *
+   * @param assay
+   * @return
+   */
+  StorageFolder getAssayFolder(Assay assay, boolean includeContents) throws StudyStorageNotFoundException;
 
   /**
    * Creates a folder for the target {@link Program}. Throws a {@link

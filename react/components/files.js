@@ -359,7 +359,7 @@ const handleFolderRepairRequest = (url) => {
 
 export const RepairableStorageFolderLink = ({folder, repairUrl}) => {
   if (!!folder && !!folder.path && !!folder.url) {
-    return <a href={folder.url} target="_blank">Files Folder</a>
+    return <a href={folder.url} target="_blank">Storage Folder</a>
   } else {
     return (
         <Button color="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
@@ -377,7 +377,7 @@ export const RepairableStorageFolderButton = ({folder, repairUrl}) => {
         <a href={folder.url}
            target="_blank"
            className="btn btn-outline-info mt-2 mr-2">
-          Study Storage Folder
+          Storage Folder
           <FolderIcon
               className="feather align-middle ml-2 mb-1"/>
         </a>

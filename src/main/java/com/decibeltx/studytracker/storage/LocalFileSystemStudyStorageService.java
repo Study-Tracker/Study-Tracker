@@ -140,6 +140,13 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     return folder;
   }
 
+  // TODO
+  @Override
+  public StorageFolder getProgramFolder(Program program, boolean includeContents)
+      throws StudyStorageNotFoundException {
+    return getProgramFolder(program);
+  }
+
   @Override
   public StorageFolder getStudyFolder(Study study) throws StudyStorageNotFoundException {
     LOGGER.info("Fetching storage folder instance for study: " + study.getCode());
@@ -160,6 +167,13 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     return folder;
   }
 
+  // TODO
+  @Override
+  public StorageFolder getStudyFolder(Study study, boolean includeContents)
+      throws StudyStorageNotFoundException {
+    return getStudyFolder(study);
+  }
+
   @Override
   public StorageFolder getAssayFolder(Assay assay) throws StudyStorageNotFoundException {
     LOGGER.info("Fetching storage folder instance for assay: " + assay.getCode());
@@ -178,6 +192,13 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     folder.setFiles(getFolderFiles(assayFolder));
     folder.setSubFolders(getSubfolders(assayFolder, 0));
     return folder;
+  }
+
+  // TODO
+  @Override
+  public StorageFolder getAssayFolder(Assay assay, boolean includeContents)
+      throws StudyStorageNotFoundException {
+    return getAssayFolder(assay);
   }
 
   @Override
