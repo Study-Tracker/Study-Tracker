@@ -20,6 +20,7 @@ import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {RepairableStorageFolderLink} from "../files";
+import {RepairableNotebookFolderLink} from "../eln";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -325,6 +326,16 @@ const ProgramDetailsModal = ({program, isOpen, toggle}) => {
                 <RepairableStorageFolderLink
                     folder={program.storageFolder}
                     repairUrl={"/api/program/" + program.id + "/storage"}
+                />
+              </p>
+            </Col>
+
+            <Col xs={6}>
+              <h4>ELN Folder</h4>
+              <p>
+                <RepairableNotebookFolderLink
+                    folder={program.notebookFolder}
+                    repairUrl={"/api/program/" + program.id + "/notebook"}
                 />
               </p>
             </Col>

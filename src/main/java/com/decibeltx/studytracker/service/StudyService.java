@@ -27,6 +27,7 @@ import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Status;
 import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.User;
+import com.decibeltx.studytracker.repository.ELNFolderRepository;
 import com.decibeltx.studytracker.repository.FileStoreFolderRepository;
 import com.decibeltx.studytracker.repository.StudyRepository;
 import com.decibeltx.studytracker.storage.StorageFolder;
@@ -67,6 +68,9 @@ public class StudyService {
 
   @Autowired
   private FileStoreFolderRepository fileStoreFolderRepository;
+
+  @Autowired
+  private ELNFolderRepository elnFolderRepository;
 
   /**
    * Finds a single study, identified by its primary key ID
@@ -347,7 +351,7 @@ public class StudyService {
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = studyStorageService.getStudyFolder(study);
+      folder = studyStorageService.getStudyFolder(study, false);
     } catch (StudyStorageNotFoundException e) {
       try {
         folder = studyStorageService.createStudyFolder(study);
@@ -362,6 +366,28 @@ public class StudyService {
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
     fileStoreFolderRepository.save(f);
+  }
+
+  @Transactional
+  public void repairElnFolder(Study study) {
+
+    // Check to see if the folder exists and create a new one if necessary
+    NotebookFolder folder;
+    Optional<NotebookFolder> optional = notebookService.findStudyFolder(study);
+    if (optional.isPresent()) {
+      folder = optional.get();
+    } else {
+      folder = notebookService.createStudyFolder(study);
+    }
+
+    // Update the record
+    ELNFolder f = elnFolderRepository.getOne(study.getNotebookFolder().getId());
+    f.setName(folder.getName());
+    f.setPath(folder.getPath());
+    f.setUrl(folder.getUrl());
+    f.setReferenceId(folder.getReferenceId());
+    elnFolderRepository.save(f);
+
   }
 
 }

@@ -71,6 +71,7 @@ const columns = [
   {
     dataField: "updatedAt",
     text: "Last Updated",
+    type: "date",
     sort: true,
     searchable: false,
     headerStyle: {width: '10%'},

@@ -29,6 +29,7 @@ import com.decibeltx.studytracker.model.FileStoreFolder;
 import com.decibeltx.studytracker.model.Status;
 import com.decibeltx.studytracker.repository.AssayRepository;
 import com.decibeltx.studytracker.repository.AssayTaskRepository;
+import com.decibeltx.studytracker.repository.ELNFolderRepository;
 import com.decibeltx.studytracker.repository.FileStoreFolderRepository;
 import com.decibeltx.studytracker.storage.StorageFolder;
 import com.decibeltx.studytracker.storage.StudyStorageService;
@@ -68,6 +69,9 @@ public class AssayService {
 
   @Autowired
   private FileStoreFolderRepository fileStoreFolderRepository;
+
+  @Autowired
+  private ELNFolderRepository elnFolderRepository;
 
   public Optional<Assay> findById(Long id) {
     return assayRepository.findById(id);
@@ -270,7 +274,7 @@ public class AssayService {
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = storageService.getAssayFolder(assay);
+      folder = storageService.getAssayFolder(assay, false);
     } catch (StudyStorageNotFoundException e) {
       try {
         folder = storageService.createAssayFolder(assay);
@@ -285,6 +289,28 @@ public class AssayService {
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
     fileStoreFolderRepository.save(f);
+  }
+
+  @Transactional
+  public void repairElnFolder(Assay assay) {
+
+    // Check to see if the folder exists and create a new one if necessary
+    NotebookFolder folder;
+    Optional<NotebookFolder> optional = notebookService.findAssayFolder(assay);
+    if (optional.isPresent()) {
+      folder = optional.get();
+    } else {
+      folder = notebookService.createAssayFolder(assay);
+    }
+
+    // Update the record
+    ELNFolder f = elnFolderRepository.getOne(assay.getNotebookFolder().getId());
+    f.setName(folder.getName());
+    f.setPath(folder.getPath());
+    f.setUrl(folder.getUrl());
+    f.setReferenceId(folder.getReferenceId());
+    elnFolderRepository.save(f);
+
   }
 
 }

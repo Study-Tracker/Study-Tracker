@@ -70,22 +70,6 @@ class UserSettings extends React.Component {
 
     const columns = [
       {
-        dataField: "username",
-        text: "Username",
-        sort: true,
-        headerStyle: {width: '20%%'},
-        formatter: (c, d, i, x) => <a href={"javascript:void(0)"} onClick={() => this.toggleModal(d)}>{d.username}</a>,
-        sortFunc: (a, b, order, dataField, rowA, rowB) => {
-          if (rowA.username > rowB.username) {
-            return order === "desc" ? -1 : 1;
-          }
-          if (rowB.username > rowA.username) {
-            return order === "desc" ? 1 : -1;
-          }
-          return 0;
-        },
-      },
-      {
         dataField: "displayName",
         text: "Display Name",
         sort: true,
@@ -96,6 +80,22 @@ class UserSettings extends React.Component {
             return order === "desc" ? -1 : 1;
           }
           if (rowB.displayName > rowA.displayName) {
+            return order === "desc" ? 1 : -1;
+          }
+          return 0;
+        },
+      },
+      {
+        dataField: "username",
+        text: "Username",
+        sort: true,
+        headerStyle: {width: '20%%'},
+        formatter: (c, d, i, x) => <a href={"javascript:void(0)"} onClick={() => this.toggleModal(d)}>{d.username}</a>,
+        sortFunc: (a, b, order, dataField, rowA, rowB) => {
+          if (rowA.username > rowB.username) {
+            return order === "desc" ? -1 : 1;
+          }
+          if (rowB.username > rowA.username) {
             return order === "desc" ? 1 : -1;
           }
           return 0;
@@ -229,7 +229,7 @@ class UserSettings extends React.Component {
                             sizePerPageList: [10, 20, 40, 80]
                           })}
                           defaultSorted={[{
-                            dataField: "username",
+                            dataField: "displayName",
                             order: "asc"
                           }]}
                           {...props.baseProps}

@@ -37,7 +37,7 @@ import {
 } from "reactstrap";
 import {SelectableStatusButton, StatusButton} from "../status";
 import React from "react";
-import {Book, Menu} from "react-feather";
+import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faFolderPlus, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {history} from "../../App";
@@ -54,6 +54,7 @@ import swal from "sweetalert";
 import AddToStudyCollectionModal from "../modals/AddToStudyCollectionModal";
 import StudyCollectionsTab from "./StudyCollectionsTab";
 import {RepairableStorageFolderButton} from "../files";
+import {RepairableNotebookFolderButton} from "../eln";
 
 const StudyDetailHeader = ({study, user}) => {
   return (
@@ -343,18 +344,10 @@ class StudyDetails extends React.Component {
                           repairUrl={"/api/study/" + study.id + "/storage"}
                       />
 
-                      {
-                        !!study.notebookFolder
-                            ? (
-                                <a href={study.notebookFolder.url}
-                                   target="_blank"
-                                   className="btn btn-outline-info mt-2 mr-2">
-                                  Study ELN Folder
-                                  <Book
-                                      className="feather align-middle ml-2 mb-1"/>
-                                </a>
-                            ) : ''
-                      }
+                      <RepairableNotebookFolderButton
+                          folder={study.notebookFolder}
+                          repairUrl={"/api/study/" + study.id + "/notebook"}
+                      />
 
                     </Col>
                   </Row>
