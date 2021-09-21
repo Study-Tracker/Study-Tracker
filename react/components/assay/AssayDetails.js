@@ -21,7 +21,7 @@ import {
   UncontrolledDropdown
 } from "reactstrap";
 import {SelectableStatusButton, StatusButton} from "../status";
-import {Book, Menu} from "react-feather";
+import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {history} from "../../App";
@@ -32,6 +32,7 @@ import AssayNotebookTab from "./AssayNotebookTab";
 import swal from "sweetalert";
 import {AssayTaskList} from "../assayTasks";
 import {RepairableStorageFolderButton} from "../files";
+import {RepairableNotebookFolderButton} from "../eln";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -422,19 +423,10 @@ export default class AssayDetails extends React.Component {
                           folder={assay.storageFolder}
                           repairUrl={"/api/assay/" + assay.id + "/storage"}
                       />
-                      {
-                        !!assay.notebookFolder
-                            ? (
-                                <a href={assay.notebookFolder.url}
-                                   target="_blank"
-                                   className="btn btn-outline-info mb-2 mr-2">
-                                  Assay ELN Folder
-                                  <Book
-                                      className="feather align-middle ml-2 mb-1"/>
-                                </a>
-                            ) : ''
-                      }
-
+                      <RepairableNotebookFolderButton
+                          folder={assay.notebookFolder}
+                          repairUrl={"/api/assay/" + assay.id + "/notebook"}
+                      />
                     </Col>
                   </Row>
                 </CardBody>

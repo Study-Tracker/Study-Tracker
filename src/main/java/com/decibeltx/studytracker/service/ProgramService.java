@@ -22,6 +22,7 @@ import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.model.ELNFolder;
 import com.decibeltx.studytracker.model.FileStoreFolder;
 import com.decibeltx.studytracker.model.Program;
+import com.decibeltx.studytracker.repository.ELNFolderRepository;
 import com.decibeltx.studytracker.repository.FileStoreFolderRepository;
 import com.decibeltx.studytracker.repository.ProgramRepository;
 import com.decibeltx.studytracker.storage.StorageFolder;
@@ -53,6 +54,9 @@ public class ProgramService {
 
   @Autowired
   private FileStoreFolderRepository fileStoreFolderRepository;
+
+  @Autowired
+  private ELNFolderRepository elnFolderRepository;
 
   public Optional<Program> findById(Long id) {
     return programRepository.findById(id);
@@ -147,7 +151,7 @@ public class ProgramService {
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = studyStorageService.getProgramFolder(program);
+      folder = studyStorageService.getProgramFolder(program, false);
     } catch (StudyStorageNotFoundException e) {
       try {
         folder = studyStorageService.createProgramFolder(program);
@@ -162,6 +166,28 @@ public class ProgramService {
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
     fileStoreFolderRepository.save(f);
+  }
+
+  @Transactional
+  public void repairElnFolder(Program program) {
+
+    // Check to see if the folder exists and create a new one if necessary
+    NotebookFolder folder;
+    Optional<NotebookFolder> optional = studyNotebookService.findProgramFolder(program);
+    if (optional.isPresent()) {
+      folder = optional.get();
+    } else {
+      folder = studyNotebookService.createProgramFolder(program);
+    }
+
+    // Update the record
+    ELNFolder f = elnFolderRepository.getOne(program.getNotebookFolder().getId());
+    f.setName(folder.getName());
+    f.setPath(folder.getPath());
+    f.setUrl(folder.getUrl());
+    f.setReferenceId(folder.getReferenceId());
+    elnFolderRepository.save(f);
+
   }
 
 }

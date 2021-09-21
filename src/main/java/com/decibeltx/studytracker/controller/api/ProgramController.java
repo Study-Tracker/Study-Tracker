@@ -17,6 +17,8 @@
 package com.decibeltx.studytracker.controller.api;
 
 import com.decibeltx.studytracker.controller.UserAuthenticationUtils;
+import com.decibeltx.studytracker.eln.NotebookFolder;
+import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.events.EventsService;
 import com.decibeltx.studytracker.events.util.ProgramActivityUtils;
 import com.decibeltx.studytracker.exception.InsufficientPrivilegesException;
@@ -82,6 +84,9 @@ public class ProgramController {
 
   @Autowired
   private StudyStorageService storageService;
+
+  @Autowired(required = false)
+  private StudyNotebookService notebookService;
 
   @GetMapping("")
   public List<?> getAllPrograms(
@@ -232,6 +237,12 @@ public class ProgramController {
     return new ResponseEntity<>(activityMapper.toActivityDetailsList(activities), HttpStatus.OK);
   }
 
+  /**
+   * Retrieves the program's storage folder reference as a {@link StorageFolder} object.
+   *
+   * @param programId PKID of the program
+   * @return
+   */
   @GetMapping("/{id}/storage")
   public HttpEntity<StorageFolder> getProgramStorageFolder(@PathVariable("id") Long programId) {
     Optional<Program> optional = programService.findById(programId);
@@ -246,6 +257,13 @@ public class ProgramController {
     }
   }
 
+  /**
+   * Repairs the reference to a program's storage folder by either fetching a new reference or
+   *   creating a new folder.
+   *
+   * @param programId
+   * @return
+   */
   @PatchMapping("/{id}/storage")
   public HttpEntity<?> repairProgramStorageFolder(@PathVariable("id") Long programId) {
 
@@ -267,6 +285,52 @@ public class ProgramController {
 
     // Repair the storage folder
     programService.repairStorageFolder(program);
+    return new ResponseEntity<>(HttpStatus.OK);
+
+  }
+
+  @GetMapping("/{id}/notebook")
+  public NotebookFolder getProgramElnFolder(@PathVariable("id") Long programId) {
+
+    // Check that the program exists
+    Optional<Program> optional = programService.findById(programId);
+    if (!optional.isPresent()) {
+      throw new RecordNotFoundException("Program not found: " + programId);
+    }
+    Program program = optional.get();
+
+    // Check that the folder exists
+    Optional<NotebookFolder> folderOptional = Optional.ofNullable(notebookService)
+        .flatMap(service -> service.findProgramFolder(program));
+    if (!folderOptional.isPresent()) {
+      throw new RecordNotFoundException("Cannot find notebook folder for program: " + programId);
+    }
+
+    return folderOptional.get();
+
+  }
+
+  @PatchMapping("/{id}/notebook")
+  public HttpEntity<?> repairNotebookFolder(@PathVariable("id") Long programId) {
+
+    // Check user privileges
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User user = userService.findByUsername(username)
+        .orElseThrow(RecordNotFoundException::new);
+    if (!user.isAdmin()) {
+      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+    }
+
+    // Check that the program exists
+    Optional<Program> optional = programService.findById(programId);
+    if (!optional.isPresent()) {
+      throw new RecordNotFoundException("Program not found: " + programId);
+    }
+    Program program = optional.get();
+
+    // Repair the folder
+    programService.repairElnFolder(program);
     return new ResponseEntity<>(HttpStatus.OK);
 
   }
