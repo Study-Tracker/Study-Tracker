@@ -105,11 +105,20 @@ public class ProgramService {
   @Transactional
   public void update(Program program) {
     LOGGER.info("Updating program with name: " + program.getName());
+
     Program p = programRepository.getOne(program.getId());
     p.setDescription(program.getDescription());
     p.setActive(program.isActive());
     p.setAttributes(program.getAttributes());
     programRepository.save(p);
+
+    ELNFolder f = elnFolderRepository.getOne(program.getNotebookFolder().getId());
+    ELNFolder folder = program.getNotebookFolder();
+    f.setReferenceId(folder.getReferenceId());
+    f.setUrl(folder.getUrl());
+    f.setName(folder.getName());
+    elnFolderRepository.save(f);
+
   }
 
   @Transactional

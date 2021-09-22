@@ -37,14 +37,19 @@ class ProgramFormView extends React.Component {
     // Programs
     fetch("/api/program")
     .then(response => response.json())
-    .then(programs => {
+    .then(async programs => {
       if (!!this.state.programId) {
-        const program = programs.find(p => String(p.id) === this.state.programId);
+
+        const program = await fetch("/api/program/" + this.state.programId)
+        .then(async response => response.json());
+        console.log(program);
+
         this.setState({
           program: program,
           programs: programs,
           isLoaded: true
         });
+
       } else {
         this.setState({
           programs: programs,
