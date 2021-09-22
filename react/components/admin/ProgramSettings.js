@@ -175,7 +175,7 @@ class ProgramSettings extends React.Component {
                 </a>
 
                 <a className="text-warning" title={"Edit program"}
-                   onClick={() => history.push("/programs/" + d.id + "/edit")}>
+                   onClick={() => history.push("/program/" + d.id + "/edit")}>
                   <Edit className="align-middle mr-1" size={18}/>
                 </a>
 
@@ -374,7 +374,7 @@ const ProgramDetailsModal = ({program, isOpen, toggle}) => {
             View Program
           </Button>
           <Button color="warning"
-                  onClick={() => history.push("/programs/" + program.id + "/edit")}>
+                  onClick={() => history.push("/program/" + program.id + "/edit")}>
             <Edit size={14} className="mb-1"/>
             &nbsp;
             Edit

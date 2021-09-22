@@ -601,6 +601,8 @@ public class WebSecurityConfiguration {
           .antMatchers("/error").permitAll()
           .antMatchers("/login").permitAll()
           .antMatchers("/saml/**").permitAll()
+          .antMatchers("/auth/passwordreset").permitAll()
+          .antMatchers("/auth/passwordresetrequest").permitAll()
           .anyRequest().fullyAuthenticated();
 
       http
