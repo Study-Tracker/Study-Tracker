@@ -68,7 +68,7 @@ export class UserInputs extends React.Component {
 
   handleOwnerChange(e) {
     let users = [];
-    const selected = e.target.dataset.id;
+    const selected = parseInt(e.target.dataset.id);
     let owner = null;
     this.props.users.forEach(user => {
       user.owner = user.id === selected;

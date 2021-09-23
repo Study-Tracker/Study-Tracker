@@ -112,12 +112,14 @@ public class ProgramService {
     p.setAttributes(program.getAttributes());
     programRepository.save(p);
 
-    ELNFolder f = elnFolderRepository.getOne(program.getNotebookFolder().getId());
-    ELNFolder folder = program.getNotebookFolder();
-    f.setReferenceId(folder.getReferenceId());
-    f.setUrl(folder.getUrl());
-    f.setName(folder.getName());
-    elnFolderRepository.save(f);
+    if (program.getNotebookFolder() != null) {
+      ELNFolder f = elnFolderRepository.getOne(program.getNotebookFolder().getId());
+      ELNFolder folder = program.getNotebookFolder();
+      f.setReferenceId(folder.getReferenceId());
+      f.setUrl(folder.getUrl());
+      f.setName(folder.getName());
+      elnFolderRepository.save(f);
+    }
 
   }
 
