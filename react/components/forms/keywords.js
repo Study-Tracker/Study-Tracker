@@ -20,7 +20,8 @@ import Select from "react-select";
 import {KeywordCategoryBadge} from "../keywords";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
-import AsyncSelect from "react-select/async";
+import AsyncCreatable from "react-select/async-creatable";
+import swal from "sweetalert";
 
 export default class KeywordInputs extends React.Component {
 
@@ -45,7 +46,7 @@ export default class KeywordInputs extends React.Component {
   }
 
   handleRemoveKeyword(e) {
-    const selected = e.currentTarget.dataset.id;
+    const selected = parseInt(e.currentTarget.dataset.id);
     const keywords = this.props.keywords.filter(k => k.id !== selected);
     this.props.onChange({
       keywords: keywords
@@ -54,24 +55,56 @@ export default class KeywordInputs extends React.Component {
 
   handleKeywordSelect(selected) {
     console.log(selected);
-    this.props.onChange({
-      keywords: [
-        ...this.props.keywords,
-        selected
-      ]
-    })
+    if (!!selected.__isNew__) {
+      fetch("/api/keyword", {
+        method: 'POST',
+        body: JSON.stringify({
+          // id: null,
+          // label: selected.label,
+          // value: null,
+          keyword: selected.label,
+          category: this.state.category
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        }
+      })
+      .then(response => response.json())
+      .then(keyword => {
+        this.props.onChange({
+          keywords: [
+            ...this.props.keywords,
+            keyword
+          ]
+        })
+      })
+      .catch(e => {
+        console.error(e);
+        swal("Failed to add new keyword",
+            "Please try again. If the problem persists, contact Study Tracker support for help.",
+            "warning");
+      })
+    } else {
+      this.props.onChange({
+        keywords: [
+          ...this.props.keywords,
+          selected
+        ]
+      })
+    }
   }
 
   keywordAutocomplete(input, callback) {
-    console.log(input);
-    if (input.length < 2) {
+    // console.log(input);
+    if (input.length < 1) {
       return;
     }
     fetch('/api/keyword/?q=' + input
         + (!!this.state.category ? "&category=" + this.state.category : ''))
     .then(response => response.json())
     .then(json => {
-      console.log(json);
+      // console.log(json);
       const keywords = json.map(k => {
         return {
           id: k.id,
@@ -80,14 +113,14 @@ export default class KeywordInputs extends React.Component {
           category: k.category,
           keyword: k.keyword
         }
-      }).sort((a, b) => {
-        if (a.keyword > b.keyword) {
-          return -1;
-        } else if (a.keyword < b.keyword) {
-          return 1;
-        } else {
-          return 0;
-        }
+      // }).sort((a, b) => {
+      //   if (a.keyword > b.keyword) {
+      //     return -1;
+      //   } else if (a.keyword < b.keyword) {
+      //     return 1;
+      //   } else {
+      //     return 0;
+      //   }
       });
       callback(keywords);
     }).catch(e => {
@@ -139,7 +172,7 @@ export default class KeywordInputs extends React.Component {
           <Col sm="5">
             <FormGroup>
               <Label>Keyword Search</Label>
-              <AsyncSelect
+              <AsyncCreatable
                   placeholder={"Search-for and select keywords..."}
                   className={"react-select-container"}
                   classNamePrefix={"react-select"}
@@ -147,6 +180,7 @@ export default class KeywordInputs extends React.Component {
                   onChange={this.handleKeywordSelect}
                   controlShouldRenderValue={false}
                   isDisabled={!this.state.category}
+                  createOptionPosition={"first"}
               />
             </FormGroup>
           </Col>
