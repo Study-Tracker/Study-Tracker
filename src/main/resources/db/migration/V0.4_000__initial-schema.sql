@@ -301,6 +301,9 @@ INDEX IDX_STUDY_CODE ON studies (code);
 CREATE
 INDEX IDX_STUDY_NAME ON studies (name);
 
+CREATE
+INDEX IDX_KEYWORD ON keywords (category, keyword);
+
 ALTER TABLE activity
     ADD CONSTRAINT FK_ACTIVITY_ON_ASSAY FOREIGN KEY (assay_id) REFERENCES assays (id);
 

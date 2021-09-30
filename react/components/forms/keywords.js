@@ -96,7 +96,6 @@ export default class KeywordInputs extends React.Component {
   }
 
   keywordAutocomplete(input, callback) {
-    // console.log(input);
     if (input.length < 1) {
       return;
     }
@@ -104,7 +103,6 @@ export default class KeywordInputs extends React.Component {
         + (!!this.state.category ? "&category=" + this.state.category : ''))
     .then(response => response.json())
     .then(json => {
-      // console.log(json);
       const keywords = json.map(k => {
         return {
           id: k.id,
