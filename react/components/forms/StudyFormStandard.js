@@ -262,7 +262,7 @@ export default class StudyForm extends React.Component {
 
           <LoadingOverlay
               isVisible={this.state.showLoadingOverlay}
-              message={"Creating your study..."}
+              message={"Saving your study..."}
           />
 
           <Row>
@@ -490,8 +490,12 @@ export default class StudyForm extends React.Component {
                                           <Input
                                               type="text"
                                               disabled={!!this.state.study.id}
-                                              defaultValue={this.state.study.notebookFolder.url
-                                              || ''}
+                                              defaultValue={
+                                                !!this.state.study.notebookFolder
+                                                && !!this.state.study.notebookFolder.url
+                                                    ? this.state.study.notebookFolder.url
+                                                    : ''
+                                              }
                                               onChange={(e) => this.handleFormUpdate(
                                                   {
                                                     "notebookFolder": {

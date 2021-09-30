@@ -25,4 +25,10 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
   @Query("select k from Keyword k where lower(k.keyword) like lower(concat('%', ?1, '%')) and k.category = ?2")
   List<Keyword> search(String fragment, String category, Pageable pageable);
 
+  @Query(value = "select * from keywords where regexp_replace(keyword, '\\s\\(.+?\\)', '') ilike concat('%', ?1, '%') and category = ?2 order by keyword limit 50", nativeQuery = true)
+  List<Keyword> search(String fragment, String category);
+
+  @Query(value = "select * from keywords where regexp_replace(keyword, '\\s\\(.+?\\)', '') ilike concat('%', ?1, '%') order by keyword limit 50", nativeQuery = true)
+  List<Keyword> search(String fragment);
+
 }

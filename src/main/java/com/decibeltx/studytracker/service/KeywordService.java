@@ -25,9 +25,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,12 +58,18 @@ public class KeywordService {
   }
 
   public List<Keyword> search(String fragment) {
-    Pageable pageable = PageRequest.of(0, 50, Sort.by("keyword"));
+    return keywordRepository.search(fragment);
+  }
+
+  public List<Keyword> search(String fragment, Pageable pageable) {
     return keywordRepository.search(fragment, pageable);
   }
 
   public List<Keyword> search(String fragment, String category) {
-    Pageable pageable = PageRequest.of(0, 50, Sort.by("keyword"));
+    return keywordRepository.search(fragment, category);
+  }
+
+  public List<Keyword> search(String fragment, String category, Pageable pageable) {
     return keywordRepository.search(fragment, category, pageable);
   }
 

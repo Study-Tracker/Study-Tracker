@@ -273,7 +273,7 @@ export default class AssayForm extends React.Component {
 
           <LoadingOverlay
               isVisible={this.state.showLoadingOverlay}
-              message={"Creating your assay..."}
+              message={"Saving your assay..."}
           />
 
           <Row>
@@ -459,9 +459,12 @@ export default class AssayForm extends React.Component {
                                       <Label>Notebook URL</Label>
                                       <Input
                                           type="text"
-                                          defaultValue={this.state.assay.notebookFolder
+                                          defaultValue={
+                                            !!this.state.assay.notebookFolder
+                                            && !!this.state.assay.notebookFolder.url
                                               ? this.state.assay.notebookFolder.url
-                                              : ''}
+                                              : ''
+                                          }
                                           onChange={(e) => this.handleFormUpdate(
                                               {
                                                 "notebookEntry": {
