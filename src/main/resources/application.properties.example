@@ -1,44 +1,63 @@
-spring.profiles.active=example
+### General
 
-### App
-spring.application.name=Study Tracker
+# Host name of your application (should not include protocol or port).
+# Eg. localhost or mywebsite.com
+application.host-name=
 
-### Data source
-db.username=studytracker
-db.password=studytracker
-db.host=localhost
-db.name=study-tracker
-db.port=27017
-db.connectionString=mongodb://${db.host}:${db.port}
+### Admin user creation
+# Optional
+# The first time Study Tracker starts, an admin user will be created. If not specified here, a
+# generic email and random password will be assigned.
+admin.email=
+admin.password=
+
+### Data Source
+db.username=
+db.password=
+db.host=
+db.port=
+db.name=
+
+### AWS
+# Optional
+# If connecting with Event Bridge, provide your AWS region, access key and secret key.
+aws.region=
+aws.access-key-id=
+aws.secret-access-key=
 
 ### Events
-events.mode=local
+# Determines where to dispatch events. Can be eventbridge or local. Default mode: local
+events.mode=
+aws.eventbridge.bus-name=
 
-# AWS
-aws.region=us-east-1
-aws.access-key-id=xxx
-aws.secret-access-key=xxx
+### Email
+# Provide SMTP connection details for outgoing emails.
+spring.mail.host=
+spring.mail.port=
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+email.outgoing-email-address=${spring.mail.username}
 
 ### Notebook
-# Options: none, benchling
-notebook.mode=none
-
-### Benchling
-benchling.eln.api.token=xxx
-benchling.eln.tenant=xxx
-benchling.eln.api.root-url=https://${benchling.eln.tenant}.benchling.com
+# Connect Study Tracker with your ELN
+# Options: none, idbs, benchling. Default: none
+notebook.mode=
+benchling.eln.api.token=
+benchling.eln.api.root-url=
 benchling.eln.api.root-entity=
-benchling.eln.api.root-folder-url=${benchling.eln.tenant}/xxx/f_
+benchling.eln.api.root-folder-url=
 
-### Storage
-# Options: local, egnyte
-storage.mode=local
+### File Storage
+# Options: local, egnyte. Defaults to local
+storage.mode=
 storage.use-existing=true
-storage.max-folder-read-depth=1
+storage.max-folder-read-depth=3
 
-# Local
-storage.temp-dir=/tmp
-storage.local-dir=${storage.temp-dir}
+# Local: Provide options for local file system storage
+storage.temp-dir=
+storage.local-dir=
 
 # Egnyte
 egnyte.root-url=
@@ -47,5 +66,31 @@ egnyte.root-path=
 egnyte.qps=3
 
 ### Studies
+# You can change default study code creation behavior here
 study.default-code-prefix=ST
 study.default-external-code-prefix=EX
+study.code-counter-start=10001
+
+### SSL
+# Optional
+# If SSL is enabled, set the port to 8443 or 443
+#server.port=8443
+#server.ssl.enabled=true
+#server.ssl.key-store-type=PKCS12
+server.ssl.key-alias=
+server.ssl.key-store=
+server.ssl.key-store-password=
+
+### Single Sign-On
+# Optional
+# If using Okta for SSO, set option to okta-saml
+#security.sso=okta-saml
+
+# Okta
+sso.url=
+saml.audience=
+saml.idp=
+saml.metadata-url=
+saml.keystore.location=
+saml.keystore.alias=
+saml.keystore.password=

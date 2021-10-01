@@ -1,10 +1,10 @@
 # Study Tracker 
 
 Study Tracker makes the job of managing your team's research easier by providing a user-friendly web
-application that serves as a single source-of-truth for your organization, and saves time by
-integrating other required platforms, such as electronic laboratory notebooks (ELNs) and data file
-storage systems. Study Tracker also includes a command line interface (CLI), a REST API, and an
-event dispatcher service for easy data access and integration with external systems.
+application that serves as a single source-of-truth for your organization. Save time by
+connecting with other required platforms, such as electronic laboratory notebooks (ELNs), data file
+storage systems, and team messaging services. Integrate Study Tracker with other platforms via an 
+integrated REST API and event dispatcher service for sharing of data.
 
 ## Requirements
 
@@ -55,13 +55,12 @@ For a rapid build and deployment in development mode, follow the steps below. Fo
 6. Run the Flyway plugin to import the Study Tracker database schema and default data:
    
    ```bash
-   mvn -Dflyway.configFiles=flyway.conf flyway:clean
-   mvn -Dflyway.configFiles=flyway.conf flyway:migrate
+   mvn -Dflyway.configFiles=flyway.conf flyway:clean flyway:migrate
    ```
    
 7. You can run the application with Maven:
 
-    ```bash
+   ```bash
    mvn spring-boot:run 
    ```
    
