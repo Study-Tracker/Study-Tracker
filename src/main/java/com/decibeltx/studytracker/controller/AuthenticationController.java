@@ -27,11 +27,13 @@ import com.decibeltx.studytracker.security.AuthCredentials;
 import com.decibeltx.studytracker.service.EmailService;
 import com.decibeltx.studytracker.service.UserService;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +64,9 @@ public class AuthenticationController {
 
   @Autowired
   private EmailService emailService;
+
+  @Autowired
+  private Environment env;
 
   @GetMapping("/login")
   public String login() {
@@ -110,6 +115,25 @@ public class AuthenticationController {
     Map<String, Object> payload = new HashMap<>();
     payload.put("user", user);
     return new ResponseEntity<>(payload, HttpStatus.OK);
+  }
+
+  @GetMapping("/auth/options")
+  public HttpEntity<?> getAuthenticationOptions() {
+
+    Map<String, Object> data = new LinkedHashMap<>();
+
+    // Single sign-on
+    if (env.containsProperty("security.sso")) {
+      Map<String, Object> sso = new LinkedHashMap<>();
+      if (env.getRequiredProperty("security.sso").equals("okta-saml")
+          && env.containsProperty("sso.okta.url") && !env.getRequiredProperty("sso.okta.url").equals("")) {
+        sso.put("okta", env.getRequiredProperty("sso.okta.url"));
+      }
+      data.put("sso", sso);
+    }
+
+    return new ResponseEntity<>(data, HttpStatus.OK);
+
   }
 
   @GetMapping("/auth/passwordresetrequest")

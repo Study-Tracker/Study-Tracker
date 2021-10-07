@@ -23,14 +23,25 @@ public class AppUserDetailsService implements UserDetailsService, SAMLUserDetail
 
   @Override
   public AppUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+    User user = null;
+
     Optional<User> optional = userService.findByUsername(username);
     if (optional.isPresent()) {
+      user = optional.get();
+    } else {
+      optional = userService.findByEmail(username);
+      user = optional.orElse(null);
+    }
+
+    if (user != null) {
       LOGGER.info("Loaded user details for username: {}", username);
-      return new AppUserDetails(optional.get(), AuthMethod.DATABASE);
+      return new AppUserDetails(user, AuthMethod.DATABASE);
     } else {
       LOGGER.warn("Could not load user details for username: {}", username);
       throw new UsernameNotFoundException(username);
     }
+
   }
 
   @Override

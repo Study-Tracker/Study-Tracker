@@ -38,9 +38,28 @@ export default class SignInView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      auth: {}
+      auth: {},
+      options: {}
     };
     this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  componentDidMount() {
+    fetch("/auth/options", {
+      headers: {
+        "Accept": "application/json"
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      this.setState({
+        options: data
+      });
+    })
+    .catch(e => {
+      console.error("Failed to fetch authentication options.");
+      console.error(e);
+    })
   }
 
   handleInputChange(data) {
@@ -67,8 +86,7 @@ export default class SignInView extends React.Component {
 
                 <div className="text-center mt-4">
                   <h2>Welcome to Study Tracker</h2>
-                  <p className="lead">Sign in with your username and password to
-                    continue</p>
+                  <p className="lead">Please sign-in to continue</p>
                 </div>
 
                 <Card>
@@ -82,12 +100,12 @@ export default class SignInView extends React.Component {
                       <Form action={"/login"} method={"post"}>
 
                         <FormGroup>
-                          <Label>Username</Label>
+                          <Label>Username or email</Label>
                           <Input
                               bsSize="lg"
                               type="text"
                               name="username"
-                              placeholder="Enter your username"
+                              placeholder="Enter your username or email address"
                               onChange={e => this.handleInputChange(
                                   {username: e.target.value})}
                           />
@@ -146,6 +164,19 @@ export default class SignInView extends React.Component {
                             Sign In
                           </button>
                         </div>
+
+                        {
+                          !!this.state.options && !!this.state.options.sso
+                          && !!this.state.options.sso.okta
+                            ? (
+                                  <div className="text-center mt-3">
+                                    <a href={this.state.options.sso.okta}
+                                       className="btn btn-lg btn-outline-primary">
+                                      Sign in with Okta
+                                    </a>
+                                  </div>
+                            ) : ''
+                        }
 
                       </Form>
                     </div>

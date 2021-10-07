@@ -206,8 +206,7 @@ public class WebSecurityConfiguration {
             .antMatchers("/static/**").permitAll()
             .antMatchers("/error").permitAll()
             .antMatchers("/login").permitAll()
-            .antMatchers("/auth/passwordreset").permitAll()
-            .antMatchers("/auth/passwordresetrequest").permitAll()
+            .antMatchers("/auth/**").permitAll()
            .anyRequest().fullyAuthenticated()
             .and()
           .formLogin()
@@ -255,6 +254,9 @@ public class WebSecurityConfiguration {
 
     @Value("${saml.metadata-url}")
     private String metadataUrl;
+
+    @Value("${saml.metadata-base-url}")
+    private String metadataBaseUrl;
 
     @Autowired
     private AppUserDetailsService appUserDetailsService;
@@ -508,6 +510,7 @@ public class WebSecurityConfiguration {
       metadataGenerator.setExtendedMetadata(extendedMetadata());
       metadataGenerator.setIncludeDiscoveryExtension(false);
       metadataGenerator.setKeyManager(keyManager());
+      metadataGenerator.setEntityBaseURL(metadataBaseUrl);
       return metadataGenerator;
     }
 
@@ -601,8 +604,7 @@ public class WebSecurityConfiguration {
           .antMatchers("/error").permitAll()
           .antMatchers("/login").permitAll()
           .antMatchers("/saml/**").permitAll()
-          .antMatchers("/auth/passwordreset").permitAll()
-          .antMatchers("/auth/passwordresetrequest").permitAll()
+          .antMatchers("/auth/**").permitAll()
           .anyRequest().fullyAuthenticated();
 
       http

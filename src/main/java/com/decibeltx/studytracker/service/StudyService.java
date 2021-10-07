@@ -20,6 +20,7 @@ import com.decibeltx.studytracker.eln.NotebookFolder;
 import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.exception.InvalidConstraintException;
+import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.model.ELNFolder;
 import com.decibeltx.studytracker.model.FileStoreFolder;
@@ -29,6 +30,7 @@ import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.repository.ELNFolderRepository;
 import com.decibeltx.studytracker.repository.FileStoreFolderRepository;
+import com.decibeltx.studytracker.repository.ProgramRepository;
 import com.decibeltx.studytracker.repository.StudyRepository;
 import com.decibeltx.studytracker.storage.StorageFolder;
 import com.decibeltx.studytracker.storage.StudyStorageService;
@@ -56,6 +58,9 @@ public class StudyService {
 
   @Autowired
   private StudyRepository studyRepository;
+
+  @Autowired
+  private ProgramRepository programRepository;
 
   @Autowired
   private StudyStorageService studyStorageService;
@@ -177,6 +182,10 @@ public class StudyService {
       study.setExternalCode(namingService.generateExternalStudyCode(study));
     }
 
+    // Get the program
+    Program program = programRepository.findById(study.getProgram().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Invalid program: " + study.getProgram().getId()));
+
     // Create the study storage folder
     try {
       studyStorageService.createStudyFolder(study);
@@ -201,12 +210,17 @@ public class StudyService {
       }
     } else {
       if (notebookService != null) {
-        try {
-          NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
-          study.setNotebookFolder(ELNFolder.from(notebookFolder));
-        } catch (Exception e) {
-          e.printStackTrace();
-          LOGGER.warn("Failed to create notebook entry for study: " + study.getCode());
+        if (program.getNotebookFolder() != null) {
+          try {
+            NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
+            study.setNotebookFolder(ELNFolder.from(notebookFolder));
+          } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.warn("Failed to create notebook entry for study: " + study.getCode());
+
+          }
+        } else {
+          LOGGER.warn(String.format("Study program %s does not have ELN folder set.", program.getName()));
         }
       }
     }

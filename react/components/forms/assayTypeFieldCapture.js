@@ -13,7 +13,13 @@ import DatePicker from "react-datepicker";
 
 export const AssayTypeFieldCaptureInputList = ({assayType, assayFields, handleUpdate, fieldValidation}) => {
 
-  let inputs = assayType.fields.map(f => {
+  let inputs = assayType.fields
+  .sort((a, b) => {
+    if (a.id > b.id) return 1;
+    else if (a.id < b.id) return -1;
+    else return 0;
+  })
+  .map(f => {
 
     let value = null;
     if (assayFields.hasOwnProperty(f.fieldName)) {
