@@ -14,33 +14,13 @@
  * limitations under the License.
  */
 
-import {Row} from "reactstrap";
 import React from "react";
 import {StudySummaryCards} from "../studies";
 
-const UserStudiesTab = ({studies, user}) => {
+const UserStudiesTab = ({studies}) => {
 
   return (
       <div>
-        <Row className="justify-content-between align-items-center">
-          <div className="col-6">
-            <h4>User Studies</h4>
-          </div>
-          {/*<div className="col-auto">*/}
-          {/*  {*/}
-          {/*    !!user*/}
-          {/*        ? (*/}
-          {/*            <Button color="info"*/}
-          {/*                    onClick={() => history.push("/studies/new")}>*/}
-          {/*              New Study*/}
-          {/*              &nbsp;*/}
-          {/*              <FontAwesomeIcon icon={faPlusCircle}/>*/}
-          {/*            </Button>*/}
-          {/*        ) : ''*/}
-          {/*  }*/}
-          {/*</div>*/}
-        </Row>
-
         <StudySummaryCards studies={studies} showDetails={true}/>
       </div>
   );

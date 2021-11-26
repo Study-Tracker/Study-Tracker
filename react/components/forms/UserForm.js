@@ -16,29 +16,14 @@
 
 import React from "react";
 import 'react-datepicker/dist/react-datepicker.css';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Container,
-  Form,
-  FormFeedback,
-  FormGroup,
-  FormText,
-  Input,
-  Label,
-  Row
-} from "reactstrap";
+import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import swal from 'sweetalert';
 import {history} from '../../App';
 import {LoadingOverlay} from "../loading";
 import Select from "react-select";
 import AttributeInputs from "./attributes";
+import {Breadcrumbs} from "../common";
+import {FormGroup} from "./common";
 
 export default class UserForm extends React.Component {
 
@@ -218,31 +203,19 @@ export default class UserForm extends React.Component {
               {
                 !!this.state.user.id
                     ? (
-                        <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/"}>Home</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/admin"}>Admin Dashboard</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/user/" + this.state.user.id}>
-                              User Detail
-                            </a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>Edit User</BreadcrumbItem>
-                        </Breadcrumb>
+                        <Breadcrumbs crumbs={[
+                          {label: "Home", url: "/"},
+                          {label: "Admin Dashboard", url: "/admin"},
+                          {label: "User Details", url: "/user/" + this.state.user.id},
+                          {label:" Edit User"}
+                        ]} />
                     )
                     : (
-                        <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/"}>Home</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/admin"}>Admin Dashboard</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>New User</BreadcrumbItem>
-                        </Breadcrumb>
+                        <Breadcrumbs crumbs={[
+                          {label: "Home", url: "/"},
+                          {label: "Admin Dashboard", url: "/admin"},
+                          {label:" New User"}
+                        ]} />
                     )
               }
             </Col>
@@ -250,54 +223,54 @@ export default class UserForm extends React.Component {
 
           <Row className="justify-content-end align-items-center">
             <Col>
-              <h1>
+              <h3>
                 {
                   !!this.state.user.id
                       ? "Edit User"
                       : "New User"
                 }
-              </h1>
+              </h3>
             </Col>
           </Row>
 
           <Row>
-            <Col xs="12">
+            <Col xs={12}>
               <Card>
 
-                <CardHeader>
-                  <CardTitle tag="h5">User Details</CardTitle>
+                <Card.Header>
+                  <Card.Title tag="h5">User Details</Card.Title>
                   <h6 className="card-subtitle text-muted">
                     Users must have unique usernames and email addresses. Users
                     granted admin privileges can create or modify programs,
                     users,
                     and other system attributes.
                   </h6>
-                </CardHeader>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Form className="user-form">
 
-                    <Row form>
+                    <Row>
 
-                      <Col md="6">
+                      <Col md={6}>
                         <FormGroup>
-                          <Label>Name *</Label>
-                          <Input
+                          <Form.Label>Name *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.nameIsValid}
+                              isInvalid={!this.state.validation.nameIsValid}
                               defaultValue={this.state.user.displayName || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"displayName": e.target.value})}
                           />
-                          <FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
                             {"Name must not be empty."}
-                          </FormFeedback>
+                          </Form.Control.Feedback>
                         </FormGroup>
                       </Col>
 
-                      <Col md="6">
+                      <Col md={6}>
                         <FormGroup>
-                          <Label>Role</Label>
+                          <Form.Label>Role</Form.Label>
                           <Select
                               className="react-select-container"
                               classNamePrefix="react-select"
@@ -329,53 +302,53 @@ export default class UserForm extends React.Component {
 
                       <Col md={6}>
                         <FormGroup>
-                          <Label>Username *</Label>
-                          <Input
+                          <Form.Label>Username *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.usernameIsValid
+                              isInvalid={!this.state.validation.usernameIsValid
                               || !this.state.validation.usernameIsUnique}
                               defaultValue={this.state.user.username || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"username": e.target.value})}
                               disabled={!!this.state.user.id}
                           />
-                          <FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
                             {
                               !this.state.validation.usernameIsUnique
                                   ? "A user with this username already exists."
                                   : "Name must not be empty."
                             }
-                          </FormFeedback>
-                          <FormText>Must be unique.</FormText>
+                          </Form.Control.Feedback>
+                          <Form.Text>Must be unique.</Form.Text>
                         </FormGroup>
                       </Col>
 
                       <Col md={6}>
                         <FormGroup>
-                          <Label>Email *</Label>
-                          <Input
+                          <Form.Label>Email *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.emailIsValid
+                              isInvalid={!this.state.validation.emailIsValid
                               || !this.state.validation.emailIsUnique}
                               defaultValue={this.state.user.email || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"email": e.target.value})}
                               disabled={!!this.state.user.id}
                           />
-                          <FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
                             {
                               !this.state.validation.emailIsUnique
                                   ? "A user with this emil address already exists."
                                   : "Email must not be empty."
                             }
-                          </FormFeedback>
+                          </Form.Control.Feedback>
                         </FormGroup>
                       </Col>
 
                       <Col md={6}>
                         <FormGroup>
-                          <Label>Title</Label>
-                          <Input
+                          <Form.Label>Title</Form.Label>
+                          <Form.Control
                               type="text"
                               defaultValue={this.state.user.title || ''}
                               onChange={(e) => this.handleFormUpdate(
@@ -386,8 +359,8 @@ export default class UserForm extends React.Component {
 
                       <Col md={6}>
                         <FormGroup>
-                          <Label>Department</Label>
-                          <Input
+                          <Form.Label>Department</Form.Label>
+                          <Form.Control
                               type="text"
                               defaultValue={this.state.user.department || ''}
                               onChange={(e) => this.handleFormUpdate(
@@ -404,9 +377,9 @@ export default class UserForm extends React.Component {
                       </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
 
-                      <Col md="12">
+                      <Col md={12}>
                         <h5 className="card-title">User Attributes</h5>
                         <h6 className="card-subtitle text-muted">
                           Key-value attributes for adding additional information
@@ -437,20 +410,20 @@ export default class UserForm extends React.Component {
                     </Row>
 
                     {/*Buttons*/}
-                    <Row form>
+                    <Row>
                       <Col className="text-center">
                         <FormGroup>
-                          <Button size="lg" color="primary"
+                          <Button size="lg" variant="primary"
                                   onClick={this.handleSubmit}>Submit</Button>
                           &nbsp;&nbsp;
-                          <Button size="lg" color="secondary"
+                          <Button size="lg" variant="secondary"
                                   onClick={this.handleCancel}>Cancel</Button>
                         </FormGroup>
                       </Col>
                     </Row>
 
                   </Form>
-                </CardBody>
+                </Card.Body>
               </Card>
             </Col>
           </Row>

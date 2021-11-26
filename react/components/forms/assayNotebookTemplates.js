@@ -15,8 +15,9 @@
  */
 
 import React from 'react';
-import {FormFeedback, FormGroup, Label} from "reactstrap";
+import {Form} from "react-bootstrap";
 import Select from "react-select";
+import {FormGroup} from "./common";
 
 export const AssayNotebookTemplatesDropdown = ({
   notebookTemplates,
@@ -40,7 +41,7 @@ export const AssayNotebookTemplatesDropdown = ({
 
   return (
     <FormGroup>
-      <Label>Notebook File Template</Label>
+      <Form.Label>Notebook File Template</Form.Label>
       <Select
         className="react-select-container"
         classNamePrefix="react-select"
@@ -50,7 +51,7 @@ export const AssayNotebookTemplatesDropdown = ({
         onChange={onChange}
         isClearable={true}
       />
-      <FormFeedback>Select a template for notebook entry.</FormFeedback>
+      <Form.Control.Feedback>Select a template for notebook entry.</Form.Control.Feedback>
     </FormGroup>
   );
 }

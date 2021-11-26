@@ -318,12 +318,25 @@ public class AssayService {
     }
 
     // Update the record
-    ELNFolder f = elnFolderRepository.getOne(assay.getNotebookFolder().getId());
+    ELNFolder f;
+    boolean isNew = false;
+    try {
+      f = elnFolderRepository.getOne(assay.getNotebookFolder().getId());
+    } catch (NullPointerException e) {
+      f = new ELNFolder();
+      isNew = true;
+    }
     f.setName(folder.getName());
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
     f.setReferenceId(folder.getReferenceId());
     elnFolderRepository.save(f);
+
+    if (isNew) {
+      Assay a = assayRepository.getById(assay.getId());
+      a.setNotebookFolder(f);
+      assayRepository.save(a);
+    }
 
   }
 

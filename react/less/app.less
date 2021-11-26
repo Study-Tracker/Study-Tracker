@@ -42,18 +42,27 @@
 
 // Navbar
 nav.navbar {
-  padding: 0.2rem 1.0rem;
+
+  form {
+    margin-block-end: auto;
+  }
+
+  .navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
 }
 
 // Sidebar
 
 @media (min-width: 1px) and (max-width: 1199.8px) {
   .sidebar {
-    margin-left: -256px;
+    margin-left: -260px;
   }
 
   .sidebar .sidebar-content {
-    left: -256px;
+    left: -260px;
   }
 
   .sidebar.toggled {
@@ -64,20 +73,20 @@ nav.navbar {
     left: 0;
   }
 
-  .sidebar-collapsed {
-    margin-left: 0;
+  .sidebar.collapsed {
+    margin-left: 0 !important;
   }
 
-  .sidebar-collapsed .sidebar-content {
+  .sidebar.collapsed .sidebar-content {
     left: 0;
   }
 
-  .sidebar-collapsed.toggled {
-    margin-left: -256px;
+  .sidebar.collapsed.toggled {
+    margin-left: -260px;
   }
 
-  .sidebar-collapsed.toggled .sidebar-content {
-    left: -256px;
+  .sidebar.collapsed.toggled .sidebar-content {
+    left: -260px;
   }
 }
 
@@ -99,6 +108,21 @@ nav.navbar {
 
 }
 
+.illustration-light {
+  background: #deeafe8c;
+}
+
+.illustration-dark {
+
+  background: #28364c;
+  color: #deeafe;
+
+  .illustration-text {
+    color: #deeafe;
+  }
+
+}
+
 .rotate-on-hover {
   -webkit-transition: -webkit-transform .8s ease-in-out;
   transition: transform .8s ease-in-out;
@@ -109,7 +133,92 @@ nav.navbar {
   transform: rotate(360deg);
 }
 
+// Activity
+.activity-icon {
+
+  border-radius: 50%;
+  padding: 0.5rem;
+  width: 48px;
+  height: 48px;
+
+  svg {
+    width: 36px;
+    height: 36px;
+  }
+
+}
+
+.stat.stat-primary {
+
+  background: #e0eafc;
+
+  svg {
+    color: #3F80EA !important;
+  }
+
+}
+
+.stat.stat-success {
+
+  //background: #00c36a;
+  background: #b5f3d9;
+
+  svg {
+    //color: #fefefe;
+    color: #00c36a !important;
+  }
+
+}
+
+.stat.stat-info {
+
+  //background: #1F9BCF;
+  background: #d2edf8;
+
+  svg {
+    //color: #fefefe;
+    color: #1F9BCF !important;
+  }
+
+}
+
+.stat.stat-warning {
+
+  //background: #E5A54B;
+  background: #fce8d1;
+
+  svg {
+    //color: #fefefe;
+    color: #E5A54B !important;
+  }
+
+}
+
+.stat.stat-danger {
+
+  //background: #d9534f;
+  background: #fddfdf;
+
+  svg {
+    //color: #fefefe;
+    color: #d9534f !important;
+  }
+
+}
+
 // Filters
+.settings-toggle-option-text {
+
+  svg {
+    transform: rotate(90deg);
+  }
+
+}
+
+.settings-toggle {
+  height: 110px;
+}
+
 .settings {
 
   display: block;
@@ -138,6 +247,12 @@ nav.navbar {
 
   }
 
+}
+
+// Media
+
+.stat.stat-transparent {
+  background: inherit;
 }
 
 // Buttons
@@ -226,4 +341,10 @@ nav ol.breadcrumb {
 
 .ql-container {
   height: 70%
+}
+
+// Forms
+
+.form-label {
+  font-weight: 500;
 }

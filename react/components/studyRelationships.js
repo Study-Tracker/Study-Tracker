@@ -14,19 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Button,
-  CardTitle,
-  Col,
-  FormGroup,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-  UncontrolledAlert
-} from "reactstrap";
+import {Alert, Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimesCircle} from "@fortawesome/free-solid-svg-icons";
@@ -49,7 +37,7 @@ class StudyRelationships extends React.Component {
       },
       modalError: null
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
     this.handleNewRelationshipChange = this.handleNewRelationshipChange.bind(
         this);
     this.handleNewRelationshipSubmit = this.handleNewRelationshipSubmit.bind(
@@ -92,9 +80,9 @@ class StudyRelationships extends React.Component {
     })
   }
 
-  toggleModal() {
+  showModal(bool) {
     this.setState({
-      modalIsOpen: !this.state.modalIsOpen
+      modalIsOpen: bool
     })
   }
 
@@ -132,7 +120,7 @@ class StudyRelationships extends React.Component {
         },
         modalError: null
       });
-      this.toggleModal();
+      this.showModal(false);
     })
     .catch(error => {
       console.error(error);
@@ -199,19 +187,19 @@ class StudyRelationships extends React.Component {
     return (
         <div>
 
-          <CardTitle>
+          <Card.Title>
             Study Relationships
             {
               !!this.props.user ? (
-                  <span className="float-right">
-                  <Button size={"sm"} color={"primary"}
-                          onClick={this.toggleModal}>
+                  <span className="float-end">
+                  <Button size={"sm"} variant={"primary"}
+                          onClick={() => this.showModal(true)}>
                     Add <PlusCircle className="feather feather-button-sm"/>
                   </Button>
                 </span>
               ) : ''
             }
-          </CardTitle>
+          </Card.Title>
 
           {
             relationships.length
@@ -228,18 +216,17 @@ class StudyRelationships extends React.Component {
           }
 
           <Modal
-              isOpen={this.state.modalIsOpen}
-              toggle={() => this.toggleModal()}
-              size={"md"}
+              show={this.state.modalIsOpen}
+              onHide={() => this.showModal(false)}
           >
 
-            <ModalHeader toggle={() => this.toggleModal()}>
+            <Modal.Header closeButton>
               Add New Study Relationship
-            </ModalHeader>
+            </Modal.Header>
 
-            <ModalBody className="m-3">
+            <Modal.Body className="m-3">
 
-              <Row form>
+              <Row>
 
                 <Col sm={12}>
                   <p>
@@ -249,8 +236,8 @@ class StudyRelationships extends React.Component {
                 </Col>
 
                 <Col xs={12} sm={4}>
-                  <FormGroup>
-                    <Label>Relationship *</Label>
+                  <Form.Group>
+                    <Form.Label>Relationship *</Form.Label>
                     <Select
                         className="react-select-container"
                         classNamePrefix="react-select"
@@ -260,12 +247,12 @@ class StudyRelationships extends React.Component {
                               type: selected.value
                             })}
                     />
-                  </FormGroup>
+                  </Form.Group>
                 </Col>
 
                 <Col xs={12} sm={8}>
-                  <FormGroup>
-                    <Label>Study *</Label>
+                  <Form.Group>
+                    <Form.Label>Study *</Form.Label>
                     <AsyncSelect
                         placeholder="Search for studies..."
                         className={"react-select-container"}
@@ -276,7 +263,7 @@ class StudyRelationships extends React.Component {
                               targetStudyId: selected.obj.id
                             })}
                     />
-                  </FormGroup>
+                  </Form.Group>
                 </Col>
 
               </Row>
@@ -285,29 +272,29 @@ class StudyRelationships extends React.Component {
                     ? (
                         <Row>
                           <Col sm={12}>
-                            <UncontrolledAlert color={"warning"}>
+                            <Alert variant={"warning"}>
                               <div className="alert-message">
                                 {this.state.modalError}
                               </div>
-                            </UncontrolledAlert>
+                            </Alert>
                           </Col>
                         </Row>
                     ) : ''
               }
 
-            </ModalBody>
+            </Modal.Body>
 
-            <ModalFooter>
-              <Button color={"secondary"} onClick={() => this.toggleModal()}>
+            <Modal.Footer>
+              <Button variant={"secondary"} onClick={() => this.showModal(false)}>
                 Cancel
               </Button>
               <Button
-                  color={"primary"}
+                  variant={"primary"}
                   onClick={this.handleNewRelationshipSubmit}
               >
                 Save
               </Button>
-            </ModalFooter>
+            </Modal.Footer>
 
           </Modal>
 

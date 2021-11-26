@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import {Button, Col, FormGroup, Input, Label, Media, Row} from "reactstrap";
+import {Button, Col, Form, Row} from 'react-bootstrap';
 import {Comment} from "../comments";
 import {MessageCircle} from 'react-feather';
 import swal from 'sweetalert';
@@ -164,36 +164,6 @@ class StudyCommentsTab extends React.Component {
       )
     })
 
-    // for (let i = 0; i < this.state.comments.length; i++) {
-    //   let comment = this.state.comments[i];
-    //   if (i > 0) {
-    //     comments.push(
-    //         <Col key={'hr-' + i} sm={12}>
-    //           <hr/>
-    //         </Col>
-    //     );
-    //   }
-    //   comments.push(
-    //       <Col key={'thread-' + comment.createdAt} sm={12}>
-    //         <Comment
-    //             comment={comment} user={this.props.user}
-    //             handleUpdate={this.updateComment}
-    //             handleDelete={this.deleteComment}
-    //         />
-    //       </Col>
-    //   )
-    // }
-
-    // comments = comments.sort((a, b) => {
-    //   if (a.createdAt > b.createdAt) {
-    //     return -1;
-    //   } else if (a.createdAt < b.createdAt) {
-    //     return 1;
-    //   } else {
-    //     return 0;
-    //   }
-    // });
-
     let content = comments.length > 0 ? comments : (
         <Col sm={12}>
           <div className={"text-center"}>
@@ -211,51 +181,43 @@ class StudyCommentsTab extends React.Component {
 
           <Row>
             <Col sm={12}>
-              <Media className="mt-3">
-                <Media body>
+              <div className="d-flex mt-3">
+                <div className="flex-grow-1 ms-3">
 
-                  <div className="mb-2 text-center"
-                       hidden={this.state.showInput}>
-                    {
-                      !!this.props.user
-                          ? (
-                              <Button color={'info'}
-                                      onClick={() => this.toggleInput()}>
-                                Add Comment
-                                <MessageCircle
-                                    className="feather align-middle ml-2 mb-1"/>
-                                {/*<FontAwesomeIcon icon={faPlusCircle} />*/}
-                              </Button>
-                          ) : ''
-                    }
-
+                  <div className="mb-2 text-center" hidden={this.state.showInput}>
+                    <Button variant={'info'} onClick={() => this.toggleInput()}>
+                      Add Comment
+                      &nbsp;
+                      <MessageCircle className="feather align-middle mb-1"/>
+                    </Button>
                   </div>
 
                   <div className="mb-2" hidden={!this.state.showInput}>
 
-                    <FormGroup>
-                      <Label>New Comment</Label>
-                      <Input
+                    <Form.Group className="mb-2">
+                      <Form.Label>New Comment</Form.Label>
+                      <Form.Control
                           ref={this.textInput}
-                          type={'textarea'}
+                          as={'textarea'}
+                          rows={3}
                           value={this.state.newComment}
                           onChange={(e) => this.handleUpdate(e.target.value)}
                       />
-                    </FormGroup>
+                    </Form.Group>
 
-                    <Button color={'secondary'}
+                    <Button variant={'secondary'}
                             onClick={() => this.toggleInput()}>
                       Cancel
                     </Button>
                     &nbsp;&nbsp;
-                    <Button color={'primary'} onClick={this.submitComment}>
+                    <Button variant={'primary'} onClick={this.submitComment}>
                       Submit
                     </Button>
 
                   </div>
 
-                </Media>
-              </Media>
+                </div>
+              </div>
             </Col>
           </Row>
 

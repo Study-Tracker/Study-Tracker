@@ -16,29 +16,18 @@
 
 import {
   Breadcrumb,
-  BreadcrumbItem,
   Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
+  Dropdown,
   Nav,
-  NavItem,
-  NavLink,
   Row,
-  TabContent,
-  TabPane,
-  UncontrolledDropdown
-} from "reactstrap";
+  Tab
+} from "react-bootstrap";
 import React from "react";
 import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
-import {history} from "../../App";
 import {
   ProgramStatusButton,
   SelectableProgramStatusButton
@@ -51,7 +40,7 @@ const ProgramDetailHeader = ({program, user}) => {
   return (
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>Program {program.name} ({program.code})</h1>
+          <h3>Program {program.name} ({program.code})</h3>
         </Col>
         <Col className="col-auto">
           {
@@ -98,12 +87,8 @@ class ProgramDetails extends React.Component {
           <Row>
             <Col>
               <Breadcrumb>
-                <BreadcrumbItem>
-                  <a href={"/programs"}>Programs</a>
-                </BreadcrumbItem>
-                <BreadcrumbItem active>
-                  Program Detail
-                </BreadcrumbItem>
+                <Breadcrumb.Item href={"/programs"}>Programs</Breadcrumb.Item>
+                <Breadcrumb.Item active>Program Detail</Breadcrumb.Item>
               </Breadcrumb>
             </Col>
           </Row>
@@ -116,13 +101,13 @@ class ProgramDetails extends React.Component {
             <Col lg={5}>
               <Card className="details-card">
 
-                <CardHeader>
-                  <div className="card-actions float-right">
-                    <UncontrolledDropdown>
-                      <DropdownToggle tag="a">
+                <Card.Header>
+                  <div className="card-actions float-end">
+                    <Dropdown>
+                      <Dropdown.Toggle tag="a">
                         <Menu/>
-                      </DropdownToggle>
-                      <DropdownMenu right>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
                         {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
                         {/*  <FontAwesomeIcon icon={faShare}/>*/}
                         {/*  &nbsp;*/}
@@ -134,12 +119,11 @@ class ProgramDetails extends React.Component {
                         {/*}*/}
                         {
                           !!this.props.user && !!this.props.user.admin ? (
-                              <DropdownItem onClick={() => history.push(
-                                  "/program/" + program.id + "/edit")}>
+                              <Dropdown.Item href={"/program/" + program.id + "/edit"}>
                                 <FontAwesomeIcon icon={faEdit}/>
                                 &nbsp;
                                 Edit
-                              </DropdownItem>
+                              </Dropdown.Item>
                           ) : ''
                         }
                         {/*{*/}
@@ -152,15 +136,15 @@ class ProgramDetails extends React.Component {
                         {/*      </DropdownItem>*/}
                         {/*  ) : ''*/}
                         {/*}*/}
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
-                  <CardTitle tag="h5" className="mb-0 text-muted">
+                  <Card.Title tag="h5" className="mb-0 text-muted">
                     Summary
-                  </CardTitle>
-                </CardHeader>
+                  </Card.Title>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
 
@@ -182,88 +166,46 @@ class ProgramDetails extends React.Component {
 
                     </Col>
                   </Row>
-                </CardBody>
-
-                {/*<CardBody>*/}
-                {/*  <Row>*/}
-                {/*    <Col xs={12}>*/}
-                {/*      <CardTitle>Program Team</CardTitle>*/}
-                {/*      <ProgramTeam program={program} studies={studies}/>*/}
-                {/*    </Col>*/}
-                {/*  </Row>*/}
-                {/*</CardBody>*/}
-
-                {/*<CardBody>*/}
-                {/*  <Row>*/}
-                {/*    <Col xs={12}>*/}
-                {/*      <CardTitle>Keywords</CardTitle>*/}
-                {/*      <ProgramKeywords studies={studies}/>*/}
-                {/*    </Col>*/}
-                {/*  </Row>*/}
-                {/*</CardBody>*/}
+                </Card.Body>
 
               </Card>
             </Col>
 
-            <Col lg="7">
+            <Col lg={7}>
 
               {/* Tabs */}
               <div className="tab">
-                <Nav tabs>
+                <Tab.Container defaultActiveKey={"timeline"}>
+                  <Nav variant={"tabs"}>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "1" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("1");
-                        }}
-                    >
-                      Timeline
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"timeline"}>
+                        Timeline
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "2" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("2");
-                        }}
-                    >
-                      Studies
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"studies"}>
+                        Studies
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  {/*<NavItem>*/}
-                  {/*  <NavLink*/}
-                  {/*      className={this.state.activeTab === "3" ? "active" : ''}*/}
-                  {/*      onClick={() => {*/}
-                  {/*        this.toggle("3");*/}
-                  {/*      }}*/}
-                  {/*  >*/}
-                  {/*    Calendar*/}
-                  {/*  </NavLink>*/}
-                  {/*</NavItem>*/}
+                  </Nav>
 
-                </Nav>
+                  <Tab.Content>
 
-                <TabContent activeTab={this.state.activeTab}>
+                    <Tab.Pane eventKey={"timeline"}>
+                      <ProgramTimelineTab program={program}
+                                          user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="1">
-                    <ProgramTimelineTab program={program}
-                                        user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"studies"}>
+                      <ProgramStudiesTab studies={studies}
+                                         user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="2">
-                    <ProgramStudiesTab studies={studies}
-                                       user={this.props.user}/>
-                  </TabPane>
-
-                  {/*<TabPane tabId="3">*/}
-                  {/*  <ProgramCalendarTab program={program} studies={studies}*/}
-                  {/*                      user={this.props.user}/>*/}
-                  {/*</TabPane>*/}
-
-                </TabContent>
+                  </Tab.Content>
+                </Tab.Container>
               </div>
             </Col>
           </Row>

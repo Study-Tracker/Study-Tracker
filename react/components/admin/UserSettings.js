@@ -1,19 +1,5 @@
 import React from 'react';
-import {
-  Badge,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-  Table
-} from 'reactstrap';
+import {Badge, Button, Card, Col, Modal, Row, Table} from 'react-bootstrap';
 import {Edit, Info, User, UserPlus} from 'react-feather';
 import {history} from "../../App";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
@@ -30,20 +16,20 @@ class UserSettings extends React.Component {
       isError: false,
       showDetails: false,
       selectedUser: null,
-      showModal: false
+      isModalOpen: false
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
   }
 
-  toggleModal(selected) {
+  showModal(selected) {
     if (!!selected) {
       this.setState({
-        showModal: true,
+        isModalOpen: true,
         selectedUser: selected
       });
     } else {
       this.setState({
-        showModal: false
+        isModalOpen: false
       })
     }
   }
@@ -90,7 +76,7 @@ class UserSettings extends React.Component {
         text: "Username",
         sort: true,
         headerStyle: {width: '20%%'},
-        formatter: (c, d, i, x) => <a href={"javascript:void(0)"} onClick={() => this.toggleModal(d)}>{d.username}</a>,
+        formatter: (c, d, i, x) => <Button variant={"link"} onClick={() => this.showModal(d)}>{d.username}</Button>,
         sortFunc: (a, b, order, dataField, rowA, rowB) => {
           if (rowA.username > rowB.username) {
             return order === "desc" ? -1 : 1;
@@ -115,17 +101,9 @@ class UserSettings extends React.Component {
         headerStyle: {width: '10%'},
         formatter: (c, d, i, x) => {
           if (d.admin) {
-            return (
-                <div className="badge badge-danger">
-                  Admin
-                </div>
-            )
+            return <Badge bg="danger">Admin</Badge>
           } else {
-            return (
-                <div className="badge badge-info">
-                  User
-                </div>
-            )
+            return <Badge bg="info">User</Badge>
           }
         }
       },
@@ -136,23 +114,11 @@ class UserSettings extends React.Component {
         headerStyle: {width: '10%'},
         formatter: (c, d, i, x) => {
           if (d.locked) {
-            return (
-                <div className="badge badge-warning">
-                  Locked
-                </div>
-            )
+            return <Badge bg="warning">Locked</Badge>
           } else if (d.active) {
-            return (
-                <div className="badge badge-success">
-                  Active
-                </div>
-            )
+            return <Badge bg="success">Active</Badge>
           } else {
-            return (
-                <div className="badge badge-danger">
-                  Inactive
-                </div>
-            )
+            return <Badge bg="danger">Inactive</Badge>
           }
         }
       },
@@ -166,18 +132,18 @@ class UserSettings extends React.Component {
               <React.Fragment>
 
                 <a className="text-info" title={"View details"}
-                   onClick={() => this.toggleModal(d)}>
-                  <Info className="align-middle mr-1" size={18}/>
+                   onClick={() => this.showModal(d)}>
+                  <Info className="align-middle me-1" size={18}/>
                 </a>
 
                 <a className="text-warning" title={"Edit user"}
                    onClick={() => history.push("/users/" + d.id + "/edit")}>
-                  <Edit className="align-middle mr-1" size={18}/>
+                  <Edit className="align-middle me-1" size={18}/>
                 </a>
 
                 {/*<a className="text-danger" title={"Disable user"}*/}
                 {/*   onClick={() => console.log("click")}>*/}
-                {/*  <Trash className="align-middle mr-1" size={18}/>*/}
+                {/*  <Trash className="align-middle me-1" size={18}/>*/}
                 {/*</a>*/}
 
               </React.Fragment>
@@ -190,22 +156,22 @@ class UserSettings extends React.Component {
         <React.Fragment>
 
           <Card>
-            <CardHeader>
-              <CardTitle tag="h5" className="mb-0">
+            <Card.Header>
+              <Card.Title tag="h5" className="mb-0">
                 Registered Users
-                <span className="float-right">
+                <span className="float-end">
                   <Button
                       color={"primary"}
                       onClick={() => history.push("/users/new")}
                   >
                     New User
                     &nbsp;
-                    <UserPlus className="feather align-middle ml-2 mb-1"/>
+                    <UserPlus className="feather align-middle ms-2 mb-1"/>
                   </Button>
                 </span>
-              </CardTitle>
-            </CardHeader>
-            <CardBody>
+              </Card.Title>
+            </Card.Header>
+            <Card.Body>
               <ToolkitProvider
                   keyField="id"
                   data={this.state.users}
@@ -215,7 +181,7 @@ class UserSettings extends React.Component {
               >
                 {props => (
                     <div>
-                      <div className="float-right">
+                      <div className="float-end">
                         <Search.SearchBar
                             {...props.searchProps}
                         />
@@ -239,11 +205,11 @@ class UserSettings extends React.Component {
                 )}
               </ToolkitProvider>
               <UserDetailsModal
-                  toggle={this.toggleModal}
-                  isOpen={this.state.showModal}
+                  toggle={this.showModal}
+                  isOpen={this.state.isModalOpen}
                   user={this.state.selectedUser}
               />
-            </CardBody>
+            </Card.Body>
           </Card>
 
         </React.Fragment>
@@ -252,7 +218,7 @@ class UserSettings extends React.Component {
 
 }
 
-const UserDetailsModal = ({user, isOpen, toggle}) => {
+const UserDetailsModal = ({user, isOpen, showModal}) => {
 
   if (!user) {
     return "";
@@ -269,14 +235,14 @@ const UserDetailsModal = ({user, isOpen, toggle}) => {
 
   return (
       <Modal
-          isOpen={isOpen}
-          toggle={() => toggle()}
+          show={isOpen}
+          onHide={() => showModal()}
           size={"lg"}
       >
-        <ModalHeader toggle={() => toggle()}>
+        <Modal.Header closeButton>
           User: <strong>{user.displayName}</strong> (<code>{user.username}</code>)
-        </ModalHeader>
-        <ModalBody>
+        </Modal.Header>
+        <Modal.Body>
           <Row>
 
             <Col md={6}>
@@ -360,24 +326,22 @@ const UserDetailsModal = ({user, isOpen, toggle}) => {
             </Col>
 
           </Row>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="info"
-                  onClick={() => history.push("/user/" + user.username)}>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="info" href={"/user/" + user.username}>
             <User size={14} className="mb-1"/>
             &nbsp;
             View Profile
           </Button>
-          <Button color="warning"
-                  onClick={() => history.push("/users/" + user.id + "/edit")}>
+          <Button variant="warning" href={"/users/" + user.id + "/edit"}>
             <Edit size={14} className="mb-1"/>
             &nbsp;
             Edit
           </Button>
-          <Button color="secondary" onClick={() => toggle()}>
+          <Button variant="secondary" onClick={() => showModal()}>
             Close
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
   )
 

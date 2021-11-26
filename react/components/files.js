@@ -14,15 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Button,
-  Col,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row
-} from "reactstrap";
+import {Button, Col, Modal, Row} from "react-bootstrap";
 import React, {useMemo} from "react";
 import {useDropzone} from 'react-dropzone';
 import {
@@ -129,7 +121,7 @@ class Folder extends React.Component {
 const File = ({file}) => {
   return (
       <li>
-        <div className="ml-3">
+        <div className="ms-3">
           <a href={file.url} target="_blank">
             <FontAwesomeIcon icon={faFile}/>
             &nbsp;
@@ -151,8 +143,8 @@ const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth,
       return 0;
     }
   })
-  .map(f => {
-    return <Folder key={"folder-" + f.name} folder={f} depth={depth} folderFileKey={folderFileKey} />
+  .map((f, i) => {
+    return <Folder key={"folder-" + i + "-" + f.name} folder={f} depth={depth} folderFileKey={folderFileKey} />
   });
 
   const files = folder[folderFileKey]
@@ -165,8 +157,8 @@ const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth,
       return 0;
     }
   })
-  .map(f => {
-    return <File key={"file-" + f.name} file={f}/>;
+  .map((f, i) => {
+    return <File key={"file-" + i + "-" + f.name} file={f}/>;
   });
 
   const items = [...subFolders, ...files];
@@ -231,12 +223,12 @@ export const StorageFolderFileList = ({
  * Modal for accepting file uploads.
  *
  * @param isOpen
- * @param toggleModal
+ * @param showModal
  * @param handleSubmit
  * @returns {*}
  * @constructor
  */
-export const UploadFilesModal = ({isOpen, toggleModal, handleSubmit}) => {
+export const UploadFilesModal = ({isOpen, showModal, handleSubmit}) => {
 
   const {
     acceptedFiles,
@@ -264,18 +256,17 @@ export const UploadFilesModal = ({isOpen, toggleModal, handleSubmit}) => {
 
   return (
       <Modal
-          isOpen={isOpen}
-          toggle={() => toggleModal()}
-          size={"md"}
+          show={isOpen}
+          onHide={() => showModal(false)}
       >
 
-        <ModalHeader toggle={() => toggleModal()}>
+        <Modal.Header closeButton>
           Upload Files
-        </ModalHeader>
+        </Modal.Header>
 
-        <ModalBody className="m-3">
+        <Modal.Body className="m-3">
 
-          <Row form>
+          <Row>
 
             <Col sm={12}>
               <p>
@@ -308,16 +299,16 @@ export const UploadFilesModal = ({isOpen, toggleModal, handleSubmit}) => {
 
           </Row>
 
-        </ModalBody>
+        </Modal.Body>
 
-        <ModalFooter>
-          <Button color={"secondary"} onClick={() => toggleModal()}>
+        <Modal.Footer>
+          <Button variant={"secondary"} onClick={() => showModal(false)}>
             Cancel
           </Button>
-          <Button color={"primary"} onClick={() => handleSubmit(acceptedFiles)}>
+          <Button variant={"primary"} onClick={() => handleSubmit(acceptedFiles)}>
             Upload
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
 
       </Modal>
   )
@@ -362,7 +353,7 @@ export const RepairableStorageFolderLink = ({folder, repairUrl}) => {
     return <a href={folder.url} target="_blank">Storage Folder</a>
   } else {
     return (
-        <Button color="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
+        <Button variant="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
           <RefreshCw size={14} className="mb-1"/>
           &nbsp;
           Repair Folder
@@ -376,15 +367,19 @@ export const RepairableStorageFolderButton = ({folder, repairUrl}) => {
     return (
         <a href={folder.url}
            target="_blank"
-           className="btn btn-outline-info mt-2 mr-2">
+           className="btn btn-outline-info mt-2 me-2">
           Storage Folder
           <FolderIcon
-              className="feather align-middle ml-2 mb-1"/>
+              className="feather align-middle ms-2 mb-1"/>
         </a>
     )
   } else {
     return (
-        <Button color="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
+        <Button
+            variant="warning"
+            onClick={() => handleFolderRepairRequest(repairUrl)}
+            className={"mt-2"}
+        >
           <RefreshCw size={14} className="mb-1"/>
           &nbsp;
           Repair Folder

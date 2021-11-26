@@ -1,17 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {
   Breadcrumb,
-  BreadcrumbItem,
   Card,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
   ListGroup,
-  ListGroupItem,
   Row
-} from "reactstrap";
+} from "react-bootstrap";
 import UserSettings from "./UserSettings";
 import AssayTypeSettings from "./AssayTypeSettings";
 import TemplateTypesSettings from './TemplateTypesSettings';
@@ -93,14 +89,14 @@ export const AdminDashboard = () => {
   })
   .map(s => {
     return (
-        <ListGroupItem
+        <ListGroup.Item
             key={'setting-tab-' + s.id}
             action
             active={activeTab === s.id}
             onClick={() => onSetActiveTab(s.id)}
         >
           {s.label}
-        </ListGroupItem>
+        </ListGroup.Item>
     )
   })
 
@@ -109,29 +105,27 @@ export const AdminDashboard = () => {
         <Row>
           <Col>
             <Breadcrumb>
-              <BreadcrumbItem>
-                <Link to="/">Home</Link>
-              </BreadcrumbItem>
-              <BreadcrumbItem active>Admin Dashboard</BreadcrumbItem>
+              <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
+              <Breadcrumb.Item active>Admin Dashboard</Breadcrumb.Item>
             </Breadcrumb>
         </Col>
       </Row>
 
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>Admin Dashboard</h1>
+          <h3>Admin Dashboard</h3>
         </Col>
       </Row>
 
       <Row>
         <Col md="3" xl="2">
           <Card>
-            <CardHeader>
-              <CardTitle tag="h5" className="mb-0">
+            <Card.Header>
+              <Card.Title tag="h5" className="mb-0">
                 Site Settings
-              </CardTitle>
-            </CardHeader>
-            <ListGroup flush>
+              </Card.Title>
+            </Card.Header>
+            <ListGroup variant={"flush"}>
               {controls}
             </ListGroup>
           </Card>

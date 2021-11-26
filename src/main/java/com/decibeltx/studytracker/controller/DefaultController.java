@@ -29,7 +29,7 @@ public class DefaultController {
       "/programs/**", "/program/**",
       "/user/**", "/users/**",
       "/collection/**", "/collections/**",
-      "/admin/**"
+      "/admin/**", "/search/**"
   })
   public String index() {
     return "index";

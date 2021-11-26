@@ -15,10 +15,11 @@
  */
 
 import React from 'react';
-import {Col, CustomInput, FormGroup, Label, Row} from "reactstrap";
+import {Col, Form, Row} from "react-bootstrap";
 import AsyncSelect from "react-select/async";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
+import {FormGroup} from "./common";
 
 export class UserInputs extends React.Component {
 
@@ -102,8 +103,8 @@ export class UserInputs extends React.Component {
     const selectedUsers = this.props.users.map(user => {
       return (
           <Row key={"user-" + user.id}>
-            <Col xs="2">
-              <CustomInput
+            <Col xs={2}>
+              <Form.Check
                   id={"owner-radio-" + user.id}
                   type="radio"
                   name="owner"
@@ -114,17 +115,17 @@ export class UserInputs extends React.Component {
                   onChange={this.handleOwnerChange}
               />
             </Col>
-            <Col xs="8">
-              <Label>{user.displayName}</Label>
+            <Col xs={8}>
+              <Form.Label>{user.displayName}</Form.Label>
             </Col>
-            <Col xs="2">
+            <Col xs={2}>
               <a
                   onClick={this.handleRemoveUser}
                   data-id={user.id}
               >
                 <FontAwesomeIcon
                     icon={faTimesCircle}
-                    className="align-middle mr-2 text-danger"
+                    className="align-middle me-2 text-danger"
                 />
               </a>
             </Col>
@@ -133,10 +134,10 @@ export class UserInputs extends React.Component {
     });
 
     return (
-        <Row form>
-          <Col sm="6">
+        <Row>
+          <Col sm={6}>
             <FormGroup>
-              <Label>Users</Label>
+              <Form.Label>Users</Form.Label>
               <AsyncSelect
                   placeholder="Search-for and select team members..."
                   className={"react-select-container" + (!this.props.isValid
@@ -148,16 +149,16 @@ export class UserInputs extends React.Component {
               />
             </FormGroup>
           </Col>
-          <Col sm="6">
+          <Col sm={6}>
             <Row>
-              <Col xs="2">
-                <Label>Owner</Label>
+              <Col xs={2}>
+                <Form.Label>Owner</Form.Label>
               </Col>
-              <Col xs="8">
-                <Label>User</Label>
+              <Col xs={8}>
+                <Form.Label>User</Form.Label>
               </Col>
-              <Col xs="2">
-                <Label>Remove</Label>
+              <Col xs={2}>
+                <Form.Label>Remove</Form.Label>
               </Col>
             </Row>
             {selectedUsers}

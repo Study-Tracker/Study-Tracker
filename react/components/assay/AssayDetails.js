@@ -1,25 +1,14 @@
 import React from 'react';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Button,
   Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
+  Dropdown,
   Nav,
-  NavItem,
-  NavLink,
   Row,
-  TabContent,
-  TabPane,
-  UncontrolledDropdown
-} from "reactstrap";
+  Tab
+} from "react-bootstrap";
 import {SelectableStatusButton, StatusButton} from "../status";
 import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -33,26 +22,31 @@ import swal from "sweetalert";
 import {AssayTaskList} from "../assayTasks";
 import {RepairableStorageFolderButton} from "../files";
 import {RepairableNotebookFolderButton} from "../eln";
+import {Breadcrumbs} from "../common";
 
 const createMarkup = (content) => {
   return {__html: content};
 };
 
-const AssayDetailHeader = ({study, assay, user}) => {
+const AssayDetailHeader = ({assay, user}) => {
   return (
       <Row className="justify-content-between align-items-center">
 
         <Col>
           <h5 className="text-muted">{assay.assayType.name} Assay</h5>
-          <h1>{assay.name}</h1>
+          <h3>{assay.name}</h3>
           <h4>{assay.code}</h4>
         </Col>
 
-        <Col className="col-auto">
+        <Col xs={"auto"}>
 
           {
-            !assay.active ? <Button size="lg" className="mr-1 mb-1"
-                                    color="danger">Inactive Assay</Button> : ''
+            !assay.active
+                ? (
+                    <Button className="me-1 mb-1" variant="danger" disabled>
+                      Inactive Assay
+                    </Button>
+                ): ''
           }
           {
             !!user
@@ -69,7 +63,11 @@ const AssayDetailHeader = ({study, assay, user}) => {
 const AssayFieldData = ({assay}) => {
 
   let fields = [];
-  const assayTypeFields = assay.assayType.fields;
+  const assayTypeFields = assay.assayType.fields.sort((a,b) => {
+    if (a.id > b.id) return 1;
+    else if (a.id < b.id) return -1;
+    else return 0;
+  });
   const assayFields = assay.fields;
   for (let f of assayTypeFields) {
     if (assayFields.hasOwnProperty(f.fieldName)) {
@@ -257,23 +255,11 @@ export default class AssayDetails extends React.Component {
 
           <Row>
             <Col>
-              <Breadcrumb>
-
-                <BreadcrumbItem>
-                  <a href={"/"}>Home</a>
-                </BreadcrumbItem>
-
-                <BreadcrumbItem>
-                  <a href={"/study/" + study.code}>
-                    Study {study.code}
-                  </a>
-                </BreadcrumbItem>
-
-                <BreadcrumbItem>
-                  Assay Detail
-                </BreadcrumbItem>
-
-              </Breadcrumb>
+              <Breadcrumbs crumbs={[
+                {label: "Home", url: "/"},
+                {label: "Study " + study.code, url: "/study/" + study.code},
+                {label: "Assay Details"}
+              ]} />
             </Col>
           </Row>
 
@@ -285,13 +271,14 @@ export default class AssayDetails extends React.Component {
             <Col lg={5}>
               <Card className="details-card">
 
-                <CardHeader>
-                  <div className="card-actions float-right">
-                    <UncontrolledDropdown>
-                      <DropdownToggle tag="a">
+                <Card.Header>
+                  <div className="card-actions float-end">
+                    <Dropdown align="end">
+                      <Dropdown.Toggle as="a" bsPrefix="-">
                         <Menu/>
-                      </DropdownToggle>
-                      <DropdownMenu right>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+
                         {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
                         {/*  <FontAwesomeIcon icon={faShare}/>*/}
                         {/*  &nbsp;*/}
@@ -300,35 +287,36 @@ export default class AssayDetails extends React.Component {
                         {/*{*/}
                         {/*  !!this.props.user ? <DropdownItem divider/> : ''*/}
                         {/*}*/}
+
                         {
                           !!this.props.user ? (
-                              <DropdownItem onClick={() => history.push(
-                                  "/study/" + study.code + "/assay/"
-                                  + assay.code + "/edit")}>
+                              <Dropdown.Item href={"/study/" + study.code + "/assay/" + assay.code + "/edit"}>
                                 <FontAwesomeIcon icon={faEdit}/>
                                 &nbsp;
                                 Edit
-                              </DropdownItem>
+                              </Dropdown.Item>
                           ) : ''
                         }
                         {
                           !!this.props.user ? (
-                              <DropdownItem onClick={this.handleAssayDelete}>
+                              <Dropdown.Item onClick={this.handleAssayDelete}>
                                 <FontAwesomeIcon icon={faTrash}/>
                                 &nbsp;
                                 Delete
-                              </DropdownItem>
+                              </Dropdown.Item>
                           ) : ''
                         }
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
-                  <CardTitle tag="h5" className="mb-0 text-muted">
-                    Assay Overview
-                  </CardTitle>
-                </CardHeader>
 
-                <CardBody>
+                  <Card.Title tag="h5" className="mb-0 text-muted">
+                    Summary
+                  </Card.Title>
+
+                </Card.Header>
+
+                <Card.Body>
                   <Row>
                     <Col xs="12">
 
@@ -356,15 +344,15 @@ export default class AssayDetails extends React.Component {
 
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
                 {
                   Object.keys(assay.fields).length > 0
                       ? (
-                          <CardBody>
-                            <CardTitle>{assay.assayType.name} Fields</CardTitle>
+                          <Card.Body>
+                            <Card.Title>{assay.assayType.name} Fields</Card.Title>
                             <AssayFieldData assay={assay}/>
-                          </CardBody>
+                          </Card.Body>
                       )
                       : ''
                 }
@@ -372,53 +360,53 @@ export default class AssayDetails extends React.Component {
                 {
                   assay.tasks.length > 0
                       ? (
-                          <CardBody>
-                            <CardTitle>
+                          <Card.Body>
+                            <Card.Title>
                               Tasks
                               {
                                 !!this.props.user
                                     ? (
                                         <small
-                                            className="float-right text-muted font-italic">
+                                            className="float-end text-muted font-italic">
                                           Click to toggle status
                                         </small>
                                     )
                                     : ''
                               }
-                            </CardTitle>
+                            </Card.Title>
                             <AssayTaskList
                                 tasks={assay.tasks}
                                 user={this.props.user}
                                 handleUpdate={this.handleTaskUpdate}
                             />
-                          </CardBody>
+                          </Card.Body>
                       ) : ''
                 }
 
                 {
                   Object.keys(assay.attributes).length > 0
                       ? (
-                          <CardBody>
-                            <CardTitle>Attributes</CardTitle>
+                          <Card.Body>
+                            <Card.Title>Attributes</Card.Title>
                             <AssayAttributes attributes={assay.attributes}/>
-                          </CardBody>
+                          </Card.Body>
                       )
                       : ''
                 }
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
-                      <CardTitle>Assay Team</CardTitle>
+                      <Card.Title>Assay Team</Card.Title>
                       <StudyTeam users={assay.users} owner={assay.owner}/>
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
-                      <CardTitle>Workspaces</CardTitle>
+                      <Card.Title>Workspaces</Card.Title>
                       <RepairableStorageFolderButton
                           folder={assay.storageFolder}
                           repairUrl={"/api/assay/" + assay.id + "/storage"}
@@ -429,7 +417,7 @@ export default class AssayDetails extends React.Component {
                       />
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
               </Card>
             </Col>
@@ -438,86 +426,54 @@ export default class AssayDetails extends React.Component {
 
               {/*Tabs*/}
               <div className="tab">
-                <Nav tabs>
+                <Tab.Container defaultActiveKey="timeline">
+                  <Nav variant="tabs">
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "1" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("1");
-                        }}
-                    >
-                      Timeline
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"timeline"}>
+                        Timeline
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "2" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("2");
-                        }}
-                    >
-                      Files
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"files"}>
+                        Files
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  {
-                    !!assay.notebookFolder ? (
-                        <NavItem>
-                          <NavLink
-                              className={this.state.activeTab === "3" ? "active" : ''}
-                              onClick={() => {
-                                this.toggle("3");
-                              }}
-                          >
-                            Notebook
-                          </NavLink>
-                        </NavItem>
-                    ) : ""
-                  }
+                    {
+                      !!assay.notebookFolder ? (
+                          <Nav.Item>
+                            <Nav.Link eventKey={"notebook"}>
+                              Notebook
+                            </Nav.Link>
+                          </Nav.Item>
+                      ) : ""
+                    }
 
-                  {/*TODO*/}
-                  {/*<NavItem>*/}
-                  {/*  <NavLink*/}
-                  {/*      className={this.state.activeTab === "3" ? "active" : ''}*/}
-                  {/*      onClick={() => {*/}
-                  {/*        this.toggle("3");*/}
-                  {/*      }}*/}
-                  {/*  >*/}
-                  {/*    Results*/}
-                  {/*  </NavLink>*/}
-                  {/*</NavItem>*/}
+                  </Nav>
 
-                </Nav>
+                  {/*Tab content*/}
+                  <Tab.Content>
 
-                {/*Tab content*/}
-                <TabContent activeTab={this.state.activeTab}>
+                    <Tab.Pane eventKey={"timeline"}>
+                      <AssayTimelineTab assay={assay} user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="1">
-                    <AssayTimelineTab assay={assay} user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"files"}>
+                      <AssayFilesTab assay={assay} user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="2">
-                    <AssayFilesTab assay={assay} user={this.props.user}/>
-                  </TabPane>
+                    {
+                      !!assay.notebookFolder ? (
+                          <Tab.Pane eventKey={"notebook"}>
+                            <AssayNotebookTab assay={assay} user={this.props.user}/>
+                          </Tab.Pane>
+                      ) : ""
+                    }
 
-                  {
-                    !!assay.notebookFolder ? (
-                        <TabPane tabId="3">
-                          <AssayNotebookTab assay={assay} user={this.props.user}/>
-                        </TabPane>
-                    ) : ""
-                  }
-
-                  {/*TODO*/}
-                  {/*<TabPane tabId="3">*/}
-                  {/*  <p className="text-center">*/}
-                  {/*    Results will go here.*/}
-                  {/*  </p>*/}
-                  {/*</TabPane>*/}
-
-                </TabContent>
+                  </Tab.Content>
+                </Tab.Container>
               </div>
             </Col>
 

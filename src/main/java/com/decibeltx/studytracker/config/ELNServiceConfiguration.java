@@ -7,6 +7,8 @@ import com.decibeltx.studytracker.benchling.exception.BenchlingException;
 import com.decibeltx.studytracker.benchling.exception.BenchlingExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -24,6 +26,8 @@ public class ELNServiceConfiguration {
   @Configuration
   @ConditionalOnProperty(name = "notebook.mode", havingValue = "benchling")
   public static class BenchlingElnServiceConfiguration {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingElnServiceConfiguration.class);
 
     @Autowired
     private Environment env;
@@ -49,6 +53,8 @@ public class ELNServiceConfiguration {
 
     @Bean
     public BenchlingElnOptions elnOptions() throws Exception {
+
+      LOGGER.info("Configuring Benchling integration...");
       BenchlingElnOptions options = new BenchlingElnOptions();
 
       // Authentication

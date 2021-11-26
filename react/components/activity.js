@@ -15,7 +15,6 @@
  */
 
 import React from "react";
-import {Media, Table} from 'reactstrap';
 import {
   Bell,
   CheckSquare,
@@ -34,8 +33,7 @@ import {StatusBadge} from "./status";
 import {KeywordBadgeList} from "./keywords";
 import {AssayTaskCard} from "./assayTasks";
 import {relationshipTypes} from "../config/studyRelationshipConstants";
-
-const dateFormat = require('dateformat');
+import dateFormat from "dateformat";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -50,7 +48,7 @@ const LegacyStudyLabel = ({user, legacyStudy, text}) => {
         </p>
         <div className="bg-light text-secondary p-3">
           <h5><a href={"/study/" + legacyStudy.code}>{legacyStudy.code}</a></h5>
-          <h3>{legacyStudy.name}</h3>
+          <h4>{legacyStudy.name}</h4>
         </div>
       </React.Fragment>
   )
@@ -59,92 +57,92 @@ const LegacyStudyLabel = ({user, legacyStudy, text}) => {
 const ActivityIcon = ({action}) => {
   switch (action) {
     case studyActions.NEW_ENTRY_TEMPLATE.value:
-      return <Star size={36} className="align-middle text-warning mr-4"/>;
+      return <Star size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.UPDATED_ENTRY_TEMPLATE.value:
-      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.NEW_STUDY.value:
-      return <Star size={36} className="align-middle text-warning mr-4"/>;
+      return <Star size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.UPDATED_STUDY.value:
-      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.DELETED_STUDY.value:
-      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     case studyActions.STUDY_STATUS_CHANGED.value:
-      return <Bell size={36} className="align-middle text-info mr-4"/>;
+      return <Bell size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.NEW_ASSAY.value:
-      return <Star size={36} className="align-middle text-warning mr-4"/>;
+      return <Star size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.UPDATED_ASSAY.value:
-      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.DELETED_ASSAY.value:
-      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     case studyActions.ASSAY_STATUS_CHANGED.value:
-      return <Bell size={36} className="align-middle text-info mr-4"/>;
+      return <Bell size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.NEW_PROGRAM.value:
-      return <Star size={36} className="align-middle text-warning mr-4"/>;
+      return <Star size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.UPDATED_PROGRAM.value:
-      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.DELETED_PROGRAM.value:
-      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     case studyActions.FILE_UPLOADED.value:
-      return <FilePlus size={36} className="align-middle text-primary mr-4"/>;
+      return <FilePlus size={36} className="align-middle text-primary me-4"/>;
 
     case studyActions.NEW_STUDY_CONCLUSIONS.value:
-      return <FileText size={36} className="align-middle text-primary mr-4"/>;
+      return <FileText size={36} className="align-middle text-primary me-4"/>;
 
     case studyActions.EDITED_STUDY_CONCLUSIONS.value:
-      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.DELETED_STUDY_CONCLUSIONS.value:
-      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     case studyActions.NEW_COMMENT.value:
-      return <MessageCircle size={36} className="align-middle text-info mr-4"/>;
+      return <MessageCircle size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.EDITED_COMMENT.value:
-      return <MessageCircle size={36} className="align-middle text-info mr-4"/>;
+      return <MessageCircle size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.DELETED_COMMENT.value:
-      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     case studyActions.NEW_STUDY_RELATIONSHIP.value:
-      return <Link size={36} className="align-middle text-primary mr-4"/>;
+      return <Link size={36} className="align-middle text-primary me-4"/>;
 
     case studyActions.UPDATED_STUDY_RELATIONSHIP.value:
-      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.DELETED_STUDY_RELATIONSHIP.value:
-      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     case studyActions.NEW_STUDY_EXTERNAL_LINK.value:
       return <ExternalLink size={36}
-                           className="align-middle text-primary mr-4"/>;
+                           className="align-middle text-primary me-4"/>;
 
     case studyActions.UPDATED_STUDY_EXTERNAL_LINK.value:
-      return <Edit size={36} className="align-middle text-warning mr-4"/>;
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.DELETED_STUDY_EXTERNAL_LINK.value:
-      return <Trash2 size={36} className="align-middle text-danger mr-4"/>;
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     case studyActions.ASSAY_TASK_ADDED.value:
-      return <CheckSquare size={36} className="align-middle text-info mr-4"/>;
+      return <CheckSquare size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.ASSAY_TASK_UPDATED.value:
-      return <CheckSquare size={36} className="align-middle text-info mr-4"/>;
+      return <CheckSquare size={36} className="align-middle text-info me-4"/>;
 
     default:
-      return <Bell size={36} className="align-middle text-info mr-4"/>;
+      return <Bell size={36} className="align-middle text-info me-4"/>;
 
   }
 };
@@ -165,7 +163,7 @@ const ActivityMessage = ({activity}) => {
           </p>
           <div className="bg-light text-secondary p-3">
             <h5>TemplateId: { activity.data.entryTemplate.templateId }</h5>
-            <h3>Name: { activity.data.entryTemplate.name }</h3>
+            <h4>Name: { activity.data.entryTemplate.name }</h4>
             <p>Active: { String(activity.data.entryTemplate.active) }</p>
           </div>
         </>
@@ -181,7 +179,7 @@ const ActivityMessage = ({activity}) => {
           </p>
           <div className="bg-light text-secondary p-3">
             <h5>TemplateId: { activity.data.entryTemplate.templateId }</h5>
-            <h3>Name: { activity.data.entryTemplate.name }</h3>
+            <h4>Name: { activity.data.entryTemplate.name }</h4>
             <p>Active: { String(activity.data.entryTemplate.active) }</p>
           </div>
         </>
@@ -211,7 +209,7 @@ const ActivityMessage = ({activity}) => {
               <div className="bg-light text-secondary p-3">
                 <h5><a href={"/study/"
                 + activity.data.study.code}>{activity.data.study.code}</a></h5>
-                <h3>{activity.data.study.name}</h3>
+                <h4>{activity.data.study.name}</h4>
                 <h5 className="text-muted">{activity.data.study.program}</h5>
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
@@ -249,7 +247,7 @@ const ActivityMessage = ({activity}) => {
               <div className="bg-light text-secondary p-3">
                 <h5><a href={"/study/"
                 + activity.data.study.code}>{activity.data.study.code}</a></h5>
-                <h3>{activity.data.study.name}</h3>
+                <h4>{activity.data.study.name}</h4>
                 <h5 className="text-muted">{activity.data.study.program}</h5>
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
@@ -349,7 +347,7 @@ const ActivityMessage = ({activity}) => {
                   </a>
                 </h5>
 
-                <h3>{activity.data.assay.name}</h3>
+                <h4>{activity.data.assay.name}</h4>
 
                 <h5 className="text-muted">
                   {activity.data.assay.assayType.name}
@@ -396,7 +394,7 @@ const ActivityMessage = ({activity}) => {
                   </a>
                 </h5>
 
-                <h3>{activity.data.assay.name}</h3>
+                <h4>{activity.data.assay.name}</h4>
 
                 <h5 className="text-muted">
                   {activity.data.assay.assayType.name}
@@ -515,11 +513,11 @@ const ActivityMessage = ({activity}) => {
 
             <div className="bg-light text-secondary p-3">
 
-              <h3>
+              <h4>
                 <a href={"/program/" + activity.data.program.id}>
                   {activity.data.program.name}
                 </a>
-              </h3>
+              </h4>
 
               <div dangerouslySetInnerHTML={createMarkup(
                   activity.data.program.description)}/>
@@ -541,11 +539,11 @@ const ActivityMessage = ({activity}) => {
 
             <div className="bg-light text-secondary p-3">
 
-              <h3>
+              <h4>
                 <a href={"/program/" + activity.data.program.id}>
                   {activity.data.program.name}
                 </a>
-              </h3>
+              </h4>
 
               <div dangerouslySetInnerHTML={createMarkup(
                   activity.data.program.description)}/>
@@ -588,13 +586,13 @@ const ActivityMessage = ({activity}) => {
                 </a>
               </p>
               <div className="bg-light text-secondary p-3">
-                <h3>
+                <h4>
                   <a href={activity.data.file.url} target="_blank">
                     <File size={24}/>
                     &nbsp;
                     {activity.data.file.name}
                   </a>
-                </h3>
+                </h4>
               </div>
             </React.Fragment>
 
@@ -611,13 +609,13 @@ const ActivityMessage = ({activity}) => {
                 </a>
               </p>
               <div className="bg-light text-secondary p-3">
-                <h3>
+                <h4>
                   <a href={activity.data.file.url} target="_blank">
                     <File size={24}/>
                     &nbsp;
                     {activity.data.file.name}
                   </a>
-                </h3>
+                </h4>
               </div>
             </React.Fragment>
 
@@ -991,13 +989,15 @@ const ActivityMessage = ({activity}) => {
 
 export const StudyTimelineActivity = ({activity}) => {
   return (
-      <Media>
+      <div className="d-flex">
 
-        <ActivityIcon action={activity.eventType}/>
+        <div className="activity-icon">
+          <ActivityIcon action={activity.eventType}/>
+        </div>
 
-        <Media body>
+        <div className="flex-grow-1 ms-3">
 
-          <small className="float-right text-navy">
+          <small className="float-end text-navy">
             {dateFormat(new Date(activity.date), 'mm/dd/yy @ h:MM TT')}
           </small>
 
@@ -1013,8 +1013,8 @@ export const StudyTimelineActivity = ({activity}) => {
 
           <ActivityMessage activity={activity}/>
 
-        </Media>
-      </Media>
+        </div>
+      </div>
   )
 };
 
@@ -1055,40 +1055,4 @@ export const Timeline = ({activities}) => {
       </React.Fragment>
   );
 
-};
-
-export const ActivityTable = ({activity}) => {
-  const rows = activity
-  .sort((a, b) => {
-    if (a.date > b.date) {
-      return -1;
-    } else if (a.date < b.date) {
-      return 1;
-    } else {
-      return 0;
-    }
-  })
-  .map(a => {
-    return (
-        <tr key={'activity-' + a.date}>
-          <td>{a.user.displayName}</td>
-          <td>{a.eventType}</td>
-          <td>{new Date(a.date).toLocaleString()}</td>
-        </tr>
-    );
-  });
-  return (
-      <Table striped>
-        <thead>
-        <tr>
-          <th>User</th>
-          <th>Action</th>
-          <th>Date</th>
-        </tr>
-        </thead>
-        <tbody>
-        {rows}
-        </tbody>
-      </Table>
-  )
 };

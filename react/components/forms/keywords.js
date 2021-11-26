@@ -15,13 +15,14 @@
  */
 
 import React from 'react';
-import {Col, FormGroup, Label, Row} from "reactstrap";
+import {Col, Form, Row} from "react-bootstrap";
 import Select from "react-select";
 import {KeywordCategoryBadge} from "../keywords";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
 import AsyncCreatable from "react-select/async-creatable";
 import swal from "sweetalert";
+import {FormGroup} from "./common";
 
 export default class KeywordInputs extends React.Component {
 
@@ -135,18 +136,18 @@ export default class KeywordInputs extends React.Component {
               key={"keyword-" + keyword.id}
               className="align-items-center justify-content-center mt-1"
           >
-            <Col xs="3">
+            <Col xs={3}>
               <KeywordCategoryBadge category={keyword.category}/>
             </Col>
-            <Col xs="7">
+            <Col xs={7}>
               {keyword.keyword}
             </Col>
-            <Col xs="2">
+            <Col xs={2}>
               <a onClick={this.handleRemoveKeyword}
                  data-id={keyword.id}>
                 <FontAwesomeIcon
                     icon={faTimesCircle}
-                    className="align-middle mr-2 text-danger"
+                    className="align-middle me-2 text-danger"
                 />
               </a>
             </Col>
@@ -155,10 +156,10 @@ export default class KeywordInputs extends React.Component {
     });
 
     return (
-        <Row form>
-          <Col sm="2">
+        <Row>
+          <Col sm={2}>
             <FormGroup>
-              <Label>Category</Label>
+              <Form.Label>Category</Form.Label>
               <Select
                   className="react-select-container"
                   classNamePrefix="react-select"
@@ -167,9 +168,9 @@ export default class KeywordInputs extends React.Component {
               />
             </FormGroup>
           </Col>
-          <Col sm="5">
+          <Col sm={5}>
             <FormGroup>
-              <Label>Keyword Search</Label>
+              <Form.Label>Keyword Search</Form.Label>
               <AsyncCreatable
                   placeholder={"Search-for and select keywords..."}
                   className={"react-select-container"}
@@ -182,10 +183,10 @@ export default class KeywordInputs extends React.Component {
               />
             </FormGroup>
           </Col>
-          <Col sm="5">
+          <Col sm={5}>
             <Row>
               <Col xs={12}>
-                <Label>Selected</Label>
+                <Form.Label>Selected</Form.Label>
               </Col>
             </Row>
             {selectedKeywords}

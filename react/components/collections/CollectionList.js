@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Container,
-  Row
-} from "reactstrap";
+import {Button, Card, Col, Container, Row} from "react-bootstrap";
 import {File} from "react-feather";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -125,10 +116,10 @@ const ExportToCsv = (props) => {
   };
   return (
       <span>
-        <Button color={'primary'} onClick={handleClick}>
+        <Button variant={'primary'} onClick={handleClick}>
           Export to CSV
           &nbsp;
-          <File className="feather align-middle ml-2 mb-1"/>
+          <File className="feather align-middle ms-2 mb-1"/>
         </Button>
       </span>
   );
@@ -145,7 +136,7 @@ export const MyCollectionTable = ({collections}) => {
       >
         {props => (
             <div>
-              <div className="float-right">
+              <div className="float-end">
                 <ExportToCsv{...props.csvProps} />
                 &nbsp;&nbsp;
                 <Search.SearchBar
@@ -184,7 +175,7 @@ export const PublicCollectionsTable = ({collections}) => {
       >
         {props => (
             <div>
-              <div className="float-right">
+              <div className="float-end">
                 <ExportToCsv{...props.csvProps} />
                 &nbsp;&nbsp;
                 <Search.SearchBar
@@ -220,45 +211,43 @@ export const CollectionList = ({collections, user}) => {
   return (
     <Container fluid className="animated fadeIn">
 
-      <Row className="justify-content-between align-items-center">
-        <Col xs="8">
-          <h1>Study Collections</h1>
+      <Row className="justify-content-between align-items-center mb-2">
+        <Col xs={8}>
+          <h3>Study Collections</h3>
         </Col>
-        <Col className="col-auto">
-          <a href="/collections/new">
-            <Button color="primary" className="mr-1 mb-1">
-              <FontAwesomeIcon icon={faPlusCircle}/> New Collection
-            </Button>
-          </a>
+        <Col xs={"auto"}>
+          <Button variant="primary" href="/collections/new" className="me-1 mb-1">
+            <FontAwesomeIcon icon={faPlusCircle}/> New Collection
+          </Button>
         </Col>
       </Row>
 
       <Row>
-        <Col lg="12">
+        <Col lg={12}>
           <Card className="details-card">
-            <CardHeader>
-              <CardTitle>
+            <Card.Header>
+              <Card.Title>
                 My Collections
-              </CardTitle>
-            </CardHeader>
-            <CardBody>
+              </Card.Title>
+            </Card.Header>
+            <Card.Body>
                 <MyCollectionTable collections={myCollections} />
-            </CardBody>
+            </Card.Body>
           </Card>
         </Col>
       </Row>
 
       <Row>
-        <Col lg="12">
+        <Col lg={12}>
           <Card className="details-card">
-            <CardHeader>
-              <CardTitle>
+            <Card.Header>
+              <Card.Title>
                 Public Collections
-              </CardTitle>
-            </CardHeader>
-            <CardBody>
+              </Card.Title>
+            </Card.Header>
+            <Card.Body>
               <PublicCollectionsTable collections={publicCollections} />
-            </CardBody>
+            </Card.Body>
           </Card>
         </Col>
       </Row>

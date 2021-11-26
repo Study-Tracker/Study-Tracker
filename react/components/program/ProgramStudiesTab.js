@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Col, Row} from "reactstrap";
-import {history} from "../../App";
+import {Button, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
@@ -30,9 +29,8 @@ const ProgramStudiesTab = ({studies, user}) => {
             {
               !!user
                   ? (
-                      <span className="float-right">
-                        <Button color="info"
-                                onClick={() => history.push("/studies/new")}>
+                      <span className="float-end">
+                        <Button variant="info" href={"/studies/new"}>
                           New Study
                           &nbsp;
                           <FontAwesomeIcon icon={faPlusCircle}/>

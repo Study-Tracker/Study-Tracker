@@ -15,10 +15,11 @@
  */
 
 import React from 'react';
-import {Col, FormGroup, Label, Row} from "reactstrap";
+import {Col, Form, Row} from "react-bootstrap";
 import AsyncSelect from "react-select/async";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
+import {FormGroup} from "./common";
 
 export class StudyInputs extends React.Component {
 
@@ -72,17 +73,17 @@ export class StudyInputs extends React.Component {
     const selectedStudies = this.props.studies.map(study => {
       return (
           <Row key={"study-" + study.id}>
-            <Col xs="10">
-              <Label>{study.code + ": " + study.name}</Label>
+            <Col xs={10}>
+              <Form.Label>{study.code + ": " + study.name}</Form.Label>
             </Col>
-            <Col xs="2">
+            <Col xs={2}>
               <a
                   onClick={this.handleRemoveStudy}
                   data-id={study.id}
               >
                 <FontAwesomeIcon
                     icon={faTimesCircle}
-                    className="align-middle mr-2 text-danger"
+                    className="align-middle me-2 text-danger"
                 />
               </a>
             </Col>
@@ -91,10 +92,10 @@ export class StudyInputs extends React.Component {
     });
 
     return (
-        <Row form>
-          <Col lg="6">
+        <Row>
+          <Col lg={6}>
             <FormGroup>
-              <Label>Studies</Label>
+              <Form.Label>Studies</Form.Label>
               <AsyncSelect
                   placeholder="Search-for and select studies to add to your collection..."
                   className={"react-select-container"}
@@ -105,13 +106,13 @@ export class StudyInputs extends React.Component {
               />
             </FormGroup>
           </Col>
-          <Col lg="6">
+          <Col lg={6}>
             <Row>
-              <Col xs="10">
-                <Label>Study</Label>
+              <Col xs={10}>
+                <Form.Label>Study</Form.Label>
               </Col>
-              <Col xs="2">
-                <Label>Remove</Label>
+              <Col xs={2}>
+                <Form.Label>Remove</Form.Label>
               </Col>
             </Row>
             {selectedStudies}

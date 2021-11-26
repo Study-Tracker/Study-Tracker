@@ -2,7 +2,7 @@ package com.decibeltx.studytracker.test.service;
 
 import com.decibeltx.studytracker.Application;
 import com.decibeltx.studytracker.example.ExampleDataGenerator;
-import com.decibeltx.studytracker.mapstruct.dto.StatisticsDto;
+import com.decibeltx.studytracker.mapstruct.dto.SummaryStatisticsDto;
 import com.decibeltx.studytracker.service.StatisticsService;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,14 +44,14 @@ public class StatisticsServiceTests {
 
   @Test
   public void currentTest() throws Exception {
-    StatisticsDto statisticsDto = statisticsService.getCurrent();
-    Assert.assertNotNull(statisticsDto);
-    System.out.println(statisticsDto.toString());
-    Assert.assertEquals(STUDY_COUNT, statisticsDto.getStudyCount());
-    Assert.assertEquals(ASSAY_COUNT, statisticsDto.getAssayCount());
-    Assert.assertEquals(PROGRAM_COUNT, statisticsDto.getProgramCount());
-    Assert.assertEquals(USER_COUNT, statisticsDto.getUserCount());
-    Assert.assertEquals(ACTIVITY_COUNT, statisticsDto.getActivityCount());
+    SummaryStatisticsDto summaryStatisticsDto = statisticsService.getCurrent();
+    Assert.assertNotNull(summaryStatisticsDto);
+    System.out.println(summaryStatisticsDto.toString());
+    Assert.assertEquals(STUDY_COUNT, summaryStatisticsDto.getStudyCount());
+    Assert.assertEquals(ASSAY_COUNT, summaryStatisticsDto.getAssayCount());
+    Assert.assertEquals(PROGRAM_COUNT, summaryStatisticsDto.getProgramCount());
+    Assert.assertEquals(USER_COUNT, summaryStatisticsDto.getUserCount());
+    Assert.assertEquals(ACTIVITY_COUNT, summaryStatisticsDto.getActivityCount());
   }
 
   @Test
@@ -61,15 +61,15 @@ public class StatisticsServiceTests {
     calendar.add(Calendar.MONTH, -1);
     Date monthAgo = calendar.getTime();
 
-    StatisticsDto statisticsDto = statisticsService.getAfterDate(monthAgo);
-    Assert.assertNotNull(statisticsDto);
-    System.out.println(statisticsDto.toString());
+    SummaryStatisticsDto summaryStatisticsDto = statisticsService.getAfterDate(monthAgo);
+    Assert.assertNotNull(summaryStatisticsDto);
+    System.out.println(summaryStatisticsDto.toString());
 
-    Assert.assertEquals(STUDY_COUNT, statisticsDto.getStudyCount());
-    Assert.assertEquals(ASSAY_COUNT, statisticsDto.getAssayCount());
-    Assert.assertEquals(PROGRAM_COUNT, statisticsDto.getProgramCount());
-    Assert.assertEquals(USER_COUNT, statisticsDto.getUserCount());
-    Assert.assertEquals(ACTIVITY_COUNT, statisticsDto.getActivityCount());
+    Assert.assertEquals(STUDY_COUNT, summaryStatisticsDto.getStudyCount());
+    Assert.assertEquals(ASSAY_COUNT, summaryStatisticsDto.getAssayCount());
+    Assert.assertEquals(PROGRAM_COUNT, summaryStatisticsDto.getProgramCount());
+    Assert.assertEquals(USER_COUNT, summaryStatisticsDto.getUserCount());
+    Assert.assertEquals(ACTIVITY_COUNT, summaryStatisticsDto.getActivityCount());
 
   }
 

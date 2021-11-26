@@ -16,35 +16,27 @@
 
 import {
   Breadcrumb,
-  BreadcrumbItem,
   Button,
   Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Row,
-  UncontrolledDropdown
-} from "reactstrap";
+  Dropdown,
+  Row
+} from "react-bootstrap";
 import React from "react";
 import {File, Menu, XCircle} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
-import {history} from "../../App";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {StatusBadge} from "../status";
 
-const StudyCollectionDetailsHeader = ({collection, user}) => {
+const StudyCollectionDetailsHeader = ({collection}) => {
   return (
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>{collection.name}</h1>
+          <h3>{collection.name}</h3>
         </Col>
       </Row>
   );
@@ -56,10 +48,10 @@ const ExportToCsv = (props) => {
   };
   return (
       <span>
-        <Button color={'primary'} onClick={handleClick}>
+        <Button variant={'primary'} onClick={handleClick}>
           Export to CSV
           &nbsp;
-          <File className="feather align-middle ml-2 mb-1"/>
+          <File className="feather align-middle ms-2 mb-1"/>
         </Button>
       </span>
   );
@@ -85,9 +77,6 @@ class StudyCollectionDetails extends React.Component {
   render() {
 
     const {collection} = this.props;
-    const createMarkup = (content) => {
-      return {__html: content};
-    };
 
     const columns = [
       {
@@ -208,7 +197,7 @@ class StudyCollectionDetails extends React.Component {
               <div>
                 <a className="text-danger" title={"Remove study from collection"}
                    onClick={() => this.props.handleRemoveStudy(d.id)}>
-                  <XCircle className="align-middle mr-1" size={18}/>
+                  <XCircle className="align-middle me-1" size={18}/>
                 </a>
               </div>
           )
@@ -262,12 +251,12 @@ class StudyCollectionDetails extends React.Component {
           <Row>
             <Col>
               <Breadcrumb>
-                <BreadcrumbItem>
-                  <a href={"/collections"}>Collections</a>
-                </BreadcrumbItem>
-                <BreadcrumbItem active>
+                <Breadcrumb.Item href={"/collections"}>
+                  Collections
+                </Breadcrumb.Item>
+                <Breadcrumb.Item active>
                   Collection Detail
-                </BreadcrumbItem>
+                </Breadcrumb.Item>
               </Breadcrumb>
             </Col>
           </Row>
@@ -280,13 +269,13 @@ class StudyCollectionDetails extends React.Component {
             <Col xs={12} md={6}>
               <Card className="details-card">
 
-                <CardHeader>
-                  <div className="card-actions float-right">
-                    <UncontrolledDropdown>
-                      <DropdownToggle tag="a">
+                <Card.Header>
+                  <div className="card-actions float-end">
+                    <Dropdown align="end">
+                      <Dropdown.Toggle as="a" bsPrefix="-">
                         <Menu/>
-                      </DropdownToggle>
-                      <DropdownMenu right>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
 
                         {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
                         {/*  <FontAwesomeIcon icon={faShare}/>*/}
@@ -298,12 +287,11 @@ class StudyCollectionDetails extends React.Component {
                         {/*      <DropdownItem divider/> : ''*/}
                         {/*}*/}
 
-                        <DropdownItem onClick={() => history.push(
-                            "/collection/" + collection.id + "/edit")}>
+                        <Dropdown.Item href={"/collection/" + collection.id + "/edit"}>
                           <FontAwesomeIcon icon={faEdit}/>
                           &nbsp;
                           Edit
-                        </DropdownItem>
+                        </Dropdown.Item>
 
                         {/*{*/}
                         {/*  !!this.props.user && !!this.props.user.admin ? (*/}
@@ -316,15 +304,15 @@ class StudyCollectionDetails extends React.Component {
                         {/*  ) : ''*/}
                         {/*}*/}
 
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
-                  <CardTitle tag="h5" className="mb-0 text-muted">
+                  <Card.Title tag="h5" className="mb-0 text-muted">
                     Summary
-                  </CardTitle>
-                </CardHeader>
+                  </Card.Title>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
 
                   <Row>
 
@@ -363,25 +351,25 @@ class StudyCollectionDetails extends React.Component {
 
                   </Row>
 
-                </CardBody>
+                </Card.Body>
 
               </Card>
             </Col>
 
-            <Col xs="12">
+            <Col xs={12}>
               <Card className="details-card">
 
-                <CardHeader>
-                  <CardTitle tag="h5" className="mb-0 text-muted">
+                <Card.Header>
+                  <Card.Title tag="h5" className="mb-0 text-muted">
                     Studies
-                  </CardTitle>
-                </CardHeader>
+                  </Card.Title>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Container fluid className="animated fadeIn">
 
                     <Row>
-                      <Col lg="12">
+                      <Col lg={12}>
                         <ToolkitProvider
                             keyField="id"
                             data={this.props.collection.studies}
@@ -391,7 +379,7 @@ class StudyCollectionDetails extends React.Component {
                         >
                           {props => (
                               <div>
-                                <div className="float-right">
+                                <div className="float-end">
                                   <ExportToCsv{...props.csvProps} />
                                   &nbsp;&nbsp;
                                   <Search.SearchBar
@@ -420,7 +408,7 @@ class StudyCollectionDetails extends React.Component {
                     </Row>
 
                   </Container>
-                </CardBody>
+                </Card.Body>
 
               </Card>
             </Col>

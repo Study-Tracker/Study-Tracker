@@ -18,43 +18,29 @@ import React from "react";
 import 'react-datepicker/dist/react-datepicker.css';
 import {
   Breadcrumb,
-  BreadcrumbItem,
   Button,
   Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
   Form,
-  FormFeedback,
-  FormGroup,
-  FormText,
-  Input,
-  Label,
   Row
-} from "reactstrap";
+} from "react-bootstrap";
 import swal from 'sweetalert';
 import {history} from '../../App';
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../loading";
 import Select from "react-select";
 import AttributeInputs from "./attributes";
+import {FormGroup} from "./common";
 
 export default class ProgramForm extends React.Component {
 
   constructor(props) {
     super(props);
 
-    // if (!!props.program) {
-    //   props.program.lastModifiedBy = this.props.user;
-    // }
-
     this.state = {
       program: props.program || {
         active: true,
-        // createdBy: this.props.user,
-        // lastModifiedBy: this.props.user,
         attributes: {},
         notebookFolder: {}
       },
@@ -238,23 +224,19 @@ export default class ProgramForm extends React.Component {
                 !!this.state.program.id
                     ? (
                         <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/"}>Home</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/program/" + this.state.program.id}>
-                              Program Detail
-                            </a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>Edit Program</BreadcrumbItem>
+                          <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
+                          <Breadcrumb.Item href={"/program/" + this.state.program.id}>
+                            Program Detail
+                          </Breadcrumb.Item>
+                          <Breadcrumb.Item active>Edit Program</Breadcrumb.Item>
                         </Breadcrumb>
                     )
                     : (
                         <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/programs"}>Programs</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>New Program</BreadcrumbItem>
+                          <Breadcrumb.Item href={"/programs"}>
+                            Programs
+                          </Breadcrumb.Item>
+                          <Breadcrumb.Item active>New Program</Breadcrumb.Item>
                         </Breadcrumb>
                     )
               }
@@ -263,17 +245,17 @@ export default class ProgramForm extends React.Component {
 
           <Row className="justify-content-end align-items-center">
             <Col>
-              <h1>{!!this.state.program.id ? "Edit Program"
-                  : "New Program"}</h1>
+              <h3>{!!this.state.program.id ? "Edit Program"
+                  : "New Program"}</h3>
             </Col>
           </Row>
 
           <Row>
-            <Col xs="12">
+            <Col xs={12}>
               <Card>
 
-                <CardHeader>
-                  <CardTitle tag="h5">Program Overview</CardTitle>
+                <Card.Header>
+                  <Card.Title tag="h5">Program Overview</Card.Title>
                   <h6 className="card-subtitle text-muted">
                     Provide a unique name and a brief overview for your program.
                     If this program is no longer active, set the status to
@@ -281,40 +263,40 @@ export default class ProgramForm extends React.Component {
                     along with their studies, but no new non-legacy studies
                     will be allowed to be created for it.
                   </h6>
-                </CardHeader>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Form className="program-form">
 
                     {/*Overview*/}
-                    <Row form>
+                    <Row>
 
-                      <Col md="7">
+                      <Col md={7} className={"mb-3"}>
                         <FormGroup>
-                          <Label>Name *</Label>
-                          <Input
+                          <Form.Label>Name *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.nameIsValid
+                              isInvalid={!this.state.validation.nameIsValid
                               || !this.state.validation.nameIsUnique}
                               defaultValue={this.state.program.name || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"name": e.target.value})}
                               disabled={!!this.state.program.id}
                           />
-                          <FormFeedback>
+                          <Form.Control.Feedback type="invalid">
                             {
                               !this.state.validation.nameIsUnique
                                   ? "A program with this name already exists."
                                   : "Name must not be empty."
                             }
-                          </FormFeedback>
-                          <FormText>Must be unique.</FormText>
+                          </Form.Control.Feedback>
+                          <Form.Text>Must be unique.</Form.Text>
                         </FormGroup>
                       </Col>
 
-                      <Col md="5">
+                      <Col md={5} className={"mb-3"}>
                         <FormGroup>
-                          <Label>Is this program active?</Label>
+                          <Form.Label>Is this program active?</Form.Label>
                           <Select
                               className="react-select-container"
                               classNamePrefix="react-select"
@@ -346,47 +328,52 @@ export default class ProgramForm extends React.Component {
 
                     </Row>
 
-                    <Row form>
+                    <Row>
 
-                      <Col md="7">
+                      <Col md={7} className={"mb-3"}>
                         <FormGroup>
-                          <Label>Description *</Label>
+                          <Form.Label>Description *</Form.Label>
                           <div>
                             <ReactQuill
                                 theme="snow"
+                                className={"mb-2"}
                                 defaultValue={this.state.program.description
                                 || ''}
                                 onChange={content => this.handleFormUpdate(
                                     {"description": content})}
                             />
                           </div>
-                          <FormFeedback>
+                          <Form.Control.Feedback type="invalid">
                             Description must not be empty.
-                          </FormFeedback>
-                          <FormText>
+                          </Form.Control.Feedback>
+                          <Form.Text>
                             Provide a brief description of the project.
-                          </FormText>
+                          </Form.Text>
                         </FormGroup>
                       </Col>
 
-                      <Col md="5">
+                      <Col md={5} className={"mb-3"}>
                         <FormGroup>
-                          <Label>Code *</Label>
-                          <Input
+                          <Form.Label>Code *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.codeIsValid}
+                              isInvalid={!this.state.validation.codeIsValid}
                               defaultValue={this.state.program.code || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"code": e.target.value})}
                               disabled={!!this.state.program.id}
                           />
-                          <FormFeedback>Code must not be empty and must not
+                          <Form.Control.Feedback>
+                            Code must not be empty and must not
                             contain any whitespace or non-alphanumeric
-                            characters.</FormFeedback>
-                          <FormText>This code will be used as a prefix when
+                            characters.
+                          </Form.Control.Feedback>
+                          <Form.Text>
+                            This code will be used as a prefix when
                             creating new studies. Eg. a code of 'PG' would
                             result in a study code such as
-                            'PG-10001'.</FormText>
+                            'PG-10001'.
+                          </Form.Text>
                         </FormGroup>
                       </Col>
 
@@ -398,11 +385,12 @@ export default class ProgramForm extends React.Component {
                       </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
 
-                      <Col md="12">
-                        <h5 className="card-title">Electronic Laboratory
-                          Notebook Folder</h5>
+                      <Col md={12} className={"mb-3"}>
+                        <h5 className="card-title">
+                          Electronic Laboratory Notebook Folder
+                        </h5>
                         <h6 className="card-subtitle text-muted">
                           When using an electronic laboratory notebook, all
                           programs require a folder in which all studies and
@@ -417,12 +405,12 @@ export default class ProgramForm extends React.Component {
                         <br/>
                       </Col>
 
-                      <Col md="6">
+                      <Col md={6} className={"mb-3"}>
                         <FormGroup>
-                          <Label>Program Folder ID *</Label>
-                          <Input
+                          <Form.Label>Program Folder ID *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.programFolderIdIsValid}
+                              isInvalid={!this.state.validation.programFolderIdIsValid}
                               defaultValue={this.state.program.notebookFolder.referenceId
                               || ''}
                               onChange={(e) => this.handleFormUpdate({
@@ -432,19 +420,20 @@ export default class ProgramForm extends React.Component {
                                 }
                               })}
                           />
-                          <FormFeedback>Program Folder ID must not be
-                            empty.</FormFeedback>
-                          <FormText>This is the ID assigned to the program
+                          <Form.Control.Feedback type={"invalid"}>
+                            Program Folder ID must not be empty.
+                          </Form.Control.Feedback>
+                          <Form.Text>This is the ID assigned to the program
                             folder in the ELN. For example, in Benchling the ID
                             will take the form of an alphanumeric code with a
-                            prefix of <code>lib_</code>.</FormText>
+                            prefix of <code>lib_</code>.</Form.Text>
                         </FormGroup>
                       </Col>
 
-                      <Col md="6">
+                      <Col md={6} className={"mb-3"}>
                         <FormGroup>
-                          <Label>Folder Name</Label>
-                          <Input
+                          <Form.Label>Folder Name</Form.Label>
+                          <Form.Control
                               type="text"
                               // invalid={!this.state.validation.programFolderNameIsValid}
                               defaultValue={this.state.program.notebookFolder.name
@@ -456,17 +445,18 @@ export default class ProgramForm extends React.Component {
                                 }
                               })}
                           />
-                          <FormFeedback>Folder Name must not be
-                            empty.</FormFeedback>
-                          <FormText>If different from the program
-                            name.</FormText>
+                          <Form.Control.Feedback type={"invalid"}>
+                            Folder Name must not be empty.
+                          </Form.Control.Feedback>
+                          <Form.Text>If different from the program
+                            name.</Form.Text>
                         </FormGroup>
                       </Col>
 
-                      <Col md="6">
+                      <Col md={6} className={"mb-3"}>
                         <FormGroup>
-                          <Label>URL</Label>
-                          <Input
+                          <Form.Label>URL</Form.Label>
+                          <Form.Control
                               type="text"
                               // invalid={!this.state.validation.programFolderUrlIsValid}
                               defaultValue={this.state.program.notebookFolder.url
@@ -478,8 +468,10 @@ export default class ProgramForm extends React.Component {
                                 }
                               })}
                           />
-                          <FormFeedback>URL must not be empty.</FormFeedback>
-                          <FormText>URL for the program in the ELN.</FormText>
+                          <Form.Control.Feedback type={"invalid"}>
+                            URL must not be empty.
+                          </Form.Control.Feedback>
+                          <Form.Text>URL for the program in the ELN.</Form.Text>
                         </FormGroup>
                       </Col>
 
@@ -491,9 +483,9 @@ export default class ProgramForm extends React.Component {
                       </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
 
-                      <Col md="12">
+                      <Col md={12} className={"mb-3"}>
                         <h5 className="card-title">Program Attributes</h5>
                         <h6 className="card-subtitle text-muted">
                           Key-value attributes for adding additional information
@@ -523,20 +515,20 @@ export default class ProgramForm extends React.Component {
                     </Row>
 
                     {/*Buttons*/}
-                    <Row form>
+                    <Row>
                       <Col className="text-center">
                         <FormGroup>
-                          <Button size="lg" color="primary"
+                          <Button size="lg" variant="primary"
                                   onClick={this.handleSubmit}>Submit</Button>
                           &nbsp;&nbsp;
-                          <Button size="lg" color="secondary"
+                          <Button size="lg" variant="secondary"
                                   onClick={this.handleCancel}>Cancel</Button>
                         </FormGroup>
                       </Col>
                     </Row>
 
                   </Form>
-                </CardBody>
+                </Card.Body>
               </Card>
             </Col>
           </Row>

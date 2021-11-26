@@ -1,19 +1,10 @@
 import React from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  FormGroup,
-  Input,
-  Label,
-  Row
-} from 'reactstrap'
+import {Button, Card, Col, Form, Row} from 'react-bootstrap'
 import {XCircle} from 'react-feather'
 import dragula from "react-dragula";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
+import {FormGroup} from "./common";
 
 class AssayTypeFieldInputList extends React.Component {
 
@@ -44,22 +35,22 @@ const AssayTypeFieldInputCard = ({field, index, handleFieldUpdate, handleRemoveF
   return (
       <Card className="mb-3 bg-light cursor-grab border">
 
-        <CardHeader className="bg-light pt-0 pb-0">
-          <div className="card-actions float-right">
+        <Card.Header className="bg-light pt-0 pb-0">
+          <div className="card-actions float-end">
             <a className="text-danger" title={"Remove field"}
                onClick={() => handleRemoveField(index)}>
               <XCircle className="align-middle mt-3" size={12}/>
             </a>
           </div>
-        </CardHeader>
+        </Card.Header>
 
-        <CardBody className="pb-3 pr-3 pl-3 pt-0">
+        <Card.Body className="pb-3 pr-3 pl-3 pt-0">
           <Row>
 
             <Col md={6} lg={3}>
               <FormGroup>
-                <Label>Name *</Label>
-                <Input
+                <Form.Label>Name *</Form.Label>
+                <Form.Control
                     type="text"
                     value={field.displayName}
                     onChange={(e) => {
@@ -75,9 +66,8 @@ const AssayTypeFieldInputCard = ({field, index, handleFieldUpdate, handleRemoveF
 
             <Col md={6} lg={3}>
               <FormGroup>
-                <Label>Type</Label>
-                <Input
-                    type="select"
+                <Form.Label>Type</Form.Label>
+                <Form.Select
                     value={field.type}
                     onChange={(e) => {
                       handleFieldUpdate({"type": e.target.value}, index);
@@ -89,16 +79,16 @@ const AssayTypeFieldInputCard = ({field, index, handleFieldUpdate, handleRemoveF
                   <option value="FLOAT">Float</option>
                   <option value="BOOLEAN">Boolean</option>
                   <option value="DATE">Date</option>
-                </Input>
+                </Form.Select>
               </FormGroup>
             </Col>
 
             <Col md={12} lg={4}>
               <FormGroup>
-                <Label>Description</Label>
-                <Input
-                    type="textarea"
-                    size="4"
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                    as="textarea"
+                    rows={4}
                     value={field.description}
                     onChange={(e) => handleFieldUpdate(
                         {"description": e.target.value}, index)}
@@ -107,19 +97,18 @@ const AssayTypeFieldInputCard = ({field, index, handleFieldUpdate, handleRemoveF
             </Col>
 
             <Col md={6} lg={1}>
-              <Label check className="ml-4 mt-3">
-                <Input
-                    type="checkbox"
-                    onChange={(e) => {
-                      handleFieldUpdate({"required": e.target.checked}, index)
-                    }}
-                    checked={field.required}
-                /> Required
-              </Label>
+              <Form.Check
+                  type="checkbox"
+                  onChange={(e) => {
+                    handleFieldUpdate({"required": e.target.checked}, index)
+                  }}
+                  checked={field.required}
+                  label={"Required"}
+              />
             </Col>
 
           </Row>
-        </CardBody>
+        </Card.Body>
       </Card>
   )
 };
@@ -190,7 +179,7 @@ export class AssayTypeFieldInputs extends React.Component {
 
     const cards = this.props.fields.map((field, index) => {
       return (
-          <Row form key={'field-inputs-' + index} data-index={index}>
+          <Row key={'field-inputs-' + index} data-index={index}>
             <Col xs={12}>
               <AssayTypeFieldInputCard
                   field={field}
@@ -210,11 +199,10 @@ export class AssayTypeFieldInputs extends React.Component {
             {cards}
           </AssayTypeFieldInputList>
 
-          <Row form>
+          <Row>
             <Col md={12}>
               <Button
-                  size="lg"
-                  color="info"
+                  variant="info"
                   onClick={this.handleAddFieldClick}>
                 <FontAwesomeIcon icon={faPlusCircle}/> Add Field
               </Button>

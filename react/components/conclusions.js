@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Button,
-  Col,
-  Media,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row
-} from "reactstrap";
+import {Button, Col, Modal, Row} from "react-bootstrap";
 import React from "react";
 import ReactQuill from "react-quill";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -34,12 +25,12 @@ import {Clipboard} from "react-feather";
  * Displays the study conclusions or a placeholder.
  *
  * @param conclusions
- * @param toggleModal
+ * @param showModal
  * @param isSignedIn
  * @returns {*}
  * @constructor
  */
-export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
+export const Conclusions = ({conclusions, showModal, isSignedIn}) => {
 
   if (!!conclusions) {
 
@@ -49,14 +40,16 @@ export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
 
     return (
 
-        <Media className="assay-card">
+        <div className="d-flex">
 
-          <Clipboard
-              size={36}
-              className="align-middle text-primary mr-4"
-          />
+          <div className="stat stat-transparent">
+            <Clipboard
+                size={36}
+                className="align-middle text-primary me-4"
+            />
+          </div>
 
-          <Media body>
+          <div className="flex-grow-1 ms-3">
 
             <Row>
 
@@ -65,59 +58,27 @@ export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
                     conclusions.content)}/>
               </Col>
 
-            </Row>
-
-            <Row className="mt-2">
-
-              <Col sm={6}>
-                <h6 className="details-label">Created By</h6>
-                <p>{conclusions.createdBy.displayName}</p>
+              <Col xs={12}>
+                <small>
+                  Added {new Date(conclusions.createdAt).toLocaleDateString()} by {conclusions.createdBy.displayName}
+                </small>
               </Col>
-
-              <Col sm={6}>
-                <h6 className="details-label">Date Added</h6>
-                <p>
-                  {new Date(conclusions.createdAt).toLocaleDateString()}
-                </p>
-              </Col>
-
-            </Row>
-
-            <Row className="mt-2">
 
               {
                 !!conclusions.lastModifiedBy
-                    ? (
-                        <Col sm={6}>
-                          <h6 className="details-label">Updated By</h6>
-                          <p>{conclusions.lastModifiedBy.displayName}</p>
-                        </Col>
-                    )
-                    : ''
-              }
-
-              {
-                !!conclusions.updatedAt
-                    ? (
-                        <Col sm={6}>
-                          <span>
-                            <h6 className="details-label">Last Updated</h6>
-                            <p>
-                              {new Date(
-                                  conclusions.updatedAt).toLocaleDateString()}
-                            </p>
-                          </span>
+                  ? (
+                        <Col xs={12}>
+                          <small>
+                            Updated {new Date(conclusions.updatedAt).toLocaleDateString()} by {conclusions.lastModifiedBy.displayName}
+                          </small>
                         </Col>
                     ) : ''
               }
 
-            </Row>
-
-            <Row className="mt-2">
               {
                 isSignedIn ? (
-                    <Col sm={12}>
-                      <Button color={'info'} onClick={() => toggleModal()}>
+                    <Col xs={12} className="mt-2">
+                      <Button color={'info'} onClick={() => showModal(true)}>
                         Edit
                         &nbsp;&nbsp;
                         <FontAwesomeIcon icon={faEdit}/>
@@ -125,10 +86,11 @@ export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
                     </Col>
                 ) : ''
               }
+
             </Row>
 
-          </Media>
-        </Media>
+          </div>
+        </div>
     );
   } else {
     return (
@@ -140,7 +102,7 @@ export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
                 isSignedIn
                     ? (
                         <div>
-                          <Button color={"primary"} onClick={() => toggleModal()}>
+                          <Button variant={"primary"} onClick={() => showModal(true)}>
                             Add Conclusions
                             &nbsp;&nbsp;
                             <FontAwesomeIcon icon={faPlusCircle}/>
@@ -162,7 +124,7 @@ export const Conclusions = ({conclusions, toggleModal, isSignedIn}) => {
 export const ConclusionsModal = ({
   conclusions,
   isOpen,
-  toggleModal,
+  showModal,
   handleUpdate,
   handleSubmit
 }) => {
@@ -170,18 +132,18 @@ export const ConclusionsModal = ({
   console.log(conclusions)
   return (
       <Modal
-          isOpen={isOpen}
-          toggle={() => toggleModal()}
+          show={isOpen}
+          onHide={() => showModal(false)}
           size={"lg"}
       >
 
-        <ModalHeader toggle={() => toggleModal()}>
+        <Modal.Header closeButton>
           Add Conclusions
-        </ModalHeader>
+        </Modal.Header>
 
-        <ModalBody className="m-3">
+        <Modal.Body className="m-3">
 
-          <Row form>
+          <Row>
 
             <Col sm={12}>
               <p>
@@ -202,17 +164,17 @@ export const ConclusionsModal = ({
 
           </Row>
 
-        </ModalBody>
+        </Modal.Body>
 
-        <ModalFooter>
-          <Button color={"secondary"}
-                  onClick={() => toggleModal()}>
+        <Modal.Footer>
+          <Button variant={"secondary"}
+                  onClick={() => showModal(false)}>
             Cancel
           </Button>
-          <Button color={"primary"} onClick={() => handleSubmit()}>
+          <Button variant={"primary"} onClick={() => handleSubmit()}>
             Save
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
 
       </Modal>
   );

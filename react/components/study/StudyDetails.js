@@ -16,25 +16,15 @@
 
 import {
   Breadcrumb,
-  BreadcrumbItem,
   Button,
   Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
+  Dropdown,
   Nav,
-  NavItem,
-  NavLink,
   Row,
-  TabContent,
-  TabPane,
-  UncontrolledDropdown
-} from "reactstrap";
+  Tab
+} from 'react-bootstrap';
 import {SelectableStatusButton, StatusButton} from "../status";
 import React from "react";
 import {Menu} from "react-feather";
@@ -60,29 +50,31 @@ const StudyDetailHeader = ({study, user}) => {
   return (
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>{study.name}</h1>
+          <h3>{study.name}</h3>
           <h5 className="text-muted">{study.code}</h5>
         </Col>
         <Col className="col-auto">
           {
             !!study.collaborator
-                ? <Button
-                    size="lg"
-                    className="mr-1 mb-1"
-                    color="info"
-                    outline
-                >
-                  External Study
-                </Button>
-                : ''
+                ? (
+                    <React.Fragment>
+                      <Button
+                          className="me-1 mb-1"
+                          variant="outline-info"
+                          disabled
+                      >
+                        External Study
+                      </Button>
+                      &nbsp;&nbsp;
+                    </React.Fragment>
+                ) : ''
           }
           {
             !study.active
                 ? <Button
-                    size="lg"
-                    className="mr-1 mb-1"
-                    outline
-                    color="danger"
+                    className="me-1 mb-1"
+                    variant="outline-danger"
+                    disabled
                   >
                     Inactive Study
                   </Button>
@@ -91,10 +83,9 @@ const StudyDetailHeader = ({study, user}) => {
           {
             study.legacy
                 ? <Button
-                    size="lg"
-                    className="mr-1 mb-1"
-                    outline
-                    color="warning"
+                    className="me-1 mb-1"
+                    variant="outline-warning"
+                    disabled
                 >
                   Legacy Study
                 </Button>
@@ -123,7 +114,7 @@ class StudyDetails extends React.Component {
     };
     this.handleStudyDelete = this.handleStudyDelete.bind(this);
     this.toggleTab = this.toggleTab.bind(this);
-    this.toggleCollectionModal = this.toggleCollectionModal.bind(this);
+    this.showCollectionModal = this.showCollectionModal.bind(this);
   }
 
   toggleTab(tab) {
@@ -134,9 +125,9 @@ class StudyDetails extends React.Component {
     }
   }
 
-  toggleCollectionModal() {
+  showCollectionModal(bool) {
     this.setState({
-      showCollectionModal: !this.state.showCollectionModal
+      showCollectionModal: bool
     });
   }
 
@@ -181,12 +172,8 @@ class StudyDetails extends React.Component {
           <Row>
             <Col>
               <Breadcrumb>
-                <BreadcrumbItem>
-                  <a href={"/"}>Home</a>
-                </BreadcrumbItem>
-                <BreadcrumbItem active>
-                  Study Detail
-                </BreadcrumbItem>
+                <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
+                <Breadcrumb.Item active>Study Detail</Breadcrumb.Item>
               </Breadcrumb>
             </Col>
           </Row>
@@ -199,19 +186,19 @@ class StudyDetails extends React.Component {
             <Col lg={5}>
               <Card className="details-card">
 
-                <CardHeader>
-                  <div className="card-actions float-right">
-                    <UncontrolledDropdown>
-                      <DropdownToggle tag="a">
+                <Card.Header>
+                  <div className="card-actions float-end">
+                    <Dropdown align="end">
+                      <Dropdown.Toggle as="a" bsPrefix="-">
                         <Menu/>
-                      </DropdownToggle>
-                      <DropdownMenu right>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
 
-                        <DropdownItem onClick={() => this.toggleCollectionModal()}>
+                        <Dropdown.Item onClick={() => this.showCollectionModal(true)}>
                           <FontAwesomeIcon icon={faFolderPlus}/>
                           &nbsp;
                           Add to Collection
-                        </DropdownItem>
+                        </Dropdown.Item>
 
                         {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
                         {/*  <FontAwesomeIcon icon={faShare}/>*/}
@@ -219,38 +206,38 @@ class StudyDetails extends React.Component {
                         {/*  Share*/}
                         {/*</DropdownItem>*/}
 
-                        <DropdownItem divider/>
+                        <Dropdown.Divider />
 
                         {
                           !!this.props.user ? (
-                              <DropdownItem onClick={() => history.push(
+                              <Dropdown.Item onClick={() => history.push(
                                   "/study/" + study.code + "/edit")}>
                                 <FontAwesomeIcon icon={faEdit}/>
                                 &nbsp;
                                 Edit
-                              </DropdownItem>
+                              </Dropdown.Item>
                           ) : ''
                         }
                         {
                           !!this.props.user ? (
-                              <DropdownItem onClick={this.handleStudyDelete}>
+                              <Dropdown.Item onClick={this.handleStudyDelete}>
                                 <FontAwesomeIcon icon={faTrash}/>
                                 &nbsp;
                                 Remove
-                              </DropdownItem>
+                              </Dropdown.Item>
                           ) : ''
                         }
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
 
-                  <CardTitle tag="h5" className="mb-0 text-muted">
+                  <Card.Title tag="h5" className="mb-0 text-muted">
                     Summary
-                  </CardTitle>
+                  </Card.Title>
 
-                </CardHeader>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
 
@@ -294,16 +281,16 @@ class StudyDetails extends React.Component {
 
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
                 {
                   !!study.collaborator
                       ? (
-                          <CardBody>
+                          <Card.Body>
                             <Row>
                               <Col xs={12}>
                                 <div>
-                                  <CardTitle>CRO/Collaborator</CardTitle>
+                                  <Card.Title>CRO/Collaborator</Card.Title>
                                   <StudyCollaborator
                                       collaborator={study.collaborator}
                                       externalCode={study.externalCode}
@@ -311,38 +298,40 @@ class StudyDetails extends React.Component {
                                 </div>
                               </Col>
                             </Row>
-                          </CardBody>
+                          </Card.Body>
                       ) : ''
                 }
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
-                      <CardTitle>Study Team</CardTitle>
+                      <Card.Title>Study Team</Card.Title>
                       <StudyTeam users={study.users} owner={study.owner}/>
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
-                      <CardTitle>Keywords</CardTitle>
+                      <Card.Title>Keywords</Card.Title>
                       <StudyKeywords keywords={study.keywords}/>
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
 
-                      <CardTitle>Workspaces</CardTitle>
+                      <Card.Title>Workspaces</Card.Title>
 
                       <RepairableStorageFolderButton
                           folder={study.storageFolder}
                           repairUrl={"/api/study/" + study.id + "/storage"}
                       />
+
+                      &nbsp;&nbsp;
 
                       <RepairableNotebookFolderButton
                           folder={study.notebookFolder}
@@ -351,11 +340,11 @@ class StudyDetails extends React.Component {
 
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
-                <CardBody>
+                <Card.Body>
                   <Row>
-                    <Col xs="12">
+                    <Col xs={12}>
                       <ExternalLinks
                           links={study.externalLinks || []}
                           studyCode={study.code}
@@ -363,9 +352,9 @@ class StudyDetails extends React.Component {
                       />
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
-                <CardBody>
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
                       <StudyRelationships
@@ -375,7 +364,7 @@ class StudyDetails extends React.Component {
                       />
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
               </Card>
             </Col>
@@ -384,138 +373,104 @@ class StudyDetails extends React.Component {
 
               {/* Tabs */}
               <div className="tab">
-                <Nav tabs>
+                <Tab.Container defaultActiveKey="timeline">
+                  <Nav variant="tabs">
+                    <Nav.Item>
+                      <Nav.Link eventKey={"timeline"} >
+                        Timeline
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "1" ? "active" : ''}
-                        onClick={() => {
-                          this.toggleTab("1");
-                        }}
-                    >
-                      Timeline
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"assays"} >
+                        Assays
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "2" ? "active" : ''}
-                        onClick={() => {
-                          this.toggleTab("2");
-                        }}
-                    >
-                      Assays
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"files"} >
+                        Files
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "3" ? "active" : ''}
-                        onClick={() => {
-                          this.toggleTab("3");
-                        }}
-                    >
-                      Files
-                    </NavLink>
-                  </NavItem>
+                    {
+                      !!study.notebookFolder ? (
+                          <Nav.Item>
+                            <Nav.Link eventKey={"notebook"} >
+                              Notebook
+                            </Nav.Link>
+                          </Nav.Item>
+                      ) : ""
+                    }
 
-                  {
-                    !!study.notebookFolder ? (
-                        <NavItem>
-                          <NavLink
-                              className={this.state.activeTab === "4" ? "active" : ''}
-                              onClick={() => {
-                                this.toggleTab("4");
-                              }}
-                          >
-                            Notebook
-                          </NavLink>
-                        </NavItem>
-                    ) : ""
-                  }
+                    <Nav.Item>
+                      <Nav.Link eventKey={"conclusions"} >
+                        Conclusions
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "5" ? "active" : ''}
-                        onClick={() => {
-                          this.toggleTab("5");
-                        }}
-                    >
-                      Conclusions
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"comments"} >
+                        Comments
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "6" ? "active" : ''}
-                        onClick={() => {
-                          this.toggleTab("6");
-                        }}
-                    >
-                      Comments
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"collections"} >
+                        Collections
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "7" ? "active" : ''}
-                        onClick={() => {
-                          this.toggleTab("7");
-                        }}
-                    >
-                      Collections
-                    </NavLink>
-                  </NavItem>
+                  </Nav>
 
-                </Nav>
+                  <Tab.Content>
 
-                <TabContent activeTab={this.state.activeTab}>
+                    {/* Assay Tab */}
+                    <Tab.Pane eventKey={"timeline"}>
+                      <StudyTimelineTab study={study} user={this.props.user}/>
+                    </Tab.Pane>
 
-                  {/* Assay Tab */}
-                  <TabPane tabId="1">
-                    <StudyTimelineTab study={study} user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"assays"}>
+                      <StudyAssaysTab study={study} user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="2">
-                    <StudyAssaysTab study={study} user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"files"}>
+                      <StudyFilesTab study={study} user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="3">
-                    <StudyFilesTab study={study} user={this.props.user}/>
-                  </TabPane>
+                    {
+                      !!study.notebookFolder ? (
+                          <Tab.Pane eventKey={"notebook"}>
+                            <StudyNotebookTab study={study}
+                                              user={this.props.user}/>
+                          </Tab.Pane>
+                      ) : ""
+                    }
 
-                  {
-                    !!study.notebookFolder ? (
-                        <TabPane tabId="4">
-                          <StudyNotebookTab study={study}
-                                            user={this.props.user}/>
-                        </TabPane>
-                    ) : ""
-                  }
+                    <Tab.Pane eventKey={"conclusions"}>
+                      <StudyConclusionsTab study={study} user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="5">
-                    <StudyConclusionsTab study={study} user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"comments"}>
+                      <StudyCommentsTab study={study} user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="6">
-                    <StudyCommentsTab study={study} user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"collections"}>
+                      <StudyCollectionsTab
+                          study={study}
+                          showCollectionModal={this.showCollectionModal}
+                      />
+                    </Tab.Pane>
 
-                  <TabPane tabId="7">
-                    <StudyCollectionsTab
-                        study={study}
-                        toggleCollectionModal={this.toggleCollectionModal}
-                    />
-                  </TabPane>
-
-                </TabContent>
+                  </Tab.Content>
+                </Tab.Container>
               </div>
             </Col>
           </Row>
 
           {/* Add to collection modal */}
           <AddToStudyCollectionModal
-              toggle={this.toggleCollectionModal}
+              showModal={this.showCollectionModal}
               isOpen={this.state.showCollectionModal}
               study={study}
           />

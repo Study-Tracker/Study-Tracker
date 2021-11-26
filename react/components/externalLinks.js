@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Button,
-  CardTitle,
-  Col,
-  FormGroup,
-  Input,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-  UncontrolledAlert
-} from "reactstrap";
+import {Alert, Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faLink, faTimesCircle} from "@fortawesome/free-solid-svg-icons";
@@ -47,15 +34,15 @@ class ExternalLinks extends React.Component {
       },
       modalError: null
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
     this.handleNewLinkChange = this.handleNewLinkChange.bind(this);
     this.handleNewLinkSubmit = this.handleNewLinkSubmit.bind(this);
     this.handleLinkDelete = this.handleLinkDelete.bind(this);
   }
 
-  toggleModal() {
+  showModal(bool) {
     this.setState({
-      modalIsOpen: !this.state.modalIsOpen
+      modalIsOpen: bool
     })
   }
 
@@ -95,7 +82,7 @@ class ExternalLinks extends React.Component {
       } else {
         throw new Error("Failed to add external link");
       }
-      this.toggleModal();
+      this.showModal(false);
     })
     .catch(error => {
       console.error(error);
@@ -140,7 +127,7 @@ class ExternalLinks extends React.Component {
 
     const links = this.state.links.map(link => {
       return (
-          <li key={"external-link-" + link.label}>
+          <li key={"external-link-" + link.id}>
             <FontAwesomeIcon icon={faLink}/>
             &nbsp;&nbsp;
             <a href={link.url} target="_blank">{link.label}</a>
@@ -159,19 +146,19 @@ class ExternalLinks extends React.Component {
     return (
         <div>
 
-          <CardTitle>
+          <Card.Title>
             External Links
             {
               !!this.props.user ? (
-                  <span className="float-right">
-                  <Button size={"sm"} color={"primary"}
-                          onClick={this.toggleModal}>
+                  <span className="float-end">
+                  <Button size={"sm"} variant={"primary"}
+                          onClick={() => this.showModal(true)}>
                     Add <PlusCircle className="feather feather-button-sm"/>
                   </Button>
                 </span>
               ) : ''
             }
-          </CardTitle>
+          </Card.Title>
 
           {
             links.length
@@ -188,18 +175,17 @@ class ExternalLinks extends React.Component {
           }
 
           <Modal
-              isOpen={this.state.modalIsOpen}
-              toggle={() => this.toggleModal()}
-              size={"md"}
+              show={this.state.modalIsOpen}
+              onHide={() => this.showModal(false)}
           >
 
-            <ModalHeader toggle={() => this.toggleModal()}>
+            <Modal.Header closeButton>
               Add New External Link
-            </ModalHeader>
+            </Modal.Header>
 
-            <ModalBody className="m-3">
+            <Modal.Body className="m-3">
 
-              <Row form>
+              <Row>
 
                 <Col sm={12}>
                   <p>
@@ -208,30 +194,30 @@ class ExternalLinks extends React.Component {
                   </p>
                 </Col>
 
-                <Col sm="12">
-                  <FormGroup>
-                    <Label>Label *</Label>
-                    <Input
+                <Col sm={12}>
+                  <Form.Group>
+                    <Form.Label>Label *</Form.Label>
+                    <Form.Control
                         type="text"
                         defaultValue={this.state.newLink.label}
                         onChange={(e) => this.handleNewLinkChange({
                           label: e.target.value
                         })}
                     />
-                  </FormGroup>
+                  </Form.Group>
                 </Col>
 
-                <Col sm="12">
-                  <FormGroup>
-                    <Label>URL *</Label>
-                    <Input
-                        type="url"
+                <Col sm={12}>
+                  <Form.Group>
+                    <Form.Label>URL *</Form.Label>
+                    <Form.Control
+                        type="text"
                         defaultValue={this.state.newLink.url}
                         onChange={(e) => this.handleNewLinkChange({
                           url: e.target.value
                         })}
                     />
-                  </FormGroup>
+                  </Form.Group>
                 </Col>
 
               </Row>
@@ -240,27 +226,27 @@ class ExternalLinks extends React.Component {
                     ? (
                         <Row>
                           <Col sm={12}>
-                            <UncontrolledAlert color={"warning"}>
+                            <Alert variant={"warning"}>
                               <div className="alert-message">
                                 {this.state.modalError}
                               </div>
-                            </UncontrolledAlert>
+                            </Alert>
                           </Col>
                         </Row>
                     ) : ''
               }
 
-            </ModalBody>
+            </Modal.Body>
 
-            <ModalFooter>
-              <Button color={"secondary"} onClick={() => this.toggleModal()}>
+            <Modal.Footer>
+              <Button variant={"secondary"} onClick={() => this.showModal(false)}>
                 Cancel
               </Button>
-              <Button color={"primary"}
+              <Button variant={"primary"}
                       onClick={this.handleNewLinkSubmit}>
                 Save
               </Button>
-            </ModalFooter>
+            </Modal.Footer>
 
           </Modal>
 

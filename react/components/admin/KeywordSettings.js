@@ -1,20 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  FormGroup,
-  Input,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row
-} from 'reactstrap';
+import {Button, Card, Col, Form, Modal, Row} from 'react-bootstrap';
 import {Edit, Tag} from 'react-feather';
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -33,7 +18,7 @@ export default class KeywordSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showModal: false,
+      isModalOpen: false,
       keywords: [],
       categories: [],
       isLoaded: false,
@@ -41,23 +26,30 @@ export default class KeywordSettings extends React.Component {
       selectedKeyword: emptyKeyword,
       categoryInput: "select"
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
     this.handleCategorySelect = this.handleCategorySelect.bind(this);
     this.handleInputUpdate = this.handleInputUpdate.bind(this);
     this.handleKeywordSubmit = this.handleKeywordSubmit.bind(this);
     this.toggleCategoryInput = this.toggleCategoryInput.bind(this);
   }
 
-  toggleModal(keyword) {
-    this.setState({
-      selectedKeyword: keyword || emptyKeyword,
-      showModal: !this.state.showModal,
-      categoryInput: "select"
-    })
+  showModal(keyword) {
+    if (!!keyword) {
+      this.setState({
+        selectedKeyword: keyword || emptyKeyword,
+        isModalOpen: true,
+        categoryInput: "select"
+      })
+    } else {
+      this.setState({
+        isModalOpen: false
+      })
+    }
+
   }
 
   toggleCategoryInput(e) {
-    console.log(e.target.value);
+    console.debug(e.target.value);
     if (e.target.checked) {
       this.setState({
         categoryInput: e.target.value
@@ -123,7 +115,7 @@ export default class KeywordSettings extends React.Component {
           "Refresh the keywords table to view updated records. You must refresh the page before new categories will show up.",
           "success")
       .then(() => {
-        this.toggleModal();
+        this.showModal();
       })
     })
     .catch(e => {
@@ -161,8 +153,8 @@ export default class KeywordSettings extends React.Component {
           return (
               <React.Fragment>
                 <a className="text-warning" title={"Edit keyword"}
-                   onClick={() => this.toggleModal(d)}>
-                  <Edit className="align-middle mr-1" size={18}/>
+                   onClick={() => this.showModal(d)}>
+                  <Edit className="align-middle me-1" size={18}/>
                 </a>
               </React.Fragment>
           )
@@ -189,25 +181,25 @@ export default class KeywordSettings extends React.Component {
 
     return (
         <Card>
-          <CardHeader>
-            <CardTitle tag={"h5"} className={"mb-0"}>
+          <Card.Header>
+            <Card.Title tag={"h5"} className={"mb-0"}>
               Keywords
-              <span className="float-right">
+              <span className="float-end">
                 <Button color={"primary"}
-                        onClick={() => this.toggleModal(true)}>
+                        onClick={() => this.showModal(true)}>
                   New Keyword
                   &nbsp;
-                  <Tag className="feather align-middle ml-2 mb-1"/>
+                  <Tag className="feather align-middle ms-2 mb-1"/>
                 </Button>
               </span>
-            </CardTitle>
-          </CardHeader>
-          <CardBody>
+            </Card.Title>
+          </Card.Header>
+          <Card.Body>
 
             <Row>
               <Col xs={12} sm={6}>
-                <FormGroup>
-                  <Label>Select a keyword category</Label>
+                <Form.Group>
+                  <Form.Label>Select a keyword category</Form.Label>
                   <Select
                       className="react-select-container"
                       classNamePrefix="react-select"
@@ -215,7 +207,7 @@ export default class KeywordSettings extends React.Component {
                       onChange={(selected) => this.handleCategorySelect(
                           selected.value)}
                   />
-                </FormGroup>
+                </Form.Group>
               </Col>
             </Row>
 
@@ -233,7 +225,7 @@ export default class KeywordSettings extends React.Component {
                           >
                             {props => (
                                 <div>
-                                  <div className="float-right">
+                                  <div className="float-end">
                                     <Search.SearchBar
                                         {...props.searchProps}
                                     />
@@ -264,19 +256,19 @@ export default class KeywordSettings extends React.Component {
             </Row>
 
             <Modal
-                isOpen={this.state.showModal}
-                toggle={() => this.toggleModal()}
+                show={this.state.isModalOpen}
+                onHide={() => this.showModal()}
                 size={"lg"}
             >
-              <ModalHeader toggle={() => this.toggleModal()}>
+              <Modal.Header closeButton>
                 {
                   !!this.state.selectedKeyword && this.state.selectedKeyword.id
                       ? "Edit Keyword" : "New Keyword"
                 }
-              </ModalHeader>
-              <ModalBody>
+              </Modal.Header>
+              <Modal.Body className="m-3">
                 {
-                  !!this.state.showModal
+                  !!this.state.isModalOpen
                       ? <ModalInputs
                           categories={categoryOptions}
                           keyword={this.state.selectedKeyword}
@@ -286,23 +278,23 @@ export default class KeywordSettings extends React.Component {
                       />
                       : ""
                 }
-              </ModalBody>
-              <ModalFooter>
-                <Button color="secondary" onClick={() => this.toggleModal()}>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={() => this.showModal()}>
                   Cancel
                 </Button>
                 <Button
-                    color="primary"
+                    variant="primary"
                     onClick={this.handleKeywordSubmit}
                     disabled={!(!!this.state.selectedKeyword.keyword
                         && !!this.state.selectedKeyword.category)}
                 >
                   Submit
                 </Button>
-              </ModalFooter>
+              </Modal.Footer>
             </Modal>
 
-          </CardBody>
+          </Card.Body>
         </Card>
     )
   }
@@ -320,37 +312,31 @@ const ModalInputs = ({
       <Row>
 
         <Col xs={12} sm={4}>
-          <FormGroup check className="mb-2">
-            <Label check>
-              <Input
-                  type={"radio"}
-                  name={"category-radio"}
-                  value={"select"}
-                  checked={categoryInput === "select"}
-                  onChange={toggleCategoryInput}
-              />
-              {" "}Use existing category
-            </Label>
-          </FormGroup>
-          <FormGroup check className="mb-2">
-            <Label check>
-              <Input
-                  type={"radio"}
-                  name={"category-radio"}
-                  value={"input"}
-                  checked={categoryInput === "input"}
-                  onChange={toggleCategoryInput}
-              />
-              {" "}Create new category
-            </Label>
-          </FormGroup>
+          <Form.Group className="mb-2">
+            <Form.Check
+                label={"Use existing category"}
+                type={"radio"}
+                name={"category-radio"}
+                value={"select"}
+                checked={categoryInput === "select"}
+                onChange={toggleCategoryInput}
+            />
+          </Form.Group>
+          <Form.Group className="mb-2">
+            <Form.Check
+                label={"Create new category"}
+                type={"radio"}
+                name={"category-radio"}
+                value={"input"}
+                checked={categoryInput === "input"}
+                onChange={toggleCategoryInput}
+            />
+          </Form.Group>
         </Col>
 
         <Col xs={12} sm={4}>
-          <FormGroup style={{
-            display: categoryInput === "select" ? "block" : "none"
-          }}>
-            <Label>Category</Label>
+          <Form.Group hidden={categoryInput !== "select"}>
+            <Form.Label>Category</Form.Label>
             <Select
                 className="react-select-container"
                 classNamePrefix="react-select"
@@ -362,25 +348,25 @@ const ModalInputs = ({
                 onChange={(selected) => handleUpdate(
                     {category: selected.value})}
             />
-          </FormGroup>
-          <FormGroup style={{
-            display: categoryInput === "input" ? "block" : "none"
-          }}>
-            <Label>Category</Label>
-            <Input
+          </Form.Group>
+          <Form.Group hidden={categoryInput !== "input"}>
+            <Form.Label>Category</Form.Label>
+            <Form.Control
+                type={"text"}
                 onChange={(e) => handleUpdate({category: e.target.value})}
             />
-          </FormGroup>
+          </Form.Group>
         </Col>
 
         <Col xs={12} sm={4}>
-          <FormGroup>
-            <Label>Keyword</Label>
-            <Input
+          <Form.Group>
+            <Form.Label>Keyword</Form.Label>
+            <Form.Control
+                type={"text"}
                 defaultValue={keyword.keyword}
                 onChange={(e) => handleUpdate({keyword: e.target.value})}
             />
-          </FormGroup>
+          </Form.Group>
         </Col>
 
       </Row>

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button} from "reactstrap";
+import {Button} from "react-bootstrap";
 import {Folder as FolderIcon, RefreshCw} from "react-feather";
 import swal from "sweetalert";
 
@@ -42,7 +42,7 @@ export const RepairableNotebookFolderLink = ({folder, repairUrl}) => {
     return <a href={folder.url} target="_blank">Notebook Folder</a>
   } else {
     return (
-        <Button color="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
+        <Button variant="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
           <RefreshCw size={14} className="mb-1"/>
           &nbsp;
           Repair Folder
@@ -56,15 +56,19 @@ export const RepairableNotebookFolderButton = ({folder, repairUrl}) => {
     return (
         <a href={folder.url}
            target="_blank"
-           className="btn btn-outline-info mt-2 mr-2">
+           className="btn btn-outline-info mt-2 me-2">
           Notebook Folder
           <FolderIcon
-              className="feather align-middle ml-2 mb-1"/>
+              className="feather align-middle ms-2 mb-1"/>
         </a>
     )
   } else {
     return (
-        <Button color="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
+        <Button
+            variant="warning"
+            onClick={() => handleFolderRepairRequest(repairUrl)}
+            className={"mt-2"}
+        >
           <RefreshCw size={14} className="mb-1"/>
           &nbsp;
           Repair Folder

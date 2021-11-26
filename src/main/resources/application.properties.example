@@ -12,6 +12,8 @@ admin.email=
 admin.password=
 
 ### Data Source
+# Provide the connection information for the primary Study Tracker database. The user and schema
+# need to be configured ahead of time.
 db.username=
 db.password=
 db.host=
@@ -26,7 +28,7 @@ aws.access-key-id=
 aws.secret-access-key=
 
 ### Events
-# Determines where to dispatch events. Can be eventbridge or local. Default mode: local
+# Determines where to dispatch events. Can be 'eventbridge' or 'local'. Default mode: 'local'
 events.mode=
 aws.eventbridge.bus-name=
 
@@ -42,7 +44,7 @@ email.outgoing-email-address=${spring.mail.username}
 
 ### Notebook
 # Connect Study Tracker with your ELN
-# Options: none, idbs, benchling. Default: none
+# Options: 'none', 'idbs', 'benchling'. Default: 'none'
 notebook.mode=
 benchling.eln.api.token=
 benchling.eln.api.root-url=
@@ -55,11 +57,11 @@ storage.mode=
 storage.use-existing=true
 storage.max-folder-read-depth=3
 
-# Local: Provide options for local file system storage
+## Local: Provide options for local file system storage
 storage.temp-dir=
 storage.local-dir=
 
-# Egnyte
+## Egnyte
 egnyte.root-url=
 egnyte.api-token=
 egnyte.root-path=
@@ -70,6 +72,18 @@ egnyte.qps=3
 study.default-code-prefix=ST
 study.default-external-code-prefix=EX
 study.code-counter-start=10001
+
+### Search
+# Study Tracker can integrate with Elasticsearch to provide advanced study search functionality.
+# To enable, set search.mode to 'elasticsearch'. The host value should be the full host name
+# (without protocol) and the port number. So if my host is https://myelasticdb.com, then the
+# value for elasticsearch.host would be 'myelasticdb.com:443'.
+search.mode=
+elasticsearch.host=
+elasticsearch.index=
+elasticsearch.use-ssl=
+elasticsearch.username=
+elasticsearch.password=
 
 ### SSL
 # Optional
@@ -83,8 +97,8 @@ server.ssl.key-store-password=
 
 ### Single Sign-On
 # Optional
-# If using Okta for SSO, set option to okta-saml
-#security.sso=okta-saml
+# If using Okta for SSO, set option to 'okta-saml'
+security.sso=
 
 # Okta
 sso.okta.url=

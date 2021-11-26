@@ -15,7 +15,7 @@
  */
 
 import React from "react";
-import {Col, Row} from 'reactstrap';
+import {Col, Row} from 'react-bootstrap';
 import BlankPageWrapper from "../structure/BlankPageWrapper";
 
 export class ErrorBoundary extends React.Component {

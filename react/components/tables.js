@@ -1,4 +1,4 @@
-import {Button} from "reactstrap";
+import {Button} from "react-bootstrap";
 import {File} from "react-feather";
 import React from "react";
 
@@ -8,10 +8,10 @@ export const ExportToCsv = (props) => {
   };
   return (
       <span>
-        <Button color={'primary'} onClick={handleClick}>
+        <Button variant={'primary'} onClick={handleClick}>
           Export to CSV
           &nbsp;
-          <File className="feather align-middle ml-2 mb-1"/>
+          <File className="feather align-middle ms-2 mb-1"/>
         </Button>
       </span>
   );

@@ -18,7 +18,7 @@ import React from 'react';
 import NoSidebarPageWrapper from "../structure/NoSidebarPageWrapper";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
-import AssayFormStandard from "../components/forms/AssayFormStandard";
+import AssayForm from "../components/forms/AssayForm";
 import {connect} from "react-redux";
 import {Redirect} from 'react-router'
 
@@ -98,7 +98,7 @@ class AssayFormView extends React.Component {
     } else if (!this.props.user) {
       content = <Redirect to="/login"/>
     } else if (this.state.isLoaded) {
-      content = <AssayFormStandard
+      content = <AssayForm
           study={this.state.study}
           assay={this.state.assay}
           user={this.props.user}

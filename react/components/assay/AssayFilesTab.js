@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Col, Row} from "reactstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFile} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
@@ -29,7 +29,7 @@ export default class AssayFilesTab extends React.Component {
       isLoaded: false,
       isError: false
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.refreshData = this.refreshData.bind(this);
   }
@@ -61,9 +61,9 @@ export default class AssayFilesTab extends React.Component {
     });
   }
 
-  toggleModal() {
+  showModal(bool) {
     this.setState({
-      modalIsOpen: !this.state.modalIsOpen
+      modalIsOpen: bool
     })
   }
 
@@ -79,7 +79,7 @@ export default class AssayFilesTab extends React.Component {
     });
     Promise.all(requests)
     .then(() => {
-      this.toggleModal();
+      this.showModal(false);
       this.refreshData();
     })
     .catch(e => {
@@ -97,8 +97,8 @@ export default class AssayFilesTab extends React.Component {
               {
                 !!this.props.user
                     ? (
-                        <span className="float-right">
-                          <Button color="info" onClick={this.toggleModal}>
+                        <span className="float-end">
+                          <Button variant="info" onClick={() => this.showModal(true)}>
                             Upload Files
                             &nbsp;
                             <FontAwesomeIcon icon={faFile}/>
@@ -121,7 +121,7 @@ export default class AssayFilesTab extends React.Component {
 
           <UploadFilesModal
               isOpen={this.state.modalIsOpen}
-              toggleModal={this.toggleModal}
+              showModal={this.showModal}
               handleSubmit={this.handleSubmit}
           />
 

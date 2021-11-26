@@ -18,7 +18,7 @@ import React from 'react';
 import NoSidebarPageWrapper from "../structure/NoSidebarPageWrapper";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
-import StudyFormStandard from "../components/forms/StudyFormStandard";
+import StudyForm from "../components/forms/StudyForm";
 import {connect} from "react-redux";
 
 class StudyFormView extends React.Component {
@@ -121,7 +121,7 @@ class StudyFormView extends React.Component {
     } else if (!!this.props.user && this.state.studyLoaded
         && this.state.programsLoaded && this.state.collaboratorsLoaded
         && this.state.keywordCategoriesLoaded) {
-      content = <StudyFormStandard
+      content = <StudyForm
           study={this.state.study}
           programs={this.state.programs}
           externalContacts={this.state.collaborators}

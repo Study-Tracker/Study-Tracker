@@ -2,26 +2,11 @@ import React from "react";
 import swal from "sweetalert";
 import {history} from "../../App";
 import {LoadingOverlay} from "../loading";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Container,
-  Form,
-  FormFeedback,
-  FormGroup,
-  FormText,
-  Input,
-  Label,
-  Row
-} from "reactstrap";
+import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import Select from "react-select";
 import {StudyInputs} from "./studies";
+import {Breadcrumbs} from "../common";
+import {FormGroup} from "./common";
 
 export default class StudyCollectionForm extends React.Component {
 
@@ -166,25 +151,17 @@ export default class StudyCollectionForm extends React.Component {
               {
                 !!this.state.collection.id
                     ? (
-                        <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/"}>Home</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/collection/" + this.state.collection.id}>
-                              Collection Detail
-                            </a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>Edit Collection</BreadcrumbItem>
-                        </Breadcrumb>
+                        <Breadcrumbs crumbs={[
+                          {label: "Home", url: "/"},
+                          {label: "Collection Details", url: "/collection/" + this.state.collection.id},
+                          {label: "Edit Collection"}
+                        ]} />
                     )
                     : (
-                        <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/collections"}>Collections</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>New Collection</BreadcrumbItem>
-                        </Breadcrumb>
+                        <Breadcrumbs crumbs={[
+                          {label: "Collections", url: "/collections"},
+                          {label: "New Collection"}
+                        ]} />
                     )
               }
             </Col>
@@ -192,48 +169,48 @@ export default class StudyCollectionForm extends React.Component {
 
           <Row className="justify-content-end align-items-center">
             <Col>
-              <h1>{!!this.state.collection.id ? "Edit Collection"
-                  : "New Collection"}</h1>
+              <h3>{!!this.state.collection.id ? "Edit Collection"
+                  : "New Collection"}</h3>
             </Col>
           </Row>
 
           <Row>
-            <Col xs="12">
+            <Col xs={12}>
               <Card>
 
-                <CardHeader>
-                  <CardTitle tag="h5">Collection Overview</CardTitle>
+                <Card.Header>
+                  <Card.Title tag="h5">Collection Overview</Card.Title>
                   <h6 className="card-subtitle text-muted">
                     Provide a unique name and a brief description for your collection.
                     Collections are private and visible only to you, unless
                     the 'Public' option is set to true. Any user can add or remove
                     studies from public collections.
                   </h6>
-                </CardHeader>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Form className="collection-form">
 
                     {/*Overview*/}
-                    <Row form>
+                    <Row>
 
-                      <Col md="7">
+                      <Col md={7}>
                         <FormGroup>
-                          <Label>Name *</Label>
-                          <Input
+                          <Form.Label>Name *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.nameIsValid}
+                              isInvalid={!this.state.validation.nameIsValid}
                               defaultValue={this.state.collection.name || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"name": e.target.value})}
                           />
-                          <FormFeedback>Name must not be empty.</FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>Name must not be empty.</Form.Control.Feedback>
                         </FormGroup>
                       </Col>
 
-                      <Col md="5">
+                      <Col md={5}>
                         <FormGroup>
-                          <Label>Is this collection public?</Label>
+                          <Form.Label>Is this collection public?</Form.Label>
                           <Select
                               className="react-select-container"
                               classNamePrefix="react-select"
@@ -265,25 +242,25 @@ export default class StudyCollectionForm extends React.Component {
 
                     </Row>
 
-                    <Row form>
+                    <Row>
 
-                      <Col md="7">
+                      <Col md={7}>
                         <FormGroup>
-                          <Label>Description *</Label>
-                          <Input
-                              type="textarea"
+                          <Form.Label>Description *</Form.Label>
+                          <Form.Control
+                              as="textarea"
                               defaultValue={this.state.collection.description
                               || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"description": e.target.value})}
-                              size="5"
+                              rows={5}
                           />
-                          <FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
                             Description must not be empty.
-                          </FormFeedback>
-                          <FormText>
+                          </Form.Control.Feedback>
+                          <Form.Text>
                             Provide a brief description of the study collection.
-                          </FormText>
+                          </Form.Text>
                         </FormGroup>
                       </Col>
 
@@ -295,8 +272,8 @@ export default class StudyCollectionForm extends React.Component {
                       </Col>
                     </Row>
 
-                    <Row form>
-                      <Col md="12">
+                    <Row>
+                      <Col md={12}>
                         <h5 className="card-title">Studies</h5>
                         <h6 className="card-subtitle text-muted">
                           Search-for and add studies to your collection. You can
@@ -321,20 +298,20 @@ export default class StudyCollectionForm extends React.Component {
                     </Row>
 
                     {/*Buttons*/}
-                    <Row form>
+                    <Row>
                       <Col className="text-center">
                         <FormGroup>
-                          <Button size="lg" color="primary"
+                          <Button size="lg" variant="primary"
                                   onClick={this.handleSubmit}>Submit</Button>
                           &nbsp;&nbsp;
-                          <Button size="lg" color="secondary"
+                          <Button size="lg" variant="secondary"
                                   onClick={this.handleCancel}>Cancel</Button>
                         </FormGroup>
                       </Col>
                     </Row>
 
                   </Form>
-                </CardBody>
+                </Card.Body>
               </Card>
             </Col>
           </Row>

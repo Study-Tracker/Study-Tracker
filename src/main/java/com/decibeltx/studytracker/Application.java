@@ -18,6 +18,7 @@ package com.decibeltx.studytracker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -27,7 +28,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @SpringBootApplication(exclude = {
-    UserDetailsServiceAutoConfiguration.class
+    UserDetailsServiceAutoConfiguration.class,
+    ElasticsearchRepositoriesAutoConfiguration.class
 })
 @PropertySource("classpath:defaults.properties")
 @EnableSwagger2

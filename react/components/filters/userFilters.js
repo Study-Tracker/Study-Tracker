@@ -1,11 +1,12 @@
 import React from "react";
-import {CustomInput, FormGroup, Input, Label} from 'reactstrap';
+import {FormGroup} from '../forms/common';
+import {Form} from 'react-bootstrap';
 import {setFilters} from "../../redux/actions/filterActions";
 import {connect} from 'react-redux';
 import {compose} from 'redux';
 import {withRouter} from 'react-router-dom';
 import {history} from "../../App";
-import {cleanQueryParams, FilterSidebar} from "./filters";
+import {cleanQueryParams, FilterLabel, FilterSidebar} from "./filters";
 
 const qs = require('qs');
 
@@ -91,12 +92,10 @@ class UserFilters extends React.Component {
 
           <div className="settings-section">
 
-            <small className="d-block font-weight-bold text-muted mb-2">
-              Quick Views
-            </small>
+            <FilterLabel text={"Quick Views"} />
 
             <FormGroup>
-              <CustomInput
+              <Form.Check
                   id="admin-check"
                   type="checkbox"
                   label="Admin users"
@@ -114,65 +113,54 @@ class UserFilters extends React.Component {
 
           <div className="settings-section">
 
-            <small className="d-block font-weight-bold text-muted mb-2">
-              User Status
-            </small>
+            <FilterLabel text={"User Status"} />
 
-            <FormGroup className="mb-2 ml-4">
-              <Label check>
-                <Input
-                    type="radio"
-                    name="user-status"
-                    checked={
-                      !this.state.filters[labels.ACTIVE]
-                      && !this.state.filters[labels.INACTIVE]
-                    }
-                    onChange={() => {
-                      this.updateFilters({
-                        [labels.ACTIVE]: null,
-                        [labels.INACTIVE]: null
-                      })
-                    }}
-                />
-                {" "}
-                Show all users
-              </Label>
+            <FormGroup className="mb-2 ms-4">
+              <Form.Check
+                  label={"Show all users"}
+                  type="radio"
+                  name="user-status"
+                  checked={
+                    !this.state.filters[labels.ACTIVE]
+                    && !this.state.filters[labels.INACTIVE]
+                  }
+                  onChange={() => {
+                    this.updateFilters({
+                      [labels.ACTIVE]: null,
+                      [labels.INACTIVE]: null
+                    })
+                  }}
+              />
             </FormGroup>
 
-            <FormGroup className="mb-2 ml-4">
-              <Label check>
-                <Input
-                    type="radio"
-                    name="user-status"
-                    checked={!!this.state.filters[labels.ACTIVE]}
-                    onChange={() => {
-                      this.updateFilters({
-                        [labels.ACTIVE]: true,
-                        [labels.INACTIVE]: null
-                      })
-                    }}
-                />
-                {" "}
-                Active users only
-              </Label>
+            <FormGroup className="mb-2 ms-4">
+              <Form.Check
+                  label={"Active users only"}
+                  type="radio"
+                  name="user-status"
+                  checked={!!this.state.filters[labels.ACTIVE]}
+                  onChange={() => {
+                    this.updateFilters({
+                      [labels.ACTIVE]: true,
+                      [labels.INACTIVE]: null
+                    })
+                  }}
+              />
             </FormGroup>
 
-            <FormGroup className="mb-2 ml-4">
-              <Label check>
-                <Input
-                    type="radio"
-                    name="user-status"
-                    checked={!!this.state.filters[labels.INACTIVE]}
-                    onChange={() => {
-                      this.updateFilters({
-                        [labels.ACTIVE]: null,
-                        [labels.INACTIVE]: true
-                      })
-                    }}
-                />
-                {" "}
-                Inactive users only
-              </Label>
+            <FormGroup className="mb-2 ms-4">
+              <Form.Check
+                  label={"Inactive users only"}
+                  type="radio"
+                  name="user-status"
+                  checked={!!this.state.filters[labels.INACTIVE]}
+                  onChange={() => {
+                    this.updateFilters({
+                      [labels.ACTIVE]: null,
+                      [labels.INACTIVE]: true
+                    })
+                  }}
+              />
             </FormGroup>
 
           </div>
