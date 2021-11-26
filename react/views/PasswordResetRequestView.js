@@ -16,19 +16,7 @@
 
 import React from "react";
 
-import {
-  Alert,
-  Card,
-  CardBody,
-  Col,
-  Container,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Row
-} from "reactstrap";
-import {User} from "react-feather";
+import {Alert, Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import NoNavWrapper from "../structure/NoNavWrapper";
 
 const qs = require('qs');
@@ -69,7 +57,7 @@ export default class PasswordResetRequestView extends React.Component {
         <NoNavWrapper>
           <Container fluid className="animated fadeIn">
             <Row className="justify-content-center">
-              <Col xs="12" sm="8" md="8" lg="6" xl="4">
+              <Col xs={12} sm={8} md={8} lg={6} xl={4}>
 
                 <div className="text-center mt-4">
                   <h2>Request Password Reset</h2>
@@ -79,32 +67,38 @@ export default class PasswordResetRequestView extends React.Component {
                 </div>
 
                 <Card>
-                  <CardBody>
+                  <Card.Body>
                     <div className="m-sm-4">
 
-                      <div className="text-center">
-                        <User size={80} className="align-middle mr-2"/>
+                      <div className="text-center mb-4">
+                        {/*<User size={80} className="align-middle me-2"/>*/}
+                        <img
+                            src={"/static/images/clip/password.png"}
+                            className="img-fluid"
+                            width="150"
+                            height="150"
+                        />
                       </div>
 
                       <Form action={"/auth/passwordresetrequest"} method={"post"}>
 
-                        <FormGroup>
-                          <Label>Email</Label>
-                          <Input
-                              bsSize="lg"
+                        <Form.Group>
+                          <Form.Label>Email</Form.Label>
+                          <Form.Control
+                              size="lg"
                               type="text"
                               name="email"
                               placeholder="Enter your email"
                               onChange={e => this.handleInputChange(
                                   {email: e.target.value})}
                           />
-                        </FormGroup>
+                        </Form.Group>
 
                         {
                           isError
                               ? (
                                   <div className="text-center mt-3">
-                                    <Alert color="danger" className="p-3">
+                                    <Alert variant="danger" className="p-3">
                                       There was a problem submitting your request.
                                     </Alert>
                                   </div>
@@ -117,18 +111,18 @@ export default class PasswordResetRequestView extends React.Component {
                             Cancel
                           </a>
                           &nbsp;&nbsp;
-                          <button
+                          <Button
                               className="btn btn-lg btn-primary"
                               type="submit"
                               disabled={!this.state.inputIsValid}
                           >
                             Submit
-                          </button>
+                          </Button>
                         </div>
 
                       </Form>
                     </div>
-                  </CardBody>
+                  </Card.Body>
                 </Card>
 
               </Col>

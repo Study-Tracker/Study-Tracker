@@ -1,8 +1,13 @@
 package com.decibeltx.studytracker.service;
 
-import com.decibeltx.studytracker.mapstruct.dto.StatisticsDto;
+import com.decibeltx.studytracker.mapstruct.dto.SummaryStatisticsDto;
+import com.decibeltx.studytracker.mapstruct.dto.UserStatisticsDto;
+import com.decibeltx.studytracker.model.Program;
+import com.decibeltx.studytracker.model.User;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,52 +29,67 @@ public class StatisticsService {
   @Autowired
   private UserService userService;
 
-  public StatisticsDto getCurrent() {
-    StatisticsDto statisticsDto = new StatisticsDto();
-    statisticsDto.setProgramCount(programService.count());
-    statisticsDto.setStudyCount(studyService.count());
-    statisticsDto.setAssayCount(assayService.count());
-    statisticsDto.setUserCount(userService.count());
-    statisticsDto.setActivityCount(activityService.count());
-    statisticsDto.setActiveUserCount(userService.countActiveUsers());
-    return statisticsDto;
+  public SummaryStatisticsDto getCurrent() {
+    SummaryStatisticsDto summaryStatisticsDto = new SummaryStatisticsDto();
+    summaryStatisticsDto.setProgramCount(programService.count());
+    summaryStatisticsDto.setStudyCount(studyService.count());
+    summaryStatisticsDto.setAssayCount(assayService.count());
+    summaryStatisticsDto.setUserCount(userService.count());
+    summaryStatisticsDto.setActivityCount(activityService.count());
+    summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
+    Map<String, Long> programCounts = new HashMap<>();
+    for (Program program: programService.findAll()) {
+      System.out.println(program.getName());
+      if (program.isActive()) {
+        programCounts.put(program.getName(), studyService.countByProgram(program));
+      }
+    }
+    summaryStatisticsDto.setProgramStudyCounts(programCounts);
+    return summaryStatisticsDto;
   }
 
-  public StatisticsDto getBeforeDate(Date date) {
-    StatisticsDto statisticsDto = new StatisticsDto();
-    statisticsDto.setProgramCount(programService.countBeforeDate(date));
-    statisticsDto.setStudyCount(studyService.countBeforeDate(date));
-    statisticsDto.setAssayCount(assayService.countBeforeDate(date));
-    statisticsDto.setUserCount(userService.countBeforeDate(date));
-    statisticsDto.setActivityCount(activityService.countBeforeDate(date));
-    statisticsDto.setActiveUserCount(userService.countActiveUsers());
-    return statisticsDto;
+  public SummaryStatisticsDto getBeforeDate(Date date) {
+    SummaryStatisticsDto summaryStatisticsDto = new SummaryStatisticsDto();
+    summaryStatisticsDto.setProgramCount(programService.countBeforeDate(date));
+    summaryStatisticsDto.setStudyCount(studyService.countBeforeDate(date));
+    summaryStatisticsDto.setAssayCount(assayService.countBeforeDate(date));
+    summaryStatisticsDto.setUserCount(userService.countBeforeDate(date));
+    summaryStatisticsDto.setActivityCount(activityService.countBeforeDate(date));
+    summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
+    return summaryStatisticsDto;
   }
 
-  public StatisticsDto getAfterDate(Date date) {
-    StatisticsDto statisticsDto = new StatisticsDto();
-    statisticsDto.setProgramCount(programService.countFromDate(date));
-    statisticsDto.setStudyCount(studyService.countFromDate(date));
-    statisticsDto.setAssayCount(assayService.countFromDate(date));
-    statisticsDto.setUserCount(userService.countFromDate(date));
-    statisticsDto.setActivityCount(activityService.countFromDate(date));
-    statisticsDto.setActiveUserCount(userService.countActiveUsers());
-    return statisticsDto;
+  public SummaryStatisticsDto getAfterDate(Date date) {
+    SummaryStatisticsDto summaryStatisticsDto = new SummaryStatisticsDto();
+    summaryStatisticsDto.setProgramCount(programService.countFromDate(date));
+    summaryStatisticsDto.setStudyCount(studyService.countFromDate(date));
+    summaryStatisticsDto.setAssayCount(assayService.countFromDate(date));
+    summaryStatisticsDto.setUserCount(userService.countFromDate(date));
+    summaryStatisticsDto.setActivityCount(activityService.countFromDate(date));
+    summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
+    Map<String, Long> programCounts = new HashMap<>();
+    for (Program program: programService.findAll()) {
+      if (program.isActive()) {
+        programCounts.put(program.getName(), studyService.countByProgramAfterDate(program, date));
+      }
+    }
+    summaryStatisticsDto.setProgramStudyCounts(programCounts);
+    return summaryStatisticsDto;
   }
 
-  public StatisticsDto getBetweenDates(Date startDate, Date endDate) {
-    StatisticsDto statisticsDto = new StatisticsDto();
-    statisticsDto.setProgramCount(programService.countBetweenDates(startDate, endDate));
-    statisticsDto.setStudyCount(studyService.countBetweenDates(startDate, endDate));
-    statisticsDto.setAssayCount(assayService.countBetweenDates(startDate, endDate));
-    statisticsDto.setUserCount(userService.countBetweenDates(startDate, endDate));
-    statisticsDto.setActivityCount(activityService.countBetweenDates(startDate, endDate));
-    statisticsDto.setActiveUserCount(userService.countActiveUsers());
-    return statisticsDto;
+  public SummaryStatisticsDto getBetweenDates(Date startDate, Date endDate) {
+    SummaryStatisticsDto summaryStatisticsDto = new SummaryStatisticsDto();
+    summaryStatisticsDto.setProgramCount(programService.countBetweenDates(startDate, endDate));
+    summaryStatisticsDto.setStudyCount(studyService.countBetweenDates(startDate, endDate));
+    summaryStatisticsDto.setAssayCount(assayService.countBetweenDates(startDate, endDate));
+    summaryStatisticsDto.setUserCount(userService.countBetweenDates(startDate, endDate));
+    summaryStatisticsDto.setActivityCount(activityService.countBetweenDates(startDate, endDate));
+    summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
+    return summaryStatisticsDto;
   }
 
-  public StatisticsDto mainPageSummary() {
-    StatisticsDto statisticsDto = new StatisticsDto();
+  public SummaryStatisticsDto mainPageSummary() {
+    SummaryStatisticsDto summaryStatisticsDto = new SummaryStatisticsDto();
 
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.DAY_OF_MONTH, -7);
@@ -79,13 +99,23 @@ public class StatisticsService {
     calendar.add(Calendar.MONTH, -1);
     Date lastMonth = calendar.getTime();
 
-    statisticsDto.setActivityCount(activityService.countFromDate(lastWeek));
-    statisticsDto.setActiveUserCount(userService.countActiveUsers());
-    statisticsDto.setNewStudyCount(studyService.countFromDate(lastWeek));
-    statisticsDto.setCompletedStudyCount(activityService.countCompletedStudiesFromDate(lastMonth));
-    statisticsDto.setStudyCount(studyService.count());
+    summaryStatisticsDto.setActivityCount(activityService.countFromDate(lastWeek));
+    summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
+    summaryStatisticsDto.setNewStudyCount(studyService.countFromDate(lastWeek));
+    summaryStatisticsDto.setCompletedStudyCount(activityService.countCompletedStudiesFromDate(lastMonth));
+    summaryStatisticsDto.setStudyCount(studyService.count());
 
-    return statisticsDto;
+    return summaryStatisticsDto;
+  }
+
+  public UserStatisticsDto getUserStatistics(User user) {
+
+    UserStatisticsDto dto = new UserStatisticsDto();
+    dto.setActiveStudyCount(studyService.countUserActiveStudies(user));
+    dto.setCompleteStudyCount(studyService.countUserCompleteStudies(user));
+
+    return dto;
+
   }
 
 }

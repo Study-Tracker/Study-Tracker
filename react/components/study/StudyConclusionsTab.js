@@ -32,14 +32,14 @@ class StudyConclusionsTab extends React.Component {
         createdBy: props.user
       }
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
   }
 
-  toggleModal() {
+  showModal(bool) {
     this.setState({
-      modalIsOpen: !this.state.modalIsOpen
+      modalIsOpen: bool
     })
   }
 
@@ -67,7 +67,7 @@ class StudyConclusionsTab extends React.Component {
         conclusions: json,
         updatedConclusions: json
       });
-      this.toggleModal();
+      this.showModal(false);
     }).catch(e => {
       console.error(e);
     })
@@ -80,13 +80,13 @@ class StudyConclusionsTab extends React.Component {
 
           <Conclusions
               conclusions={this.state.conclusions}
-              toggleModal={this.toggleModal}
+              showModal={this.showModal}
               isSignedIn={!!this.props.user}
           />
 
           <ConclusionsModal
               isOpen={this.state.modalIsOpen}
-              toggleModal={this.toggleModal}
+              showModal={this.showModal}
               conclusions={this.state.updatedConclusions}
               handleSubmit={this.handleSubmit}
               handleUpdate={this.handleUpdate}

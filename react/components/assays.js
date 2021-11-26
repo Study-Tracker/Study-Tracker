@@ -15,14 +15,12 @@
  */
 
 import React from 'react';
-import {Button, Col, Media, Row} from "reactstrap";
+import {Col, Row} from "react-bootstrap";
 import ErrorMessage from "../structure/ErrorMessage";
 import LoadingMessage from "../structure/LoadingMessage";
 import {StatusIcon} from "./status";
-import {history} from '../App';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSignInAlt} from "@fortawesome/free-solid-svg-icons";
 import {StudyTeam} from "./studyMetadata";
+import dateFormat from "dateformat";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -30,27 +28,29 @@ const createMarkup = (content) => {
 
 const AssaySummaryCard = ({studyCode, assay}) => {
   return (
-      <Media className="assay-card">
+      <div className="d-flex assay-card">
 
-        <StatusIcon status={assay.status}/>
+        <div className="stat stat-transparent">
+          <StatusIcon status={assay.status}/>
+        </div>
 
-        <Media body>
+        <div className="flex-grow-1 ms-3">
 
           <Row>
             <Col xs={12}>
 
-              <span className="float-right">
-                <h5>
+              <span className="float-end">
+                <h5 className="text-muted">
                   {assay.assayType.name}
                 </h5>
               </span>
 
-              <h6>{assay.code}</h6>
               <h4>
                 <a href={"/study/" + studyCode + "/assay/" + assay.code}>
                   {assay.name}
                 </a>
               </h4>
+              <h6>{assay.code}</h6>
 
             </Col>
           </Row>
@@ -58,66 +58,52 @@ const AssaySummaryCard = ({studyCode, assay}) => {
           <Row>
 
             <Col xs={12}>
-              <h6 className="details-label">Description</h6>
-              <div dangerouslySetInnerHTML={createMarkup(assay.description)}/>
+              <div className="bg-light p-3" dangerouslySetInnerHTML={createMarkup(assay.description)}/>
             </Col>
 
-          </Row>
-
-          <Row className="mt-2">
-
-            <Col sm={4}>
-              <h6 className="details-label">Start Date</h6>
-              <p>
-                {new Date(assay.startDate).toLocaleDateString()}
+            <Col xs={12}>
+              <p className="text-muted">
+                Created {dateFormat(new Date(assay.createdAt), 'mm/dd/yy @ h:MM TT')}
+                {/*{new Date(assay.createdAt).toLocaleString()}*/}
               </p>
             </Col>
 
             {
-              !!assay.endDate ? (
-                  <Col sm={4}>
-                    <span>
-                      <h6 className="details-label">End Date</h6>
-                      <p>
-                        {new Date(assay.endDate).toLocaleDateString()}
-                      </p>
-                    </span>
+              !!assay.updatedAt ? (
+                  <Col xs={12}>
+                    <small className="text-muted">
+                      Updated {dateFormat(new Date(assay.updatedAt), 'mm/dd/yy @ h:MM TT')}
+                      {/*Created {new Date(assay.updatedAt).toLocaleString()}*/}
+                    </small>
                   </Col>
               ) : ''
             }
-
-            <Col sm={4}>
-              <h6 className="details-label">Last Updated</h6>
-              <p>
-                {new Date(assay.updatedAt).toLocaleDateString()}
-              </p>
-            </Col>
 
           </Row>
 
           <Row className="mt-2">
 
             <Col xs={12} sm={6}>
-              <h6 className="details-label">Assay Team</h6>
+              {/*<h6 className="details-label">Assay Team</h6>*/}
               <StudyTeam users={assay.users} owner={assay.owner}/>
             </Col>
 
           </Row>
 
-          <Row className="mt-2">
-            <Col>
-              <Button outline size="md" color="primary"
-                      onClick={() => history.push(
-                          "/study/" + studyCode + "/assay/" + assay.code)}>
-                Details
-                &nbsp;
-                <FontAwesomeIcon icon={faSignInAlt}/>
-              </Button>
-            </Col>
-          </Row>
+          {/*<Row className="mt-2">*/}
+          {/*  <Col>*/}
+          {/*    <Button size="md" variant="outline-primary"*/}
+          {/*            onClick={() => history.push(*/}
+          {/*                "/study/" + studyCode + "/assay/" + assay.code)}>*/}
+          {/*      Details*/}
+          {/*      &nbsp;*/}
+          {/*      <FontAwesomeIcon icon={faSignInAlt}/>*/}
+          {/*    </Button>*/}
+          {/*  </Col>*/}
+          {/*</Row>*/}
 
-        </Media>
-      </Media>
+        </div>
+      </div>
   );
 };
 

@@ -15,70 +15,21 @@
  */
 
 import React from 'react';
-import {
-  Col,
-  Collapse,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  ListGroup,
-  ListGroupItem,
-  Nav,
-  Navbar,
-  Row,
-  UncontrolledDropdown
-} from "reactstrap";
+import {Button, Dropdown, Form, InputGroup, Nav, Navbar} from "react-bootstrap";
 import {toggleSidebar} from "../redux/actions/sidebarActions";
-import {LogIn, LogOut, Settings, User} from "react-feather";
+import {LogIn, LogOut, Search, Settings, User} from "react-feather";
 import {connect} from "react-redux";
 import {setUser} from '../redux/actions/userActions'
-
-const NavbarDropdown = ({
-  children,
-  count,
-  showBadge,
-  header,
-  footer,
-  icon: Icon
-}) => (
-    <UncontrolledDropdown nav inNavbar className="mr-2">
-      <DropdownToggle nav className="nav-icon dropdown-toggle">
-        <div className="position-relative">
-          <Icon className="align-middle" size={18}/>
-          {showBadge ? <span className="indicator">{count}</span> : null}
-        </div>
-      </DropdownToggle>
-      <DropdownMenu right className="dropdown-menu-lg py-0">
-        <div className="dropdown-menu-header position-relative">
-          {count} {header}
-        </div>
-        <ListGroup>{children}</ListGroup>
-        <DropdownItem header className="dropdown-menu-footer">
-          <span className="text-muted">{footer}</span>
-        </DropdownItem>
-      </DropdownMenu>
-    </UncontrolledDropdown>
-);
-
-const NavbarDropdownItem = ({icon, title, description, time, spacing}) => (
-    <ListGroupItem>
-      <Row noGutters className="align-items-center">
-        <Col xs={2}>{icon}</Col>
-        <Col xs={10} className={spacing ? "pl-2" : null}>
-          <div className="text-dark">{title}</div>
-          <div className="text-muted small mt-1">{description}</div>
-          <div className="text-muted small mt-1">{time}</div>
-        </Col>
-      </Row>
-    </ListGroupItem>
-);
+import {Formik} from "formik";
+import {history} from "../App";
 
 class NavBarComponent extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      user: null
+      user: null,
+      q: ""
     }
   }
 
@@ -99,91 +50,83 @@ class NavBarComponent extends React.Component {
 
     const {dispatch, hideToggle} = this.props;
     return (
-        <Navbar color="white" light expand>
+        <Navbar variant="light" className="navbar-bg" expand>
 
           {
             !hideToggle
                 ? (
                     <span
-                        className="sidebar-toggle d-flex mr-2"
+                        className="sidebar-toggle d-flex"
                         onClick={() => {
                           dispatch(toggleSidebar());
                         }}
                     >
                     <i className="hamburger align-self-center"/>
                   </span>
-                ) : ''
+                ) : (
+                    <Navbar.Brand href={"/"}>
+                      <img
+                          width="40"
+                          height="30"
+                          className="d-inline-block align-top"
+                          alt="Study Tracker"
+                          src={"/static/images/logo-icon.png"}
+                      />
+                    </Navbar.Brand>
+                )
 
           }
 
-          <a href="/" className="navbar-brand mx-auto">Study Tracker</a>
+          <Formik
+              initialValues={{q: ''}}
+              onSubmit={(values => {
+                console.log("Searching for: " + values.q);
+                history.push("/search?q=" + values.q);
+                history.go(0);
+              })}
+          >
+            {({
+              handleSubmit,
+              handleChange,
+              values
+            }) => (
+                <Form
+                    inline="true"
+                    className="d-none d-sm-inline-block"
+                    onSubmit={handleSubmit}
+                >
+                  <InputGroup className="input-group-navbar">
+                    <Form.Control
+                        type="text"
+                        name={"q"}
+                        placeholder={"Search"}
+                        aria-label={"Search"}
+                        onChange={handleChange}
+                    />
+                    <Button type="submit" variant="">
+                      <Search className={"feather"}/>
+                    </Button>
+                  </InputGroup>
+                </Form>
+            )}
 
-          <Collapse navbar>
-            <Nav className="ml-auto" navbar>
+          </Formik>
+
+          <Navbar.Collapse>
+            <Nav className="navbar-align">
 
               {
                 !!this.state.user
                     ? (
-                        <UncontrolledDropdown nav inNavbar>
-
-                      <span className="d-inline-block d-sm-none">
-                        <DropdownToggle nav caret>
-                          <Settings size={18} className="align-middle"/>
-                        </DropdownToggle>
-                      </span>
-
-                          <span className="d-none d-sm-inline-block">
-                        <DropdownToggle nav caret>
-                          <User/>
-                          <span
-                              className="text-dark">{this.state.user.displayName}</span>
-                        </DropdownToggle>
-                      </span>
-
-                          <DropdownMenu right>
-
-                            {
-                              !!this.state.user.admin
-                                  ? (
-                                      <DropdownItem>
-                                        <a href="/admin">
-                                          <Settings size={18}
-                                                    className="align-middle mr-2"/>
-                                          Admin Dashboard
-                                        </a>
-                                      </DropdownItem>
-                                  ) : ''
-                            }
-
-                            <DropdownItem>
-                              <a href={"/user/" + this.state.user.username}>
-                                <User size={18} className="align-middle mr-2"/>
-                                Profile
-                              </a>
-                            </DropdownItem>
-
-                            {/*<DropdownItem>*/}
-                            {/*  <a href="#">*/}
-                            {/*    <HelpCircle size={18}*/}
-                            {/*                className="align-middle mr-2"/>*/}
-                            {/*    Help*/}
-                            {/*  </a>*/}
-                            {/*</DropdownItem>*/}
-
-                            <DropdownItem>
-                              <a href="/logout">
-                                <LogOut size={18}
-                                        className="align-middle mr-2"/>
-                                Sign out
-                              </a>
-                            </DropdownItem>
-
-                          </DropdownMenu>
-                        </UncontrolledDropdown>
+                        <NavbarUser
+                            isAdmin={this.state.user.admin}
+                            userName={this.state.user.username}
+                            displayName={this.state.user.displayName}
+                        />
                     ) : (
                         <li>
                           <a href="/login" className="btn btn-info">
-                            Sign In <LogIn className="feather align-middle mr-2"/>
+                            Sign In <LogIn className="feather align-middle me-2"/>
                           </a>
                         </li>
                     )
@@ -191,11 +134,103 @@ class NavBarComponent extends React.Component {
               }
 
             </Nav>
-          </Collapse>
+          </Navbar.Collapse>
         </Navbar>
     );
   }
 
+}
+
+class NavbarSearch extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      "q": ""
+    };
+  }
+
+  render() {
+    return (
+        <Formik
+            initialValues={{q: ''}}
+            onSubmit={(values => {
+              history.push("/search?q=" + values.q);
+              history.go(0);
+            })}
+        >
+          <Form inline={true} className="d-none d-sm-inline-block" >
+            <InputGroup className="input-group-navbar">
+              <Form.Control
+                  name={"q"}
+                  placeholder={"Search"}
+                  aria-label={"Search"}
+              />
+              <Button variant="">
+                <Search className={"feather"}/>
+              </Button>
+            </InputGroup>
+          </Form>
+        </Formik>
+    )
+  }
+
+}
+
+const NavbarUser = ({isAdmin, userName, displayName}) => {
+  return (
+      <Dropdown className="nav-item" align="end">
+
+        <span className="d-inline-block d-sm-none">
+          <Dropdown.Toggle as={"a"} className={"nav-link"}>
+            <Settings size={18} className="align-middle"/>
+          </Dropdown.Toggle>
+        </span>
+
+        <span className="d-none d-sm-inline-block">
+          <Dropdown.Toggle as={"a"} className={"nav-link"}>
+            <User/>
+            <span className="text-dark">
+              {displayName}
+            </span>
+          </Dropdown.Toggle>
+        </span>
+
+        <Dropdown.Menu drop={"end"}>
+
+          {
+            !!isAdmin
+                ? (
+                    <Dropdown.Item as={"a"} href={"/admin"}>
+                        <Settings size={18}
+                                  className="align-middle me-2"/>
+                        Admin Dashboard
+                    </Dropdown.Item>
+                ) : ''
+          }
+
+          <Dropdown.Item as={"a"} href={"/user/" + userName}>
+              <User size={18} className="align-middle me-2"/>
+              Profile
+          </Dropdown.Item>
+
+          {/*<DropdownItem>*/}
+          {/*  <a href="#">*/}
+          {/*    <HelpCircle size={18}*/}
+          {/*                className="align-middle me-2"/>*/}
+          {/*    Help*/}
+          {/*  </a>*/}
+          {/*</DropdownItem>*/}
+
+          <Dropdown.Item as={"a"} href={"/logout"}>
+              <LogOut size={18}
+                      className="align-middle me-2"/>
+              Sign out
+          </Dropdown.Item>
+
+        </Dropdown.Menu>
+      </Dropdown>
+  )
 }
 
 export default connect(

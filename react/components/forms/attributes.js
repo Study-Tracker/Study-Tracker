@@ -1,8 +1,9 @@
 import React from 'react';
-import {Button, Col, FormGroup, Input, Label, Row} from "reactstrap";
+import {Button, Col, Form, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import {Trash} from "react-feather";
+import {FormGroup} from "./common";
 
 const mapToAttributeArray = (map) => {
   let array = [];
@@ -73,8 +74,8 @@ class AttributeInputs extends React.Component {
           <Row key={'attributes-inputs-' + i}>
             <Col xs={5}>
               <FormGroup>
-                <Label></Label>
-                <Input
+                <Form.Label />
+                <Form.Control
                     type="text"
                     value={a.key}
                     onChange={(e) => this.handleValueUpdate(e.target.value,
@@ -84,8 +85,8 @@ class AttributeInputs extends React.Component {
             </Col>
             <Col xs={5}>
               <FormGroup>
-                <Label></Label>
-                <Input
+                <Form.Label />
+                <Form.Control
                     type="text"
                     value={a.value}
                     onChange={(e) => this.handleValueUpdate(a.key,
@@ -112,12 +113,12 @@ class AttributeInputs extends React.Component {
           <Row>
             <Col xs={5}>
               <FormGroup>
-                <Label>Attribute Name</Label>
+                <Form.Label>Name</Form.Label>
               </FormGroup>
             </Col>
             <Col xs={5}>
               <FormGroup>
-                <Label>Attribute Value</Label>
+                <Form.Label>Value</Form.Label>
               </FormGroup>
             </Col>
             <Col xs={2}></Col>
@@ -126,10 +127,9 @@ class AttributeInputs extends React.Component {
           {inputs}
 
           <Row>
-            <Col md={12}>
+            <Col md={12} className="mt-2">
               <Button
-                  size="lg"
-                  color="info"
+                  variant="info"
                   onClick={this.handleAddAttributeClick}>
                 <FontAwesomeIcon icon={faPlusCircle}/> Add Attribute
               </Button>

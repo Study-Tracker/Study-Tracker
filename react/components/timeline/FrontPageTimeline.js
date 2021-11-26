@@ -1,18 +1,25 @@
 import React from 'react';
-import {Button, Card, CardBody, Col, Container, Row} from "reactstrap";
+import {Card, Col, Container, Row} from "react-bootstrap";
 import {Timeline} from "../activity";
 import {
-  ActiveUsers,
+  ActiveStudies,
   CompletedStudies,
   NewStudies,
-  StudyUpdates,
-  TotalStudies
+  TotalStudies,
+  WelcomeBack
 } from './timelineWidgets';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import {ArrowLeft, ArrowRight} from "react-feather";
 
-const FrontPageTimeline = ({activity, stats, user, pageNumber, pageSize, hasNextPage, hasPreviousPage}) => {
+const FrontPageTimeline = ({
+  activity,
+  stats,
+  userStats,
+  user,
+  pageNumber,
+  pageSize,
+  hasNextPage,
+  hasPreviousPage
+}) => {
 
   let activityCount = stats.activityCount || 0;
   let activeUsers = stats.activeUserCount || 0;
@@ -24,49 +31,38 @@ const FrontPageTimeline = ({activity, stats, user, pageNumber, pageSize, hasNext
 
       <Container fluid className="animated fadeIn">
 
-        <Row className="justify-content-between align-items-center">
-          <Col xs="8">
-            <h1>Latest Activity</h1>
+        <Row className="mb-2 mb-xl-3">
+
+          <Col xs="8" className="d-none d-sm-block">
+            <h3>Latest Activity</h3>
           </Col>
-          <Col className="col-auto">
-            {
-              !!user
-                  ? (
-                      <a href="/studies/new">
-                        <Button color="primary" className="mr-1 mb-1">
-                          <FontAwesomeIcon icon={faPlusCircle}/> New Study
-                        </Button>
-                      </a>
-                  ) : ''
-            }
-          </Col>
+
         </Row>
 
         <Row>
 
-          <Col lg={3}>
+          <Col lg={4}>
 
             <Row className="study-statistics">
 
-              <Col xs={6} md={4} lg={12}>
-                <StudyUpdates count={activityCount}
-                              label={"Updates This Week"}/>
+              <Col xs={12} sm={6} md={4} lg={12} className="d-flex">
+                <WelcomeBack />
               </Col>
 
-              <Col xs={6} sm={4} md={3} lg={12}>
-                <ActiveUsers count={activeUsers}/>
+              <Col xs={12} sm={6} md={4} lg={12} className="d-flex">
+                <ActiveStudies count={userStats.activeStudyCount} />
               </Col>
 
-              <Col xs={6} sm={4} md={3} lg={12}>
-                <NewStudies count={newStudies} label={"New Studies This Week"}/>
+              <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">
+                <NewStudies count={newStudies} />
               </Col>
 
-              <Col xs={6} sm={4} md={3} lg={12}>
+              <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">
                 <CompletedStudies count={completedStudies}
                                   label={"Completed Studies This Month"}/>
               </Col>
 
-              <Col xs={6} sm={4} md={3} lg={12}>
+              <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">
                 <TotalStudies count={totalStudies}/>
               </Col>
 
@@ -74,9 +70,9 @@ const FrontPageTimeline = ({activity, stats, user, pageNumber, pageSize, hasNext
 
           </Col>
 
-          <Col lg={9}>
+          <Col lg={8}>
             <Card>
-              <CardBody>
+              <Card.Body>
                 <Row>
 
                   <Col xs={12}>
@@ -87,32 +83,35 @@ const FrontPageTimeline = ({activity, stats, user, pageNumber, pageSize, hasNext
                     <hr/>
                   </Col>
 
-                  <Col xs={12}>
+                  <Col xs="auto" className="d-none d-sm-block">
                     {
                       !!hasPreviousPage
                           ? <a
                               href={"/?size=" + pageSize + "&page=" + (pageNumber
                                   - 1)} className="btn btn-primary">
                             <ArrowLeft
-                                className="feather align-middle mr-2"/> Previous
+                                className="feather align-middle me-2"/> Previous
                             Page
                           </a>
                           : ''
                     }
+                  </Col>
+
+                  <Col xs="auto" className="ms-auto text-end mt-n1">
                     {
                       !!hasNextPage
                           ? <a
                               href={"/?size=" + pageSize + "&page=" + (pageNumber
-                                  + 1)} className="btn btn-primary float-right">
+                                  + 1)} className="btn btn-primary float-end">
                             Next Page <ArrowRight
-                              className="feather align-middle mr-2"/>
+                              className="feather align-middle me-2"/>
                           </a>
                           : ''
                     }
                   </Col>
 
                 </Row>
-              </CardBody>
+              </Card.Body>
             </Card>
           </Col>
 

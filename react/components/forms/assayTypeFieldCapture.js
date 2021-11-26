@@ -1,15 +1,7 @@
 import React from 'react';
-import {
-  Col,
-  CustomInput,
-  FormFeedback,
-  FormGroup,
-  FormText,
-  Input,
-  Label,
-  Row
-} from 'reactstrap'
+import {Col, Form, Row} from 'react-bootstrap'
 import DatePicker from "react-datepicker";
+import {FormGroup} from "./common";
 
 export const AssayTypeFieldCaptureInputList = ({assayType, assayFields, handleUpdate, fieldValidation}) => {
 
@@ -92,7 +84,7 @@ export const AssayTypeFieldCaptureInputList = ({assayType, assayFields, handleUp
   });
 
   return (
-      <Row form>
+      <Row>
         {inputs}
       </Row>
   )
@@ -103,8 +95,8 @@ export const AssayTypeFieldCaptureInputList = ({assayType, assayFields, handleUp
 const StringFieldInput = ({field, value, handleUpdate, isValid, error}) => {
   return (
       <FormGroup>
-        <Label>{field.displayName}{field.required ? " *" : ""}</Label>
-        <Input
+        <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
+        <Form.Control
             type="text"
             defaultValue={value || ''}
             onChange={e => handleUpdate(
@@ -112,10 +104,10 @@ const StringFieldInput = ({field, value, handleUpdate, isValid, error}) => {
                   [field.fieldName]: e.target.value
                 }
             )}
-            valid={!isValid}
+            isValid={!isValid}
         />
-        <FormText>{field.description}</FormText>
-        <FormFeedback>{error}</FormFeedback>
+        <Form.Text>{field.description}</Form.Text>
+        <Form.Control.Feedback type={"invalid"}>{error}</Form.Control.Feedback>
       </FormGroup>
   )
 };
@@ -123,20 +115,20 @@ const StringFieldInput = ({field, value, handleUpdate, isValid, error}) => {
 const TextFieldInput = ({field, value, handleUpdate, isValid, error}) => {
   return (
       <FormGroup>
-        <Label>{field.displayName}{field.required ? " *" : ""}</Label>
-        <Input
-            type="textarea"
-            size="3"
+        <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
+        <Form.Control
+            as="textarea"
+            rows={3}
             defaultValue={value || ''}
             onChange={e => handleUpdate(
                 {
                   [field.fieldName]: e.target.value
                 }
             )}
-            valid={!isValid}
+            isValid={!isValid}
         />
-        <FormText>{field.description}</FormText>
-        <FormFeedback>{error}</FormFeedback>
+        <Form.Text>{field.description}</Form.Text>
+        <Form.Control.Feedback>{error}</Form.Control.Feedback>
       </FormGroup>
   )
 };
@@ -144,8 +136,8 @@ const TextFieldInput = ({field, value, handleUpdate, isValid, error}) => {
 const NumberFieldInput = ({field, value, handleUpdate, isValid, error}) => {
   return (
       <FormGroup>
-        <Label>{field.displayName}{field.required ? " *" : ""}</Label>
-        <Input
+        <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
+        <Form.Control
             type="number"
             defaultValue={value || null}
             onChange={e => {
@@ -157,10 +149,10 @@ const NumberFieldInput = ({field, value, handleUpdate, isValid, error}) => {
               }
               handleUpdate({[field.fieldName]: value})
             }}
-            invalid={!isValid}
+            isValid={!isValid}
         />
-        <FormText>{field.description}</FormText>
-        <FormFeedback>{error}</FormFeedback>
+        <Form.Text>{field.description}</Form.Text>
+        <Form.Control.Feedback type={"invalid"}>{error}</Form.Control.Feedback>
       </FormGroup>
   )
 };
@@ -168,7 +160,7 @@ const NumberFieldInput = ({field, value, handleUpdate, isValid, error}) => {
 const BooleanFieldInput = ({field, value, handleUpdate}) => {
   return (
       <FormGroup>
-        <CustomInput
+        <Form.Check
             id={"assay-field-" + field.fieldName + "-check"}
             type="checkbox"
             label={field.displayName}
@@ -179,7 +171,7 @@ const BooleanFieldInput = ({field, value, handleUpdate}) => {
                 }
             )}
         />
-        <FormText>{field.description}</FormText>
+        <Form.Text>{field.description}</Form.Text>
       </FormGroup>
   )
 };
@@ -187,7 +179,7 @@ const BooleanFieldInput = ({field, value, handleUpdate}) => {
 const DateFieldInput = ({field, value, handleUpdate, isValid, error}) => {
   return (
       <FormGroup>
-        <Label>{field.displayName}{field.required ? " *" : ""}</Label>
+        <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
         <DatePicker
             maxlength="2"
             className="form-control"
@@ -203,8 +195,8 @@ const DateFieldInput = ({field, value, handleUpdate, isValid, error}) => {
             dateFormat=" MM / dd / yyyy"
             placeholderText="MM / DD / YYYY"
         />
-        <FormFeedback>{error}</FormFeedback>
-        <FormText>{field.description}</FormText>
+        <Form.Control.Feedback type={"invalid"}>{error}</Form.Control.Feedback>
+        <Form.Text>{field.description}</Form.Text>
       </FormGroup>
   )
 };

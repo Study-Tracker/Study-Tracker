@@ -111,8 +111,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
   private String getNotebookFolderPath(Study study) {
     StringBuilder path = new StringBuilder("/");
     NotebookFolder studyFolder = NotebookFolder.from(study.getNotebookFolder());
-    path.append(getProjectPath(studyFolder));
-    path.append(study.getProgram().getName()).append("/").append(study.getName());
+    path.append(getProjectPath(studyFolder))
+        .append(study.getName());
     return path.toString();
   }
 
@@ -121,8 +121,9 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     NotebookFolder assayFolder = NotebookFolder.from(assay.getNotebookFolder());
     path.append(getProjectPath(assayFolder));
     Study study = assay.getStudy();
-    Program program = study.getProgram();
-    path.append(program.getName()).append("/").append(study.getName()).append("/").append(assay.getName());
+    path.append(study.getName())
+        .append("/")
+        .append(assay.getName());
     return path.toString();
   }
 

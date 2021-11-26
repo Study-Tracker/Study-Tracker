@@ -143,6 +143,7 @@ public class AuthenticationController {
 
   @PostMapping("/auth/passwordresetrequest")
   public String updatePasswordRequest(@RequestParam String email) {
+    LOGGER.info("Received password reset request for user: {}", email);
     Optional<User> optional = userService.findByEmail(email);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Cannot find user with email: " + email);
@@ -167,6 +168,7 @@ public class AuthenticationController {
   @PostMapping("/auth/passwordreset")
   public String updatePassword(@RequestParam String email, @RequestParam String password,
       @RequestParam String passwordAgain, @RequestParam String token) {
+    LOGGER.info("Updating password for user: {}", email);
     Optional<User> optional = userService.findByEmail(email);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Cannot find user: " + email);

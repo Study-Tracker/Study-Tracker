@@ -15,11 +15,10 @@
  */
 
 import React from "react";
-import {Button, Input, Media} from "reactstrap";
+import {Button, Form} from "react-bootstrap";
 import {User} from 'react-feather';
 import swal from "sweetalert";
-
-const dateFormat = require('dateformat');
+import dateFormat from "dateformat";
 
 export class Comment extends React.Component {
 
@@ -71,16 +70,18 @@ export class Comment extends React.Component {
 
   render() {
     return (
-        <Media>
+        <div className="d-flex">
 
-          <User
-              size={36}
-              className="align-middle text-info mr-4"
-          />
+          <div className="stat">
+            <User
+                size={36}
+                className="align-middle text-info me-4"
+            />
+          </div>
 
-          <Media body>
+          <div className="flex-grow-1 ms-3">
 
-            <small className="float-right text-navy">
+            <small className="float-end text-navy">
               posted {dateFormat(new Date(this.props.comment.createdAt),
                 'mm/dd/yy @ h:MM TT')}
               {
@@ -106,24 +107,26 @@ export class Comment extends React.Component {
               <div hidden={!this.state.showInput}>
 
                 <div className="mb-2">
-                  <Input
+                  <Form.Control
                       ref={this.textInput}
-                      type={'textarea'}
+                      as={'textarea'}
+                      rows={3}
                       defaultValue={this.props.comment.text}
                       onChange={(e) => this.handleUpdate(e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <Button color={'secondary'}
+                  <Button variant={'secondary'}
                           onClick={() => this.toggleInput()}>
                     Cancel
                   </Button>
                   &nbsp;
-                  <Button color={'primary'} onClick={() => {
-                    this.toggleInput();
-                    this.props.handleUpdate(this.state.updatedComment)
-                  }}>
+                  <Button variant={'primary'} onClick={() => {
+                      this.toggleInput();
+                      this.props.handleUpdate(this.state.updatedComment)
+                    }}
+                  >
                     Submit
                   </Button>
                 </div>
@@ -136,18 +139,18 @@ export class Comment extends React.Component {
               === this.props.user.accountName
                   ? (
                       <div hidden={this.state.showInput}>
-                        <Button size='sm' color='warning'
+                        <Button size='sm' variant='warning'
                                 onClick={() => this.toggleInput()}>Edit</Button>
                         &nbsp;&nbsp;
-                        <Button size='sm' color='danger'
+                        <Button size='sm' variant='danger'
                                 onClick={this.handleDelete}>Delete</Button>
                       </div>
                   ) : ''
             }
 
-          </Media>
+          </div>
 
-        </Media>
+        </div>
     );
   }
 

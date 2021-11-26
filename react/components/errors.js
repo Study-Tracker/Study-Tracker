@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import {UncontrolledAlert} from 'reactstrap'
+import {Alert} from 'react-bootstrap'
 import React from "react";
 
 export const DismissableAlert = ({header, message, color}) => {
   return (
-      <UncontrolledAlert color={color}>
+      <Alert variant={color} dismissible>
         <div className="alert-message">
           {
             !!header ? (<strong>{header}</strong>) : ''
           }
           {message}
         </div>
-      </UncontrolledAlert>
+      </Alert>
   )
 };

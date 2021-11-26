@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Col, Row} from "reactstrap";
+import {Col, Row} from "react-bootstrap";
 import React from "react";
 import {StorageFolderFileList} from "../files";
 

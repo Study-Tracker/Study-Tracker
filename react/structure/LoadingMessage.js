@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import {Spinner} from "reactstrap";
+import {Spinner} from "react-bootstrap";
 
 const LoadingMessage = () => {
 
@@ -25,7 +25,7 @@ const LoadingMessage = () => {
           <div className="ibox">
             <div className="ibox-content text-center">
               <h1>
-                <Spinner color="primary"/>
+                <Spinner animation="border" variant="primary"/>
                 &nbsp;&nbsp;
                 Loading...
               </h1>

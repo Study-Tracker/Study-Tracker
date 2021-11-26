@@ -16,24 +16,7 @@
 
 import React from "react";
 import 'react-datepicker/dist/react-datepicker.css';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Container,
-  Form,
-  FormFeedback,
-  FormGroup,
-  FormText,
-  Input,
-  Label,
-  Row
-} from "reactstrap";
+import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import swal from 'sweetalert';
 import {history} from '../../App';
 import {LoadingOverlay} from "../loading";
@@ -41,6 +24,8 @@ import Select from "react-select";
 import AttributeInputs from "./attributes";
 import {AssayTypeFieldInputs} from "./assayTypeFieldCreation";
 import {TaskInputs} from "./tasks";
+import {Breadcrumbs} from "../common";
+import {FormGroup} from "./common";
 
 export default class AssayTypeForm extends React.Component {
 
@@ -207,31 +192,23 @@ export default class AssayTypeForm extends React.Component {
               {
                 !!this.state.assayType.id
                     ? (
-                        <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/"}>Home</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/admin"}>Admin Dashboard</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/assaytype/" + this.state.assayType.id}>
-                              Assay Type Detail
-                            </a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>Edit Assay Type</BreadcrumbItem>
-                        </Breadcrumb>
+                        <Breadcrumbs
+                            crumbs={[
+                              {label: "Home", url: "/"},
+                              {label: "Admin Dashboard", url: "/admin"},
+                              {label: "Assay Type Detail", url: "/assaytype/" + this.state.assayType.id},
+                              {label: "Edit Assay Type"}
+                            ]}
+                        />
                     )
                     : (
-                        <Breadcrumb>
-                          <BreadcrumbItem>
-                            <a href={"/"}>Home</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem>
-                            <a href={"/admin"}>Admin Dashboard</a>
-                          </BreadcrumbItem>
-                          <BreadcrumbItem active>New Assay Type</BreadcrumbItem>
-                        </Breadcrumb>
+                        <Breadcrumbs
+                            crumbs={[
+                              {label: "Home", url: "/"},
+                              {label: "Admin Dashboard", url: "/admin"},
+                              {label: "New Assay Type"}
+                            ]}
+                        />
                     )
               }
             </Col>
@@ -239,57 +216,57 @@ export default class AssayTypeForm extends React.Component {
 
           <Row className="justify-content-end align-items-center">
             <Col>
-              <h1>
+              <h3>
                 {
                   !!this.state.assayType.id
                       ? "Edit Assay Type"
                       : "New Assay Type"
                 }
-              </h1>
+              </h3>
             </Col>
           </Row>
 
           <Row>
-            <Col xs="12">
+            <Col xs={12}>
               <Card>
 
-                <CardHeader>
-                  <CardTitle tag="h5">Assay Type Details</CardTitle>
+                <Card.Header>
+                  <Card.Title tag="h5">Assay Type Details</Card.Title>
                   <h6 className="card-subtitle text-muted">
                     Assay Types must have a unique name. Fields, attributes, and
                     tasks are all optional.
                   </h6>
-                </CardHeader>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Form className="assay-type-form">
 
-                    <Row form>
+                    <Row>
 
                       <Col md="6">
                         <FormGroup>
-                          <Label>Name *</Label>
-                          <Input
+                          <Form.Label>Name *</Form.Label>
+                          <Form.Control
                               type="text"
                               disabled={!!this.state.assayType.id}
-                              invalid={!this.state.validation.nameIsValid}
+                              isInvalid={!this.state.validation.nameIsValid}
                               defaultValue={this.state.assayType.name || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"name": e.target.value})}
                           />
-                          <FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
                             {
                               !this.state.validation.nameIsUnique
                                   ? "Name must be unique."
                                   : "Name must not be empty."
                             }
-                          </FormFeedback>
+                          </Form.Control.Feedback>
                         </FormGroup>
                       </Col>
 
                       <Col md="6">
                         <FormGroup>
-                          <Label>Status</Label>
+                          <Form.Label>Status</Form.Label>
                           <Select
                               className="react-select-container"
                               classNamePrefix="react-select"
@@ -321,33 +298,33 @@ export default class AssayTypeForm extends React.Component {
 
                       <Col md="6">
                         <FormGroup>
-                          <Label>Description *</Label>
-                          <Input
-                              type="textarea"
+                          <Form.Label>Description *</Form.Label>
+                          <Form.Control
+                              as="textarea"
                               defaultValue={this.state.assayType.description
                               || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"description": e.target.value})}
-                              size="5"
+                              rows={5}
                           />
-                          <FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
                             Description must not be empty.
-                          </FormFeedback>
-                          <FormText>
+                          </Form.Control.Feedback>
+                          <Form.Text>
                             Describe the intended use of this assay type.
-                          </FormText>
+                          </Form.Text>
                         </FormGroup>
                       </Col>
 
                     </Row>
 
-                    <Row form>
+                    <Row>
                       <Col>
                         <hr/>
                       </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
 
                       <Col md="12">
                         <h5 className="card-title">Input Fields</h5>
@@ -374,13 +351,13 @@ export default class AssayTypeForm extends React.Component {
                         }}
                     />
 
-                    <Row form>
+                    <Row>
                       <Col>
                         <hr/>
                       </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
 
                       <Col md="12">
                         <h5 className="card-title">Tasks</h5>
@@ -404,13 +381,13 @@ export default class AssayTypeForm extends React.Component {
                         }}
                     />
 
-                    <Row form>
+                    <Row>
                       <Col>
                         <hr/>
                       </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
 
                       <Col md="12">
                         <h5 className="card-title">Attributes</h5>
@@ -434,27 +411,27 @@ export default class AssayTypeForm extends React.Component {
                         attributes={this.state.assayType.attributes}
                     />
 
-                    <Row form>
+                    <Row>
                       <Col>
                         <hr/>
                       </Col>
                     </Row>
 
                     {/*Buttons*/}
-                    <Row form>
+                    <Row>
                       <Col className="text-center">
                         <FormGroup>
-                          <Button size="lg" color="primary"
+                          <Button size="lg" variant="primary"
                                   onClick={this.handleSubmit}>Submit</Button>
                           &nbsp;&nbsp;
-                          <Button size="lg" color="secondary"
+                          <Button size="lg" variant="secondary"
                                   onClick={this.handleCancel}>Cancel</Button>
                         </FormGroup>
                       </Col>
                     </Row>
 
                   </Form>
-                </CardBody>
+                </Card.Body>
               </Card>
             </Col>
           </Row>

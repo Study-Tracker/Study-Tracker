@@ -1,5 +1,6 @@
 import React from "react";
-import {CustomInput, FormGroup} from 'reactstrap';
+import {FormGroup} from '../forms/common';
+import {Form} from 'react-bootstrap';
 import {setFilters} from "../../redux/actions/filterActions";
 import {connect} from 'react-redux';
 import {statuses} from "../../config/statusConstants";
@@ -46,6 +47,9 @@ class AssayFilters extends React.Component {
 
     this.updateFilters = this.updateFilters.bind(this);
     this.resetFilters = this.resetFilters.bind(this);
+    this.toggleAllProgramFilters = this.toggleAllProgramFilters.bind(this);
+    this.toggleAllStatusFilters = this.toggleAllStatusFilters.bind(this);
+    this.toggleAllAssayTypeFilters = this.toggleAllAssayTypeFilters.bind(this);
     this.props.dispatch(setFilters(defaults));
   }
 
@@ -83,6 +87,38 @@ class AssayFilters extends React.Component {
     return params.join("&");
   }
 
+  toggleAllStatusFilters() {
+    let filter = this.state.filters[labels.STATUS];
+    if (!!filter && filter.length > 0) {
+      filter = [];
+    } else {
+      filter = Object.values(statuses).map(status => status.value);
+    }
+    this.updateFilters({[labels.STATUS]: filter})
+  }
+
+  toggleAllProgramFilters() {
+    let filter = this.state.filters[labels.PROGRAM];
+    if (!!filter && filter.length > 0) {
+      filter = [];
+    } else {
+      filter = Object.values(this.state.programs)
+      .map(program => program.id);
+    }
+    this.updateFilters({[labels.PROGRAM]: filter})
+  }
+
+  toggleAllAssayTypeFilters() {
+    let filter = this.state.filters[labels.ASSAY_TYPE];
+    if (!!filter && filter.length > 0) {
+      filter = [];
+    } else {
+      filter = Object.values(this.state.assayTypes)
+      .map(type => type.id);
+    }
+    this.updateFilters({[labels.ASSAY_TYPE]: filter})
+  }
+
   componentDidMount() {
 
     fetch("/api/program")
@@ -116,10 +152,16 @@ class AssayFilters extends React.Component {
         const params = cleanQueryParams(
             qs.parse(this.props.location.search, {ignoreQueryPrefix: true}));
         if (params.hasOwnProperty(labels.PROGRAM)) {
-          params[labels.PROGRAM] = [...params[labels.PROGRAM].split(",")];
+          const p = String(params[labels.PROGRAM])
+          .split(",")
+          .map(p => parseInt(p));
+          params[labels.PROGRAM] = [...p];
         }
         if (params.hasOwnProperty(labels.ASSAY_TYPE)) {
-          params[labels.ASSAY_TYPE] = [...params[labels.ASSAY_TYPE].split(",")];
+          const t = String(params[labels.ASSAY_TYPE])
+          .split(",")
+          .map(p => parseInt(p));
+          params[labels.ASSAY_TYPE] = [...t];
         }
         if (params.hasOwnProperty(labels.STATUS)) {
           params[labels.STATUS] = [...params[labels.STATUS].split(",")];
@@ -180,14 +222,12 @@ class AssayFilters extends React.Component {
 
           <div className="settings-section">
 
-            <small className="d-block font-weight-bold text-muted mb-2">
-              Quick Views
-            </small>
+            <FilterLabel text={"Quick Views"} />
 
             {
               !!this.props.user ? (
                   <FormGroup>
-                    <CustomInput
+                    <Form.Check
                         id="my-assays-check"
                         type="checkbox"
                         label="My Assays"
@@ -202,7 +242,7 @@ class AssayFilters extends React.Component {
             }
 
             <FormGroup>
-              <CustomInput
+              <Form.Check
                   id="legacy-study-check"
                   type="checkbox"
                   label="Legacy Studies"
@@ -214,7 +254,7 @@ class AssayFilters extends React.Component {
             </FormGroup>
 
             <FormGroup>
-              <CustomInput
+              <Form.Check
                   id="cro-study-check"
                   type="checkbox"
                   label="External Studies"
@@ -232,12 +272,12 @@ class AssayFilters extends React.Component {
           <div className="settings-section">
 
             <FormGroup>
-              <FilterLabel text="Status"/>
+              <FilterLabel text="Status" toggle={this.toggleAllStatusFilters}/>
               <div>
                 {
                   Object.values(statuses).map(status => {
                     return (
-                        <CustomInput
+                        <Form.Check
                             key={"status-checkbox-" + status.value}
                             id={"status-checkbox-" + status.value}
                             type={"checkbox"}
@@ -268,12 +308,12 @@ class AssayFilters extends React.Component {
             {
               !!this.state.programs ? (
                   <FormGroup>
-                    <FilterLabel text={"Programs"}/>
+                    <FilterLabel text={"Programs"} toggle={this.toggleAllProgramFilters}/>
                     <div>
                       {
                         this.state.programs.map(program => {
                           return (
-                              <CustomInput
+                              <Form.Check
                                   key={"program-checkbox-" + program.id}
                                   id={"program-checkbox-" + program.id}
                                   type={"checkbox"}
@@ -305,12 +345,12 @@ class AssayFilters extends React.Component {
             {
               !!this.state.assayTypes ? (
                   <FormGroup>
-                    <FilterLabel text={"Assay Types"}/>
+                    <FilterLabel text={"Assay Types"} toggle={this.toggleAllAssayTypeFilters}/>
                     <div>
                       {
                         this.state.assayTypes.map(assayType => {
                           return (
-                              <CustomInput
+                              <Form.Check
                                   key={"assay-type-checkbox-" + assayType.id}
                                   id={"assay-type-checkbox-" + assayType.id}
                                   type={"checkbox"}

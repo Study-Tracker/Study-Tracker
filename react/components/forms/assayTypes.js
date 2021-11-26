@@ -15,8 +15,9 @@
  */
 
 import React from "react";
-import {FormFeedback, FormGroup, Label} from "reactstrap";
 import Select from "react-select";
+import {Form} from 'react-bootstrap';
+import {FormGroup} from "./common";
 
 export const AssayTypeDropdown = ({
   assayTypes,
@@ -45,7 +46,7 @@ export const AssayTypeDropdown = ({
 
   return (
       <FormGroup>
-        <Label>Assay Type *</Label>
+        <Form.Label>Assay Type *</Form.Label>
         <Select
             className={"react-select-container "}
             invalid={!isValid}
@@ -83,8 +84,8 @@ export const AssayTypeDropdown = ({
 
             }}
         />
-        <FormFeedback>Select the assay type that best corresponds to the
-          experiment to be performed.</FormFeedback>
+        <Form.Text>Select the assay type that best corresponds to the
+          experiment to be performed.</Form.Text>
       </FormGroup>
   );
 

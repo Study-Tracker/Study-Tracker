@@ -57,17 +57,22 @@ class FrontPageView extends React.Component {
       fetch("/api/stats/frontpage")
       .then(response => response.json())
       .then(stats => {
-        this.setState({
-          stats: stats,
-          activity: activityPage.content,
-          isLoaded: true,
-          pageNumber: page,
-          pageSize: size,
-          pageSort: sort,
-          totalItems: activityPage.numberOfElements,
-          totalPages: activityPage.totalPages,
-          hasNextPage: !activityPage.last,
-          hasPreviousPage: page > 0
+        fetch("/api/stats/user")
+        .then(response => response.json())
+        .then(userStats => {
+          this.setState({
+            stats: stats,
+            userStats: userStats,
+            activity: activityPage.content,
+            isLoaded: true,
+            pageNumber: page,
+            pageSize: size,
+            pageSort: sort,
+            totalItems: activityPage.numberOfElements,
+            totalPages: activityPage.totalPages,
+            hasNextPage: !activityPage.last,
+            hasPreviousPage: page > 0
+          })
         })
       })
     })
@@ -96,6 +101,7 @@ class FrontPageView extends React.Component {
         content = <FrontPageTimeline
             activity={this.state.activity}
             stats={this.state.stats}
+            userStats={this.state.userStats}
             user={this.props.user}
             pageNumber={this.state.pageNumber}
             pageSize={this.state.pageSize}
@@ -122,7 +128,6 @@ class FrontPageView extends React.Component {
               <Footer/>
             </div>
           </div>
-          {/*<StudyFilters/>*/}
         </React.Fragment>
     );
 

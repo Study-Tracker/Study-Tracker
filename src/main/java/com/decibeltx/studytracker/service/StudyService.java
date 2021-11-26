@@ -197,7 +197,6 @@ public class StudyService {
     }
 
     // Create the ELN folder
-    LOGGER.info(String.format("Creating ELN entry for study: %s", study.getCode()));
     if (study.isLegacy()) {
       LOGGER.info(String.format("Legacy Study : %s", study.getCode()));
       if (study.getNotebookFolder().getUrl() != null) {
@@ -210,6 +209,7 @@ public class StudyService {
       }
     } else {
       if (notebookService != null) {
+        LOGGER.info(String.format("Creating ELN entry for study: %s", study.getCode()));
         if (program.getNotebookFolder() != null) {
           try {
             NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
@@ -222,11 +222,15 @@ public class StudyService {
         } else {
           LOGGER.warn(String.format("Study program %s does not have ELN folder set.", program.getName()));
         }
+      } else {
+        study.setNotebookFolder(null);
       }
     }
 
     try {
       studyRepository.save(study);
+      LOGGER.info(String.format("Successfully created new study with code %s and ID %s",
+          study.getCode(), study.getId()));
     } catch (Exception e) {
       if (e instanceof ConstraintViolationException) {
         throw new InvalidConstraintException(e);
@@ -234,9 +238,6 @@ public class StudyService {
         throw e;
       }
     }
-
-    LOGGER.info(String.format("Successfully created new study with code %s and ID %s",
-        study.getCode(), study.getId()));
 
   }
 
@@ -251,6 +252,7 @@ public class StudyService {
     Study study = studyRepository.getOne(updated.getId());
 
     study.setDescription(updated.getDescription());
+    study.setExternalCode(updated.getExternalCode());
     study.setStatus(updated.getStatus());
     study.setStartDate(updated.getStartDate());
     study.setEndDate(updated.getEndDate());
@@ -359,6 +361,22 @@ public class StudyService {
     return studyRepository.countByCreatedAtBetween(startDate, endDate);
   }
 
+  public long countUserActiveStudies(User user) {
+    return studyRepository.countActiveUserStudies(user.getId());
+  }
+
+  public long countUserCompleteStudies(User user) {
+    return studyRepository.countCompleteUserStudies(user.getId());
+  }
+
+  public long countByProgram(Program program) {
+    return studyRepository.countByProgram(program);
+  }
+
+  public long countByProgramAfterDate(Program program, Date date) {
+    return studyRepository.countByProgramAndCreatedAtAfter(program, date);
+  }
+
   @Transactional
   public void repairStorageFolder(Study study) {
 
@@ -395,12 +413,25 @@ public class StudyService {
     }
 
     // Update the record
-    ELNFolder f = elnFolderRepository.getOne(study.getNotebookFolder().getId());
+    ELNFolder f;
+    boolean isNew = false;
+    try {
+      f = elnFolderRepository.getOne(study.getNotebookFolder().getId());
+    } catch (NullPointerException e) {
+      f = new ELNFolder();
+      isNew = true;
+    }
     f.setName(folder.getName());
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
     f.setReferenceId(folder.getReferenceId());
     elnFolderRepository.save(f);
+
+    if (isNew) {
+      Study s = studyRepository.getById(study.getId());
+      s.setNotebookFolder(f);
+      studyRepository.save(s);
+    }
 
   }
 

@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-import React, { useMemo } from 'react';
-import { history } from '../App';
+import React, {useMemo} from 'react';
+import {history} from '../App';
 import swal from 'sweetalert';
 import {
-  Container,
-  Row,
-  Col,
   Breadcrumb,
-  BreadcrumbItem,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
-  FormFeedback,
   Button,
-  Input,
-} from 'reactstrap';
-import { Field, Form, Formik } from "formik";
-import { Link } from 'react-router-dom';
-import { LoadingOverlay } from '../components/loading';
+  Card,
+  Col,
+  Container,
+  Form,
+  Row
+} from 'react-bootstrap';
+import {Form as FormikForm, Formik} from "formik";
+import {LoadingOverlay} from '../components/loading';
 import NoSidebarPageWrapper from "../structure/NoSidebarPageWrapper";
 
 export const TemplateFormView = (props) => {
@@ -48,13 +42,9 @@ export const TemplateFormView = (props) => {
   const templateFormBreadcrumbs = useMemo(() => {
     return (
       <Breadcrumb>
-        <BreadcrumbItem>
-          <Link to="/">Home</Link>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <Link to="/admin">Admin Dashboard</Link>
-        </BreadcrumbItem>
-        <BreadcrumbItem active>{ templateFormHeading }</BreadcrumbItem>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/admin">Admin Dashboard</Breadcrumb.Item>
+        <Breadcrumb.Item active>{ templateFormHeading }</Breadcrumb.Item>
       </Breadcrumb>
     );
   }, [templateFormHeading]);
@@ -75,13 +65,13 @@ export const TemplateFormView = (props) => {
         </h1>
 
         <Card>
-          <CardHeader>
-            <CardTitle tag="h5">Template Type Details</CardTitle>
+          <Card.Header>
+            <Card.Title tag="h5">Template Type Details</Card.Title>
             <h6 className="card-subtitle text-muted">
               Template Types must have a unique name and templateId fields
             </h6>
-          </CardHeader>
-          <CardBody>
+          </Card.Header>
+          <Card.Body>
             <Formik
               initialValues={ { name: '', templateId: '' } }
               validate={ values => {
@@ -126,45 +116,59 @@ export const TemplateFormView = (props) => {
                   })
               } }
             >
-              { ({errors, touched, isSubmitting}) => (
-                  <>
+              { ({
+                errors,
+                touched,
+                isSubmitting,
+                handleChange,
+                handleSubmit,
+                handleBlur,
+                values
+              }) => (
+                  <React.Fragment>
                     <LoadingOverlay
                       isVisible={isSubmitting}
                       message={'Creating new template...'}
                     />
-                    <Form>
-                      <Row form>
-                        <Col xs="12" md="6">
-                          <Input
+                    <FormikForm>
+                      <Row>
+                        <Col xs={12} md={6}>
+                          <Form.Control
                             type="text"
                             name="name"
-                            tag={Field}
+                            value={values.name}
+                            onChange={handleChange}
                             placeholder="Enter template name..."
                             invalid={ errors.name && touched.name }
                           />
-                          <FormFeedback>{errors.name}</FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
+                            {errors.name}
+                          </Form.Control.Feedback>
                         </Col>
-                        <Col xs="12" md="6">
-                          <Input
+                        <Col xs={12} md={6}>
+                          <Form.Control
                             type="text"
                             name="templateId"
-                            tag={Field}
+                            value={values.templateId}
+                            onChange={handleChange}
                             placeholder="Enter template id..."
                             invalid={ errors.templateId && touched.templateId }
                           />
-                          <FormFeedback>{errors.templateId}</FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
+                            {errors.templateId}
+                          </Form.Control.Feedback>
                         </Col>
                       </Row>
     
                       <hr />
     
-                      <Row form>
-                        <Col xs="12">
+                      <Row>
+                        <Col xs={12}>
                           <div className="text-center">
                             <Button
                               className="mx-1"
                               size="lg"
-                              color="secondary"
+                              variant="secondary"
                               onClick={handleCancel}
                             >
                               Cancel
@@ -172,7 +176,7 @@ export const TemplateFormView = (props) => {
                             <Button
                               className="mx-1"
                               size="lg"
-                              color="primary"
+                              variant="primary"
                               type="submit"
                             >
                               Submit
@@ -180,11 +184,11 @@ export const TemplateFormView = (props) => {
                           </div>
                         </Col>
                       </Row>
-                    </Form>
-                  </>
+                    </FormikForm>
+                  </React.Fragment>
                 ) }
             </Formik>
-          </CardBody>
+          </Card.Body>
         </Card>
       </Container>
     </NoSidebarPageWrapper>

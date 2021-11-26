@@ -15,9 +15,10 @@
  */
 
 import React from 'react';
-import {FormGroup, Label} from "reactstrap";
+import {Form} from "react-bootstrap";
 import Select from "react-select";
 import {statuses} from "../../config/statusConstants";
+import {FormGroup} from "./common";
 
 export const StatusDropdown = ({onChange, selected}) => {
   let defaultValue = statuses.IN_PLANNING.value;
@@ -33,7 +34,7 @@ export const StatusDropdown = ({onChange, selected}) => {
 
   return (
       <FormGroup>
-        <Label>Status *</Label>
+        <Form.Label>Status *</Form.Label>
         <Select
             className="react-select-container"
             classNamePrefix="react-select"

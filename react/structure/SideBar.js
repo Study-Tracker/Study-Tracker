@@ -15,151 +15,36 @@
  */
 
 import React from 'react';
-import {
-  Badge,
-  Collapse,
-  Form,
-  Input,
-  InputGroup,
-  InputGroupAddon
-} from "reactstrap";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {NavLink, withRouter} from "react-router-dom";
-import sidebarRoutes from "../config/sidebarRoutes";
+import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
-import {Search} from "react-feather";
-
-const SidebarCategory = withRouter(
-    ({
-      name,
-      badgeColor,
-      badgeText,
-      icon: Icon,
-      isOpen,
-      children,
-      onClick,
-      location,
-      to
-    }) => {
-      const getSidebarItemClass = path => {
-        return location.pathname.indexOf(path) !== -1 ||
-        (location.pathname === "/" && path === "/dashboard")
-            ? "active"
-            : "";
-      };
-
-      return (
-          <li className={"sidebar-item " + getSidebarItemClass(to)}>
-        <span
-            data-toggle="collapse"
-            className={"sidebar-link " + (!isOpen ? "collapsed" : "")}
-            onClick={onClick}
-            aria-expanded={isOpen ? "true" : "false"}
-        >
-          <Icon size={18} className="align-middle mr-3"/>
-          <span className="align-middle">{name}</span>
-          {badgeColor && badgeText ? (
-              <Badge color={badgeColor} size={18} className="sidebar-badge">
-                {badgeText}
-              </Badge>
-          ) : null}
-        </span>
-            <Collapse isOpen={isOpen}>
-              <ul id="item" className={"sidebar-dropdown list-unstyled"}>
-                {children}
-              </ul>
-            </Collapse>
-          </li>
-      );
-    }
-);
-
-const SidebarItem = withRouter(
-    ({name, badgeColor, badgeText, icon: Icon, location, to}) => {
-      const getSidebarItemClass = path => {
-        return location.pathname === path ? "active" : "";
-      };
-
-      return (
-          <li className={"sidebar-item " + getSidebarItemClass(to)}>
-            <NavLink to={to} className="sidebar-link" activeClassName="active">
-              {Icon ? <Icon size={18} className="align-middle mr-3"/> : null}
-              {name}
-              {badgeColor && badgeText ? (
-                  <Badge color={badgeColor} size={18} className="sidebar-badge">
-                    {badgeText}
-                  </Badge>
-              ) : null}
-            </NavLink>
-          </li>
-      );
-    }
-);
-
-const SidebarLink = withRouter(({name, icon: Icon, location, to}) => {
-  const getSidebarItemClass = path => {
-    return location.pathname === path ? "active" : "";
-  };
-  return (
-      <li className={"sidebar-item " + getSidebarItemClass(to)}>
-        <a href={to} className="sidebar-link">
-          {Icon ? <Icon size={18} className="align-middle mr-3"/> : null}
-          {name}
-        </a>
-      </li>
-  );
-});
+import {Activity, Clipboard, Layers, List, Target, Users} from "react-feather";
 
 class Sidebar extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {};
   }
 
-  toggle = index => {
-    // Collapse all elements
-    Object.keys(this.state).forEach(
-        item =>
-            this.state[index] ||
-            this.setState(() => ({
-              [item]: false
-            }))
-    );
-
-    // Toggle selected element
-    this.setState(state => ({
-      [index]: !state[index]
-    }));
-  };
-
-  UNSAFE_componentWillMount() {
-    /* Open collapse element that matches current url */
-    const pathName = this.props.location.pathname;
-
-    sidebarRoutes.forEach((route, index) => {
-      const isActive = pathName.indexOf(route.path) === 0;
-      const isOpen = route.open;
-      const isHome = route.containsHome && pathName === "/" ? true : false;
-
-      this.setState(() => ({
-        [index]: isActive || isOpen || isHome
-      }));
-    });
+  isActive(paths) {
+    for (let i = 0; i < paths.length; i++) {
+      if (location.pathname.indexOf(paths[i]) > 0
+          || location.pathname === ("/" + paths[i])) {
+        return "active";
+      }
+    }
+    return "";
   }
 
   render() {
     const {sidebar} = this.props;
 
     return (
-        <nav
-            className={
-              "sidebar" +
-              (!sidebar.isOpen ? " toggled" : "") +
-              (sidebar.isSticky ? " sidebar-sticky" : "")
-            }
-        >
+        <nav className={"sidebar" + (!sidebar.isOpen ? " collapsed" : "")}>
           <div className="sidebar-content">
             <PerfectScrollbar>
+
               <a className="sidebar-brand" href="/">
                 <img className="img-fluid" alt="Study Tracker"
                      src="/static/images/logo.png"/>
@@ -167,76 +52,50 @@ class Sidebar extends React.Component {
 
               <ul className="sidebar-nav">
 
-                {/*Search*/}
-                <li className="sidebar-header">Search</li>
+                <li className="sidebar-header">Navigation</li>
 
-                <li className="sidebar-item">
-                  <Form className="ml-3 mr-3">
-                    <InputGroup className="mb-3 sidebar-search">
-                      <Input
-                          type="text"
-                          placeholder="Enter keywords here..."
-                          aria-label="Search"
-                          className="form-control-no-border"
-                          name={"search"}
-                      />
-                      <InputGroupAddon addonType={"append"}>
-                        <button type={"submit"} className={"btn btn-primary"}>
-                          <Search className={"feather align-middle"}/>
-                        </button>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </Form>
+                <li className={"sidebar-item"}>
+                  <a className={"sidebar-link " + this.isActive([""])} href={"/"}>
+                    <Activity size={18} className="align-middle me-3"/>
+                    <span className="align-middle">Activity</span>
+                  </a>
                 </li>
 
-                {sidebarRoutes.map((category, index) => {
-                  return (
-                      <React.Fragment key={index}>
-                        {category.header ? (
-                            <li className="sidebar-header">{category.header}</li>
-                        ) : null}
+                <li className={"sidebar-item"}>
+                  <a className={"sidebar-link "  + this.isActive(["studies", "study"])} href={"/studies"}>
+                    <Clipboard size={18} className="align-middle me-3"/>
+                    <span className="align-middle">Studies</span>
+                  </a>
+                </li>
 
-                        {category.children ? (
-                            <SidebarCategory
-                                name={category.name}
-                                badgeColor={category.badgeColor}
-                                badgeText={category.badgeText}
-                                icon={category.icon}
-                                to={category.path}
-                                isOpen={this.state[index]}
-                                onClick={() => this.toggle(index)}
-                            >
-                              {
-                                category.children.map((route, index) => {
-                                  if (!!route.protected
-                                      && !this.props.user) {
-                                    return '';
-                                  } else {
-                                    return (
-                                        <SidebarLink
-                                            key={index}
-                                            name={route.name}
-                                            to={route.path}
-                                            badgeColor={route.badgeColor}
-                                            badgeText={route.badgeText}
-                                        />
-                                    );
-                                  }
-                                })
-                              }
-                            </SidebarCategory>
-                        ) : (
-                            <SidebarItem
-                                name={category.name}
-                                to={category.path}
-                                icon={category.icon}
-                                badgeColor={category.badgeColor}
-                                badgeText={category.badgeText}
-                            />
-                        )}
-                      </React.Fragment>
-                  );
-                })}
+                <li className={"sidebar-item"}>
+                  <a className={"sidebar-link " + this.isActive(["assay", "assays"])} href={"/assays"}>
+                    <Layers size={18} className="align-middle me-3"/>
+                    <span className="align-middle">Assays</span>
+                  </a>
+                </li>
+
+                <li className={"sidebar-item"}>
+                  <a className={"sidebar-link " + this.isActive(["program", "programs"])} href={"/programs"}>
+                    <Target size={18} className="align-middle me-3"/>
+                    <span className="align-middle">Programs</span>
+                  </a>
+                </li>
+
+                <li className={"sidebar-item"}>
+                  <a className={"sidebar-link "  + this.isActive(["users", "user"])} href={"/users"}>
+                    <Users size={18} className="align-middle me-3"/>
+                    <span className="align-middle">Users</span>
+                  </a>
+                </li>
+
+                <li className={"sidebar-item"}>
+                  <a className={"sidebar-link " + this.isActive(["collections", "collection"])} href={"/collections"}>
+                    <List size={18} className="align-middle me-3"/>
+                    <span className="align-middle">Collections</span>
+                  </a>
+                </li>
+
               </ul>
             </PerfectScrollbar>
           </div>

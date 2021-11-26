@@ -16,7 +16,7 @@
 
 import React from "react";
 import {StatusBadge} from "../status";
-import {Button, Card, CardBody, Col, Container, Row} from "reactstrap";
+import {Button, Card, Col, Container, Row} from "react-bootstrap";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -50,7 +50,8 @@ const columns = [
     text: "Assay Type",
     sort: true,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => d.assayType.name
+    formatter: (c, d, i, x) => d.assayType.name,
+    csvFormatter: (c, d, i, x) => d.assayType.name
   },
   {
     dataField: "status",
@@ -75,7 +76,8 @@ const columns = [
     sort: true,
     searchable: false,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString()
+    formatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString(),
+    csvFormatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString()
   },
   {
     dataField: "program",
@@ -91,7 +93,8 @@ const columns = [
       }
       return 0;
     },
-    formatter: (cell, d, i, x) => d.study.program.name
+    formatter: (cell, d, i, x) => d.study.program.name,
+    csvFormatter: (cell, d, i, x) => d.study.program.name
   },
   {
     dataField: "name",
@@ -105,7 +108,8 @@ const columns = [
     text: "Owner",
     sort: true,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => d.owner.displayName
+    formatter: (c, d, i, x) => d.owner.displayName,
+    csvFormatter: (c, d, i, x) => d.owner.displayName
   },
   {
     dataField: "cro",
@@ -127,6 +131,7 @@ const columns = [
       }
       return 0;
     },
+    csvFormatter: (c, d, i, x) => !!d.study.collaborator ? d.study.collaborator.organizationName : "",
     formatter: (c, d, i, x) => !!d.study.collaborator
         ? (
             <div>
@@ -146,6 +151,7 @@ const columns = [
     sort: false,
     searchable: false,
     headerStyle: {width: '10%'},
+    csvExport: false,
     formatter: (c, d, i, x) => {
       let links = [];
       if (!!d.storageFolder) {
@@ -176,6 +182,7 @@ const columns = [
     sort: false,
     isDummyField: true,
     hidden: true,
+    csvExport: false,
     formatter: (c, d, i, x) => '',
     filterValue: (c, d, i, x) => {
       const CRO = !!d.study.collaborator
@@ -198,8 +205,6 @@ const columns = [
           ' ' +
           CRO +
           ' ' +
-          d.createdBy.displayName +
-          ' ' +
           d.owner.displayName +
           ' ' +
           (d.study.externalCode || '');
@@ -214,11 +219,11 @@ const ExportToCsv = (props) => {
   };
   return (
       <span>
-        <Button color={'primary'} onClick={handleClick}>
+        <Button variant={'primary'} onClick={handleClick}>
           Export to CSV
           &nbsp;
           {/*<FontAwesomeIcon icon={faFile} />*/}
-          <File className="feather align-middle ml-2 mb-1"/>
+          <File className="feather align-middle ms-2 mb-1"/>
         </Button>
       </span>
   );
@@ -229,16 +234,16 @@ const AssayList = ({assays, title, filters, user}) => {
   return (
       <Container fluid className="animated fadeIn">
 
-        <Row className="justify-content-between align-items-center">
+        <Row className="justify-content-between align-items-center mb-2">
           <Col>
-            <h1>{title}</h1>
+            <h3>Assays</h3>
           </Col>
         </Row>
 
         <Row>
-          <Col lg="12">
+          <Col lg={12}>
             <Card>
-              <CardBody>
+              <Card.Body>
                 <ToolkitProvider
                     keyField="id"
                     data={assays}
@@ -248,7 +253,7 @@ const AssayList = ({assays, title, filters, user}) => {
                 >
                   {props => (
                       <div>
-                        <div className="float-right">
+                        <div className="float-end">
                           <ExportToCsv{...props.csvProps} />
                           &nbsp;&nbsp;
                           <Search.SearchBar
@@ -273,7 +278,7 @@ const AssayList = ({assays, title, filters, user}) => {
                       </div>
                   )}
                 </ToolkitProvider>
-              </CardBody>
+              </Card.Body>
             </Card>
           </Col>
         </Row>

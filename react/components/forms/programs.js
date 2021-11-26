@@ -15,7 +15,8 @@
  */
 
 import React from "react";
-import {FormFeedback, FormGroup, Label} from "reactstrap";
+import {FormGroup} from "./common";
+import {Form} from "react-bootstrap";
 import Select from "react-select";
 
 export const ProgramDropdown = ({programs, selectedProgram, onChange, isValid, disabled, isLegacyStudy}) => {
@@ -41,7 +42,7 @@ export const ProgramDropdown = ({programs, selectedProgram, onChange, isValid, d
 
   return (
       <FormGroup>
-        <Label>Program *</Label>
+        <Form.Label>Program *</Form.Label>
         <Select
             className={"react-select-container "}
             invalid={!isValid}
@@ -58,8 +59,9 @@ export const ProgramDropdown = ({programs, selectedProgram, onChange, isValid, d
             }}
             isDisabled={disabled}
         />
-        <FormFeedback>Select the program your study is associated
-          with.</FormFeedback>
+        <Form.Control.Feedback>
+          Select the program your study is associated with.
+        </Form.Control.Feedback>
       </FormGroup>
   );
 

@@ -16,29 +16,18 @@
 
 import {
   Breadcrumb,
-  BreadcrumbItem,
   Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
   Col,
   Container,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
+  Dropdown,
   Nav,
-  NavItem,
-  NavLink,
   Row,
-  TabContent,
-  TabPane,
-  UncontrolledDropdown
-} from "reactstrap";
+  Tab
+} from "react-bootstrap";
 import React from "react";
 import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faShare} from "@fortawesome/free-solid-svg-icons";
-import {history} from "../../App";
+import {faEdit} from "@fortawesome/free-solid-svg-icons";
 import {SelectableUserStatusButton, UserStatusButton} from "./userStatus";
 import UserTimelineTab from "./UserTimelineTab";
 import UserStudiesTab from "./UserStudiesTab";
@@ -47,9 +36,9 @@ const UserDetailHeader = ({targetUser, user}) => {
   return (
       <Row className="justify-content-between align-items-center">
         <Col>
-          <h1>{targetUser.displayName} ({targetUser.username})</h1>
+          <h3>{targetUser.displayName} ({targetUser.username})</h3>
         </Col>
-        <Col className="col-auto">
+        <Col xs="auto">
           {
             !!user && !!user.admin
                 ? <SelectableUserStatusButton active={targetUser.active}
@@ -91,12 +80,8 @@ class UserDetails extends React.Component {
           <Row>
             <Col>
               <Breadcrumb>
-                <BreadcrumbItem>
-                  <a href={"/users"}>Users</a>
-                </BreadcrumbItem>
-                <BreadcrumbItem active>
-                  User Detail
-                </BreadcrumbItem>
+                <Breadcrumb.Item href={"/users"}>Users</Breadcrumb.Item>
+                <Breadcrumb.Item active>User Detail</Breadcrumb.Item>
               </Breadcrumb>
             </Col>
           </Row>
@@ -109,51 +94,34 @@ class UserDetails extends React.Component {
             <Col lg={5}>
               <Card className="details-card">
 
-                <CardHeader>
-                  <div className="card-actions float-right">
-                    <UncontrolledDropdown>
-                      <DropdownToggle tag="a">
-                        <Menu/>
-                      </DropdownToggle>
-                      <DropdownMenu right>
-                        <DropdownItem onClick={() => console.log("Share!")}>
-                          <FontAwesomeIcon icon={faShare}/>
-                          &nbsp;
-                          Share
-                        </DropdownItem>
-                        {
-                          !!this.props.target && !!this.props.user.admin ?
-                              <DropdownItem divider/> : ''
-                        }
-                        {
-                          !!this.props.user && !!this.props.user.admin ? (
-                              <DropdownItem onClick={() => history.push(
-                                  "/users/" + targetUser.id + "/edit")}>
-                                <FontAwesomeIcon icon={faEdit}/>
-                                &nbsp;
-                                Edit
-                              </DropdownItem>
-                          ) : ''
-                        }
-                        {/*{*/}
-                        {/*  !!this.props.user && !!this.props.user.admin ? (*/}
-                        {/*      <DropdownItem*/}
-                        {/*          onClick={() => console.log("Delete!")}>*/}
-                        {/*        <FontAwesomeIcon icon={faTrash}/>*/}
-                        {/*        &nbsp;*/}
-                        {/*        Delete*/}
-                        {/*      </DropdownItem>*/}
-                        {/*  ) : ''*/}
-                        {/*}*/}
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
-                  </div>
-                  <CardTitle tag="h5" className="mb-0 text-muted">
-                    Summary
-                  </CardTitle>
-                </CardHeader>
+                <Card.Header>
 
-                <CardBody>
+                  {
+                    !!this.props.user && !!this.props.user.admin ? (
+                      <div className="card-actions float-end">
+                        <Dropdown align="end">
+                          <Dropdown.Toggle as="a" bsPrefix={"-"}>
+                            <Menu/>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                            <Dropdown.Item href={"/users/" + targetUser.id + "/edit"}>
+                              <FontAwesomeIcon icon={faEdit}/>
+                              &nbsp;
+                              Edit
+                            </Dropdown.Item>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </div>
+                    ) : ''
+                  }
+
+                  <Card.Title tag="h5" className="mb-0 text-muted">
+                    Summary
+                  </Card.Title>
+
+                </Card.Header>
+
+                <Card.Body>
                   <Row>
                     <Col xs={12}>
 
@@ -174,54 +142,47 @@ class UserDetails extends React.Component {
 
                     </Col>
                   </Row>
-                </CardBody>
+                </Card.Body>
 
               </Card>
             </Col>
 
-            <Col lg="7">
+            <Col lg={7}>
 
               {/* Tabs */}
               <div className="tab">
-                <Nav tabs>
+                <Tab.Container defaultActiveKey="timeline">
+                  <Nav variant="tabs">
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "1" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("1");
-                        }}
-                    >
-                      Timeline
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"timeline"}>
+                        Timeline
+                      </Nav.Link>
+                    </Nav.Item>
 
-                  <NavItem>
-                    <NavLink
-                        className={this.state.activeTab === "2" ? "active" : ''}
-                        onClick={() => {
-                          this.toggle("2");
-                        }}
-                    >
-                      Studies
-                    </NavLink>
-                  </NavItem>
+                    <Nav.Item>
+                      <Nav.Link eventKey={"studies"}>
+                        Studies
+                      </Nav.Link>
+                    </Nav.Item>
 
-                </Nav>
+                  </Nav>
 
-                <TabContent activeTab={this.state.activeTab}>
+                  <Tab.Content>
 
-                  <TabPane tabId="1">
-                    <UserTimelineTab targetUser={targetUser}
-                                     user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"timeline"}>
+                      <UserTimelineTab targetUser={targetUser}
+                                       user={this.props.user}/>
+                    </Tab.Pane>
 
-                  <TabPane tabId="2">
-                    <UserStudiesTab studies={studies}
-                                    user={this.props.user}/>
-                  </TabPane>
+                    <Tab.Pane eventKey={"studies"}>
+                      <UserStudiesTab studies={studies}
+                                      user={this.props.user}/>
+                    </Tab.Pane>
 
-                </TabContent>
+                  </Tab.Content>
+
+                </Tab.Container>
               </div>
             </Col>
           </Row>

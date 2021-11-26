@@ -17,24 +17,7 @@
 import React from "react";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Container,
-  Form,
-  FormFeedback,
-  FormGroup,
-  FormText,
-  Input,
-  Label,
-  Row
-} from "reactstrap";
+import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {StatusDropdown} from "./status";
 import {statuses} from "../../config/statusConstants";
 import {UserInputs} from "./users";
@@ -47,6 +30,8 @@ import AttributeInputs from "./attributes";
 import {TaskInputs} from "./tasks";
 import {LoadingOverlay} from "../loading";
 import ReactQuill from "react-quill";
+import {Breadcrumbs} from "../common";
+import {FormGroup} from "./common";
 
 export default class AssayForm extends React.Component {
 
@@ -278,40 +263,26 @@ export default class AssayForm extends React.Component {
 
           <Row>
             <Col>
-              <Breadcrumb>
-
-                <BreadcrumbItem>
-                  <a href={"/"}>Home</a>
-                </BreadcrumbItem>
-
-                <BreadcrumbItem>
-                  <a href={"/study/" + this.props.study.code}>
-                    Study {this.props.study.code}
-                  </a>
-                </BreadcrumbItem>
-
-                {
-                  !!this.state.assay.id
-                      ? (<BreadcrumbItem active>Edit Assay</BreadcrumbItem>)
-                      : (<BreadcrumbItem active>New Assay</BreadcrumbItem>)
-                }
-
-              </Breadcrumb>
+              <Breadcrumbs crumbs={[
+                {label: "Home", url: "/"},
+                {label: "Study " + this.props.study.code, url: "/study/" + this.props.study.code},
+                {label: !!this.state.assay.id ? "Edit Assay" : "New Assay"}
+              ]} />
             </Col>
           </Row>
 
           <Row className="justify-content-end align-items-center">
             <Col>
-              <h1>{!!this.state.assay.id ? "Edit Assay" : "New Assay"}</h1>
+              <h3>{!!this.state.assay.id ? "Edit Assay" : "New Assay"}</h3>
             </Col>
           </Row>
 
           <Row>
-            <Col xs="12">
+            <Col xs={12}>
               <Card>
 
-                <CardHeader>
-                  <CardTitle tag="h5">Assay Overview</CardTitle>
+                <Card.Header>
+                  <Card.Title tag="h5">Assay Overview</Card.Title>
                   <h6 className="card-subtitle text-muted">Select the assay type
                     that best reflects the experiment being done. If an accurate
                     option does not exist, or if this is a new assay type,
@@ -322,30 +293,32 @@ export default class AssayForm extends React.Component {
                     Choose the date your assay is expected to start. If the
                     assay has already completed, you may select an end
                     date.</h6>
-                </CardHeader>
+                </Card.Header>
 
-                <CardBody>
+                <Card.Body>
                   <Form>
 
                     {/*Overview*/}
-                    <Row form>
+                    <Row>
 
-                      <Col sm="7">
+                      <Col sm={7}>
                         <FormGroup>
-                          <Label>Name *</Label>
-                          <Input
+                          <Form.Label>Name *</Form.Label>
+                          <Form.Control
                               type="text"
-                              invalid={!this.state.validation.nameIsValid}
+                              isInvalid={!this.state.validation.nameIsValid}
                               defaultValue={this.state.assay.name || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"name": e.target.value})}
                               disabled={!!this.state.assay.id}
                           />
-                          <FormFeedback>Name must not be empty.</FormFeedback>
+                          <Form.Control.Feedback type={"invalid"}>
+                            Name must not be empty.
+                          </Form.Control.Feedback>
                         </FormGroup>
                       </Col>
 
-                      <Col sm="5">
+                      <Col sm={5}>
                         <AssayTypeDropdown
                             assayTypes={this.props.assayTypes}
                             selectedType={!!this.state.assay.assayType
@@ -357,23 +330,25 @@ export default class AssayForm extends React.Component {
 
                     </Row>
 
-                    <Row form>
-                      <Col sm="7">
+                    <Row>
+                      <Col sm={7}>
                         <FormGroup>
-                          <Label>Description *</Label>
+                          <Form.Label>Description *</Form.Label>
                           <ReactQuill
                               theme="snow"
                               defaultValue={this.state.assay.description || ''}
                               onChange={content => this.handleFormUpdate(
                                   {"description": content})}
                           />
-                          <FormFeedback>Description must not be
-                            empty.</FormFeedback>
-                          <FormText>Provide a brief description of your
-                            assay.</FormText>
+                          <Form.Control.Feedback type={"invalid"}>
+                            Description must not be empty.
+                          </Form.Control.Feedback>
+                          <Form.Text>
+                            Provide a brief description of your assay.
+                          </Form.Text>
                         </FormGroup>
                       </Col>
-                      <Col sm="5">
+                      <Col sm={5}>
                         { !this.state.isUpdateModeOn &&
                           <AssayNotebookTemplatesDropdown
                             notebookTemplates={this.props.notebookTemplates}
@@ -387,7 +362,7 @@ export default class AssayForm extends React.Component {
                         />
 
                         <FormGroup>
-                          <Label>Start Date *</Label>
+                          <Form.Label>Start Date *</Form.Label>
                           <DatePicker
                               maxlength="2"
                               className={"form-control"}
@@ -400,14 +375,16 @@ export default class AssayForm extends React.Component {
                               dateFormat=" MM / dd / yyyy"
                               placeholderText="MM / DD / YYYY"
                           />
-                          <FormFeedback>You must select a Start
-                            Date.</FormFeedback>
-                          <FormText>Select the date your assay began or is
-                            expected to begin.</FormText>
+                          <Form.Control.Feedback type={"invalid"}>
+                            You must select a Start Date.
+                          </Form.Control.Feedback>
+                          <Form.Text>
+                            Select the date your assay began or is expected to begin.
+                          </Form.Text>
                         </FormGroup>
 
                         <FormGroup>
-                          <Label>End Date</Label>
+                          <Form.Label>End Date</Form.Label>
                           <DatePicker
                               maxlength="2"
                               className="form-control"
@@ -419,14 +396,14 @@ export default class AssayForm extends React.Component {
                               dateFormat=" MM / dd / yyyy"
                               placeholderText="MM / DD / YYYY"
                           />
-                          <FormText>Select the date your assay was
-                            completed.</FormText>
+                          <Form.Text>Select the date your assay was
+                            completed.</Form.Text>
                         </FormGroup>
 
                       </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                       <Col>
                         <hr/>
                       </Col>
@@ -438,9 +415,9 @@ export default class AssayForm extends React.Component {
                       !!this.props.study.legacy
                           ? (
                               <React.Fragment>
-                                <Row form>
+                                <Row>
 
-                                  <Col md="12">
+                                  <Col md={12}>
                                     <h5 className="card-title">Legacy Study</h5>
                                     <h6 className="card-subtitle text-muted">Studies
                                       created
@@ -453,11 +430,11 @@ export default class AssayForm extends React.Component {
                                     <br/>
                                   </Col>
 
-                                  <Col md="12">
+                                  <Col md={12}>
 
                                     <FormGroup>
-                                      <Label>Notebook URL</Label>
-                                      <Input
+                                      <Form.Label>Notebook URL</Form.Label>
+                                      <Form.Control
                                           type="text"
                                           defaultValue={
                                             !!this.state.assay.notebookFolder
@@ -473,15 +450,15 @@ export default class AssayForm extends React.Component {
                                                 }
                                               })}
                                       />
-                                      <FormText>If the study already has an ELN
+                                      <Form.Text>If the study already has an ELN
                                         entry,
-                                        provide the URL here.</FormText>
+                                        provide the URL here.</Form.Text>
                                     </FormGroup>
                                   </Col>
 
                                 </Row>
 
-                                <Row form>
+                                <Row>
                                   <Col>
                                     <hr/>
                                   </Col>
@@ -499,9 +476,9 @@ export default class AssayForm extends React.Component {
                           ? (
                               <React.Fragment>
 
-                                <Row form>
+                                <Row>
 
-                                  <Col md="12">
+                                  <Col md={12}>
                                     <h5 className="card-title">
                                       {this.state.assay.assayType.name} Fields
                                     </h5>
@@ -519,7 +496,7 @@ export default class AssayForm extends React.Component {
                                     handleUpdate={this.handleFieldUpdate}
                                 />
 
-                                <Row form>
+                                <Row>
                                   <Col>
                                     <hr/>
                                   </Col>
@@ -532,8 +509,8 @@ export default class AssayForm extends React.Component {
 
                     {/* Tasks */}
 
-                    <Row form>
-                      <Col sm="12">
+                    <Row>
+                      <Col sm={12}>
                         <h5 className="card-title">Tasks</h5>
                         <h6 className="card-subtitle text-muted">
                           You can define an ordered list of tasks that must be
@@ -558,8 +535,8 @@ export default class AssayForm extends React.Component {
                     </Row>
 
                     {/* Assay Team */}
-                    <Row form>
-                      <Col sm="12">
+                    <Row>
+                      <Col sm={12}>
                         <h5 className="card-title">Assay Team</h5>
                         <h6 className="card-subtitle text-muted">Who will be
                           working on this assay? One user must be assigned as
@@ -588,9 +565,9 @@ export default class AssayForm extends React.Component {
 
                     {/* Attributes */}
 
-                    <Row form>
+                    <Row>
 
-                      <Col md="12">
+                      <Col md={12}>
                         <h5 className="card-title">Assay Attributes</h5>
                         <h6 className="card-subtitle text-muted">
                           Key-value attributes for adding additional information
@@ -620,20 +597,20 @@ export default class AssayForm extends React.Component {
                     </Row>
 
                     {/*Buttons*/}
-                    <Row form>
+                    <Row>
                       <Col className="text-center">
                         <FormGroup>
-                          <Button size="lg" color="primary"
+                          <Button size="lg" variant="primary"
                                   onClick={this.handleSubmit}>Submit</Button>
                           &nbsp;&nbsp;
-                          <Button size="lg" color="secondary"
+                          <Button size="lg" variant="secondary"
                                   onClick={this.handleCancel}>Cancel</Button>
                         </FormGroup>
                       </Col>
                     </Row>
 
                   </Form>
-                </CardBody>
+                </Card.Body>
               </Card>
             </Col>
           </Row>

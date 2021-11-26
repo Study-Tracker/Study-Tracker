@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Spinner} from 'reactstrap';
+import {Spinner} from 'react-bootstrap';
 import React from "react";
 
 export const CardLoadingMessage = () => {
@@ -22,7 +22,7 @@ export const CardLoadingMessage = () => {
       <div>
         <h4>
           Loading...
-          <Spinner color={'primary'} className="mr-2"/>
+          <Spinner animation="border" variant={'primary'} className="me-2"/>
         </h4>
       </div>
   )
@@ -35,7 +35,7 @@ export const LoadingOverlay = ({isVisible, message}) => {
         <h2 className="mb-3">
           {label}
         </h2>
-        <Spinner color={'primary'} className="mr-2"/>
+        <Spinner animation="border" variant={'primary'} className="me-2"/>
       </div>
   );
 }

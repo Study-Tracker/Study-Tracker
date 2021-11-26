@@ -1,10 +1,12 @@
 package com.decibeltx.studytracker.mapstruct.dto;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Data;
 
 @Data
-public class StatisticsDto {
+public class SummaryStatisticsDto {
 
   /* Timeframe */
   private Date startDate;
@@ -32,5 +34,7 @@ public class StatisticsDto {
   private long newAssayCount;
 
   private long completedAssayCount;
+
+  private Map<String, Long> programStudyCounts = new HashMap<>();
 
 }

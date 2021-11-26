@@ -15,6 +15,16 @@
  */
 
 import React from 'react';
+import {Form} from 'react-bootstrap';
+
+export const FormGroup = (props) => {
+  return (
+      <Form.Group className={"mb-3"}>
+        {props.children}
+      </Form.Group>
+
+  )
+}
 
 export class InputWrapper extends React.Component {
 

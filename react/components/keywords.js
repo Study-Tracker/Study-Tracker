@@ -15,18 +15,19 @@
  */
 
 import React from 'react';
+import {Badge} from 'react-bootstrap'
 
 export const KeywordCategoryBadge = ({category}) => {
   return (
-      <span className="badge badge-info">{category}</span>
+      <Badge bg={"info"}>{category}</Badge>
   );
 };
 
 export const KeywordBadge = ({category, label}) => {
   return (
-      <span className="badge badge-info">
+      <Badge bg={"info"} className="m-1">
         {category}: {label}
-      </span>
+      </Badge>
   );
 };
 

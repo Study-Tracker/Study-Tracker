@@ -15,21 +15,8 @@
  */
 
 import React from "react";
-import {
-  Button,
-  Col,
-  CustomInput,
-  FormGroup,
-  FormText,
-  Input,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-  UncontrolledAlert
-} from "reactstrap";
+import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {FormGroup} from "./common";
 import Select from "react-select";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
@@ -56,11 +43,9 @@ export default class CollaboratorInputs extends React.Component {
     };
     this.handleCollaboratorSelect = this.handleCollaboratorSelect.bind(this);
     this.handleExternalCodeChange = this.handleExternalCodeChange.bind(this);
-    this.toggleModal = this.toggleModal.bind(this);
-    this.handleNewCollaboratorChange = this.handleNewCollaboratorChange.bind(
-        this);
-    this.handleNewCollaboratorSubmit = this.handleNewCollaboratorSubmit.bind(
-        this);
+    this.showModal = this.showModal.bind(this);
+    this.handleNewCollaboratorChange = this.handleNewCollaboratorChange.bind(this);
+    this.handleNewCollaboratorSubmit = this.handleNewCollaboratorSubmit.bind(this);
     this.handleShowInputs = this.handleShowInputs.bind(this);
   }
 
@@ -82,9 +67,9 @@ export default class CollaboratorInputs extends React.Component {
     })
   }
 
-  toggleModal() {
+  showModal(bool) {
     this.setState({
-      modalIsOpen: !this.state.modalIsOpen
+      modalIsOpen: bool
     })
   }
 
@@ -167,7 +152,7 @@ export default class CollaboratorInputs extends React.Component {
           },
           modalError: null
         });
-        this.toggleModal();
+        this.showModal();
       }).catch(e => {
         throw e;
       })
@@ -182,9 +167,9 @@ export default class CollaboratorInputs extends React.Component {
   render() {
 
     return (
-        <Row form>
+        <Row>
 
-          <Col sm="12">
+          <Col sm={12}>
             <h5 className="card-title">
               CRO/External Collaborator
             </h5>
@@ -197,9 +182,9 @@ export default class CollaboratorInputs extends React.Component {
             <br/>
           </Col>
 
-          <Col sm="12">
+          <Col sm={12}>
             <FormGroup>
-              <CustomInput
+              <Form.Check
                   id="cro-check"
                   type="checkbox"
                   label="Is this study being performed externally?"
@@ -209,7 +194,7 @@ export default class CollaboratorInputs extends React.Component {
             </FormGroup>
           </Col>
 
-          <Col sm="12" id="cro-input-container"
+          <Col sm={12} id="cro-input-container"
                style={{
                  display: this.state.isVisible ? "block" : "none",
                  zIndex: 1000
@@ -217,30 +202,30 @@ export default class CollaboratorInputs extends React.Component {
                className={this.state.isVisible ? "animated fadein" : ""}
           >
 
-            <Row form>
+            <Row>
 
               <Col sm={6}>
                 <FormGroup>
-                  <Label>External Study Code</Label>
-                  <Input
+                  <Form.Label>External Study Code</Form.Label>
+                  <Form.Control
                       type="text"
                       defaultValue={this.state.externalCode || ''}
                       onChange={this.handleExternalCodeChange}
                       placeholder={"eg. DB-01234"}
                   />
-                  <FormText>If the CRO provided their own study code, enter it
-                    here.</FormText>
+                  <Form.Text>If the CRO provided their own study code, enter it
+                    here.</Form.Text>
                 </FormGroup>
               </Col>
 
             </Row>
 
-            <Row form>
+            <Row>
 
               <Col sm={6}>
 
                 <FormGroup>
-                  <Label>Registered Organizations</Label>
+                  <Form.Label>Registered Organizations</Form.Label>
                   <Select
                       className="react-select-container"
                       classNamePrefix="react-select"
@@ -255,7 +240,7 @@ export default class CollaboratorInputs extends React.Component {
               <Col sm={6}>
 
                 <div style={{marginTop: "2em"}}>
-                  <Button color={"primary"} onClick={this.toggleModal}>
+                  <Button variant={"primary"} onClick={() => this.showModal(true)}>
                     <FontAwesomeIcon icon={faPlusCircle}/> Add New Organization
                   </Button>
                 </div>
@@ -267,18 +252,18 @@ export default class CollaboratorInputs extends React.Component {
           </Col>
 
           <Modal
-              isOpen={this.state.modalIsOpen}
-              toggle={() => this.toggleModal()}
+              show={this.state.modalIsOpen}
+              onHide={() => this.showModal(false)}
               size={"lg"}
           >
 
-            <ModalHeader toggle={() => this.toggleModal()}>
+            <Modal.Header closeButton>
               Add New Organization
-            </ModalHeader>
+            </Modal.Header>
 
-            <ModalBody className="m-3">
+            <Modal.Body className="m-3">
 
-              <Row form>
+              <Row>
 
                 <Col sm={12}>
                   <p>
@@ -292,10 +277,10 @@ export default class CollaboratorInputs extends React.Component {
                   </p>
                 </Col>
 
-                <Col sm="6">
+                <Col sm={6}>
                   <FormGroup>
-                    <Label>Label *</Label>
-                    <Input
+                    <Form.Label>Label *</Form.Label>
+                    <Form.Control
                         type="text"
                         defaultValue={this.state.newCollaborator.label}
                         onChange={(e) => this.handleNewCollaboratorChange({
@@ -305,10 +290,10 @@ export default class CollaboratorInputs extends React.Component {
                   </FormGroup>
                 </Col>
 
-                <Col sm="6">
+                <Col sm={6}>
                   <FormGroup>
-                    <Label>Organization Code *</Label>
-                    <Input
+                    <Form.Label>Organization Code *</Form.Label>
+                    <Form.Control
                         type="text"
                         defaultValue={this.state.newCollaborator.code}
                         onChange={(e) => this.handleNewCollaboratorChange({
@@ -318,10 +303,10 @@ export default class CollaboratorInputs extends React.Component {
                   </FormGroup>
                 </Col>
 
-                <Col sm="6">
+                <Col sm={6}>
                   <FormGroup>
-                    <Label>Organization Name *</Label>
-                    <Input
+                    <Form.Label>Organization Name *</Form.Label>
+                    <Form.Control
                         type="text"
                         defaultValue={this.state.newCollaborator.organizationName}
                         onChange={(e) => this.handleNewCollaboratorChange({
@@ -331,10 +316,10 @@ export default class CollaboratorInputs extends React.Component {
                   </FormGroup>
                 </Col>
 
-                <Col sm="6">
+                <Col sm={6}>
                   <FormGroup>
-                    <Label>Organization Location</Label>
-                    <Input
+                    <Form.Label>Organization Location</Form.Label>
+                    <Form.Control
                         type="text"
                         defaultValue={this.state.newCollaborator.organizationLocation}
                         onChange={(e) => this.handleNewCollaboratorChange({
@@ -344,10 +329,10 @@ export default class CollaboratorInputs extends React.Component {
                   </FormGroup>
                 </Col>
 
-                <Col sm="6">
+                <Col sm={6}>
                   <FormGroup>
-                    <Label>Contact Person</Label>
-                    <Input
+                    <Form.Label>Contact Person</Form.Label>
+                    <Form.Control
                         type="text"
                         defaultValue={this.state.newCollaborator.contactPersonName}
                         onChange={(e) => this.handleNewCollaboratorChange({
@@ -357,10 +342,10 @@ export default class CollaboratorInputs extends React.Component {
                   </FormGroup>
                 </Col>
 
-                <Col sm="6">
+                <Col sm={6}>
                   <FormGroup>
-                    <Label>Contact Email</Label>
-                    <Input
+                    <Form.Label>Contact Email</Form.Label>
+                    <Form.Control
                         type="text"
                         defaultValue={this.state.newCollaborator.contactEmail}
                         onChange={(e) => this.handleNewCollaboratorChange({
@@ -376,27 +361,28 @@ export default class CollaboratorInputs extends React.Component {
                     ? (
                         <Row>
                           <Col sm={12}>
-                            <UncontrolledAlert color={"warning"}>
+                            <Alert variant={"warning"}>
                               <div className="alert-message">
                                 {this.state.modalError}
                               </div>
-                            </UncontrolledAlert>
+                            </Alert>
                           </Col>
                         </Row>
                     ) : ''
               }
 
-            </ModalBody>
+            </Modal.Body>
 
-            <ModalFooter>
-              <Button color={"secondary"} onClick={() => this.toggleModal()}>
+            <Modal.Footer>
+              <Button variant={"secondary"}
+                      onClick={() => this.showModal(false)}>
                 Cancel
               </Button>
-              <Button color={"primary"}
+              <Button variant={"primary"}
                       onClick={this.handleNewCollaboratorSubmit}>
                 Save
               </Button>
-            </ModalFooter>
+            </Modal.Footer>
 
           </Modal>
 

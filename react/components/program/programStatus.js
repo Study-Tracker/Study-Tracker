@@ -1,10 +1,4 @@
-import {
-  Button,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  UncontrolledButtonDropdown
-} from "reactstrap";
+import {Button, Dropdown} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import {statuses} from "../../config/programActivityConstants";
@@ -13,7 +7,7 @@ import swal from "sweetalert";
 export const ProgramStatusButton = ({active}) => {
   const config = !!active ? statuses.ACTIVE : statuses.INACTIVE;
   return (
-      <Button size="lg" className="mr-1" color={config.color}>
+      <Button size="lg" className="me-1" variant={config.color}>
         <FontAwesomeIcon icon={config.icon}
                          className="align-middle"/> {config.label}
       </Button>
@@ -58,33 +52,26 @@ export class SelectableProgramStatusButton extends React.Component {
     for (const k in statuses) {
       const s = statuses[k];
       options.push(
-          <DropdownItem
+          <Dropdown.Item
               key={'status-option-' + s.label}
               onClick={this.handleChange}
               data-value={s.value}
           >
             {s.label}
-          </DropdownItem>
+          </Dropdown.Item>
       );
     }
     return (
-        <UncontrolledButtonDropdown className="mr-1 mb-1">
-          <DropdownToggle caret size={"lg"} color={config.color}>
+        <Dropdown className="me-1 mb-1">
+          <Dropdown.Toggle size={"lg"} variant={config.color}>
             <FontAwesomeIcon icon={config.icon}/>
             &nbsp;&nbsp;
             {config.label}
-          </DropdownToggle>
-          <DropdownMenu>
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
             {options}
-          </DropdownMenu>
-        </UncontrolledButtonDropdown>
+          </Dropdown.Menu>
+        </Dropdown>
     )
   }
 }
-
-export const ProgramStatusBadge = ({status}) => {
-  const config = !!active ? statuses.ACTIVE : statuses.INACTIVE;
-  return (
-      <span className={"badge badge-" + config.color}>{config.label}</span>
-  )
-};

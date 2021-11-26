@@ -15,7 +15,7 @@
  */
 
 import React from "react";
-import {Button, Card, CardBody, Col, Container, Row,} from "reactstrap";
+import {Badge, Button, Card, Col, Container, Row,} from "react-bootstrap";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -57,15 +57,15 @@ const columns = [
     formatter: (c, d, i, x) => {
       if (d.active) {
         return (
-            <div className="badge badge-success">
+            <Badge bg="success">
               Active
-            </div>
+            </Badge>
         )
       } else {
         return (
-            <div className="badge badge-warning">
+            <Badge bg="warning">
               Inactive
-            </div>
+            </Badge>
         )
       }
     }
@@ -78,30 +78,30 @@ const ExportToCsv = (props) => {
   };
   return (
       <span>
-        <Button color={'primary'} onClick={handleClick}>
+        <Button variant={'primary'} onClick={handleClick}>
           Export to CSV
           &nbsp;
-          <File className="feather align-middle ml-2 mb-1"/>
+          <File className="feather align-middle ms-2 mb-1"/>
         </Button>
       </span>
   );
 };
 
-const ProgramList = ({title, user, programs}) => {
+const ProgramList = ({programs}) => {
 
   return (
       <Container fluid className="animated fadeIn">
 
-        <Row className="justify-content-between align-items-center">
-          <Col xs="8">
-            <h1>{title}</h1>
+        <Row className="justify-content-between align-items-center mb-2">
+          <Col>
+            <h3>Programs</h3>
           </Col>
         </Row>
 
         <Row>
-          <Col lg="12">
+          <Col lg={12}>
             <Card>
-              <CardBody>
+              <Card.Body>
                 <ToolkitProvider
                     keyField="id"
                     data={programs}
@@ -111,7 +111,7 @@ const ProgramList = ({title, user, programs}) => {
                 >
                   {props => (
                       <div>
-                        <div className="float-right">
+                        <div className="float-end">
                           <ExportToCsv{...props.csvProps} />
                           &nbsp;&nbsp;
                           <Search.SearchBar
@@ -136,7 +136,7 @@ const ProgramList = ({title, user, programs}) => {
                       </div>
                   )}
                 </ToolkitProvider>
-              </CardBody>
+              </Card.Body>
             </Card>
           </Col>
         </Row>

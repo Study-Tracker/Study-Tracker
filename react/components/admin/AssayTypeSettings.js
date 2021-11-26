@@ -1,18 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-  Table
-} from "reactstrap";
+import {Badge, Button, Card, Col, Modal, Row, Table} from "react-bootstrap";
 import {history} from "../../App";
 import {CheckCircle, Edit, Info, PlusCircle, Trash} from "react-feather";
 import ToolkitProvider from "react-bootstrap-table2-toolkit";
@@ -26,21 +13,21 @@ class AssayTypeSettings extends React.Component {
     super(props);
     this.state = {
       assayTypes: [],
-      showModal: false
+      isModalOpen: false
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
     this.toggleActive = this.toggleActive.bind(this);
   }
 
-  toggleModal(selected) {
+  showModal(selected) {
     if (!!selected) {
       this.setState({
-        showModal: true,
+        isModalOpen: true,
         selectedAssayType: selected
       });
     } else {
       this.setState({
-        showModal: false
+        isModalOpen: false
       })
     }
   }
@@ -89,9 +76,9 @@ class AssayTypeSettings extends React.Component {
         <React.Fragment>
           <AssayTypeListCard
               assayTypes={this.state.assayTypes}
-              showModal={this.state.showModal}
+              isModalOpen={this.state.isModalOpen}
               selectedAssayType={this.state.selectedAssayType}
-              toggleModal={this.toggleModal}
+              showModal={this.showModal}
               toggleActive={this.toggleActive}
           />
         </React.Fragment>
@@ -104,9 +91,9 @@ export default AssayTypeSettings;
 
 const AssayTypeListCard = ({
   assayTypes,
-  showModal,
+  isModalOpen,
   selectedAssayType,
-  toggleModal,
+  showModal,
   toggleActive
 }) => {
 
@@ -116,8 +103,8 @@ const AssayTypeListCard = ({
       text: "Name",
       sort: true,
       headerStyle: {width: '20%'},
-      formatter: (c, d, i, x) => <a href="javascript:void(0)"
-                                    onClick={() => toggleModal(d)}>{d.name}</a>,
+      formatter: (c, d, i, x) => <Button variant="link"
+                                    onClick={() => showModal(d)}>{d.name}</Button>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (rowA.name > rowB.name) {
           return order === "desc" ? -1 : 1;
@@ -142,8 +129,8 @@ const AssayTypeListCard = ({
       headerStyle: {width: '20%'},
       formatter: (c, d, i, x) => {
         return !!d.active
-            ? <span className="badge badge-success">Active</span>
-            : <span className="badge badge-warning">Inactive</span>
+            ? <Badge bg="success">Active</Badge>
+            : <Badge bg="warning">Inactive</Badge>
       }
     },
     {
@@ -155,14 +142,14 @@ const AssayTypeListCard = ({
         return (
             <React.Fragment>
               <a className="text-info" title={"Details"}
-                 onClick={() => toggleModal(d)}>
-                <Info className="align-middle mr-1" size={18}/>
+                 onClick={() => showModal(d)}>
+                <Info className="align-middle me-1" size={18}/>
               </a>
               {
                 d.name === "Generic" ? "" : (
                     <a className="text-warning" title={"Edit assay type"}
                        onClick={() => history.push("/assaytypes/" + d.id + "/edit")}>
-                      <Edit className="align-middle mr-1" size={18}/>
+                      <Edit className="align-middle me-1" size={18}/>
                     </a>
                 )
               }
@@ -172,13 +159,13 @@ const AssayTypeListCard = ({
                       ? (
                           <a className="text-danger" title={"Set inactive"}
                              onClick={() => toggleActive(d)}>
-                            <Trash className="align-middle mr-1" size={18}/>
+                            <Trash className="align-middle me-1" size={18}/>
                           </a>
                       )
                       : (
                           <a className="text-info" title={"Set active"}
                              onClick={() => toggleActive(d)}>
-                            <CheckCircle className="align-middle mr-1" size={18}/>
+                            <CheckCircle className="align-middle me-1" size={18}/>
                           </a>
                       )
                 )
@@ -191,22 +178,22 @@ const AssayTypeListCard = ({
 
   return (
       <Card>
-        <CardHeader>
-          <CardTitle tag="h5" className="mb-0">
+        <Card.Header>
+          <Card.Title tag="h5" className="mb-0">
             Assay Types
-            <span className="float-right">
+            <span className="float-end">
                   <Button
-                      color={"primary"}
-                      onClick={() => history.push("/assaytypes/new")}
+                      variant={"primary"}
+                      href={"/assaytypes/new"}
                   >
                     New Assay Type
                     &nbsp;
-                    <PlusCircle className="feather align-middle ml-2 mb-1"/>
+                    <PlusCircle className="feather align-middle ms-2 mb-1"/>
                   </Button>
                 </span>
-          </CardTitle>
-        </CardHeader>
-        <CardBody>
+          </Card.Title>
+        </Card.Header>
+        <Card.Body>
           <ToolkitProvider
               keyField="id"
               data={assayTypes}
@@ -234,15 +221,15 @@ const AssayTypeListCard = ({
           </ToolkitProvider>
           <AssayTypeDetailsModal
               assayType={selectedAssayType}
-              isOpen={showModal}
-              toggle={toggleModal}
+              isOpen={isModalOpen}
+              showModal={showModal}
           />
-        </CardBody>
+        </Card.Body>
       </Card>
   )
 }
 
-const AssayTypeDetailsModal = ({assayType, isOpen, toggle}) => {
+const AssayTypeDetailsModal = ({assayType, isOpen, showModal}) => {
 
   if (!assayType) {
     return "";
@@ -271,14 +258,14 @@ const AssayTypeDetailsModal = ({assayType, isOpen, toggle}) => {
 
   return (
       <Modal
-          isOpen={isOpen}
-          toggle={() => toggle()}
+          show={isOpen}
+          onHide={() => showModal()}
           size={"lg"}
       >
-        <ModalHeader toggle={() => toggle()}>
+        <Modal.Header closeButton>
           Assay Type: {assayType.name}
-        </ModalHeader>
-        <ModalBody>
+        </Modal.Header>
+        <Modal.Body className="m-3">
           <Row>
 
             <Col xs={12}>
@@ -342,12 +329,12 @@ const AssayTypeDetailsModal = ({assayType, isOpen, toggle}) => {
             </Col>
 
           </Row>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="secondary" onClick={() => toggle()}>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button color="secondary" onClick={() => showModal()}>
             Close
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
 
       </Modal>
   )

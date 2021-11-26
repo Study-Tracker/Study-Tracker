@@ -1,21 +1,6 @@
 import React from 'react';
-import {
-  Badge,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-  Table
-} from 'reactstrap';
+import {Badge, Button, Card, Col, Modal, Row, Table} from 'react-bootstrap';
 import {Clipboard, Edit, FolderPlus, Info} from 'react-feather';
-import {history} from "../../App";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -36,20 +21,20 @@ class ProgramSettings extends React.Component {
       isError: false,
       showDetails: false,
       selectedProgram: null,
-      showModal: false
+      isModalOpen: false
     };
-    this.toggleModal = this.toggleModal.bind(this);
+    this.showModal = this.showModal.bind(this);
   }
 
-  toggleModal(selected) {
+  showModal(selected) {
     if (!!selected) {
       this.setState({
-        showModal: true,
+        isModalOpen: true,
         selectedProgram: selected
       });
     } else {
       this.setState({
-        showModal: false
+        isModalOpen: false
       })
     }
   }
@@ -80,7 +65,7 @@ class ProgramSettings extends React.Component {
         text: "Name",
         sort: true,
         // headerStyle: {width: '40%'},
-        formatter: (c, d, i, x) => <a href={"javascript:void(0)"} onClick={() => this.toggleModal(d)}>{d.name}</a>,
+        formatter: (c, d, i, x) => <Button variant="link" onClick={() => this.showModal(d)}>{d.name}</Button>,
         sortFunc: (a, b, order, dataField, rowA, rowB) => {
           if (rowA.name > rowB.name) {
             return order === "desc" ? -1 : 1;
@@ -112,17 +97,9 @@ class ProgramSettings extends React.Component {
         // headerStyle: {width: '10%'},
         formatter: (c, d, i, x) => {
           if (d.active) {
-            return (
-                <div className="badge badge-success">
-                  Active
-                </div>
-            )
+            return <Badge bg="success">Active</Badge>
           } else {
-            return (
-                <div className="badge badge-danger">
-                  Inactive
-                </div>
-            )
+            return <Badge bg="danger">Inactive</Badge>
           }
         }
       },
@@ -136,7 +113,7 @@ class ProgramSettings extends React.Component {
             if (!!d.notebookFolder.url && d.notebookFolder.url !== "ERROR") {
               return <a href={d.notebookFolder.url} target="_blank">ELN Folder</a>
             } else {
-              return <span className="badge badge-warning">ERROR</span>
+              return <Badge bg="warning">ERROR</Badge>
             }
           } else {
             return "n/a"
@@ -153,7 +130,7 @@ class ProgramSettings extends React.Component {
             if (!!d.storageFolder.url) {
               return <a href={d.storageFolder.url} target="_blank">Files Folder</a>
             } else {
-              return <span className="badge badge-warning">ERROR</span>
+              return <Badge bg="warning">ERROR</Badge>
             }
           } else {
             return "n/a"
@@ -170,18 +147,18 @@ class ProgramSettings extends React.Component {
               <React.Fragment>
 
                 <a className="text-info" title={"View details"}
-                   onClick={() => this.toggleModal(d)}>
-                  <Info className="align-middle mr-1" size={18}/>
+                   onClick={() => this.showModal(d)}>
+                  <Info className="align-middle me-1" size={18}/>
                 </a>
 
                 <a className="text-warning" title={"Edit program"}
-                   onClick={() => history.push("/program/" + d.id + "/edit")}>
-                  <Edit className="align-middle mr-1" size={18}/>
+                   href={"/program/" + d.id + "/edit"}>
+                  <Edit className="align-middle me-1" size={18}/>
                 </a>
 
                 {/*<a className="text-danger" title={"Disable program"}*/}
                 {/*   onClick={() => console.log("click")}>*/}
-                {/*  <Trash className="align-middle mr-1" size={18}/>*/}
+                {/*  <Trash className="align-middle me-1" size={18}/>*/}
                 {/*</a>*/}
 
               </React.Fragment>
@@ -194,22 +171,22 @@ class ProgramSettings extends React.Component {
         <React.Fragment>
 
           <Card>
-            <CardHeader>
-              <CardTitle tag="h5" className="mb-0">
+            <Card.Header>
+              <Card.Title tag="h5" className="mb-0">
                 Registered Programs
-                <span className="float-right">
+                <span className="float-end">
                   <Button
-                      color={"primary"}
-                      onClick={() => history.push("/programs/new")}
+                      variant={"primary"}
+                      href={"/programs/new"}
                   >
                     New Program
                     &nbsp;
-                    <FolderPlus className="feather align-middle ml-2 mb-1"/>
+                    <FolderPlus className="feather align-middle ms-2 mb-1"/>
                   </Button>
                 </span>
-              </CardTitle>
-            </CardHeader>
-            <CardBody>
+              </Card.Title>
+            </Card.Header>
+            <Card.Body>
               <ToolkitProvider
                   keyField="id"
                   data={this.state.programs}
@@ -219,7 +196,7 @@ class ProgramSettings extends React.Component {
               >
                 {props => (
                     <div>
-                      <div className="float-right">
+                      <div className="float-end">
                         <Search.SearchBar
                             {...props.searchProps}
                         />
@@ -243,11 +220,11 @@ class ProgramSettings extends React.Component {
                 )}
               </ToolkitProvider>
               <ProgramDetailsModal
-                  toggle={this.toggleModal}
-                  isOpen={this.state.showModal}
+                  showModal={this.showModal}
+                  isOpen={this.state.isModalOpen}
                   program={this.state.selectedProgram}
               />
-            </CardBody>
+            </Card.Body>
           </Card>
 
         </React.Fragment>
@@ -256,7 +233,7 @@ class ProgramSettings extends React.Component {
 
 }
 
-const ProgramDetailsModal = ({program, isOpen, toggle}) => {
+const ProgramDetailsModal = ({program, isOpen, showModal}) => {
 
   if (!program) {
     return "";
@@ -273,14 +250,14 @@ const ProgramDetailsModal = ({program, isOpen, toggle}) => {
 
   return (
       <Modal
-          isOpen={isOpen}
-          toggle={() => toggle()}
+          open={isOpen}
+          onHide={() => showModal()}
           size={"lg"}
       >
-        <ModalHeader toggle={() => toggle()}>
+        <Modal.Header closeButton>
           Program: <strong>{program.name}</strong> (<code>{program.code}</code>)
-        </ModalHeader>
-        <ModalBody>
+        </Modal.Header>
+        <Modal.Body>
           <Row>
 
             <Col md={6}>
@@ -365,24 +342,24 @@ const ProgramDetailsModal = ({program, isOpen, toggle}) => {
             </Col>
 
           </Row>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="info"
-                  onClick={() => history.push("/program/" + program.id)}>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="info"
+                  href={"/program/" + program.id}>
             <Clipboard size={14} className="mb-1"/>
             &nbsp;
             View Program
           </Button>
-          <Button color="warning"
-                  onClick={() => history.push("/program/" + program.id + "/edit")}>
+          <Button variant="warning"
+                  href={"/program/" + program.id + "/edit"}>
             <Edit size={14} className="mb-1"/>
             &nbsp;
             Edit
           </Button>
-          <Button color="secondary" onClick={() => toggle()}>
+          <Button variant="secondary" onClick={() => showModal()}>
             Close
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
   )
 
@@ -390,9 +367,9 @@ const ProgramDetailsModal = ({program, isOpen, toggle}) => {
 
 const TrueFalseLabel = ({bool}) => {
   if (!!bool) {
-    return <Badge color={'success'}>True</Badge>
+    return <Badge bg={'success'}>True</Badge>
   } else {
-    return <Badge color={'danger'}>False</Badge>
+    return <Badge bg={'danger'}>False</Badge>
   }
 }
 

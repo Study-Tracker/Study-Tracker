@@ -1,16 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Col,
-  Form,
-  FormGroup,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row
-} from "reactstrap";
+import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import Select from "react-select";
 import swal from "sweetalert";
 
@@ -40,7 +29,7 @@ class AddToStudyCollectionModal extends React.Component {
         method: "POST"
       }).then(response => {
         if (response.ok) {
-          this.props.toggle();
+          this.props.showModal(false);
         } else {
           console.warn("Failed to add study to collection.")
           swal(
@@ -72,18 +61,18 @@ class AddToStudyCollectionModal extends React.Component {
     });
 
     return (
-        <Modal isOpen={this.props.isOpen}
-               toggle={() => this.props.toggle()}
-               size={"md"}>
-          <ModalHeader toggle={() => this.props.toggle()}>
+        <Modal show={this.props.isOpen}
+               onHide={() => this.props.showModal(false)}
+        >
+          <Modal.Header closeButton>
             Add Study to Collection
-          </ModalHeader>
-          <ModalBody>
+          </Modal.Header>
+          <Modal.Body>
             <Form>
-              <Row form>
+              <Row>
                 <Col xs={12}>
-                  <FormGroup>
-                    <Label>Collection</Label>
+                  <Form.Group>
+                    <Form.Label>Collection</Form.Label>
                     <Select
                       className="react-select-container"
                       classNamePrefix="react-select"
@@ -94,26 +83,26 @@ class AddToStudyCollectionModal extends React.Component {
                         this.setState({selected: o.value})
                       }}
                     />
-                  </FormGroup>
+                  </Form.Group>
                 </Col>
               </Row>
             </Form>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button
-                color="secondary"
-                onClick={() => this.props.toggle()}
+                variant="secondary"
+                onClick={() => this.props.showModal(false)}
             >
               Cancel
             </Button>
             <Button
-                color="primary"
+                variant="primary"
                 onClick={() => this.handleSubmit(this.state.selected)}
                 disabled={!this.state.selected}
             >
               Submit
             </Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
     )
   }

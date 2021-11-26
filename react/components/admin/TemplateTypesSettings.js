@@ -1,18 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
-  Button,
-  UncontrolledButtonDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-} from 'reactstrap';
-import { PlusCircle } from "react-feather";
-import { Link } from 'react-router-dom';
+import {Button, Card, Dropdown} from 'react-bootstrap';
+import {PlusCircle} from "react-feather";
+import {Link} from 'react-router-dom';
 
 import ToolkitProvider from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -79,19 +69,16 @@ export const TemplateTypesSettings = () => {
           };
 
           return (
-            <UncontrolledButtonDropdown>
-              <DropdownToggle
-                caret
-                color={ status.color }
-              >
+            <Dropwdown>
+              <Dropdown.Toggle variant={status.color}>
                 { status.text }
-              </DropdownToggle>
-              <DropdownMenu>
-                <DropdownItem onClick={ () => handleStatusChange({ id: row.id, statusToSet: !row.active }) }>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={ () => handleStatusChange({ id: row.id, statusToSet: !row.active }) }>
                   { status.actionText }
-                </DropdownItem>
-              </DropdownMenu>
-            </UncontrolledButtonDropdown>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropwdown>
           );
         },
       },
@@ -128,22 +115,22 @@ export const TemplateTypesList = ({ templateTypes, templateTableColumns }) => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
+      <Card.Header>
+        <Card.Title>
           ELN Entry Templates
-          <span className="float-right">
+          <span className="float-end">
             <Link to="/template-types/new">
-              <Button color="primary">
+              <Button variant="primary">
                 New Template
                 &nbsp;
-                <PlusCircle className="feather align-middle ml-2 mb-1"/>
+                <PlusCircle className="feather align-middle ms-2 mb-1"/>
               </Button>
             </Link>
           </span>
-        </CardTitle>
-      </CardHeader>
+        </Card.Title>
+      </Card.Header>
 
-      <CardBody>
+      <Card.Body>
         <ToolkitProvider
           keyField="id"
           data={ templateTypes }
@@ -175,7 +162,7 @@ export const TemplateTypesList = ({ templateTypes, templateTableColumns }) => {
             </div>
           )}
         </ToolkitProvider>
-      </CardBody>
+      </Card.Body>
     </Card>
   );
 }

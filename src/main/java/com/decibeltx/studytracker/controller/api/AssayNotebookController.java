@@ -38,8 +38,8 @@ public class AssayNotebookController extends AbstractAssayController {
             .orElseThrow(() -> new RecordNotFoundException("Could not load assay folder"));
   }
 
-  @PatchMapping("/{id}/notebook")
-  public HttpEntity<?> repairNotebookFolder(@PathVariable("id") Long assayId) {
+  @PatchMapping("")
+  public HttpEntity<?> repairNotebookFolder(@PathVariable("assayId") Long assayId) {
 
     // Check that the study exists
     Optional<Assay> optional = this.getAssayService().findById(assayId);

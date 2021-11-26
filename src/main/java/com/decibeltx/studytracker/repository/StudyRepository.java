@@ -16,6 +16,7 @@
 
 package com.decibeltx.studytracker.repository;
 
+import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Study;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,10 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
   @Override
   @EntityGraph("study-summary")
   List<Study> findAll();
+
+  @EntityGraph("study-with-attributes")
+  @Query("select s from Study s")
+  List<Study> findAllWithDetails();
 
   @Override
   @EntityGraph("study-with-attributes")
@@ -53,7 +58,6 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
   Optional<Study> findByAssayId(Long assayId);
 
   @EntityGraph("study-with-attributes")
-//  @Query("select s from Study s join s.users u where u.id = ?1")
   List<Study> findByUsersId(Long userId);
 
   /**
@@ -69,10 +73,30 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
   @Query("select s from Study s where lower(s.name) like lower(concat('%', ?1, '%')) or lower(s.code) like lower(concat('%', ?1, '%'))")
   List<Study> findByNameOrCodeLike(String keyword);
 
+  @EntityGraph("study-with-attributes")
+  List<Study> findByUpdatedAtAfter(Date date);
+
   long countByCreatedAtBefore(Date date);
 
   long countByCreatedAtAfter(Date date);
 
   long countByCreatedAtBetween(Date startDate, Date endDate);
+
+  long countByProgram(Program program);
+
+  long countByProgramAndCreatedAtAfter(Program program, Date date);
+
+  @Query(nativeQuery = true, value = "select count(distinct(s.id)) "
+      + "from studies s join study_users su on s.id = su.study_id "
+      + "where (s.created_by = ?1 or su.user_id = ?1) and s.status in ('IN_PLANNING', 'ACTIVE') "
+      + "and s.active = true")
+  long countActiveUserStudies(Long userId);
+
+  @Query(nativeQuery = true, value = "select count(distinct(s.id)) "
+      + "from studies s join study_users su on s.id = su.study_id "
+      + "where (s.created_by = ?1 or su.user_id = ?1) "
+      + "and s.status in ('COMPLETE') "
+      + "and s.active = true")
+  long countCompleteUserStudies(Long userId);
 
 }
