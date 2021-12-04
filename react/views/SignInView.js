@@ -164,19 +164,6 @@ export default class SignInView extends React.Component {
                           && !!this.state.options.sso.okta
                             ? (
                                   <div className="text-center mt-3">
-                                    <a href={this.state.options.sso.okta}
-                                       className="btn btn-lg btn-outline-primary">
-                                      Sign in with Okta
-                                    </a>
-                                  </div>
-                            ) : ''
-                        }
-
-                        {
-                          !!this.state.options && !!this.state.options.sso
-                          && !!this.state.options.sso.okta
-                            ? (
-                                  <div className="text-center mt-3">
                                     <Button
                                         href={this.state.options.sso.okta}
                                         size={"lg"}
