@@ -24,7 +24,7 @@ import {UserInputs} from "./users";
 import swal from 'sweetalert';
 import {history} from '../../App';
 import {AssayTypeDropdown} from "./assayTypes";
-import {AssayNotebookTemplatesDropdown} from './assayNotebookTemplates';
+import {NotebookEntryTemplatesDropdown} from './notebookEntryTemplates';
 import {AssayTypeFieldCaptureInputList} from "./assayTypeFieldCapture";
 import AttributeInputs from "./attributes";
 import {TaskInputs} from "./tasks";
@@ -48,7 +48,7 @@ export default class AssayForm extends React.Component {
       fields: {},
       tasks: [],
       attributes: {},
-      entryTemplateId: '',
+      notebookTemplateId: '',
     };
     assay.lastModifiedBy = this.props.user;
 
@@ -108,7 +108,7 @@ export default class AssayForm extends React.Component {
     this.setState({
       assay: {
         ...this.state.assay,
-        entryTemplateId: selectedItem
+        notebookTemplateId: selectedItem
           ? selectedItem.value
           : '',
       },
@@ -350,7 +350,7 @@ export default class AssayForm extends React.Component {
                       </Col>
                       <Col sm={5}>
                         { !this.state.isUpdateModeOn &&
-                          <AssayNotebookTemplatesDropdown
+                          <NotebookEntryTemplatesDropdown
                             notebookTemplates={this.props.notebookTemplates}
                             onChange={this.handleTemplateSelection}
                           />

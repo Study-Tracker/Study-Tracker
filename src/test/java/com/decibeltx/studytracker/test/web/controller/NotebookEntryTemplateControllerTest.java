@@ -15,6 +15,7 @@ import com.decibeltx.studytracker.Application;
 import com.decibeltx.studytracker.example.ExampleDataGenerator;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.model.NotebookEntryTemplate;
+import com.decibeltx.studytracker.model.NotebookEntryTemplate.Category;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.repository.NotebookEntryTemplateRepository;
 import com.decibeltx.studytracker.repository.UserRepository;
@@ -22,6 +23,7 @@ import com.decibeltx.studytracker.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +43,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles({"web-test", "example"})
 public class NotebookEntryTemplateControllerTest {
 
-    private static final int ENTRY_TEMPLATE_COUNT = 2;
+    private static final int ENTRY_TEMPLATE_COUNT = ExampleDataGenerator.NOTEBOOK_ENTRY_TEMPLATE_COUNT;
 
     @Autowired
     private ExampleDataGenerator exampleDataGenerator;
@@ -71,7 +73,7 @@ public class NotebookEntryTemplateControllerTest {
 
     @Test
     public void allEntryTemplateTest() throws Exception {
-        mockMvc.perform(get("/api/entryTemplate")
+        mockMvc.perform(get("/api/notebookentrytemplate")
             .with(user(username)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(ENTRY_TEMPLATE_COUNT)))
@@ -84,8 +86,9 @@ public class NotebookEntryTemplateControllerTest {
     public void createEntryTemplateTest() throws Exception {
         User user = userRepository.findByUsername("rblack")
                 .orElseThrow(RecordNotFoundException::new);
-        NotebookEntryTemplate notebookEntryTemplate = NotebookEntryTemplate.of(user, "id3", "table3", new Date());
-        mockMvc.perform(post("/api/entryTemplate")
+        NotebookEntryTemplate notebookEntryTemplate = NotebookEntryTemplate.of(user, "id9999",
+            "table3", Category.STUDY, new Date());
+        mockMvc.perform(post("/api/notebookentrytemplate")
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(notebookEntryTemplate)))
@@ -95,7 +98,14 @@ public class NotebookEntryTemplateControllerTest {
                 .andExpect(jsonPath("$", hasKey("name")))
                 .andExpect(jsonPath("$.name", is("table3")))
                 .andExpect(jsonPath("$", hasKey("templateId")))
-                .andExpect(jsonPath("$.templateId", is("id3")));
+                .andExpect(jsonPath("$.templateId", is("id9999")))
+                .andExpect(jsonPath("$", hasKey("category")))
+                .andExpect(jsonPath("$.category", is("STUDY")))
+                .andExpect(jsonPath("$", hasKey("default")))
+                .andExpect(jsonPath("$.default", is(false)))
+                .andExpect(jsonPath("$", hasKey("active")))
+                .andExpect(jsonPath("$.active", is(true)))
+        ;
     }
 
     @Test
@@ -105,7 +115,7 @@ public class NotebookEntryTemplateControllerTest {
         List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll();
         NotebookEntryTemplate testTemplate = templates.get(0);
         boolean previousStatus = testTemplate.isActive();
-        mockMvc.perform(post("/api/entryTemplate/" + testTemplate.getId() + "/status/?active=" + !previousStatus)
+        mockMvc.perform(post("/api/notebookentrytemplate/" + testTemplate.getId() + "/status/?active=" + !previousStatus)
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -115,7 +125,7 @@ public class NotebookEntryTemplateControllerTest {
     public void updateNonExistentEntryTemplateStatusTest() throws Exception {
         User user = userRepository.findByUsername("rblack")
                 .orElseThrow(RecordNotFoundException::new);
-        mockMvc.perform(post("/api/entryTemplate/99999/status/?active=" + false)
+        mockMvc.perform(post("/api/notebookentrytemplate/99999/status/?active=" + false)
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -129,7 +139,7 @@ public class NotebookEntryTemplateControllerTest {
         NotebookEntryTemplate testTemplate = templates.get(0);
         testTemplate.setName("updated name");
         testTemplate.setTemplateId("updated id");
-        mockMvc.perform(put("/api/entryTemplate")
+        mockMvc.perform(put("/api/notebookentrytemplate")
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))
@@ -149,7 +159,7 @@ public class NotebookEntryTemplateControllerTest {
         List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll();
         NotebookEntryTemplate testTemplate = templates.get(0);
         testTemplate.setId(999999L);
-        mockMvc.perform(put("/api/entryTemplate")
+        mockMvc.perform(put("/api/notebookentrytemplate")
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))
@@ -160,15 +170,18 @@ public class NotebookEntryTemplateControllerTest {
     public void getActiveTemplatesTest() throws Exception {
         User user = userRepository.findByUsername("rblack")
                 .orElseThrow(RecordNotFoundException::new);
-        List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll();
+        List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll().stream()
+            .filter(NotebookEntryTemplate::isActive)
+            .collect(Collectors.toList());
+        int size = templates.size();
         NotebookEntryTemplate testTemplate = templates.get(0);
-        mockMvc.perform(post("/api/entryTemplate/" + testTemplate.getId() + "/status/?active=" + false)
+        mockMvc.perform(post("/api/notebookentrytemplate/" + testTemplate.getId() + "/status/?active=" + false)
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/api/entryTemplate/active")
+        mockMvc.perform(get("/api/notebookentrytemplate/active")
             .with(user(username)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(ENTRY_TEMPLATE_COUNT-1)));
+                .andExpect(jsonPath("$", hasSize(size-1)));
     }
 }

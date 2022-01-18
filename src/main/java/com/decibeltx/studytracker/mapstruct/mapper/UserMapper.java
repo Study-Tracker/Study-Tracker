@@ -1,6 +1,7 @@
 package com.decibeltx.studytracker.mapstruct.mapper;
 
 import com.decibeltx.studytracker.mapstruct.dto.UserDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.UserFormDto;
 import com.decibeltx.studytracker.mapstruct.dto.UserSlimDto;
 import com.decibeltx.studytracker.mapstruct.dto.UserSummaryDto;
 import com.decibeltx.studytracker.model.User;
@@ -10,6 +11,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
+  User fromUserForm(UserFormDto dto);
 
   // UserSummary
   User fromUserSummary(UserSummaryDto dto);

@@ -17,10 +17,13 @@
 package com.decibeltx.studytracker.controller.api;
 
 import com.decibeltx.studytracker.controller.UserAuthenticationUtils;
+import com.decibeltx.studytracker.eln.NotebookTemplate;
+import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.exception.NotebookException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.mapstruct.dto.AssayDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.AssayFormDto;
 import com.decibeltx.studytracker.mapstruct.dto.AssaySummaryDto;
 import com.decibeltx.studytracker.mapstruct.mapper.AssayMapper;
 import com.decibeltx.studytracker.model.Assay;
@@ -29,6 +32,7 @@ import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.model.User;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +61,9 @@ public class StudyAssayController extends AbstractAssayController {
   @Autowired
   private AssayMapper assayMapper;
 
+  @Autowired(required = false)
+  private StudyNotebookService notebookService;
+
   @GetMapping("")
   public List<AssaySummaryDto> findStudyAssays(@PathVariable("studyId") String studyId) {
     Study study = getStudyFromIdentifier(studyId);
@@ -69,7 +77,7 @@ public class StudyAssayController extends AbstractAssayController {
 
   @PostMapping("")
   public HttpEntity<AssayDetailsDto> create(@PathVariable("studyId") String studyId,
-      @RequestBody @Valid AssayDetailsDto dto)
+      @RequestBody @Valid AssayFormDto dto)
           throws RecordNotFoundException, NotebookException {
 
     LOGGER.info("Creating assay");
@@ -82,8 +90,22 @@ public class StudyAssayController extends AbstractAssayController {
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
 
-    Assay assay = assayMapper.fromAssayDetails(dto);
-    Assay created = this.createAssay(assay, study, user);
+    Assay assay = assayMapper.fromAssayForm(dto);
+    Assay created;
+
+    // If a notebook template was requested, find it
+    if (notebookService != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
+      Optional<NotebookTemplate> templateOptional =
+          notebookService.findEntryTemplateById(dto.getNotebookTemplateId());
+      if (templateOptional.isPresent()) {
+        created = this.createAssay(assay, study, user, templateOptional.get());
+      } else {
+        throw new RecordNotFoundException("Could not find notebook entry template: "
+            + dto.getNotebookTemplateId());
+      }
+    } else {
+      created = this.createAssay(assay, study, user);
+    }
 
     return new ResponseEntity<>(assayMapper.toAssayDetails(created), HttpStatus.CREATED);
 
@@ -91,14 +113,14 @@ public class StudyAssayController extends AbstractAssayController {
 
   @PutMapping("/{assayId}")
   public HttpEntity<AssayDetailsDto> update(@PathVariable("assayId") String assayId,
-      @RequestBody @Valid AssayDetailsDto dto) {
+      @RequestBody @Valid AssayFormDto dto) {
     LOGGER.info("Updating assay");
     LOGGER.info(dto.toString());
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
-    Assay assay = assayMapper.fromAssayDetails(dto);
+    Assay assay = assayMapper.fromAssayForm(dto);
     this.updateAssay(assay, user);
     return new ResponseEntity<>(assayMapper.toAssayDetails(assay), HttpStatus.OK);
   }

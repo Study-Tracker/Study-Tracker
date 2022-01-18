@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import UserSettings from "./UserSettings";
 import AssayTypeSettings from "./AssayTypeSettings";
-import TemplateTypesSettings from './TemplateTypesSettings';
+import EntryTemplateSettings from './EntryTemplateSettings';
 import {history} from '../../App';
 import KeywordSettings from "./KeywordSettings";
 import ProgramSettings from "./ProgramSettings";
@@ -29,7 +29,7 @@ const settings = {
   "eln-entry-templates": {
     id: "eln-entry-templates",
     label: "ELN Entry Templates",
-    tag: TemplateTypesSettings
+    tag: EntryTemplateSettings
   },
   "keywords": {
     id: "keywords",

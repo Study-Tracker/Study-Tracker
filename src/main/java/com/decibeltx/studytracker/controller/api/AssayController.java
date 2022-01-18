@@ -21,6 +21,7 @@ import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.mapstruct.dto.ActivitySummaryDto;
 import com.decibeltx.studytracker.mapstruct.dto.AssayDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.AssayFormDto;
 import com.decibeltx.studytracker.mapstruct.dto.AssayParentDto;
 import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
 import com.decibeltx.studytracker.mapstruct.mapper.AssayMapper;
@@ -75,12 +76,12 @@ public class AssayController extends AbstractAssayController {
 
   @PutMapping("/{id}")
   public HttpEntity<AssayDetailsDto> update(@PathVariable("id") Long id,
-      @RequestBody @Valid AssayDetailsDto dto) {
+      @RequestBody @Valid AssayFormDto dto) {
 
     LOGGER.info("Updating assay with id: " + id);
     LOGGER.info(dto.toString());
 
-    Assay assay = assayMapper.fromAssayDetails(dto);
+    Assay assay = assayMapper.fromAssayForm(dto);
 
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

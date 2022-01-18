@@ -16,13 +16,16 @@
 
 package com.decibeltx.studytracker.service;
 
+import com.decibeltx.studytracker.eln.NotebookEntry;
 import com.decibeltx.studytracker.eln.NotebookFolder;
+import com.decibeltx.studytracker.eln.NotebookTemplate;
 import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.exception.DuplicateRecordException;
 import com.decibeltx.studytracker.exception.InvalidConstraintException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.model.ELNFolder;
+import com.decibeltx.studytracker.model.ExternalLink;
 import com.decibeltx.studytracker.model.FileStoreFolder;
 import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Status;
@@ -35,6 +38,7 @@ import com.decibeltx.studytracker.repository.StudyRepository;
 import com.decibeltx.studytracker.storage.StorageFolder;
 import com.decibeltx.studytracker.storage.StudyStorageService;
 import com.decibeltx.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -150,13 +154,18 @@ public class StudyService {
     return studyRepository.findByExternalCode(code);
   }
 
+  public void create(Study study) {
+    this.create(study, null);
+  }
+
   /**
-   * Creates a new study record
+   * Creates a new study record, creates a storage folder, creates and ELN folder, and creates
+   *  an ELN entry for the study.
    *
    * @param study new study
    */
   @Transactional
-  public void create(Study study) {
+  public void create(Study study, NotebookTemplate template) {
 
     LOGGER.info("Attempting to create new study with name: " + study.getName());
 
@@ -197,26 +206,36 @@ public class StudyService {
     }
 
     // Create the ELN folder
+    ELNFolder elnFolder = null;
+    NotebookEntry studySummaryEntry = null;
     if (study.isLegacy()) {
       LOGGER.info(String.format("Legacy Study : %s", study.getCode()));
       if (study.getNotebookFolder().getUrl() != null) {
-        ELNFolder notebookFolder = study.getNotebookFolder();
-        notebookFolder.setName(namingService.getStudyNotebookFolderName(study));
-        study.setNotebookFolder(notebookFolder);
+        elnFolder = study.getNotebookFolder();
+        elnFolder.setName(namingService.getStudyNotebookFolderName(study));
+        study.setNotebookFolder(elnFolder);
       } else {
         LOGGER.warn("No ELN URL set, so folder reference will not be created.");
         study.setNotebookFolder(null);
       }
     } else {
+      // New study and notebook integration active
       if (notebookService != null) {
         LOGGER.info(String.format("Creating ELN entry for study: %s", study.getCode()));
         if (program.getNotebookFolder() != null) {
           try {
+
+            // Create the notebook folder
             NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
-            study.setNotebookFolder(ELNFolder.from(notebookFolder));
+            elnFolder = ELNFolder.from(notebookFolder);
+            study.setNotebookFolder(elnFolder);
+
+            // Creat the notebook entry
+            studySummaryEntry = notebookService.createStudyNotebookEntry(study, template);
+
           } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.warn("Failed to create notebook entry for study: " + study.getCode());
+            LOGGER.warn("Failed to create notebook folder and entry for study: " + study.getCode());
 
           }
         } else {
@@ -227,6 +246,7 @@ public class StudyService {
       }
     }
 
+    // Persist the record
     try {
       studyRepository.save(study);
       LOGGER.info(String.format("Successfully created new study with code %s and ID %s",
@@ -236,6 +256,21 @@ public class StudyService {
         throw new InvalidConstraintException(e);
       } else {
         throw e;
+      }
+    }
+
+    // Add a link to the study summary entry
+    if (studySummaryEntry != null) {
+      try {
+        ExternalLink entryLink = new ExternalLink();
+        entryLink.setStudy(study);
+        entryLink.setLabel("Summary ELN Entry");
+        entryLink.setUrl(new URL(studySummaryEntry.getUrl()));
+        study.addExternalLink(entryLink);
+        studyRepository.save(study);
+      } catch (Exception e) {
+        e.printStackTrace();
+        LOGGER.warn("Failed to create link to ELN entry.");
       }
     }
 
@@ -249,7 +284,7 @@ public class StudyService {
   @Transactional
   public void update(Study updated) {
     LOGGER.info("Attempting to update existing study with code: " + updated.getCode());
-    Study study = studyRepository.getOne(updated.getId());
+    Study study = studyRepository.getById(updated.getId());
 
     study.setDescription(updated.getDescription());
     study.setExternalCode(updated.getExternalCode());
@@ -284,7 +319,7 @@ public class StudyService {
    */
   @Transactional
   public void delete(Study study) {
-    Study s = studyRepository.getOne(study.getId());
+    Study s = studyRepository.getById(study.getId());
     s.setActive(false);
     studyRepository.save(s);
   }
@@ -297,7 +332,7 @@ public class StudyService {
    */
   @Transactional
   public void updateStatus(Study study, Status status) {
-    Study s = studyRepository.getOne(study.getId());
+    Study s = studyRepository.getById(study.getId());
     s.setStatus(status);
     if (status.equals(Status.COMPLETE) && study.getEndDate() == null) {
       s.setEndDate(new Date());
@@ -336,7 +371,7 @@ public class StudyService {
    */
   @Transactional
   public void markAsUpdated(Study study, User user) {
-    Study s = studyRepository.getOne(study.getId());
+    Study s = studyRepository.getById(study.getId());
     s.setLastModifiedBy(user);
     s.setUpdatedAt(new Date());
     studyRepository.save(s);
@@ -393,7 +428,7 @@ public class StudyService {
     }
 
     // Update the  program record
-    FileStoreFolder f = fileStoreFolderRepository.getOne(study.getStorageFolder().getId());
+    FileStoreFolder f = fileStoreFolderRepository.getById(study.getStorageFolder().getId());
     f.setName(folder.getName());
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
@@ -416,7 +451,7 @@ public class StudyService {
     ELNFolder f;
     boolean isNew = false;
     try {
-      f = elnFolderRepository.getOne(study.getNotebookFolder().getId());
+      f = elnFolderRepository.getById(study.getNotebookFolder().getId());
     } catch (NullPointerException e) {
       f = new ELNFolder();
       isNew = true;

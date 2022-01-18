@@ -48,10 +48,10 @@ public class StudyConclusionsService {
 
   @Transactional
   public void updateStudyConclusions(Study study, StudyConclusions conclusions) {
-    StudyConclusions c = studyConclusionsRepository.getOne(conclusions.getId());
+    StudyConclusions c = studyConclusionsRepository.getById(conclusions.getId());
     c.setContent(conclusions.getContent());
     studyConclusionsRepository.save(c);
-    Study s = studyRepository.getOne(study.getId());
+    Study s = studyRepository.getById(study.getId());
     s.setUpdatedAt(new Date());
     studyRepository.save(s);
   }

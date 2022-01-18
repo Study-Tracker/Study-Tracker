@@ -6,6 +6,8 @@ import ToolkitProvider from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {AssayTaskList} from "../assayTasks";
+import {SettingsLoadingMessage} from "../loading";
+import {SettingsErrorMessage} from "../errors";
 
 class AssayTypeSettings extends React.Component {
 
@@ -13,7 +15,9 @@ class AssayTypeSettings extends React.Component {
     super(props);
     this.state = {
       assayTypes: [],
-      isModalOpen: false
+      isModalOpen: false,
+      isLoaded: false,
+      isError: false
     };
     this.showModal = this.showModal.bind(this);
     this.toggleActive = this.toggleActive.bind(this);
@@ -58,7 +62,8 @@ class AssayTypeSettings extends React.Component {
     .then(response => response.json())
     .then(json => {
       this.setState({
-        assayTypes: json
+        assayTypes: json,
+        isLoaded: true
       })
     })
     .catch(error => {
@@ -80,6 +85,8 @@ class AssayTypeSettings extends React.Component {
               selectedAssayType={this.state.selectedAssayType}
               showModal={this.showModal}
               toggleActive={this.toggleActive}
+              isLoaded={this.state.isLoaded}
+              isError={this.state.isError}
           />
         </React.Fragment>
     )
@@ -92,6 +99,8 @@ export default AssayTypeSettings;
 const AssayTypeListCard = ({
   assayTypes,
   isModalOpen,
+  isLoaded,
+  isError,
   selectedAssayType,
   showModal,
   toggleActive
@@ -176,56 +185,75 @@ const AssayTypeListCard = ({
     }
   ];
 
+  let content = <SettingsLoadingMessage />
+  if (!!isLoaded) {
+    content = <AssayTypeTable columns={columns} assayTypes={assayTypes} />
+  } else if (!!isError) {
+    content = <SettingsErrorMessage />
+  }
+
   return (
       <Card>
+
         <Card.Header>
           <Card.Title tag="h5" className="mb-0">
             Assay Types
             <span className="float-end">
-                  <Button
-                      variant={"primary"}
-                      href={"/assaytypes/new"}
-                  >
-                    New Assay Type
-                    &nbsp;
-                    <PlusCircle className="feather align-middle ms-2 mb-1"/>
-                  </Button>
-                </span>
+              <Button
+                  variant={"primary"}
+                  href={"/assaytypes/new"}
+              >
+                New Assay Type
+                &nbsp;
+                <PlusCircle className="feather align-middle ms-2 mb-1"/>
+              </Button>
+            </span>
           </Card.Title>
         </Card.Header>
+
         <Card.Body>
-          <ToolkitProvider
-              keyField="id"
-              data={assayTypes}
-              columns={columns}
-          >
-            {props => (
-                <div>
-                  <BootstrapTable
-                      bootstrap4
-                      keyField="id"
-                      bordered={false}
-                      pagination={paginationFactory({
-                        sizePerPage: 10,
-                        sizePerPageList: [10, 20, 40, 80]
-                      })}
-                      defaultSorted={[{
-                        dataField: "name",
-                        order: "asc"
-                      }]}
-                      {...props.baseProps}
-                  >
-                  </BootstrapTable>
-                </div>
-            )}
-          </ToolkitProvider>
+
+          { content }
+
           <AssayTypeDetailsModal
               assayType={selectedAssayType}
               isOpen={isModalOpen}
               showModal={showModal}
           />
+
         </Card.Body>
+
       </Card>
+  )
+}
+
+const AssayTypeTable = ({columns, assayTypes}) => {
+  return (
+      <ToolkitProvider
+          keyField="id"
+          data={assayTypes}
+          columns={columns}
+      >
+        {props => (
+            <div>
+              <BootstrapTable
+                  bootstrap4
+                  keyField="id"
+                  bordered={false}
+                  pagination={paginationFactory({
+                    sizePerPage: 10,
+                    sizePerPageList: [10, 20, 40, 80]
+                  })}
+                  defaultSorted={[{
+                    dataField: "name",
+                    order: "asc"
+                  }]}
+                  {...props.baseProps}
+              >
+              </BootstrapTable>
+            </div>
+        )}
+      </ToolkitProvider>
   )
 }
 

@@ -21,6 +21,7 @@ import com.decibeltx.studytracker.exception.InsufficientPrivilegesException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.mapstruct.dto.ActivityDetailsDto;
 import com.decibeltx.studytracker.mapstruct.dto.UserDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.UserFormDto;
 import com.decibeltx.studytracker.mapstruct.dto.UserSummaryDto;
 import com.decibeltx.studytracker.mapstruct.mapper.ActivityMapper;
 import com.decibeltx.studytracker.mapstruct.mapper.UserMapper;
@@ -130,7 +131,7 @@ public class UserController {
   }
 
   @PostMapping("")
-  public HttpEntity<UserDetailsDto> createUser(@RequestBody @Valid UserDetailsDto dto) {
+  public HttpEntity<UserDetailsDto> createUser(@RequestBody @Valid UserFormDto dto) {
 
     LOGGER.info("Registering new user: " + dto.toString());
 
@@ -143,7 +144,7 @@ public class UserController {
     }
 
     // Save the new user record
-    User user = userMapper.fromUserDetails(dto);
+    User user = userMapper.fromUserForm(dto);
     userService.create(user);
 
     // Create a password reset token and send email to new user
@@ -155,7 +156,7 @@ public class UserController {
 
   @PutMapping("/{id}")
   public HttpEntity<UserDetailsDto> updateUser(@PathVariable("id") Long userId,
-      @RequestBody UserDetailsDto dto) {
+      @RequestBody @Valid UserFormDto dto) {
 
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
@@ -168,7 +169,7 @@ public class UserController {
     if (!userService.exists(userId)) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    userService.update(userMapper.fromUserDetails(dto));
+    userService.update(userMapper.fromUserForm(dto));
     User user = userService.findById(userId)
         .orElseThrow(RecordNotFoundException::new);
     return new ResponseEntity<>(userMapper.toUserDetails(user), HttpStatus.CREATED);

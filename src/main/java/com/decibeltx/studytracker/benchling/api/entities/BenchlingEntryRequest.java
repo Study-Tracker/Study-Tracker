@@ -1,4 +1,4 @@
-package com.decibeltx.studytracker.benchling.eln.entities;
+package com.decibeltx.studytracker.benchling.api.entities;
 
 import java.util.LinkedHashMap;
 import java.util.List;

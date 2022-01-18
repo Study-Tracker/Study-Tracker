@@ -44,12 +44,17 @@ email.outgoing-email-address=${spring.mail.username}
 
 ### Notebook
 # Connect Study Tracker with your ELN
-# Options: 'none', 'idbs', 'benchling'. Default: 'none'
+# Options: 'none', 'benchling'. Default: 'none'
 notebook.mode=
-benchling.eln.api.token=
-benchling.eln.api.root-url=
-benchling.eln.api.root-entity=
-benchling.eln.api.root-folder-url=
+benchling.tenant-name=
+benchling.api.token=
+benchling.api.username=
+benchling.api.password=
+benchling.api.client-id=
+benchling.api.client-secret=
+benchling.api.root-url=
+benchling.api.root-entity=
+benchling.api.root-folder-url=
 
 ### File Storage
 # Options: local, egnyte. Defaults to local

@@ -39,13 +39,13 @@ public class AssayTaskService {
 
   @Transactional
   public void updateAssayTask(AssayTask task, Assay assay) {
-    AssayTask t = assayTaskRepository.getOne(task.getId());
+    AssayTask t = assayTaskRepository.getById(task.getId());
     t.setAssay(assay);
     t.setStatus(task.getStatus());
     t.setOrder(task.getOrder());
     t.setLabel(task.getLabel());
     assayTaskRepository.save(t);
-    Assay a = assayRepository.getOne(assay.getId());
+    Assay a = assayRepository.getById(assay.getId());
     a.setUpdatedAt(new Date());
     assayRepository.save(a);
   }

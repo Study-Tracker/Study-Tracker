@@ -106,14 +106,14 @@ public class ProgramService {
   public void update(Program program) {
     LOGGER.info("Updating program with name: " + program.getName());
 
-    Program p = programRepository.getOne(program.getId());
+    Program p = programRepository.getById(program.getId());
     p.setDescription(program.getDescription());
     p.setActive(program.isActive());
     p.setAttributes(program.getAttributes());
     programRepository.save(p);
 
     if (program.getNotebookFolder() != null) {
-      ELNFolder f = elnFolderRepository.getOne(program.getNotebookFolder().getId());
+      ELNFolder f = elnFolderRepository.getById(program.getNotebookFolder().getId());
       ELNFolder folder = program.getNotebookFolder();
       f.setReferenceId(folder.getReferenceId());
       f.setUrl(folder.getUrl());
@@ -131,7 +131,7 @@ public class ProgramService {
 
   @Transactional
   public void delete(Long programId) {
-    Program program = programRepository.getOne(programId);
+    Program program = programRepository.getById(programId);
     program.setActive(false);
     programRepository.save(program);
   }
@@ -172,7 +172,7 @@ public class ProgramService {
     }
 
     // Update the  program record
-    FileStoreFolder f = fileStoreFolderRepository.getOne(program.getStorageFolder().getId());
+    FileStoreFolder f = fileStoreFolderRepository.getById(program.getStorageFolder().getId());
     f.setName(folder.getName());
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
@@ -192,7 +192,7 @@ public class ProgramService {
     }
 
     // Update the record
-    ELNFolder f = elnFolderRepository.getOne(program.getNotebookFolder().getId());
+    ELNFolder f = elnFolderRepository.getById(program.getNotebookFolder().getId());
     f.setName(folder.getName());
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());

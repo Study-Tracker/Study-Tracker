@@ -210,7 +210,14 @@ public class StudyBaseControllerTests {
         .with(user(study.getOwner().getUsername()))
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
+        .andExpect(status().isNotFound());
+
+    mockMvc.perform(put("/api/study/CPA-10001")
+            .with(user(study.getOwner().getUsername()))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isOk());
+
   }
 
   @Test

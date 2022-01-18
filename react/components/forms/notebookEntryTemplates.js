@@ -19,34 +19,34 @@ import {Form} from "react-bootstrap";
 import Select from "react-select";
 import {FormGroup} from "./common";
 
-export const AssayNotebookTemplatesDropdown = ({
+export const NotebookEntryTemplatesDropdown = ({
   notebookTemplates,
-  selectedTemplate,
   onChange,
 }) => {
   const options = notebookTemplates
     .sort((a, b) => {
       if (a.name > b.name) { return 1; }
       if (a.name < b.name) { return -1; }
-
       return 0;
     })
-    .map(({templateId, name}) => {
+    .map(t => {
       return {
-        value: templateId,
-        label: name,
+        value: t.referenceId,
+        label: t.name,
+        default: t.default
       };
     });
-  const selectedValue = options.find(option => option.value === selectedTemplate);
+  const defaultValue = options.find(o => o.default === true);
+  const selectedValue = defaultValue || null;
 
   return (
     <FormGroup>
-      <Form.Label>Notebook File Template</Form.Label>
+      <Form.Label>Notebook Entry Template</Form.Label>
       <Select
         className="react-select-container"
         classNamePrefix="react-select"
 
-        defaultValue={selectedValue}
+        defaultValue={selectedValue || defaultValue}
         options={options}
         onChange={onChange}
         isClearable={true}

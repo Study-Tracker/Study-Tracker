@@ -57,7 +57,7 @@ public class StudyExternalLinkService {
 
   @Transactional
   public void updateStudyExternalLink(Study study, ExternalLink externalLink) {
-    ExternalLink l = externalLinkRepository.getOne(externalLink.getId());
+    ExternalLink l = externalLinkRepository.getById(externalLink.getId());
     l.setUrl(externalLink.getUrl());
     l.setLabel(externalLink.getLabel());
     externalLinkRepository.save(l);
@@ -68,7 +68,7 @@ public class StudyExternalLinkService {
     study.removeExternalLink(linkId);
 //    externalLinkRepository.deleteById(linkId);
 //    externalLinkRepository.flush();
-//    Study s = studyRepository.getOne(study.getId());
+//    Study s = studyRepository.getById(study.getId());
 //    s.setUpdatedAt(new Date());
     studyRepository.save(study);
   }

@@ -6,6 +6,8 @@ import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {RepairableStorageFolderLink} from "../files";
 import {RepairableNotebookFolderLink} from "../eln";
+import {SettingsLoadingMessage} from "../loading";
+import {SettingsErrorMessage} from "../errors";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -27,6 +29,7 @@ class ProgramSettings extends React.Component {
   }
 
   showModal(selected) {
+    console.log(selected);
     if (!!selected) {
       this.setState({
         isModalOpen: true,
@@ -34,7 +37,8 @@ class ProgramSettings extends React.Component {
       });
     } else {
       this.setState({
-        isModalOpen: false
+        isModalOpen: false,
+        selectedProgram: null
       })
     }
   }
@@ -59,185 +63,211 @@ class ProgramSettings extends React.Component {
 
   render() {
 
-    const columns = [
-      {
-        dataField: "name",
-        text: "Name",
-        sort: true,
-        // headerStyle: {width: '40%'},
-        formatter: (c, d, i, x) => <Button variant="link" onClick={() => this.showModal(d)}>{d.name}</Button>,
-        sortFunc: (a, b, order, dataField, rowA, rowB) => {
-          if (rowA.name > rowB.name) {
-            return order === "desc" ? -1 : 1;
-          }
-          if (rowB.name > rowA.name) {
-            return order === "desc" ? 1 : -1;
-          }
-          return 0;
-        },
-      },
-      {
-        dataField: "code",
-        text: "Code",
-        sort: true,
-        // headerStyle: {width: '20%'},
-        formatter: (cell, d, index, x) => d.code,
-      },
-      {
-        dataField: "createdAt",
-        text: "Created",
-        sort: true,
-        // headerStyle: {width: '40%'},
-        formatter: (c, d, i, x) => new Date(d.createdAt).toLocaleDateString()
-      },
-      {
-        dataField: "status",
-        text: "Status",
-        sort: true,
-        // headerStyle: {width: '10%'},
-        formatter: (c, d, i, x) => {
-          if (d.active) {
-            return <Badge bg="success">Active</Badge>
-          } else {
-            return <Badge bg="danger">Inactive</Badge>
-          }
-        }
-      },
-      {
-        dataField: "eln",
-        text: "ELN",
-        sort: false,
-        // headerStyle: {width: '40%'},
-        formatter: (c, d, i, x) => {
-          if (!!d.notebookFolder) {
-            if (!!d.notebookFolder.url && d.notebookFolder.url !== "ERROR") {
-              return <a href={d.notebookFolder.url} target="_blank">ELN Folder</a>
-            } else {
-              return <Badge bg="warning">ERROR</Badge>
-            }
-          } else {
-            return "n/a"
-          }
-        }
-      },
-      {
-        dataField: "storage",
-        text: "File Storage",
-        sort: false,
-        // headerStyle: {width: '40%'},
-        formatter: (c, d, i, x) => {
-          if (!!d.storageFolder) {
-            if (!!d.storageFolder.url) {
-              return <a href={d.storageFolder.url} target="_blank">Files Folder</a>
-            } else {
-              return <Badge bg="warning">ERROR</Badge>
-            }
-          } else {
-            return "n/a"
-          }
-        }
-      },
-      {
-        dataField: "controls",
-        text: "Options",
-        sort: false,
-        // headerStyle: {width: '10%'},
-        formatter: (c, d, i, x) => {
-          return (
-              <React.Fragment>
-
-                <a className="text-info" title={"View details"}
-                   onClick={() => this.showModal(d)}>
-                  <Info className="align-middle me-1" size={18}/>
-                </a>
-
-                <a className="text-warning" title={"Edit program"}
-                   href={"/program/" + d.id + "/edit"}>
-                  <Edit className="align-middle me-1" size={18}/>
-                </a>
-
-                {/*<a className="text-danger" title={"Disable program"}*/}
-                {/*   onClick={() => console.log("click")}>*/}
-                {/*  <Trash className="align-middle me-1" size={18}/>*/}
-                {/*</a>*/}
-
-              </React.Fragment>
-          )
-        }
-      }
-    ];
+    let content = '';
+    if (!!this.state.isLoaded) {
+      content = <ProgramsTable
+          programs={this.state.programs}
+          showModal={this.showModal}
+      />
+    } else if (!!this.state.isError) {
+      content = <SettingsErrorMessage />;
+    } else {
+      content = <SettingsLoadingMessage />;
+    }
 
     return (
-        <React.Fragment>
+        <Card>
 
-          <Card>
-            <Card.Header>
-              <Card.Title tag="h5" className="mb-0">
-                Registered Programs
-                <span className="float-end">
-                  <Button
-                      variant={"primary"}
-                      href={"/programs/new"}
-                  >
-                    New Program
-                    &nbsp;
-                    <FolderPlus className="feather align-middle ms-2 mb-1"/>
-                  </Button>
-                </span>
-              </Card.Title>
-            </Card.Header>
-            <Card.Body>
-              <ToolkitProvider
-                  keyField="id"
-                  data={this.state.programs}
-                  columns={columns}
-                  search
-                  exportCSV
-              >
-                {props => (
-                    <div>
-                      <div className="float-end">
-                        <Search.SearchBar
-                            {...props.searchProps}
-                        />
-                      </div>
-                      <BootstrapTable
-                          bootstrap4
-                          keyField="id"
-                          bordered={false}
-                          pagination={paginationFactory({
-                            sizePerPage: 10,
-                            sizePerPageList: [10, 20, 40, 80]
-                          })}
-                          defaultSorted={[{
-                            dataField: "name",
-                            order: "asc"
-                          }]}
-                          {...props.baseProps}
-                      >
-                      </BootstrapTable>
-                    </div>
-                )}
-              </ToolkitProvider>
+          <Card.Header>
+            <Card.Title tag="h5" className="mb-0">
+              Registered Programs
+              <span className="float-end">
+                <Button
+                    variant={"primary"}
+                    href={"/programs/new"}
+                >
+                  New Program
+                  &nbsp;
+                  <FolderPlus className="feather align-middle ms-2 mb-1"/>
+                </Button>
+              </span>
+            </Card.Title>
+          </Card.Header>
+
+          <Card.Body>
+
+            {content}
+
+            <Modal
+                show={this.state.isModalOpen}
+                onHide={() => this.showModal()}
+                size={"lg"}
+            >
               <ProgramDetailsModal
-                  showModal={this.showModal}
-                  isOpen={this.state.isModalOpen}
                   program={this.state.selectedProgram}
+                  showModal={this.showModal}
               />
-            </Card.Body>
-          </Card>
+            </Modal>
 
-        </React.Fragment>
+          </Card.Body>
+
+        </Card>
     );
   }
 
 }
 
-const ProgramDetailsModal = ({program, isOpen, showModal}) => {
+const ProgramsTable = ({
+  programs,
+  showModal
+}) => {
 
-  if (!program) {
-    return "";
-  }
+  const columns = [
+    {
+      dataField: "name",
+      text: "Name",
+      sort: true,
+      // headerStyle: {width: '40%'},
+      formatter: (c, d, i, x) => <Button variant="link" onClick={() => showModal(d)}>{d.name}</Button>,
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (rowA.name > rowB.name) {
+          return order === "desc" ? -1 : 1;
+        }
+        if (rowB.name > rowA.name) {
+          return order === "desc" ? 1 : -1;
+        }
+        return 0;
+      },
+    },
+    {
+      dataField: "code",
+      text: "Code",
+      sort: true,
+      // headerStyle: {width: '20%'},
+      formatter: (cell, d, index, x) => d.code,
+    },
+    {
+      dataField: "createdAt",
+      text: "Created",
+      sort: true,
+      // headerStyle: {width: '40%'},
+      formatter: (c, d, i, x) => new Date(d.createdAt).toLocaleDateString()
+    },
+    {
+      dataField: "status",
+      text: "Status",
+      sort: true,
+      // headerStyle: {width: '10%'},
+      formatter: (c, d, i, x) => {
+        if (d.active) {
+          return <Badge bg="success">Active</Badge>
+        } else {
+          return <Badge bg="danger">Inactive</Badge>
+        }
+      }
+    },
+    {
+      dataField: "eln",
+      text: "ELN",
+      sort: false,
+      // headerStyle: {width: '40%'},
+      formatter: (c, d, i, x) => {
+        if (!!d.notebookFolder) {
+          if (!!d.notebookFolder.url && d.notebookFolder.url !== "ERROR") {
+            return <a href={d.notebookFolder.url} target="_blank">ELN Folder</a>
+          } else {
+            return <Badge bg="warning">ERROR</Badge>
+          }
+        } else {
+          return "n/a"
+        }
+      }
+    },
+    {
+      dataField: "storage",
+      text: "File Storage",
+      sort: false,
+      // headerStyle: {width: '40%'},
+      formatter: (c, d, i, x) => {
+        if (!!d.storageFolder) {
+          if (!!d.storageFolder.url) {
+            return <a href={d.storageFolder.url} target="_blank">Files Folder</a>
+          } else {
+            return <Badge bg="warning">ERROR</Badge>
+          }
+        } else {
+          return "n/a"
+        }
+      }
+    },
+    {
+      dataField: "controls",
+      text: "Options",
+      sort: false,
+      // headerStyle: {width: '10%'},
+      formatter: (c, d, i, x) => {
+        return (
+            <React.Fragment>
+
+              <a className="text-info" title={"View details"}
+                 onClick={() => showModal(d)}>
+                <Info className="align-middle me-1" size={18}/>
+              </a>
+
+              <a className="text-warning" title={"Edit program"}
+                 href={"/program/" + d.id + "/edit"}>
+                <Edit className="align-middle me-1" size={18}/>
+              </a>
+
+              {/*<a className="text-danger" title={"Disable program"}*/}
+              {/*   onClick={() => console.log("click")}>*/}
+              {/*  <Trash className="align-middle me-1" size={18}/>*/}
+              {/*</a>*/}
+
+            </React.Fragment>
+        )
+      }
+    }
+  ];
+
+  return (
+      <ToolkitProvider
+          keyField="id"
+          data={programs}
+          columns={columns}
+          search
+          exportCSV
+      >
+        {props => (
+            <div>
+              <div className="float-end">
+                <Search.SearchBar
+                    {...props.searchProps}
+                />
+              </div>
+              <BootstrapTable
+                  bootstrap4
+                  keyField="id"
+                  bordered={false}
+                  pagination={paginationFactory({
+                    sizePerPage: 10,
+                    sizePerPageList: [10, 20, 40, 80]
+                  })}
+                  defaultSorted={[{
+                    dataField: "name",
+                    order: "asc"
+                  }]}
+                  {...props.baseProps}
+              >
+              </BootstrapTable>
+            </div>
+        )}
+      </ToolkitProvider>
+  )
+
+}
+
+const ProgramDetailsModal = ({program, showModal}) => {
 
   const attributes = Object.keys(program.attributes).map(k => {
     return (
@@ -249,11 +279,7 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
   });
 
   return (
-      <Modal
-          open={isOpen}
-          onHide={() => showModal()}
-          size={"lg"}
-      >
+      <React.Fragment>
         <Modal.Header closeButton>
           Program: <strong>{program.name}</strong> (<code>{program.code}</code>)
         </Modal.Header>
@@ -360,7 +386,7 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
             Close
           </Button>
         </Modal.Footer>
-      </Modal>
+      </React.Fragment>
   )
 
 }

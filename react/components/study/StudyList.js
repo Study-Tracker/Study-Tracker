@@ -53,10 +53,10 @@ const columns = [
     sort: true,
     headerStyle: {width: '10%'},
     sortFunc: (a, b, order, dataField, rowA, rowB) => {
-      if (rowA.status.label > rowB.status.label) {
+      if (rowA.status > rowB.status) {
         return order === "desc" ? -1 : 1;
       }
-      if (rowB.status.label > rowA.status.label) {
+      if (rowB.status > rowA.status) {
         return order === "desc" ? 1 : -1;
       }
       return 0;

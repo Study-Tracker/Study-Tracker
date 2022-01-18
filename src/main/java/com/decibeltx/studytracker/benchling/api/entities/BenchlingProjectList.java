@@ -1,4 +1,4 @@
-package com.decibeltx.studytracker.benchling.eln.entities;
+package com.decibeltx.studytracker.benchling.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ import lombok.Data;
 public class BenchlingProjectList {
 
   private String nextToken;
-
   private List<BenchlingProject> projects = new ArrayList<>();
 
 }

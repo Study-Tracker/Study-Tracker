@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -16,18 +15,17 @@ public class AssayDetailsDto {
   private Long id;
   private Status status;
   private AssayTypeDetailsDto assayType;
-  @NotNull private String name;
+  private String name;
   private String code;
-  @NotNull private String description;
+  private String description;
   private UserSlimDto createdBy;
   private UserSlimDto lastModifiedBy;
   private UserSlimDto owner;
-  @NotNull private Date startDate;
+  private Date startDate;
   private Date endDate;
   private ELNFolderDto notebookFolder;
   private FileStoreFolderDto storageFolder;
   private boolean active = true;
-  private String entryTemplateId;
   private Date createdAt;
   private Date updatedAt;
   private Set<UserSlimDto> users = new HashSet<>();

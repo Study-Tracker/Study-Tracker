@@ -6,6 +6,8 @@ import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import Select from 'react-select';
 import swal from "sweetalert";
+import {SettingsLoadingMessage} from "../loading";
+import {SettingsErrorMessage} from "../errors";
 
 const emptyKeyword = {
   id: null,
@@ -45,7 +47,6 @@ export default class KeywordSettings extends React.Component {
         isModalOpen: false
       })
     }
-
   }
 
   toggleCategoryInput(e) {
@@ -129,39 +130,6 @@ export default class KeywordSettings extends React.Component {
 
   render() {
 
-    const columns = [
-      {
-        dataField: "keyword",
-        text: "Keyword",
-        sort: true,
-        formatter: (c, d, i, x) => d.keyword,
-        sortFunc: (a, b, order, dataField, rowA, rowB) => {
-          if (rowA.keyword > rowB.keyword) {
-            return order === "desc" ? -1 : 1;
-          }
-          if (rowB.keyword > rowA.keyword) {
-            return order === "desc" ? 1 : -1;
-          }
-          return 0;
-        },
-      },
-      {
-        dataField: "controls",
-        text: "Options",
-        sort: false,
-        formatter: (c, d, i, x) => {
-          return (
-              <React.Fragment>
-                <a className="text-warning" title={"Edit keyword"}
-                   onClick={() => this.showModal(d)}>
-                  <Edit className="align-middle me-1" size={18}/>
-                </a>
-              </React.Fragment>
-          )
-        }
-      }
-    ];
-
     const categoryOptions = this.state.categories
     .sort((a, b) => {
       if (a > b) {
@@ -178,6 +146,19 @@ export default class KeywordSettings extends React.Component {
         label: c
       }
     });
+
+    let content = <SettingsLoadingMessage />
+    if (this.state.isLoaded) {
+      content = <KeywordsTable
+          keywords={this.state.keywords}
+          categoryOptions={categoryOptions}
+          handleCategorySelect={this.handleCategorySelect}
+          selectedCategory={this.state.selectedCategory}
+          showModal={this.showModal}
+      />
+    } else if (!!this.state.isError) {
+      content = <SettingsErrorMessage />;
+    }
 
     return (
         <Card>
@@ -196,64 +177,7 @@ export default class KeywordSettings extends React.Component {
           </Card.Header>
           <Card.Body>
 
-            <Row>
-              <Col xs={12} sm={6}>
-                <Form.Group>
-                  <Form.Label>Select a keyword category</Form.Label>
-                  <Select
-                      className="react-select-container"
-                      classNamePrefix="react-select"
-                      options={categoryOptions}
-                      onChange={(selected) => this.handleCategorySelect(
-                          selected.value)}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col xs={12}>
-                {
-                  !!this.state.selectedCategory
-                      ? (
-                          <ToolkitProvider
-                              keyField="id"
-                              data={this.state.keywords}
-                              columns={columns}
-                              search
-                              exportCSV
-                          >
-                            {props => (
-                                <div>
-                                  <div className="float-end">
-                                    <Search.SearchBar
-                                        {...props.searchProps}
-                                    />
-                                  </div>
-                                  <BootstrapTable
-                                      bootstrap4
-                                      keyField="id"
-                                      bordered={false}
-                                      pagination={paginationFactory({
-                                        sizePerPage: 10,
-                                        sizePerPageList: [10, 20, 40, 80]
-                                      })}
-                                      defaultSorted={[{
-                                        dataField: "keyword",
-                                        order: "asc"
-                                      }]}
-                                      {...props.baseProps}
-                                  >
-                                  </BootstrapTable>
-                                </div>
-                            )}
-                          </ToolkitProvider>
-                      ) : (
-                          ""
-                      )
-                }
-              </Col>
-            </Row>
+            { content }
 
             <Modal
                 show={this.state.isModalOpen}
@@ -299,6 +223,111 @@ export default class KeywordSettings extends React.Component {
     )
   }
 
+}
+
+const KeywordsTable = ({
+  keywords,
+  categoryOptions,
+  handleCategorySelect,
+  selectedCategory,
+  showModal
+}) => {
+
+  const columns = [
+    {
+      dataField: "keyword",
+      text: "Keyword",
+      sort: true,
+      formatter: (c, d, i, x) => d.keyword,
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (rowA.keyword > rowB.keyword) {
+          return order === "desc" ? -1 : 1;
+        }
+        if (rowB.keyword > rowA.keyword) {
+          return order === "desc" ? 1 : -1;
+        }
+        return 0;
+      },
+    },
+    {
+      dataField: "controls",
+      text: "Options",
+      sort: false,
+      formatter: (c, d, i, x) => {
+        return (
+            <React.Fragment>
+              <a className="text-warning" title={"Edit keyword"}
+                 onClick={() => showModal(d)}>
+                <Edit className="align-middle me-1" size={18}/>
+              </a>
+            </React.Fragment>
+        )
+      }
+    }
+  ];
+
+  return (
+      <React.Fragment>
+        <Row>
+          <Col xs={12} sm={6}>
+            <Form.Group>
+              <Form.Label>Select a keyword category</Form.Label>
+              <Select
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  options={categoryOptions}
+                  onChange={(selected) => handleCategorySelect(
+                      selected.value)}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col xs={12}>
+            {
+              !!selectedCategory
+                  ? (
+                      <ToolkitProvider
+                          keyField="id"
+                          data={keywords}
+                          columns={columns}
+                          search
+                          exportCSV
+                      >
+                        {props => (
+                            <div>
+                              <div className="float-end">
+                                <Search.SearchBar
+                                    {...props.searchProps}
+                                />
+                              </div>
+                              <BootstrapTable
+                                  bootstrap4
+                                  keyField="id"
+                                  bordered={false}
+                                  pagination={paginationFactory({
+                                    sizePerPage: 10,
+                                    sizePerPageList: [10, 20, 40, 80]
+                                  })}
+                                  defaultSorted={[{
+                                    dataField: "keyword",
+                                    order: "asc"
+                                  }]}
+                                  {...props.baseProps}
+                              >
+                              </BootstrapTable>
+                            </div>
+                        )}
+                      </ToolkitProvider>
+                  ) : (
+                      ""
+                  )
+            }
+          </Col>
+        </Row>
+      </React.Fragment>
+  )
 }
 
 const ModalInputs = ({

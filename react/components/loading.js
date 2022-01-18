@@ -14,19 +14,37 @@
  * limitations under the License.
  */
 
-import {Spinner} from 'react-bootstrap';
+import {Col, Row, Spinner} from 'react-bootstrap';
 import React from "react";
 
 export const CardLoadingMessage = () => {
   return (
-      <div>
-        <h4>
-          Loading...
-          <Spinner animation="border" variant={'primary'} className="me-2"/>
-        </h4>
-      </div>
+      <Row>
+        <Col>
+          <h4>
+            Loading...
+            <Spinner animation="border" variant={'primary'} className="me-2"/>
+          </h4>
+        </Col>
+      </Row>
   )
 };
+
+export const SettingsLoadingMessage = () => {
+  return (
+      <Row>
+        <Col>
+          <div className="text-center p-5">
+            <h2>
+              <Spinner animation="border" variant={'primary'} className="me-2"/>
+              &nbsp;
+              Loading...
+            </h2>
+          </div>
+        </Col>
+      </Row>
+  )
+}
 
 export const LoadingOverlay = ({isVisible, message}) => {
   const label = message || "Loading..."

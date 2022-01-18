@@ -31,6 +31,7 @@ class StudyFormView extends React.Component {
       programsLoaded: false,
       collaboratorsLoaded: false,
       keywordCategoriesLoaded: false,
+      notebookTemplatesLoaded: false,
       isError: false,
     };
   }
@@ -90,6 +91,23 @@ class StudyFormView extends React.Component {
       });
     });
 
+    // Entry Templates
+    fetch("/api/notebookentrytemplate?category=STUDY&active=true")
+    .then(response => response.json())
+    .then(templates => {
+      this.setState({
+        notebookTemplates: templates,
+        notebookTemplatesLoaded: true
+      });
+    })
+    .catch(error => {
+      console.error(error);
+      this.setState({
+        isError: true,
+        error: error
+      });
+    });
+
     // Selected study
     if (!!this.state.studyCode) {
       fetch("/api/study/" + this.state.studyCode)
@@ -118,14 +136,20 @@ class StudyFormView extends React.Component {
     let content = <LoadingMessage/>;
     if (this.state.isError) {
       content = <ErrorMessage/>;
-    } else if (!!this.props.user && this.state.studyLoaded
-        && this.state.programsLoaded && this.state.collaboratorsLoaded
-        && this.state.keywordCategoriesLoaded) {
+    } else if (
+        !!this.props.user
+        && this.state.studyLoaded
+        && this.state.programsLoaded
+        && this.state.collaboratorsLoaded
+        && this.state.keywordCategoriesLoaded
+        && this.state.notebookTemplatesLoaded
+    ) {
       content = <StudyForm
           study={this.state.study}
           programs={this.state.programs}
           externalContacts={this.state.collaborators}
           keywordCategories={this.state.keywordCategories}
+          notebookTemplates={this.state.notebookTemplates}
           user={this.props.user}
       />;
     }

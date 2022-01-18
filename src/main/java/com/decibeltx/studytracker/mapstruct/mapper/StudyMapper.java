@@ -1,6 +1,7 @@
 package com.decibeltx.studytracker.mapstruct.mapper;
 
 import com.decibeltx.studytracker.mapstruct.dto.StudyDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.StudyFormDto;
 import com.decibeltx.studytracker.mapstruct.dto.StudySlimDto;
 import com.decibeltx.studytracker.mapstruct.dto.StudySummaryDto;
 import com.decibeltx.studytracker.model.Study;
@@ -10,6 +11,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface StudyMapper {
+
+  Study fromStudyForm(StudyFormDto dto);
 
   Study fromStudyDetails(StudyDetailsDto dto);
   List<Study> fromStudyDetailsList(List<StudyDetailsDto> dtos);

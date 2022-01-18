@@ -5,6 +5,8 @@ import {history} from "../../App";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
+import {SettingsErrorMessage} from "../errors";
+import {SettingsLoadingMessage} from "../loading";
 
 class UserSettings extends React.Component {
 
@@ -54,103 +56,14 @@ class UserSettings extends React.Component {
 
   render() {
 
-    const columns = [
-      {
-        dataField: "displayName",
-        text: "Display Name",
-        sort: true,
-        headerStyle: {width: '25%%'},
-        formatter: (cell, d, index, x) => d.displayName,
-        sortFunc: (a, b, order, dataField, rowA, rowB) => {
-          if (rowA.displayName > rowB.displayName) {
-            return order === "desc" ? -1 : 1;
-          }
-          if (rowB.displayName > rowA.displayName) {
-            return order === "desc" ? 1 : -1;
-          }
-          return 0;
-        },
-      },
-      {
-        dataField: "username",
-        text: "Username",
-        sort: true,
-        headerStyle: {width: '20%%'},
-        formatter: (c, d, i, x) => <Button variant={"link"} onClick={() => this.showModal(d)}>{d.username}</Button>,
-        sortFunc: (a, b, order, dataField, rowA, rowB) => {
-          if (rowA.username > rowB.username) {
-            return order === "desc" ? -1 : 1;
-          }
-          if (rowB.username > rowA.username) {
-            return order === "desc" ? 1 : -1;
-          }
-          return 0;
-        },
-      },
-      {
-        dataField: "email",
-        text: "Email",
-        sort: true,
-        headerStyle: {width: '25%'},
-        formatter: (cell, d, index, x) => d.email
-      },
-      {
-        dataField: "type",
-        text: "Type",
-        sort: true,
-        headerStyle: {width: '10%'},
-        formatter: (c, d, i, x) => {
-          if (d.admin) {
-            return <Badge bg="danger">Admin</Badge>
-          } else {
-            return <Badge bg="info">User</Badge>
-          }
-        }
-      },
-      {
-        dataField: "status",
-        text: "Status",
-        sort: true,
-        headerStyle: {width: '10%'},
-        formatter: (c, d, i, x) => {
-          if (d.locked) {
-            return <Badge bg="warning">Locked</Badge>
-          } else if (d.active) {
-            return <Badge bg="success">Active</Badge>
-          } else {
-            return <Badge bg="danger">Inactive</Badge>
-          }
-        }
-      },
-      {
-        dataField: "controls",
-        text: "Options",
-        sort: false,
-        headerStyle: {width: '10%'},
-        formatter: (c, d, i, x) => {
-          return (
-              <React.Fragment>
-
-                <a className="text-info" title={"View details"}
-                   onClick={() => this.showModal(d)}>
-                  <Info className="align-middle me-1" size={18}/>
-                </a>
-
-                <a className="text-warning" title={"Edit user"}
-                   onClick={() => history.push("/users/" + d.id + "/edit")}>
-                  <Edit className="align-middle me-1" size={18}/>
-                </a>
-
-                {/*<a className="text-danger" title={"Disable user"}*/}
-                {/*   onClick={() => console.log("click")}>*/}
-                {/*  <Trash className="align-middle me-1" size={18}/>*/}
-                {/*</a>*/}
-
-              </React.Fragment>
-          )
-        }
-      }
-    ];
+    let content = '';
+    if (!!this.state.isLoaded) {
+      content = <UserTable users={this.state.users} showModal={this.showModal} />
+    } else if (!!this.state.isError) {
+      content = <SettingsErrorMessage />
+    } else {
+      content = <SettingsLoadingMessage />
+    }
 
     return (
         <React.Fragment>
@@ -172,49 +85,158 @@ class UserSettings extends React.Component {
               </Card.Title>
             </Card.Header>
             <Card.Body>
-              <ToolkitProvider
-                  keyField="id"
-                  data={this.state.users}
-                  columns={columns}
-                  search
-                  exportCSV
-              >
-                {props => (
-                    <div>
-                      <div className="float-end">
-                        <Search.SearchBar
-                            {...props.searchProps}
-                        />
-                      </div>
-                      <BootstrapTable
-                          bootstrap4
-                          keyField="id"
-                          bordered={false}
-                          pagination={paginationFactory({
-                            sizePerPage: 10,
-                            sizePerPageList: [10, 20, 40, 80]
-                          })}
-                          defaultSorted={[{
-                            dataField: "displayName",
-                            order: "asc"
-                          }]}
-                          {...props.baseProps}
-                      >
-                      </BootstrapTable>
-                    </div>
-                )}
-              </ToolkitProvider>
+
+              {content}
+
               <UserDetailsModal
-                  toggle={this.showModal}
+                  showModal={this.showModal}
                   isOpen={this.state.isModalOpen}
                   user={this.state.selectedUser}
               />
+
             </Card.Body>
           </Card>
 
         </React.Fragment>
     );
   }
+
+}
+
+const UserTable = ({users, showModal}) => {
+
+  const columns = [
+    {
+      dataField: "displayName",
+      text: "Display Name",
+      sort: true,
+      headerStyle: {width: '25%%'},
+      formatter: (cell, d, index, x) => d.displayName,
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (rowA.displayName > rowB.displayName) {
+          return order === "desc" ? -1 : 1;
+        }
+        if (rowB.displayName > rowA.displayName) {
+          return order === "desc" ? 1 : -1;
+        }
+        return 0;
+      },
+    },
+    {
+      dataField: "username",
+      text: "Username",
+      sort: true,
+      headerStyle: {width: '20%%'},
+      formatter: (c, d, i, x) => <Button variant={"link"} onClick={() => showModal(d)}>{d.username}</Button>,
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (rowA.username > rowB.username) {
+          return order === "desc" ? -1 : 1;
+        }
+        if (rowB.username > rowA.username) {
+          return order === "desc" ? 1 : -1;
+        }
+        return 0;
+      },
+    },
+    {
+      dataField: "email",
+      text: "Email",
+      sort: true,
+      headerStyle: {width: '25%'},
+      formatter: (cell, d, index, x) => d.email
+    },
+    {
+      dataField: "type",
+      text: "Type",
+      sort: true,
+      headerStyle: {width: '10%'},
+      formatter: (c, d, i, x) => {
+        if (d.admin) {
+          return <Badge bg="danger">Admin</Badge>
+        } else {
+          return <Badge bg="info">User</Badge>
+        }
+      }
+    },
+    {
+      dataField: "status",
+      text: "Status",
+      sort: true,
+      headerStyle: {width: '10%'},
+      formatter: (c, d, i, x) => {
+        if (d.locked) {
+          return <Badge bg="warning">Locked</Badge>
+        } else if (d.active) {
+          return <Badge bg="success">Active</Badge>
+        } else {
+          return <Badge bg="danger">Inactive</Badge>
+        }
+      }
+    },
+    {
+      dataField: "controls",
+      text: "Options",
+      sort: false,
+      headerStyle: {width: '10%'},
+      formatter: (c, d, i, x) => {
+        return (
+            <React.Fragment>
+
+              <a className="text-info" title={"View details"}
+                 onClick={() => showModal(d)}>
+                <Info className="align-middle me-1" size={18}/>
+              </a>
+
+              <a className="text-warning" title={"Edit user"}
+                 onClick={() => history.push("/users/" + d.id + "/edit")}>
+                <Edit className="align-middle me-1" size={18}/>
+              </a>
+
+              {/*<a className="text-danger" title={"Disable user"}*/}
+              {/*   onClick={() => console.log("click")}>*/}
+              {/*  <Trash className="align-middle me-1" size={18}/>*/}
+              {/*</a>*/}
+
+            </React.Fragment>
+        )
+      }
+    }
+  ];
+
+  return (
+      <ToolkitProvider
+          keyField="id"
+          data={users}
+          columns={columns}
+          search
+          exportCSV
+      >
+        {props => (
+            <div>
+              <div className="float-end">
+                <Search.SearchBar
+                    {...props.searchProps}
+                />
+              </div>
+              <BootstrapTable
+                  bootstrap4
+                  keyField="id"
+                  bordered={false}
+                  pagination={paginationFactory({
+                    sizePerPage: 10,
+                    sizePerPageList: [10, 20, 40, 80]
+                  })}
+                  defaultSorted={[{
+                    dataField: "displayName",
+                    order: "asc"
+                  }]}
+                  {...props.baseProps}
+              >
+              </BootstrapTable>
+            </div>
+        )}
+      </ToolkitProvider>
+  )
 
 }
 
@@ -240,7 +262,7 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
           size={"lg"}
       >
         <Modal.Header closeButton>
-          User: <strong>{user.displayName}</strong> (<code>{user.username}</code>)
+          User:&nbsp;<strong>{user.displayName}</strong>&nbsp;(<code>{user.username}</code>)
         </Modal.Header>
         <Modal.Body>
           <Row>

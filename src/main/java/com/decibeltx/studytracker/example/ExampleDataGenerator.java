@@ -16,7 +16,6 @@
 
 package com.decibeltx.studytracker.example;
 
-import com.decibeltx.studytracker.events.util.EntryTemplateActivityUtils;
 import com.decibeltx.studytracker.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.exception.StudyTrackerException;
@@ -34,6 +33,7 @@ import com.decibeltx.studytracker.model.ExternalLink;
 import com.decibeltx.studytracker.model.FileStoreFolder;
 import com.decibeltx.studytracker.model.Keyword;
 import com.decibeltx.studytracker.model.NotebookEntryTemplate;
+import com.decibeltx.studytracker.model.NotebookEntryTemplate.Category;
 import com.decibeltx.studytracker.model.Program;
 import com.decibeltx.studytracker.model.Status;
 import com.decibeltx.studytracker.model.Study;
@@ -89,7 +89,7 @@ public class ExampleDataGenerator {
 
   public static final int ASSAY_COUNT = 2;
 
-  public static final int ENTRY_TEMPLATE_COUNT = 2;
+  public static final int NOTEBOOK_ENTRY_TEMPLATE_COUNT = 5;
 
   public static final int STUDY_COUNT = 6;
 
@@ -149,22 +149,71 @@ public class ExampleDataGenerator {
   @Autowired
   private PasswordResetTokenRepository passwordResetTokenRepository;
 
-  public List<NotebookEntryTemplate> generateExampleEntryTemplates(List<User> users) {
-    User user = users.get(0);
+  public List<NotebookEntryTemplate> generateExampleEntryTemplates() {
+    User user = userRepository.findAll().get(0);
     List<NotebookEntryTemplate> templates = new ArrayList<>();
-    createEntryTemplate(user, templates, "id1", "table1", new Date());
-    createEntryTemplate(user, templates, "id2", "table2", new Date());
-    return templates;
-  }
 
-  private void createEntryTemplate(User user, List<NotebookEntryTemplate> templates,
-                                   String templateId, String name, Date timeStamp) {
-    NotebookEntryTemplate notebookEntryTemplate = NotebookEntryTemplate.of(user, templateId, name, timeStamp);
-    notebookEntryTemplateRepository.save(notebookEntryTemplate);
-    Activity activity = EntryTemplateActivityUtils
-            .fromNewEntryTemplate(notebookEntryTemplate, user);
-    activityRepository.save(activity);
-    templates.add(notebookEntryTemplate);
+    NotebookEntryTemplate template = new NotebookEntryTemplate();
+    template.setName("Default Study Template");
+    template.setTemplateId("id1");
+    template.setActive(true);
+    template.setDefault(true);
+    template.setCategory(Category.STUDY);
+    template.setCreatedBy(user);
+    template.setLastModifiedBy(user);
+    template.setCreatedAt(new Date());
+    template.setUpdatedAt(new Date());
+    templates.add(template);
+
+    template = new NotebookEntryTemplate();
+    template.setName("Active Study Template");
+    template.setTemplateId("id2");
+    template.setActive(true);
+    template.setDefault(false);
+    template.setCategory(Category.STUDY);
+    template.setCreatedBy(user);
+    template.setLastModifiedBy(user);
+    template.setCreatedAt(new Date());
+    template.setUpdatedAt(new Date());
+    templates.add(template);
+
+    template = new NotebookEntryTemplate();
+    template.setName("Inactive Study Template");
+    template.setTemplateId("id3");
+    template.setActive(false);
+    template.setDefault(false);
+    template.setCategory(Category.STUDY);
+    template.setCreatedBy(user);
+    template.setLastModifiedBy(user);
+    template.setCreatedAt(new Date());
+    template.setUpdatedAt(new Date());
+    templates.add(template);
+
+    template = new NotebookEntryTemplate();
+    template.setName("Default Assay Template");
+    template.setTemplateId("id4");
+    template.setActive(true);
+    template.setDefault(true);
+    template.setCategory(Category.ASSAY);
+    template.setCreatedBy(user);
+    template.setLastModifiedBy(user);
+    template.setCreatedAt(new Date());
+    template.setUpdatedAt(new Date());
+    templates.add(template);
+
+    template = new NotebookEntryTemplate();
+    template.setName("Active Assay Template");
+    template.setTemplateId("id5");
+    template.setActive(true);
+    template.setDefault(false);
+    template.setCategory(Category.ASSAY);
+    template.setCreatedBy(user);
+    template.setLastModifiedBy(user);
+    template.setCreatedAt(new Date());
+    template.setUpdatedAt(new Date());
+    templates.add(template);
+
+    return templates;
   }
 
   public List<Program> generateExamplePrograms(List<User> users) {
@@ -789,7 +838,7 @@ public class ExampleDataGenerator {
       generateExampleAssayTypes();
       keywordRepository.saveAll(generateExampleKeywords());
       collaboratorRepository.saveAll(generateExampleCollaborators());
-      notebookEntryTemplateRepository.saveAll(generateExampleEntryTemplates(userRepository.findAll()));
+      notebookEntryTemplateRepository.saveAll(generateExampleEntryTemplates());
       generateExampleStudies();
       generateExampleAssays(studyRepository.findAll());
       LOGGER.info("Done.");
