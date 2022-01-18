@@ -52,7 +52,7 @@ public class StudyCommentService {
 
   @Transactional
   public Comment updateStudyComment(Comment comment) {
-    Comment c = commentRepository.getOne(comment.getId());
+    Comment c = commentRepository.getById(comment.getId());
     c.setText(comment.getText());
     commentRepository.save(c);
     return c;

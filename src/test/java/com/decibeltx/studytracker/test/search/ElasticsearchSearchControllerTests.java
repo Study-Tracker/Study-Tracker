@@ -19,7 +19,6 @@ package com.decibeltx.studytracker.test.search;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.hasValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,6 +31,7 @@ import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.search.elasticsearch.ElasticsearchSearchService;
 import com.decibeltx.studytracker.service.StudyService;
 import com.decibeltx.studytracker.service.UserService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,16 +86,16 @@ public class ElasticsearchSearchControllerTests {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("numHits")))
-        .andExpect(jsonPath("$.numHits", hasValue(1)))
+        .andExpect(jsonPath("$.numHits", Matchers.is(3)))
         .andExpect(jsonPath("$", hasKey("maxScore")))
-        .andExpect(jsonPath("$.maxScore", greaterThan(0)))
+        .andExpect(jsonPath("$.maxScore", greaterThan(0.0)))
         .andExpect(jsonPath("$", hasKey("hits")))
-        .andExpect(jsonPath("$.hits", hasSize(1)))
+        .andExpect(jsonPath("$.hits", hasSize(3)))
         .andExpect(jsonPath("$.hits[0]", hasKey("score")))
-        .andExpect(jsonPath("$.hits[0].score", greaterThan(0)))
+        .andExpect(jsonPath("$.hits[0].score", greaterThan(0.0)))
         .andExpect(jsonPath("$.hits[0]", hasKey("document")))
         .andExpect(jsonPath("$.hits[0].document", hasKey("code")))
-        .andExpect(jsonPath("$.hits[0].document.code", hasValue("PPB-00001")));
+        .andExpect(jsonPath("$.hits[0].document.code", Matchers.is("PPB-00001")));
 
   }
 

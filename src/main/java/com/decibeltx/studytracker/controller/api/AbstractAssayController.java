@@ -1,9 +1,9 @@
 package com.decibeltx.studytracker.controller.api;
 
+import com.decibeltx.studytracker.eln.NotebookTemplate;
 import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.events.EventsService;
 import com.decibeltx.studytracker.events.util.AssayActivityUtils;
-import com.decibeltx.studytracker.exception.NotebookException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.model.Activity;
 import com.decibeltx.studytracker.model.Assay;
@@ -16,17 +16,12 @@ import com.decibeltx.studytracker.service.AssayTypeService;
 import com.decibeltx.studytracker.service.StudyService;
 import com.decibeltx.studytracker.service.UserService;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 public abstract class AbstractAssayController {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAssayController.class);
 
   private AssayService assayService;
 
@@ -99,9 +94,8 @@ public abstract class AbstractAssayController {
    * @param user
    * @return
    */
-  protected Assay createAssay(Assay assay, Study study, User user, String notebookTemplateId) {
+  protected Assay createAssay(Assay assay, Study study, User user, NotebookTemplate template) {
 
-//    assay.setCreatedBy(user);
     assay.setStudy(study);
 
     // Assay team
@@ -116,28 +110,14 @@ public abstract class AbstractAssayController {
     assay.setOwner(userService.findById(assay.getOwner().getId())
         .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
 
-    assayService.create(assay);
+    // Create the record
+    assayService.create(assay, template);
     Assert.notNull(assay.getId(), "Assay not persisted.");
 
-    if (notebookTemplateId != null) {
-      if (studyNotebookService == null) {
-        LOGGER.warn("StudyNotebookService is not defined, cannot create notebook entry.");
-      } else {
-        Map<String, String> userAttributes = user.getAttributes();
-        String benchlingUserId =
-            userAttributes != null ? userAttributes.get("benchlingUserId") : null;
-        try {
-          studyNotebookService
-              .createAssayNotebookEntry(assay, notebookTemplateId, benchlingUserId);
-        } catch (NotebookException e) {
-          e.printStackTrace();
-          LOGGER.error("Failed to create notebook entry");
-        }
-      }
-    }
-
+    // Update the study
     studyService.markAsUpdated(study, user);
 
+    // Add activity record and dispatch event
     Activity activity = AssayActivityUtils.fromNewAssay(assay, user);
     activityService.create(activity);
     eventsService.dispatchEvent(activity);

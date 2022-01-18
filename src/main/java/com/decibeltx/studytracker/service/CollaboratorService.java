@@ -54,7 +54,7 @@ public class CollaboratorService {
   }
 
   public void update(Collaborator collaborator) {
-    Collaborator c = collaboratorRepository.getOne(collaborator.getId());
+    Collaborator c = collaboratorRepository.getById(collaborator.getId());
     c.setActive(collaborator.isActive());
     c.setCode(collaborator.getCode());
     c.setContactEmail(collaborator.getContactEmail());
@@ -66,13 +66,13 @@ public class CollaboratorService {
   }
 
   public void delete(Collaborator collaborator) {
-    Collaborator c = collaboratorRepository.getOne(collaborator.getId());
+    Collaborator c = collaboratorRepository.getById(collaborator.getId());
     c.setActive(false);
     collaboratorRepository.save(c);
   }
 
   public void delete(Long id) {
-    Collaborator c = collaboratorRepository.getOne(id);
+    Collaborator c = collaboratorRepository.getById(id);
     c.setActive(false);
     collaboratorRepository.save(c);
   }

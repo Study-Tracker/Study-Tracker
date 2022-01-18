@@ -30,6 +30,7 @@ import CollaboratorInputs from "./collaborators";
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../loading";
 import {Breadcrumbs} from "../common";
+import {NotebookEntryTemplatesDropdown} from "./notebookEntryTemplates";
 
 export default class StudyForm extends React.Component {
 
@@ -48,8 +49,6 @@ export default class StudyForm extends React.Component {
           owner: true
         }],
         owner: this.props.user,
-        // createdBy: this.props.user,
-        // lastModifiedBy: this.props.user,
         notebookFolder: {}
       },
       validation: {
@@ -349,6 +348,21 @@ export default class StudyForm extends React.Component {
                             selected={this.state.study.status}
                             onChange={this.handleFormUpdate}
                         />
+
+                        {
+                          !this.state.study.id ? (
+                              <NotebookEntryTemplatesDropdown
+                                  notebookTemplates={this.props.notebookTemplates}
+                                  onChange={selectedItem => {
+                                    this.handleFormUpdate({
+                                      notebookTemplateId: selectedItem
+                                          ? selectedItem.value
+                                          : ''
+                                    })
+                                  }}
+                              />
+                          ) : ''
+                        }
 
                         <FormGroup>
                           <Form.Label>Start Date *</Form.Label>

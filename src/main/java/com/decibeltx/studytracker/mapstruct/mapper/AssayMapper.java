@@ -1,6 +1,7 @@
 package com.decibeltx.studytracker.mapstruct.mapper;
 
 import com.decibeltx.studytracker.mapstruct.dto.AssayDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.AssayFormDto;
 import com.decibeltx.studytracker.mapstruct.dto.AssayParentDto;
 import com.decibeltx.studytracker.mapstruct.dto.AssaySlimDto;
 import com.decibeltx.studytracker.mapstruct.dto.AssaySummaryDto;
@@ -11,6 +12,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface AssayMapper {
+
+  Assay fromAssayForm(AssayFormDto dto);
 
   Assay fromAssayDetails(AssayDetailsDto dto);
   Set<Assay> fromAssayDetailsSet(Set<AssayDetailsDto> dtos);

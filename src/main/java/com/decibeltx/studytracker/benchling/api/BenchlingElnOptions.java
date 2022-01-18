@@ -14,36 +14,19 @@
  * limitations under the License.
  */
 
-package com.decibeltx.studytracker.benchling.eln.entities;
+package com.decibeltx.studytracker.benchling.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.net.URL;
 import lombok.Data;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class BenchlingEntry {
+public class BenchlingElnOptions {
 
-  private BenchlingArchiveRecord archiveRecord;
-
-  private List<BenchlingUser> authors = new ArrayList<>();
-
-  private Date createdAt;
-
-  private BenchlingUser creator;
-
-  private String folderId;
-
-  private String id;
-
-  private String name;
-
-  private Date modifiedAt;
-
-  private Object schema;
-
-  private String webURL;
+  private URL rootUrl;
+  private String username;
+  private String password;
+  private String apiToken;
+  private String rootEntity;
+  private String rootFolderUrl;
 
 }

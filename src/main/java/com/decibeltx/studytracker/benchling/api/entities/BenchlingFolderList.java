@@ -1,4 +1,4 @@
-package com.decibeltx.studytracker.benchling.eln.entities;
+package com.decibeltx.studytracker.benchling.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
@@ -7,8 +7,9 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BenchlingEntryList {
+public class BenchlingFolderList {
 
-  private List<BenchlingEntry> entries = new ArrayList<>();
+  private List<BenchlingFolder> folders = new ArrayList<>();
+  private String nextToken;
 
 }

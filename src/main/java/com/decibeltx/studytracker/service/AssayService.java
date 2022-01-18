@@ -17,6 +17,7 @@
 package com.decibeltx.studytracker.service;
 
 import com.decibeltx.studytracker.eln.NotebookFolder;
+import com.decibeltx.studytracker.eln.NotebookTemplate;
 import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.exception.InvalidConstraintException;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
@@ -168,8 +169,12 @@ public class AssayService {
     }
   }
 
-  @Transactional
   public void create(Assay assay) {
+    this.create(assay, null);
+  }
+
+  @Transactional
+  public void create(Assay assay, NotebookTemplate template) {
 
     LOGGER.info("Creating new assay record with name: " + assay.getName());
 
@@ -200,8 +205,16 @@ public class AssayService {
     if (notebookService != null) {
       if (study.getNotebookFolder() != null) {
         try {
+
+          LOGGER.info(String.format("Creating ELN entry for assay: %s", assay.getCode()));
+
+          // Create the notebook folder
           NotebookFolder notebookFolder = notebookService.createAssayFolder(assay);
           assay.setNotebookFolder(ELNFolder.from(notebookFolder));
+
+          // Create the notebook entry
+          notebookService.createAssayNotebookEntry(assay, template);
+
         } catch (Exception e) {
           e.printStackTrace();
           LOGGER.warn("Failed to create notebook entry for assay: " + assay.getCode());
@@ -219,7 +232,7 @@ public class AssayService {
   public Assay update(Assay updated) {
 
     LOGGER.info("Updating assay record with code: " + updated.getCode());
-    Assay assay = assayRepository.getOne(updated.getId());
+    Assay assay = assayRepository.getById(updated.getId());
 
     assay.setDescription(updated.getDescription());
     assay.setStartDate(updated.getStartDate());
@@ -234,7 +247,7 @@ public class AssayService {
     // Update the tasks
     for (AssayTask task: updated.getTasks()) {
       if (task.getId() != null) {
-        AssayTask t = assayTaskRepository.getOne(task.getId());
+        AssayTask t = assayTaskRepository.getById(task.getId());
         t.setStatus(task.getStatus());
         t.setOrder(task.getOrder());
         t.setLabel(task.getLabel());
@@ -298,7 +311,7 @@ public class AssayService {
     }
 
     // Update the  program record
-    FileStoreFolder f = fileStoreFolderRepository.getOne(assay.getStorageFolder().getId());
+    FileStoreFolder f = fileStoreFolderRepository.getById(assay.getStorageFolder().getId());
     f.setName(folder.getName());
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
@@ -321,7 +334,7 @@ public class AssayService {
     ELNFolder f;
     boolean isNew = false;
     try {
-      f = elnFolderRepository.getOne(assay.getNotebookFolder().getId());
+      f = elnFolderRepository.getById(assay.getNotebookFolder().getId());
     } catch (NullPointerException e) {
       f = new ELNFolder();
       isNew = true;

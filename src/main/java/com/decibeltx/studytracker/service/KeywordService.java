@@ -93,7 +93,7 @@ public class KeywordService {
 
   @Transactional
   public Keyword update(Keyword keyword) {
-    Keyword k = keywordRepository.getOne(keyword.getId());
+    Keyword k = keywordRepository.getById(keyword.getId());
     k.setKeyword(keyword.getKeyword());
     k.setCategory(keyword.getCategory());
     return keywordRepository.save(k);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Alert} from 'react-bootstrap'
+import {Alert, Col, Row} from 'react-bootstrap'
 import React from "react";
 
 export const DismissableAlert = ({header, message, color}) => {
@@ -29,3 +29,19 @@ export const DismissableAlert = ({header, message, color}) => {
       </Alert>
   )
 };
+
+export const SettingsErrorMessage = () => {
+  return (
+      <Row>
+        <Col>
+          <Alert color="danger" className="text-center p-5">
+            <Alert.Heading>Error</Alert.Heading>
+            <p>
+              Failed to load settings content. Please reload the page and try
+              again. If the error persist, contact Study Tracker support.
+            </p>
+          </Alert>
+        </Col>
+      </Row>
+  )
+}

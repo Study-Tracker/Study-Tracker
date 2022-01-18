@@ -36,7 +36,7 @@ public class StudyCollectionService {
   }
 
   public void update(StudyCollection collection) {
-    StudyCollection c = studyCollectionRepository.getOne(collection.getId());
+    StudyCollection c = studyCollectionRepository.getById(collection.getId());
     c.setDescription(collection.getDescription());
     c.setName(collection.getName());
     c.setStudies(collection.getStudies());

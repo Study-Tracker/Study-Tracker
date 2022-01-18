@@ -17,10 +17,13 @@
 package com.decibeltx.studytracker.controller.api;
 
 import com.decibeltx.studytracker.controller.UserAuthenticationUtils;
+import com.decibeltx.studytracker.eln.NotebookTemplate;
+import com.decibeltx.studytracker.eln.StudyNotebookService;
 import com.decibeltx.studytracker.events.util.StudyActivityUtils;
 import com.decibeltx.studytracker.exception.RecordNotFoundException;
 import com.decibeltx.studytracker.exception.StudyTrackerException;
 import com.decibeltx.studytracker.mapstruct.dto.StudyDetailsDto;
+import com.decibeltx.studytracker.mapstruct.dto.StudyFormDto;
 import com.decibeltx.studytracker.mapstruct.dto.StudySummaryDto;
 import com.decibeltx.studytracker.model.Activity;
 import com.decibeltx.studytracker.model.Program;
@@ -38,6 +41,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +65,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudyBaseController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyBaseController.class);
+
+  @Autowired(required = false)
+  private StudyNotebookService notebookService;
 
   @GetMapping("")
   public List<StudySummaryDto> getAllStudies(
@@ -168,7 +175,7 @@ public class StudyBaseController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<StudyDetailsDto> createStudy(@RequestBody @Valid StudyDetailsDto dto) {
+  public HttpEntity<StudyDetailsDto> createStudy(@RequestBody @Valid StudyFormDto dto) {
 
     LOGGER.info("Creating study");
     LOGGER.info(dto.toString());
@@ -176,13 +183,10 @@ public class StudyBaseController extends AbstractStudyController {
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-
-    // Created by
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
-//    study.setCreatedBy(user);
 
-    Study study = this.getStudyMapper().fromStudyDetails(dto);
+    Study study = this.getStudyMapper().fromStudyForm(dto);
 
     // Study team
     Set<User> team = new HashSet<>();
@@ -196,8 +200,22 @@ public class StudyBaseController extends AbstractStudyController {
     study.setOwner(getUserService().findById(study.getOwner().getId())
         .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + study.getOwner().getId())));
 
+    // If a notebook template was requested, find it
+    if (notebookService != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
+      Optional<NotebookTemplate> templateOptional =
+          notebookService.findEntryTemplateById(dto.getNotebookTemplateId());
+      if (templateOptional.isPresent()) {
+        getStudyService().create(study, templateOptional.get());
+      } else {
+        throw new RecordNotFoundException("Could not find notebook entry template: "
+            + dto.getNotebookTemplateId());
+      }
+    } else {
+      getStudyService().create(study);
+    }
+
     // Save the record
-    getStudyService().create(study);
+
     Assert.notNull(study.getId(), "Study not persisted.");
 
     // Publish events
@@ -210,20 +228,21 @@ public class StudyBaseController extends AbstractStudyController {
 
   @PutMapping("/{id}")
   public HttpEntity<StudyDetailsDto> updateStudy(@PathVariable("id") String id,
-      @RequestBody @Valid StudyDetailsDto dto) {
+      @RequestBody @Valid StudyFormDto dto) {
 
-    LOGGER.info("Updating study");
+    LOGGER.info("Updating study: " + id);
     LOGGER.info(dto.toString());
 
-    // Last modified by
+    // Get current user
     String username = UserAuthenticationUtils
         .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
     User user = getUserService().findByUsername(username)
         .orElseThrow(RecordNotFoundException::new);
 
-    Study study = this.getStudyMapper().fromStudyDetails(dto);
+    // Make sure the study exists
+    this.getStudyFromIdentifier(id);
 
-//    study.setLastModifiedBy(user);
+    Study study = this.getStudyMapper().fromStudyForm(dto);
 
     // Study team
     Set<User> team = new HashSet<>();

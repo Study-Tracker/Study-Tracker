@@ -76,7 +76,7 @@ public class UserService {
 
   @Transactional
   public void update(User user) {
-    User u = userRepository.getOne(user.getId());
+    User u = userRepository.getById(user.getId());
     u.setDisplayName(user.getDisplayName());
     u.setEmail(user.getEmail());
     u.setActive(user.isActive());
@@ -89,7 +89,7 @@ public class UserService {
 
   @Transactional
   public void updatePassword(User user, String password) {
-    User u = userRepository.getOne(user.getId());
+    User u = userRepository.getById(user.getId());
     u.setPassword(password);
     u.setCredentialsExpired(false);
     userRepository.save(u);

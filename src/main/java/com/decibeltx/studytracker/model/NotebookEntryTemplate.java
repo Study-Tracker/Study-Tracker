@@ -66,11 +66,23 @@ public class NotebookEntryTemplate {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    public static NotebookEntryTemplate of(User user, String templateId,
-                                           String name, Date timeStamp) {
+    @Column(name = "category", nullable = false)
+    private Category category;
+
+    @Column(name = "is_default", nullable = false)
+    private boolean isDefault = false;
+
+    public enum Category {
+        STUDY,
+        ASSAY
+    }
+
+    public static NotebookEntryTemplate of(User user, String templateId, String name,
+        Category category, Date timeStamp) {
         NotebookEntryTemplate notebookEntryTemplate = new NotebookEntryTemplate();
         notebookEntryTemplate.setTemplateId(templateId);
         notebookEntryTemplate.setName(name);
+        notebookEntryTemplate.setCategory(category);
         notebookEntryTemplate.setCreatedBy(user);
         notebookEntryTemplate.setLastModifiedBy(user);
         notebookEntryTemplate.setCreatedAt(timeStamp);
@@ -140,5 +152,21 @@ public class NotebookEntryTemplate {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 }
