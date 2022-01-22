@@ -258,6 +258,9 @@ public class WebSecurityConfiguration {
     @Value("${saml.metadata-base-url}")
     private String metadataBaseUrl;
 
+    @Value("${saml.max-authentication-age:86400}")
+    private long maxAuthenticationAge;
+
     @Autowired
     private AppUserDetailsService appUserDetailsService;
 
@@ -325,7 +328,9 @@ public class WebSecurityConfiguration {
 
     @Bean
     public WebSSOProfileConsumer webSSOprofileConsumer() {
-      return new WebSSOProfileConsumerImpl();
+      WebSSOProfileConsumerImpl consumer = new WebSSOProfileConsumerImpl();
+      consumer.setMaxAuthenticationAge(maxAuthenticationAge);
+      return consumer;
     }
 
     @Bean
