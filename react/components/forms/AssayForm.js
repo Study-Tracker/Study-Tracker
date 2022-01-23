@@ -48,7 +48,8 @@ export default class AssayForm extends React.Component {
       fields: {},
       tasks: [],
       attributes: {},
-      notebookTemplateId: '',
+      notebookTemplateId: !!props.defaultNotebookTemplate
+          ? props.defaultNotebookTemplate.templateId : null
     };
     assay.lastModifiedBy = this.props.user;
 
@@ -352,6 +353,7 @@ export default class AssayForm extends React.Component {
                         { !this.state.isUpdateModeOn &&
                           <NotebookEntryTemplatesDropdown
                             notebookTemplates={this.props.notebookTemplates}
+                            defaultTemplate={this.props.defaultNotebookTemplate}
                             onChange={this.handleTemplateSelection}
                           />
                         }
