@@ -80,12 +80,14 @@ class AssayFormView extends React.Component {
         error: error
       });
     });
+    const defaultNotebookTemplate = notebookTemplates.find(o => o.default === true);
 
     this.setState({
       study: study,
       assay: assay,
       assayTypes: assayTypes,
       notebookTemplates: notebookTemplates,
+      defaultNotebookTemplate,
       isLoaded: true
     });
 
@@ -104,6 +106,7 @@ class AssayFormView extends React.Component {
           user={this.props.user}
           assayTypes={this.state.assayTypes}
           notebookTemplates={this.state.notebookTemplates}
+          defaultNotebookTemplate={this.state.defaultNotebookTemplate}
       />;
     }
     return (

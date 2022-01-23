@@ -49,7 +49,9 @@ export default class StudyForm extends React.Component {
           owner: true
         }],
         owner: this.props.user,
-        notebookFolder: {}
+        notebookFolder: {},
+        notebookTemplateId: !!props.defaultNotebookTemplate
+            ? props.defaultNotebookTemplate.templateId : null
       },
       validation: {
         nameIsValid: true,
@@ -353,6 +355,7 @@ export default class StudyForm extends React.Component {
                           !this.state.study.id ? (
                               <NotebookEntryTemplatesDropdown
                                   notebookTemplates={this.props.notebookTemplates}
+                                  defaultTemplate={this.props.defaultNotebookTemplate}
                                   onChange={selectedItem => {
                                     this.handleFormUpdate({
                                       notebookTemplateId: selectedItem

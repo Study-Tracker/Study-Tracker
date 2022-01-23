@@ -95,8 +95,10 @@ class StudyFormView extends React.Component {
     fetch("/api/notebookentrytemplate?category=STUDY&active=true")
     .then(response => response.json())
     .then(templates => {
+      const defaultNotebookTemplate = templates.find(o => o.default === true);
       this.setState({
         notebookTemplates: templates,
+        defaultNotebookTemplate: defaultNotebookTemplate,
         notebookTemplatesLoaded: true
       });
     })
@@ -150,6 +152,7 @@ class StudyFormView extends React.Component {
           externalContacts={this.state.collaborators}
           keywordCategories={this.state.keywordCategories}
           notebookTemplates={this.state.notebookTemplates}
+          defaultNotebookTemplate={this.state.defaultNotebookTemplate}
           user={this.props.user}
       />;
     }

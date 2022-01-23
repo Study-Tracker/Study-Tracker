@@ -21,6 +21,7 @@ import {FormGroup} from "./common";
 
 export const NotebookEntryTemplatesDropdown = ({
   notebookTemplates,
+  defaultTemplate,
   onChange,
 }) => {
   const options = notebookTemplates
@@ -31,13 +32,13 @@ export const NotebookEntryTemplatesDropdown = ({
     })
     .map(t => {
       return {
-        value: t.referenceId,
+        value: t.templateId,
         label: t.name,
         default: t.default
       };
     });
-  const defaultValue = options.find(o => o.default === true);
-  const selectedValue = defaultValue || null;
+  const selectedValue = !!defaultTemplate
+      ? options.find(o => o.value === defaultTemplate.templateId) : null;
 
   return (
     <FormGroup>
@@ -45,13 +46,14 @@ export const NotebookEntryTemplatesDropdown = ({
       <Select
         className="react-select-container"
         classNamePrefix="react-select"
-
-        defaultValue={selectedValue || defaultValue}
+        defaultValue={selectedValue}
         options={options}
         onChange={onChange}
         isClearable={true}
       />
-      <Form.Control.Feedback>Select a template for notebook entry.</Form.Control.Feedback>
+      <Form.Control.Feedback>
+        Select a template for notebook entry.
+      </Form.Control.Feedback>
     </FormGroup>
   );
 }
