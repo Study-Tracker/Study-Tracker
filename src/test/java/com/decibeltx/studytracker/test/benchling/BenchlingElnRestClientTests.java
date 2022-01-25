@@ -36,6 +36,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -247,6 +249,18 @@ public class BenchlingElnRestClientTests {
     for (BenchlingEntrySchema schema: schemas) {
       System.out.println(schema.toString());
     }
+  }
+
+  @Test
+  public void uriEncodingTest() throws Exception {
+    LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.set("nextToken", "W3siX19iZW5jaGxpbmdUeXBlIjogImRhdGV0aW1lIiwgInZhbHVlIjogIjIwMjEtMDctMjRUMDM6MTc6MTUuNjk4NjE0In0sICJlbnRfZE9ZQW4wdXQiXQ==");
+    URL url = new URL(rootUrl, "/api/v2/users");
+    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url.toString())
+        .queryParams(params);
+    UriComponents components = uriComponentsBuilder.build().encode();
+    String out = components.toString();
+    System.out.println(out);
   }
 
 }

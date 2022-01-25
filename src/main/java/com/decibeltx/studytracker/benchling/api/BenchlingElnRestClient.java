@@ -531,7 +531,7 @@ public final class BenchlingElnRestClient {
     URL url = joinUrls(rootUrl, endpoint);
     UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url.toString())
         .queryParams(params);
-    UriComponents components = uriComponentsBuilder.build().encode();
+    UriComponents components = uriComponentsBuilder.build(false);
     return components.toString();
   }
 
