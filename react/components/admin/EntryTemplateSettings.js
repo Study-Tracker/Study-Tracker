@@ -45,6 +45,7 @@ export default class EntryTemplateSettings extends React.Component {
     this.updateTemplate = this.updateTemplate.bind(this);
     this.handleSelectedTemplateUpdate = this.handleSelectedTemplateUpdate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.showModal = this.showModal.bind(this);
   }
 
   componentDidMount() {
@@ -197,6 +198,11 @@ export default class EntryTemplateSettings extends React.Component {
 
   render() {
 
+    const categoryOptions = [
+      {label: 'Study', value: 'STUDY'},
+      {label: 'Assay', value: 'ASSAY'}
+    ];
+
     const availableTemplateOptions = this.state.availableTemplates
     .sort((a, b) => {
       if (a.name < b.name) return -1;
@@ -320,7 +326,6 @@ export default class EntryTemplateSettings extends React.Component {
                                   type="text"
                                   name="name"
                                   value={values.name}
-                                  disabled={true}
                                   onChange={handleChange}
                               />
                             </Form.Group>
@@ -346,11 +351,8 @@ export default class EntryTemplateSettings extends React.Component {
                                   className={"react-select-container " + !errors.category ? "is-invalid" : ''}
                                   classNamePrefix="react-select"
                                   name="category"
-                                  defaultValue={values.category}
-                                  options={[
-                                    {label: 'Study', value: 'STUDY'},
-                                    {label: 'Assay', value: 'ASSAY'}
-                                  ]}
+                                  defaultValue={categoryOptions.find(d => d.value === values.category)}
+                                  options={categoryOptions}
                                   onChange={(selected, e) => {
                                     setFieldValue("category", selected.value);
                                   }}

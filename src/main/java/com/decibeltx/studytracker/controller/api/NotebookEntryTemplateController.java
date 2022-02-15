@@ -150,14 +150,19 @@ public class NotebookEntryTemplateController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("")
+    @PutMapping("/{id}")
     public HttpEntity<NotebookEntryTemplateDetailsDto> updateEntryTemplate(
+        @PathVariable("id") Long id,
         @RequestBody @Valid NotebookEntryTemplateFormDto dto) {
 
         User user = getAuthenticatedUser();
         if (!user.isAdmin()){
             throw new InsufficientPrivilegesException("User does not have sufficient privileges "
                 + "to perform this action: " + user.getUsername());
+        }
+
+        if (!entryTemplateService.exists(id)) {
+            throw new RecordNotFoundException("Cannot find notebook entry template with ID: " + id);
         }
 
         NotebookEntryTemplate notebookEntryTemplate = mapper.fromForm(dto);

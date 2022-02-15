@@ -139,7 +139,7 @@ public class NotebookEntryTemplateControllerTest {
         NotebookEntryTemplate testTemplate = templates.get(0);
         testTemplate.setName("updated name");
         testTemplate.setTemplateId("updated id");
-        mockMvc.perform(put("/api/notebookentrytemplate")
+        mockMvc.perform(put("/api/notebookentrytemplate/" + testTemplate.getId())
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))
@@ -159,7 +159,7 @@ public class NotebookEntryTemplateControllerTest {
         List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll();
         NotebookEntryTemplate testTemplate = templates.get(0);
         testTemplate.setId(999999L);
-        mockMvc.perform(put("/api/notebookentrytemplate")
+        mockMvc.perform(put("/api/notebookentrytemplate/" + testTemplate.getId())
                 .with(user(user.getUsername()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))

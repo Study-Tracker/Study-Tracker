@@ -85,6 +85,8 @@ public class NotebookEntryTemplateService {
         notebookEntryTemplateRepository.deleteById(template.getId());
     }
 
-
+    public boolean exists(Long id) {
+        return notebookEntryTemplateRepository.existsById(id);
+    }
 
 }
