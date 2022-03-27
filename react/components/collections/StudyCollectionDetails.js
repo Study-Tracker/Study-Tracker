@@ -214,9 +214,9 @@ class StudyCollectionDetails extends React.Component {
           const CRO = !!d.collaborator
               ? d.collaborator.organizationName +
               ' ' +
-              d.collaborator.contactName
+              d.collaborator.contactPersonName
               : '';
-          let text =
+          return (
               d.name +
               ' ' +
               d.status +
@@ -229,17 +229,10 @@ class StudyCollectionDetails extends React.Component {
               ' ' +
               CRO +
               ' ' +
-              (d.createdBy.displayName || '') +
-              ' ' +
               (d.owner.displayName || '') +
               ' ' +
-              (d.externalCode || '');
-          if (d.keywords != null) {
-            d.keywords.forEach(keyword => {
-              text = text + ' ' + keyword.keyword;
-            });
-          }
-          return text;
+              (d.externalCode || '')
+          );
         }
       }
     ];
