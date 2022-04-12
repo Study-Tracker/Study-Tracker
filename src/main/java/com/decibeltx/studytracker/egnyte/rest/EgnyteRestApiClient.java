@@ -99,6 +99,7 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
       String errorMessage =
           json != null && json.containsKey("errorMessage") ? json.get("errorMessage")
               : responseBody;
+      LOGGER.warn("Egnyte error message: " + errorMessage);
       if (errorMessage.equals("Folder already exists at this location")) {
         throw new DuplicateFolderException(errorMessage);
       } else if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -139,6 +140,7 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     }
 
     EgnyteObject object = response.getBody();
+    LOGGER.debug(object.toString());
 
     // Object is a folder
     if (object.isFolder()) {
@@ -177,7 +179,9 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
       ResponseEntity<EgnyteFolder> response = restTemplate
           .exchange(url.toString(), HttpMethod.GET, request, EgnyteFolder.class);
       LOGGER.debug("Successfully completed Egnyte API request.");
-      return response.getBody();
+      EgnyteFolder egnyteFolder = response.getBody();
+      LOGGER.debug(egnyteFolder.toString());
+      return egnyteFolder;
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
         throw new ObjectNotFoundException("Requested resource was not found.");
