@@ -14,7 +14,7 @@
 
   <groupId>com.decibeltx</groupId>
   <artifactId>study-tracker</artifactId>
-  <version>0.6.5</version>
+  <version>0.6.6</version>
   <name>Study Tracker</name>
   <packaging>war</packaging>
 

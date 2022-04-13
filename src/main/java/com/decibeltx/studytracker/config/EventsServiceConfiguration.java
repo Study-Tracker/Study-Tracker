@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
+import software.amazon.awssdk.services.eventbridge.EventBridgeClientBuilder;
 
 @Configuration
 public class EventsServiceConfiguration {
@@ -34,16 +35,18 @@ public class EventsServiceConfiguration {
     private Environment env;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
+    @Autowired(required = false)
     private AwsCredentialsProvider credentialsProvider;
 
     @Bean
     public EventBridgeClient eventBridgeClient() {
       Region region = Region.of(env.getRequiredProperty("aws.region"));
-      return EventBridgeClient.builder()
-          .region(region)
-          .credentialsProvider(credentialsProvider)
-          .build();
+      EventBridgeClientBuilder builder = EventBridgeClient.builder()
+          .region(region);
+      if (credentialsProvider != null) {
+        builder.credentialsProvider(credentialsProvider);
+      }
+      return builder.build();
     }
 
     @Bean

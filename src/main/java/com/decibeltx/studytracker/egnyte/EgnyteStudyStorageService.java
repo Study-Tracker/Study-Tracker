@@ -237,6 +237,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     try {
       return this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
+      LOGGER.warn("Duplicate folder found: " + path);
       if (options.isUseExisting()) {
         LOGGER.warn("Existing folder will be used.");
         return this.getProgramFolder(program, false);

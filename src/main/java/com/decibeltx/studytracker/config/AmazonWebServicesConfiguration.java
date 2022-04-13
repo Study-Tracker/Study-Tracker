@@ -20,13 +20,18 @@ public class AmazonWebServicesConfiguration {
 
   @Bean
   public AwsCredentialsProvider credentialsProvider() {
-    Assert.isTrue(env.containsProperty("aws.secret-access-key"),
-        "Property 'aws.secret-access-key' must be set.");
-    AwsCredentials credentials = AwsBasicCredentials.create(
-        env.getRequiredProperty("aws.access-key-id"),
-        env.getRequiredProperty("aws.secret-access-key")
-    );
-    return StaticCredentialsProvider.create(credentials);
+    if (env.containsProperty("aws.secret-access-key")
+        && env.containsProperty("aws.access-key-id")) {
+      Assert.isTrue(env.containsProperty("aws.secret-access-key"),
+          "Property 'aws.secret-access-key' must be set.");
+      AwsCredentials credentials = AwsBasicCredentials.create(
+          env.getRequiredProperty("aws.access-key-id"),
+          env.getRequiredProperty("aws.secret-access-key")
+      );
+      return StaticCredentialsProvider.create(credentials);
+    } else {
+      return null;
+    }
   }
 
 }
