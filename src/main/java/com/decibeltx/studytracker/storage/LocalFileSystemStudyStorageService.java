@@ -52,7 +52,6 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   private int maxDepth = 2;
 
-  @Autowired
   private NamingService namingService;
 
   public LocalFileSystemStudyStorageService(Path rootPath) {
@@ -357,5 +356,10 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   public void setMaxDepth(int maxDepth) {
     this.maxDepth = maxDepth;
+  }
+
+  @Autowired
+  public void setNamingService(NamingService namingService) {
+    this.namingService = namingService;
   }
 }

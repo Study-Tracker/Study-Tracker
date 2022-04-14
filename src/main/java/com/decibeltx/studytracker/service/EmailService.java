@@ -15,7 +15,6 @@ public class EmailService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailService.class);
 
-  @Autowired(required = false)
   private JavaMailSender mailSender;
 
   @Value("#{servletContext.contextPath}")
@@ -78,4 +77,8 @@ public class EmailService {
 
   }
 
+  @Autowired(required = false)
+  public void setMailSender(JavaMailSender mailSender) {
+    this.mailSender = mailSender;
+  }
 }

@@ -7,6 +7,7 @@ import com.decibeltx.studytracker.mapstruct.dto.UserStatisticsDto;
 import com.decibeltx.studytracker.model.User;
 import com.decibeltx.studytracker.service.StatisticsService;
 import com.decibeltx.studytracker.service.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,17 +16,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/api/stats")
-@ApiIgnore
+@Hidden
 public class StatisticsController {
 
-  @Autowired
   private StatisticsService statisticsService;
 
-  @Autowired
   private UserService userService;
 
   @GetMapping("")
@@ -62,4 +60,13 @@ public class StatisticsController {
 
   }
 
+  @Autowired
+  public void setStatisticsService(StatisticsService statisticsService) {
+    this.statisticsService = statisticsService;
+  }
+
+  @Autowired
+  public void setUserService(UserService userService) {
+    this.userService = userService;
+  }
 }

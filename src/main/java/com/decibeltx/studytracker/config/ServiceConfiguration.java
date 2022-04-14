@@ -27,7 +27,6 @@ import org.springframework.core.env.Environment;
 @Configuration
 public class ServiceConfiguration {
 
-  @Autowired
   private Environment env;
 
   @Bean
@@ -59,6 +58,11 @@ public class ServiceConfiguration {
           env.getRequiredProperty("study.assay-code-min-digits", Integer.class));
     }
     return new NamingService(namingOptions);
+  }
+
+  @Autowired
+  public void setEnv(Environment env) {
+    this.env = env;
   }
 
 }

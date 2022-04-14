@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -49,11 +48,8 @@ public class StorageServiceConfiguration {
   @ConditionalOnProperty(name = "storage.mode", havingValue = "local", matchIfMissing = true)
   public static class LocalStudyStorageServiceConfiguration {
 
-    @Autowired
-    private Environment env;
-
     @Bean
-    public StudyStorageService localFileSystemStudyStorageService() {
+    public StudyStorageService localFileSystemStudyStorageService(Environment env) {
       Assert.notNull(env.getProperty("storage.local-dir"),
           "Local storage directory is not set. Eg. storage.local-dir=/path/to/storage");
       Path path = Paths.get(env.getRequiredProperty("storage.local-dir"));
@@ -78,11 +74,8 @@ public class StorageServiceConfiguration {
   @AutoConfigureBefore(StorageServiceConfiguration.class)
   public static class EgnyteServiceConfiguration {
 
-    @Autowired
-    private Environment env;
-
     @Bean
-    public EgnyteFolderNamingService egnyteFolderNamingService() {
+    public EgnyteFolderNamingService egnyteFolderNamingService(Environment env) {
       NamingOptions namingOptions = new NamingOptions();
       if (env.containsProperty("study.study-code-counter-start")) {
         namingOptions.setStudyCodeCounterStart(
@@ -100,7 +93,7 @@ public class StorageServiceConfiguration {
     }
 
     @Bean
-    public ObjectMapper egnyteObjectMapper() throws Exception {
+    public ObjectMapper egnyteObjectMapper(Environment env) throws Exception {
       Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.registerModule(new SimpleModule() {{
@@ -111,16 +104,16 @@ public class StorageServiceConfiguration {
     }
 
     @Bean
-    public RestTemplate egnyteRestTemplate() throws Exception {
+    public RestTemplate egnyteRestTemplate(Environment env) throws Exception {
       RestTemplate restTemplate = new RestTemplateBuilder().build();
       MappingJackson2HttpMessageConverter httpMessageConverter = new MappingJackson2HttpMessageConverter();
-      httpMessageConverter.setObjectMapper(egnyteObjectMapper());
+      httpMessageConverter.setObjectMapper(egnyteObjectMapper(env));
       restTemplate.getMessageConverters().add(0, httpMessageConverter);
       return restTemplate;
     }
 
     @Bean
-    public EgnyteOptions egnyteOptions() throws Exception {
+    public EgnyteOptions egnyteOptions(Environment env) throws Exception {
       Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
       Assert.notNull(env.getProperty("egnyte.root-path"), "Egnyte root directory path is not set.");
       Assert.notNull(env.getProperty("egnyte.api-token"), "Egnyte API token is not set.");
@@ -144,8 +137,8 @@ public class StorageServiceConfiguration {
     }
 
     @Bean
-    public EgnyteClientOperations egnyteClient(EgnyteOptions egnyteOptions) throws Exception {
-      return new EgnyteRestApiClient(egnyteRestTemplate(), egnyteOptions);
+    public EgnyteClientOperations egnyteClient(EgnyteOptions egnyteOptions, Environment env) throws Exception {
+      return new EgnyteRestApiClient(egnyteRestTemplate(env), egnyteOptions);
     }
 
     @Bean

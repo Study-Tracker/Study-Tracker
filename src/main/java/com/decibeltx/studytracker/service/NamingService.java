@@ -8,6 +8,7 @@ import com.decibeltx.studytracker.model.Study;
 import com.decibeltx.studytracker.repository.AssayRepository;
 import com.decibeltx.studytracker.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Service definition for naming study folders, notebook entries, and more.
@@ -16,13 +17,10 @@ public class NamingService {
 
   private final NamingOptions options;
 
-  @Autowired
   private ProgramService programService;
 
-  @Autowired
   private StudyRepository studyRepository;
 
-  @Autowired
   private AssayRepository assayRepository;
 
   public NamingService(NamingOptions options) {
@@ -122,4 +120,18 @@ public class NamingService {
     return program.getName();
   }
 
+  @Autowired
+  public void setProgramService(@Lazy ProgramService programService) {
+    this.programService = programService;
+  }
+
+  @Autowired
+  public void setStudyRepository(@Lazy StudyRepository studyRepository) {
+    this.studyRepository = studyRepository;
+  }
+
+  @Autowired
+  public void setAssayRepository(@Lazy AssayRepository assayRepository) {
+    this.assayRepository = assayRepository;
+  }
 }
