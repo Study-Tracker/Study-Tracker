@@ -24,7 +24,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @SpringBootApplication(exclude = {
@@ -32,7 +31,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
     ElasticsearchRepositoriesAutoConfiguration.class
 })
 @PropertySource("classpath:defaults.properties")
-@EnableSwagger2
 public class Application extends SpringBootServletInitializer {
 
   @Override

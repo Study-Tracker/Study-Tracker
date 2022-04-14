@@ -28,23 +28,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/api/autocomplete")
-@ApiIgnore
 public class AutocompleteController {
 
-  @Autowired
   private UserService userService;
 
-  @Autowired
   private UserMapper userMapper;
 
-  @Autowired
   private StudyService studyService;
 
-  @Autowired
   private StudyMapper studyMapper;
 
   @GetMapping("/user")
@@ -57,4 +51,23 @@ public class AutocompleteController {
     return studyMapper.toStudySlimList(studyService.search(keyword));
   }
 
+  @Autowired
+  public void setUserService(UserService userService) {
+    this.userService = userService;
+  }
+
+  @Autowired
+  public void setUserMapper(UserMapper userMapper) {
+    this.userMapper = userMapper;
+  }
+
+  @Autowired
+  public void setStudyService(StudyService studyService) {
+    this.studyService = studyService;
+  }
+
+  @Autowired
+  public void setStudyMapper(StudyMapper studyMapper) {
+    this.studyMapper = studyMapper;
+  }
 }

@@ -60,25 +60,18 @@ public class StudyService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyService.class);
 
-  @Autowired
   private StudyRepository studyRepository;
 
-  @Autowired
   private ProgramRepository programRepository;
 
-  @Autowired
   private StudyStorageService studyStorageService;
 
-  @Autowired(required = false)
   private StudyNotebookService notebookService;
 
-  @Autowired
   private NamingService namingService;
 
-  @Autowired
   private FileStoreFolderRepository fileStoreFolderRepository;
 
-  @Autowired
   private ELNFolderRepository elnFolderRepository;
 
   /**
@@ -470,4 +463,42 @@ public class StudyService {
 
   }
 
+  @Autowired
+  public void setStudyRepository(StudyRepository studyRepository) {
+    this.studyRepository = studyRepository;
+  }
+
+  @Autowired
+  public void setProgramRepository(
+      ProgramRepository programRepository) {
+    this.programRepository = programRepository;
+  }
+
+  @Autowired
+  public void setStudyStorageService(
+      StudyStorageService studyStorageService) {
+    this.studyStorageService = studyStorageService;
+  }
+
+  @Autowired(required = false)
+  public void setNotebookService(StudyNotebookService notebookService) {
+    this.notebookService = notebookService;
+  }
+
+  @Autowired
+  public void setNamingService(NamingService namingService) {
+    this.namingService = namingService;
+  }
+
+  @Autowired
+  public void setFileStoreFolderRepository(
+      FileStoreFolderRepository fileStoreFolderRepository) {
+    this.fileStoreFolderRepository = fileStoreFolderRepository;
+  }
+
+  @Autowired
+  public void setElnFolderRepository(
+      ELNFolderRepository elnFolderRepository) {
+    this.elnFolderRepository = elnFolderRepository;
+  }
 }

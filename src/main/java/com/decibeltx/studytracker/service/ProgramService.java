@@ -43,19 +43,14 @@ public class ProgramService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgramService.class);
 
-  @Autowired
   private ProgramRepository programRepository;
 
-  @Autowired
   private StudyStorageService studyStorageService;
 
-  @Autowired(required = false)
   private StudyNotebookService studyNotebookService;
 
-  @Autowired
   private FileStoreFolderRepository fileStoreFolderRepository;
 
-  @Autowired
   private ELNFolderRepository elnFolderRepository;
 
   public Optional<Program> findById(Long id) {
@@ -201,4 +196,33 @@ public class ProgramService {
 
   }
 
+  @Autowired
+  public void setProgramRepository(
+      ProgramRepository programRepository) {
+    this.programRepository = programRepository;
+  }
+
+  @Autowired
+  public void setStudyStorageService(
+      StudyStorageService studyStorageService) {
+    this.studyStorageService = studyStorageService;
+  }
+
+  @Autowired(required = false)
+  public void setStudyNotebookService(
+      StudyNotebookService studyNotebookService) {
+    this.studyNotebookService = studyNotebookService;
+  }
+
+  @Autowired
+  public void setFileStoreFolderRepository(
+      FileStoreFolderRepository fileStoreFolderRepository) {
+    this.fileStoreFolderRepository = fileStoreFolderRepository;
+  }
+
+  @Autowired
+  public void setElnFolderRepository(
+      ELNFolderRepository elnFolderRepository) {
+    this.elnFolderRepository = elnFolderRepository;
+  }
 }
