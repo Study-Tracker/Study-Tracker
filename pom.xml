@@ -12,9 +12,9 @@
     <version>2.5.5</version>
   </parent>
 
-  <groupId>com.decibeltx</groupId>
+  <groupId>io.studytracker</groupId>
   <artifactId>study-tracker</artifactId>
-  <version>0.6.7</version>
+  <version>0.6.8</version>
   <name>Study Tracker</name>
   <packaging>war</packaging>
 

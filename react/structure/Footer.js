@@ -20,7 +20,7 @@ const Footer = () => {
   return (
       <div className="footer">
         <div className="text-center">
-          Copyright Decibel Therapeutics {new Date().getFullYear()}
+          Copyright {new Date().getFullYear()}
         </div>
       </div>
   );

@@ -29,7 +29,7 @@
     <appender-ref ref="Console" />
   </root>
 
-  <logger name="com.decibeltx" level="debug" additivity="false">
+  <logger name="io.studytracker" level="debug" additivity="false">
     <appender-ref ref="RollingFile" />
     <appender-ref ref="Console" />
   </logger>

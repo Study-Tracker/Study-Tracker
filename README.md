@@ -17,7 +17,7 @@ integrated REST API and event dispatcher service for sharing of data.
 ## Documentation
 
 For instructions about how to configure and deploy Study
-Tracker, [see the wiki](https://github.com/Decibel-Therapeutics/Study-Tracker/wiki).
+Tracker, [see the wiki](https://github.com/Study-Tracker/Study-Tracker/wiki).
 
 ## Supported Integrations
 
@@ -75,11 +75,11 @@ For a rapid build and deployment in development mode, follow the steps below. Fo
 
 For questions about Study Tracker, or if you would like to contribute, please contact:
 
-- [Will Oemler, Decibel Therapeutics](mailto:woemler@decibeltx.com)
+- [Will Oemler, Vesalius Therapeutics](mailto:woemler@vesaliustx.com)
 
 ## License
 
-Copyright 2021 Decibel Therapeutics
+Copyright 2022 the original authors
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
 compliance with the License. You may obtain a copy of the License at
