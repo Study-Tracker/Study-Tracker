@@ -22,9 +22,46 @@ import {
   faCheckCircle,
   faEdit,
   faInfoCircle,
+  faRedo,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
+
+const resetUserPassword = (user) => {
+  swal({
+    title: "Are you sure you want to reset the password for user: "
+        + user["displayName"] + " (" + user["email"] + ")?",
+    text: "This will override any existing password reset requests and send a "
+        + "new notification email to the user.",
+    icon: "warning",
+    buttons: true
+  })
+  .then(val => {
+    if (val) {
+      fetch("/api/user/" + user["id"] + "/password-reset", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(response => {
+        if (response.ok) {
+          swal("Password reset successful",
+              "A notification email has been sent to the user.",
+              "success")
+        } else {
+          swal("Request failed",
+              "Check the server log for more information.",
+              "warning");
+        }
+      })
+      .catch(error => {
+        swal("Request failed",
+            "Check the server log for more information.",
+            "warning");
+      })
+    }
+  })
+}
 
 const toggleUserActive = (user, active) => {
   swal({
@@ -229,7 +266,7 @@ const UserTable = ({users, showModal}) => {
     },
     {
       dataField: "controls",
-      text: "Options",
+      text: "",
       sort: false,
       headerStyle: {width: '10%'},
       formatter: (c, d, i, x) => {
@@ -246,25 +283,21 @@ const UserTable = ({users, showModal}) => {
 
                 <Dropdown.Menu>
 
-                  <Dropdown.Item
-                      className={"text-info"}
-                      onClick={() => showModal(d)}
-                  >
+                  <Dropdown.Item onClick={() => showModal(d)}>
                     <FontAwesomeIcon icon={faInfoCircle} />
                     &nbsp;&nbsp;
                     View Details
                   </Dropdown.Item>
 
-                  <Dropdown.Divider />
-
                   <Dropdown.Item
-                      className={"text-warning"}
                       onClick={() => history.push("/users/" + d.id + "/edit")}
                   >
                     <FontAwesomeIcon icon={faEdit} />
                     &nbsp;&nbsp;
                     Edit User
                   </Dropdown.Item>
+
+                  <Dropdown.Divider />
 
                   {
                     !!d.active ? (
@@ -287,6 +320,15 @@ const UserTable = ({users, showModal}) => {
                         </Dropdown.Item>
                     )
                   }
+
+                  <Dropdown.Item
+                      className={"text-warning"}
+                      onClick={() => resetUserPassword(d)}
+                  >
+                    <FontAwesomeIcon icon={faRedo} />
+                    &nbsp;&nbsp;
+                    Reset Password
+                  </Dropdown.Item>
 
                 </Dropdown.Menu>
               </Dropdown>

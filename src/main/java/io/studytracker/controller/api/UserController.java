@@ -120,6 +120,30 @@ public class UserController {
 
   }
 
+  @PostMapping("/{id}/password-reset")
+  public HttpEntity<?> resetUserPassword(@PathVariable("id") Long userId) {
+
+    String username = UserAuthenticationUtils
+        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    User currentUser = userService.findByUsername(username)
+        .orElseThrow(RecordNotFoundException::new);
+    if (!currentUser.isAdmin()) {
+      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+    }
+
+    Optional<User> optional = userService.findById(userId);
+    if (!optional.isPresent()) {
+      throw new RecordNotFoundException("User not found: " + userId);
+    }
+    User user = optional.get();
+
+    LOGGER.info("Generating password reset request for user: " + user.getUsername());
+    PasswordResetToken token = userService.createPasswordResetToken(user);
+    emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
+    return new ResponseEntity<>(HttpStatus.OK);
+
+  }
+
   @GetMapping("/{id}/activity")
   public List<ActivityDetailsDto> getUserActivity(@PathVariable("id") Long userId) {
     Optional<User> optional = userService.findById(userId);
