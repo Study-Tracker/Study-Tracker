@@ -119,6 +119,7 @@ export const AdminDashboard = () => {
 
       <Row>
         <Col md="3" xl="2">
+
           <Card>
             <Card.Header>
               <Card.Title tag="h5" className="mb-0">
@@ -129,6 +130,23 @@ export const AdminDashboard = () => {
               {controls}
             </ListGroup>
           </Card>
+
+          <Card>
+            <Card.Header>
+              <Card.Title tag="h5" className="mb-0">
+                Developer Tools
+              </Card.Title>
+            </Card.Header>
+            <ListGroup variant={"flush"}>
+              <ListGroup.Item
+                  action
+                  href={"/swagger-ui.html"}
+              >
+                API Documentation
+              </ListGroup.Item>
+            </ListGroup>
+          </Card>
+
         </Col>
 
         <Col md="9" xl="10">
