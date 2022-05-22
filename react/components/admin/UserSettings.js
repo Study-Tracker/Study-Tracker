@@ -1,12 +1,66 @@
 import React from 'react';
-import {Badge, Button, Card, Col, Modal, Row, Table} from 'react-bootstrap';
-import {Edit, Info, User, UserPlus} from 'react-feather';
+import {
+  Badge,
+  Button,
+  Card,
+  Col,
+  Dropdown,
+  Modal,
+  Row,
+  Table
+} from 'react-bootstrap';
+import {Edit, User, UserPlus} from 'react-feather';
 import {history} from "../../App";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {SettingsErrorMessage} from "../errors";
 import {SettingsLoadingMessage} from "../loading";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {
+  faBars,
+  faCheckCircle,
+  faEdit,
+  faInfoCircle,
+  faTimesCircle
+} from "@fortawesome/free-solid-svg-icons";
+import swal from "sweetalert";
+
+const toggleUserActive = (user, active) => {
+  swal({
+    title: "Are you sure you want to " + (!!active ? "enable" : "disable")
+        + " user: " + user["displayName"] + " (" + user["email"] + ")?",
+    text: "Disabled users cannot be added to new studies and assays, but they "
+        + "will remain associated with existing studies and assays.",
+    icon: "warning",
+    buttons: true
+  })
+  .then(val => {
+    if (val) {
+      fetch("/api/user/" + user["id"] + "/status?active=" + active, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(response => {
+        if (response.ok) {
+          swal("User " + (!!active ? "enabled" : "disabled"),
+              "Refresh the page to view the updated user information.",
+              "success")
+        } else {
+          swal("Request failed",
+              "Check the server log for more information.",
+              "warning");
+        }
+      })
+      .catch(error => {
+        swal("Request failed",
+            "Check the server log for more information.",
+            "warning");
+      })
+    }
+  });
+}
 
 class UserSettings extends React.Component {
 
@@ -182,15 +236,70 @@ const UserTable = ({users, showModal}) => {
         return (
             <React.Fragment>
 
-              <a className="text-info" title={"View details"}
-                 onClick={() => showModal(d)}>
-                <Info className="align-middle me-1" size={18}/>
-              </a>
+              <Dropdown>
 
-              <a className="text-warning" title={"Edit user"}
-                 onClick={() => history.push("/users/" + d.id + "/edit")}>
-                <Edit className="align-middle me-1" size={18}/>
-              </a>
+                <Dropdown.Toggle variant={"outline-primary"}>
+                  <FontAwesomeIcon icon={faBars} />
+                  &nbsp;&nbsp;
+                  Options
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+
+                  <Dropdown.Item
+                      className={"text-info"}
+                      onClick={() => showModal(d)}
+                  >
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    &nbsp;&nbsp;
+                    View Details
+                  </Dropdown.Item>
+
+                  <Dropdown.Divider />
+
+                  <Dropdown.Item
+                      className={"text-warning"}
+                      onClick={() => history.push("/users/" + d.id + "/edit")}
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                    &nbsp;&nbsp;
+                    Edit User
+                  </Dropdown.Item>
+
+                  {
+                    !!d.active ? (
+                        <Dropdown.Item
+                            className={"text-warning"}
+                            onClick={() => toggleUserActive(d, false)}
+                        >
+                          <FontAwesomeIcon icon={faTimesCircle} />
+                          &nbsp;&nbsp;
+                          Set Inactive
+                        </Dropdown.Item>
+                    ) : (
+                        <Dropdown.Item
+                            className={"text-warning"}
+                            onClick={() => toggleUserActive(d, true)}
+                        >
+                          <FontAwesomeIcon icon={faCheckCircle} />
+                          &nbsp;&nbsp;
+                          Set Active
+                        </Dropdown.Item>
+                    )
+                  }
+
+                </Dropdown.Menu>
+              </Dropdown>
+
+              {/*<a className="text-info" title={"View details"}*/}
+              {/*   onClick={() => showModal(d)}>*/}
+              {/*  <Info className="align-middle me-1" size={18}/>*/}
+              {/*</a>*/}
+
+              {/*<a className="text-warning" title={"Edit user"}*/}
+              {/*   onClick={() => history.push("/users/" + d.id + "/edit")}>*/}
+              {/*  <Edit className="align-middle me-1" size={18}/>*/}
+              {/*</a>*/}
 
               {/*<a className="text-danger" title={"Disable user"}*/}
               {/*   onClick={() => console.log("click")}>*/}
