@@ -1,13 +1,29 @@
 import React from 'react';
-import {Badge, Button, Card, Col, Modal, Row, Table} from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  Card,
+  Col,
+  Dropdown,
+  Modal,
+  Row,
+  Table
+} from "react-bootstrap";
 import {history} from "../../App";
-import {CheckCircle, Edit, Info, PlusCircle, Trash} from "react-feather";
+import {PlusCircle} from "react-feather";
 import ToolkitProvider from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {AssayTaskList} from "../assayTasks";
 import {SettingsLoadingMessage} from "../loading";
 import {SettingsErrorMessage} from "../errors";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {
+  faCheckCircle,
+  faEdit,
+  faInfoCircle,
+  faTimesCircle
+} from "@fortawesome/free-solid-svg-icons";
 
 class AssayTypeSettings extends React.Component {
 
@@ -144,41 +160,71 @@ const AssayTypeListCard = ({
     },
     {
       dataField: "controls",
-      text: "Options",
+      text: "",
       sort: false,
       headerStyle: {width: '20%'},
       formatter: (c, d, i, x) => {
         return (
             <React.Fragment>
-              <a className="text-info" title={"Details"}
-                 onClick={() => showModal(d)}>
-                <Info className="align-middle me-1" size={18}/>
-              </a>
-              {
-                d.name === "Generic" ? "" : (
-                    <a className="text-warning" title={"Edit assay type"}
-                       onClick={() => history.push("/assaytypes/" + d.id + "/edit")}>
-                      <Edit className="align-middle me-1" size={18}/>
-                    </a>
-                )
-              }
-              {
-                d.name === "Generic" ? "" : (
-                  !!d.active
-                      ? (
-                          <a className="text-danger" title={"Set inactive"}
-                             onClick={() => toggleActive(d)}>
-                            <Trash className="align-middle me-1" size={18}/>
-                          </a>
-                      )
-                      : (
-                          <a className="text-info" title={"Set active"}
-                             onClick={() => toggleActive(d)}>
-                            <CheckCircle className="align-middle me-1" size={18}/>
-                          </a>
-                      )
-                )
-              }
+
+              <Dropdown>
+
+                <Dropdown.Toggle variant={"outline-primary"}>
+                  {/*<FontAwesomeIcon icon={faBars} />*/}
+                  &nbsp;Options&nbsp;
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+
+                  <Dropdown.Item onClick={() => showModal(d)}>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    &nbsp;&nbsp;
+                    View Details
+                  </Dropdown.Item>
+
+                  {
+                    d.name === "Generic" ? "" : (
+                        <React.Fragment>
+                          <Dropdown.Divider />
+                          <Dropdown.Item
+                              onClick={() => history.push("/assaytypes/" + d.id + "/edit")}
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                            &nbsp;&nbsp;
+                            Edit assay type
+                          </Dropdown.Item>
+                        </React.Fragment>
+                    )
+                  }
+
+                  {
+                    d.name === "Generic" ? "" : (
+                        !!d.active ? (
+                            <Dropdown.Item
+                                className={"text-warning"}
+                                onClick={() => toggleActive(d)}
+                            >
+                              <FontAwesomeIcon icon={faTimesCircle} />
+                              &nbsp;&nbsp;
+                              Set Inactive
+                            </Dropdown.Item>
+                        ) : (
+                            <Dropdown.Item
+                                className={"text-warning"}
+                                onClick={() => toggleActive(d)}
+                            >
+                              <FontAwesomeIcon icon={faCheckCircle} />
+                              &nbsp;&nbsp;
+                              Set Active
+                            </Dropdown.Item>
+                        )
+                    )
+                  }
+
+                </Dropdown.Menu>
+
+              </Dropdown>
+
             </React.Fragment>
         )
       }

@@ -18,7 +18,6 @@ import {SettingsErrorMessage} from "../errors";
 import {SettingsLoadingMessage} from "../loading";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-  faBars,
   faCheckCircle,
   faEdit,
   faInfoCircle,
@@ -276,9 +275,8 @@ const UserTable = ({users, showModal}) => {
               <Dropdown>
 
                 <Dropdown.Toggle variant={"outline-primary"}>
-                  <FontAwesomeIcon icon={faBars} />
-                  &nbsp;&nbsp;
-                  Options
+                  {/*<FontAwesomeIcon icon={faBars} />*/}
+                  &nbsp;Options&nbsp;
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>

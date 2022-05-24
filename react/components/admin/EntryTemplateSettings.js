@@ -468,7 +468,7 @@ const RegisteredEntryTemplateLists = ({
     },
     {
       dataField: "controls",
-      text: "Options",
+      text: "",
       sort: false,
       headerStyle: {width: '10%'},
       formatter: (c, d, i, x) => {

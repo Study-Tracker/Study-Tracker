@@ -1,6 +1,15 @@
 import React from 'react';
-import {Badge, Button, Card, Col, Modal, Row, Table} from 'react-bootstrap';
-import {Clipboard, Edit, FolderPlus, Info} from 'react-feather';
+import {
+  Badge,
+  Button,
+  Card,
+  Col,
+  Dropdown,
+  Modal,
+  Row,
+  Table
+} from 'react-bootstrap';
+import {Clipboard, Edit, FolderPlus} from 'react-feather';
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -8,6 +17,9 @@ import {RepairableStorageFolderLink} from "../files";
 import {RepairableNotebookFolderLink} from "../eln";
 import {SettingsLoadingMessage} from "../loading";
 import {SettingsErrorMessage} from "../errors";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEdit, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
+import {history} from "../../App";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -98,16 +110,11 @@ class ProgramSettings extends React.Component {
 
             {content}
 
-            <Modal
-                show={this.state.isModalOpen}
-                onHide={() => this.showModal()}
-                size={"lg"}
-            >
-              <ProgramDetailsModal
-                  program={this.state.selectedProgram}
-                  showModal={this.showModal}
-              />
-            </Modal>
+            <ProgramDetailsModal
+                isOpen={this.state.isModalOpen}
+                program={this.state.selectedProgram}
+                showModal={this.showModal}
+            />
 
           </Card.Body>
 
@@ -202,27 +209,38 @@ const ProgramsTable = ({
     },
     {
       dataField: "controls",
-      text: "Options",
+      text: "",
       sort: false,
       // headerStyle: {width: '10%'},
       formatter: (c, d, i, x) => {
         return (
             <React.Fragment>
+              <Dropdown>
 
-              <a className="text-info" title={"View details"}
-                 onClick={() => showModal(d)}>
-                <Info className="align-middle me-1" size={18}/>
-              </a>
+                <Dropdown.Toggle variant={"outline-primary"}>
+                  {/*<FontAwesomeIcon icon={faBars} />*/}
+                  &nbsp;Options&nbsp;
+                </Dropdown.Toggle>
 
-              <a className="text-warning" title={"Edit program"}
-                 href={"/program/" + d.id + "/edit"}>
-                <Edit className="align-middle me-1" size={18}/>
-              </a>
+                <Dropdown.Menu>
 
-              {/*<a className="text-danger" title={"Disable program"}*/}
-              {/*   onClick={() => console.log("click")}>*/}
-              {/*  <Trash className="align-middle me-1" size={18}/>*/}
-              {/*</a>*/}
+                  <Dropdown.Item onClick={() => showModal(d)}>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    &nbsp;&nbsp;
+                    View Details
+                  </Dropdown.Item>
+
+                  <Dropdown.Item
+                      onClick={() => history.push("/program/" + d.id + "/edit")}
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                    &nbsp;&nbsp;
+                    Edit Program
+                  </Dropdown.Item>
+
+                </Dropdown.Menu>
+
+              </Dropdown>
 
             </React.Fragment>
         )
@@ -267,7 +285,11 @@ const ProgramsTable = ({
 
 }
 
-const ProgramDetailsModal = ({program, showModal}) => {
+const ProgramDetailsModal = ({program, isOpen, showModal}) => {
+
+  if (!program) {
+    return "";
+  }
 
   const attributes = Object.keys(program.attributes).map(k => {
     return (
@@ -279,7 +301,11 @@ const ProgramDetailsModal = ({program, showModal}) => {
   });
 
   return (
-      <React.Fragment>
+      <Modal
+          show={isOpen}
+          onHide={() => showModal()}
+          size={"lg"}
+      >
         <Modal.Header closeButton>
           Program: <strong>{program.name}</strong> (<code>{program.code}</code>)
         </Modal.Header>
@@ -386,7 +412,7 @@ const ProgramDetailsModal = ({program, showModal}) => {
             Close
           </Button>
         </Modal.Footer>
-      </React.Fragment>
+      </Modal>
   )
 
 }
