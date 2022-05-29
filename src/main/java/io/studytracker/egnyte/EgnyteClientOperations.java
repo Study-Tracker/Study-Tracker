@@ -50,7 +50,7 @@ public interface EgnyteClientOperations {
    * exists at the given location. The response object will either be a {@link EgnyteFolder} or
    * {@link EgnyteFile} object.
    *
-   * @param path  full path of file or folder
+   * @param path full path of file or folder
    * @param depth maximum folder depth to traverse
    * @return
    * @throws EgnyteException
@@ -86,5 +86,4 @@ public interface EgnyteClientOperations {
   EgnyteFile uploadFile(File file, String path) throws EgnyteException;
 
   void deleteObjectByPath(String path) throws EgnyteException;
-
 }

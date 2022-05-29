@@ -45,5 +45,4 @@ public class ProgramActivityUtils {
     activity.setData(data);
     return activity;
   }
-
 }

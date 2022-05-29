@@ -11,5 +11,4 @@ public class BenchlingEntryList {
 
   private List<BenchlingEntry> entries = new ArrayList<>();
   private String nextToken;
-
 }

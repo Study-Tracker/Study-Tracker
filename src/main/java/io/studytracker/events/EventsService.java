@@ -9,6 +9,6 @@ import io.studytracker.model.Activity;
 public interface EventsService {
 
   void dispatchEvent(Activity activity);
-  void dispatchEvent(StudyTrackerEvent event);
 
+  void dispatchEvent(StudyTrackerEvent event);
 }

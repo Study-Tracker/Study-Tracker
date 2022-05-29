@@ -15,19 +15,20 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaAuditing
 public class JpaRepositoryConfiguration {
 
-//  @Bean
-//  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-//
-//    HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-//    vendorAdapter.setGenerateDdl(true);
-//
-//    LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-//    factory.setJpaVendorAdapter(vendorAdapter);
-//    factory.setPackagesToScan("io.studytracker.model");
-//    factory.setDataSource(dataSource);
-//    return factory;
-//
-//  }
+  //  @Bean
+  //  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+  //
+  //    HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+  //    vendorAdapter.setGenerateDdl(true);
+  //
+  //    LocalContainerEntityManagerFactoryBean factory = new
+  // LocalContainerEntityManagerFactoryBean();
+  //    factory.setJpaVendorAdapter(vendorAdapter);
+  //    factory.setPackagesToScan("io.studytracker.model");
+  //    factory.setDataSource(dataSource);
+  //    return factory;
+  //
+  //  }
 
   @Bean
   public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
@@ -35,5 +36,4 @@ public class JpaRepositoryConfiguration {
     txManager.setEntityManagerFactory(entityManagerFactory);
     return txManager;
   }
-
 }

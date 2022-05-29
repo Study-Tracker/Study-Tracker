@@ -18,8 +18,7 @@ package io.studytracker.exception;
 
 public class DuplicateRecordException extends RuntimeException {
 
-  public DuplicateRecordException() {
-  }
+  public DuplicateRecordException() {}
 
   public DuplicateRecordException(String message) {
     super(message);
@@ -33,8 +32,8 @@ public class DuplicateRecordException extends RuntimeException {
     super(cause);
   }
 
-  public DuplicateRecordException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public DuplicateRecordException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

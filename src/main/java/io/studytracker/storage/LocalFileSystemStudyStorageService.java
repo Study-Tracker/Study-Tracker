@@ -39,8 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(LocalFileSystemStudyStorageService.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(LocalFileSystemStudyStorageService.class);
 
   private final Path rootPath;
 
@@ -80,13 +80,14 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     try {
       return Files.walk(path, 1)
           .filter(Files::isRegularFile)
-          .map(f -> {
-            StorageFile file = new StorageFile();
-            file.setPath(f);
-            file.setName(f.getFileName().toString());
-            file.setUrl(getObjectUrl(f));
-            return file;
-          })
+          .map(
+              f -> {
+                StorageFile file = new StorageFile();
+                file.setPath(f);
+                file.setName(f.getFileName().toString());
+                file.setUrl(getObjectUrl(f));
+                return file;
+              })
           .collect(Collectors.toList());
     } catch (IOException e) {
       throw new StudyTrackerException(e);
@@ -104,17 +105,18 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
       return Files.walk(path, 1)
           .filter(Files::isDirectory)
           .filter(p -> !p.toString().equals(path.toString()))
-          .map(d -> {
-            StorageFolder folder = new StorageFolder();
-            folder.setName(d.toFile().getName());
-            folder.setPath(d);
-            folder.setUrl(getObjectUrl(d));
-            if (depth < maxDepth) {
-              folder.setFiles(this.getFolderFiles(d));
-              folder.setSubFolders(this.getSubfolders(d, depth + 1));
-            }
-            return folder;
-          })
+          .map(
+              d -> {
+                StorageFolder folder = new StorageFolder();
+                folder.setName(d.toFile().getName());
+                folder.setPath(d);
+                folder.setUrl(getObjectUrl(d));
+                if (depth < maxDepth) {
+                  folder.setFiles(this.getFolderFiles(d));
+                  folder.setSubFolders(this.getSubfolders(d, depth + 1));
+                }
+                return folder;
+              })
           .collect(Collectors.toList());
     } catch (IOException e) {
       throw new StudyTrackerException(e);
@@ -267,7 +269,6 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     folder.setPath(studyPath);
     folder.setUrl(getObjectUrl(studyPath));
     return folder;
-
   }
 
   @Override
@@ -303,13 +304,14 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     folder.setPath(assayPath);
     folder.setUrl(getObjectUrl(assayPath));
     return folder;
-
   }
 
   @Override
   public StorageFile saveStudyFile(File file, Study study) throws StudyStorageException {
-    LOGGER.info(String.format("Saving file %s to storage folder instance for study %s",
-        file.getName(), study.getCode()));
+    LOGGER.info(
+        String.format(
+            "Saving file %s to storage folder instance for study %s",
+            file.getName(), study.getCode()));
     StorageFolder studyFolder = this.getStudyFolder(study);
     Path studyPath = Paths.get(studyFolder.getPath());
     Path newFilePath = studyPath.resolve(file.getName());
@@ -328,8 +330,10 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   @Override
   public StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException {
-    LOGGER.info(String.format("Saving file %s to storage folder instance for assay %s",
-        file.getName(), assay.getCode()));
+    LOGGER.info(
+        String.format(
+            "Saving file %s to storage folder instance for assay %s",
+            file.getName(), assay.getCode()));
     StorageFolder assayFolder = this.getAssayFolder(assay);
     Path assayPath = Paths.get(assayFolder.getPath());
     Path newFilePath = assayPath.resolve(file.getName());

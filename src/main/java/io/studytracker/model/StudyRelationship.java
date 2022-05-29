@@ -34,10 +34,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "study_relationships")
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "relationship-details", attributeNodes = {
-        @NamedAttributeNode("sourceStudy"),
-        @NamedAttributeNode("targetStudy")
-    })
+  @NamedEntityGraph(
+      name = "relationship-details",
+      attributeNodes = {@NamedAttributeNode("sourceStudy"), @NamedAttributeNode("targetStudy")})
 })
 public class StudyRelationship {
 
@@ -57,8 +56,7 @@ public class StudyRelationship {
   @JoinColumn(name = "target_study_id", nullable = false)
   private Study targetStudy;
 
-  public StudyRelationship() {
-  }
+  public StudyRelationship() {}
 
   public StudyRelationship(RelationshipType type, Study sourceStudy, Study targetStudy) {
     this.type = type;

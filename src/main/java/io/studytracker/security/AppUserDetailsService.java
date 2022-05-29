@@ -18,8 +18,7 @@ public class AppUserDetailsService implements UserDetailsService, SAMLUserDetail
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AppUserDetailsService.class);
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   @Override
   public AppUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -41,7 +40,6 @@ public class AppUserDetailsService implements UserDetailsService, SAMLUserDetail
       LOGGER.warn("Could not load user details for username: {}", username);
       throw new UsernameNotFoundException(username);
     }
-
   }
 
   @Override

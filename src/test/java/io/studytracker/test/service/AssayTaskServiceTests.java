@@ -42,14 +42,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class AssayTaskServiceTests {
 
-  @Autowired
-  private AssayTaskService assayTaskService;
+  @Autowired private AssayTaskService assayTaskService;
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -58,8 +55,8 @@ public class AssayTaskServiceTests {
 
   @Test
   public void findAssayTasks() {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     List<AssayTask> tasks = assayTaskService.findAssayTasks(assay);
     Assert.assertNotNull(tasks);
     Assert.assertFalse(tasks.isEmpty());
@@ -68,8 +65,8 @@ public class AssayTaskServiceTests {
 
   @Test
   public void addTaskTest() {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     User user = assay.getCreatedBy();
     List<AssayTask> tasks = assayTaskService.findAssayTasks(assay);
     Assert.assertNotNull(tasks);
@@ -89,21 +86,22 @@ public class AssayTaskServiceTests {
     Assert.assertFalse(tasks.isEmpty());
     Assert.assertEquals(2, tasks.size());
 
-    task = tasks.stream()
-        .filter(t -> t.getLabel().equals("Test task"))
-        .findFirst().orElseThrow(RecordNotFoundException::new);
+    task =
+        tasks.stream()
+            .filter(t -> t.getLabel().equals("Test task"))
+            .findFirst()
+            .orElseThrow(RecordNotFoundException::new);
     Assert.assertNotNull(task);
     Assert.assertEquals("Test task", task.getLabel());
     Assert.assertNotNull(task.getCreatedAt());
     Assert.assertNotNull(task.getOrder());
     Assert.assertEquals(1, (int) task.getOrder());
-
   }
 
   @Test
   public void updateTaskTest() {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Date then = assay.getUpdatedAt();
     List<AssayTask> tasks = assayTaskService.findAssayTasks(assay);
     Assert.assertNotNull(tasks);
@@ -123,15 +121,15 @@ public class AssayTaskServiceTests {
     Assert.assertEquals(TaskStatus.COMPLETE, task.getStatus());
     Assert.assertNotEquals(task.getCreatedAt(), task.getUpdatedAt());
 
-    Assay updatedAssay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay updatedAssay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Assert.assertNotEquals(then, updatedAssay.getUpdatedAt());
   }
 
   @Test
   public void deleteTaskTest() {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     List<AssayTask> tasks = assayTaskService.findAssayTasks(assay);
     Assert.assertNotNull(tasks);
     Assert.assertFalse(tasks.isEmpty());
@@ -144,5 +142,4 @@ public class AssayTaskServiceTests {
     Assert.assertNotNull(tasks);
     Assert.assertTrue(tasks.isEmpty());
   }
-
 }

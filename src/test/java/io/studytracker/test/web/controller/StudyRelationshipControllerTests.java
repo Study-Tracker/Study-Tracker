@@ -55,20 +55,15 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles({"web-test", "example"})
 public class StudyRelationshipControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
   private String username;
 
@@ -81,16 +76,16 @@ public class StudyRelationshipControllerTests {
   @Test
   public void createStudyRelationshipTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001/relationships")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/relationships").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 
-    Study sourceStudy = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study sourceStudy =
+        studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(0, sourceStudy.getStudyRelationships().size());
-    Study targetStudy = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study targetStudy =
+        studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(0, targetStudy.getStudyRelationships().size());
 
     StudyRelationshipSlimDto dto = new StudyRelationshipSlimDto();
@@ -98,35 +93,37 @@ public class StudyRelationshipControllerTests {
     dto.setTargetStudyId(targetStudy.getId());
     dto.setType(RelationshipType.IS_BLOCKING);
 
-    mockMvc.perform(post("/api/study/CPA-10001/relationships")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(dto))
-        .with(user("jsmith")))
+    mockMvc
+        .perform(
+            post("/api/study/CPA-10001/relationships")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(dto))
+                .with(user("jsmith")))
         .andExpect(status().isCreated());
 
-    sourceStudy = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    targetStudy = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    sourceStudy = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    targetStudy = studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(1, targetStudy.getStudyRelationships().size());
     Assert.assertEquals(
-        RelationshipType.IS_BLOCKING, sourceStudy.getStudyRelationships().stream().findFirst().get().getType());
-    Assert.assertEquals(targetStudy.getId(),
-        sourceStudy.getStudyRelationships().stream().findFirst().get().getTargetStudy().getId());
-    targetStudy = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
+        RelationshipType.IS_BLOCKING,
+        sourceStudy.getStudyRelationships().stream().findFirst().get().getType());
     Assert.assertEquals(
-        RelationshipType.IS_BLOCKED_BY, targetStudy.getStudyRelationships().stream().findFirst().get().getType());
-    Assert.assertEquals(sourceStudy.getId(),
+        targetStudy.getId(),
+        sourceStudy.getStudyRelationships().stream().findFirst().get().getTargetStudy().getId());
+    targetStudy = studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(
+        RelationshipType.IS_BLOCKED_BY,
+        targetStudy.getStudyRelationships().stream().findFirst().get().getType());
+    Assert.assertEquals(
+        sourceStudy.getId(),
         targetStudy.getStudyRelationships().stream().findFirst().get().getTargetStudy().getId());
-
   }
 
   @Test
   public void fetchStudyRelationshipsTest() throws Exception {
     this.createStudyRelationshipTest();
-    mockMvc.perform(get("/api/study/CPA-10001/relationships")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/relationships").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("type")))
@@ -142,29 +139,29 @@ public class StudyRelationshipControllerTests {
   @Test
   public void deleteStudyRelationshipTest() throws Exception {
     this.createStudyRelationshipTest();
-    Study targetStudy = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    Study sourceStudy = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study targetStudy =
+        studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
+    Study sourceStudy =
+        studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(1, sourceStudy.getStudyRelationships().size());
     Assert.assertEquals(1, targetStudy.getStudyRelationships().size());
 
-    StudyRelationship relationship = sourceStudy.getStudyRelationships().stream()
-        .findFirst()
-        .orElseThrow();
+    StudyRelationship relationship =
+        sourceStudy.getStudyRelationships().stream().findFirst().orElseThrow();
 
-    mockMvc.perform(delete("/api/study/CPA-10001/relationships/" + relationship.getId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .with(user("jsmith")))
+    mockMvc
+        .perform(
+            delete("/api/study/CPA-10001/relationships/" + relationship.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user("jsmith")))
         .andExpect(status().isOk());
 
-    Study targetStudy2 = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    Study sourceStudy2 = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study targetStudy2 =
+        studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
+    Study sourceStudy2 =
+        studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
 
     Assert.assertEquals(0, sourceStudy2.getStudyRelationships().size());
     Assert.assertEquals(0, targetStudy2.getStudyRelationships().size());
   }
-
 }

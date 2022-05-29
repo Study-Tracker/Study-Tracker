@@ -28,14 +28,15 @@ public class AssayNotebookController extends AbstractAssayController {
 
   @GetMapping("")
   public NotebookFolder getNotebookFolder(@PathVariable("assayId") String assayId)
-          throws RecordNotFoundException {
+      throws RecordNotFoundException {
     LOGGER.info("Fetching notebook folder for assay: " + assayId);
     Assay assay = getAssayFromIdentifier(assayId);
 
-    Optional<NotebookFolder> notebookFolder = Optional.ofNullable(studyNotebookService)
+    Optional<NotebookFolder> notebookFolder =
+        Optional.ofNullable(studyNotebookService)
             .flatMap(service -> service.findAssayFolder(assay));
-    return notebookFolder
-            .orElseThrow(() -> new RecordNotFoundException("Could not load assay folder"));
+    return notebookFolder.orElseThrow(
+        () -> new RecordNotFoundException("Could not load assay folder"));
   }
 
   @PatchMapping("")
@@ -51,7 +52,5 @@ public class AssayNotebookController extends AbstractAssayController {
     // Repair the folder
     this.getAssayService().repairElnFolder(assay);
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
-
 }

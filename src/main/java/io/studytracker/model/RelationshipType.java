@@ -1,7 +1,6 @@
 package io.studytracker.model;
 
 public enum RelationshipType {
-
   IS_RELATED_TO,
   IS_PARENT_OF,
   IS_CHILD_OF,
@@ -30,5 +29,4 @@ public enum RelationshipType {
         return IS_RELATED_TO;
     }
   }
-
 }

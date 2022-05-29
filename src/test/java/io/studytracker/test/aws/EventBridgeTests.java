@@ -26,8 +26,7 @@ public class EventBridgeTests {
   @Autowired(required = false)
   private EventsService eventsService;
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
   @Test
   public void configTest() throws Exception {
@@ -42,5 +41,4 @@ public class EventBridgeTests {
     activity.setEventType(EventType.TEST_EVENT);
     eventsService.dispatchEvent(activity);
   }
-
 }

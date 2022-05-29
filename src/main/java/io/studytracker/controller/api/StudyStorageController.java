@@ -50,8 +50,7 @@ public class StudyStorageController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyStorageController.class);
 
-  @Autowired
-  private FileSystemStorageService fileStorageService;
+  @Autowired private FileSystemStorageService fileStorageService;
 
   @Autowired(required = false)
   private StudyStorageService studyStorageService;
@@ -65,13 +64,14 @@ public class StudyStorageController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<StorageFile> uploadStudyFile(@PathVariable("studyId") String studyId,
-      @RequestParam("file") MultipartFile file) throws Exception {
+  public HttpEntity<StorageFile> uploadStudyFile(
+      @PathVariable("studyId") String studyId, @RequestParam("file") MultipartFile file)
+      throws Exception {
     LOGGER.info("Uploaded file: " + file.getOriginalFilename());
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     Study study = getStudyFromIdentifier(studyId);
     Path path;
     try {
@@ -84,8 +84,7 @@ public class StudyStorageController extends AbstractStudyController {
     StorageFile storageFile = studyStorageService.saveStudyFile(path.toFile(), study);
 
     // Publish events
-    Activity activity = StudyActivityUtils
-        .fromFileUpload(study, user, storageFile);
+    Activity activity = StudyActivityUtils.fromFileUpload(study, user, storageFile);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
@@ -95,20 +94,20 @@ public class StudyStorageController extends AbstractStudyController {
   @PatchMapping("/{id}/storage")
   public HttpEntity<?> repairStorageFolder(@PathVariable("id") String studyId) {
 
-//    // Check user privileges
-//    String username = UserAuthenticationUtils
-//        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-//    User user = this.getUserService().findByUsername(username)
-//        .orElseThrow(RecordNotFoundException::new);
-//    if (!user.isAdmin()) {
-//      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
-//    }
+    //    // Check user privileges
+    //    String username = UserAuthenticationUtils
+    //
+    // .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    //    User user = this.getUserService().findByUsername(username)
+    //        .orElseThrow(RecordNotFoundException::new);
+    //    if (!user.isAdmin()) {
+    //      throw new InsufficientPrivilegesException("You do not have permission to perform this
+    // action.");
+    //    }
 
     // Repair the storage folder
     Study study = this.getStudyFromIdentifier(studyId);
     getStudyService().repairStorageFolder(study);
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
-
 }

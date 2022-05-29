@@ -69,10 +69,16 @@ public class StorageFile implements StorageObject {
 
   @Override
   public String toString() {
-    return "StorageFile{" +
-        "url='" + url + '\'' +
-        ", path='" + path + '\'' +
-        ", name='" + name + '\'' +
-        '}';
+    return "StorageFile{"
+        + "url='"
+        + url
+        + '\''
+        + ", path='"
+        + path
+        + '\''
+        + ", name='"
+        + name
+        + '\''
+        + '}';
   }
 }

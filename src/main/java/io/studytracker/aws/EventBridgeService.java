@@ -45,15 +45,14 @@ public class EventBridgeService implements EventsService {
       throw new StudyTrackerException(e);
     }
     LOGGER.info("Dispatching event with data: " + json);
-    PutEventsRequestEntry entry = PutEventsRequestEntry.builder()
-        .eventBusName(eventBusName)
-        .source("study-tracker")
-        .detailType(event.getEventType().toString())
-        .detail(json)
-        .build();
-    PutEventsRequest request = PutEventsRequest.builder()
-        .entries(entry)
-        .build();
+    PutEventsRequestEntry entry =
+        PutEventsRequestEntry.builder()
+            .eventBusName(eventBusName)
+            .source("study-tracker")
+            .detailType(event.getEventType().toString())
+            .detail(json)
+            .build();
+    PutEventsRequest request = PutEventsRequest.builder().entries(entry).build();
     PutEventsResponse response = client.putEvents(request);
     for (PutEventsResultEntry resultEntry : response.entries()) {
       System.out.println(resultEntry.toString());

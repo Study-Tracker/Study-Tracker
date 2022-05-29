@@ -53,20 +53,15 @@ public class AuthenticationController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  @Autowired private PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private AuthenticationManager authenticationManager;
+  @Autowired private AuthenticationManager authenticationManager;
 
-  @Autowired
-  private EmailService emailService;
+  @Autowired private EmailService emailService;
 
-  @Autowired
-  private Environment env;
+  @Autowired private Environment env;
 
   @GetMapping("/login")
   public String login() {
@@ -76,8 +71,10 @@ public class AuthenticationController {
   @PostMapping("/login")
   public String submitLogin(@ModelAttribute AuthCredentials credentials) {
     try {
-      Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-          credentials.getUsername(), credentials.getPassword()));
+      Authentication authentication =
+          authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(
+                  credentials.getUsername(), credentials.getPassword()));
       if (authentication.isAuthenticated()) {
         SecurityContextHolder.getContext().setAuthentication(authentication);
       } else {
@@ -93,8 +90,8 @@ public class AuthenticationController {
   public HttpEntity<?> getAuthenticatedUser() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     User user = null;
-    if (authentication.isAuthenticated() && !authentication.getPrincipal()
-        .equals("anonymousUser")) {
+    if (authentication.isAuthenticated()
+        && !authentication.getPrincipal().equals("anonymousUser")) {
       Object principal = authentication.getPrincipal();
       if (principal instanceof User) {
         user = (User) principal;
@@ -105,8 +102,7 @@ public class AuthenticationController {
         LOGGER.debug("Loaded user from userDetails: {}", userDetails.getUsername());
       } else {
         String username = principal.toString();
-        user = userService.findByUsername(username)
-            .orElseThrow(UnknownUserException::new);
+        user = userService.findByUsername(username).orElseThrow(UnknownUserException::new);
         LOGGER.debug("Loaded user from username: {}", username);
       }
     } else {
@@ -126,14 +122,14 @@ public class AuthenticationController {
     if (env.containsProperty("security.sso")) {
       Map<String, Object> sso = new LinkedHashMap<>();
       if (env.getRequiredProperty("security.sso").equals("okta-saml")
-          && env.containsProperty("sso.okta.url") && !env.getRequiredProperty("sso.okta.url").equals("")) {
+          && env.containsProperty("sso.okta.url")
+          && !env.getRequiredProperty("sso.okta.url").equals("")) {
         sso.put("okta", env.getRequiredProperty("sso.okta.url"));
       }
       data.put("sso", sso);
     }
 
     return new ResponseEntity<>(data, HttpStatus.OK);
-
   }
 
   @GetMapping("/auth/passwordresetrequest")
@@ -155,8 +151,8 @@ public class AuthenticationController {
   }
 
   @GetMapping("/auth/passwordreset")
-  public String passwordReset(@RequestParam("token") String token,
-      @RequestParam("email") String email) {
+  public String passwordReset(
+      @RequestParam("token") String token, @RequestParam("email") String email) {
     boolean valid = userService.validatePasswordResetToken(email, token);
     if (valid) {
       return "index";
@@ -166,8 +162,11 @@ public class AuthenticationController {
   }
 
   @PostMapping("/auth/passwordreset")
-  public String updatePassword(@RequestParam String email, @RequestParam String password,
-      @RequestParam String passwordAgain, @RequestParam String token) {
+  public String updatePassword(
+      @RequestParam String email,
+      @RequestParam String password,
+      @RequestParam String passwordAgain,
+      @RequestParam String token) {
     LOGGER.info("Updating password for user: {}", email);
     Optional<User> optional = userService.findByEmail(email);
     if (!optional.isPresent()) {
@@ -186,5 +185,4 @@ public class AuthenticationController {
       return "redirect:/login?message=The password reset token is invalid or expired. Please try again.";
     }
   }
-
 }

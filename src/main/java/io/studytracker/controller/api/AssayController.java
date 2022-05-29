@@ -55,28 +55,28 @@ public class AssayController extends AbstractAssayController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayController.class);
 
-  @Autowired
-  private AssayMapper assayMapper;
+  @Autowired private AssayMapper assayMapper;
 
-  @Autowired
-  private ActivityMapper activityMapper;
+  @Autowired private ActivityMapper activityMapper;
 
   @GetMapping("")
   public List<AssayParentDto> findAll() {
-    return assayMapper.toAssayParentList(getAssayService().findAll().stream()
-        .filter(Assay::isActive)
-        .filter(a -> a.getStudy().isActive())
-        .collect(Collectors.toList()));
+    return assayMapper.toAssayParentList(
+        getAssayService().findAll().stream()
+            .filter(Assay::isActive)
+            .filter(a -> a.getStudy().isActive())
+            .collect(Collectors.toList()));
   }
 
   @GetMapping("/{id}")
-  public AssayDetailsDto findById(@PathVariable("id") String assayId) throws RecordNotFoundException {
+  public AssayDetailsDto findById(@PathVariable("id") String assayId)
+      throws RecordNotFoundException {
     return assayMapper.toAssayDetails(getAssayFromIdentifier(assayId));
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<AssayDetailsDto> update(@PathVariable("id") Long id,
-      @RequestBody @Valid AssayFormDto dto) {
+  public HttpEntity<AssayDetailsDto> update(
+      @PathVariable("id") Long id, @RequestBody @Valid AssayFormDto dto) {
 
     LOGGER.info("Updating assay with id: " + id);
     LOGGER.info(dto.toString());
@@ -86,13 +86,11 @@ public class AssayController extends AbstractAssayController {
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     Assay updated = updateAssay(assay, user);
 
     return new ResponseEntity<>(assayMapper.toAssayDetails(updated), HttpStatus.CREATED);
-
   }
 
   @DeleteMapping("/{id}")
@@ -103,18 +101,18 @@ public class AssayController extends AbstractAssayController {
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user = this.getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    User user =
+        this.getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     this.deleteAssay(id, user);
 
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
 
   @PostMapping("/{id}/status")
-  public HttpEntity<?> updateStatus(@PathVariable("id") String id,
-      @RequestBody Map<String, Object> params) throws StudyTrackerException {
+  public HttpEntity<?> updateStatus(
+      @PathVariable("id") String id, @RequestBody Map<String, Object> params)
+      throws StudyTrackerException {
 
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
@@ -125,8 +123,8 @@ public class AssayController extends AbstractAssayController {
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user = this.getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    User user =
+        this.getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     String label = (String) params.get("status");
     Status status = Status.valueOf(label);
@@ -135,7 +133,6 @@ public class AssayController extends AbstractAssayController {
     this.updateAssayStatus(assay.getId(), status, user);
 
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
 
   @GetMapping("/{assayId}/activity")
@@ -143,5 +140,4 @@ public class AssayController extends AbstractAssayController {
     Assay assay = this.getAssayFromIdentifier(assayId);
     return activityMapper.toActivitySummaryList(getActivityService().findByAssay(assay));
   }
-
 }

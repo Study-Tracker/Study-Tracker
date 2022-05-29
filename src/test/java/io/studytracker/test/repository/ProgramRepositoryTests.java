@@ -101,7 +101,8 @@ public class ProgramRepositoryTests {
 
     FileStoreFolder programFolder = created.getStorageFolder();
     Assert.assertNotNull(programFolder.getId());
-    Optional<FileStoreFolder> fileStoreFolderOptional = fileStoreFolderRepository.findById(programFolder.getId());
+    Optional<FileStoreFolder> fileStoreFolderOptional =
+        fileStoreFolderRepository.findById(programFolder.getId());
     Assert.assertTrue(fileStoreFolderOptional.isPresent());
 
     created.setStorageFolder(null);
@@ -124,7 +125,6 @@ public class ProgramRepositoryTests {
 
     Assert.assertNotNull(exception);
     Assert.assertEquals(1, programRepository.count());
-
   }
 
   @Test
@@ -135,7 +135,8 @@ public class ProgramRepositoryTests {
     Exception exception = null;
     System.out.println("FInd programs test start");
 
-    Optional<Program> optional = programRepository.findByName("Test Program"); //fetch the eagerly-loaded entity
+    Optional<Program> optional =
+        programRepository.findByName("Test Program"); // fetch the eagerly-loaded entity
     Assert.assertTrue(optional.isPresent());
     Program program = optional.get();
     Assert.assertEquals("Test Program", program.getName());
@@ -155,17 +156,20 @@ public class ProgramRepositoryTests {
     Program program2 = another.get(0);
 
     Assert.assertNotNull(program2.getCreatedBy()); // the reference is there, but not loaded
-    Assert.assertNotNull(program2.getCreatedBy().getId()); // the ID of the reference is always present
+    Assert.assertNotNull(
+        program2.getCreatedBy().getId()); // the ID of the reference is always present
 
     try {
-      Assert.assertNotNull(program2.getCreatedBy().getDisplayName()); // but the attributes are not loaded because the entity is not fully loaded
+      Assert.assertNotNull(
+          program2
+              .getCreatedBy()
+              .getDisplayName()); // but the attributes are not loaded because the entity is not
+                                  // fully loaded
     } catch (Exception e) {
       exception = e;
     }
 
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof LazyInitializationException);
-
   }
-
 }

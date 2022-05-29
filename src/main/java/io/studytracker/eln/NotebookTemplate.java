@@ -7,5 +7,4 @@ public class NotebookTemplate {
 
   private String name;
   private String referenceId;
-
 }

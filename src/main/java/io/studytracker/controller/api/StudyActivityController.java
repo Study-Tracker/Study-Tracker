@@ -31,16 +31,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class StudyActivityController extends AbstractStudyController {
 
-  @Autowired
-  private ActivityService activityService;
+  @Autowired private ActivityService activityService;
 
-  @Autowired
-  private ActivityMapper activityMapper;
+  @Autowired private ActivityMapper activityMapper;
 
   @GetMapping("")
   public List<ActivitySummaryDto> getStudyActivity(@PathVariable("studyId") String studyId) {
     Study study = this.getStudyFromIdentifier(studyId);
     return activityMapper.toActivitySummaryList(activityService.findByStudy(study));
   }
-
 }

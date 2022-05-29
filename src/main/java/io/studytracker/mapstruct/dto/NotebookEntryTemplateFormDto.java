@@ -12,12 +12,11 @@ public class NotebookEntryTemplateFormDto {
   private Long id;
   private @NotNull(message = "Template name must not be empty") String name;
   private @NotNull(message = "Template id must not be empty") String templateId;
-//  private UserSlimDto createdBy;
-//  private UserSlimDto lastModifiedBy;
-//  private Date createdAt;
-//  private Date updatedAt;
+  //  private UserSlimDto createdBy;
+  //  private UserSlimDto lastModifiedBy;
+  //  private Date createdAt;
+  //  private Date updatedAt;
   private boolean active = true;
   private NotebookEntryTemplate.Category category;
   private boolean isDefault = false;
-
 }

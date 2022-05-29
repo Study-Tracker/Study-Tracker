@@ -115,7 +115,6 @@ public class ProgramService {
       f.setName(folder.getName());
       elnFolderRepository.save(f);
     }
-
   }
 
   @Transactional
@@ -193,36 +192,30 @@ public class ProgramService {
     f.setUrl(folder.getUrl());
     f.setReferenceId(folder.getReferenceId());
     elnFolderRepository.save(f);
-
   }
 
   @Autowired
-  public void setProgramRepository(
-      ProgramRepository programRepository) {
+  public void setProgramRepository(ProgramRepository programRepository) {
     this.programRepository = programRepository;
   }
 
   @Autowired
-  public void setStudyStorageService(
-      StudyStorageService studyStorageService) {
+  public void setStudyStorageService(StudyStorageService studyStorageService) {
     this.studyStorageService = studyStorageService;
   }
 
   @Autowired(required = false)
-  public void setStudyNotebookService(
-      StudyNotebookService studyNotebookService) {
+  public void setStudyNotebookService(StudyNotebookService studyNotebookService) {
     this.studyNotebookService = studyNotebookService;
   }
 
   @Autowired
-  public void setFileStoreFolderRepository(
-      FileStoreFolderRepository fileStoreFolderRepository) {
+  public void setFileStoreFolderRepository(FileStoreFolderRepository fileStoreFolderRepository) {
     this.fileStoreFolderRepository = fileStoreFolderRepository;
   }
 
   @Autowired
-  public void setElnFolderRepository(
-      ELNFolderRepository elnFolderRepository) {
+  public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {
     this.elnFolderRepository = elnFolderRepository;
   }
 }

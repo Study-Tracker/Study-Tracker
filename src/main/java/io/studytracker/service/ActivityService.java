@@ -16,7 +16,6 @@
 
 package io.studytracker.service;
 
-
 import io.studytracker.events.EventType;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Activity;
@@ -40,14 +39,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ActivityService {
 
-  @Autowired
-  private ActivityRepository activityRepository;
+  @Autowired private ActivityRepository activityRepository;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
   public List<Activity> findAll() {
     return activityRepository.findAll();
@@ -88,13 +84,23 @@ public class ActivityService {
   @Transactional
   public Activity create(Activity activity) {
     if (activity.getAssay() != null && activity.getStudy() == null) {
-      Study study = studyRepository.findByAssayId(activity.getAssay().getId())
-          .orElseThrow(() -> new RecordNotFoundException("Could not find study: " + activity.getAssay().getId()));
+      Study study =
+          studyRepository
+              .findByAssayId(activity.getAssay().getId())
+              .orElseThrow(
+                  () ->
+                      new RecordNotFoundException(
+                          "Could not find study: " + activity.getAssay().getId()));
       activity.setStudy(study);
     }
     if (activity.getStudy() != null && activity.getProgram() == null) {
-      Program program = programRepository.findByStudyId(activity.getStudy().getId())
-          .orElseThrow(() -> new RecordNotFoundException("Could not find program: " + activity.getStudy().getId()));
+      Program program =
+          programRepository
+              .findByStudyId(activity.getStudy().getId())
+              .orElseThrow(
+                  () ->
+                      new RecordNotFoundException(
+                          "Could not find program: " + activity.getStudy().getId()));
       activity.setProgram(program);
     }
     return activityRepository.save(activity);
@@ -132,10 +138,11 @@ public class ActivityService {
   }
 
   public long countCompletedStudiesFromDate(Date date) {
-    return activityRepository.findStatusChangeStudiesAfterDate(date)
-        .stream()
-        .filter(a -> a.getData().containsKey("newStatus") && a.getData().get("newStatus").equals("COMPLETE"))
+    return activityRepository.findStatusChangeStudiesAfterDate(date).stream()
+        .filter(
+            a ->
+                a.getData().containsKey("newStatus")
+                    && a.getData().get("newStatus").equals("COMPLETE"))
         .count();
   }
-
 }

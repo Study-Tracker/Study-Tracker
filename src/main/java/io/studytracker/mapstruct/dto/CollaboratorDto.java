@@ -8,11 +8,9 @@ public class CollaboratorDto {
 
   private Long id;
 
-  @NotNull
-  private String label;
+  @NotNull private String label;
 
-  @NotNull
-  private String organizationName;
+  @NotNull private String organizationName;
 
   private String organizationLocation;
 
@@ -20,9 +18,7 @@ public class CollaboratorDto {
 
   private String contactEmail;
 
-  @NotNull
-  private String code;
+  @NotNull private String code;
 
   private boolean active = true;
-
 }

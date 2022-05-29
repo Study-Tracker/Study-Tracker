@@ -40,14 +40,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class StudyRelationshipServiceTests {
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private StudyRelationshipService studyRelationshipService;
+  @Autowired private StudyRelationshipService studyRelationshipService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -57,24 +54,27 @@ public class StudyRelationshipServiceTests {
   @Test
   public void studyRelationshipTests() {
 
-    Study sourceStudy = studyService.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study sourceStudy =
+        studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
 
-    Study targetStudy = studyService.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study targetStudy =
+        studyService.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
 
-    List<StudyRelationship> sourceStudyRelationships = studyRelationshipService.findStudyRelationships(sourceStudy);
-    List<StudyRelationship> targetStudyRelationships = studyRelationshipService.findStudyRelationships(targetStudy);
+    List<StudyRelationship> sourceStudyRelationships =
+        studyRelationshipService.findStudyRelationships(sourceStudy);
+    List<StudyRelationship> targetStudyRelationships =
+        studyRelationshipService.findStudyRelationships(targetStudy);
 
     Assert.assertEquals(0, sourceStudyRelationships.size());
     Assert.assertEquals(0, targetStudyRelationships.size());
 
-    studyRelationshipService.addStudyRelationship(sourceStudy, targetStudy, RelationshipType.IS_BLOCKING);
+    studyRelationshipService.addStudyRelationship(
+        sourceStudy, targetStudy, RelationshipType.IS_BLOCKING);
 
-//    Study updatedSource = studyService.findByCode("CPA-10001")
-//        .orElseThrow(RecordNotFoundException::new);
-//    Study updatedTarget = studyService.findByCode("PPB-10001")
-//        .orElseThrow(RecordNotFoundException::new);
+    //    Study updatedSource = studyService.findByCode("CPA-10001")
+    //        .orElseThrow(RecordNotFoundException::new);
+    //    Study updatedTarget = studyService.findByCode("PPB-10001")
+    //        .orElseThrow(RecordNotFoundException::new);
 
     sourceStudyRelationships = studyRelationshipService.findStudyRelationships(sourceStudy);
     targetStudyRelationships = studyRelationshipService.findStudyRelationships(targetStudy);
@@ -88,7 +88,8 @@ public class StudyRelationshipServiceTests {
     Assert.assertEquals(sourceStudy.getCode(), targetRelationship.getTargetStudy().getCode());
     Assert.assertEquals(RelationshipType.IS_BLOCKED_BY, targetRelationship.getType());
 
-    studyRelationshipService.addStudyRelationship(sourceStudy, targetStudy, RelationshipType.IS_RELATED_TO);
+    studyRelationshipService.addStudyRelationship(
+        sourceStudy, targetStudy, RelationshipType.IS_RELATED_TO);
 
     sourceStudyRelationships = studyRelationshipService.findStudyRelationships(sourceStudy);
     targetStudyRelationships = studyRelationshipService.findStudyRelationships(targetStudy);
@@ -99,40 +100,35 @@ public class StudyRelationshipServiceTests {
 
     Assert.assertEquals(targetStudy.getCode(), sourceRelationship.getTargetStudy().getCode());
     Assert.assertEquals(RelationshipType.IS_RELATED_TO, sourceRelationship.getType());
-    Assert.assertEquals(sourceStudy.getCode(),targetRelationship.getTargetStudy().getCode());
+    Assert.assertEquals(sourceStudy.getCode(), targetRelationship.getTargetStudy().getCode());
     Assert.assertEquals(RelationshipType.IS_RELATED_TO, targetRelationship.getType());
-
   }
 
   @Test
   public void removeStudyRelationshipTest() {
     this.studyRelationshipTests();
 
-    Study sourceStudy = studyService.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    Study targetStudy = studyService.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
-//    List<StudyRelationship> sourceRelationships
-//        = studyRelationshipService.findStudyRelationships(sourceStudy);
-//    List<StudyRelationship> targetRelationships
-//        = studyRelationshipService.findStudyRelationships(targetStudy);
+    Study sourceStudy =
+        studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    Study targetStudy =
+        studyService.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
+    //    List<StudyRelationship> sourceRelationships
+    //        = studyRelationshipService.findStudyRelationships(sourceStudy);
+    //    List<StudyRelationship> targetRelationships
+    //        = studyRelationshipService.findStudyRelationships(targetStudy);
 
     Assert.assertEquals(1, sourceStudy.getStudyRelationships().size());
     Assert.assertEquals(1, targetStudy.getStudyRelationships().size());
 
     studyRelationshipService.removeStudyRelationship(sourceStudy, targetStudy);
 
-//    sourceRelationships = studyRelationshipService.findStudyRelationships(sourceStudy);
-//    targetRelationships = studyRelationshipService.findStudyRelationships(targetStudy);
+    //    sourceRelationships = studyRelationshipService.findStudyRelationships(sourceStudy);
+    //    targetRelationships = studyRelationshipService.findStudyRelationships(targetStudy);
 
-    sourceStudy = studyService.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    targetStudy = studyService.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    sourceStudy = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    targetStudy = studyService.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
 
     Assert.assertEquals(0, sourceStudy.getStudyRelationships().size());
     Assert.assertEquals(0, targetStudy.getStudyRelationships().size());
   }
-
-
 }

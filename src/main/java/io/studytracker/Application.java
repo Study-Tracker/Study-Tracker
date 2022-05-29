@@ -26,10 +26,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@SpringBootApplication(exclude = {
-    UserDetailsServiceAutoConfiguration.class,
-    ElasticsearchRepositoriesAutoConfiguration.class
-})
+@SpringBootApplication(
+    exclude = {
+      UserDetailsServiceAutoConfiguration.class,
+      ElasticsearchRepositoriesAutoConfiguration.class
+    })
 @PropertySource("classpath:defaults.properties")
 public class Application extends SpringBootServletInitializer {
 

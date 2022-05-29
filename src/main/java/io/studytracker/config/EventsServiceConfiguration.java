@@ -24,15 +24,13 @@ public class EventsServiceConfiguration {
     public EventsService localEventsService() {
       return new LocalEventsService();
     }
-
   }
 
   @Configuration
   @ConditionalOnProperty(name = "events.mode", havingValue = "eventbridge")
   public static class EventBridgeConfiguration {
 
-    @Autowired
-    private Environment env;
+    @Autowired private Environment env;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired(required = false)
@@ -41,8 +39,7 @@ public class EventsServiceConfiguration {
     @Bean
     public EventBridgeClient eventBridgeClient() {
       Region region = Region.of(env.getRequiredProperty("aws.region"));
-      EventBridgeClientBuilder builder = EventBridgeClient.builder()
-          .region(region);
+      EventBridgeClientBuilder builder = EventBridgeClient.builder().region(region);
       if (credentialsProvider != null) {
         builder.credentialsProvider(credentialsProvider);
       }
@@ -52,11 +49,7 @@ public class EventsServiceConfiguration {
     @Bean
     public EventBridgeService eventBridgeService() {
       return new EventBridgeService(
-          eventBridgeClient(),
-          env.getRequiredProperty("aws.eventbridge.bus-name")
-      );
+          eventBridgeClient(), env.getRequiredProperty("aws.eventbridge.bus-name"));
     }
-
   }
-
 }

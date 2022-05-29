@@ -45,7 +45,7 @@ public class UserRepositoryTests {
     user.setDisplayName("Joe Person");
     user.setActive(true);
     user.setPassword("password");
-//    user.setAttributes(Collections.singletonMap("key", "value"));
+    //    user.setAttributes(Collections.singletonMap("key", "value"));
     user.setTitle("Director");
     Map<String, String> attributes = new HashMap<>();
     attributes.put("key", "value");
@@ -86,7 +86,6 @@ public class UserRepositoryTests {
     }
 
     Assert.assertNotNull(exception);
-
   }
 
   @Test
@@ -102,7 +101,6 @@ public class UserRepositoryTests {
     Assert.assertTrue(optional.isPresent());
     User updated = optional.get();
     Assert.assertEquals("VP", updated.getTitle());
-
   }
 
   @Test
@@ -116,5 +114,4 @@ public class UserRepositoryTests {
     userRepository.delete(user);
     Assert.assertEquals(0, userRepository.count());
   }
-
 }

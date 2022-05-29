@@ -36,9 +36,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"egnyte-test", "example"})
 public class EgnyteRestClientFolderBrowsingTests {
 
-  private final static String EGNYTE_ROOT = "Shared/General/Informatics & IT/Egnyte API Testing/StudyTrackerTest/Test";
+  private static final String EGNYTE_ROOT =
+      "Shared/General/Informatics & IT/Egnyte API Testing/StudyTrackerTest/Test";
 
-  private final static String FOLDER_ID = "efd92932-46c1-4f50-877f-a31128d3b71e";
+  private static final String FOLDER_ID = "efd92932-46c1-4f50-877f-a31128d3b71e";
 
   private static final String FILE_ID = "158be718-e35c-4abd-a5a4-b96b61bfb2fe";
 
@@ -51,7 +52,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     EgnyteObject egnyteObject = client.findObjectByPath(EGNYTE_ROOT);
     Assert.assertTrue(egnyteObject.isFolder());
     EgnyteFolder folder = (EgnyteFolder) egnyteObject;
-    System.out.println(folder.toString());
+    System.out.println(folder);
     Assert.assertNotNull(folder);
     Assert.assertTrue(folder.isFolder());
     Assert.assertEquals(folder.getName(), "Test");
@@ -89,8 +90,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     Assert.assertNotNull(folder);
     Assert.assertTrue(folder.isFolder());
     Assert.assertFalse(folder.getSubFolders().isEmpty());
-    EgnyteObject subfolderObject = client
-        .findObjectByPath(folder.getSubFolders().get(0).getPath());
+    EgnyteObject subfolderObject = client.findObjectByPath(folder.getSubFolders().get(0).getPath());
     Assert.assertTrue(subfolderObject.isFolder());
     EgnyteFolder subfolder = (EgnyteFolder) subfolderObject;
     Assert.assertNotNull(subfolder);
@@ -113,7 +113,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     Assert.assertEquals(folder.getFiles().size(), 1);
     EgnyteFile egnyteFile = folder.getFiles().get(0);
     Assert.assertEquals(egnyteFile.getName(), "test.txt");
-    System.out.println(folder.toString());
+    System.out.println(folder);
   }
 
   @Test
@@ -176,5 +176,4 @@ public class EgnyteRestClientFolderBrowsingTests {
     Assert.assertNull(file);
     Assert.assertTrue(exception instanceof ObjectNotFoundException);
   }
-
 }

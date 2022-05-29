@@ -11,5 +11,4 @@ public class BenchlingUser {
   private String name;
   private String handle;
   private String email;
-
 }

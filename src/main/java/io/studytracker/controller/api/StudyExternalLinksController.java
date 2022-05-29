@@ -47,11 +47,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class StudyExternalLinksController extends AbstractStudyController {
 
-  @Autowired
-  private StudyExternalLinkService studyExternalLinkService;
+  @Autowired private StudyExternalLinkService studyExternalLinkService;
 
-  @Autowired
-  private ExternalLinkMapper externalLinkMapper;
+  @Autowired private ExternalLinkMapper externalLinkMapper;
 
   @GetMapping("")
   public List<ExternalLinkDto> getStudyExternalLinks(@PathVariable("id") String studyId) {
@@ -60,13 +58,13 @@ public class StudyExternalLinksController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<ExternalLinkDto> addExternalLink(@PathVariable("id") String studyId,
-      @RequestBody @Valid ExternalLinkDto dto) {
+  public HttpEntity<ExternalLinkDto> addExternalLink(
+      @PathVariable("id") String studyId, @RequestBody @Valid ExternalLinkDto dto) {
     Study study = getStudyFromIdentifier(studyId);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     ExternalLink externalLink = externalLinkMapper.fromDto(dto);
     studyExternalLinkService.addStudyExternalLink(study, externalLink);
 
@@ -79,15 +77,16 @@ public class StudyExternalLinksController extends AbstractStudyController {
   }
 
   @PutMapping("/{linkId}")
-  public HttpEntity<ExternalLinkDto> editExternalLink(@PathVariable("id") String studyId,
-      @PathVariable("linkId") Long linkId, @RequestBody @Valid ExternalLinkDto dto) {
+  public HttpEntity<ExternalLinkDto> editExternalLink(
+      @PathVariable("id") String studyId,
+      @PathVariable("linkId") Long linkId,
+      @RequestBody @Valid ExternalLinkDto dto) {
     Study study = getStudyFromIdentifier(studyId);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
-    Optional<ExternalLink> optional = studyExternalLinkService
-        .findById(linkId);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    Optional<ExternalLink> optional = studyExternalLinkService.findById(linkId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Cannot find external link with ID: " + linkId);
     }
@@ -104,13 +103,13 @@ public class StudyExternalLinksController extends AbstractStudyController {
   }
 
   @DeleteMapping("/{linkId}")
-  public HttpEntity<?> removeExternalLink(@PathVariable("id") String studyId,
-      @PathVariable("linkId") Long linkId) {
+  public HttpEntity<?> removeExternalLink(
+      @PathVariable("id") String studyId, @PathVariable("linkId") Long linkId) {
     Study study = getStudyFromIdentifier(studyId);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     study.setLastModifiedBy(user);
     studyExternalLinkService.deleteStudyExternalLink(study, linkId);
 
@@ -121,5 +120,4 @@ public class StudyExternalLinksController extends AbstractStudyController {
 
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
 }

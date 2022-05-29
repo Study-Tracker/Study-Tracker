@@ -52,12 +52,12 @@ public class EgnyteObjectDeserializer extends StdNodeBasedDeserializer<EgnyteObj
       target = EgnyteFile.class;
     }
     JavaType jacksonType = deserializationContext.getTypeFactory().constructType(target);
-    JsonDeserializer<?> deserializer = deserializationContext
-        .findRootValueDeserializer(jacksonType);
+    JsonDeserializer<?> deserializer =
+        deserializationContext.findRootValueDeserializer(jacksonType);
     JsonParser nodeParser = root.traverse(deserializationContext.getParser().getCodec());
     nodeParser.nextToken();
-    EgnyteObject object = (EgnyteObject) deserializer
-        .deserialize(nodeParser, deserializationContext);
+    EgnyteObject object =
+        (EgnyteObject) deserializer.deserialize(nodeParser, deserializationContext);
     if (object.isFolder()) {
       EgnyteFolder folder = (EgnyteFolder) object;
       Path path = Paths.get("/navigate/folder/", folder.getFolderId());
@@ -94,5 +94,4 @@ public class EgnyteObjectDeserializer extends StdNodeBasedDeserializer<EgnyteObj
       return file;
     }
   }
-
 }

@@ -19,5 +19,4 @@ package io.studytracker.egnyte.entity;
 public interface EgnyteObject {
 
   boolean isFolder();
-
 }

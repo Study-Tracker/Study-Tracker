@@ -104,7 +104,6 @@ public class StudyRepositoryTests {
     program.setStorageFolder(folder);
 
     programRepository.save(program);
-
   }
 
   @Test
@@ -121,8 +120,8 @@ public class StudyRepositoryTests {
       createProgram();
 
       User user = userRepository.findByUsername("test").orElseThrow(RecordNotFoundException::new);
-      Program program = programRepository.findByName("Test Program")
-          .orElseThrow(RecordNotFoundException::new);
+      Program program =
+          programRepository.findByName("Test Program").orElseThrow(RecordNotFoundException::new);
 
       Study study = new Study();
       study.setName("Test Study");
@@ -162,12 +161,13 @@ public class StudyRepositoryTests {
       Comment comment = new Comment();
       comment.setText("This is a test");
       comment.setCreatedBy(user);
-//      comment.setStudy(created);
-//      commentRepository.save(comment);
+      //      comment.setStudy(created);
+      //      commentRepository.save(comment);
       created.addComment(comment);
       studyRepository.save(created);
 
-      Study updated = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+      Study updated =
+          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       Assert.assertFalse(updated.getComments().isEmpty());
 
       transaction.commit();
@@ -181,7 +181,6 @@ public class StudyRepositoryTests {
     }
 
     Assert.assertNull(exception);
-
   }
 
   @Test
@@ -196,14 +195,16 @@ public class StudyRepositoryTests {
 
       newStudyTest();
 
-      Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+      Study study =
+          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       Assert.assertNotNull(study.getOwner());
       User user = study.getOwner();
       Assert.assertNotNull(user);
       study.removeUser(user);
       studyRepository.save(study);
 
-      Study updated = studyRepository.findByCode("TST-10001").orElseThrow(ReflectiveOperationException::new);
+      Study updated =
+          studyRepository.findByCode("TST-10001").orElseThrow(ReflectiveOperationException::new);
       Assert.assertTrue(updated.getUsers().isEmpty());
       Assert.assertEquals(1, userRepository.count());
 
@@ -218,7 +219,6 @@ public class StudyRepositoryTests {
     }
 
     Assert.assertNull(exception);
-
   }
 
   @Test
@@ -233,7 +233,8 @@ public class StudyRepositoryTests {
 
       newStudyTest();
 
-      Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+      Study study =
+          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       User user = userRepository.findAll().get(0);
       Assert.assertNull(study.getConclusions());
       Assert.assertEquals(0, studyConclusionsRepository.count());
@@ -245,7 +246,8 @@ public class StudyRepositoryTests {
       study.setConclusions(conclusions);
       studyRepository.save(study);
 
-      Study updated = studyRepository.findById(study.getId()).orElseThrow(RecordNotFoundException::new);
+      Study updated =
+          studyRepository.findById(study.getId()).orElseThrow(RecordNotFoundException::new);
       Assert.assertNotNull(updated.getConclusions());
 
       conclusions = updated.getConclusions();
@@ -270,7 +272,6 @@ public class StudyRepositoryTests {
     }
 
     Assert.assertNull(exception);
-
   }
 
   @Test
@@ -296,15 +297,18 @@ public class StudyRepositoryTests {
       user.setTitle("Assistant");
       userRepository.save(user);
 
-      Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+      Study study =
+          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       User owner = study.getOwner();
-      User otherUser = userRepository.findByUsername("jperson").orElseThrow(RecordNotFoundException::new);
+      User otherUser =
+          userRepository.findByUsername("jperson").orElseThrow(RecordNotFoundException::new);
 
       study.addUser(otherUser);
       study.addUser(owner);
       studyRepository.save(study);
 
-      Study updated = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+      Study updated =
+          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       Assert.assertEquals(2, updated.getUsers().size());
 
       transaction.commit();
@@ -318,7 +322,6 @@ public class StudyRepositoryTests {
     }
 
     Assert.assertNull(exception);
-
   }
 
   @Test
@@ -333,7 +336,8 @@ public class StudyRepositoryTests {
 
       newStudyTest();
 
-      Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+      Study study =
+          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       User user = userRepository.findAll().get(0);
       Assert.assertEquals(1, study.getComments().size());
 
@@ -343,7 +347,8 @@ public class StudyRepositoryTests {
       study.addComment(comment2);
 
       studyRepository.save(study);
-      Study updated = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+      Study updated =
+          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       Assert.assertEquals(2, updated.getComments().size());
       Assert.assertEquals(2, commentRepository.count());
 
@@ -358,7 +363,6 @@ public class StudyRepositoryTests {
     }
 
     Assert.assertNull(exception);
-
   }
 
   @Test
@@ -370,19 +374,19 @@ public class StudyRepositoryTests {
     Assert.assertTrue(optional.isPresent());
     Study study = optional.get();
     Assert.assertNotNull(study.getProgram());
-//    Program program = study.getProgram();
+    //    Program program = study.getProgram();
 
-//    Exception exception = null;
-//    try {
-//      Assert.assertNotNull(program.getCreatedBy());
-//      Assert.assertNotNull(program.getCreatedBy().getDisplayName());
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//      exception = e;
-//    }
-//
-//    Assert.assertNotNull(exception);
-//    Assert.assertTrue(exception instanceof LazyInitializationException);
+    //    Exception exception = null;
+    //    try {
+    //      Assert.assertNotNull(program.getCreatedBy());
+    //      Assert.assertNotNull(program.getCreatedBy().getDisplayName());
+    //    } catch (Exception e) {
+    //      e.printStackTrace();
+    //      exception = e;
+    //    }
+    //
+    //    Assert.assertNotNull(exception);
+    //    Assert.assertTrue(exception instanceof LazyInitializationException);
 
   }
 
@@ -413,9 +417,5 @@ public class StudyRepositoryTests {
     }
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof LazyInitializationException);
-
-
   }
-
-
 }

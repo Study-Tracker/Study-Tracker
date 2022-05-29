@@ -158,25 +158,28 @@ public class WebSecurityConfiguration {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-      http
-          .antMatcher("/api/**")
-            .authorizeRequests().anyRequest().fullyAuthenticated()
-            .and()
+      http.antMatcher("/api/**")
+          .authorizeRequests()
+          .anyRequest()
+          .fullyAuthenticated()
+          .and()
           .httpBasic()
-            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-//          .authenticationEntryPoint(apiAuthenticationEntryPoint())
-            .and()
+          .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+          //          .authenticationEntryPoint(apiAuthenticationEntryPoint())
+          .and()
           .cors()
-            .and()
+          .and()
           .exceptionHandling()
-            .and()
+          .and()
           .headers()
-            .frameOptions().disable()
-            .httpStrictTransportSecurity().disable()
-            .and()
-          .csrf().disable();
+          .frameOptions()
+          .disable()
+          .httpStrictTransportSecurity()
+          .disable()
+          .and()
+          .csrf()
+          .disable();
     }
-
   }
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -185,8 +188,7 @@ public class WebSecurityConfiguration {
   @ConditionalOnProperty(name = "security.sso", havingValue = "none", matchIfMissing = true)
   public static class WebAppSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private DatabaseAuthenticationProvider dbAuthProvider;
+    @Autowired private DatabaseAuthenticationProvider dbAuthProvider;
 
     @Bean
     @Override
@@ -201,41 +203,48 @@ public class WebSecurityConfiguration {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-      http
-          .authorizeRequests()
-            .antMatchers("/static/**").permitAll()
-            .antMatchers("/error").permitAll()
-            .antMatchers("/login").permitAll()
-            .antMatchers("/auth/**").permitAll()
-           .anyRequest().fullyAuthenticated()
-            .and()
+      http.authorizeRequests()
+          .antMatchers("/static/**")
+          .permitAll()
+          .antMatchers("/error")
+          .permitAll()
+          .antMatchers("/login")
+          .permitAll()
+          .antMatchers("/auth/**")
+          .permitAll()
+          .anyRequest()
+          .fullyAuthenticated()
+          .and()
           .formLogin()
-            .loginPage("/login")
-            .defaultSuccessUrl("/")
-             .permitAll()
-           .and()
+          .loginPage("/login")
+          .defaultSuccessUrl("/")
+          .permitAll()
+          .and()
           .logout()
-            .logoutUrl("/logout")
-            .logoutSuccessUrl("/")
-            .invalidateHttpSession(true)
-            .and()
+          .logoutUrl("/logout")
+          .logoutSuccessUrl("/")
+          .invalidateHttpSession(true)
+          .and()
           .headers()
-            .frameOptions().disable()
-            .httpStrictTransportSecurity().disable()
-            .and()
-          .csrf().disable();
+          .frameOptions()
+          .disable()
+          .httpStrictTransportSecurity()
+          .disable()
+          .and()
+          .csrf()
+          .disable();
     }
-
   }
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Configuration
   @Order(3)
   @ConditionalOnProperty(name = "security.sso", havingValue = "okta-saml")
-  public static class WebOktaSSOAppSecurityConfiguration
-      extends WebSecurityConfigurerAdapter implements DisposableBean, InitializingBean {
+  public static class WebOktaSSOAppSecurityConfiguration extends WebSecurityConfigurerAdapter
+      implements DisposableBean, InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebOktaSSOAppSecurityConfiguration.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(WebOktaSSOAppSecurityConfiguration.class);
 
     @Value("${saml.audience}")
     private String samlAudience;
@@ -261,11 +270,9 @@ public class WebSecurityConfiguration {
     @Value("${saml.max-authentication-age:86400}")
     private long maxAuthenticationAge;
 
-    @Autowired
-    private AppUserDetailsService appUserDetailsService;
+    @Autowired private AppUserDetailsService appUserDetailsService;
 
-    @Autowired
-    private DatabaseAuthenticationProvider dbAuthProvider;
+    @Autowired private DatabaseAuthenticationProvider dbAuthProvider;
 
     private Timer backgroundTaskTimer;
 
@@ -401,9 +408,10 @@ public class WebSecurityConfiguration {
 
     @Bean
     @Qualifier("okta")
-    public ExtendedMetadataDelegate oktaExtendedMetadataProvider(Timer backgroundTaskTimer) throws MetadataProviderException {
-      HTTPMetadataProvider metadataProvider
-          = new HTTPMetadataProvider(backgroundTaskTimer, httpClient(), metadataUrl);
+    public ExtendedMetadataDelegate oktaExtendedMetadataProvider(Timer backgroundTaskTimer)
+        throws MetadataProviderException {
+      HTTPMetadataProvider metadataProvider =
+          new HTTPMetadataProvider(backgroundTaskTimer, httpClient(), metadataUrl);
       metadataProvider.setParserPool(parserPool());
       metadataProvider.initialize();
 
@@ -418,7 +426,8 @@ public class WebSecurityConfiguration {
 
     @Bean
     @Qualifier("metadata")
-    public CachingMetadataManager metadata(ExtendedMetadataDelegate oktaExtendedMetadataProvider) throws MetadataProviderException, ResourceException {
+    public CachingMetadataManager metadata(ExtendedMetadataDelegate oktaExtendedMetadataProvider)
+        throws MetadataProviderException, ResourceException {
       List<MetadataProvider> providers = new ArrayList<>();
       providers.add(oktaExtendedMetadataProvider);
       CachingMetadataManager metadataManager = new CachingMetadataManager(providers);
@@ -440,8 +449,7 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityContextLogoutHandler logoutHandler() {
-      SecurityContextLogoutHandler logoutHandler =
-          new SecurityContextLogoutHandler();
+      SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
       logoutHandler.setInvalidateHttpSession(true);
       logoutHandler.setClearAuthentication(true);
       return logoutHandler;
@@ -449,15 +457,15 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SAMLLogoutProcessingFilter samlLogoutProcessingFilter() {
-      return new SAMLLogoutProcessingFilter(successLogoutHandler(),
-          logoutHandler());
+      return new SAMLLogoutProcessingFilter(successLogoutHandler(), logoutHandler());
     }
 
     @Bean
     public SAMLLogoutFilter samlLogoutFilter() {
-      return new SAMLLogoutFilter(successLogoutHandler(),
-          new LogoutHandler[] { logoutHandler() },
-          new LogoutHandler[] { logoutHandler() });
+      return new SAMLLogoutFilter(
+          successLogoutHandler(),
+          new LogoutHandler[] {logoutHandler()},
+          new LogoutHandler[] {logoutHandler()});
     }
 
     private ArtifactResolutionProfile artifactResolutionProfile() {
@@ -468,7 +476,8 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public HTTPArtifactBinding artifactBinding(ParserPool parserPool, VelocityEngine velocityEngine) {
+    public HTTPArtifactBinding artifactBinding(
+        ParserPool parserPool, VelocityEngine velocityEngine) {
       return new HTTPArtifactBinding(parserPool, velocityEngine, artifactResolutionProfile());
     }
 
@@ -547,7 +556,8 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SAMLWebSSOHoKProcessingFilter samlWebSSOHoKProcessingFilter() throws Exception {
-      SAMLWebSSOHoKProcessingFilter samlWebSSOHoKProcessingFilter = new SAMLWebSSOHoKProcessingFilter();
+      SAMLWebSSOHoKProcessingFilter samlWebSSOHoKProcessingFilter =
+          new SAMLWebSSOHoKProcessingFilter();
       samlWebSSOHoKProcessingFilter.setAuthenticationSuccessHandler(samlAuthSuccessHandler());
       samlWebSSOHoKProcessingFilter.setAuthenticationManager(authenticationManager());
       samlWebSSOHoKProcessingFilter.setAuthenticationFailureHandler(samlAuthFailureHandler());
@@ -572,20 +582,27 @@ public class WebSecurityConfiguration {
     @Bean
     public FilterChainProxy samlFilter() throws Exception {
       List<SecurityFilterChain> chains = new ArrayList<>();
-      chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/login/**"),
-          samlEntryPoint()));
-      chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/logout/**"),
-          samlLogoutFilter()));
-      chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/metadata/**"),
-          metadataDisplayFilter()));
-      chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SSO/**"),
-          samlWebSSOProcessingFilter()));
-      chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SSOHoK/**"),
-          samlWebSSOHoKProcessingFilter()));
-      chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SingleLogout/**"),
-          samlLogoutProcessingFilter()));
-      chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/discovery/**"),
-          samlIDPDiscovery()));
+      chains.add(
+          new DefaultSecurityFilterChain(
+              new AntPathRequestMatcher("/saml/login/**"), samlEntryPoint()));
+      chains.add(
+          new DefaultSecurityFilterChain(
+              new AntPathRequestMatcher("/saml/logout/**"), samlLogoutFilter()));
+      chains.add(
+          new DefaultSecurityFilterChain(
+              new AntPathRequestMatcher("/saml/metadata/**"), metadataDisplayFilter()));
+      chains.add(
+          new DefaultSecurityFilterChain(
+              new AntPathRequestMatcher("/saml/SSO/**"), samlWebSSOProcessingFilter()));
+      chains.add(
+          new DefaultSecurityFilterChain(
+              new AntPathRequestMatcher("/saml/SSOHoK/**"), samlWebSSOHoKProcessingFilter()));
+      chains.add(
+          new DefaultSecurityFilterChain(
+              new AntPathRequestMatcher("/saml/SingleLogout/**"), samlLogoutProcessingFilter()));
+      chains.add(
+          new DefaultSecurityFilterChain(
+              new AntPathRequestMatcher("/saml/discovery/**"), samlIDPDiscovery()));
       return new FilterChainProxy(chains);
     }
 
@@ -603,54 +620,54 @@ public class WebSecurityConfiguration {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-      http
-          .authorizeRequests()
-          .antMatchers("/static/**").permitAll()
-          .antMatchers("/error").permitAll()
-          .antMatchers("/login").permitAll()
-          .antMatchers("/saml/**").permitAll()
-          .antMatchers("/auth/**").permitAll()
-          .anyRequest().fullyAuthenticated();
+      http.authorizeRequests()
+          .antMatchers("/static/**")
+          .permitAll()
+          .antMatchers("/error")
+          .permitAll()
+          .antMatchers("/login")
+          .permitAll()
+          .antMatchers("/saml/**")
+          .permitAll()
+          .antMatchers("/auth/**")
+          .permitAll()
+          .anyRequest()
+          .fullyAuthenticated();
 
-      http
-          .httpBasic()
-          .authenticationEntryPoint((request, response, exception) -> {
-            if (request.getRequestURI().endsWith("doSaml")) {
-              samlEntryPoint().commence(request, response, exception);
-            } else {
-              response.sendRedirect("/login");
-            }
-          });
+      http.httpBasic()
+          .authenticationEntryPoint(
+              (request, response, exception) -> {
+                if (request.getRequestURI().endsWith("doSaml")) {
+                  samlEntryPoint().commence(request, response, exception);
+                } else {
+                  response.sendRedirect("/login");
+                }
+              });
 
-      http
-          .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
+      http.addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
           .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class)
           .addFilterBefore(samlFilter(), CsrfFilter.class);
 
-      http
-          .logout()
-          .addLogoutHandler((request, response, authentication) -> {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth instanceof AppUserDetails) {
-              AppUserDetails userDetails = (AppUserDetails) auth.getPrincipal();
-              if (userDetails.getAuthMethod() == AuthMethod.SAML) {
-                try {
-                  response.sendRedirect("/saml/logout");
-                } catch (Exception e) {
-                  LOGGER.error("Error processing logout for SAML user", e);
-                  throw new RuntimeException(e);
+      http.logout()
+          .addLogoutHandler(
+              (request, response, authentication) -> {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth instanceof AppUserDetails) {
+                  AppUserDetails userDetails = (AppUserDetails) auth.getPrincipal();
+                  if (userDetails.getAuthMethod() == AuthMethod.SAML) {
+                    try {
+                      response.sendRedirect("/saml/logout");
+                    } catch (Exception e) {
+                      LOGGER.error("Error processing logout for SAML user", e);
+                      throw new StudyTrackerException(e);
+                    }
+                  }
                 }
-              }
-            }
-          });
+              });
 
-      http
-          .headers()
-          .frameOptions().disable()
-          .httpStrictTransportSecurity().disable();
+      http.headers().frameOptions().disable().httpStrictTransportSecurity().disable();
 
-      http
-          .csrf().disable();
+      http.csrf().disable();
     }
 
     @Override
@@ -665,7 +682,5 @@ public class WebSecurityConfiguration {
       this.backgroundTaskTimer.cancel();
       this.multiThreadedHttpConnectionManager.shutdown();
     }
-
   }
-
 }

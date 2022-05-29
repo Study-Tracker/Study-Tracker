@@ -17,5 +17,4 @@ public class BenchlingEntrySchema {
   private String registryId;
   private String type;
   private BenchlingArchiveRecord archiveRecord;
-
 }

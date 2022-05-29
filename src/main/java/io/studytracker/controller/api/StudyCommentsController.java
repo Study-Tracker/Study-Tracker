@@ -51,11 +51,9 @@ public class StudyCommentsController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyCommentsController.class);
 
-  @Autowired
-  private StudyCommentService studyCommentService;
+  @Autowired private StudyCommentService studyCommentService;
 
-  @Autowired
-  private CommentMapper commentMapper;
+  @Autowired private CommentMapper commentMapper;
 
   @GetMapping("")
   public List<CommentDto> getStudyComments(@PathVariable("studyId") String studyId) {
@@ -64,19 +62,18 @@ public class StudyCommentsController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<CommentDto> addStudyComment(@PathVariable("studyId") String studyId,
-      @RequestBody @Valid CommentDto dto) {
+  public HttpEntity<CommentDto> addStudyComment(
+      @PathVariable("studyId") String studyId, @RequestBody @Valid CommentDto dto) {
 
-    LOGGER
-        .info(String.format("Creating new comment for study %s: %s", studyId, dto.toString()));
+    LOGGER.info(String.format("Creating new comment for study %s: %s", studyId, dto.toString()));
 
     Comment comment = commentMapper.fromDto(dto);
 
     Study study = getStudyFromIdentifier(studyId);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     studyCommentService.addStudyComment(study, comment);
 
@@ -89,15 +86,17 @@ public class StudyCommentsController extends AbstractStudyController {
   }
 
   @PutMapping("/{commentId}")
-  public HttpEntity<CommentDto> editedStudyComment(@PathVariable("studyId") String studyId,
-      @PathVariable("commentId") Long commentId, @RequestBody @Valid CommentDto dto) {
+  public HttpEntity<CommentDto> editedStudyComment(
+      @PathVariable("studyId") String studyId,
+      @PathVariable("commentId") Long commentId,
+      @RequestBody @Valid CommentDto dto) {
 
     LOGGER.info(String.format("Editing comment for study %s: %s", studyId, dto.toString()));
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     Study study = getStudyFromIdentifier(studyId);
     Comment comment = commentMapper.fromDto(dto);
@@ -114,21 +113,21 @@ public class StudyCommentsController extends AbstractStudyController {
   }
 
   @DeleteMapping("/{commentId}")
-  public HttpEntity<?> deleteStudyComment(@PathVariable("studyId") String studyId,
-      @PathVariable("commentId") Long commentId) {
+  public HttpEntity<?> deleteStudyComment(
+      @PathVariable("studyId") String studyId, @PathVariable("commentId") Long commentId) {
 
     LOGGER.info(String.format("Removing comment %s for study %s", commentId, studyId));
 
     Study study = getStudyFromIdentifier(studyId);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     Optional<Comment> optional = studyCommentService.findStudyCommentById(commentId);
     if (!optional.isPresent()) {
-      throw new RecordNotFoundException(String.format("No comment with ID %s found for study %s",
-          commentId, study.getCode()));
+      throw new RecordNotFoundException(
+          String.format("No comment with ID %s found for study %s", commentId, study.getCode()));
     }
 
     studyCommentService.deleteStudyComment(study, optional.get());
@@ -140,5 +139,4 @@ public class StudyCommentsController extends AbstractStudyController {
 
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
 }

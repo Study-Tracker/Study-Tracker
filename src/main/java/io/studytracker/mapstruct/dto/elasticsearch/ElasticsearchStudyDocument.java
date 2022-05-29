@@ -17,8 +17,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 public class ElasticsearchStudyDocument implements StudySearchDocument<Long> {
 
-  @Id
-  private Long id;
+  @Id private Long id;
 
   private String code;
 
@@ -79,5 +78,4 @@ public class ElasticsearchStudyDocument implements StudySearchDocument<Long> {
 
   @Field(type = FieldType.Nested, includeInParent = true)
   private Set<ElasticsearchCommentDocument> comments = new HashSet<>();
-
 }

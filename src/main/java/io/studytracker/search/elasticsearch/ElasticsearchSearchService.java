@@ -16,8 +16,7 @@ public class ElasticsearchSearchService implements SearchService<ElasticsearchSt
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchSearchService.class);
 
-  @Autowired
-  private StudyIndexRepository studyIndexRepository;
+  @Autowired private StudyIndexRepository studyIndexRepository;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -26,7 +25,8 @@ public class ElasticsearchSearchService implements SearchService<ElasticsearchSt
   @Override
   public StudySearchHits<ElasticsearchStudyDocument> search(String keyword) {
     LOGGER.info("Searching study index for keyword: {}", keyword);
-    SearchHits<ElasticsearchStudyDocument> hits = studyIndexRepository.findDocumentsByKeyword(keyword);
+    SearchHits<ElasticsearchStudyDocument> hits =
+        studyIndexRepository.findDocumentsByKeyword(keyword);
     return StudySearchHits.fromElasticsearchHits(hits);
   }
 
@@ -46,7 +46,7 @@ public class ElasticsearchSearchService implements SearchService<ElasticsearchSt
 
   @Override
   public void indexStudies(Collection<Study> studies) {
-    for (Study study: studies) {
+    for (Study study : studies) {
       this.indexStudy(study);
     }
   }

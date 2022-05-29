@@ -19,11 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/user/{userId}/studycollection")
 public class UserStudyCollectionController {
 
-  @Autowired
-  private StudyCollectionService studyCollectionService;
+  @Autowired private StudyCollectionService studyCollectionService;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -50,10 +48,10 @@ public class UserStudyCollectionController {
   }
 
   @GetMapping("")
-  public List<StudyCollectionSummaryDto> getUserStudyCollections(@PathVariable("userId") String userId) {
+  public List<StudyCollectionSummaryDto> getUserStudyCollections(
+      @PathVariable("userId") String userId) {
     User user = getUserFromIdentifier(userId);
     List<StudyCollection> collections = studyCollectionService.findByUser(user);
     return mapper.toSummaryDtoList(collections);
   }
-
 }

@@ -28,14 +28,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserServiceAuditor implements AuditorAware<User> {
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   @Override
   public Optional<User> getCurrentAuditor() {
     User user = null;
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.isAuthenticated()
+    if (authentication != null
+        && authentication.isAuthenticated()
         && !authentication.getPrincipal().toString().equals("anonymousUser")) {
       String username;
       if (authentication instanceof UsernamePasswordAuthenticationToken) {

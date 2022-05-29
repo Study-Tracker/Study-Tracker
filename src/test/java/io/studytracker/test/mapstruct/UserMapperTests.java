@@ -23,14 +23,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class UserMapperTests {
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private UserMapper userMapper;
+  @Autowired private UserMapper userMapper;
 
   @Before
   public void doBefore() {
@@ -42,13 +39,10 @@ public class UserMapperTests {
 
     List<User> users = userRepository.findAll();
     Assert.assertFalse(users.isEmpty());
-    List<UserSummaryDto> dtos = users.stream()
-        .map(userMapper::toUserSummary)
-        .collect(Collectors.toList());
+    List<UserSummaryDto> dtos =
+        users.stream().map(userMapper::toUserSummary).collect(Collectors.toList());
     Assert.assertNotNull(dtos);
     Assert.assertFalse(dtos.isEmpty());
-    System.out.println(dtos.toString());
-
+    System.out.println(dtos);
   }
-
 }

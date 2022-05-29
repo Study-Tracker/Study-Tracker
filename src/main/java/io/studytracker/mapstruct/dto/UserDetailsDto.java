@@ -23,5 +23,4 @@ public class UserDetailsDto {
   private boolean expired = false;
   private boolean credentialsExpired = false;
   private Map<String, String> configuration = new HashMap<>();
-
 }

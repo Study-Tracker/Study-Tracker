@@ -11,10 +11,6 @@ public class ApiDocumentationConfiguration {
   @Bean
   public OpenAPI publicApi() {
     return new OpenAPI()
-        .info(new Info()
-            .title("Study Tracker API")
-            .description("Study Tracker public REST API")
-        );
+        .info(new Info().title("Study Tracker API").description("Study Tracker public REST API"));
   }
-
 }

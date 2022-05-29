@@ -9,5 +9,4 @@ public class NotebookUser {
   private String name;
   private String email;
   private String referenceId;
-
 }

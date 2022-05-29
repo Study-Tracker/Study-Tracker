@@ -10,10 +10,14 @@ import org.mapstruct.Mapper;
 public interface AssayTypeTaskMapper {
 
   AssayTypeTaskDto toDto(AssayTypeTask task);
-  Set<AssayTypeTaskDto> toDtoSet(Set<AssayTypeTask> tasks);
-  List<AssayTypeTaskDto> toDtoList(List<AssayTypeTask> tasks);
-  AssayTypeTask fromDto(AssayTypeTaskDto dto);
-  Set<AssayTypeTask> fromDtoSet(Set<AssayTypeTaskDto> dtos);
-  List<AssayTypeTask> fromDtoList(List<AssayTypeTaskDto> dtos);
 
+  Set<AssayTypeTaskDto> toDtoSet(Set<AssayTypeTask> tasks);
+
+  List<AssayTypeTaskDto> toDtoList(List<AssayTypeTask> tasks);
+
+  AssayTypeTask fromDto(AssayTypeTaskDto dto);
+
+  Set<AssayTypeTask> fromDtoSet(Set<AssayTypeTaskDto> dtos);
+
+  List<AssayTypeTask> fromDtoList(List<AssayTypeTaskDto> dtos);
 }

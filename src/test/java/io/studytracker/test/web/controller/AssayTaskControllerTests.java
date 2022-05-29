@@ -57,23 +57,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ActiveProfiles({"web-test", "example"})
 public class AssayTaskControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
-  @Autowired
-  private AssayTaskMapper mapper;
+  @Autowired private AssayTaskMapper mapper;
 
   private String username;
 
@@ -85,11 +79,11 @@ public class AssayTaskControllerTests {
 
   @Test
   public void findAssayTasksTest() throws Exception {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("label")))
@@ -97,119 +91,131 @@ public class AssayTaskControllerTests {
         .andExpect(jsonPath("$[0]", hasKey("order")))
         .andExpect(jsonPath("$[0].order", is(0)))
         .andExpect(jsonPath("$[0]", hasKey("status")))
-        .andExpect(jsonPath("$[0].status", is("TODO")))
-    ;
+        .andExpect(jsonPath("$[0].status", is("TODO")));
   }
 
   @Test
   public void createTaskTest() throws Exception {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
     AssayTask task = new AssayTask();
     task.setLabel("New task");
     task.setStatus(TaskStatus.TODO);
 
-    mockMvc.perform(post("/api/assay/xxxxxxx/tasks")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            post("/api/assay/xxxxxxx/tasks")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
-    mockMvc.perform(post("/api/assay/" + assay.getCode() + "/tasks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            post("/api/assay/" + assay.getCode() + "/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isUnauthorized());
 
-    mockMvc.perform(post("/api/assay/" + assay.getCode() + "/tasks")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            post("/api/assay/" + assay.getCode() + "/tasks")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
-
   }
 
   @Test
   public void updateTaskTest() throws Exception {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
     AssayTask task = assay.getTasks().stream().findFirst().get();
     task.setStatus(TaskStatus.COMPLETE);
 
-    mockMvc.perform(put("/api/assay/xxxxxxx/tasks")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            put("/api/assay/xxxxxxx/tasks")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
-    mockMvc.perform(put("/api/assay/" + assay.getCode() + "/tasks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            put("/api/assay/" + assay.getCode() + "/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isUnauthorized());
 
-    mockMvc.perform(put("/api/assay/" + assay.getCode() + "/tasks")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            put("/api/assay/" + assay.getCode() + "/tasks")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("status")))
-        .andExpect(jsonPath("$[0].status", is("COMPLETE")))
-    ;
-
+        .andExpect(jsonPath("$[0].status", is("COMPLETE")));
   }
 
   @Test
   public void deleteTaskTest() throws Exception {
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
     AssayTask task = assay.getTasks().stream().findFirst().get();
 
-    mockMvc.perform(delete("/api/assay/xxxxxxx/tasks")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            delete("/api/assay/xxxxxxx/tasks")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
-    mockMvc.perform(delete("/api/assay/" + assay.getCode() + "/tasks")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            delete("/api/assay/" + assay.getCode() + "/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isUnauthorized());
 
-    mockMvc.perform(delete("/api/assay/" + assay.getCode() + "/tasks")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+    mockMvc
+        .perform(
+            delete("/api/assay/" + assay.getCode() + "/tasks")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/assay/" + assay.getCode() + "/tasks")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
-
   }
-
 }

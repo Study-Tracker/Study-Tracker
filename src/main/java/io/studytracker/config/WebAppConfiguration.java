@@ -34,13 +34,11 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@ComponentScan(basePackages = {"io.studytracker.controller",
-    "io.studytracker.exception"})
+@ComponentScan(basePackages = {"io.studytracker.controller", "io.studytracker.exception"})
 @PropertySource("classpath:web.properties")
 public class WebAppConfiguration {
 
-  @Autowired
-  private Environment env;
+  @Autowired private Environment env;
 
   @Bean
   public WebMvcConfigurer webMvcConfigurer() {
@@ -55,17 +53,16 @@ public class WebAppConfiguration {
       public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
         // Swagger webjars
-        registry.addResourceHandler("swagger-ui.html")
+        registry
+            .addResourceHandler("swagger-ui.html")
             .addResourceLocations("classpath:/META-INF/resources/")
             .resourceChain(false);
-        registry.addResourceHandler("/webjars/**")
+        registry
+            .addResourceHandler("/webjars/**")
             .addResourceLocations("classpath:/META-INF/resources/webjars/")
             .resourceChain(false);
         registry.setOrder(1);
-
-
       }
-
     };
   }
 
@@ -87,5 +84,4 @@ public class WebAppConfiguration {
   public Module hibernate5Module() {
     return new Hibernate5Module();
   }
-
 }

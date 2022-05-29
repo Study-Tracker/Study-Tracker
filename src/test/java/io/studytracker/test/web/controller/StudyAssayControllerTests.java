@@ -68,29 +68,21 @@ public class StudyAssayControllerTests {
 
   private static final int NUM_ASSAYS = ExampleDataGenerator.ASSAY_COUNT;
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private AssayTypeRepository assayTypeRepository;
+  @Autowired private AssayTypeRepository assayTypeRepository;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private AssayMapper assayMapper;
+  @Autowired private AssayMapper assayMapper;
 
   private String username;
 
@@ -102,27 +94,27 @@ public class StudyAssayControllerTests {
 
   @Test
   public void findStudyAssaysTest() throws Exception {
-    mockMvc.perform(get("/api/study/PPB-10001/assays")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-10001/assays").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
         .andExpect(jsonPath("$[0].code", is("PPB-10001-001")));
 
-    mockMvc.perform(get("/api/study/CPA-10001/assays")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/assays").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 
-    mockMvc.perform(get("/api/study/PPB-XXXX/assays")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-XXXX/assays").with(user(username)))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void findAssayByIdTest() throws Exception {
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("PPB-10001-001")))
@@ -130,16 +122,16 @@ public class StudyAssayControllerTests {
         .andExpect(jsonPath("$.assayType", hasKey("name")))
         .andExpect(jsonPath("$.assayType.name", is("Generic")));
 
-    mockMvc.perform(get("/api/study/PPB-10001/assay/PPB-10001-XXXXX")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-10001/assay/PPB-10001-XXXXX").with(user(username)))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void createTest() throws Exception {
 
-    AssayType assayType = assayTypeRepository.findByName("Histology")
-        .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Histology").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(NUM_ASSAYS, assayRepository.count());
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     User user = study.getOwner();
@@ -167,23 +159,29 @@ public class StudyAssayControllerTests {
     fields.put("stain", "DAPI");
     assay.setFields(fields);
 
-    mockMvc.perform(post("/api/study/XXXXXX/assays/")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
+    mockMvc
+        .perform(
+            post("/api/study/XXXXXX/assays/")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
-    mockMvc.perform(post("/api/study/" + study.getCode() + "/assays/")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
+    mockMvc
+        .perform(
+            post("/api/study/" + study.getCode() + "/assays/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isUnauthorized());
 
-    mockMvc.perform(post("/api/study/" + study.getCode() + "/assays/")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
+    mockMvc
+        .perform(
+            post("/api/study/" + study.getCode() + "/assays/")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
@@ -193,55 +191,52 @@ public class StudyAssayControllerTests {
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("CPA-10001-001")));
 
-    mockMvc.perform(get("/api/study/CPA-10001/assays")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/assays").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
         .andExpect(jsonPath("$[0].code", is("CPA-10001-001")));
-
   }
 
   @Test
   public void updateAssayTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status", is("ACTIVE")));
 
-    Assay assay = assayRepository.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     assay.setStatus(Status.COMPLETE);
 
-    mockMvc.perform(put("/api/study/PPB-10001/assays/PPB-10001-001")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(assay))
-        .with(user(assay.getOwner().getUsername())))
+    mockMvc
+        .perform(
+            put("/api/study/PPB-10001/assays/PPB-10001-001")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(assay))
+                .with(user(assay.getOwner().getUsername())))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("COMPLETE")));
-
-
   }
 
   @Test
   public void deleteAssayTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(true)));
 
-    mockMvc.perform(delete("/api/study/PPB-10001/assays/PPB-10001-001")
-        .with(user(username)))
+    mockMvc
+        .perform(delete("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/study/PPB-10001/assays/PPB-10001-001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(false)));
-
   }
-
 }

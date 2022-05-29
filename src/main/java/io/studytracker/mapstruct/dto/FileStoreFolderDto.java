@@ -10,5 +10,4 @@ public class FileStoreFolderDto {
   private String name;
   private String path;
   private String referenceId;
-
 }

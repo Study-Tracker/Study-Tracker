@@ -18,8 +18,7 @@ package io.studytracker.egnyte.exception;
 
 public class UnauthorizedException extends RuntimeException {
 
-  public UnauthorizedException() {
-  }
+  public UnauthorizedException() {}
 
   public UnauthorizedException(String message) {
     super(message);
@@ -32,5 +31,4 @@ public class UnauthorizedException extends RuntimeException {
   public UnauthorizedException(Throwable cause) {
     super(cause);
   }
-
 }

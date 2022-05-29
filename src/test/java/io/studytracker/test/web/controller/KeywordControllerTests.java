@@ -55,17 +55,13 @@ public class KeywordControllerTests {
 
   private static final int CATEGORY_COUNT = 2;
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
   private String username;
 
@@ -77,8 +73,8 @@ public class KeywordControllerTests {
 
   @Test
   public void getAllKeywordsTest() throws Exception {
-    mockMvc.perform(get("/api/keyword")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/keyword").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(KEYWORD_COUNT)));
@@ -86,8 +82,8 @@ public class KeywordControllerTests {
 
   @Test
   public void getAllKeywordCategoryTest() throws Exception {
-    mockMvc.perform(get("/api/keyword/categories")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/keyword/categories").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(CATEGORY_COUNT)));
@@ -95,48 +91,48 @@ public class KeywordControllerTests {
 
   @Test
   public void keywordSearchTest() throws Exception {
-    mockMvc.perform(get("/api/keyword?q=akt")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/keyword?q=akt").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
-    mockMvc.perform(get("/api/keyword?q=akt&category=Gene")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/keyword?q=akt&category=Gene").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
-    mockMvc.perform(get("/api/keyword?q=akt&category=Cell Line")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/keyword?q=akt&category=Cell Line").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", empty()));
   }
 
   @Test
   public void createKeywordTest() throws Exception {
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     Keyword keyword = new Keyword("TTN", "Gene");
-    mockMvc.perform(post("/api/keyword")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(keyword)))
+    mockMvc
+        .perform(
+            post("/api/keyword")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(keyword)))
         .andExpect(status().isCreated());
   }
 
   @Test
   public void duplicateKeywordTest() throws Exception {
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     Keyword keyword = new Keyword("AKT1", "Gene");
-    mockMvc.perform(post("/api/keyword")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(keyword)))
+    mockMvc
+        .perform(
+            post("/api/keyword")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(keyword)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isBadRequest());
   }
-
-
 }

@@ -9,5 +9,4 @@ public class StudyRelationshipPostDto {
   private Long sourceStudyId;
   private RelationshipType type;
   private Long targetStudyId;
-
 }

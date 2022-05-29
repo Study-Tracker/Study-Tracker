@@ -8,5 +8,4 @@ import lombok.Data;
 public class BenchlingArchiveRecord {
 
   private String reason;
-
 }

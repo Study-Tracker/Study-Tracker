@@ -8,8 +8,7 @@ import lombok.Data;
 public class StudyRelationshipSlimDto {
 
   private Long id;
-  private @NotNull  RelationshipType type;
+  private @NotNull RelationshipType type;
   private Long sourceStudyId;
   private @NotNull Long targetStudyId;
-
 }

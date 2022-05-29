@@ -23,5 +23,4 @@ public class AssaySummaryDto {
   private FileStoreFolderDto storageFolder;
   private boolean active = true;
   private Set<UserSlimDto> users = new HashSet<>();
-
 }

@@ -19,23 +19,20 @@ public class ELNServiceConfiguration {
   @ConditionalOnProperty(name = "notebook.mode", havingValue = "benchling")
   public static class BenchlingElnServiceConfiguration {
 
-//    private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingElnServiceConfiguration.class);
-
-//    @Autowired
-//    private Environment env;
-
     @Bean
-    public ObjectMapper BenchlingElnObjectMapper() {
+    public ObjectMapper benchlingElnObjectMapper() {
       return new ObjectMapper();
     }
 
     @Bean(name = "benchlingElnRestTemplate")
-    public RestTemplate BenchlingElnRestTemplate() {
-      RestTemplate restTemplate = new RestTemplateBuilder()
-          .errorHandler(new BenchlingExceptionHandler(BenchlingElnObjectMapper()))
-          .build();
-      MappingJackson2HttpMessageConverter httpMessageConverter = new MappingJackson2HttpMessageConverter();
-      httpMessageConverter.setObjectMapper(BenchlingElnObjectMapper());
+    public RestTemplate benchlingElnRestTemplate() {
+      RestTemplate restTemplate =
+          new RestTemplateBuilder()
+              .errorHandler(new BenchlingExceptionHandler(benchlingElnObjectMapper()))
+              .build();
+      MappingJackson2HttpMessageConverter httpMessageConverter =
+          new MappingJackson2HttpMessageConverter();
+      httpMessageConverter.setObjectMapper(benchlingElnObjectMapper());
       restTemplate.getMessageConverters().add(0, httpMessageConverter);
       SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
       requestFactory.setOutputStreaming(false);
@@ -43,47 +40,8 @@ public class ELNServiceConfiguration {
       return restTemplate;
     }
 
-//    @Bean
-//    public BenchlingElnOptions elnOptions() throws Exception {
-//
-//      LOGGER.info("Configuring Benchling integration...");
-//      BenchlingElnOptions options = new BenchlingElnOptions();
-//
-//      // Authentication
-//      if (env.containsProperty("benchling.eln.api.token")) {
-//        Assert.notNull(env.getRequiredProperty("benchling.eln.api.token"),
-//            "API token must not be null. Eg. benchling.eln.api.token=xxx");
-//        options.setApiToken(env.getRequiredProperty("benchling.eln.api.token"));
-//      } else if (env.containsProperty("benchling.eln.api.username") && env
-//          .containsProperty("benchling.eln.api.password")) {
-//        Assert.notNull(env.getRequiredProperty("benchling.eln.api.username"),
-//            "API username must not be null. Eg. benchling.eln.api.username=xxx");
-//        Assert.notNull(env.getRequiredProperty("benchling.eln.api.password"),
-//            "API password must not be null. Eg. benchling.eln.api.password=xxx");
-//        options.setUsername(env.getRequiredProperty("benchling.eln.api.username"));
-//        options.setPassword(env.getRequiredProperty("benchling.eln.api.password"));
-//      } else {
-//        throw new BenchlingException(
-//            "Missing configuration properties. Authentication requires the 'benchling.eln.api.username' and 'benchling.eln.api.password' properties or the 'benchling.eln.api.token' property.");
-//      }
-//
-//      Assert.notNull(env.getProperty("benchling.eln.api.root-url"),
-//          "benchling ELN API root URL is not set.");
-//      options.setRootUrl(new URL(env.getRequiredProperty("benchling.eln.api.root-url")));
-//      Assert.notNull(env.getProperty("benchling.eln.api.root-entity"),
-//          "benchling ELN API root entity is not set.");
-//      options.setRootEntity(env.getRequiredProperty("benchling.eln.api.root-entity"));
-//
-//      //Folder URL
-//      Assert.notNull(env.getProperty("benchling.eln.api.root-folder-url"),
-//          "benchling ELN API root entity is not set.");
-//      options.setRootFolderUrl(env.getRequiredProperty("benchling.eln.api.root-folder-url"));
-//
-//      return options;
-//    }
-
     @Bean
-    public BenchlingElnRestClient BenchlingRestElnClient() throws Exception {
+    public BenchlingElnRestClient benchlingRestElnClient() throws Exception {
       return new BenchlingElnRestClient();
     }
 
@@ -91,7 +49,5 @@ public class ELNServiceConfiguration {
     public BenchlingNotebookService benchlingNotebookService() {
       return new BenchlingNotebookService();
     }
-
   }
-
 }

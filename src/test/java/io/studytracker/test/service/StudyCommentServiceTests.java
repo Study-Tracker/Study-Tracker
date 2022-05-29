@@ -40,14 +40,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class StudyCommentServiceTests {
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private StudyCommentService studyCommentService;
+  @Autowired private StudyCommentService studyCommentService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -74,7 +71,6 @@ public class StudyCommentServiceTests {
     Assert.assertTrue(optional.isPresent());
     comment = optional.get();
     Assert.assertEquals("This is a test", comment.getText());
-
   }
 
   @Test
@@ -90,8 +86,8 @@ public class StudyCommentServiceTests {
     comment.setText("Different text");
     studyCommentService.updateStudyComment(comment);
 
-    comment = studyCommentService.findStudyCommentById(id)
-        .orElseThrow(RecordNotFoundException::new);
+    comment =
+        studyCommentService.findStudyCommentById(id).orElseThrow(RecordNotFoundException::new);
     Assert.assertNotNull(comment.getUpdatedAt());
     Assert.assertNotEquals(firstDate, comment.getUpdatedAt());
     Assert.assertEquals("Different text", comment.getText());
@@ -106,13 +102,12 @@ public class StudyCommentServiceTests {
     studyCommentService.deleteStudyComment(study, comment);
     Exception exception = null;
     try {
-      comment = studyCommentService.findStudyCommentById(id)
-          .orElseThrow(RecordNotFoundException::new);
+      comment =
+          studyCommentService.findStudyCommentById(id).orElseThrow(RecordNotFoundException::new);
     } catch (Exception e) {
       exception = e;
     }
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof RecordNotFoundException);
   }
-
 }

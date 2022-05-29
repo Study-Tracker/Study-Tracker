@@ -37,5 +37,4 @@ public class StudyDetailsDto {
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();
   private StudyConclusionsDto conclusions;
   private Set<CommentDto> comments = new HashSet<>();
-
 }

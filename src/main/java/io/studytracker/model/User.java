@@ -101,8 +101,7 @@ public class User {
   @Column(name = "configuration", columnDefinition = "json")
   private Map<String, String> configuration = new HashMap<>();
 
-  @Transient
-  private List<GrantedAuthority> authorities = new ArrayList<>();
+  @Transient private List<GrantedAuthority> authorities = new ArrayList<>();
 
   @JsonIgnore
   public String getPassword() {
@@ -230,8 +229,7 @@ public class User {
     return authorities;
   }
 
-  public void setAuthorities(
-      List<GrantedAuthority> authorities) {
+  public void setAuthorities(List<GrantedAuthority> authorities) {
     this.authorities = authorities;
   }
 
@@ -258,5 +256,4 @@ public class User {
   public void removeConfiguration(String key) {
     this.configuration.remove(key);
   }
-
 }

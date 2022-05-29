@@ -21,5 +21,4 @@ public class BenchlingEntryTemplate {
   private Map<String, BenchlingCustomField> customFields = new LinkedHashMap<>();
   private BenchlingEntrySchema schema;
   private String templateCollectionId;
-
 }

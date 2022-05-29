@@ -13,5 +13,4 @@ public interface SearchService<T extends StudySearchDocument<I>, I extends Seria
   void indexStudy(Study study);
 
   void indexStudies(Collection<Study> studies);
-
 }

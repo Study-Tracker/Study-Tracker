@@ -24,11 +24,9 @@ public class KeywordServiceTests {
 
   private static final int KEYWORD_COUNT = 7;
 
-  @Autowired
-  private KeywordService keywordService;
+  @Autowired private KeywordService keywordService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -56,7 +54,6 @@ public class KeywordServiceTests {
     Assert.assertEquals(0, keywords.size());
 
     Assert.assertEquals(2, keywordService.findAllCategories().size());
-
   }
 
   @Test
@@ -73,5 +70,4 @@ public class KeywordServiceTests {
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof DuplicateRecordException);
   }
-
 }

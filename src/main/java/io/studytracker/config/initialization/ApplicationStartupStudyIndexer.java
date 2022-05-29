@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationStartupStudyIndexer implements ApplicationRunner {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationStartupStudyIndexer.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(ApplicationStartupStudyIndexer.class);
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
   @Autowired(required = false)
   private SearchService<?, ?> searchService;

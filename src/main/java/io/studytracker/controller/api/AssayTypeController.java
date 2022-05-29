@@ -46,11 +46,9 @@ public class AssayTypeController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayTypeController.class);
 
-  @Autowired
-  private AssayTypeService assayTypeService;
+  @Autowired private AssayTypeService assayTypeService;
 
-  @Autowired
-  private AssayTypeMapper assayTypeMapper;
+  @Autowired private AssayTypeMapper assayTypeMapper;
 
   @GetMapping("")
   public List<AssayTypeDetailsDto> findAll() {
@@ -58,7 +56,8 @@ public class AssayTypeController {
   }
 
   @GetMapping("/{id}")
-  public AssayTypeDetailsDto findById(@PathVariable("id") Long assayTypeId) throws RecordNotFoundException {
+  public AssayTypeDetailsDto findById(@PathVariable("id") Long assayTypeId)
+      throws RecordNotFoundException {
     Optional<AssayType> optional = assayTypeService.findById(assayTypeId);
     if (optional.isPresent()) {
       return assayTypeMapper.toDetailsDto(optional.get());
@@ -78,8 +77,8 @@ public class AssayTypeController {
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<AssayType> update(@PathVariable("id") String id,
-      @RequestBody @Valid AssayTypeDetailsDto dto) {
+  public HttpEntity<AssayType> update(
+      @PathVariable("id") String id, @RequestBody @Valid AssayTypeDetailsDto dto) {
     LOGGER.info("Updating assay type");
     LOGGER.info(dto.toString());
     AssayType assayType = assayTypeMapper.fromDetailsDto(dto);
@@ -89,8 +88,10 @@ public class AssayTypeController {
 
   @PatchMapping("/{id}")
   public HttpEntity<?> toggleActive(@PathVariable("id") Long id) {
-    AssayType assayType = assayTypeService.findById(id)
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find assay type: " + id));
+    AssayType assayType =
+        assayTypeService
+            .findById(id)
+            .orElseThrow(() -> new RecordNotFoundException("Cannot find assay type: " + id));
     assayTypeService.toggleActive(assayType);
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -101,5 +102,4 @@ public class AssayTypeController {
     AssayType assayType = assayTypeService.findById(id).orElseThrow(RecordNotFoundException::new);
     assayTypeService.delete(assayType);
   }
-
 }

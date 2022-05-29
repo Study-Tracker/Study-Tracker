@@ -51,11 +51,9 @@ public class StudyConclusionsController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyConclusionsController.class);
 
-  @Autowired
-  private StudyConclusionsService studyConclusionsService;
+  @Autowired private StudyConclusionsService studyConclusionsService;
 
-  @Autowired
-  private StudyConclusionsMapper conclusionsMapper;
+  @Autowired private StudyConclusionsMapper conclusionsMapper;
 
   @GetMapping("")
   public StudyConclusionsDto getStudyConclusions(@PathVariable("studyId") String studyId) {
@@ -68,19 +66,18 @@ public class StudyConclusionsController extends AbstractStudyController {
   }
 
   @PostMapping("")
-  public HttpEntity<StudyConclusionsDto> newStudyConclusions(@PathVariable("studyId") String studyId,
-      @RequestBody @Valid StudyConclusionsDto dto) {
+  public HttpEntity<StudyConclusionsDto> newStudyConclusions(
+      @PathVariable("studyId") String studyId, @RequestBody @Valid StudyConclusionsDto dto) {
     Study study = getStudyFromIdentifier(studyId);
     if (dto.getId() != null || study.getConclusions() != null) {
       throw new StudyTrackerException("Study conclusions object already exists.");
     }
-    LOGGER.info(
-        String.format("Creating conclusions for study %s: %s", studyId, dto.toString()));
+    LOGGER.info(String.format("Creating conclusions for study %s: %s", studyId, dto));
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     StudyConclusions conclusions = conclusionsMapper.fromDto(dto);
     studyConclusionsService.addStudyConclusions(study, conclusions);
@@ -94,15 +91,14 @@ public class StudyConclusionsController extends AbstractStudyController {
   }
 
   @PutMapping("")
-  public HttpEntity<StudyConclusionsDto> editStudyConclusions(@PathVariable("studyId") String studyId,
-      @RequestBody @Valid StudyConclusionsDto dto) {
-    LOGGER.info(
-        String.format("Updating conclusions for study %s: %s", studyId, dto.toString()));
+  public HttpEntity<StudyConclusionsDto> editStudyConclusions(
+      @PathVariable("studyId") String studyId, @RequestBody @Valid StudyConclusionsDto dto) {
+    LOGGER.info(String.format("Updating conclusions for study %s: %s", studyId, dto.toString()));
     Study study = getStudyFromIdentifier(studyId);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     StudyConclusions conclusions = conclusionsMapper.fromDto(dto);
     studyConclusionsService.updateStudyConclusions(study, conclusions);
@@ -118,10 +114,10 @@ public class StudyConclusionsController extends AbstractStudyController {
   public HttpEntity<?> deleteStudyConclusions(@PathVariable("studyId") String studyId) {
     LOGGER.info(String.format("Deleting conclusions for study %s", studyId));
     Study study = getStudyFromIdentifier(studyId);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     studyConclusionsService.deleteStudyConclusions(study);
 
@@ -131,5 +127,4 @@ public class StudyConclusionsController extends AbstractStudyController {
 
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
 }

@@ -10,10 +10,14 @@ import org.mapstruct.Mapper;
 public interface AssayTypeFieldMapper {
 
   AssayTypeFieldDto toDto(AssayTypeField field);
-  Set<AssayTypeFieldDto> toDtoSet(Set<AssayTypeField> fields);
-  List<AssayTypeFieldDto> toDtoList(List<AssayTypeField> fields);
-  AssayTypeField fromDto(AssayTypeFieldDto dto);
-  Set<AssayTypeField> fromDtoSet(Set<AssayTypeFieldDto> dtos);
-  List<AssayTypeField> fromDtoList(List<AssayTypeFieldDto> dtos);
 
+  Set<AssayTypeFieldDto> toDtoSet(Set<AssayTypeField> fields);
+
+  List<AssayTypeFieldDto> toDtoList(List<AssayTypeField> fields);
+
+  AssayTypeField fromDto(AssayTypeFieldDto dto);
+
+  Set<AssayTypeField> fromDtoSet(Set<AssayTypeFieldDto> dtos);
+
+  List<AssayTypeField> fromDtoList(List<AssayTypeFieldDto> dtos);
 }

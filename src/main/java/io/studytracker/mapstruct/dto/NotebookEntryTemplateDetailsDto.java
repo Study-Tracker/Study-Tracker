@@ -17,5 +17,4 @@ public class NotebookEntryTemplateDetailsDto {
   private boolean active;
   private NotebookEntryTemplate.Category category;
   private boolean isDefault;
-
 }

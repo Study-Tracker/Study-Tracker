@@ -23,7 +23,8 @@ public class StudyActivityUtils {
     activity.setEventType(EventType.NEW_STUDY);
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
-//    activity.setData(Collections.singletonMap("study", EntityViewUtils.createStudyView(study)));
+    //    activity.setData(Collections.singletonMap("study",
+    // EntityViewUtils.createStudyView(study)));
     activity.setData(Collections.singletonMap("study", EntityViewUtils.createStudyView(study)));
     return activity;
   }
@@ -48,8 +49,8 @@ public class StudyActivityUtils {
     return activity;
   }
 
-  public static Activity fromStudyStatusChange(Study study, User triggeredBy, Status oldStatus,
-      Status newStatus) {
+  public static Activity fromStudyStatusChange(
+      Study study, User triggeredBy, Status oldStatus, Status newStatus) {
     Activity activity = new Activity();
     activity.setStudy(study);
     activity.setEventType(EventType.STUDY_STATUS_CHANGED);
@@ -76,8 +77,8 @@ public class StudyActivityUtils {
     return activity;
   }
 
-  public static Activity fromNewConclusions(Study study, User triggeredBy,
-      StudyConclusions conclusions) {
+  public static Activity fromNewConclusions(
+      Study study, User triggeredBy, StudyConclusions conclusions) {
     Activity activity = new Activity();
     activity.setStudy(study);
     activity.setEventType(EventType.NEW_STUDY_CONCLUSIONS);
@@ -90,8 +91,8 @@ public class StudyActivityUtils {
     return activity;
   }
 
-  public static Activity fromUpdatedConclusions(Study study, User triggeredBy,
-      StudyConclusions conclusions) {
+  public static Activity fromUpdatedConclusions(
+      Study study, User triggeredBy, StudyConclusions conclusions) {
     Activity activity = new Activity();
     activity.setStudy(study);
     activity.setEventType(EventType.EDITED_STUDY_CONCLUSIONS);
@@ -154,8 +155,8 @@ public class StudyActivityUtils {
     return activity;
   }
 
-  public static Activity fromNewStudyRelationship(Study sourceStudy, Study targetStudy,
-      User triggeredBy, StudyRelationship relationship) {
+  public static Activity fromNewStudyRelationship(
+      Study sourceStudy, Study targetStudy, User triggeredBy, StudyRelationship relationship) {
     Activity activity = new Activity();
     activity.setStudy(sourceStudy);
     activity.setEventType(EventType.NEW_STUDY_RELATIONSHIP);
@@ -169,8 +170,8 @@ public class StudyActivityUtils {
     return activity;
   }
 
-  public static Activity fromUpdatedStudyRelationship(Study study, User triggeredBy,
-      StudyRelationship relationship) {
+  public static Activity fromUpdatedStudyRelationship(
+      Study study, User triggeredBy, StudyRelationship relationship) {
     Activity activity = new Activity();
     activity.setStudy(study);
     activity.setEventType(EventType.UPDATED_STUDY_RELATIONSHIP);
@@ -233,5 +234,4 @@ public class StudyActivityUtils {
     activity.setData(data);
     return activity;
   }
-
 }

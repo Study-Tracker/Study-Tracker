@@ -20,5 +20,4 @@ public class AssayParentDto {
   private Date updatedAt;
   private boolean active = true;
   private StudySummaryDto study;
-
 }

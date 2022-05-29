@@ -7,5 +7,4 @@ public class UserStatisticsDto {
 
   long activeStudyCount;
   long completeStudyCount;
-
 }

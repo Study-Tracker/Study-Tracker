@@ -28,14 +28,15 @@ public class StudyNotebookController extends AbstractStudyController {
 
   @GetMapping("")
   public NotebookFolder getStudyNotebookFolder(@PathVariable("studyId") String studyId)
-          throws RecordNotFoundException {
+      throws RecordNotFoundException {
     LOGGER.info("Fetching notebook folder for study: " + studyId);
     Study study = getStudyFromIdentifier(studyId);
 
-    Optional<NotebookFolder> notebookFolder = Optional.ofNullable(studyNotebookService)
+    Optional<NotebookFolder> notebookFolder =
+        Optional.ofNullable(studyNotebookService)
             .flatMap(service -> service.findStudyFolder(study));
-    return notebookFolder
-            .orElseThrow(() -> new RecordNotFoundException("Could not load notebook folder"));
+    return notebookFolder.orElseThrow(
+        () -> new RecordNotFoundException("Could not load notebook folder"));
   }
 
   @PatchMapping("/{id}/notebook")
@@ -51,7 +52,5 @@ public class StudyNotebookController extends AbstractStudyController {
     // Repair the folder
     this.getStudyService().repairElnFolder(study);
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
-
 }

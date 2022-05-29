@@ -106,5 +106,4 @@ public abstract class Task {
   public void setUpdatedAt(Date updatedAt) {
     this.updatedAt = updatedAt;
   }
-
 }

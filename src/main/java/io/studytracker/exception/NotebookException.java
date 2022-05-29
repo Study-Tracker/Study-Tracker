@@ -18,8 +18,7 @@ package io.studytracker.exception;
 
 public class NotebookException extends StudyTrackerException {
 
-  public NotebookException() {
-  }
+  public NotebookException() {}
 
   public NotebookException(String message) {
     super(message);
@@ -33,8 +32,8 @@ public class NotebookException extends StudyTrackerException {
     super(cause);
   }
 
-  public NotebookException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public NotebookException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

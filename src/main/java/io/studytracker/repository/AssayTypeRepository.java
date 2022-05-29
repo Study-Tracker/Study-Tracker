@@ -13,5 +13,4 @@ public interface AssayTypeRepository extends JpaRepository<AssayType, Long> {
 
   @EntityGraph("assay-type-details")
   Optional<AssayType> findByName(String name);
-
 }

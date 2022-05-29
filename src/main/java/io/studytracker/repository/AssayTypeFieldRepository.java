@@ -9,5 +9,4 @@ public interface AssayTypeFieldRepository extends JpaRepository<AssayTypeField, 
 
   @Query("select f from AssayTypeField f where f.assayType.id = ?1")
   List<AssayTypeField> findByAssayTypeId(Long assayTypeId);
-
 }

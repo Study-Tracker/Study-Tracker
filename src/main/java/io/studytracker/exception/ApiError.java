@@ -31,5 +31,4 @@ public class ApiError {
     this.details = details;
     this.timestamp = new Date();
   }
-
 }

@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface NotebookEntryTemplateRepository extends JpaRepository<NotebookEntryTemplate, Long> {
+public interface NotebookEntryTemplateRepository
+    extends JpaRepository<NotebookEntryTemplate, Long> {
 
   @Override
   @EntityGraph("entry-template-details")
@@ -14,5 +15,4 @@ public interface NotebookEntryTemplateRepository extends JpaRepository<NotebookE
 
   @Query("select t from NotebookEntryTemplate t where t.isDefault = true and t.category = ?1")
   Optional<NotebookEntryTemplate> findDefaultByCategory(NotebookEntryTemplate.Category category);
-
 }

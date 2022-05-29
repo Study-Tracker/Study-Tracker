@@ -30,16 +30,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "study_collections")
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "study-collection-summary",
-        attributeNodes = {
-            @NamedAttributeNode("createdBy")
-        }
-    ),
-    @NamedEntityGraph(name = "study-collection-details", attributeNodes = {
+  @NamedEntityGraph(
+      name = "study-collection-summary",
+      attributeNodes = {@NamedAttributeNode("createdBy")}),
+  @NamedEntityGraph(
+      name = "study-collection-details",
+      attributeNodes = {
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("studies")
-    })
+      })
 })
 public class StudyCollection {
 
@@ -77,7 +77,8 @@ public class StudyCollection {
   private Date updatedAt;
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "study_collection_studies",
+  @JoinTable(
+      name = "study_collection_studies",
       joinColumns = @JoinColumn(name = "study_collection_id", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "study_id", nullable = false))
   private Set<Study> studies = new HashSet<>();
@@ -161,5 +162,4 @@ public class StudyCollection {
   public void removeStudy(Study study) {
     this.studies.removeIf(d -> d.getId().equals(study.getId()));
   }
-
 }

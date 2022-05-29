@@ -16,5 +16,4 @@ public class UserAuthenticationUtils {
     }
     return username;
   }
-
 }

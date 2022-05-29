@@ -12,5 +12,4 @@ public class NotebookEntryTemplateSlimDto {
   private boolean active;
   private NotebookEntryTemplate.Category category;
   private boolean isDefault;
-
 }

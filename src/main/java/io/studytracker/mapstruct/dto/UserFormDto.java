@@ -24,5 +24,4 @@ public class UserFormDto {
   private boolean expired = false;
   private boolean credentialsExpired = false;
   private Map<String, String> configuration = new HashMap<>();
-
 }

@@ -22,14 +22,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class ActivityMapperTests {
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private ActivityRepository activityRepository;
+  @Autowired private ActivityRepository activityRepository;
 
-  @Autowired
-  private ActivityMapper activityMapper;
+  @Autowired private ActivityMapper activityMapper;
 
   @Before
   public void doBefore() {
@@ -45,6 +42,4 @@ public class ActivityMapperTests {
     Assert.assertFalse(dtos.isEmpty());
     System.out.println(dtos);
   }
-
-
 }

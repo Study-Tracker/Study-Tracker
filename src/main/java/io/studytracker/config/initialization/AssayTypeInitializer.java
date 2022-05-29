@@ -13,8 +13,7 @@ public class AssayTypeInitializer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayTypeInitializer.class);
 
-  @Autowired
-  private AssayTypeService assayTypeService;
+  @Autowired private AssayTypeService assayTypeService;
 
   @PostConstruct
   public void initializeAdminUser() {
@@ -28,5 +27,4 @@ public class AssayTypeInitializer {
     assayType.setActive(true);
     assayTypeService.create(assayType);
   }
-
 }

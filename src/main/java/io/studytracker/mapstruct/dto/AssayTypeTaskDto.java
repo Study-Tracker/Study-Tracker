@@ -14,5 +14,4 @@ public class AssayTypeTaskDto {
   private Integer order;
   private Date createdAt;
   private Date updatedAt;
-
 }

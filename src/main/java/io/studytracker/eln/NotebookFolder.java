@@ -29,26 +29,19 @@ import org.springframework.data.annotation.Transient;
 @Data
 public class NotebookFolder {
 
-  @Transient
-  private NotebookFolder parentFolder;
+  @Transient private NotebookFolder parentFolder;
 
-  @NotNull
-  private String url;
+  @NotNull private String url;
 
-  @NotNull
-  private String name;
+  @NotNull private String name;
 
-  @NotNull
-  private String path;
+  @NotNull private String path;
 
-  @NotNull
-  private String referenceId;
+  @NotNull private String referenceId;
 
-  @Transient
-  private List<NotebookFolder> subFolders = new ArrayList<>();
+  @Transient private List<NotebookFolder> subFolders = new ArrayList<>();
 
-  @Transient
-  private List<NotebookEntry> entries = new ArrayList<>();
+  @Transient private List<NotebookEntry> entries = new ArrayList<>();
 
   private Map<String, Object> attributes = new HashMap<>();
 
@@ -68,5 +61,4 @@ public class NotebookFolder {
   public void setUrl(String url) {
     this.url = url;
   }
-
 }

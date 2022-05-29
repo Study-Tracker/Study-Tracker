@@ -13,11 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AssayTaskService {
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private AssayTaskRepository assayTaskRepository;
+  @Autowired private AssayTaskRepository assayTaskRepository;
 
   public List<AssayTask> findAssayTasks(Assay assay) {
     return this.findAssayTasks(assay.getId());
@@ -55,5 +53,4 @@ public class AssayTaskService {
     assay.removeTask(task.getId());
     assayRepository.save(assay);
   }
-
 }

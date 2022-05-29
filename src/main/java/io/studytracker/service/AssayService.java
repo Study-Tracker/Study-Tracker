@@ -53,32 +53,25 @@ public class AssayService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayService.class);
 
-  private static final SimpleDateFormat JAVASCRIPT_DATE_FORMAT = new SimpleDateFormat(
-      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //2021-01-02T05:00:00.000Z
+  private static final SimpleDateFormat JAVASCRIPT_DATE_FORMAT =
+      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // 2021-01-02T05:00:00.000Z
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private AssayTaskRepository assayTaskRepository;
+  @Autowired private AssayTaskRepository assayTaskRepository;
 
-  @Autowired
-  private StudyStorageService storageService;
+  @Autowired private StudyStorageService storageService;
 
   @Autowired(required = false)
   private StudyNotebookService notebookService;
 
-  @Autowired
-  private NamingService namingService;
+  @Autowired private NamingService namingService;
 
-  @Autowired
-  private FileStoreFolderRepository fileStoreFolderRepository;
+  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
 
-  @Autowired
-  private ELNFolderRepository elnFolderRepository;
+  @Autowired private ELNFolderRepository elnFolderRepository;
 
   public Optional<Assay> findById(Long id) {
     return assayRepository.findById(id);
@@ -107,11 +100,11 @@ public class AssayService {
       case DATE:
         if (Date.class.isAssignableFrom(clazz)) {
           System.out.println("Date as Date");
-          System.out.println(value.toString());
+          System.out.println(value);
           return true;
         } else if (String.class.isAssignableFrom(clazz)) {
           System.out.println("Date as String");
-          System.out.println(value.toString());
+          System.out.println(value);
           try {
             JAVASCRIPT_DATE_FORMAT.parse((String) value);
             return true;
@@ -121,7 +114,7 @@ public class AssayService {
           }
         } else {
           System.out.println("Date as integer");
-          System.out.println(value.toString());
+          System.out.println(value);
           try {
             new Date((long) value);
             return true;
@@ -145,13 +138,15 @@ public class AssayService {
     for (AssayTypeField assayTypeField : assay.getAssayType().getFields()) {
       if (!assay.getFields().containsKey(assayTypeField.getFieldName())) {
         throw new InvalidConstraintException(
-            String.format("Assay %s does not have field %s defined in fields attribute.",
+            String.format(
+                "Assay %s does not have field %s defined in fields attribute.",
                 assay.getName(), assayTypeField.getFieldName()));
       }
       Object value = assay.getFields().get(assayTypeField.getFieldName());
       if (assayTypeField.isRequired() && value == null) {
         throw new InvalidConstraintException(
-            String.format("Assay %s does not have required field %s set in fields attribute.",
+            String.format(
+                "Assay %s does not have required field %s set in fields attribute.",
                 assay.getName(), assayTypeField.getFieldName()));
       }
       if (value != null && !isValidFieldType(value, assayTypeField.getType())) {
@@ -163,8 +158,7 @@ public class AssayService {
                 assayTypeField.getFieldName(),
                 assayTypeField.getType().toString(),
                 value.getClass().getName(),
-                assayTypeField.getType().toString()
-            ));
+                assayTypeField.getType().toString()));
       }
     }
   }
@@ -183,13 +177,17 @@ public class AssayService {
     assay.setCode(namingService.generateAssayCode(assay));
     assay.setActive(true);
 
-    for (AssayTask task: assay.getTasks()) {
+    for (AssayTask task : assay.getTasks()) {
       task.setAssay(assay);
     }
 
     // Get the study
-    Study study = studyRepository.findById(assay.getStudy().getId())
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find study: " + assay.getStudy().getId()));
+    Study study =
+        studyRepository
+            .findById(assay.getStudy().getId())
+            .orElseThrow(
+                () ->
+                    new RecordNotFoundException("Cannot find study: " + assay.getStudy().getId()));
 
     // Create the storage folder
     try {
@@ -225,7 +223,6 @@ public class AssayService {
     }
 
     assayRepository.save(assay);
-
   }
 
   @Transactional
@@ -242,10 +239,10 @@ public class AssayService {
     assay.setUsers(updated.getUsers());
     assay.setAttributes(updated.getAttributes());
     assay.setFields(updated.getFields());
-//    assay.setTasks(updated.getTasks());
+    //    assay.setTasks(updated.getTasks());
 
     // Update the tasks
-    for (AssayTask task: updated.getTasks()) {
+    for (AssayTask task : updated.getTasks()) {
       if (task.getId() != null) {
         AssayTask t = assayTaskRepository.getById(task.getId());
         t.setStatus(task.getStatus());
@@ -261,7 +258,6 @@ public class AssayService {
     assayRepository.save(assay);
 
     return assay;
-
   }
 
   @Transactional
@@ -350,7 +346,5 @@ public class AssayService {
       a.setNotebookFolder(f);
       assayRepository.save(a);
     }
-
   }
-
 }

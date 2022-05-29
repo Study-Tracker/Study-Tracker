@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(DatabaseAuthenticationProvider.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(DatabaseAuthenticationProvider.class);
 
   private final PasswordEncoder passwordEncoder;
 
@@ -24,8 +24,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
   @Autowired
   public DatabaseAuthenticationProvider(
-      PasswordEncoder passwordEncoder,
-      AppUserDetailsService userDetailsService) {
+      PasswordEncoder passwordEncoder, AppUserDetailsService userDetailsService) {
     this.passwordEncoder = passwordEncoder;
     this.userDetailsService = userDetailsService;
   }
@@ -39,8 +38,8 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         authentication.getCredentials() == null ? null : authentication.getCredentials().toString();
     if (passwordEncoder.matches(pw, userDetails.getPassword())) {
       LOGGER.warn("User successfully logged in: {}", authentication.getPrincipal().toString());
-      return new UsernamePasswordAuthenticationToken(userDetails.getUser().getUsername(), pw,
-          Collections.emptyList());
+      return new UsernamePasswordAuthenticationToken(
+          userDetails.getUser().getUsername(), pw, Collections.emptyList());
     } else {
       LOGGER.error("User failed to log in: {}", authentication.getPrincipal().toString());
       throw new BadCredentialsException("Bad password");

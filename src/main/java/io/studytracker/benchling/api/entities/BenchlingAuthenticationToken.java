@@ -16,5 +16,4 @@ public class BenchlingAuthenticationToken {
 
   @JsonProperty("token_type")
   private String tokenType;
-
 }

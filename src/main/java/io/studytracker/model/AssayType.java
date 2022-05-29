@@ -40,17 +40,24 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "assay-type-details", attributeNodes = {
-        @NamedAttributeNode("fields"),
-        @NamedAttributeNode("tasks")
-    })
+  @NamedEntityGraph(
+      name = "assay-type-details",
+      attributeNodes = {@NamedAttributeNode("fields"), @NamedAttributeNode("tasks")})
 })
 public class AssayType extends CustomEntity {
 
-  @OneToMany(mappedBy = "assayType", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "assayType",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   private Set<AssayTypeField> fields = new HashSet<>();
 
-  @OneToMany(mappedBy = "assayType", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "assayType",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   private Set<AssayTypeTask> tasks = new HashSet<>();
 
   @Type(type = "json")
@@ -96,7 +103,7 @@ public class AssayType extends CustomEntity {
   }
 
   public void setFields(Set<AssayTypeField> fields) {
-    for (AssayTypeField field: fields) {
+    for (AssayTypeField field : fields) {
       field.setAssayType(this);
     }
     this.fields = fields;
@@ -107,7 +114,7 @@ public class AssayType extends CustomEntity {
   }
 
   public void setTasks(Set<AssayTypeTask> tasks) {
-    for (AssayTypeTask task :tasks) {
+    for (AssayTypeTask task : tasks) {
       task.setAssayType(this);
     }
     this.tasks = tasks;

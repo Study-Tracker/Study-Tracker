@@ -58,23 +58,17 @@ public class LocalStorageStudyStorageServiceTests {
 
   private static final Resource TEST_FILE = new ClassPathResource("test.txt");
 
-  @Autowired
-  private LocalFileSystemStudyStorageService storageService;
+  @Autowired private LocalFileSystemStudyStorageService storageService;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private AssayTypeRepository assayTypeRepository;
+  @Autowired private AssayTypeRepository assayTypeRepository;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -140,15 +134,15 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertNull(exception);
     Assert.assertNotNull(file);
     Assert.assertTrue(file.getPath().endsWith("test.txt"));
-
   }
 
   @Test
   public void getInvalidStudyFolderTest() {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setName("Test study");
     study.setProgram(program);
@@ -168,12 +162,11 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertNull(folder);
   }
 
-
   @Test
   public void assayFolderTests() throws Exception {
 
-    AssayType assayType = assayTypeRepository.findByName("Generic")
-        .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
 
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
@@ -242,16 +235,14 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertNull(exception);
     Assert.assertNotNull(file);
     Assert.assertTrue(file.getPath().endsWith("test.txt"));
-
   }
 
   @Test
   public void getInvalidAssayFolderTest() {
 
-    Study study = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    AssayType assayType = assayTypeRepository.findByName("Generic")
-        .orElseThrow(RecordNotFoundException::new);
+    Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
     assay.setName("Test assay");
     assay.setCode("CPA-10001-XXXXX");
@@ -270,6 +261,4 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertTrue(exception instanceof StudyStorageNotFoundException);
     Assert.assertNull(folder);
   }
-
-
 }

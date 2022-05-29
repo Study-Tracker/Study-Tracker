@@ -33,11 +33,9 @@ public class StudyExternalLinkService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyExternalLinkService.class);
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private ExternalLinkRepository externalLinkRepository;
+  @Autowired private ExternalLinkRepository externalLinkRepository;
 
   public List<ExternalLink> findAllStudyExternalLinks(Study study) {
     return externalLinkRepository.findByStudyId(study.getId());
@@ -49,8 +47,8 @@ public class StudyExternalLinkService {
 
   @Transactional
   public void addStudyExternalLink(Study study, ExternalLink externalLink) {
-    LOGGER.info(String.format("Adding new external link for study %s: %s",
-        study.getCode(), externalLink));
+    LOGGER.info(
+        String.format("Adding new external link for study %s: %s", study.getCode(), externalLink));
     study.addExternalLink(externalLink);
     studyRepository.save(study);
   }
@@ -66,11 +64,10 @@ public class StudyExternalLinkService {
   @Transactional
   public void deleteStudyExternalLink(Study study, Long linkId) {
     study.removeExternalLink(linkId);
-//    externalLinkRepository.deleteById(linkId);
-//    externalLinkRepository.flush();
-//    Study s = studyRepository.getById(study.getId());
-//    s.setUpdatedAt(new Date());
+    //    externalLinkRepository.deleteById(linkId);
+    //    externalLinkRepository.flush();
+    //    Study s = studyRepository.getById(study.getId());
+    //    s.setUpdatedAt(new Date());
     studyRepository.save(study);
   }
-
 }

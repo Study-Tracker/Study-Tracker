@@ -2,8 +2,7 @@ package io.studytracker.exception;
 
 public class UnknownUserException extends RuntimeException {
 
-  public UnknownUserException() {
-  }
+  public UnknownUserException() {}
 
   public UnknownUserException(String message) {
     super(message);
@@ -17,8 +16,8 @@ public class UnknownUserException extends RuntimeException {
     super(cause);
   }
 
-  public UnknownUserException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public UnknownUserException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

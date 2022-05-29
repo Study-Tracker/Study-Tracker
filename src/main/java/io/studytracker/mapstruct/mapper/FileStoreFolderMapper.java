@@ -7,5 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface FileStoreFolderMapper {
   FileStoreFolder fromDto(FileStoreFolderDto dto);
+
   FileStoreFolderDto toDto(FileStoreFolder folder);
 }

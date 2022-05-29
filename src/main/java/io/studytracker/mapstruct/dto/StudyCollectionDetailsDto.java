@@ -18,5 +18,4 @@ public class StudyCollectionDetailsDto {
   private Date createdAt;
   private Date updatedAt;
   private Set<StudySummaryDto> studies = new HashSet<>();
-
 }

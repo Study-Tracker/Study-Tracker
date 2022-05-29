@@ -35,7 +35,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "external_links")
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "link-only", attributeNodes = {})
+  @NamedEntityGraph(
+      name = "link-only",
+      attributeNodes = {})
 })
 public class ExternalLink {
 

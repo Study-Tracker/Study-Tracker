@@ -41,9 +41,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "comments")
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "comment-details", attributeNodes = {
-        @NamedAttributeNode("createdBy")
-    })
+  @NamedEntityGraph(
+      name = "comment-details",
+      attributeNodes = {@NamedAttributeNode("createdBy")})
 })
 public class Comment {
 

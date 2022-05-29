@@ -9,5 +9,4 @@ public interface AssayTaskRepository extends JpaRepository<AssayTask, Long> {
 
   @Query("select v from AssayTask v where v.assay.id = ?1")
   List<AssayTask> findByAssayId(Long assayId);
-
 }

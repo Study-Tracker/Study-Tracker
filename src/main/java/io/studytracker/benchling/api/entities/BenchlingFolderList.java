@@ -11,5 +11,4 @@ public class BenchlingFolderList {
 
   private List<BenchlingFolder> folders = new ArrayList<>();
   private String nextToken;
-
 }

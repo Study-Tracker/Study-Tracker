@@ -14,12 +14,12 @@ public class StudySearchHit<T extends StudySearchDocument<?>> {
   private Float score;
   private Map<String, List<String>> highlightFields = new LinkedHashMap<>();
 
-  public static StudySearchHit<ElasticsearchStudyDocument> fromElasticsearchSearchHit(SearchHit<ElasticsearchStudyDocument> esHit) {
+  public static StudySearchHit<ElasticsearchStudyDocument> fromElasticsearchSearchHit(
+      SearchHit<ElasticsearchStudyDocument> esHit) {
     StudySearchHit<ElasticsearchStudyDocument> hit = new StudySearchHit<>();
     hit.setDocument(esHit.getContent());
     hit.setScore(esHit.getScore());
     hit.setHighlightFields(esHit.getHighlightFields());
     return hit;
   }
-
 }

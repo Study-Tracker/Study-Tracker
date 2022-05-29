@@ -13,13 +13,18 @@ public interface NotebookEntryTemplateMapper {
   NotebookEntryTemplate fromForm(NotebookEntryTemplateFormDto dto);
 
   NotebookEntryTemplateDetailsDto toDetails(NotebookEntryTemplate template);
+
   List<NotebookEntryTemplateDetailsDto> toDetailsList(List<NotebookEntryTemplate> templates);
+
   NotebookEntryTemplate fromDetails(NotebookEntryTemplateDetailsDto dto);
+
   List<NotebookEntryTemplate> fromDetailsList(List<NotebookEntryTemplateDetailsDto> dtos);
 
   NotebookEntryTemplateSlimDto toSlim(NotebookEntryTemplate template);
-  List<NotebookEntryTemplateSlimDto> toSlimList(List<NotebookEntryTemplate> templates);
-  NotebookEntryTemplate fromSlim(NotebookEntryTemplateSlimDto dto);
-  List<NotebookEntryTemplate> fromSlimList(List<NotebookEntryTemplateSlimDto> dtos);
 
+  List<NotebookEntryTemplateSlimDto> toSlimList(List<NotebookEntryTemplate> templates);
+
+  NotebookEntryTemplate fromSlim(NotebookEntryTemplateSlimDto dto);
+
+  List<NotebookEntryTemplate> fromSlimList(List<NotebookEntryTemplateSlimDto> dtos);
 }

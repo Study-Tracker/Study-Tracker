@@ -38,11 +38,9 @@ public class UserService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private PasswordResetTokenRepository passwordResetTokenRepository;
+  @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
   public Optional<User> findById(Long id) {
     return userRepository.findById(id);
@@ -138,7 +136,6 @@ public class UserService {
     token.setExpirationDate(calendar.getTime());
 
     return passwordResetTokenRepository.save(token);
-
   }
 
   public PasswordResetToken createPasswordResetToken(User user) {
@@ -167,9 +164,11 @@ public class UserService {
 
   @Transactional
   public void deletePasswordResetToken(String token) {
-    PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token)
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find password reset token: " + token));
+    PasswordResetToken passwordResetToken =
+        passwordResetTokenRepository
+            .findByToken(token)
+            .orElseThrow(
+                () -> new RecordNotFoundException("Cannot find password reset token: " + token));
     passwordResetTokenRepository.deleteById(passwordResetToken.getId());
   }
-
 }

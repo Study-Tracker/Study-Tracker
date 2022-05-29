@@ -33,21 +33,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ActivityController {
 
-  @Autowired
-  private ActivityService activityService;
+  @Autowired private ActivityService activityService;
 
-  @Autowired
-  private ActivityMapper activityMapper;
+  @Autowired private ActivityMapper activityMapper;
 
   @GetMapping("/{id}")
   public ActivityDetailsDto findById(@PathVariable Long id) {
-    return activityMapper.toActivityDetails(activityService.findById(id)
-        .orElseThrow(() -> new RecordNotFoundException("Could not find activity record: " + id)));
+    return activityMapper.toActivityDetails(
+        activityService
+            .findById(id)
+            .orElseThrow(
+                () -> new RecordNotFoundException("Could not find activity record: " + id)));
   }
 
   @GetMapping(value = "")
   public Page<ActivitySummaryDto> getActivity(Pageable pageable) {
     return activityMapper.toActivitySummaryPage(activityService.findAll(pageable));
   }
-
 }

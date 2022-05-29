@@ -63,14 +63,11 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingNotebookService.class);
 
-  @Autowired
-  private BenchlingElnRestClient client;
+  @Autowired private BenchlingElnRestClient client;
 
-  @Autowired
-  private NamingService namingService;
+  @Autowired private NamingService namingService;
 
-  @Autowired
-  private ELNFolderRepository elnFolderRepository;
+  @Autowired private ELNFolderRepository elnFolderRepository;
 
   @Value("${benchling.tenant-name}")
   private String tenantName;
@@ -102,8 +99,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
   /**
    * Generates an Authorization header to be used in REST API requests. The header will acquired
-   *  based on the provided configuration. If an application client is provided, a Bearer token
-   *  will be generated. Otherwise, a HTTP Basic auth header will be used.
+   * based on the provided configuration. If an application client is provided, a Bearer token will
+   * be generated. Otherwise, a HTTP Basic auth header will be used.
    *
    * @return token
    */
@@ -115,8 +112,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
       byte[] bytes = Base64.encodeBase64(auth.getBytes(StandardCharsets.US_ASCII));
       return "Basic " + new String(bytes);
     } else {
-      BenchlingAuthenticationToken benchlingAuthenticationToken
-          = client.acquireApplicationAuthenticationToken(clientId, clientSecret);
+      BenchlingAuthenticationToken benchlingAuthenticationToken =
+          client.acquireApplicationAuthenticationToken(clientId, clientSecret);
       String token = benchlingAuthenticationToken.getAccessToken();
       return "Bearer " + token;
     }
@@ -129,12 +126,17 @@ public final class BenchlingNotebookService implements StudyNotebookService {
    * @return
    */
   private String createFolderUrl(BenchlingFolder folder) {
-    return rootFolderUrl + "/" + folder.getId().replace("lib_", "") + "-"
-        + folder.getName().toLowerCase()
-        .replaceAll(" ", "-")
-        .replaceAll("[^A-Za-z0-9-_\\s()]+", "")
-        .replaceAll("[\\()]", "")
-        .trim();
+    return rootFolderUrl
+        + "/"
+        + folder.getId().replace("lib_", "")
+        + "-"
+        + folder
+            .getName()
+            .toLowerCase()
+            .replaceAll(" ", "-")
+            .replaceAll("[^A-Za-z0-9-_\\s()]+", "")
+            .replaceAll("[\\()]", "")
+            .trim();
   }
 
   /**
@@ -168,9 +170,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
   }
 
   /**
-   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} via
-   *  {@link #convertBenchlingFolder(BenchlingFolder)}, without loading the contents of linked
-   *  entries.
+   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} via {@link
+   * #convertBenchlingFolder(BenchlingFolder)}, without loading the contents of linked entries.
    *
    * @param benchlingFolder
    * @return
@@ -180,16 +181,16 @@ public final class BenchlingNotebookService implements StudyNotebookService {
   }
 
   /**
-   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} via
-   *  {@link #convertBenchlingFolder(BenchlingFolder)}, loading the contents of linked
-   *  {@link BenchlingEntry} entries.
+   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} via {@link
+   * #convertBenchlingFolder(BenchlingFolder)}, loading the contents of linked {@link
+   * BenchlingEntry} entries.
    *
    * @param benchlingFolder
    * @param entries
    * @return
    */
-  private NotebookFolder convertFolder(BenchlingFolder benchlingFolder,
-      List<BenchlingEntry> entries, String authHeader) {
+  private NotebookFolder convertFolder(
+      BenchlingFolder benchlingFolder, List<BenchlingEntry> entries, String authHeader) {
     NotebookFolder notebookFolder = convertBenchlingFolder(benchlingFolder);
     if (entries != null) {
       loadContents(benchlingFolder, notebookFolder, entries, authHeader);
@@ -204,9 +205,10 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     return template;
   }
 
-  private List<NotebookTemplate> convertNotebookEntryTemplates(List<BenchlingEntryTemplate> benchlingEntryTemplates) {
+  private List<NotebookTemplate> convertNotebookEntryTemplates(
+      List<BenchlingEntryTemplate> benchlingEntryTemplates) {
     List<NotebookTemplate> templates = new ArrayList<>();
-    for (BenchlingEntryTemplate benchlingEntryTemplate: benchlingEntryTemplates) {
+    for (BenchlingEntryTemplate benchlingEntryTemplate : benchlingEntryTemplates) {
       templates.add(this.convertNotebookEntryTemplate(benchlingEntryTemplate));
     }
     return templates;
@@ -223,37 +225,40 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
   private List<NotebookUser> convertUsers(List<BenchlingUser> benchlingUsers) {
     List<NotebookUser> notebookUsers = new ArrayList<>();
-    for (BenchlingUser benchlingUser: benchlingUsers) {
+    for (BenchlingUser benchlingUser : benchlingUsers) {
       notebookUsers.add(this.convertUser(benchlingUser));
     }
     return notebookUsers;
   }
 
   /**
-   * Loads the contents of {@link BenchlingFolder} folders and appends them to the referenced
-   *  {@link NotebookFolder} object.
+   * Loads the contents of {@link BenchlingFolder} folders and appends them to the referenced {@link
+   * NotebookFolder} object.
    *
    * @param benchlingFolder
    * @param notebookFolder
    * @param entries
    */
-  private void loadContents(BenchlingFolder benchlingFolder, NotebookFolder notebookFolder,
-      List<BenchlingEntry> entries, String authHeader) {
+  private void loadContents(
+      BenchlingFolder benchlingFolder,
+      NotebookFolder notebookFolder,
+      List<BenchlingEntry> entries,
+      String authHeader) {
     entries.stream()
-            .filter(entry -> entry.getFolderId().equals(benchlingFolder.getId()))
-            .forEach(entry -> notebookFolder.getEntries().add(convertBenchlingEntry(entry)));
+        .filter(entry -> entry.getFolderId().equals(benchlingFolder.getId()))
+        .forEach(entry -> notebookFolder.getEntries().add(convertBenchlingEntry(entry)));
     List<BenchlingFolder> childrenFolders = new ArrayList<>();
     boolean hasNext = true;
     String nextToken = null;
     while (hasNext) {
-      BenchlingFolderList folderList = client.findFolderChildren(benchlingFolder.getId(),
-          authHeader, nextToken);
+      BenchlingFolderList folderList =
+          client.findFolderChildren(benchlingFolder.getId(), authHeader, nextToken);
       childrenFolders.addAll(folderList.getFolders());
       nextToken = folderList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
     }
-    childrenFolders.forEach(folder ->
-        notebookFolder.getSubFolders().add(convertFolder(folder, entries, authHeader)));
+    childrenFolders.forEach(
+        folder -> notebookFolder.getSubFolders().add(convertFolder(folder, entries, authHeader)));
   }
 
   /**
@@ -263,10 +268,13 @@ public final class BenchlingNotebookService implements StudyNotebookService {
    * @return
    */
   private String getProjectPath(NotebookFolder folder, String authHeader) {
-    return client.findFolderById(folder.getReferenceId(), authHeader)
-            .flatMap(benchlingFolder ->
-                client.findProjectById(benchlingFolder.getProjectId(), authHeader))
-            .map(BenchlingProject::getName).map(name -> name + "/").orElse("");
+    return client
+        .findFolderById(folder.getReferenceId(), authHeader)
+        .flatMap(
+            benchlingFolder -> client.findProjectById(benchlingFolder.getProjectId(), authHeader))
+        .map(BenchlingProject::getName)
+        .map(name -> name + "/")
+        .orElse("");
   }
 
   /**
@@ -278,8 +286,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
   private String getNotebookFolderPath(Study study, String authHeader) {
     StringBuilder path = new StringBuilder("/");
     NotebookFolder studyFolder = NotebookFolder.from(study.getNotebookFolder());
-    path.append(getProjectPath(studyFolder, authHeader))
-        .append(study.getName());
+    path.append(getProjectPath(studyFolder, authHeader)).append(study.getName());
     return path.toString();
   }
 
@@ -294,41 +301,35 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     NotebookFolder assayFolder = NotebookFolder.from(assay.getNotebookFolder());
     path.append(getProjectPath(assayFolder, authHeader));
     Study study = assay.getStudy();
-    path.append(study.getName())
-        .append("/")
-        .append(assay.getName());
+    path.append(study.getName()).append("/").append(assay.getName());
     return path.toString();
   }
 
   /**
    * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} and fetches it contents for the
-   *  given {@link Assay}.
+   * given {@link Assay}.
    *
    * @param benchlingFolder
    * @param assay
    * @return
    */
-  private NotebookFolder getContentFullNotebookFolder(BenchlingFolder benchlingFolder, Assay assay,
-      String authHeader) {
+  private NotebookFolder getContentFullNotebookFolder(
+      BenchlingFolder benchlingFolder, Assay assay, String authHeader) {
 
     // Get notebook entries
     List<BenchlingEntry> entries = new ArrayList<>();
     String nextToken = null;
     boolean hasNext = true;
     while (hasNext) {
-      BenchlingEntryList entryList = client.findProjectEntries(benchlingFolder.getProjectId(),
-          authHeader, nextToken);
+      BenchlingEntryList entryList =
+          client.findProjectEntries(benchlingFolder.getProjectId(), authHeader, nextToken);
       entries.addAll(entryList.getEntries());
       nextToken = entryList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
     }
 
     // Convert the folder object
-    NotebookFolder notebookFolder = convertFolder(
-        benchlingFolder,
-        entries,
-        authHeader
-    );
+    NotebookFolder notebookFolder = convertFolder(benchlingFolder, entries, authHeader);
     String path = getNotebookFolderPath(assay, authHeader);
     notebookFolder.setPath(path);
 
@@ -337,31 +338,27 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
   /**
    * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} and fetches it contents for the
-   *  given {@link Study}.
+   * given {@link Study}.
    *
    * @param benchlingFolder
    * @param study
    * @return
    */
-  private NotebookFolder getContentFullNotebookFolder(BenchlingFolder benchlingFolder, Study study,
-      String authHeader) {
+  private NotebookFolder getContentFullNotebookFolder(
+      BenchlingFolder benchlingFolder, Study study, String authHeader) {
 
     List<BenchlingEntry> entries = new ArrayList<>();
     String nextToken = null;
     boolean hasNext = true;
     while (hasNext) {
-      BenchlingEntryList entryList = client.findProjectEntries(benchlingFolder.getProjectId(),
-          authHeader, nextToken);
+      BenchlingEntryList entryList =
+          client.findProjectEntries(benchlingFolder.getProjectId(), authHeader, nextToken);
       entries.addAll(entryList.getEntries());
       nextToken = entryList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
     }
 
-    NotebookFolder notebookFolder = convertFolder(
-        benchlingFolder,
-        entries,
-        authHeader
-    );
+    NotebookFolder notebookFolder = convertFolder(benchlingFolder, entries, authHeader);
     String path = getNotebookFolderPath(study, authHeader);
     notebookFolder.setPath(path);
 
@@ -384,12 +381,11 @@ public final class BenchlingNotebookService implements StudyNotebookService {
           String.format("Program %s does not have a notebook folder set.", program.getName()));
       return Optional.empty();
     }
-
   }
 
   @Override
   public Optional<NotebookFolder> findStudyFolder(Study study) {
-      return findStudyFolder(study, true);
+    return findStudyFolder(study, true);
   }
 
   private Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents) {
@@ -403,18 +399,18 @@ public final class BenchlingNotebookService implements StudyNotebookService {
       NotebookFolder studyFolder = NotebookFolder.from(elnFolderOptional.get());
       Optional<BenchlingFolder> optional =
           client.findFolderById(studyFolder.getReferenceId(), authHeader);
-      return optional.flatMap(folder -> {
-          if (includeContents) {
+      return optional.flatMap(
+          folder -> {
+            if (includeContents) {
               return Optional.of(getContentFullNotebookFolder(folder, study, authHeader));
-          } else {
+            } else {
               return Optional.of(this.convertFolder(folder, authHeader));
-          }
-      });
+            }
+          });
     } else {
       LOGGER.warn(String.format("Study %s does not have a notebook folder set.", study.getName()));
       return Optional.empty();
     }
-
   }
 
   @Override
@@ -428,34 +424,35 @@ public final class BenchlingNotebookService implements StudyNotebookService {
       NotebookFolder assayFolder = NotebookFolder.from(elnFolderOptional.get());
       Optional<BenchlingFolder> optional =
           client.findFolderById(assayFolder.getReferenceId(), authHeader);
-      return optional.flatMap(folder -> Optional.of(getContentFullNotebookFolder(folder, assay, authHeader)));
+      return optional.flatMap(
+          folder -> Optional.of(getContentFullNotebookFolder(folder, assay, authHeader)));
     } else {
       LOGGER.warn(String.format("Assay %s does not have a notebook folder set.", assay.getName()));
       return Optional.empty();
     }
-
   }
 
   @Override
   public NotebookFolder createProgramFolder(Program program) throws NotebookException {
-    LOGGER.info("Registering new program folder. NOTE: Benchling does not support project "
-        + "creation, so a valid folderId must be provided when registering new programs.");
+    LOGGER.info(
+        "Registering new program folder. NOTE: Benchling does not support project "
+            + "creation, so a valid folderId must be provided when registering new programs.");
     if (program.getNotebookFolder() != null
         && program.getNotebookFolder().getReferenceId() != null) {
       String authHeader = generateAuthorizationHeader();
       try {
-        BenchlingFolder folder = client.findFolderById(
-            program.getNotebookFolder().getReferenceId(),
-            authHeader
-        ).get();
+        BenchlingFolder folder =
+            client.findFolderById(program.getNotebookFolder().getReferenceId(), authHeader).get();
         return this.convertFolder(folder, authHeader);
       } catch (Exception e) {
         LOGGER.error("Failed to register new program: " + program.getName());
         throw new NotebookException(e);
       }
     } else {
-      throw new MalformedEntityException("Program folder ID is not set, cannot create "
-          + "NotebookFolder record for program: " + program.getName());
+      throw new MalformedEntityException(
+          "Program folder ID is not set, cannot create "
+              + "NotebookFolder record for program: "
+              + program.getName());
     }
   }
 
@@ -471,17 +468,15 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     NotebookFolder programFolder = programFolderOptional.get();
 
     String authHeader = generateAuthorizationHeader();
-    BenchlingFolder benchlingFolder = client.createFolder(
-        namingService.getStudyNotebookFolderName(study),
-        programFolder.getReferenceId(),
-        authHeader
-    );
+    BenchlingFolder benchlingFolder =
+        client.createFolder(
+            namingService.getStudyNotebookFolderName(study),
+            programFolder.getReferenceId(),
+            authHeader);
     NotebookFolder studyFolder = this.convertFolder(benchlingFolder, authHeader);
     studyFolder.setParentFolder(programFolder);
     return studyFolder;
-
   }
-
 
   @Override
   public NotebookFolder createAssayFolder(Assay assay) {
@@ -495,16 +490,15 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     NotebookFolder studyFolder = studyFolderOptional.get();
 
     String authHeader = generateAuthorizationHeader();
-    BenchlingFolder benchlingFolder = client.createFolder(
-        namingService.getAssayNotebookFolderName(assay),
-        studyFolder.getReferenceId(),
-        authHeader
-    );
+    BenchlingFolder benchlingFolder =
+        client.createFolder(
+            namingService.getAssayNotebookFolderName(assay),
+            studyFolder.getReferenceId(),
+            authHeader);
     NotebookFolder assayFolder = this.convertFolder(benchlingFolder, authHeader);
     assayFolder.setParentFolder(studyFolder);
 
     return assayFolder;
-
   }
 
   @Override
@@ -546,12 +540,12 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
     // Users
     List<String> userIds = new ArrayList<>();
-    for (User user: study.getUsers()) {
+    for (User user : study.getUsers()) {
       Optional<NotebookUser> userOptional = this.findNotebookUser(user);
       if (userOptional.isPresent()) {
         userIds.add(userOptional.get().getReferenceId());
       } else {
-        LOGGER.warn("Could not find user registered in Benchling: " + user.toString());
+        LOGGER.warn("Could not find user registered in Benchling: " + user);
       }
     }
     request.setAuthorIds(userIds);
@@ -565,8 +559,8 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     Map<String, CustomField> customFields = new LinkedHashMap<>();
     customFields.put("Name", new CustomField(study.getName()));
     customFields.put("Code", new CustomField(study.getCode()));
-    customFields.put("Description",
-        new CustomField(study.getDescription().replaceAll("<.+?>", "")));
+    customFields.put(
+        "Description", new CustomField(study.getDescription().replaceAll("<.+?>", "")));
     customFields.put("Program", new CustomField(study.getProgram().getName()));
     if (study.getExternalCode() != null) {
       customFields.put("External Code", new CustomField(study.getExternalCode()));
@@ -575,7 +569,6 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
     String authHeader = generateAuthorizationHeader();
     return this.convertBenchlingEntry(client.createEntry(request, authHeader));
-
   }
 
   @Override
@@ -593,12 +586,12 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
     // Users
     List<String> userIds = new ArrayList<>();
-    for (User user: assay.getUsers()) {
+    for (User user : assay.getUsers()) {
       Optional<NotebookUser> userOptional = this.findNotebookUser(user);
       if (userOptional.isPresent()) {
         userIds.add(userOptional.get().getReferenceId());
       } else {
-        LOGGER.warn("Could not find user registered in Benchling: " + user.toString());
+        LOGGER.warn("Could not find user registered in Benchling: " + user);
       }
     }
     request.setAuthorIds(userIds);
@@ -612,15 +605,14 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     Map<String, CustomField> customFields = new LinkedHashMap<>();
     customFields.put("Name", new CustomField(assay.getName()));
     customFields.put("Code", new CustomField(assay.getCode()));
-    customFields.put("Description",
-        new CustomField(assay.getDescription().replaceAll("<.+?>", "")));
+    customFields.put(
+        "Description", new CustomField(assay.getDescription().replaceAll("<.+?>", "")));
     customFields.put("Assay Type", new CustomField(assay.getAssayType().getName()));
     customFields.put("Study", new CustomField(assay.getStudy().getCode()));
     request.setCustomFields(customFields);
 
     String authHeader = generateAuthorizationHeader();
     return this.convertBenchlingEntry(client.createEntry(request, authHeader));
-
   }
 
   @Override
@@ -649,13 +641,14 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     String nextToken = null;
     boolean hasNext = true;
     while (hasNext) {
-      BenchlingUserList userList = client.findUsersByUsername(user.getUsername(), authHeader, nextToken);
+      BenchlingUserList userList =
+          client.findUsersByUsername(user.getUsername(), authHeader, nextToken);
       users.addAll(userList.getUsers());
       nextToken = userList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
     }
     if (!users.isEmpty()) {
-      for (BenchlingUser benchlingUser: users) {
+      for (BenchlingUser benchlingUser : users) {
         if (benchlingUser.getEmail().equals(user.getEmail())) {
           return Optional.of(this.convertUser(benchlingUser));
         }
@@ -673,7 +666,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
         hasNext = StringUtils.hasText(nextToken);
       }
       if (!users.isEmpty()) {
-        for (BenchlingUser benchlingUser: users) {
+        for (BenchlingUser benchlingUser : users) {
           if (benchlingUser.getEmail().equals(user.getEmail())) {
             return Optional.of(this.convertUser(benchlingUser));
           }
@@ -682,6 +675,5 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     }
 
     return Optional.empty();
-
   }
 }

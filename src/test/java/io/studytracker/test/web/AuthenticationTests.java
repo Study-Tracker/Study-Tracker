@@ -61,32 +61,23 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ActiveProfiles({"web-test", "example"})
 public class AuthenticationTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private Environment env;
+  @Autowired private Environment env;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private PasswordResetTokenRepository passwordResetTokenRepository;
+  @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  @Autowired private PasswordEncoder passwordEncoder;
 
-  @MockBean
-  private EmailService emailService;
+  @MockBean private EmailService emailService;
 
   @Before
   public void doBefore() {
@@ -107,16 +98,18 @@ public class AuthenticationTests {
 
   @Test
   public void accessOpenEndpointTest() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.get("/api/study/"))
+    mockMvc
+        .perform(MockMvcRequestBuilders.get("/api/study/"))
         .andExpect(MockMvcResultMatchers.status().isUnauthorized());
   }
 
   @Test
   public void postWithoutAuthenticationTest() throws Exception {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setStatus(Status.ACTIVE);
@@ -130,19 +123,22 @@ public class AuthenticationTests {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/api/study")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(study)))
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/study")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(MockMvcResultMatchers.status().isUnauthorized());
   }
 
   @Test
   public void postWithAuthenticationTest() throws Exception {
 
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setStatus(Status.ACTIVE);
@@ -156,33 +152,38 @@ public class AuthenticationTests {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/api/study")
-        .with(SecurityMockMvcRequestPostProcessors.httpBasic(
-            env.getRequiredProperty("security.example.user"),
-            env.getRequiredProperty("security.example.password")))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(study)))
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/study")
+                .with(
+                    SecurityMockMvcRequestPostProcessors.httpBasic(
+                        env.getRequiredProperty("security.example.user"),
+                        env.getRequiredProperty("security.example.password")))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(MockMvcResultMatchers.status().isCreated());
   }
 
   @Test
   public void passwordResetRequestTest() throws Exception {
 
-    Mockito.doNothing().when(emailService).sendPasswordResetEmail(Mockito.anyString(), Mockito.anyString());
+    Mockito.doNothing()
+        .when(emailService)
+        .sendPasswordResetEmail(Mockito.anyString(), Mockito.anyString());
 
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(0, passwordResetTokenRepository.findByUserId(user.getId()).size());
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/auth/passwordresetrequest")
-        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-        .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
-            new BasicNameValuePair("email", user.getEmail())
-        )))))
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/auth/passwordresetrequest")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .content(
+                    EntityUtils.toString(
+                        new UrlEncodedFormEntity(
+                            Arrays.asList(new BasicNameValuePair("email", user.getEmail()))))))
         .andExpect(MockMvcResultMatchers.status().isFound());
 
     Assert.assertEquals(1, passwordResetTokenRepository.findByUserId(user.getId()).size());
-
   }
-
 }

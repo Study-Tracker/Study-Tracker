@@ -59,23 +59,17 @@ public class ProgramControllerTests {
 
   private static final int NUM_PROGRAMS = 5;
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private ProgramMapper mapper;
+  @Autowired private ProgramMapper mapper;
 
   private String username;
 
@@ -89,25 +83,26 @@ public class ProgramControllerTests {
 
   @Test
   public void allProgramsTest() throws Exception {
-    mockMvc.perform(get("/api/program")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/program").with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(NUM_PROGRAMS)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("name")))
-        .andExpect(jsonPath("$[0]", hasKey("code")))
-    ;
+        .andExpect(jsonPath("$[0]", hasKey("code")));
   }
 
   @Test
   public void findProgramById() throws Exception {
 
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/program/" + program.getId())
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/program/" + program.getId()).with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
@@ -118,102 +113,113 @@ public class ProgramControllerTests {
         .andExpect(jsonPath("$.name", is("Clinical Program A")))
         .andExpect(jsonPath("$", hasKey("createdBy")))
         .andExpect(jsonPath("$.createdBy", hasKey("displayName")))
-        .andExpect(jsonPath("$.createdBy.displayName", notNullValue()))
-    ;
+        .andExpect(jsonPath("$.createdBy.displayName", notNullValue()));
   }
 
   @Test
   public void findNonExistantProgramTest() throws Exception {
-    mockMvc.perform(get("/api/program/999999")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/program/999999").with(user(username)))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void createProgramTest() throws Exception {
 
-    User user = userRepository.findByUsername("rblack")
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
 
     Program program = new Program();
     program.setName("Program X");
     program.setCode("PX");
     program.setActive(true);
 
-    mockMvc.perform(post("/api/program/")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
+    mockMvc
+        .perform(
+            post("/api/program/")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
         .andExpect(jsonPath("$", hasKey("name")))
         .andExpect(jsonPath("$.name", is("Program X")));
-
   }
 
   @Test
   public void createProgramWithoutAuthorizationTest() throws Exception {
-    mockMvc.perform(post("/api/program/")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(new Program())))
+    mockMvc
+        .perform(
+            post("/api/program/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new Program())))
         .andExpect(status().isUnauthorized());
   }
 
   @Test
   public void updateProgramTest() throws Exception {
 
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("rblack")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/program/" + program.getId())
-        .with(user(user.getUsername())))
+    mockMvc
+        .perform(get("/api/program/" + program.getId()).with(user(user.getUsername())))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("active")))
         .andExpect(jsonPath("$.active", is(true)));
 
     program.setActive(false);
 
-    mockMvc.perform(put("/api/program/" + program.getId())
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
+    mockMvc
+        .perform(
+            put("/api/program/" + program.getId())
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
         .andExpect(status().isOk());
   }
 
   @Test
   public void updateWithoutAutheotizationTest() throws Exception {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(put("/api/program/" + program.getId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(program)))
+    mockMvc
+        .perform(
+            put("/api/program/" + program.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(program)))
         .andExpect(status().isUnauthorized());
   }
 
   @Test
   public void deleteProgramTest() throws Exception {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("rblack")
-        .orElseThrow(RecordNotFoundException::new);
-    mockMvc.perform(delete("/api/program/" + program.getId())
-        .with(user(user.getUsername())))
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    mockMvc
+        .perform(delete("/api/program/" + program.getId()).with(user(user.getUsername())))
         .andExpect(status().isOk());
-    program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(program.isActive());
   }
 
   @Test
   public void deleteWithoutAuthorizationTest() throws Exception {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    mockMvc.perform(delete("/api/program/" + program.getId()))
-        .andExpect(status().isUnauthorized());
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    mockMvc.perform(delete("/api/program/" + program.getId())).andExpect(status().isUnauthorized());
   }
-
 }

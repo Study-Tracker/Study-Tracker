@@ -49,17 +49,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ActiveProfiles({"web-test", "example"})
 public class ActivityControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   private String username;
 
@@ -75,8 +71,8 @@ public class ActivityControllerTests {
     Study study = studyService.findAll().get(0);
     studyService.updateStatus(study, Status.ON_HOLD);
 
-    mockMvc.perform(get("/api/activity")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/activity").with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content", not(empty())))
@@ -84,7 +80,6 @@ public class ActivityControllerTests {
         .andExpect(jsonPath("$.content[0]", hasKey("eventType")))
         .andExpect(jsonPath("$.content[0]", hasKey("date")))
         .andExpect(jsonPath("$.content[0]", hasKey("data")));
-
   }
 
   @Test
@@ -94,8 +89,8 @@ public class ActivityControllerTests {
     studyService.updateStatus(study, Status.ON_HOLD);
     studyService.updateStatus(study, Status.COMPLETE);
 
-    mockMvc.perform(get("/api/activity?sort=date,desc")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/activity?sort=date,desc").with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
@@ -111,7 +106,6 @@ public class ActivityControllerTests {
         .andExpect(jsonPath("$.content[1]", hasKey("data")))
         .andExpect(jsonPath("$.content[1].data", hasKey("newStatus")))
         .andExpect(jsonPath("$.content[1].data.newStatus", is("COMPLETE")));
-
   }
 
   @Test
@@ -121,8 +115,8 @@ public class ActivityControllerTests {
     studyService.updateStatus(study, Status.ON_HOLD);
     studyService.updateStatus(study, Status.COMPLETE);
 
-    mockMvc.perform(get("/api/activity?size=2&page=0&sort=date,desc")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/activity?size=2&page=0&sort=date,desc").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$", hasKey("pageable")))
@@ -145,7 +139,5 @@ public class ActivityControllerTests {
         .andExpect(jsonPath("$.content[1]", hasKey("data")))
         .andExpect(jsonPath("$.content[1].data", hasKey("newStatus")))
         .andExpect(jsonPath("$.content[1].data.newStatus", is("COMPLETE")));
-
   }
-
 }

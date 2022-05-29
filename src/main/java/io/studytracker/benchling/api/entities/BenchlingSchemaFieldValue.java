@@ -12,5 +12,4 @@ public class BenchlingSchemaFieldValue {
   private String textValue;
   private String type;
   private String value;
-
 }

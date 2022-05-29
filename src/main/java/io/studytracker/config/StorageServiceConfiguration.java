@@ -50,7 +50,8 @@ public class StorageServiceConfiguration {
 
     @Bean
     public StudyStorageService localFileSystemStudyStorageService(Environment env) {
-      Assert.notNull(env.getProperty("storage.local-dir"),
+      Assert.notNull(
+          env.getProperty("storage.local-dir"),
           "Local storage directory is not set. Eg. storage.local-dir=/path/to/storage");
       Path path = Paths.get(env.getRequiredProperty("storage.local-dir"));
       LocalFileSystemStudyStorageService service = new LocalFileSystemStudyStorageService(path);
@@ -66,7 +67,6 @@ public class StorageServiceConfiguration {
       }
       return service;
     }
-
   }
 
   @Configuration
@@ -96,17 +96,23 @@ public class StorageServiceConfiguration {
     public ObjectMapper egnyteObjectMapper(Environment env) throws Exception {
       Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
       ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.registerModule(new SimpleModule() {{
-        addDeserializer(EgnyteObject.class,
-            new EgnyteObjectDeserializer(new URL(env.getRequiredProperty("egnyte.root-url"))));
-      }});
+      objectMapper.registerModule(
+          new SimpleModule() {
+            {
+              addDeserializer(
+                  EgnyteObject.class,
+                  new EgnyteObjectDeserializer(
+                      new URL(env.getRequiredProperty("egnyte.root-url"))));
+            }
+          });
       return objectMapper;
     }
 
     @Bean
     public RestTemplate egnyteRestTemplate(Environment env) throws Exception {
       RestTemplate restTemplate = new RestTemplateBuilder().build();
-      MappingJackson2HttpMessageConverter httpMessageConverter = new MappingJackson2HttpMessageConverter();
+      MappingJackson2HttpMessageConverter httpMessageConverter =
+          new MappingJackson2HttpMessageConverter();
       httpMessageConverter.setObjectMapper(egnyteObjectMapper(env));
       restTemplate.getMessageConverters().add(0, httpMessageConverter);
       return restTemplate;
@@ -127,8 +133,8 @@ public class StorageServiceConfiguration {
         options.setSleep(env.getRequiredProperty("egnyte.sleep", Integer.class));
       }
       if (env.containsProperty("storage.max-folder-read-depth")) {
-        options
-            .setMaxReadDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
+        options.setMaxReadDepth(
+            env.getRequiredProperty("storage.max-folder-read-depth", int.class));
       }
       if (env.containsProperty("storage.use-existing")) {
         options.setUseExisting(env.getRequiredProperty("storage.use-existing", boolean.class));
@@ -137,7 +143,8 @@ public class StorageServiceConfiguration {
     }
 
     @Bean
-    public EgnyteClientOperations egnyteClient(EgnyteOptions egnyteOptions, Environment env) throws Exception {
+    public EgnyteClientOperations egnyteClient(EgnyteOptions egnyteOptions, Environment env)
+        throws Exception {
       return new EgnyteRestApiClient(egnyteRestTemplate(env), egnyteOptions);
     }
 
@@ -146,7 +153,5 @@ public class StorageServiceConfiguration {
         EgnyteClientOperations egnyteClient, EgnyteOptions options) {
       return new EgnyteStudyStorageService(egnyteClient, options);
     }
-
   }
-
 }

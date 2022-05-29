@@ -101,14 +101,18 @@ public abstract class AbstractAssayController {
     // Assay team
     Set<User> team = new HashSet<>();
     for (User u : assay.getUsers()) {
-      team.add(userService.findById(u.getId())
-          .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
+      team.add(
+          userService
+              .findById(u.getId())
+              .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
     }
     assay.setUsers(team);
 
     // Owner
-    assay.setOwner(userService.findById(assay.getOwner().getId())
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
+    assay.setOwner(
+        userService
+            .findById(assay.getOwner().getId())
+            .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
 
     // Create the record
     assayService.create(assay, template);
@@ -123,7 +127,6 @@ public abstract class AbstractAssayController {
     eventsService.dispatchEvent(activity);
 
     return assay;
-
   }
 
   protected Assay createAssay(Assay assay, Study study, User user) {
@@ -142,14 +145,18 @@ public abstract class AbstractAssayController {
     // Assay team
     Set<User> team = new HashSet<>();
     for (User u : assay.getUsers()) {
-      team.add(userService.findById(u.getId())
-          .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
+      team.add(
+          userService
+              .findById(u.getId())
+              .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
     }
     assay.setUsers(team);
 
     // Owner
-    assay.setOwner(userService.findById(assay.getOwner().getId())
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
+    assay.setOwner(
+        userService
+            .findById(assay.getOwner().getId())
+            .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
 
     assayService.update(assay);
 
@@ -158,7 +165,6 @@ public abstract class AbstractAssayController {
     eventsService.dispatchEvent(activity);
 
     return assay;
-
   }
 
   /**
@@ -175,7 +181,6 @@ public abstract class AbstractAssayController {
     Activity activity = AssayActivityUtils.fromDeletedAssay(assay, user);
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
-
   }
 
   /**
@@ -196,7 +201,6 @@ public abstract class AbstractAssayController {
     Activity activity = AssayActivityUtils.fromChangedAssayStatus(assay, user, oldStatus, status);
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
-
   }
 
   /* Getters and Setters */
@@ -224,8 +228,7 @@ public abstract class AbstractAssayController {
   }
 
   @Autowired
-  public void setAssayTypeService(
-      AssayTypeService assayTypeService) {
+  public void setAssayTypeService(AssayTypeService assayTypeService) {
     this.assayTypeService = assayTypeService;
   }
 
@@ -261,8 +264,7 @@ public abstract class AbstractAssayController {
   }
 
   @Autowired(required = false)
-  public void setStudyNotebookService(
-      StudyNotebookService studyNotebookService) {
+  public void setStudyNotebookService(StudyNotebookService studyNotebookService) {
     this.studyNotebookService = studyNotebookService;
   }
 }

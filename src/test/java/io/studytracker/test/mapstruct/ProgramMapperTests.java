@@ -24,14 +24,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class ProgramMapperTests {
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private ProgramMapper programMapper;
+  @Autowired private ProgramMapper programMapper;
 
   @Before
   public void doBefore() {
@@ -50,8 +47,10 @@ public class ProgramMapperTests {
 
   @Test
   public void programDetailsMappingTest() {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
     ProgramDetailsDto dto = programMapper.toProgramDetails(program);
     Assert.assertNotNull(dto);
     Assert.assertEquals("Clinical Program A", dto.getName());
@@ -61,5 +60,4 @@ public class ProgramMapperTests {
     Assert.assertNotNull(created);
     Assert.assertNotNull(created.getCreatedBy().getDisplayName());
   }
-
 }

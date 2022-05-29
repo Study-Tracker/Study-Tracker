@@ -29,30 +29,33 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(UserAuthenticationSuccessHandler.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(UserAuthenticationSuccessHandler.class);
 
   @Override
   public void onAuthenticationSuccess(
-      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-      Authentication authentication
-  ) throws IOException, ServletException {
+      HttpServletRequest httpServletRequest,
+      HttpServletResponse httpServletResponse,
+      Authentication authentication)
+      throws IOException, ServletException {
     UserDetails user = (UserDetails) authentication.getPrincipal();
-    LOGGER.info(String.format(
-        "Successfully authenticated user %s with granted authorities: %s",
-        user.getUsername(),
-        user.getAuthorities().toString()
-    ));
+    LOGGER.info(
+        String.format(
+            "Successfully authenticated user %s with granted authorities: %s",
+            user.getUsername(), user.getAuthorities().toString()));
   }
 
   @Override
-  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-      FilterChain chain, Authentication authentication) throws IOException, ServletException {
+  public void onAuthenticationSuccess(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      FilterChain chain,
+      Authentication authentication)
+      throws IOException, ServletException {
     UserDetails user = (UserDetails) authentication.getPrincipal();
-    LOGGER.info(String.format(
-        "Successfully authenticated user %s with granted authorities: %s",
-        user.getUsername(),
-        user.getAuthorities().toString()
-    ));
+    LOGGER.info(
+        String.format(
+            "Successfully authenticated user %s with granted authorities: %s",
+            user.getUsername(), user.getAuthorities().toString()));
   }
 }

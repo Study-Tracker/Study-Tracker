@@ -37,15 +37,20 @@ public class EmailService {
   public void sendPasswordResetEmail(String emailAddress, String token) {
 
     if (mailSender == null) {
-      LOGGER.warn("Mail service is not configured. Check config properties and restart the application if necessary.");
+      LOGGER.warn(
+          "Mail service is not configured. Check config properties and restart the application if necessary.");
       return;
     }
 
-    String text = "You are receiving this email because a password reset request has been made for "
-        + "your account. To reset your password, click the link below and follow the provided "
-        + "instructions:\n\n" + getRootUrl() + "auth/passwordreset?token="
-        + URLEncoder.encode(token, StandardCharsets.UTF_8)
-        + "&email=" + URLEncoder.encode(emailAddress, StandardCharsets.UTF_8);
+    String text =
+        "You are receiving this email because a password reset request has been made for "
+            + "your account. To reset your password, click the link below and follow the provided "
+            + "instructions:\n\n"
+            + getRootUrl()
+            + "auth/passwordreset?token="
+            + URLEncoder.encode(token, StandardCharsets.UTF_8)
+            + "&email="
+            + URLEncoder.encode(emailAddress, StandardCharsets.UTF_8);
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(emailAddress);
@@ -58,15 +63,19 @@ public class EmailService {
   public void sendNewUserEmail(String emailAddress, String token) {
 
     if (mailSender == null) {
-      LOGGER.warn("Mail service is not configured. Check config properties and restart the application if necessary.");
+      LOGGER.warn(
+          "Mail service is not configured. Check config properties and restart the application if necessary.");
       return;
     }
 
-    String text = "Welcome to Study Tracker! To activate your account, click on the link below to "
-        + "confirm your registration and set a new password for your account.\n\n"
-        + getRootUrl() + "auth/passwordreset?token="
-        + URLEncoder.encode(token, StandardCharsets.UTF_8)
-        + "&email=" + URLEncoder.encode(emailAddress, StandardCharsets.UTF_8);
+    String text =
+        "Welcome to Study Tracker! To activate your account, click on the link below to "
+            + "confirm your registration and set a new password for your account.\n\n"
+            + getRootUrl()
+            + "auth/passwordreset?token="
+            + URLEncoder.encode(token, StandardCharsets.UTF_8)
+            + "&email="
+            + URLEncoder.encode(emailAddress, StandardCharsets.UTF_8);
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(emailAddress);
@@ -74,7 +83,6 @@ public class EmailService {
     message.setSubject("Welcome to Study Tracker");
     message.setText(text);
     mailSender.send(message);
-
   }
 
   @Autowired(required = false)

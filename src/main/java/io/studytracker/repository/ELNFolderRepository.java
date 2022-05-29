@@ -15,5 +15,4 @@ public interface ELNFolderRepository extends JpaRepository<ELNFolder, Long> {
 
   @Query("select f from ELNFolder f join Assay a on a.notebookFolder.id = f.id where a.id = ?1")
   Optional<ELNFolder> findByAssayId(Long assayId);
-
 }

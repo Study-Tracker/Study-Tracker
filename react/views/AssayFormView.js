@@ -20,6 +20,7 @@ import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import AssayForm from "../components/forms/AssayForm";
 import {connect} from "react-redux";
+import PropTypes from "prop-types";
 
 class AssayFormView extends React.Component {
 
@@ -113,6 +114,10 @@ class AssayFormView extends React.Component {
     );
   }
 
+}
+
+AssayFormView.propTypes = {
+  user: PropTypes.object.isRequired
 }
 
 export default connect(store => ({

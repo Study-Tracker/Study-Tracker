@@ -18,5 +18,4 @@ public class AssayTaskDto {
   private UserSlimDto lastModifiedBy;
   private UserSlimDto assignedTo;
   private Date dueDate;
-
 }

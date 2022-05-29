@@ -2,8 +2,7 @@ package io.studytracker.exception;
 
 public class InsufficientPrivilegesException extends StudyTrackerException {
 
-  public InsufficientPrivilegesException() {
-  }
+  public InsufficientPrivilegesException() {}
 
   public InsufficientPrivilegesException(String message) {
     super(message);
@@ -17,8 +16,8 @@ public class InsufficientPrivilegesException extends StudyTrackerException {
     super(cause);
   }
 
-  public InsufficientPrivilegesException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public InsufficientPrivilegesException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

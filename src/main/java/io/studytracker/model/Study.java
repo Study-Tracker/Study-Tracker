@@ -55,41 +55,41 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "studies", indexes = {
-    @Index(name = "idx_study_code", columnList = "code"),
-    @Index(name = "idx_study_name", columnList = "name")
-})
+@Table(
+    name = "studies",
+    indexes = {
+      @Index(name = "idx_study_code", columnList = "code"),
+      @Index(name = "idx_study_name", columnList = "name")
+    })
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = "study-summary",
-        attributeNodes = {
-            @NamedAttributeNode("program"),
-            @NamedAttributeNode("collaborator"),
-            @NamedAttributeNode("notebookFolder"),
-            @NamedAttributeNode("storageFolder"),
-            @NamedAttributeNode("owner")
-        }
-    ),
-    @NamedEntityGraph(
-        name = "study-with-attributes",
-        attributeNodes = {
-            @NamedAttributeNode("program"),
-            @NamedAttributeNode("collaborator"),
-            @NamedAttributeNode("notebookFolder"),
-            @NamedAttributeNode("storageFolder"),
-            @NamedAttributeNode("createdBy"),
-            @NamedAttributeNode("lastModifiedBy"),
-            @NamedAttributeNode("owner"),
-            @NamedAttributeNode("users"),
-            @NamedAttributeNode("keywords"),
-            @NamedAttributeNode("externalLinks"),
-            @NamedAttributeNode("conclusions"),
-            @NamedAttributeNode("comments"),
-            @NamedAttributeNode("studyRelationships")
-        }
-    )
+  @NamedEntityGraph(
+      name = "study-summary",
+      attributeNodes = {
+        @NamedAttributeNode("program"),
+        @NamedAttributeNode("collaborator"),
+        @NamedAttributeNode("notebookFolder"),
+        @NamedAttributeNode("storageFolder"),
+        @NamedAttributeNode("owner")
+      }),
+  @NamedEntityGraph(
+      name = "study-with-attributes",
+      attributeNodes = {
+        @NamedAttributeNode("program"),
+        @NamedAttributeNode("collaborator"),
+        @NamedAttributeNode("notebookFolder"),
+        @NamedAttributeNode("storageFolder"),
+        @NamedAttributeNode("createdBy"),
+        @NamedAttributeNode("lastModifiedBy"),
+        @NamedAttributeNode("owner"),
+        @NamedAttributeNode("users"),
+        @NamedAttributeNode("keywords"),
+        @NamedAttributeNode("externalLinks"),
+        @NamedAttributeNode("conclusions"),
+        @NamedAttributeNode("comments"),
+        @NamedAttributeNode("studyRelationships")
+      })
 })
 public class Study {
 
@@ -168,18 +168,24 @@ public class Study {
   private User owner;
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "study_users",
+  @JoinTable(
+      name = "study_users",
       joinColumns = @JoinColumn(name = "study_id", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
   private Set<User> users = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "study_keywords",
+  @JoinTable(
+      name = "study_keywords",
       joinColumns = @JoinColumn(name = "study_id", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "keyword_id", nullable = false))
   private Set<Keyword> keywords = new HashSet<>();
 
-  @OneToMany(mappedBy = "study", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "study",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonIgnore
   private Set<Assay> assays = new HashSet<>();
 
@@ -187,19 +193,36 @@ public class Study {
   @Column(name = "attributes", columnDefinition = "json")
   private Map<String, String> attributes = new LinkedHashMap<>();
 
-  @OneToMany(mappedBy = "study", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "study",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   private Set<ExternalLink> externalLinks = new HashSet<>();
 
-  @OneToMany(mappedBy = "sourceStudy", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "sourceStudy",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.PERSIST,
+      orphanRemoval = true)
   private Set<StudyRelationship> studyRelationships = new HashSet<>();
 
-//  @OneToMany(mappedBy = "targetStudy", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//  private Set<StudyRelationship> studyRelationships = new HashSet<>();
+  //  @OneToMany(mappedBy = "targetStudy", fetch = FetchType.LAZY, cascade = CascadeType.ALL,
+  // orphanRemoval = true)
+  //  private Set<StudyRelationship> studyRelationships = new HashSet<>();
 
-  @OneToOne(mappedBy = "study", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @OneToOne(
+      mappedBy = "study",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   private StudyConclusions conclusions;
 
-  @OneToMany(mappedBy = "study", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "study",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   private Set<Comment> comments = new HashSet<>();
 
   public void addUser(User user) {
@@ -458,7 +481,7 @@ public class Study {
   }
 
   public void setAssays(Set<Assay> assays) {
-    for (Assay assay: assays) {
+    for (Assay assay : assays) {
       assay.setStudy(this);
     }
     this.assays = assays;
@@ -477,7 +500,7 @@ public class Study {
   }
 
   public void setExternalLinks(Set<ExternalLink> externalLinks) {
-    for (ExternalLink link: externalLinks) {
+    for (ExternalLink link : externalLinks) {
       link.setStudy(this);
     }
     this.externalLinks = externalLinks;
@@ -505,7 +528,7 @@ public class Study {
   }
 
   public void setComments(Set<Comment> comments) {
-    for (Comment comment: comments) {
+    for (Comment comment : comments) {
       comment.setStudy(this);
     }
     this.comments = comments;

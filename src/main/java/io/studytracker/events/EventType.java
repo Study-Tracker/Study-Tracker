@@ -40,7 +40,7 @@ public enum EventType {
   UPDATED_ASSAY_TYPE,
   DELETED_ASSAY_TYPE,
 
-  //Program Events
+  // Program Events
   NEW_PROGRAM,
   UPDATED_PROGRAM,
   DELETED_PROGRAM,
@@ -50,7 +50,7 @@ public enum EventType {
   UPDATED_USER,
   DELETED_USER,
 
-  //EntryTemplate events
+  // EntryTemplate events
   NEW_ENTRY_TEMPLATE,
   UPDATED_ENTRY_TEMPLATE,
 
@@ -60,5 +60,4 @@ public enum EventType {
   DELETED_STUDY_COLLECTION,
   STUDY_ADDED_TO_COLLECTION,
   STUDY_REMOVED_FROM_COLLECTION
-
 }

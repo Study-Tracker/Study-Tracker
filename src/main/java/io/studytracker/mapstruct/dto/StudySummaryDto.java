@@ -19,14 +19,14 @@ public class StudySummaryDto {
   private boolean active = true;
   private ELNFolderDto notebookFolder;
   private FileStoreFolderDto storageFolder;
-//  private UserSummaryDto createdBy;
-//  private UserSummaryDto lastModifiedBy;
+  //  private UserSummaryDto createdBy;
+  //  private UserSummaryDto lastModifiedBy;
   private Date startDate;
   private Date endDate;
   private Date createdAt;
   private Date updatedAt;
   private UserSummaryDto owner;
-//  private Set<UserSummaryDto> users = new HashSet<>();
-//  private Set<KeywordDto> keywords = new HashSet<>();
+  //  private Set<UserSummaryDto> users = new HashSet<>();
+  //  private Set<KeywordDto> keywords = new HashSet<>();
 
 }

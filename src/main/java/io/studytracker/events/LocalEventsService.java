@@ -6,8 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 public class LocalEventsService implements EventsService {
 
-  @Autowired
-  private ApplicationEventPublisher eventPublisher;
+  @Autowired private ApplicationEventPublisher eventPublisher;
 
   @Override
   public void dispatchEvent(Activity activity) {

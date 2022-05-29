@@ -15,23 +15,22 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 @ConditionalOnProperty(name = "aws.access-key-id", havingValue = "")
 public class AmazonWebServicesConfiguration {
 
-  @Autowired
-  private Environment env;
+  @Autowired private Environment env;
 
   @Bean
   public AwsCredentialsProvider credentialsProvider() {
     if (env.containsProperty("aws.secret-access-key")
         && env.containsProperty("aws.access-key-id")) {
-      Assert.isTrue(env.containsProperty("aws.secret-access-key"),
+      Assert.isTrue(
+          env.containsProperty("aws.secret-access-key"),
           "Property 'aws.secret-access-key' must be set.");
-      AwsCredentials credentials = AwsBasicCredentials.create(
-          env.getRequiredProperty("aws.access-key-id"),
-          env.getRequiredProperty("aws.secret-access-key")
-      );
+      AwsCredentials credentials =
+          AwsBasicCredentials.create(
+              env.getRequiredProperty("aws.access-key-id"),
+              env.getRequiredProperty("aws.secret-access-key"));
       return StaticCredentialsProvider.create(credentials);
     } else {
       return null;
     }
   }
-
 }

@@ -34,7 +34,6 @@ public class EgnyteOptions {
 
   private boolean useExisting = false;
 
-
   @PostConstruct
   void init() {
     Assert.notNull(rootUrl, "Root URL must not be null.");
@@ -45,5 +44,4 @@ public class EgnyteOptions {
       rootPath = rootPath + "/";
     }
   }
-
 }

@@ -44,8 +44,7 @@ public class EgnyteRestClientFileUploadTests {
   @Autowired
   private EgnyteRestApiClient client;
 
-  @Autowired
-  private Environment env;
+  @Autowired private Environment env;
 
   @Test
   public void fileUploadTest() throws Exception {
@@ -93,5 +92,4 @@ public class EgnyteRestClientFileUploadTests {
     }
     Assert.assertNotNull(exception);
   }
-
 }

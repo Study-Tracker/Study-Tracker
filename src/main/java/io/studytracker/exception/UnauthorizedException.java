@@ -2,8 +2,7 @@ package io.studytracker.exception;
 
 public class UnauthorizedException extends StudyTrackerException {
 
-  public UnauthorizedException() {
-  }
+  public UnauthorizedException() {}
 
   public UnauthorizedException(String message) {
     super(message);
@@ -17,8 +16,8 @@ public class UnauthorizedException extends StudyTrackerException {
     super(cause);
   }
 
-  public UnauthorizedException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public UnauthorizedException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

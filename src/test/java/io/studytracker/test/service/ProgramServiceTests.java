@@ -41,17 +41,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class ProgramServiceTests {
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private ProgramService programService;
+  @Autowired private ProgramService programService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
   @Before
   public void doBefore() {
@@ -70,7 +66,7 @@ public class ProgramServiceTests {
     Assert.assertNotNull(programs);
     Assert.assertTrue(!programs.isEmpty());
     Assert.assertEquals(5, programs.size());
-    System.out.println(programs.toString());
+    System.out.println(programs);
   }
 
   @Test
@@ -106,7 +102,7 @@ public class ProgramServiceTests {
     programRepository.save(program);
     Assert.assertEquals(6, programRepository.count());
     Assert.assertNotNull(program.getId());
-    System.out.println(program.toString());
+    System.out.println(program);
   }
 
   @Test
@@ -142,5 +138,4 @@ public class ProgramServiceTests {
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof DataIntegrityViolationException);
   }
-
 }

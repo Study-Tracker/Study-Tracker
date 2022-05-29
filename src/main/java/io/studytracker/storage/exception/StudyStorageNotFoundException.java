@@ -18,8 +18,7 @@ package io.studytracker.storage.exception;
 
 public class StudyStorageNotFoundException extends StudyStorageException {
 
-  public StudyStorageNotFoundException() {
-  }
+  public StudyStorageNotFoundException() {}
 
   public StudyStorageNotFoundException(String message) {
     super(message);
@@ -33,8 +32,8 @@ public class StudyStorageNotFoundException extends StudyStorageException {
     super(cause);
   }
 
-  public StudyStorageNotFoundException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public StudyStorageNotFoundException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

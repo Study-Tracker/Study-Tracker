@@ -58,30 +58,23 @@ public class EgnyteStudyStorageServiceTests {
 
   private static final Resource TEST_FILE = new ClassPathResource("test.txt");
 
-  @Autowired
-  private EgnyteStudyStorageService storageService;
+  @Autowired private EgnyteStudyStorageService storageService;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private AssayTypeRepository assayTypeRepository;
+  @Autowired private AssayTypeRepository assayTypeRepository;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private EgnyteOptions egnyteOptions;
+  @Autowired private EgnyteOptions egnyteOptions;
 
   @Before
   public void doBefore() {
@@ -103,8 +96,8 @@ public class EgnyteStudyStorageServiceTests {
     study.setCode(program.getCode() + "-12345");
     path = storageService.getStudyFolderPath(study);
     System.out.println(path);
-    Assert.assertTrue(path.endsWith("/Clinical Program A/" + study.getCode() + " - "
-        + study.getName() + "/"));
+    Assert.assertTrue(
+        path.endsWith("/Clinical Program A/" + study.getCode() + " - " + study.getName() + "/"));
 
     Assay assay = new Assay();
     assay.setStudy(study);
@@ -112,8 +105,17 @@ public class EgnyteStudyStorageServiceTests {
     assay.setCode(program.getCode() + "-12345-123");
     path = storageService.getAssayFolderPath(assay);
     System.out.println(path);
-    Assert.assertTrue(path.endsWith("/Clinical Program A/" + study.getCode() + " - "
-        + study.getName() + "/" + assay.getCode() + " - " + assay.getName() + "/"));
+    Assert.assertTrue(
+        path.endsWith(
+            "/Clinical Program A/"
+                + study.getCode()
+                + " - "
+                + study.getName()
+                + "/"
+                + assay.getCode()
+                + " - "
+                + assay.getName()
+                + "/"));
   }
 
   @Test
@@ -173,15 +175,15 @@ public class EgnyteStudyStorageServiceTests {
     Assert.assertTrue(file.getPath().endsWith("test.txt"));
     Assert.assertEquals(TEST_FILE.getFilename(), file.getName());
     Assert.assertNotNull(file.getUrl());
-
   }
 
   @Test
   public void getInvalidStudyFolderTest() {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setName("Test study");
     study.setProgram(program);
@@ -208,8 +210,8 @@ public class EgnyteStudyStorageServiceTests {
     Program program = optionalProgram.get();
     Optional<User> optionalUser = userRepository.findByUsername("jsmith");
     Assert.assertTrue(optionalUser.isPresent());
-    AssayType assayType = assayTypeRepository.findByName("Generic")
-        .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
     User user = optionalUser.get();
     Study study = new Study();
     study.setStatus(Status.IN_PLANNING);
@@ -270,16 +272,14 @@ public class EgnyteStudyStorageServiceTests {
     Assert.assertNull(exception);
     Assert.assertNotNull(file);
     Assert.assertTrue(file.getPath().endsWith("test.txt"));
-
   }
 
   @Test
   public void getInvalidAssayFolderTest() {
 
-    Study study = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    AssayType assayType = assayTypeRepository.findByName("Generic")
-        .orElseThrow(RecordNotFoundException::new);
+    Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
     assay.setName("Test assay");
     assay.setCode("CPA-10001-XXXXX");
@@ -303,21 +303,19 @@ public class EgnyteStudyStorageServiceTests {
   public void studyFolderDepthTest() throws Exception {
 
     System.out.println("Read depth: " + egnyteOptions.getMaxReadDepth());
-    Study study = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study study = studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
     StorageFolder studyFolder = storageService.getStudyFolder(study, true);
     System.out.println(studyFolder.toString());
     Assert.assertNotNull(studyFolder);
     Assert.assertFalse(studyFolder.getFiles().isEmpty());
     Assert.assertFalse(studyFolder.getSubFolders().isEmpty());
-    StorageFolder assayFolder = studyFolder.getSubFolders().stream()
-        .filter(f -> f.getName().equals("PPB-10001-001 - Histology assay"))
-        .findFirst()
-        .orElseThrow(RecordNotFoundException::new);
+    StorageFolder assayFolder =
+        studyFolder.getSubFolders().stream()
+            .filter(f -> f.getName().equals("PPB-10001-001 - Histology assay"))
+            .findFirst()
+            .orElseThrow(RecordNotFoundException::new);
     Assert.assertNotNull(assayFolder);
-    System.out.println(assayFolder.toString());
+    System.out.println(assayFolder);
     Assert.assertFalse(assayFolder.getFiles().isEmpty());
-
   }
-
 }

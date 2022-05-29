@@ -56,20 +56,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ActiveProfiles({"web-test", "example"})
 public class StudyLinkControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
   private String username;
 
@@ -81,8 +76,8 @@ public class StudyLinkControllerTests {
 
   @Test
   public void fetchStudyLinksTest() throws Exception {
-    mockMvc.perform(get("/api/study/CPA-10001/links")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/links").with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
@@ -91,12 +86,12 @@ public class StudyLinkControllerTests {
         .andExpect(jsonPath("$[0]", hasKey("url")))
         .andExpect(jsonPath("$[0].url", is("https://google.com")));
 
-    mockMvc.perform(get("/api/study/CPA-XXXX/links")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-XXXX/links").with(user(username)))
         .andExpect(status().isNotFound());
 
-    mockMvc.perform(get("/api/study/PPB-10001/links")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/PPB-10001/links").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }
@@ -104,25 +99,26 @@ public class StudyLinkControllerTests {
   @Test
   public void createStudyLinkTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001/links")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/links").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     ExternalLink link = new ExternalLink();
     link.setLabel("Twitter");
     link.setUrl(new URL("https://twitter.com"));
 
-    mockMvc.perform(post("/api/study/CPA-10001/links")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(link))
-        .with(user(user.getUsername())))
+    mockMvc
+        .perform(
+            post("/api/study/CPA-10001/links")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(link))
+                .with(user(user.getUsername())))
         .andExpect(status().isCreated());
 
-    mockMvc.perform(get("/api/study/CPA-10001/links")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/links").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
@@ -130,27 +126,27 @@ public class StudyLinkControllerTests {
   @Test
   public void deleteStudyLinkTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001/links")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/links").with(user(username)))
         .andExpect(status().isOk())
-         .andExpect(jsonPath("$", hasSize(1)));
+        .andExpect(jsonPath("$", hasSize(1)));
 
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(study.getExternalLinks().isEmpty());
     ExternalLink link = study.getExternalLinks().stream().findFirst().get();
 
-    mockMvc.perform(delete("/api/study/CPA-10001/links/" + link.getId())
-//        .contentType(MediaType.APPLICATION_JSON)
-//        .content(objectMapper.writeValueAsBytes(link))
-        .with(user(user.getUsername())))
+    mockMvc
+        .perform(
+            delete("/api/study/CPA-10001/links/" + link.getId())
+                //        .contentType(MediaType.APPLICATION_JSON)
+                //        .content(objectMapper.writeValueAsBytes(link))
+                .with(user(user.getUsername())))
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/study/CPA-10001/links")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001/links").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }
-
 }

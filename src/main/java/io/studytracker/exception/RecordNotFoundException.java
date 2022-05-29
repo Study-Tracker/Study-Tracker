@@ -16,11 +16,9 @@
 
 package io.studytracker.exception;
 
-
 public class RecordNotFoundException extends StudyTrackerException {
 
-  public RecordNotFoundException() {
-  }
+  public RecordNotFoundException() {}
 
   public RecordNotFoundException(String message) {
     super(message);
@@ -34,9 +32,8 @@ public class RecordNotFoundException extends StudyTrackerException {
     super(cause);
   }
 
-  public RecordNotFoundException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public RecordNotFoundException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
-
 }

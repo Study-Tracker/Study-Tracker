@@ -14,20 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class StatisticsService {
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private AssayService assayService;
+  @Autowired private AssayService assayService;
 
-  @Autowired
-  private ProgramService programService;
+  @Autowired private ProgramService programService;
 
-  @Autowired
-  private ActivityService activityService;
+  @Autowired private ActivityService activityService;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   public SummaryStatisticsDto getCurrent() {
     SummaryStatisticsDto summaryStatisticsDto = new SummaryStatisticsDto();
@@ -38,7 +33,7 @@ public class StatisticsService {
     summaryStatisticsDto.setActivityCount(activityService.count());
     summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
     Map<String, Long> programCounts = new HashMap<>();
-    for (Program program: programService.findAll()) {
+    for (Program program : programService.findAll()) {
       System.out.println(program.getName());
       if (program.isActive()) {
         programCounts.put(program.getName(), studyService.countByProgram(program));
@@ -68,7 +63,7 @@ public class StatisticsService {
     summaryStatisticsDto.setActivityCount(activityService.countFromDate(date));
     summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
     Map<String, Long> programCounts = new HashMap<>();
-    for (Program program: programService.findAll()) {
+    for (Program program : programService.findAll()) {
       if (program.isActive()) {
         programCounts.put(program.getName(), studyService.countByProgramAfterDate(program, date));
       }
@@ -102,7 +97,8 @@ public class StatisticsService {
     summaryStatisticsDto.setActivityCount(activityService.countFromDate(lastWeek));
     summaryStatisticsDto.setActiveUserCount(userService.countActiveUsers());
     summaryStatisticsDto.setNewStudyCount(studyService.countFromDate(lastWeek));
-    summaryStatisticsDto.setCompletedStudyCount(activityService.countCompletedStudiesFromDate(lastMonth));
+    summaryStatisticsDto.setCompletedStudyCount(
+        activityService.countCompletedStudiesFromDate(lastMonth));
     summaryStatisticsDto.setStudyCount(studyService.count());
 
     return summaryStatisticsDto;
@@ -115,7 +111,5 @@ public class StatisticsService {
     dto.setCompleteStudyCount(studyService.countUserCompleteStudies(user));
 
     return dto;
-
   }
-
 }

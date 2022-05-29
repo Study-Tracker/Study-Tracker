@@ -29,11 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StudyCommentService {
 
-  @Autowired
-  private CommentRepository commentRepository;
+  @Autowired private CommentRepository commentRepository;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
   public Optional<Comment> findStudyCommentById(Long id) {
     return commentRepository.findById(id);
@@ -63,5 +61,4 @@ public class StudyCommentService {
     study.removeComment(comment);
     studyRepository.save(study);
   }
-
 }

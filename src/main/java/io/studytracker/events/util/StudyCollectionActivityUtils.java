@@ -17,8 +17,9 @@ public class StudyCollectionActivityUtils {
     activity.setEventType(EventType.NEW_STUDY_COLLECTION);
     activity.setDate(new Date());
     activity.setUser(user);
-    activity.setData(Collections.singletonMap("collection",
-        EntityViewUtils.createStudyCollectionView(collection)));
+    activity.setData(
+        Collections.singletonMap(
+            "collection", EntityViewUtils.createStudyCollectionView(collection)));
     return activity;
   }
 
@@ -27,8 +28,9 @@ public class StudyCollectionActivityUtils {
     activity.setEventType(EventType.UPDATED_STUDY_COLLECTION);
     activity.setDate(new Date());
     activity.setUser(user);
-    activity.setData(Collections.singletonMap("collection",
-        EntityViewUtils.createStudyCollectionView(collection)));
+    activity.setData(
+        Collections.singletonMap(
+            "collection", EntityViewUtils.createStudyCollectionView(collection)));
     return activity;
   }
 
@@ -37,12 +39,14 @@ public class StudyCollectionActivityUtils {
     activity.setEventType(EventType.DELETED_STUDY_COLLECTION);
     activity.setDate(new Date());
     activity.setUser(user);
-    activity.setData(Collections.singletonMap("collection",
-        EntityViewUtils.createStudyCollectionView(collection)));
+    activity.setData(
+        Collections.singletonMap(
+            "collection", EntityViewUtils.createStudyCollectionView(collection)));
     return activity;
   }
 
-  public static Activity fromStudyAddedToCollection(Study study, StudyCollection collection, User user) {
+  public static Activity fromStudyAddedToCollection(
+      Study study, StudyCollection collection, User user) {
     Activity activity = new Activity();
     activity.setEventType(EventType.NEW_STUDY_COLLECTION);
     activity.setDate(new Date());
@@ -54,7 +58,8 @@ public class StudyCollectionActivityUtils {
     return activity;
   }
 
-  public static Activity fromStudyRemovedFromCollection(Study study, StudyCollection collection, User user) {
+  public static Activity fromStudyRemovedFromCollection(
+      Study study, StudyCollection collection, User user) {
     Activity activity = new Activity();
     activity.setEventType(EventType.NEW_STUDY_COLLECTION);
     activity.setDate(new Date());
@@ -65,5 +70,4 @@ public class StudyCollectionActivityUtils {
     data.put("study", EntityViewUtils.createStudyView(study));
     return activity;
   }
-
 }

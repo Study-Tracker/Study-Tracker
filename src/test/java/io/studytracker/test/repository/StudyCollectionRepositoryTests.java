@@ -83,14 +83,13 @@ public class StudyCollectionRepositoryTests {
     program.setStorageFolder(folder);
 
     programRepository.save(program);
-
   }
 
   private void createStudy() {
 
     User user = userRepository.findByUsername("test").orElseThrow(RecordNotFoundException::new);
-    Program program = programRepository.findByName("Test Program")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository.findByName("Test Program").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setName("Test Study");
@@ -105,7 +104,6 @@ public class StudyCollectionRepositoryTests {
     study.setStartDate(new Date());
     study.addAttribute("key", "value");
     studyRepository.save(study);
-
   }
 
   @Test
@@ -130,10 +128,11 @@ public class StudyCollectionRepositoryTests {
 
     Assert.assertEquals(1, studyCollectionRepository.count());
     Assert.assertNotNull(studyCollection.getId());
-    StudyCollection created = studyCollectionRepository.findById(studyCollection.getId())
-        .orElseThrow(RecordNotFoundException::new);
+    StudyCollection created =
+        studyCollectionRepository
+            .findById(studyCollection.getId())
+            .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(1, created.getStudies().size());
-
   }
 
   @Test
@@ -141,14 +140,16 @@ public class StudyCollectionRepositoryTests {
     newStudyCollectionTest();
     Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
     StudyCollection created = studyCollectionRepository.findAll().get(0);
-    StudyCollection c = studyCollectionRepository.findById(created.getId())
-        .orElseThrow(RecordNotFoundException::new);
+    StudyCollection c =
+        studyCollectionRepository
+            .findById(created.getId())
+            .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(1, c.getStudies().size());
     c.removeStudy(study);
     Assert.assertEquals(0, c.getStudies().size());
     studyCollectionRepository.save(c);
-    StudyCollection updated = studyCollectionRepository.findById(c.getId())
-        .orElseThrow(RecordNotFoundException::new);
+    StudyCollection updated =
+        studyCollectionRepository.findById(c.getId()).orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(0, updated.getStudies().size());
   }
 
@@ -160,5 +161,4 @@ public class StudyCollectionRepositoryTests {
     studyCollectionRepository.deleteById(studyCollection.getId());
     Assert.assertEquals(0, studyCollectionRepository.count());
   }
-
 }

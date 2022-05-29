@@ -17,5 +17,4 @@ public class ActivityDetailsDto {
   private Map<String, Object> data = new HashMap<>();
   private UserSlimDto user;
   private Date date;
-
 }

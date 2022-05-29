@@ -18,8 +18,7 @@ package io.studytracker.benchling.exception;
 
 public class BenchlingException extends RuntimeException {
 
-  public BenchlingException() {
-  }
+  public BenchlingException() {}
 
   public BenchlingException(String message) {
     super(message);
@@ -33,9 +32,8 @@ public class BenchlingException extends RuntimeException {
     super(cause);
   }
 
-  public BenchlingException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public BenchlingException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
-
 }

@@ -50,20 +50,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ActiveProfiles({"web-elasticsearch-test", "example"})
 public class ElasticsearchSearchControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
-  @Autowired
-  private ElasticsearchSearchService searchService;
+  @Autowired private ElasticsearchSearchService searchService;
 
   private String username;
 
@@ -71,9 +66,8 @@ public class ElasticsearchSearchControllerTests {
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
     username = userService.findAll().get(0).getUsername();
-    for (Study s: studyService.findAll()){
-      Study study = studyService.findById(s.getId())
-          .orElseThrow(RecordNotFoundException::new);
+    for (Study s : studyService.findAll()) {
+      Study study = studyService.findById(s.getId()).orElseThrow(RecordNotFoundException::new);
       searchService.indexStudy(study);
     }
   }
@@ -81,8 +75,8 @@ public class ElasticsearchSearchControllerTests {
   @Test
   public void searchStudies() throws Exception {
 
-    mockMvc.perform(get("/api/search?keyword=legacy")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/search?keyword=legacy").with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("numHits")))
@@ -96,7 +90,5 @@ public class ElasticsearchSearchControllerTests {
         .andExpect(jsonPath("$.hits[0]", hasKey("document")))
         .andExpect(jsonPath("$.hits[0].document", hasKey("code")))
         .andExpect(jsonPath("$.hits[0].document.code", Matchers.is("PPB-00001")));
-
   }
-
 }

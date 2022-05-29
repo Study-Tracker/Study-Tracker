@@ -48,14 +48,15 @@ public class EntityViewUtils {
     view.put("updatedAt", study.getUpdatedAt());
     view.put("legacy", study.isLegacy());
     view.put("active", study.isActive());
-    view.put("keywords", study.getKeywords().stream()
-        .map(EntityViewUtils::createKeywordView)
-        .collect(Collectors.toSet()));
+    view.put(
+        "keywords",
+        study.getKeywords().stream()
+            .map(EntityViewUtils::createKeywordView)
+            .collect(Collectors.toSet()));
     view.put("startDate", study.getStartDate());
     view.put("endDate", study.getEndDate());
-    view.put("users", study.getUsers().stream()
-        .map(User::getDisplayName)
-        .collect(Collectors.toSet()));
+    view.put(
+        "users", study.getUsers().stream().map(User::getDisplayName).collect(Collectors.toSet()));
     view.put("attributes", study.getAttributes());
     if (study.getCollaborator() != null) {
       view.put("collaborator", study.getCollaborator().getLabel());
@@ -90,11 +91,16 @@ public class EntityViewUtils {
     Map<String, Object> view = new HashMap<>();
     view.put("id", conclusions.getId());
     view.put("content", conclusions.getContent());
-    view.put("date", conclusions.getUpdatedAt() != null
-        ? conclusions.getUpdatedAt() : conclusions.getCreatedAt());
-    view.put("user", conclusions.getLastModifiedBy() != null
-        ? conclusions.getLastModifiedBy().getDisplayName()
-        : conclusions.getCreatedBy().getDisplayName());
+    view.put(
+        "date",
+        conclusions.getUpdatedAt() != null
+            ? conclusions.getUpdatedAt()
+            : conclusions.getCreatedAt());
+    view.put(
+        "user",
+        conclusions.getLastModifiedBy() != null
+            ? conclusions.getLastModifiedBy().getDisplayName()
+            : conclusions.getCreatedBy().getDisplayName());
     return view;
   }
 
@@ -102,7 +108,8 @@ public class EntityViewUtils {
     Map<String, Object> view = new HashMap<>();
     view.put("id", comment.getId());
     view.put("text", comment.getText());
-    view.put("date", comment.getUpdatedAt() != null ? comment.getUpdatedAt() : comment.getCreatedAt());
+    view.put(
+        "date", comment.getUpdatedAt() != null ? comment.getUpdatedAt() : comment.getCreatedAt());
     view.put("user", comment.getCreatedBy().getDisplayName());
     return view;
   }
@@ -112,7 +119,7 @@ public class EntityViewUtils {
     view.put("id", assay.getId());
     view.put("name", assay.getName());
     view.put("code", assay.getCode());
-//    view.put("study", assay.getStudy().getCode());
+    //    view.put("study", assay.getStudy().getCode());
     view.put("description", assay.getDescription());
     view.put("status", assay.getStatus().toString());
     view.put("owner", assay.getOwner().getDisplayName());
@@ -123,13 +130,14 @@ public class EntityViewUtils {
     view.put("active", assay.isActive());
     view.put("startDate", assay.getStartDate());
     view.put("endDate", assay.getEndDate());
-    view.put("users", assay.getUsers().stream()
-        .map(User::getDisplayName)
-        .collect(Collectors.toSet()));
+    view.put(
+        "users", assay.getUsers().stream().map(User::getDisplayName).collect(Collectors.toSet()));
     view.put("fields", assay.getFields());
-    view.put("tasks", assay.getTasks().stream()
-        .map(EntityViewUtils::createAssayTaskView)
-        .collect(Collectors.toSet()));
+    view.put(
+        "tasks",
+        assay.getTasks().stream()
+            .map(EntityViewUtils::createAssayTaskView)
+            .collect(Collectors.toSet()));
     view.put("attributes", assay.getAttributes());
     view.put("assayType", assay.getAssayType().getName());
     return view;
@@ -141,7 +149,8 @@ public class EntityViewUtils {
     view.put("label", task.getLabel());
     view.put("status", task.getStatus());
     view.put("order", task.getOrder());
-    view.put("assignedTo", task.getAssignedTo() != null ? task.getAssignedTo().getDisplayName() : null);
+    view.put(
+        "assignedTo", task.getAssignedTo() != null ? task.getAssignedTo().getDisplayName() : null);
     view.put("dueDate", task.getDueDate());
     return view;
   }
@@ -176,5 +185,4 @@ public class EntityViewUtils {
     view.put("updatedAt", collection.getUpdatedAt());
     return view;
   }
-
 }

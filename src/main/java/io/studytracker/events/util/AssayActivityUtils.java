@@ -49,8 +49,8 @@ public class AssayActivityUtils {
     return activity;
   }
 
-  public static Activity fromChangedAssayStatus(Assay assay, User triggeredBy, Status oldStatus,
-      Status newStatus) {
+  public static Activity fromChangedAssayStatus(
+      Assay assay, User triggeredBy, Status oldStatus, Status newStatus) {
     Activity activity = new Activity();
     activity.setAssay(assay);
     activity.setEventType(EventType.ASSAY_STATUS_CHANGED);
@@ -115,5 +115,4 @@ public class AssayActivityUtils {
     activity.setData(data);
     return activity;
   }
-
 }

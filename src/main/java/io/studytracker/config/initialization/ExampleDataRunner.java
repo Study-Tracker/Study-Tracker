@@ -29,8 +29,7 @@ import org.springframework.stereotype.Component;
 @Order(1)
 public class ExampleDataRunner implements ApplicationRunner {
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {

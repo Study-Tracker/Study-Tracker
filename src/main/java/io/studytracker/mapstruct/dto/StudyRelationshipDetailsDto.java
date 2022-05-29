@@ -11,5 +11,4 @@ public class StudyRelationshipDetailsDto {
   @NotNull private RelationshipType type;
   private StudySlimDto sourceStudy;
   private StudySlimDto targetStudy;
-
 }

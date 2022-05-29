@@ -103,7 +103,7 @@ public interface StudyNotebookService {
 
   /**
    * Creates a blank notebook entry from the provided template for a study in the ELN and returns a
-   *   {@link NotebookEntry}.
+   * {@link NotebookEntry}.
    *
    * @param study
    * @return
@@ -123,7 +123,7 @@ public interface StudyNotebookService {
 
   /**
    * Creates a blank notebook entry from the provided template for an assay in the ELN and returns a
-   *   {@link NotebookEntry}.
+   * {@link NotebookEntry}.
    *
    * @param assay
    * @return
@@ -146,5 +146,4 @@ public interface StudyNotebookService {
    * @return
    */
   Optional<NotebookUser> findNotebookUser(User user);
-
 }

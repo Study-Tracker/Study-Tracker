@@ -52,9 +52,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-/**
- * Service class for reading and writing {@link Study} records.
- */
+/** Service class for reading and writing {@link Study} records. */
 @Service
 public class StudyService {
 
@@ -152,8 +150,8 @@ public class StudyService {
   }
 
   /**
-   * Creates a new study record, creates a storage folder, creates and ELN folder, and creates
-   *  an ELN entry for the study.
+   * Creates a new study record, creates a storage folder, creates and ELN folder, and creates an
+   * ELN entry for the study.
    *
    * @param study new study
    */
@@ -185,8 +183,12 @@ public class StudyService {
     }
 
     // Get the program
-    Program program = programRepository.findById(study.getProgram().getId())
-        .orElseThrow(() -> new RecordNotFoundException("Invalid program: " + study.getProgram().getId()));
+    Program program =
+        programRepository
+            .findById(study.getProgram().getId())
+            .orElseThrow(
+                () ->
+                    new RecordNotFoundException("Invalid program: " + study.getProgram().getId()));
 
     // Create the study storage folder
     try {
@@ -229,10 +231,10 @@ public class StudyService {
           } catch (Exception e) {
             e.printStackTrace();
             LOGGER.warn("Failed to create notebook folder and entry for study: " + study.getCode());
-
           }
         } else {
-          LOGGER.warn(String.format("Study program %s does not have ELN folder set.", program.getName()));
+          LOGGER.warn(
+              String.format("Study program %s does not have ELN folder set.", program.getName()));
         }
       } else {
         study.setNotebookFolder(null);
@@ -242,8 +244,10 @@ public class StudyService {
     // Persist the record
     try {
       studyRepository.save(study);
-      LOGGER.info(String.format("Successfully created new study with code %s and ID %s",
-          study.getCode(), study.getId()));
+      LOGGER.info(
+          String.format(
+              "Successfully created new study with code %s and ID %s",
+              study.getCode(), study.getId()));
     } catch (Exception e) {
       if (e instanceof ConstraintViolationException) {
         throw new InvalidConstraintException(e);
@@ -266,7 +270,6 @@ public class StudyService {
         LOGGER.warn("Failed to create link to ELN entry.");
       }
     }
-
   }
 
   /**
@@ -320,7 +323,7 @@ public class StudyService {
   /**
    * Updates the status of the study with the provided PKID to the provided status.
    *
-   * @param study  study
+   * @param study study
    * @param status status to set
    */
   @Transactional
@@ -344,7 +347,6 @@ public class StudyService {
   public List<Study> search(String keyword) {
     return studyRepository.findByNameOrCodeLike(keyword);
   }
-
 
   /**
    * Checks to see whether the study with the provided ID exists.
@@ -370,9 +372,7 @@ public class StudyService {
     studyRepository.save(s);
   }
 
-  /**
-   * Counting number of studies created before/after/between given dates.
-   */
+  /** Counting number of studies created before/after/between given dates. */
   public long count() {
     return studyRepository.count();
   }
@@ -460,7 +460,6 @@ public class StudyService {
       s.setNotebookFolder(f);
       studyRepository.save(s);
     }
-
   }
 
   @Autowired
@@ -469,14 +468,12 @@ public class StudyService {
   }
 
   @Autowired
-  public void setProgramRepository(
-      ProgramRepository programRepository) {
+  public void setProgramRepository(ProgramRepository programRepository) {
     this.programRepository = programRepository;
   }
 
   @Autowired
-  public void setStudyStorageService(
-      StudyStorageService studyStorageService) {
+  public void setStudyStorageService(StudyStorageService studyStorageService) {
     this.studyStorageService = studyStorageService;
   }
 
@@ -491,14 +488,12 @@ public class StudyService {
   }
 
   @Autowired
-  public void setFileStoreFolderRepository(
-      FileStoreFolderRepository fileStoreFolderRepository) {
+  public void setFileStoreFolderRepository(FileStoreFolderRepository fileStoreFolderRepository) {
     this.fileStoreFolderRepository = fileStoreFolderRepository;
   }
 
   @Autowired
-  public void setElnFolderRepository(
-      ELNFolderRepository elnFolderRepository) {
+  public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {
     this.elnFolderRepository = elnFolderRepository;
   }
 }

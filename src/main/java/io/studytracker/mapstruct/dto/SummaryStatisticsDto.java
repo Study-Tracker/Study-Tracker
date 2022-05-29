@@ -36,5 +36,4 @@ public class SummaryStatisticsDto {
   private long completedAssayCount;
 
   private Map<String, Long> programStudyCounts = new HashMap<>();
-
 }

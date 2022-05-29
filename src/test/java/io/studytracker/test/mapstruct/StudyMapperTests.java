@@ -25,14 +25,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class StudyMapperTests {
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private StudyMapper studyMapper;
+  @Autowired private StudyMapper studyMapper;
 
   @Before
   public void doBefore() {
@@ -61,13 +58,11 @@ public class StudyMapperTests {
 
   @Test
   public void studyDetailsMappingTest() {
-    Study study = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study study = studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
     StudyDetailsDto dto = studyMapper.toStudyDetails(study);
     Assert.assertEquals("PPB-10001", dto.getCode());
     Assert.assertFalse(dto.getComments().isEmpty());
     Assert.assertNotNull(dto.getConclusions().getContent());
     System.out.println(dto);
   }
-
 }

@@ -40,14 +40,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class NotebookEntryTemplateServiceTests {
 
-  @Autowired
-  private NotebookEntryTemplateService templateService;
+  @Autowired private NotebookEntryTemplateService templateService;
 
-  @Autowired
-  private NotebookEntryTemplateRepository templateRepository;
+  @Autowired private NotebookEntryTemplateRepository templateRepository;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -68,23 +65,27 @@ public class NotebookEntryTemplateServiceTests {
     List<NotebookEntryTemplate> templates = templateService.findAll();
     Assert.assertEquals(ExampleDataGenerator.NOTEBOOK_ENTRY_TEMPLATE_COUNT, 5);
 
-    List<NotebookEntryTemplate> defaultTemplates = templates.stream()
-        .filter(NotebookEntryTemplate::isDefault)
-        .collect(Collectors.toList());
+    List<NotebookEntryTemplate> defaultTemplates =
+        templates.stream().filter(NotebookEntryTemplate::isDefault).collect(Collectors.toList());
     Assert.assertEquals(defaultTemplates.size(), 2);
 
-    NotebookEntryTemplate studyDefault = defaultTemplates.stream()
-        .filter(t -> t.getCategory().equals(Category.STUDY))
-        .findFirst().get();
+    NotebookEntryTemplate studyDefault =
+        defaultTemplates.stream()
+            .filter(t -> t.getCategory().equals(Category.STUDY))
+            .findFirst()
+            .get();
     Assert.assertEquals("Default Study Template", studyDefault.getName());
 
-    NotebookEntryTemplate assayDefault = defaultTemplates.stream()
-        .filter(t -> t.getCategory().equals(Category.ASSAY))
-        .findFirst().get();
+    NotebookEntryTemplate assayDefault =
+        defaultTemplates.stream()
+            .filter(t -> t.getCategory().equals(Category.ASSAY))
+            .findFirst()
+            .get();
     Assert.assertEquals("Default Assay Template", assayDefault.getName());
 
     // Test against repository method
-    Optional<NotebookEntryTemplate> optional = templateRepository.findDefaultByCategory(Category.STUDY);
+    Optional<NotebookEntryTemplate> optional =
+        templateRepository.findDefaultByCategory(Category.STUDY);
     Assert.assertTrue(optional.isPresent());
     NotebookEntryTemplate template = optional.get();
     Assert.assertTrue(template.isDefault());
@@ -98,14 +99,18 @@ public class NotebookEntryTemplateServiceTests {
 
     // Update the defaults
 
-    NotebookEntryTemplate newStudyDefault = templates.stream()
-        .filter(t -> t.getCategory().equals(Category.STUDY) && !t.isDefault() && t.isActive())
-        .findFirst().get();
+    NotebookEntryTemplate newStudyDefault =
+        templates.stream()
+            .filter(t -> t.getCategory().equals(Category.STUDY) && !t.isDefault() && t.isActive())
+            .findFirst()
+            .get();
     Assert.assertEquals("Active Study Template", newStudyDefault.getName());
 
-    NotebookEntryTemplate newAssayDefault = templates.stream()
-        .filter(t -> t.getCategory().equals(Category.ASSAY) && !t.isDefault() && t.isActive())
-        .findFirst().get();
+    NotebookEntryTemplate newAssayDefault =
+        templates.stream()
+            .filter(t -> t.getCategory().equals(Category.ASSAY) && !t.isDefault() && t.isActive())
+            .findFirst()
+            .get();
     Assert.assertEquals("Active Assay Template", newAssayDefault.getName());
 
     templateService.updateDefault(newStudyDefault);
@@ -122,7 +127,5 @@ public class NotebookEntryTemplateServiceTests {
     template = optional.get();
     Assert.assertTrue(template.isDefault());
     Assert.assertEquals(newAssayDefault.getName(), template.getName());
-
   }
-
 }

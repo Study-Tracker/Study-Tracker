@@ -10,5 +10,4 @@ public class ElasticsearchCollaboratorDocument {
   private String organizationLocation;
   private String contactPersonName;
   private String contactEmail;
-
 }

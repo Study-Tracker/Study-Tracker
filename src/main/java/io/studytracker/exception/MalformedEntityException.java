@@ -2,8 +2,7 @@ package io.studytracker.exception;
 
 public class MalformedEntityException extends StudyTrackerException {
 
-  public MalformedEntityException() {
-  }
+  public MalformedEntityException() {}
 
   public MalformedEntityException(String message) {
     super(message);
@@ -17,8 +16,8 @@ public class MalformedEntityException extends StudyTrackerException {
     super(cause);
   }
 
-  public MalformedEntityException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public MalformedEntityException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

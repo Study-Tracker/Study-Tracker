@@ -18,13 +18,10 @@ package io.studytracker.exception;
 
 import io.studytracker.storage.StudyStorageService;
 
-/**
- * Exception thrown by {@link StudyStorageService} implementations.
- */
+/** Exception thrown by {@link StudyStorageService} implementations. */
 public class StudyFileManagementException extends StudyTrackerException {
 
-  public StudyFileManagementException() {
-  }
+  public StudyFileManagementException() {}
 
   public StudyFileManagementException(String message) {
     super(message);
@@ -38,9 +35,8 @@ public class StudyFileManagementException extends StudyTrackerException {
     super(cause);
   }
 
-  public StudyFileManagementException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public StudyFileManagementException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
-
 }

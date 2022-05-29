@@ -42,17 +42,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class StudyConclusionsServiceTests {
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private StudyConclusionsService studyConclusionsService;
+  @Autowired private StudyConclusionsService studyConclusionsService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -84,7 +80,6 @@ public class StudyConclusionsServiceTests {
     Assert.assertTrue(optional.isPresent());
     conclusions = optional.get();
     Assert.assertEquals("This is a test", conclusions.getContent());
-
   }
 
   @Test
@@ -103,8 +98,10 @@ public class StudyConclusionsServiceTests {
     conclusions.setLastModifiedBy(conclusions.getCreatedBy());
     studyConclusionsService.updateStudyConclusions(study, conclusions);
 
-    conclusions = studyConclusionsService.findStudyConclusions(study)
-        .orElseThrow(RecordNotFoundException::new);
+    conclusions =
+        studyConclusionsService
+            .findStudyConclusions(study)
+            .orElseThrow(RecordNotFoundException::new);
     Assert.assertNotNull(conclusions.getUpdatedAt());
     Assert.assertNotEquals(firstDate, conclusions.getUpdatedAt());
     Assert.assertEquals("Different text", conclusions.getContent());
@@ -117,13 +114,11 @@ public class StudyConclusionsServiceTests {
     studyConclusionsService.deleteStudyConclusions(study);
     Exception exception = null;
     try {
-      studyConclusionsService.findStudyConclusions(study)
-          .orElseThrow(RecordNotFoundException::new);
+      studyConclusionsService.findStudyConclusions(study).orElseThrow(RecordNotFoundException::new);
     } catch (Exception e) {
       exception = e;
     }
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof RecordNotFoundException);
   }
-
 }

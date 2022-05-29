@@ -45,8 +45,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
   private final EgnyteOptions options;
 
-  @Autowired
-  private EgnyteFolderNamingService egnyteFolderNamingService;
+  @Autowired private EgnyteFolderNamingService egnyteFolderNamingService;
 
   public EgnyteStudyStorageService(EgnyteClientOperations egnyteClient, EgnyteOptions options) {
     this.egnyteClient = egnyteClient;
@@ -75,8 +74,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
         path = path + "/";
       }
     } else {
-      path = this.getProgramFolderPath(study.getProgram())
-          + egnyteFolderNamingService.getStudyStorageFolderName(study) + "/";
+      path =
+          this.getProgramFolderPath(study.getProgram())
+              + egnyteFolderNamingService.getStudyStorageFolderName(study)
+              + "/";
     }
     return path;
   }
@@ -252,8 +253,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   public StorageFolder createStudyFolder(Study study) throws StudyStorageException {
     Program program = study.getProgram();
     String path = getStudyFolderPath(study);
-    LOGGER.info(String.format("Creating folder for study %s in program folder %s with path: %s",
-        study.getCode(), program.getName(), path));
+    LOGGER.info(
+        String.format(
+            "Creating folder for study %s in program folder %s with path: %s",
+            study.getCode(), program.getName(), path));
     try {
       return this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
@@ -270,8 +273,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFolder createAssayFolder(Assay assay) throws StudyStorageException {
     Study study = assay.getStudy();
-    LOGGER.info(String.format("Creating folder for assay %s in study folder %s",
-        assay.getCode(), study.getName() + " (" + study.getCode() + ")"));
+    LOGGER.info(
+        String.format(
+            "Creating folder for assay %s in study folder %s",
+            assay.getCode(), study.getName() + " (" + study.getCode() + ")"));
     String path = getAssayFolderPath(assay);
     try {
       return this.convertFolder(egnyteClient.createFolder(path));

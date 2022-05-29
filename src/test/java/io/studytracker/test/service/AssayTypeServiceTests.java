@@ -43,11 +43,9 @@ public class AssayTypeServiceTests {
 
   private static final int ASSAY_TYPE_COUNT = ExampleDataGenerator.ASSAY_TYPE_COUNT;
 
-  @Autowired
-  private AssayTypeService assayTypeService;
+  @Autowired private AssayTypeService assayTypeService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -92,7 +90,6 @@ public class AssayTypeServiceTests {
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals("Test", optional.get().getName());
     Assert.assertFalse(optional.get().getFields().isEmpty());
-
   }
 
   @Test
@@ -130,7 +127,6 @@ public class AssayTypeServiceTests {
     Assert.assertTrue(optional.isPresent());
     Assert.assertFalse(optional.get().getFields().isEmpty());
     Assert.assertEquals(2, optional.get().getFields().size());
-
   }
 
   @Test
@@ -158,8 +154,5 @@ public class AssayTypeServiceTests {
     optional = assayTypeService.findByName("Test");
     Assert.assertTrue(optional.isPresent());
     Assert.assertFalse(optional.get().isActive());
-
   }
-
-
 }

@@ -18,8 +18,7 @@ package io.studytracker.benchling.exception;
 
 public class EntityNotFoundException extends BenchlingException {
 
-  public EntityNotFoundException() {
-  }
+  public EntityNotFoundException() {}
 
   public EntityNotFoundException(String message) {
     super(message);
@@ -33,8 +32,8 @@ public class EntityNotFoundException extends BenchlingException {
     super(cause);
   }
 
-  public EntityNotFoundException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public EntityNotFoundException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

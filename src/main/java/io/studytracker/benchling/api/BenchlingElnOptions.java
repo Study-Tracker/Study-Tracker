@@ -28,5 +28,4 @@ public class BenchlingElnOptions {
   private String apiToken;
   private String rootEntity;
   private String rootFolderUrl;
-
 }

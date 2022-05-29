@@ -53,23 +53,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class AssayServiceTests {
 
-  @Autowired
-  private AssayService assayService;
+  @Autowired private AssayService assayService;
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private AssayTypeRepository assayTypeRepository;
+  @Autowired private AssayTypeRepository assayTypeRepository;
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private NamingService namingService;
+  @Autowired private NamingService namingService;
 
   private static final int ASSAY_COUNT = 2;
 
@@ -88,8 +82,8 @@ public class AssayServiceTests {
 
   @Test
   public void createAssayTest() {
-    AssayType assayType = assayTypeRepository.findByName("Generic")
-        .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(ASSAY_COUNT, assayRepository.count());
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     User user = study.getOwner();
@@ -130,8 +124,8 @@ public class AssayServiceTests {
 
   @Test
   public void createAssayWithFieldDataTest() {
-    AssayType assayType = assayTypeRepository.findByName("Histology")
-        .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Histology").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(ASSAY_COUNT, assayRepository.count());
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     User user = study.getOwner();
@@ -172,8 +166,8 @@ public class AssayServiceTests {
 
   @Test
   public void createAssayWithInvalidFieldDataTest() {
-    AssayType assayType = assayTypeRepository.findByName("Histology")
-        .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Histology").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(ASSAY_COUNT, assayRepository.count());
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     User user = study.getOwner();
@@ -237,24 +231,23 @@ public class AssayServiceTests {
 
   @Test
   public void inactivateAssayTest() {
-    Assay assay = assayService.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Assert.assertTrue(assay.isActive());
     assayService.delete(assay);
-    Assay updated = assayService.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay updated =
+        assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(updated.isActive());
   }
 
   @Test
   public void updateAssayStatusTest() {
-    Assay assay = assayService.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay assay =
+        assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Status.ACTIVE, assay.getStatus());
     assayService.updateStatus(assay, Status.COMPLETE);
-    Assay updated = assayService.findByCode("PPB-10001-001")
-        .orElseThrow(RecordNotFoundException::new);
+    Assay updated =
+        assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Status.COMPLETE, updated.getStatus());
   }
-
 }

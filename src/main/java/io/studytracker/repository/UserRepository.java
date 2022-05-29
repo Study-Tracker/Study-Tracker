@@ -39,5 +39,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
   long countByCreatedAtBetween(Date startDate, Date endDate);
 
   long countByActive(boolean active);
-
 }

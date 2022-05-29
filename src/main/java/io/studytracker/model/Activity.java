@@ -48,14 +48,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "activity-with-user",
-        attributeNodes = { @NamedAttributeNode("user") }),
-    @NamedEntityGraph(name = "activity-details", attributeNodes = {
-        @NamedAttributeNode("user") ,
+  @NamedEntityGraph(
+      name = "activity-with-user",
+      attributeNodes = {@NamedAttributeNode("user")}),
+  @NamedEntityGraph(
+      name = "activity-details",
+      attributeNodes = {
+        @NamedAttributeNode("user"),
         @NamedAttributeNode("program"),
         @NamedAttributeNode("study"),
         @NamedAttributeNode("assay")
-    })
+      })
 })
 public class Activity {
 
@@ -91,7 +94,7 @@ public class Activity {
   @Temporal(TemporalType.TIMESTAMP)
   private Date date;
 
-  public Activity() { }
+  public Activity() {}
 
   public Activity(EventType type, User user) {
     this.eventType = type;
@@ -175,5 +178,4 @@ public class Activity {
   public void removeData(String key) {
     this.data.remove(key);
   }
-
 }

@@ -45,5 +45,4 @@ public class BenchlingEntry {
   private Object schema;
 
   private String webURL;
-
 }

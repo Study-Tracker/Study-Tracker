@@ -50,26 +50,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class StudyServiceTests {
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private CollaboratorRepository collaboratorRepository;
+  @Autowired private CollaboratorRepository collaboratorRepository;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private NamingService namingService;
+  @Autowired private NamingService namingService;
 
   private static final int STUDY_COUNT = 6;
 
@@ -94,26 +87,34 @@ public class StudyServiceTests {
 
   @Test
   public void findByProgramTest() {
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
     List<Study> studies = studyService.findByProgram(program);
     Assert.assertTrue(!studies.isEmpty());
     Assert.assertEquals(2, studies.size());
 
-    program = programRepository.findByName("Preclinical Project B")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Preclinical Project B")
+            .orElseThrow(RecordNotFoundException::new);
     studies = studyService.findByProgram(program);
     Assert.assertTrue(!studies.isEmpty());
     Assert.assertEquals(2, studies.size());
 
-    program = programRepository.findByName("Target ID Project D")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Target ID Project D")
+            .orElseThrow(RecordNotFoundException::new);
     studies = studyService.findByProgram(program);
     Assert.assertTrue(!studies.isEmpty());
     Assert.assertEquals(1, studies.size());
 
-    program = programRepository.findByName("Cancelled Program C")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Cancelled Program C")
+            .orElseThrow(RecordNotFoundException::new);
     studies = studyService.findByProgram(program);
     Assert.assertTrue(studies.isEmpty());
   }
@@ -168,32 +169,40 @@ public class StudyServiceTests {
   @Test
   public void createStudyCodeTest() {
 
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setProgram(program);
     String code = namingService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("CPA-10003", code);
 
-    program = programRepository.findByName("Preclinical Project B")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Preclinical Project B")
+            .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
     code = namingService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("PPB-10002", code);
 
-    program = programRepository.findByName("Target ID Project D")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Target ID Project D")
+            .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
     code = namingService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("TID-10003", code);
 
-    program = programRepository.findByName("Cancelled Program C")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Cancelled Program C")
+            .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
     code = namingService.generateStudyCode(study);
@@ -208,21 +217,24 @@ public class StudyServiceTests {
       exception = e;
     }
     Assert.assertNotNull(exception);
-
   }
 
   @Test
   public void createExternalStudyCodeTest() {
-    Collaborator collaborator = collaboratorRepository.findByLabel("Inactive CRO")
-        .orElseThrow(RecordNotFoundException::new);
+    Collaborator collaborator =
+        collaboratorRepository
+            .findByLabel("Inactive CRO")
+            .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setCollaborator(collaborator);
     String code = namingService.generateExternalStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("IN-00001", code);
 
-    collaborator = collaboratorRepository.findByLabel("University of Somewhere")
-        .orElseThrow(RecordNotFoundException::new);
+    collaborator =
+        collaboratorRepository
+            .findByLabel("University of Somewhere")
+            .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setCollaborator(collaborator);
     code = namingService.generateExternalStudyCode(study);
@@ -260,7 +272,5 @@ public class StudyServiceTests {
     Assert.assertEquals(0, studyService.countBeforeDate(monthAgo));
     Assert.assertEquals(STUDY_COUNT, studyService.countFromDate(monthAgo));
     Assert.assertEquals(STUDY_COUNT, studyService.countBetweenDates(monthAgo, now));
-
   }
-
 }

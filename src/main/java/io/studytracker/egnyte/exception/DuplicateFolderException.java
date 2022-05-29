@@ -18,8 +18,7 @@ package io.studytracker.egnyte.exception;
 
 public class DuplicateFolderException extends EgnyteException {
 
-  public DuplicateFolderException() {
-  }
+  public DuplicateFolderException() {}
 
   public DuplicateFolderException(String message) {
     super(message);
@@ -32,5 +31,4 @@ public class DuplicateFolderException extends EgnyteException {
   public DuplicateFolderException(Throwable cause) {
     super(cause);
   }
-
 }

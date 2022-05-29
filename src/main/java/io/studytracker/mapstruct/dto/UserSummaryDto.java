@@ -22,5 +22,4 @@ public class UserSummaryDto {
   private Date createdAt;
   private Date updatedAt;
   private Map<String, String> attributes = new HashMap<>();
-
 }

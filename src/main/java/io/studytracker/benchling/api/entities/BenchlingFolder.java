@@ -16,5 +16,4 @@ public class BenchlingFolder {
   private String parentFolderId;
 
   private String projectId;
-
 }

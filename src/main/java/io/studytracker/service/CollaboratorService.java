@@ -26,8 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CollaboratorService {
 
-  @Autowired
-  private CollaboratorRepository collaboratorRepository;
+  @Autowired private CollaboratorRepository collaboratorRepository;
 
   public List<Collaborator> findAll() {
     return collaboratorRepository.findAll();
@@ -80,5 +79,4 @@ public class CollaboratorService {
   public boolean exists(Long id) {
     return collaboratorRepository.existsById(id);
   }
-
 }

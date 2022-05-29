@@ -20,22 +20,22 @@ public class UserPasswordGenerator {
     upperCaseRule.setNumberOfCharacters(1);
     CharacterRule numberRule = new CharacterRule(EnglishCharacterData.Digit);
     numberRule.setNumberOfCharacters(1);
-    CharacterData specialChars = new CharacterData() {
-      public String getErrorCode() {
-        return ERROR_CODE;
-      }
+    CharacterData specialChars =
+        new CharacterData() {
+          public String getErrorCode() {
+            return ERROR_CODE;
+          }
 
-      public String getCharacters() {
-        return "!@#$%^&*()_+";
-      }
-    };
+          public String getCharacters() {
+            return "!@#$%^&*()_+";
+          }
+        };
     CharacterRule specialCharacterRule = new CharacterRule(specialChars);
     specialCharacterRule.setNumberOfCharacters(1);
-    return new CharacterRule[]{lowerCaseRule, upperCaseRule, numberRule, specialCharacterRule};
+    return new CharacterRule[] {lowerCaseRule, upperCaseRule, numberRule, specialCharacterRule};
   }
 
   public String generatePassword() {
     return passwordGenerator.generatePassword(8, getCharacterRules());
   }
-
 }

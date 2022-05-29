@@ -21,11 +21,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "assay_tasks")
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "assay-task-details", attributeNodes = {
+  @NamedEntityGraph(
+      name = "assay-task-details",
+      attributeNodes = {
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("assignedTo")
-    })
+      })
 })
 public class AssayTask extends Task {
 

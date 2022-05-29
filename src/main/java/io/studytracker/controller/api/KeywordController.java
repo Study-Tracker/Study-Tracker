@@ -48,14 +48,13 @@ public class KeywordController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(KeywordController.class);
 
-  @Autowired
-  private KeywordService keywordService;
+  @Autowired private KeywordService keywordService;
 
-  @Autowired
-  private KeywordMapper keywordMapper;
+  @Autowired private KeywordMapper keywordMapper;
 
   @GetMapping("")
-  public List<KeywordDto> findAll(@RequestParam(required = false) String category,
+  public List<KeywordDto> findAll(
+      @RequestParam(required = false) String category,
       @RequestParam(required = false, value = "q") String query) {
     List<Keyword> keywords;
     if (query != null && category != null) {
@@ -90,29 +89,31 @@ public class KeywordController {
     LOGGER.info("Creating keyword");
     LOGGER.info(dto.toString());
     Keyword keyword = keywordMapper.fromDto(dto);
-    Optional<Keyword> optional = keywordService
-        .findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
+    Optional<Keyword> optional =
+        keywordService.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
     if (optional.isPresent()) {
-      throw new DuplicateRecordException(String.format("Keyword already exists: %s %s",
-          keyword.getCategory(), keyword.getKeyword()));
+      throw new DuplicateRecordException(
+          String.format(
+              "Keyword already exists: %s %s", keyword.getCategory(), keyword.getKeyword()));
     }
     keywordService.create(keyword);
     return new ResponseEntity<>(keywordMapper.toDto(keyword), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<KeywordDto> update(@PathVariable("id") Long id,
-      @RequestBody @Valid KeywordDto dto) {
+  public HttpEntity<KeywordDto> update(
+      @PathVariable("id") Long id, @RequestBody @Valid KeywordDto dto) {
     LOGGER.info("Updating keyword");
     LOGGER.info(dto.toString());
     Keyword updated = keywordMapper.fromDto(dto);
-    Optional<Keyword> optional = keywordService
-        .findByKeywordAndCategory(updated.getKeyword(), updated.getCategory());
+    Optional<Keyword> optional =
+        keywordService.findByKeywordAndCategory(updated.getKeyword(), updated.getCategory());
     if (optional.isPresent()) {
       Keyword keyword = optional.get();
       if (!keyword.getId().equals(id)) {
-        throw new DuplicateRecordException(String.format("Keyword already exists: %s %s",
-            updated.getCategory(), updated.getKeyword()));
+        throw new DuplicateRecordException(
+            String.format(
+                "Keyword already exists: %s %s", updated.getCategory(), updated.getKeyword()));
       }
     }
     keywordService.update(updated);
@@ -122,10 +123,11 @@ public class KeywordController {
   @DeleteMapping("/{id}")
   public HttpEntity<?> delete(@PathVariable("id") Long id) {
     LOGGER.info("Deleting assay type: " + id);
-    Keyword keyword = keywordService.findById(id)
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find keyword with ID: " + id));
+    Keyword keyword =
+        keywordService
+            .findById(id)
+            .orElseThrow(() -> new RecordNotFoundException("Cannot find keyword with ID: " + id));
     keywordService.delete(keyword);
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
 }

@@ -46,14 +46,11 @@ public class AssayControllerTests {
 
   private static final int NUM_ASSAYS = ExampleDataGenerator.ASSAY_COUNT;
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   private String username;
 
@@ -67,20 +64,19 @@ public class AssayControllerTests {
 
   @Test
   public void findAllTest() throws Exception {
-    mockMvc.perform(get("/api/assay")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/assay").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(NUM_ASSAYS)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("name")))
-        .andExpect(jsonPath("$[0]", hasKey("description")))
-    ;
+        .andExpect(jsonPath("$[0]", hasKey("description")));
   }
 
   @Test
   public void findByIdTest() throws Exception {
-    mockMvc.perform(get("/api/assay/PPB-10001-001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/assay/PPB-10001-001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("PPB-10001-001")))
@@ -93,9 +89,8 @@ public class AssayControllerTests {
 
   @Test
   public void findNonExistentAssayTest() throws Exception {
-    mockMvc.perform(get("/api/assay/CPA-XXXX-XXXX")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/assay/CPA-XXXX-XXXX").with(user(username)))
         .andExpect(status().isNotFound());
   }
-
 }

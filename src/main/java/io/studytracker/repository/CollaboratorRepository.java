@@ -28,5 +28,4 @@ public interface CollaboratorRepository extends JpaRepository<Collaborator, Long
   List<Collaborator> findByOrganizationName(String name);
 
   List<Collaborator> findByCode(String code);
-
 }

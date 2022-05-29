@@ -45,17 +45,13 @@ public class UserServiceTests {
 
   private static final int USER_COUNT = 3;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private PasswordResetTokenRepository passwordResetTokenRepository;
+  @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -67,7 +63,7 @@ public class UserServiceTests {
     List<User> users = userService.findAll();
     Assert.assertTrue(!users.isEmpty());
     Assert.assertEquals(USER_COUNT, users.size());
-    System.out.println(users.toString());
+    System.out.println(users);
   }
 
   @Test
@@ -168,7 +164,7 @@ public class UserServiceTests {
     Assert.assertNotNull(users);
     Assert.assertEquals(1, users.size());
     Assert.assertEquals("Joe Smith", users.get(0).getDisplayName());
-    System.out.println(users.toString());
+    System.out.println(users);
 
     users = userService.search("frank");
     Assert.assertNotNull(users);
@@ -183,14 +179,14 @@ public class UserServiceTests {
 
   @Test
   public void passwordResetTest() {
-    User user = userService.findByEmail("jsmith@email.com")
-        .orElseThrow(RecordNotFoundException::new);
+    User user =
+        userService.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(0, passwordResetTokenRepository.count());
     PasswordResetToken token = userService.createPasswordResetToken(user);
     Assert.assertNotNull(token);
     Assert.assertEquals(1, passwordResetTokenRepository.count());
     Assert.assertTrue(userService.validatePasswordResetToken(user.getEmail(), token.getToken()));
-    Assert.assertFalse(userService.validatePasswordResetToken("another@email.com", token.getToken()));
+    Assert.assertFalse(
+        userService.validatePasswordResetToken("another@email.com", token.getToken()));
   }
-
 }

@@ -13,5 +13,4 @@ public class AssaySlimDto {
   @NotNull private String name;
   private String code;
   private boolean active = true;
-
 }

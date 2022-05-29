@@ -47,8 +47,8 @@ public class BenchlingExceptionHandler implements ResponseErrorHandler {
     String body = IOUtils.toString(response.getBody(), StandardCharsets.UTF_8.name());
     Map<String, String> json = null;
     try {
-      TypeReference<HashMap<String, String>> typeReference = new TypeReference<HashMap<String, String>>() {
-      };
+      TypeReference<HashMap<String, String>> typeReference =
+          new TypeReference<HashMap<String, String>>() {};
       json = objectMapper.readValue(body, typeReference);
     } catch (Exception e) {
       e.printStackTrace();
@@ -61,5 +61,4 @@ public class BenchlingExceptionHandler implements ResponseErrorHandler {
       throw new BenchlingException(errorMessage);
     }
   }
-
 }

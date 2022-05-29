@@ -21,30 +21,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/study/{studyId}/studycollection")
 public class StudyStudyCollectionController extends AbstractStudyController {
 
-  @Autowired
-  private StudyCollectionService studyCollectionService;
+  @Autowired private StudyCollectionService studyCollectionService;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private StudyCollectionMapper mapper;
 
   @GetMapping("")
-  public List<StudyCollectionSummaryDto> getStudyStudyCollections(@PathVariable("studyId") String studyId) {
+  public List<StudyCollectionSummaryDto> getStudyStudyCollections(
+      @PathVariable("studyId") String studyId) {
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User currentUser = this.getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User currentUser =
+        this.getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     Study study = this.getStudyFromIdentifier(studyId);
-    List<StudyCollection> collections = studyCollectionService.findByStudy(study)
-        .stream()
-        .filter(c -> c.isShared()
-            || c.getCreatedBy().getId().equals(currentUser.getId())
-            || currentUser.isAdmin())
-        .collect(Collectors.toList());
+    List<StudyCollection> collections =
+        studyCollectionService.findByStudy(study).stream()
+            .filter(
+                c ->
+                    c.isShared()
+                        || c.getCreatedBy().getId().equals(currentUser.getId())
+                        || currentUser.isAdmin())
+            .collect(Collectors.toList());
 
     return mapper.toSummaryDtoList(collections);
   }
-
 }

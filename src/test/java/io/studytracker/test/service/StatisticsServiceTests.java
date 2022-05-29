@@ -31,11 +31,9 @@ public class StatisticsServiceTests {
 
   private static final long ACTIVITY_COUNT = 13;
 
-  @Autowired
-  private StatisticsService statisticsService;
+  @Autowired private StatisticsService statisticsService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -46,7 +44,7 @@ public class StatisticsServiceTests {
   public void currentTest() throws Exception {
     SummaryStatisticsDto summaryStatisticsDto = statisticsService.getCurrent();
     Assert.assertNotNull(summaryStatisticsDto);
-    System.out.println(summaryStatisticsDto.toString());
+    System.out.println(summaryStatisticsDto);
     Assert.assertEquals(STUDY_COUNT, summaryStatisticsDto.getStudyCount());
     Assert.assertEquals(ASSAY_COUNT, summaryStatisticsDto.getAssayCount());
     Assert.assertEquals(PROGRAM_COUNT, summaryStatisticsDto.getProgramCount());
@@ -63,14 +61,12 @@ public class StatisticsServiceTests {
 
     SummaryStatisticsDto summaryStatisticsDto = statisticsService.getAfterDate(monthAgo);
     Assert.assertNotNull(summaryStatisticsDto);
-    System.out.println(summaryStatisticsDto.toString());
+    System.out.println(summaryStatisticsDto);
 
     Assert.assertEquals(STUDY_COUNT, summaryStatisticsDto.getStudyCount());
     Assert.assertEquals(ASSAY_COUNT, summaryStatisticsDto.getAssayCount());
     Assert.assertEquals(PROGRAM_COUNT, summaryStatisticsDto.getProgramCount());
     Assert.assertEquals(USER_COUNT, summaryStatisticsDto.getUserCount());
     Assert.assertEquals(ACTIVITY_COUNT, summaryStatisticsDto.getActivityCount());
-
   }
-
 }

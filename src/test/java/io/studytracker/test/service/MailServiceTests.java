@@ -33,8 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test"})
 public class MailServiceTests {
 
-  @Autowired
-  private EmailService emailService;
+  @Autowired private EmailService emailService;
 
   @Value("${email.test-email:test@email.com}")
   private String testEmail;
@@ -50,5 +49,4 @@ public class MailServiceTests {
     String token = UUID.randomUUID().toString();
     emailService.sendNewUserEmail(testEmail, token);
   }
-
 }

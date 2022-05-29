@@ -21,5 +21,4 @@ public class ProgramDetailsDto {
   private ELNFolderDto notebookFolder;
   private FileStoreFolderDto storageFolder;
   private Map<String, String> attributes = new HashMap<>();
-
 }

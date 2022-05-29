@@ -33,8 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"egnyte-test", "example"})
 public class EgnyteRestClientFolderCreationTests {
 
-  @Autowired
-  private Environment env;
+  @Autowired private Environment env;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -48,58 +47,57 @@ public class EgnyteRestClientFolderCreationTests {
         "This functionality works, but the current API user account does not have permission to delete folders or files.");
     Assert.assertNotNull(client);
     Assert.assertNotNull(egnyteRoot);
-//
-//    // Create the new folder
-//    Exception exception = null;
-//    EgnyteFolder folder = null;
-//    String path = egnyteRoot + "/NewFolder";
-//
-//    try {
-//      folder = client.createFolder(path);
-//    } catch (Exception e) {
-//      exception = e;
-//      e.printStackTrace();
-//    }
-//    Assert.assertNotNull(folder);
-//    Assert.assertNull(exception);
-//
-//    // Make sure the folder is there
-//    EgnyteFolder newFolder = client.findFolderById(folder.getFolderId());
-//    Assert.assertNotNull(newFolder);
-//    Assert.assertEquals("NewFolder", newFolder.getName());
-//
-//    // Try to create the folder again
-//    try {
-//      folder = client.createFolder(path);
-//    } catch (Exception e) {
-//      exception = e;
-//      e.printStackTrace();
-//    }
-//
-//    Assert.assertNotNull(exception);
-//    Assert.assertTrue(exception.getCause() instanceof DuplicateFolderException);
-//
-//    // Delete the folder
-//    try {
-//      client.deleteObjectByPath(path);
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//      exception = e;
-//    }
-//    Assert.assertNull(exception);
-//
-//    // Make sure it is gone
-//    EgnyteObject egnyteObject = null;
-//    try {
-//      egnyteObject = client.findObjectByPath(path);
-//    } catch (Exception e) {
-//      exception = e;
-//      e.printStackTrace();
-//    }
-//    Assert.assertNotNull(exception);
-//    Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
-//    Assert.assertNull(egnyteObject);
+    //
+    //    // Create the new folder
+    //    Exception exception = null;
+    //    EgnyteFolder folder = null;
+    //    String path = egnyteRoot + "/NewFolder";
+    //
+    //    try {
+    //      folder = client.createFolder(path);
+    //    } catch (Exception e) {
+    //      exception = e;
+    //      e.printStackTrace();
+    //    }
+    //    Assert.assertNotNull(folder);
+    //    Assert.assertNull(exception);
+    //
+    //    // Make sure the folder is there
+    //    EgnyteFolder newFolder = client.findFolderById(folder.getFolderId());
+    //    Assert.assertNotNull(newFolder);
+    //    Assert.assertEquals("NewFolder", newFolder.getName());
+    //
+    //    // Try to create the folder again
+    //    try {
+    //      folder = client.createFolder(path);
+    //    } catch (Exception e) {
+    //      exception = e;
+    //      e.printStackTrace();
+    //    }
+    //
+    //    Assert.assertNotNull(exception);
+    //    Assert.assertTrue(exception.getCause() instanceof DuplicateFolderException);
+    //
+    //    // Delete the folder
+    //    try {
+    //      client.deleteObjectByPath(path);
+    //    } catch (Exception e) {
+    //      e.printStackTrace();
+    //      exception = e;
+    //    }
+    //    Assert.assertNull(exception);
+    //
+    //    // Make sure it is gone
+    //    EgnyteObject egnyteObject = null;
+    //    try {
+    //      egnyteObject = client.findObjectByPath(path);
+    //    } catch (Exception e) {
+    //      exception = e;
+    //      e.printStackTrace();
+    //    }
+    //    Assert.assertNotNull(exception);
+    //    Assert.assertTrue(exception.getCause() instanceof ObjectNotFoundException);
+    //    Assert.assertNull(egnyteObject);
 
   }
-
 }

@@ -18,8 +18,7 @@ package io.studytracker.exception;
 
 public class StudyTrackerException extends RuntimeException {
 
-  public StudyTrackerException() {
-  }
+  public StudyTrackerException() {}
 
   public StudyTrackerException(String message) {
     super(message);
@@ -33,9 +32,8 @@ public class StudyTrackerException extends RuntimeException {
     super(cause);
   }
 
-  public StudyTrackerException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public StudyTrackerException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
-
 }

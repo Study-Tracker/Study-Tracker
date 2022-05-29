@@ -58,14 +58,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @NamedEntityGraphs({
-    @NamedEntityGraph(name = "assay-summary", attributeNodes = {
+  @NamedEntityGraph(
+      name = "assay-summary",
+      attributeNodes = {
         @NamedAttributeNode("assayType"),
         @NamedAttributeNode("notebookFolder"),
         @NamedAttributeNode("storageFolder"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("users")
-    }),
-    @NamedEntityGraph(name = "assay-with-attributes", attributeNodes = {
+      }),
+  @NamedEntityGraph(
+      name = "assay-with-attributes",
+      attributeNodes = {
         @NamedAttributeNode(value = "assayType", subgraph = "assay-type-details"),
         @NamedAttributeNode("notebookFolder"),
         @NamedAttributeNode("storageFolder"),
@@ -74,29 +78,33 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode(value = "tasks", subgraph = "assay-task-details"),
         @NamedAttributeNode("users")
-    }, subgraphs = {
-        @NamedSubgraph(name = "assay-type-details", attributeNodes = {
-            @NamedAttributeNode("fields"),
-            @NamedAttributeNode("tasks")
-        }),
-        @NamedSubgraph(name = "assay-task-details", attributeNodes = {
-            @NamedAttributeNode("createdBy"),
-            @NamedAttributeNode("lastModifiedBy"),
-            @NamedAttributeNode("assignedTo")
-        })
-    }),
-    @NamedEntityGraph(name = "assay-with-parents", attributeNodes =  {
+      },
+      subgraphs = {
+        @NamedSubgraph(
+            name = "assay-type-details",
+            attributeNodes = {@NamedAttributeNode("fields"), @NamedAttributeNode("tasks")}),
+        @NamedSubgraph(
+            name = "assay-task-details",
+            attributeNodes = {
+              @NamedAttributeNode("createdBy"),
+              @NamedAttributeNode("lastModifiedBy"),
+              @NamedAttributeNode("assignedTo")
+            })
+      }),
+  @NamedEntityGraph(
+      name = "assay-with-parents",
+      attributeNodes = {
         @NamedAttributeNode("assayType"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("notebookFolder"),
         @NamedAttributeNode("storageFolder"),
         @NamedAttributeNode(value = "study", subgraph = "study-summary")
-    }, subgraphs = {
-        @NamedSubgraph(name = "study-summary", attributeNodes = {
-            @NamedAttributeNode("program"),
-            @NamedAttributeNode("collaborator")
-        })
-    })
+      },
+      subgraphs = {
+        @NamedSubgraph(
+            name = "study-summary",
+            attributeNodes = {@NamedAttributeNode("program"), @NamedAttributeNode("collaborator")})
+      })
 })
 public class Assay {
 
@@ -169,7 +177,8 @@ public class Assay {
   private Date updatedAt;
 
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "assay_users",
+  @JoinTable(
+      name = "assay_users",
       joinColumns = @JoinColumn(name = "assay_id", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
   private Set<User> users = new HashSet<>();
@@ -182,7 +191,11 @@ public class Assay {
   @Column(name = "attributes", columnDefinition = "json")
   private Map<String, String> attributes = new LinkedHashMap<>();
 
-  @OneToMany(mappedBy = "assay", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "assay",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   private Set<AssayTask> tasks = new HashSet<>();
 
   public void addTask(AssayTask task) {
@@ -391,7 +404,7 @@ public class Assay {
   }
 
   public void setTasks(Set<AssayTask> tasks) {
-    for (AssayTask task: tasks) {
+    for (AssayTask task : tasks) {
       task.setAssay(this);
     }
     this.tasks = tasks;

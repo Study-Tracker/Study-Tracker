@@ -43,14 +43,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ActiveProfiles({"web-test", "example"})
 public class StudyActivityControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
   @Before
   public void doBefore() {
@@ -63,11 +60,11 @@ public class StudyActivityControllerTests {
     Study study = studyService.findAll().get(0);
     studyService.updateStatus(study, Status.ON_HOLD);
 
-    mockMvc.perform(get("/api/study/" + study.getCode() + "/activity")
-        .with(user(study.getOwner().getUsername())))
+    mockMvc
+        .perform(
+            get("/api/study/" + study.getCode() + "/activity")
+                .with(user(study.getOwner().getUsername())))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
-
   }
-
 }

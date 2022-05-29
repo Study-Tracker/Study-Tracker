@@ -21,5 +21,4 @@ public class EventBridgeEvent implements StudyTrackerEvent {
     this.date = activity.getDate();
     this.data = activity.getData();
   }
-
 }

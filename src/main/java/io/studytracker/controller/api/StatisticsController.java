@@ -29,8 +29,7 @@ public class StatisticsController {
   @GetMapping("")
   public SummaryStatisticsDto getCurrentStats(
       @RequestParam(required = false, name = "startDate") Date startDate,
-      @RequestParam(required = false, name = "endDate") Date endDate
-  ) {
+      @RequestParam(required = false, name = "endDate") Date endDate) {
     if (startDate == null && endDate == null) {
       return statisticsService.getCurrent();
     } else if (startDate != null && endDate == null) {
@@ -53,11 +52,9 @@ public class StatisticsController {
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user = userService.findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     return statisticsService.getUserStatistics(user);
-
   }
 
   @Autowired

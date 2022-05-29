@@ -10,5 +10,4 @@ public class AssayTypeSlimDto {
   @NotNull private String name;
   @NotNull private String description;
   private boolean active = true;
-
 }

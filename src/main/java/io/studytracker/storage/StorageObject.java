@@ -51,5 +51,4 @@ public interface StorageObject {
   String getName();
 
   void setName(String name);
-
 }

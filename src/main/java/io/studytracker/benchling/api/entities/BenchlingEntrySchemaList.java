@@ -11,5 +11,4 @@ public class BenchlingEntrySchemaList {
 
   private List<BenchlingEntrySchema> entrySchemas = new ArrayList<>();
   private String nextToken;
-
 }

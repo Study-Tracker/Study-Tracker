@@ -9,5 +9,4 @@ public interface StudyConclusionsRepository extends JpaRepository<StudyConclusio
 
   @Query("select c from StudyConclusions c where c.study.id = ?1")
   Optional<StudyConclusions> findByStudyId(Long id);
-
 }

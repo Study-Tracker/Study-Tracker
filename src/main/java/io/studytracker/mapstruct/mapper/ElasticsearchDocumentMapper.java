@@ -28,44 +28,59 @@ import org.mapstruct.Mapper;
 public interface ElasticsearchDocumentMapper {
 
   ElasticsearchStudyDocument fromStudy(Study study);
+
   List<ElasticsearchStudyDocument> fromStudyList(List<Study> studies);
+
   Set<ElasticsearchStudyDocument> fromStudySet(Set<Study> studies);
 
   ElasticsearchCollaboratorDocument fromCollaborator(Collaborator collaborator);
+
   List<ElasticsearchCollaboratorDocument> fromCollaboratorList(List<Collaborator> collaborators);
+
   Set<ElasticsearchCollaboratorDocument> fromCollaboratorSet(Set<Collaborator> collaborators);
 
   ElasticsearchCommentDocument fromCommentt(Comment comment);
+
   List<ElasticsearchCommentDocument> fromCommentList(List<Comment> comments);
+
   Set<ElasticsearchCommentDocument> fromCommentSet(Set<Comment> comments);
 
   ElasticsearchConclusionsDocument fromConclusions(Conclusions conclusions);
 
   ElasticsearchFolderDocument fromELNFolder(ELNFolder elnFolder);
+
   List<ElasticsearchFolderDocument> fromElnFolderList(List<ELNFolder> elnFolderList);
+
   Set<ElasticsearchFolderDocument> fromElnFolderSet(Set<ELNFolder> folders);
 
   ElasticsearchFolderDocument fromFileStoreFolder(FileStoreFolder fileStoreFolder);
+
   List<ElasticsearchFolderDocument> fromFileStoreFolderList(List<FileStoreFolder> folders);
+
   Set<ElasticsearchFolderDocument> fromFileStoreFolderSet(Set<FileStoreFolder> folders);
 
   ElasticsearchKeywordDocument fromKeyword(Keyword keyword);
+
   List<ElasticsearchKeywordDocument> fromKeywordList(List<Keyword> keywords);
+
   Set<ElasticsearchKeywordDocument> fromKeywordSet(Set<Keyword> keywords);
 
   ElasticsearchLinkDocument fromExternalLink(ExternalLink link);
+
   List<ElasticsearchLinkDocument> fromExternalLinkList(List<ExternalLink> links);
+
   Set<ElasticsearchLinkDocument> fromExternalLinkSet(Set<ExternalLink> links);
 
   ElasticsearchProgramDocument fromProgram(Program program);
 
   ElasticsearchUserDocument fromUser(User user);
+
   List<ElasticsearchUserDocument> fromUserList(List<User> users);
+
   Set<ElasticsearchUserDocument> fromUserSet(Set<User> users);
 
-  /** For mapping the {@link ExternalLink#getUrl()} field to a String **/
+  /** For mapping the {@link ExternalLink#getUrl()} field to a String * */
   default String map(URL url) {
     return url.toString();
   }
-
 }

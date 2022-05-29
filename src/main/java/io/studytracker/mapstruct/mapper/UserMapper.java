@@ -16,20 +16,29 @@ public interface UserMapper {
 
   // UserSummary
   User fromUserSummary(UserSummaryDto dto);
+
   Set<User> fromUserSummarySet(Set<UserSummaryDto> dtos);
+
   List<User> fromUserSummaryList(List<UserSummaryDto> dtos);
+
   UserSummaryDto toUserSummary(User user);
+
   Set<UserSummaryDto> toUserSummarySet(Set<User> users);
+
   List<UserSummaryDto> toUserSummaryList(List<User> users);
 
   // UserDetails
   User fromUserDetails(UserDetailsDto dto);
+
   List<User> fromUserDetailsList(List<UserDetailsDto> dtos);
+
   UserDetailsDto toUserDetails(User user);
+
   List<UserDetailsDto> toUserDetailsList(List<User> users);
 
   User fromUserSlim(UserSlimDto dto);
-  UserSlimDto toUserSlim(User user);
-  List<UserSlimDto> toUserSlimList(List<User> users);
 
+  UserSlimDto toUserSlim(User user);
+
+  List<UserSlimDto> toUserSlimList(List<User> users);
 }

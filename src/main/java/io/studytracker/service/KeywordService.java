@@ -34,8 +34,7 @@ public class KeywordService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(KeywordService.class);
 
-  @Autowired
-  private KeywordRepository keywordRepository;
+  @Autowired private KeywordRepository keywordRepository;
 
   public Optional<Keyword> findById(Long id) {
     return keywordRepository.findById(id);
@@ -80,11 +79,12 @@ public class KeywordService {
   @Transactional
   public Keyword create(Keyword keyword) {
     LOGGER.info("Registering new keyword: " + keyword.toString());
-    Optional<Keyword> optional
-        = this.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
+    Optional<Keyword> optional =
+        this.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
     if (optional.isPresent()) {
       throw new DuplicateRecordException(
-          String.format("Keyword '%s' already exists in category '%s'",
+          String.format(
+              "Keyword '%s' already exists in category '%s'",
               keyword.getKeyword(), keyword.getCategory()));
     } else {
       return keywordRepository.save(keyword);
@@ -103,5 +103,4 @@ public class KeywordService {
   public void delete(Keyword keyword) {
     keywordRepository.delete(keyword);
   }
-
 }

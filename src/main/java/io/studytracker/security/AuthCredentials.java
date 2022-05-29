@@ -7,5 +7,4 @@ public class AuthCredentials {
 
   private String username;
   private String password;
-
 }

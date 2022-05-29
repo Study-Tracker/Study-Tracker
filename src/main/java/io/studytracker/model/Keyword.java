@@ -25,9 +25,9 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "keywords", indexes = {
-    @Index(name = "idx_keyword", columnList = "category, keyword")
-})
+@Table(
+    name = "keywords",
+    indexes = {@Index(name = "idx_keyword", columnList = "category, keyword")})
 public class Keyword {
 
   @Id
@@ -40,8 +40,7 @@ public class Keyword {
   @Column(name = "category", nullable = false)
   private String category;
 
-  public Keyword() {
-  }
+  public Keyword() {}
 
   public Keyword(String keyword, String category) {
     this.keyword = keyword;

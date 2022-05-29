@@ -10,13 +10,18 @@ import org.mapstruct.Mapper;
 public interface AssayTypeMapper {
 
   AssayTypeDetailsDto toDetailsDto(AssayType assayType);
+
   List<AssayTypeDetailsDto> toDetailsDtoList(List<AssayType> assayTypes);
+
   AssayType fromDetailsDto(AssayTypeDetailsDto dto);
+
   List<AssayType> fromDetailsDtoList(List<AssayTypeDetailsDto> dtos);
 
   AssayTypeSlimDto toSlimDto(AssayType assayType);
-  List<AssayTypeSlimDto> toSlimDtoList(List<AssayType> assayTypes);
-  AssayType fromSlimDto(AssayTypeSlimDto dto);
-  List<AssayType> fromSlimDtoList(List<AssayTypeSlimDto> dtos);
 
+  List<AssayTypeSlimDto> toSlimDtoList(List<AssayType> assayTypes);
+
+  AssayType fromSlimDto(AssayTypeSlimDto dto);
+
+  List<AssayType> fromSlimDtoList(List<AssayTypeSlimDto> dtos);
 }

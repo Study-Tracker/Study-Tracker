@@ -51,5 +51,4 @@ public interface AssayRepository extends JpaRepository<Assay, Long> {
   long countByCreatedAtAfter(Date date);
 
   long countByCreatedAtBetween(Date startDate, Date endDate);
-
 }

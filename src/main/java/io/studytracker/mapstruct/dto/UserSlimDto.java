@@ -9,5 +9,4 @@ public class UserSlimDto {
   private String username;
   private String displayName;
   private String email;
-
 }

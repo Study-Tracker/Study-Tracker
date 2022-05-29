@@ -16,11 +16,9 @@
 
 package io.studytracker.exception;
 
-
 public class InvalidConstraintException extends StudyTrackerException {
 
-  public InvalidConstraintException() {
-  }
+  public InvalidConstraintException() {}
 
   public InvalidConstraintException(String message) {
     super(message);
@@ -34,9 +32,8 @@ public class InvalidConstraintException extends StudyTrackerException {
     super(cause);
   }
 
-  public InvalidConstraintException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public InvalidConstraintException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
-
 }

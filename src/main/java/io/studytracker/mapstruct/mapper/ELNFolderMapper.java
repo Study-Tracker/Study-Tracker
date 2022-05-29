@@ -7,5 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ELNFolderMapper {
   ELNFolderDto toDto(ELNFolder folder);
+
   ELNFolder fromDto(ELNFolderDto dto);
 }

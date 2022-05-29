@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class StudyCollectionService {
 
-  @Autowired
-  private StudyCollectionRepository studyCollectionRepository;
+  @Autowired private StudyCollectionRepository studyCollectionRepository;
 
   public Optional<StudyCollection> findById(Long id) {
     return studyCollectionRepository.findById(id);
@@ -50,8 +49,9 @@ public class StudyCollectionService {
 
   public boolean collectionWithNameExists(StudyCollection collection, User user) {
     return studyCollectionRepository.findByCreatedById(user.getId()).stream()
-        .anyMatch(c -> c.getName().equalsIgnoreCase(collection.getName().toLowerCase())
-            && !c.getId().equals(collection.getId()));
+        .anyMatch(
+            c ->
+                c.getName().equalsIgnoreCase(collection.getName())
+                    && !c.getId().equals(collection.getId()));
   }
-
 }

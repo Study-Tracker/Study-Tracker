@@ -36,5 +36,4 @@ public class WebErrorController implements ErrorController {
     modelMap.addAttribute("code", code);
     return "index";
   }
-
 }

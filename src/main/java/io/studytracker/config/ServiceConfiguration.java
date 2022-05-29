@@ -64,5 +64,4 @@ public class ServiceConfiguration {
   public void setEnv(Environment env) {
     this.env = env;
   }
-
 }

@@ -13,5 +13,4 @@ public class BenchlingSchemaFieldDefinition {
   private String name;
   private String type;
   private BenchlingArchiveRecord archiveRecord;
-
 }

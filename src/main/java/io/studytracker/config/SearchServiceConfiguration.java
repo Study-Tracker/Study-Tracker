@@ -48,15 +48,11 @@ public class SearchServiceConfiguration {
       MaybeSecureClientConfigurationBuilder sBuilder = builder.connectedTo(host);
       ClientConfiguration configuration;
       if (useSsl != null && useSsl && username != null && password != null) {
-        configuration = sBuilder.usingSsl()
-            .withBasicAuth(username, password)
-            .build();
+        configuration = sBuilder.usingSsl().withBasicAuth(username, password).build();
       } else if (useSsl != null && useSsl) {
-        configuration = sBuilder.usingSsl()
-            .build();
+        configuration = sBuilder.usingSsl().build();
       } else if (username != null && password != null) {
-        configuration = sBuilder.withBasicAuth(username, password)
-            .build();
+        configuration = sBuilder.withBasicAuth(username, password).build();
       } else {
         configuration = sBuilder.build();
       }
@@ -64,10 +60,9 @@ public class SearchServiceConfiguration {
     }
 
     @Bean
-    public ElasticsearchSearchService elasticsearchSearchService(){
+    public ElasticsearchSearchService elasticsearchSearchService() {
       return new ElasticsearchSearchService();
     }
-
   }
 
   @Configuration
@@ -77,11 +72,9 @@ public class SearchServiceConfiguration {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(SearchServiceConfiguration.class);
 
-    @Autowired
-    private StudyRepository studyRepository;
+    @Autowired private StudyRepository studyRepository;
 
-    @Autowired
-    private SearchService<?, ?> searchService;
+    @Autowired private SearchService<?, ?> searchService;
 
     /**
      * Indexes all studies that have been updated within the past two hours. Runs on a schedule
@@ -99,7 +92,5 @@ public class SearchServiceConfiguration {
       }
       LOGGER.info("Study indexing complete. Indexed {} studies", count);
     }
-
   }
-
 }

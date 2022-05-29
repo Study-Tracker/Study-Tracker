@@ -18,8 +18,7 @@ package io.studytracker.storage.exception;
 
 public class StudyStorageException extends Exception {
 
-  public StudyStorageException() {
-  }
+  public StudyStorageException() {}
 
   public StudyStorageException(String message) {
     super(message);
@@ -33,8 +32,8 @@ public class StudyStorageException extends Exception {
     super(cause);
   }
 
-  public StudyStorageException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public StudyStorageException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

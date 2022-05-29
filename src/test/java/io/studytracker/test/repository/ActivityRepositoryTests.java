@@ -89,14 +89,13 @@ public class ActivityRepositoryTests {
     program.setStorageFolder(folder);
 
     programRepository.save(program);
-
   }
 
   private void createStudy() {
 
     User user = userRepository.findByUsername("test").orElseThrow(RecordNotFoundException::new);
-    Program program = programRepository.findByName("Test Program")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository.findByName("Test Program").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setName("Test Study");
@@ -111,7 +110,6 @@ public class ActivityRepositoryTests {
     study.setStartDate(new Date());
     study.addAttribute("key", "value");
     studyRepository.save(study);
-
   }
 
   @Test
@@ -129,7 +127,6 @@ public class ActivityRepositoryTests {
     activityRepository.save(activity);
     Assert.assertNotNull(activity.getId());
     Assert.assertEquals(1, activityRepository.count());
-
   }
 
   private static Map<String, Object> createStudyView(Study study) {
@@ -148,14 +145,15 @@ public class ActivityRepositoryTests {
     view.put("updatedAt", study.getUpdatedAt());
     view.put("legacy", study.isLegacy());
     view.put("active", study.isActive());
-    view.put("keyword", study.getKeywords().stream()
-        .map(EntityViewUtils::createKeywordView)
-        .collect(Collectors.toSet()));
+    view.put(
+        "keyword",
+        study.getKeywords().stream()
+            .map(EntityViewUtils::createKeywordView)
+            .collect(Collectors.toSet()));
     view.put("startDate", study.getStartDate());
     view.put("endDate", study.getEndDate());
-    view.put("users", study.getUsers().stream()
-        .map(User::getDisplayName)
-        .collect(Collectors.toSet()));
+    view.put(
+        "users", study.getUsers().stream().map(User::getDisplayName).collect(Collectors.toSet()));
     view.put("attributes", study.getAttributes());
     if (study.getCollaborator() != null) {
       view.put("collaborator", study.getCollaborator().getLabel());
@@ -174,7 +172,8 @@ public class ActivityRepositoryTests {
     Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
     study.setStatus(Status.COMPLETE);
     studyRepository.save(study);
-//    Activity activity = StudyActivityUtils.fromStudyStatusChange(study, user, Status.ACTIVE, Status.COMPLETE);
+    //    Activity activity = StudyActivityUtils.fromStudyStatusChange(study, user, Status.ACTIVE,
+    // Status.COMPLETE);
 
     Activity activity = new Activity();
     activity.setStudy(study);
@@ -194,8 +193,5 @@ public class ActivityRepositoryTests {
     Activity created = activityRepository.findAll().get(0);
     Assert.assertEquals(EventType.STUDY_STATUS_CHANGED, created.getEventType());
     System.out.println(created.getData());
-
   }
-
-
 }

@@ -13,5 +13,4 @@ public class AssayTypeFieldDto {
   private boolean required = false;
   private String description;
   private boolean active = true;
-
 }

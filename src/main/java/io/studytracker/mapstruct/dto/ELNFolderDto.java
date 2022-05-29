@@ -10,5 +10,4 @@ public class ELNFolderDto {
   private String name;
   private String path;
   private String referenceId;
-
 }

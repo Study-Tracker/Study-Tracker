@@ -49,22 +49,20 @@ public class CollaboratorController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollaboratorController.class);
 
-  @Autowired
-  private CollaboratorService collaboratorService;
+  @Autowired private CollaboratorService collaboratorService;
 
-  @Autowired
-  private CollaboratorMapper collaboratorMapper;
+  @Autowired private CollaboratorMapper collaboratorMapper;
 
   @GetMapping("")
   public List<CollaboratorDto> getAllExternalContacts(
       @RequestParam(value = "label", required = false) String label,
       @RequestParam(value = "organizationName", required = false) String name,
-      @RequestParam(value = "organizationCode", required = false) String code
-  ) {
+      @RequestParam(value = "organizationCode", required = false) String code) {
     List<Collaborator> collaborators;
     if (label != null) {
       Optional<Collaborator> optional = collaboratorService.findByLabel(label);
-      collaborators = optional.isPresent() ? Collections.singletonList(optional.get()) : new ArrayList<>();
+      collaborators =
+          optional.isPresent() ? Collections.singletonList(optional.get()) : new ArrayList<>();
     } else if (name != null) {
       collaborators = collaboratorService.findByOrganizationName(name);
     } else if (code != null) {
@@ -96,8 +94,8 @@ public class CollaboratorController {
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<CollaboratorDto> updateCollaborator(@PathVariable("id") Long id,
-      @Valid @RequestBody CollaboratorDto dto) {
+  public HttpEntity<CollaboratorDto> updateCollaborator(
+      @PathVariable("id") Long id, @Valid @RequestBody CollaboratorDto dto) {
     LOGGER.info("Updating collaborator record: " + dto.toString());
     if (!collaboratorService.exists(id)) {
       throw new RecordNotFoundException("Collaborator does not exist: " + id);
@@ -118,5 +116,4 @@ public class CollaboratorController {
     collaboratorService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
 }

@@ -29,11 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StudyConclusionsService {
 
-  @Autowired
-  private StudyConclusionsRepository studyConclusionsRepository;
+  @Autowired private StudyConclusionsRepository studyConclusionsRepository;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
   public Optional<StudyConclusions> findStudyConclusions(Study study) {
     return studyConclusionsRepository.findByStudyId(study.getId());
@@ -59,12 +57,13 @@ public class StudyConclusionsService {
   @Transactional
   public void deleteStudyConclusions(Study study) {
     study.setConclusions(null);
-//    Optional<StudyConclusions> optional = studyConclusionsRepository.findByStudyId(study.getId());
-//    if (!optional.isPresent()) {
-//        throw new RecordNotFoundException(String.format("Conclusions not found for study: %s", study.getCode()));
-//    }
-//    studyConclusionsRepository.deleteById(optional.get().getId());
+    //    Optional<StudyConclusions> optional =
+    // studyConclusionsRepository.findByStudyId(study.getId());
+    //    if (!optional.isPresent()) {
+    //        throw new RecordNotFoundException(String.format("Conclusions not found for study: %s",
+    // study.getCode()));
+    //    }
+    //    studyConclusionsRepository.deleteById(optional.get().getId());
     studyRepository.save(study);
   }
-
 }

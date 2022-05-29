@@ -18,8 +18,7 @@ package io.studytracker.exception;
 
 public class FileStorageException extends Exception {
 
-  public FileStorageException() {
-  }
+  public FileStorageException() {}
 
   public FileStorageException(String message) {
     super(message);
@@ -33,8 +32,8 @@ public class FileStorageException extends Exception {
     super(cause);
   }
 
-  public FileStorageException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  public FileStorageException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

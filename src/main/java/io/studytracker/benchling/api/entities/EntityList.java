@@ -28,5 +28,4 @@ public class EntityList<T> {
 
   @JsonProperty("entity")
   private List<T> entities = new ArrayList<>();
-
 }

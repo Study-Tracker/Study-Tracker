@@ -31,17 +31,14 @@ public class ElasticsearchSearchServiceTests {
   @Autowired
   private ElasticsearchSearchService elasticsearchSearchService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private StudyIndexRepository studyIndexRepository;
+  @Autowired private StudyIndexRepository studyIndexRepository;
 
   @Before
-  public void before(){
+  public void before() {
     exampleDataGenerator.populateDatabase();
     studyIndexRepository.deleteAll();
   }
@@ -50,7 +47,7 @@ public class ElasticsearchSearchServiceTests {
   public void indexStudiesTest() {
     Assert.assertEquals(0, studyIndexRepository.count());
     List<Study> studyList = new ArrayList<>();
-    for (Study s: studyRepository.findAll()){
+    for (Study s : studyRepository.findAll()) {
       Study study = studyRepository.findById(s.getId()).orElseThrow(RecordNotFoundException::new);
       studyList.add(study);
     }
@@ -68,5 +65,4 @@ public class ElasticsearchSearchServiceTests {
     StudySearchHit<ElasticsearchStudyDocument> hit = hits.getHits().get(0);
     Assert.assertEquals("PPB-00001", hit.getDocument().getCode());
   }
-
 }

@@ -11,5 +11,4 @@ public interface ExternalLinkRepository extends JpaRepository<ExternalLink, Long
   @EntityGraph("link-only")
   @Query("select l from ExternalLink l where l.study.id = ?1")
   List<ExternalLink> findByStudyId(Long studyId);
-
 }

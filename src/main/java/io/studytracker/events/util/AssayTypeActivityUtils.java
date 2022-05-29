@@ -14,7 +14,8 @@ public class AssayTypeActivityUtils {
     activity.setEventType(EventType.NEW_ASSAY_TYPE);
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
-    activity.setData(Collections.singletonMap("assayType", EntityViewUtils.createAssayTypeView(assayType)));
+    activity.setData(
+        Collections.singletonMap("assayType", EntityViewUtils.createAssayTypeView(assayType)));
     return activity;
   }
 
@@ -23,7 +24,8 @@ public class AssayTypeActivityUtils {
     activity.setEventType(EventType.UPDATED_ASSAY_TYPE);
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
-    activity.setData(Collections.singletonMap("assayType", EntityViewUtils.createAssayTypeView(assayType)));
+    activity.setData(
+        Collections.singletonMap("assayType", EntityViewUtils.createAssayTypeView(assayType)));
     return activity;
   }
 
@@ -32,8 +34,8 @@ public class AssayTypeActivityUtils {
     activity.setEventType(EventType.DELETED_ASSAY_TYPE);
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
-    activity.setData(Collections.singletonMap("assayType", EntityViewUtils.createAssayTypeView(assayType)));
+    activity.setData(
+        Collections.singletonMap("assayType", EntityViewUtils.createAssayTypeView(assayType)));
     return activity;
   }
-
 }

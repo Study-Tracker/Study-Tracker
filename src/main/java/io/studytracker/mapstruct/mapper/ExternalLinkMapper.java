@@ -8,7 +8,10 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ExternalLinkMapper {
   ExternalLinkDto toDto(ExternalLink link);
+
   List<ExternalLinkDto> toDtoList(List<ExternalLink> links);
+
   ExternalLink fromDto(ExternalLinkDto dto);
+
   List<ExternalLink> fromDtoList(List<ExternalLinkDto> dtos);
 }

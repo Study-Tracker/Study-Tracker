@@ -35,13 +35,11 @@ public class BenchlingEntryRequest {
 
     private String value;
 
-    public CustomField() {
-    }
+    public CustomField() {}
 
     public CustomField(String value) {
       this.value = value;
     }
-
   }
 
   @Data
@@ -49,12 +47,10 @@ public class BenchlingEntryRequest {
 
     private String value;
 
-    private Field() {
-    }
+    private Field() {}
 
     public Field(String value) {
       this.value = value;
     }
   }
-
 }

@@ -41,14 +41,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class StudyExternalLinkServiceTests {
 
-  @Autowired
-  private StudyService studyService;
+  @Autowired private StudyService studyService;
 
-  @Autowired
-  private StudyExternalLinkService externalLinkService;
+  @Autowired private StudyExternalLinkService externalLinkService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -89,7 +86,6 @@ public class StudyExternalLinkServiceTests {
     }
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof LazyInitializationException);
-
   }
 
   @Test
@@ -101,8 +97,7 @@ public class StudyExternalLinkServiceTests {
     String url = link.getUrl().toString();
     link.setUrl(new URL("https://maps.google.com"));
     externalLinkService.updateStudyExternalLink(study, link);
-    link = externalLinkService.findById(id)
-        .orElseThrow(RecordNotFoundException::new);
+    link = externalLinkService.findById(id).orElseThrow(RecordNotFoundException::new);
     Assert.assertNotEquals(url, link.getUrl().toString());
   }
 
@@ -115,13 +110,11 @@ public class StudyExternalLinkServiceTests {
     externalLinkService.deleteStudyExternalLink(study, link.getId());
     Exception exception = null;
     try {
-      link = externalLinkService.findById(id)
-          .orElseThrow(RecordNotFoundException::new);
+      link = externalLinkService.findById(id).orElseThrow(RecordNotFoundException::new);
     } catch (Exception e) {
       exception = e;
     }
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof RecordNotFoundException);
   }
-
 }

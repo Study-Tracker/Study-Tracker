@@ -95,59 +95,41 @@ public class ExampleDataGenerator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private CollaboratorRepository collaboratorRepository;
+  @Autowired private CollaboratorRepository collaboratorRepository;
 
-  @Autowired
-  private AssayRepository assayRepository;
+  @Autowired private AssayRepository assayRepository;
 
-  @Autowired
-  private ActivityRepository activityRepository;
+  @Autowired private ActivityRepository activityRepository;
 
-  @Autowired
-  private StudyStorageService studyStorageService;
+  @Autowired private StudyStorageService studyStorageService;
 
-  @Autowired
-  private AssayTypeRepository assayTypeRepository;
+  @Autowired private AssayTypeRepository assayTypeRepository;
 
-  @Autowired
-  private AssayTypeFieldRepository assayTypeFieldRepository;
+  @Autowired private AssayTypeFieldRepository assayTypeFieldRepository;
 
-  @Autowired
-  private AssayTypeTaskRepository assayTypeTaskRepository;
+  @Autowired private AssayTypeTaskRepository assayTypeTaskRepository;
 
-  @Autowired
-  private KeywordRepository keywordRepository;
+  @Autowired private KeywordRepository keywordRepository;
 
-  @Autowired
-  private CommentRepository commentRepository;
+  @Autowired private CommentRepository commentRepository;
 
-  @Autowired
-  private StudyConclusionsRepository studyConclusionsRepository;
+  @Autowired private StudyConclusionsRepository studyConclusionsRepository;
 
-  @Autowired
-  private NotebookEntryTemplateRepository notebookEntryTemplateRepository;
+  @Autowired private NotebookEntryTemplateRepository notebookEntryTemplateRepository;
 
-  @Autowired
-  private AssayTaskRepository assayTaskRepository;
+  @Autowired private AssayTaskRepository assayTaskRepository;
 
-  @Autowired
-  private StudyRelationshipRepository studyRelationshipRepository;
+  @Autowired private StudyRelationshipRepository studyRelationshipRepository;
 
-  @Autowired
-  private ExternalLinkRepository externalLinkRepository;
+  @Autowired private ExternalLinkRepository externalLinkRepository;
 
-  @Autowired
-  private PasswordResetTokenRepository passwordResetTokenRepository;
+  @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
   public List<NotebookEntryTemplate> generateExampleEntryTemplates() {
     User user = userRepository.findAll().get(0);
@@ -284,7 +266,7 @@ public class ExampleDataGenerator {
       Assert.notNull(folder, "Program folder must not be null");
       return FileStoreFolder.from(folder);
     } catch (Exception ex) {
-      throw new RuntimeException(ex);
+      throw new StudyTrackerException(ex);
     }
   }
 
@@ -298,7 +280,7 @@ public class ExampleDataGenerator {
         }
       }
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new StudyTrackerException(e);
     }
   }
 
@@ -339,7 +321,6 @@ public class ExampleDataGenerator {
     users.add(user);
 
     return users;
-
   }
 
   public List<Keyword> generateExampleKeywords() {
@@ -353,7 +334,6 @@ public class ExampleDataGenerator {
     keywords.add(new Keyword("AKT3", "Gene"));
     keywords.add(new Keyword("PTEN", "Gene"));
     return keywords;
-
   }
 
   public List<Collaborator> generateExampleCollaborators() {
@@ -399,24 +379,30 @@ public class ExampleDataGenerator {
     collaborators.add(collaborator);
 
     return collaborators;
-
   }
 
   public void generateExampleStudies() throws Exception {
 
     Set<Keyword> keywords = new HashSet<>();
-    keywords.add(keywordRepository.findByKeywordAndCategory("AKT1", "Gene")
-        .orElseThrow(RecordNotFoundException::new));
-    keywords.add(keywordRepository.findByKeywordAndCategory("MCF7", "Cell Line")
-        .orElseThrow(RecordNotFoundException::new));
+    keywords.add(
+        keywordRepository
+            .findByKeywordAndCategory("AKT1", "Gene")
+            .orElseThrow(RecordNotFoundException::new));
+    keywords.add(
+        keywordRepository
+            .findByKeywordAndCategory("MCF7", "Cell Line")
+            .orElseThrow(RecordNotFoundException::new));
 
     // Study 1
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
-    Collaborator collaborator = collaboratorRepository.findByLabel("University of Somewhere")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    Collaborator collaborator =
+        collaboratorRepository
+            .findByLabel("University of Somewhere")
+            .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setStatus(Status.IN_PLANNING);
     study.setName("Example Collaborator Study");
@@ -457,8 +443,10 @@ public class ExampleDataGenerator {
     activityRepository.save(StudyActivityUtils.fromNewExternalLink(study, user, link));
 
     // Study 2
-    program = programRepository.findByName("Preclinical Project B")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Preclinical Project B")
+            .orElseThrow(RecordNotFoundException::new);
     user = userRepository.findByUsername("ajohnson").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
@@ -490,7 +478,8 @@ public class ExampleDataGenerator {
     study.setStatus(Status.ACTIVE);
     studyRepository.save(study);
 
-    Activity activity = StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.ACTIVE);
+    Activity activity =
+        StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.ACTIVE);
     activityRepository.save(activity);
 
     Comment comment = new Comment();
@@ -515,8 +504,10 @@ public class ExampleDataGenerator {
     activityRepository.save(StudyActivityUtils.fromNewConclusions(study, user, conclusions));
 
     // Study 3
-    program = programRepository.findByName("Preclinical Project B")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Preclinical Project B")
+            .orElseThrow(RecordNotFoundException::new);
     user = userRepository.findByUsername("ajohnson").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
@@ -536,8 +527,7 @@ public class ExampleDataGenerator {
     study.setKeywords(keywords);
     notebookEntry = new ELNFolder();
     notebookEntry.setName("ELN");
-    notebookEntry.setUrl(
-        "https://google.com");
+    notebookEntry.setUrl("https://google.com");
     study.setNotebookFolder(notebookEntry);
     study.setStorageFolder(createStudyFolder(study));
     studyRepository.save(study);
@@ -551,8 +541,10 @@ public class ExampleDataGenerator {
         StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.COMPLETE));
 
     // Study 4
-    program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
     user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
@@ -581,8 +573,10 @@ public class ExampleDataGenerator {
         StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.ON_HOLD));
 
     // Study 5
-    program = programRepository.findByName("Target ID Project D")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Target ID Project D")
+            .orElseThrow(RecordNotFoundException::new);
     user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
@@ -610,8 +604,10 @@ public class ExampleDataGenerator {
         StudyActivityUtils.fromStudyStatusChange(study, user, Status.IN_PLANNING, Status.COMPLETE));
 
     // Study 6
-    program = programRepository.findByName("Target ID Project E")
-        .orElseThrow(RecordNotFoundException::new);
+    program =
+        programRepository
+            .findByName("Target ID Project E")
+            .orElseThrow(RecordNotFoundException::new);
     user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
@@ -632,7 +628,6 @@ public class ExampleDataGenerator {
     study.setStorageFolder(createStudyFolder(study));
     studyRepository.save(study);
     activityRepository.save(StudyActivityUtils.fromNewStudy(study, user));
-
   }
 
   public FileStoreFolder createStudyFolder(Study study) {
@@ -646,26 +641,26 @@ public class ExampleDataGenerator {
       Assert.notNull(folder, "Study folder must not be null");
       return FileStoreFolder.from(folder);
     } catch (Exception ex) {
-      throw new RuntimeException(ex);
+      throw new StudyTrackerException(ex);
     }
   }
 
-//  public void createStudyFolders() {
-//    for (Study study : studyRepository.findAll()) {
-//      try {
-//        StorageFolder folder;
-//        try {
-//          folder = studyStorageService.getStudyFolder(study);
-//        } catch (Exception e) {
-//          folder = studyStorageService.createStudyFolder(study);
-//        }
-//        study.setStorageFolder(FileStoreFolder.from(folder));
-//        studyRepository.save(study);
-//      } catch (Exception ex) {
-//        throw new RuntimeException(ex);
-//      }
-//    }
-//  }
+  //  public void createStudyFolders() {
+  //    for (Study study : studyRepository.findAll()) {
+  //      try {
+  //        StorageFolder folder;
+  //        try {
+  //          folder = studyStorageService.getStudyFolder(study);
+  //        } catch (Exception e) {
+  //          folder = studyStorageService.createStudyFolder(study);
+  //        }
+  //        study.setStorageFolder(FileStoreFolder.from(folder));
+  //        studyRepository.save(study);
+  //      } catch (Exception ex) {
+  //        throw new RuntimeException(ex);
+  //      }
+  //    }
+  //  }
 
   public void generateExampleAssayTypes() {
 
@@ -686,14 +681,17 @@ public class ExampleDataGenerator {
 
     assayTypeRepository.save(assayType);
 
-    List<AssayTypeField> fields = Arrays.asList(
-        new AssayTypeField(assayType, "No. Slides", "number_of_slides", CustomEntityFieldType.INTEGER, true),
-        new AssayTypeField(assayType, "Antibodies", "antibodies", CustomEntityFieldType.TEXT),
-        new AssayTypeField(assayType, "Concentration (ul/mg)", "concentration", CustomEntityFieldType.FLOAT),
-        new AssayTypeField(assayType, "Date", "date", CustomEntityFieldType.DATE),
-        new AssayTypeField(assayType, "External", "external", CustomEntityFieldType.BOOLEAN, true),
-        new AssayTypeField(assayType, "Stain", "stain", CustomEntityFieldType.STRING)
-    );
+    List<AssayTypeField> fields =
+        Arrays.asList(
+            new AssayTypeField(
+                assayType, "No. Slides", "number_of_slides", CustomEntityFieldType.INTEGER, true),
+            new AssayTypeField(assayType, "Antibodies", "antibodies", CustomEntityFieldType.TEXT),
+            new AssayTypeField(
+                assayType, "Concentration (ul/mg)", "concentration", CustomEntityFieldType.FLOAT),
+            new AssayTypeField(assayType, "Date", "date", CustomEntityFieldType.DATE),
+            new AssayTypeField(
+                assayType, "External", "external", CustomEntityFieldType.BOOLEAN, true),
+            new AssayTypeField(assayType, "Stain", "stain", CustomEntityFieldType.STRING));
     assayTypeFieldRepository.saveAll(fields);
 
     AssayTypeTask task1 = new AssayTypeTask();
@@ -716,20 +714,18 @@ public class ExampleDataGenerator {
     task3.setOrder(2);
     task3.setAssayType(assayType);
     assayTypeTaskRepository.save(task3);
-
-
-
   }
 
   public void generateExampleAssays(List<Study> studies) {
 
-    AssayType assayType = assayTypeRepository.findByName("Generic")
-        .orElseThrow(RecordNotFoundException::new);
+    AssayType assayType =
+        assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
 
-    Study study = studies.stream()
-        .filter(s -> s.getCode().equals("PPB-10001"))
-        .collect(Collectors.toList())
-        .get(0);
+    Study study =
+        studies.stream()
+            .filter(s -> s.getCode().equals("PPB-10001"))
+            .collect(Collectors.toList())
+            .get(0);
     User user = study.getOwner();
     Assay assay = new Assay();
     assay.setStudy(study);
@@ -759,7 +755,6 @@ public class ExampleDataGenerator {
 
     assayRepository.save(assay);
 
-
     assay = new Assay();
     assay.setStudy(study);
     assay.setActive(true);
@@ -788,7 +783,6 @@ public class ExampleDataGenerator {
     assay.addTask(task);
 
     assayRepository.save(assay);
-
   }
 
   public FileStoreFolder createAssayFolder(Assay assay) {
@@ -802,7 +796,7 @@ public class ExampleDataGenerator {
       Assert.notNull(folder, "Assay folder must not be null");
       return FileStoreFolder.from(folder);
     } catch (Exception ex) {
-      throw new RuntimeException(ex);
+      throw new StudyTrackerException(ex);
     }
   }
 
@@ -847,5 +841,4 @@ public class ExampleDataGenerator {
       throw new StudyTrackerException(e);
     }
   }
-
 }

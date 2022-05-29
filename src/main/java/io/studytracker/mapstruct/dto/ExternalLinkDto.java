@@ -10,5 +10,4 @@ public class ExternalLinkDto {
   private Long id;
   @NotNull private String label;
   @NotNull private URL url;
-
 }

@@ -14,7 +14,9 @@ import org.springframework.data.domain.PageImpl;
 public interface ActivityMapper {
 
   ActivityDetailsDto toActivityDetails(Activity activity);
+
   Set<ActivityDetailsDto> toActivityDetailsSet(Set<Activity> activities);
+
   List<ActivityDetailsDto> toActivityDetailsList(List<Activity> activities);
 
   @Mapping(source = "program.id", target = "programId")
@@ -22,18 +24,16 @@ public interface ActivityMapper {
   @Mapping(source = "assay.id", target = "assayId")
   ActivitySummaryDto toActivitySummary(Activity activity);
 
-//  @Mapping(source = "program.id", target = "programId")
-//  @Mapping(source = "study.id", target = "studyId")
-//  @Mapping(source = "assay.id", target = "assayId")
+  //  @Mapping(source = "program.id", target = "programId")
+  //  @Mapping(source = "study.id", target = "studyId")
+  //  @Mapping(source = "assay.id", target = "assayId")
   List<ActivitySummaryDto> toActivitySummaryList(List<Activity> activities);
 
-//  @Mapping(source = "program.id", target = "programId")
-//  @Mapping(source = "study.id", target = "studyId")
-//  @Mapping(source = "assay.id", target = "assayId")
+  //  @Mapping(source = "program.id", target = "programId")
+  //  @Mapping(source = "study.id", target = "studyId")
+  //  @Mapping(source = "assay.id", target = "assayId")
   default Page<ActivitySummaryDto> toActivitySummaryPage(Page<Activity> page) {
     List<ActivitySummaryDto> dtos = this.toActivitySummaryList(page.getContent());
     return new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
   }
-
-
 }

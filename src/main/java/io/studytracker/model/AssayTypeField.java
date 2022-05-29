@@ -22,11 +22,7 @@ public class AssayTypeField extends CustomEntityField {
   }
 
   public AssayTypeField(
-      AssayType assayType,
-      String displayName,
-      String fieldName,
-      CustomEntityFieldType type
-  ) {
+      AssayType assayType, String displayName, String fieldName, CustomEntityFieldType type) {
     super();
     this.setAssayType(assayType);
     this.setDisplayName(displayName);
@@ -41,8 +37,7 @@ public class AssayTypeField extends CustomEntityField {
       String displayName,
       String fieldName,
       CustomEntityFieldType type,
-      boolean required
-  ) {
+      boolean required) {
     this.setAssayType(assayType);
     this.setDisplayName(displayName);
     this.setFieldName(fieldName);
@@ -57,8 +52,7 @@ public class AssayTypeField extends CustomEntityField {
       String fieldName,
       CustomEntityFieldType type,
       boolean required,
-      String description
-  ) {
+      String description) {
     this.setAssayType(assayType);
     this.setDisplayName(displayName);
     this.setFieldName(fieldName);

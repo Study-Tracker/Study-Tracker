@@ -82,22 +82,23 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     body.put("action", "add_folder");
     HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
     try {
-      ResponseEntity<EgnyteFolder> response = restTemplate
-          .exchange(url.toString(), HttpMethod.POST, request, EgnyteFolder.class);
+      ResponseEntity<EgnyteFolder> response =
+          restTemplate.exchange(url.toString(), HttpMethod.POST, request, EgnyteFolder.class);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
       String responseBody = e.getResponseBodyAsString();
       Map<String, String> json = null;
       try {
-        TypeReference<HashMap<String, String>> typeReference = new TypeReference<HashMap<String, String>>() {
-        };
+        TypeReference<HashMap<String, String>> typeReference =
+            new TypeReference<HashMap<String, String>>() {};
         json = new ObjectMapper().readValue(responseBody, typeReference);
         LOGGER.warn(json.toString());
       } catch (Exception ex) {
         ex.printStackTrace();
       }
       String errorMessage =
-          json != null && json.containsKey("errorMessage") ? json.get("errorMessage")
+          json != null && json.containsKey("errorMessage")
+              ? json.get("errorMessage")
               : responseBody;
       LOGGER.warn("Egnyte error message: " + errorMessage);
       if (errorMessage.equals("Folder already exists at this location")) {
@@ -120,15 +121,14 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     doBefore();
 
     URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/" + path);
-    LOGGER.debug("Request URL: " + url.toString());
+    LOGGER.debug("Request URL: " + url);
 
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + options.getToken());
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
     ResponseEntity<EgnyteObject> response = null;
     try {
-      response = restTemplate
-          .exchange(url.toString(), HttpMethod.GET, request, EgnyteObject.class);
+      response = restTemplate.exchange(url.toString(), HttpMethod.GET, request, EgnyteObject.class);
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
         throw new ObjectNotFoundException("Requested resource was not found.");
@@ -176,8 +176,8 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     headers.set("Authorization", "Bearer " + options.getToken());
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
     try {
-      ResponseEntity<EgnyteFolder> response = restTemplate
-          .exchange(url.toString(), HttpMethod.GET, request, EgnyteFolder.class);
+      ResponseEntity<EgnyteFolder> response =
+          restTemplate.exchange(url.toString(), HttpMethod.GET, request, EgnyteFolder.class);
       LOGGER.debug("Successfully completed Egnyte API request.");
       EgnyteFolder egnyteFolder = response.getBody();
       LOGGER.debug(egnyteFolder.toString());
@@ -203,8 +203,8 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
 
     try {
-      ResponseEntity<EgnyteFile> response = restTemplate
-          .exchange(url.toString(), HttpMethod.GET, request, EgnyteFile.class);
+      ResponseEntity<EgnyteFile> response =
+          restTemplate.exchange(url.toString(), HttpMethod.GET, request, EgnyteFile.class);
       LOGGER.debug("Successfully completed Egnyte API request.");
       return response.getBody();
     } catch (HttpStatusCodeException e) {
@@ -220,11 +220,13 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
 
   @Override
   public EgnyteFile uploadFile(File file, String path) throws EgnyteException {
-    LOGGER.info(String.format("Making request to Egnyte API to upload file %s to directory %s",
-        file.getName(), path));
+    LOGGER.info(
+        String.format(
+            "Making request to Egnyte API to upload file %s to directory %s",
+            file.getName(), path));
     doBefore();
-    URL url = joinUrls(options.getRootUrl(),
-        "/pubapi/v1/fs-content/" + path + "/" + file.getName());
+    URL url =
+        joinUrls(options.getRootUrl(), "/pubapi/v1/fs-content/" + path + "/" + file.getName());
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + options.getToken());
     headers.set("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
@@ -232,8 +234,8 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     body.add("file", new FileSystemResource(file));
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
     try {
-      ResponseEntity<EgnyteFile> response = restTemplate
-          .exchange(url.toString(), HttpMethod.POST, request, EgnyteFile.class);
+      ResponseEntity<EgnyteFile> response =
+          restTemplate.exchange(url.toString(), HttpMethod.POST, request, EgnyteFile.class);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -271,8 +273,7 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     try {
       return new URL(root, path);
     } catch (MalformedURLException ex) {
-      throw new RuntimeException(ex);
+      throw new StudyTrackerException(ex);
     }
   }
-
 }

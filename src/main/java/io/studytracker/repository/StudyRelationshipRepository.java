@@ -16,5 +16,4 @@ public interface StudyRelationshipRepository extends JpaRepository<StudyRelation
 
   @Query("select r from StudyRelationship r where r.sourceStudy.id = ?1 and r.targetStudy.id = ?2")
   Optional<StudyRelationship> findBySourceAndTargetStudyIds(Long sourceStudyId, Long targetStudyId);
-
 }

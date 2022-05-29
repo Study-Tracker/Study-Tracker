@@ -43,5 +43,4 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
   long countByCreatedAtAfter(Date date);
 
   long countByCreatedAtBetween(Date startDate, Date endDate);
-
 }

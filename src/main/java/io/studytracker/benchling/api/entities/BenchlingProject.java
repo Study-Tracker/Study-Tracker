@@ -27,5 +27,4 @@ public class BenchlingProject {
   private String name;
 
   private BenchlingUser owner;
-
 }

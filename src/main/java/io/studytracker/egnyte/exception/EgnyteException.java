@@ -20,8 +20,7 @@ import java.io.IOException;
 
 public class EgnyteException extends IOException {
 
-  public EgnyteException() {
-  }
+  public EgnyteException() {}
 
   public EgnyteException(String message) {
     super(message);
@@ -34,5 +33,4 @@ public class EgnyteException extends IOException {
   public EgnyteException(Throwable cause) {
     super(cause);
   }
-
 }

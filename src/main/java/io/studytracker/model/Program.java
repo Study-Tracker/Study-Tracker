@@ -47,9 +47,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "programs", indexes = {
-    @Index(name = "idx_program_name", columnList = "name")
-})
+@Table(
+    name = "programs",
+    indexes = {@Index(name = "idx_program_name", columnList = "name")})
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @NamedEntityGraphs(
@@ -60,9 +60,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           @NamedAttributeNode("lastModifiedBy"),
           @NamedAttributeNode("notebookFolder"),
           @NamedAttributeNode("storageFolder")
-        }
-    )
-)
+        }))
 public class Program {
 
   @Id

@@ -10,9 +10,7 @@ import io.studytracker.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-/**
- * Service definition for naming study folders, notebook entries, and more.
- */
+/** Service definition for naming study folders, notebook entries, and more. */
 public class NamingService {
 
   private final NamingOptions options;
@@ -42,7 +40,8 @@ public class NamingService {
     for (Program p : programService.findByCode(program.getCode())) {
       count = count + (studyRepository.findActiveProgramStudies(p.getId())).size();
     }
-    return program.getCode() + "-"
+    return program.getCode()
+        + "-"
         + String.format("%0" + options.getStudyCodeMinimumDigits() + "d", count);
   }
 
@@ -57,9 +56,11 @@ public class NamingService {
     if (collaborator == null) {
       throw new StudyTrackerException("External studies require a valid collaborator reference.");
     }
-    int count = options.getExternalStudyCodeCounterStart()
-        + studyRepository.findByExternalCodePrefix(collaborator.getCode() + "-").size();
-    return collaborator.getCode() + "-"
+    int count =
+        options.getExternalStudyCodeCounterStart()
+            + studyRepository.findByExternalCodePrefix(collaborator.getCode() + "-").size();
+    return collaborator.getCode()
+        + "-"
         + String.format("%0" + options.getExternalStudyCodeMinimumDigits() + "d", count);
   }
 
@@ -72,9 +73,9 @@ public class NamingService {
   public String generateAssayCode(Assay assay) {
     Study study = assay.getStudy();
     String prefix = study.getCode().split("-")[0] + "-";
-    long count = options.getAssayCodeCounterStart()
-        + assayRepository.countByCodePrefix(prefix);
-    return study.getCode() + "-"
+    long count = options.getAssayCodeCounterStart() + assayRepository.countByCodePrefix(prefix);
+    return study.getCode()
+        + "-"
         + String.format("%0" + options.getAssayCodeMinimumDigits() + "d", count);
   }
 

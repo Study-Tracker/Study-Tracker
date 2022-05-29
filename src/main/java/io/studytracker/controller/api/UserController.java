@@ -56,20 +56,15 @@ public class UserController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
-  @Autowired
-  private UserMapper userMapper;
+  @Autowired private UserMapper userMapper;
 
-  @Autowired
-  private ActivityMapper activityMapper;
+  @Autowired private ActivityMapper activityMapper;
 
-  @Autowired
-  private ActivityService activityService;
+  @Autowired private ActivityService activityService;
 
-  @Autowired
-  private EmailService emailService;
+  @Autowired private EmailService emailService;
 
   @GetMapping("")
   public List<UserSummaryDto> getAllUsers() throws Exception {
@@ -98,15 +93,17 @@ public class UserController {
   }
 
   @PostMapping("/{id}/status")
-  public HttpEntity<UserDetailsDto> updateUserStatus(@PathVariable("id") Long userId,
-      @RequestParam("active") boolean active) {
+  public HttpEntity<UserDetailsDto> updateUserStatus(
+      @PathVariable("id") Long userId, @RequestParam("active") boolean active) {
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User currentUser = userService.findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User currentUser =
+        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
     if (!currentUser.isAdmin()) {
-      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+      throw new InsufficientPrivilegesException(
+          "You do not have permission to perform this action.");
     }
 
     Optional<User> optional = userService.findById(userId);
@@ -117,18 +114,19 @@ public class UserController {
     user.setActive(active);
     userService.update(user);
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
 
   @PostMapping("/{id}/password-reset")
   public HttpEntity<?> resetUserPassword(@PathVariable("id") Long userId) {
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User currentUser = userService.findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User currentUser =
+        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
     if (!currentUser.isAdmin()) {
-      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+      throw new InsufficientPrivilegesException(
+          "You do not have permission to perform this action.");
     }
 
     Optional<User> optional = userService.findById(userId);
@@ -141,7 +139,6 @@ public class UserController {
     PasswordResetToken token = userService.createPasswordResetToken(user);
     emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
 
   @GetMapping("/{id}/activity")
@@ -159,12 +156,14 @@ public class UserController {
 
     LOGGER.info("Registering new user: " + dto.toString());
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User currentUser = userService.findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User currentUser =
+        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
     if (!currentUser.isAdmin()) {
-      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+      throw new InsufficientPrivilegesException(
+          "You do not have permission to perform this action.");
     }
 
     // Save the new user record
@@ -179,25 +178,24 @@ public class UserController {
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<UserDetailsDto> updateUser(@PathVariable("id") Long userId,
-      @RequestBody @Valid UserFormDto dto) {
+  public HttpEntity<UserDetailsDto> updateUser(
+      @PathVariable("id") Long userId, @RequestBody @Valid UserFormDto dto) {
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User currentUser = userService.findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User currentUser =
+        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
     if (!currentUser.isAdmin()) {
-      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
+      throw new InsufficientPrivilegesException(
+          "You do not have permission to perform this action.");
     }
 
     if (!userService.exists(userId)) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     userService.update(userMapper.fromUserForm(dto));
-    User user = userService.findById(userId)
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userService.findById(userId).orElseThrow(RecordNotFoundException::new);
     return new ResponseEntity<>(userMapper.toUserDetails(user), HttpStatus.CREATED);
-
   }
-
 }

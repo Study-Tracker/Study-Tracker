@@ -17,5 +17,4 @@ public class AssayTypeDetailsDto {
   private Set<AssayTypeFieldDto> fields = new HashSet<>();
   private Set<AssayTypeTaskDto> tasks = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
-
 }

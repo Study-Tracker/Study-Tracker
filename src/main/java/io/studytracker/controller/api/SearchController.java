@@ -20,7 +20,8 @@ public class SearchController {
   private SearchService<?, ?> searchService;
 
   @GetMapping("")
-  public HttpEntity<StudySearchHits<?>> search(@RequestParam("keyword") String keyword,
+  public HttpEntity<StudySearchHits<?>> search(
+      @RequestParam("keyword") String keyword,
       @RequestParam(value = "field", required = false) String field) {
     if (searchService != null) {
       StudySearchHits<?> searchHits;
@@ -34,5 +35,4 @@ public class SearchController {
       return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
   }
-
 }

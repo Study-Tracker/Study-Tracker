@@ -63,26 +63,19 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles({"web-test", "example"})
 public class StudyBaseControllerTests {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private ProgramRepository programRepository;
+  @Autowired private ProgramRepository programRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private StudyMapper mapper;
+  @Autowired private StudyMapper mapper;
 
   private String username;
 
@@ -96,20 +89,19 @@ public class StudyBaseControllerTests {
 
   @Test
   public void allStudiesTest() throws Exception {
-    mockMvc.perform(get("/api/study")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STUDY_COUNT - 1)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("name")))
-        .andExpect(jsonPath("$[0]", hasKey("description")))
-    ;
+        .andExpect(jsonPath("$[0]", hasKey("description")));
   }
 
   @Test
   public void findStudyByIdTest() throws Exception {
-    mockMvc.perform(get("/api/study/CPA-10001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("CPA-10001")))
@@ -122,18 +114,19 @@ public class StudyBaseControllerTests {
 
   @Test
   public void findNonExistantStudyTest() throws Exception {
-    mockMvc.perform(get("/api/study/CPA-XXXX")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-XXXX").with(user(username)))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void createStudyTest() throws Exception {
 
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setStatus(Status.ACTIVE);
@@ -141,31 +134,33 @@ public class StudyBaseControllerTests {
     study.setProgram(program);
     study.setDescription("This is a test");
     study.setLegacy(false);
-//    study.setCreatedBy(user);
-//    study.setLastModifiedBy(user);
+    //    study.setCreatedBy(user);
+    //    study.setLastModifiedBy(user);
     study.setStartDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
 
-    mockMvc.perform(post("/api/study/")
-        .with(user(user.getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(study)))
+    mockMvc
+        .perform(
+            post("/api/study/")
+                .with(user(user.getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("CPA-10003")));
-
   }
 
   @Test
   public void createStudyWithInvalidAttributes() throws Exception {
 
-    Program program = programRepository.findByName("Clinical Program A")
-        .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setStatus(Status.ACTIVE);
@@ -178,83 +173,85 @@ public class StudyBaseControllerTests {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
 
-    mockMvc.perform(post("/api/study/")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study)))
-        .with(user(user.getUsername())))
+    mockMvc
+        .perform(
+            post("/api/study/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study)))
+                .with(user(user.getUsername())))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   public void createStudyWithoutAuthorizationTest() throws Exception {
-    mockMvc.perform(post("/api/study/")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(new Study())))
+    mockMvc
+        .perform(
+            post("/api/study/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new Study())))
         .andExpect(status().isUnauthorized());
   }
 
   @Test
   public void updateStudyTest() throws Exception {
 
-    mockMvc.perform(get("/api/study/CPA-10001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("IN_PLANNING")));
 
-    Study study = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     study.setStatus(Status.ON_HOLD);
 
-    mockMvc.perform(put("/api/study/CPA-XXXXX")
-        .with(user(study.getOwner().getUsername()))
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
+    mockMvc
+        .perform(
+            put("/api/study/CPA-XXXXX")
+                .with(user(study.getOwner().getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isNotFound());
 
-    mockMvc.perform(put("/api/study/CPA-10001")
-            .with(user(study.getOwner().getUsername()))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
+    mockMvc
+        .perform(
+            put("/api/study/CPA-10001")
+                .with(user(study.getOwner().getUsername()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isOk());
-
   }
 
   @Test
   public void updateWithoutAutheotizationTest() throws Exception {
-    Study study = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     study.setStatus(Status.ON_HOLD);
 
-    mockMvc.perform(put("/api/study/CPA-10001")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
+    mockMvc
+        .perform(
+            put("/api/study/CPA-10001")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isUnauthorized());
   }
 
   @Test
   public void deleteStudyTest() throws Exception {
-    mockMvc.perform(delete("/api/study/CPA-10001")
-        .with(user("jsmith")))
-        .andExpect(status().isOk());
-    Study study = studyRepository.findByCode("CPA-10001")
-        .orElseThrow(RecordNotFoundException::new);
+    mockMvc.perform(delete("/api/study/CPA-10001").with(user("jsmith"))).andExpect(status().isOk());
+    Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(study.isActive());
   }
 
   @Test
   public void deleteWithoutAuthorizationTest() throws Exception {
-    mockMvc.perform(delete("/api/study/CPA-10001"))
-        .andExpect(status().isUnauthorized());
+    mockMvc.perform(delete("/api/study/CPA-10001")).andExpect(status().isUnauthorized());
   }
 
   @Test
   public void updateStatusTest() throws Exception {
-    User user = userRepository.findByUsername("jsmith")
-        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/study/CPA-10001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("IN_PLANNING")));
@@ -262,14 +259,16 @@ public class StudyBaseControllerTests {
     Map<String, String> params = new HashMap<>();
     params.put("status", "ON_HOLD");
 
-    mockMvc.perform(post("/api/study/CPA-10001/status")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(params))
-        .with(user(user.getUsername())))
+    mockMvc
+        .perform(
+            post("/api/study/CPA-10001/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(params))
+                .with(user(user.getUsername())))
         .andExpect(status().isOk());
 
-    mockMvc.perform(get("/api/study/CPA-10001")
-        .with(user(username)))
+    mockMvc
+        .perform(get("/api/study/CPA-10001").with(user(username)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("ON_HOLD")));
@@ -280,10 +279,11 @@ public class StudyBaseControllerTests {
     Map<String, String> params = new HashMap<>();
     params.put("status", "ON_HOLD");
 
-    mockMvc.perform(post("/api/study/CPA-10001/status")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(params)))
+    mockMvc
+        .perform(
+            post("/api/study/CPA-10001/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(params)))
         .andExpect(status().isUnauthorized());
   }
-
 }

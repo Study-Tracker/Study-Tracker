@@ -18,8 +18,7 @@ package io.studytracker.egnyte.exception;
 
 public class ObjectNotFoundException extends EgnyteException {
 
-  public ObjectNotFoundException() {
-  }
+  public ObjectNotFoundException() {}
 
   public ObjectNotFoundException(String message) {
     super(message);
@@ -32,5 +31,4 @@ public class ObjectNotFoundException extends EgnyteException {
   public ObjectNotFoundException(Throwable cause) {
     super(cause);
   }
-
 }

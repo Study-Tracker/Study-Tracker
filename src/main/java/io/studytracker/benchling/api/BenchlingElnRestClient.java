@@ -87,12 +87,9 @@ public final class BenchlingElnRestClient {
     data.add("client_secret", clientSecret);
     data.add("grant_type", "client_credentials");
     HttpEntity<?> request = new HttpEntity<>(data, headers);
-    ResponseEntity<BenchlingAuthenticationToken> response = restTemplate.exchange(
-        url.toString(),
-        HttpMethod.POST,
-        request,
-        BenchlingAuthenticationToken.class
-    );
+    ResponseEntity<BenchlingAuthenticationToken> response =
+        restTemplate.exchange(
+            url.toString(), HttpMethod.POST, request, BenchlingAuthenticationToken.class);
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return response.getBody();
     } else {
@@ -115,9 +112,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
     Map<String, Object> body = new LinkedHashMap<>();
     HttpEntity<?> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingProjectList> response
-        = restTemplate
-        .exchange(url, HttpMethod.GET, request, BenchlingProjectList.class);
+    ResponseEntity<BenchlingProjectList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingProjectList.class);
     if (!response.getStatusCode().equals(HttpStatus.OK)) {
       throw new StudyTrackerException("Failed to fetch project list.");
     }
@@ -126,14 +122,14 @@ public final class BenchlingElnRestClient {
 
   /**
    * Returns project details, identified by a PKID. Project IDs typically have a {@code src_}
-   *  prefix.
+   * prefix.
    *
    * @param id Project ID
    * @param authHeader
    * @return
    */
-  public Optional<BenchlingProject> findProjectById(@NotNull String id,
-      @NotNull String authHeader) {
+  public Optional<BenchlingProject> findProjectById(
+      @NotNull String id, @NotNull String authHeader) {
     String url = resolveUrl("/api/v2/projects/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -142,8 +138,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
     Map<String, Object> body = new LinkedHashMap<>();
     HttpEntity<?> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingProject> response
-        = restTemplate.exchange(url, HttpMethod.GET, request, BenchlingProject.class);
+    ResponseEntity<BenchlingProject> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingProject.class);
     BenchlingProject project = null;
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       project = response.getBody();
@@ -159,8 +155,8 @@ public final class BenchlingElnRestClient {
    * @param authHeader
    * @return
    */
-  private BenchlingFolderList findFolders(@NotNull String param, @NotNull String value,
-      @NotNull String authHeader, String nextToken) {
+  private BenchlingFolderList findFolders(
+      @NotNull String param, @NotNull String value, @NotNull String authHeader, String nextToken) {
     Map<String, String> map = new HashMap<>();
     map.put(param, value);
     map.put("nextToken", nextToken);
@@ -172,8 +168,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
     Map<String, Object> body = new LinkedHashMap<>();
     HttpEntity<?> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingFolderList> response
-        = restTemplate.exchange(url, HttpMethod.GET, request, BenchlingFolderList.class);
+    ResponseEntity<BenchlingFolderList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingFolderList.class);
     return response.getBody();
   }
 
@@ -194,8 +190,8 @@ public final class BenchlingElnRestClient {
    * @param authHeader
    * @return
    */
-  public BenchlingFolderList findFolderChildren(@NotNull String folderId,
-      @NotNull String authHeader, String nextToken) {
+  public BenchlingFolderList findFolderChildren(
+      @NotNull String folderId, @NotNull String authHeader, String nextToken) {
     return findFolders("parentFolderId", folderId, authHeader, nextToken);
   }
 
@@ -206,14 +202,14 @@ public final class BenchlingElnRestClient {
    * @param authHeader
    * @return
    */
-  public BenchlingFolderList findProjectFolderChildren(@NotNull String projectId,
-      @NotNull String authHeader, String nextToken) {
+  public BenchlingFolderList findProjectFolderChildren(
+      @NotNull String projectId, @NotNull String authHeader, String nextToken) {
     return findFolders("projectId", projectId, authHeader, nextToken);
   }
 
   /**
    * Returns a folder object {@link BenchlingFolder}, identified by its PKID. Folder IDs typically
-   *  have a {@code lib_} prefix.
+   * have a {@code lib_} prefix.
    *
    * @param id
    * @param authHeader
@@ -228,8 +224,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
     Map<String, Object> body = new LinkedHashMap<>();
     HttpEntity<?> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingFolder> response
-        = restTemplate.exchange(url, HttpMethod.GET, request, BenchlingFolder.class);
+    ResponseEntity<BenchlingFolder> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingFolder.class);
     BenchlingFolder folder = null;
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       folder = response.getBody();
@@ -245,8 +241,8 @@ public final class BenchlingElnRestClient {
    * @param authHeader
    * @return
    */
-  public BenchlingFolder createFolder(@NotNull String name, @NotNull String parentFolderId,
-      @NotNull String authHeader) {
+  public BenchlingFolder createFolder(
+      @NotNull String name, @NotNull String parentFolderId, @NotNull String authHeader) {
     String url = resolveUrl("/api/v2/folders");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -258,8 +254,8 @@ public final class BenchlingElnRestClient {
     body.put("name", name);
 
     HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingFolder> response = restTemplate
-        .exchange(url, HttpMethod.POST, request, BenchlingFolder.class);
+    ResponseEntity<BenchlingFolder> response =
+        restTemplate.exchange(url, HttpMethod.POST, request, BenchlingFolder.class);
     if (response.getStatusCode().equals(HttpStatus.CREATED)) {
       return response.getBody();
     }
@@ -268,14 +264,14 @@ public final class BenchlingElnRestClient {
 
   /**
    * Fetches a notebook entry {@link BenchlingEntry}, identified by its PKID. Entry records
-   *   typically have IDs with a {@code ent_} prefix.
+   * typically have IDs with a {@code ent_} prefix.
    *
    * @param entryId
    * @param authHeader
    * @return
    */
-  public Optional<BenchlingEntry> findEntryById(@NotNull String entryId,
-      @NotNull String authHeader) {
+  public Optional<BenchlingEntry> findEntryById(
+      @NotNull String entryId, @NotNull String authHeader) {
     LOGGER.info("Requesting entry with ID: " + entryId);
     String url = resolveUrl("/api/v2/entries/" + entryId);
     HttpHeaders headers = new HttpHeaders();
@@ -285,8 +281,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
     Map<String, Object> body = new LinkedHashMap<>();
     HttpEntity<?> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingEntry> response = restTemplate
-        .exchange(url, HttpMethod.GET, request, BenchlingEntry.class);
+    ResponseEntity<BenchlingEntry> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingEntry.class);
     BenchlingEntry entry = null;
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       entry = response.getBody();
@@ -309,8 +305,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
     Map<String, Object> body = new LinkedHashMap<>();
     HttpEntity<?> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingEntryList> response = restTemplate
-        .exchange(url, HttpMethod.GET, request, BenchlingEntryList.class);
+    ResponseEntity<BenchlingEntryList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingEntryList.class);
     return response.getBody();
   }
 
@@ -321,8 +317,8 @@ public final class BenchlingElnRestClient {
    * @param authHeader
    * @return
    */
-  public BenchlingEntryList findProjectEntries(@NotNull String projectId,
-      @NotNull String authHeader, String nextToken) {
+  public BenchlingEntryList findProjectEntries(
+      @NotNull String projectId, @NotNull String authHeader, String nextToken) {
     Map<String, String> map = new HashMap<>();
     map.put("projectId", projectId);
     map.put("nextToken", nextToken);
@@ -334,14 +330,13 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
     Map<String, Object> body = new LinkedHashMap<>();
     HttpEntity<?> request = new HttpEntity<>(body, headers);
-    ResponseEntity<BenchlingEntryList> response = restTemplate
-        .exchange(url, HttpMethod.GET, request, BenchlingEntryList.class);
+    ResponseEntity<BenchlingEntryList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingEntryList.class);
     return response.getBody();
   }
 
-  
-  public BenchlingEntry createEntry(@NotNull BenchlingEntryRequest entryRequest,
-      @NotNull String authHeader) {
+  public BenchlingEntry createEntry(
+      @NotNull BenchlingEntryRequest entryRequest, @NotNull String authHeader) {
     String url = resolveUrl("/api/v2/entries");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -350,8 +345,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingEntryRequest> request = new HttpEntity<>(entryRequest, headers);
-    ResponseEntity<BenchlingEntry> response = restTemplate
-        .exchange(url, HttpMethod.POST, request, BenchlingEntry.class);
+    ResponseEntity<BenchlingEntry> response =
+        restTemplate.exchange(url, HttpMethod.POST, request, BenchlingEntry.class);
     if (response.getStatusCode().equals(HttpStatus.CREATED)) {
       return response.getBody();
     }
@@ -364,22 +359,18 @@ public final class BenchlingElnRestClient {
    * @param authHeader
    * @return
    */
-  public BenchlingEntryTemplateList findEntryTemplates(@NotNull String authHeader,
-      String nextToken) {
-    String url = resolveUrl("/api/v2/entry-templates",
-        Collections.singletonMap("nextToken", nextToken));
+  public BenchlingEntryTemplateList findEntryTemplates(
+      @NotNull String authHeader, String nextToken) {
+    String url =
+        resolveUrl("/api/v2/entry-templates", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
     headers.set("Accept", "application/json");
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingEntryTemplateList> request = new HttpEntity<>(headers);
-    ResponseEntity<BenchlingEntryTemplateList> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        request,
-        BenchlingEntryTemplateList.class
-    );
+    ResponseEntity<BenchlingEntryTemplateList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingEntryTemplateList.class);
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return response.getBody();
     } else {
@@ -394,8 +385,8 @@ public final class BenchlingElnRestClient {
    * @param id
    * @return
    */
-  public BenchlingEntryTemplate findEntryTemplateById(@NotNull String id,
-      @NotNull String authHeader) {
+  public BenchlingEntryTemplate findEntryTemplateById(
+      @NotNull String id, @NotNull String authHeader) {
     String url = resolveUrl("/api/v2/entry-templates/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -403,12 +394,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingEntryTemplate> request = new HttpEntity<>(headers);
-    ResponseEntity<BenchlingEntryTemplate> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        request,
-        BenchlingEntryTemplate.class
-    );
+    ResponseEntity<BenchlingEntryTemplate> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingEntryTemplate.class);
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return response.getBody();
     } else {
@@ -417,20 +404,16 @@ public final class BenchlingElnRestClient {
   }
 
   public BenchlingEntrySchemaList findEntrySchemas(@NotNull String authHeader, String nextToken) {
-    String url = resolveUrl("/api/v2/entry-schemas",
-        Collections.singletonMap("nextToken", nextToken));
+    String url =
+        resolveUrl("/api/v2/entry-schemas", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
     headers.set("Accept", "application/json");
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingEntrySchemaList> request = new HttpEntity<>(headers);
-    ResponseEntity<BenchlingEntrySchemaList> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        request,
-        BenchlingEntrySchemaList.class
-    );
+    ResponseEntity<BenchlingEntrySchemaList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingEntrySchemaList.class);
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return response.getBody();
     } else {
@@ -438,8 +421,8 @@ public final class BenchlingElnRestClient {
     }
   }
 
-  public Optional<BenchlingEntrySchema> findEntrySchemaById(@NotNull String id,
-      @NotNull String authHeader) {
+  public Optional<BenchlingEntrySchema> findEntrySchemaById(
+      @NotNull String id, @NotNull String authHeader) {
     String url = resolveUrl("/api/v2/entry-schemas/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -447,12 +430,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingEntrySchema> request = new HttpEntity<>(headers);
-    ResponseEntity<BenchlingEntrySchema> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        request,
-        BenchlingEntrySchema.class
-    );
+    ResponseEntity<BenchlingEntrySchema> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingEntrySchema.class);
     BenchlingEntrySchema schema = null;
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       schema = response.getBody();
@@ -461,20 +440,15 @@ public final class BenchlingElnRestClient {
   }
 
   public BenchlingUserList findUsers(@NotNull String authHeader, String nextToken) {
-    String url = resolveUrl("/api/v2/users",
-        Collections.singletonMap("nextToken", nextToken));
+    String url = resolveUrl("/api/v2/users", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
     headers.set("Accept", "application/json");
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingUserList> request = new HttpEntity<>(headers);
-    ResponseEntity<BenchlingUserList> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        request,
-        BenchlingUserList.class
-    );
+    ResponseEntity<BenchlingUserList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingUserList.class);
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return response.getBody();
     } else {
@@ -482,22 +456,19 @@ public final class BenchlingElnRestClient {
     }
   }
 
-  public BenchlingUserList findUsersByUsername(@NotNull String username,
-      @NotNull String authHeader, String nextToken) {
-    String url = resolveUrl("/api/v2/users?handles=" + username,
-        Collections.singletonMap("nextToken", nextToken));
+  public BenchlingUserList findUsersByUsername(
+      @NotNull String username, @NotNull String authHeader, String nextToken) {
+    String url =
+        resolveUrl(
+            "/api/v2/users?handles=" + username, Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
     headers.set("Accept", "application/json");
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingUserList> request = new HttpEntity<>(headers);
-    ResponseEntity<BenchlingUserList> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        request,
-        BenchlingUserList.class
-    );
+    ResponseEntity<BenchlingUserList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingUserList.class);
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return response.getBody();
     } else {
@@ -505,8 +476,7 @@ public final class BenchlingElnRestClient {
     }
   }
 
-  public Optional<BenchlingUser> findUserById(@NotNull String id,
-      @NotNull String authHeader) {
+  public Optional<BenchlingUser> findUserById(@NotNull String id, @NotNull String authHeader) {
     String url = resolveUrl("/api/v2/users/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -514,12 +484,8 @@ public final class BenchlingElnRestClient {
     headers.set("Cache-Control", "no-cache");
 
     HttpEntity<BenchlingUser> request = new HttpEntity<>(headers);
-    ResponseEntity<BenchlingUser> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        request,
-        BenchlingUser.class
-    );
+    ResponseEntity<BenchlingUser> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingUser.class);
     BenchlingUser user = null;
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       user = response.getBody();
@@ -529,8 +495,8 @@ public final class BenchlingElnRestClient {
 
   private String resolveUrl(String endpoint, LinkedMultiValueMap<String, String> params) {
     URL url = joinUrls(rootUrl, endpoint);
-    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url.toString())
-        .queryParams(params);
+    UriComponentsBuilder uriComponentsBuilder =
+        UriComponentsBuilder.fromHttpUrl(url.toString()).queryParams(params);
     UriComponents components = uriComponentsBuilder.build(false);
     return components.toString();
   }
@@ -541,7 +507,7 @@ public final class BenchlingElnRestClient {
 
   private String resolveUrl(String endpoint, Map<String, String> params) {
     LinkedMultiValueMap<String, String> linkedMap = new LinkedMultiValueMap<>();
-    for (Map.Entry<String, String> entry: params.entrySet()) {
+    for (Map.Entry<String, String> entry : params.entrySet()) {
       if (StringUtils.hasText(entry.getValue())) {
         linkedMap.set(entry.getKey(), entry.getValue());
       }
@@ -553,8 +519,7 @@ public final class BenchlingElnRestClient {
     try {
       return new URL(root, path);
     } catch (MalformedURLException ex) {
-      throw new RuntimeException(ex);
+      throw new StudyTrackerException(ex);
     }
   }
-
 }

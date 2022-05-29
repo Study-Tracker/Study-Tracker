@@ -404,7 +404,8 @@
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <configLocation>./checkstyle.xml</configLocation>
+<!--          <configLocation>./checkstyle.xml</configLocation>-->
+          <configLocation>google_checks.xml</configLocation>
           <consoleOutput>true</consoleOutput>
         </configuration>
         <dependencies>

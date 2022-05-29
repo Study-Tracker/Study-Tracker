@@ -63,5 +63,4 @@ public class AppUserDetails implements UserDetails {
     DATABASE,
     SAML
   }
-
 }

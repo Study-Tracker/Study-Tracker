@@ -29,5 +29,4 @@ public class ExampleDataConfiguration {
   public ExampleDataGenerator exampleDataGenerator() {
     return new ExampleDataGenerator();
   }
-
 }

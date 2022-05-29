@@ -50,28 +50,27 @@ public class AssayStorageController extends AbstractAssayController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayStorageController.class);
 
-  @Autowired
-  private FileSystemStorageService fileStorageService;
+  @Autowired private FileSystemStorageService fileStorageService;
 
   @Autowired(required = false)
   private StudyStorageService studyStorageService;
 
   @GetMapping("")
-  public StorageFolder getStorageFolder(@PathVariable("assayId") String assayId)
-      throws Exception {
+  public StorageFolder getStorageFolder(@PathVariable("assayId") String assayId) throws Exception {
     LOGGER.info("Fetching storage folder for assay: " + assayId);
     Assay assay = getAssayFromIdentifier(assayId);
     return studyStorageService.getAssayFolder(assay);
   }
 
   @PostMapping("")
-  public HttpEntity<StorageFile> uploadFile(@PathVariable("assayId") String assayId,
-      @RequestParam("file") MultipartFile file) throws Exception {
+  public HttpEntity<StorageFile> uploadFile(
+      @PathVariable("assayId") String assayId, @RequestParam("file") MultipartFile file)
+      throws Exception {
     LOGGER.info("Uploaded file: " + file.getOriginalFilename());
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     Assay assay = getAssayFromIdentifier(assayId);
     Path path;
     try {
@@ -84,8 +83,7 @@ public class AssayStorageController extends AbstractAssayController {
     StorageFile storageFile = studyStorageService.saveAssayFile(path.toFile(), assay);
 
     // Publish events
-    Activity activity = AssayActivityUtils
-        .fromFileUpload(assay, user, storageFile);
+    Activity activity = AssayActivityUtils.fromFileUpload(assay, user, storageFile);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
@@ -95,20 +93,20 @@ public class AssayStorageController extends AbstractAssayController {
   @PatchMapping("/{id}/storage")
   public HttpEntity<?> repairStorageFolder(@PathVariable("id") String assayId) {
 
-//    // Check user privileges
-//    String username = UserAuthenticationUtils
-//        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-//    User user = this.getUserService().findByUsername(username)
-//        .orElseThrow(RecordNotFoundException::new);
-//    if (!user.isAdmin()) {
-//      throw new InsufficientPrivilegesException("You do not have permission to perform this action.");
-//    }
+    //    // Check user privileges
+    //    String username = UserAuthenticationUtils
+    //
+    // .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
+    //    User user = this.getUserService().findByUsername(username)
+    //        .orElseThrow(RecordNotFoundException::new);
+    //    if (!user.isAdmin()) {
+    //      throw new InsufficientPrivilegesException("You do not have permission to perform this
+    // action.");
+    //    }
 
     // Repair the storage folder
     Assay assay = this.getAssayFromIdentifier(assayId);
     getAssayService().repairStorageFolder(assay);
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
-
 }

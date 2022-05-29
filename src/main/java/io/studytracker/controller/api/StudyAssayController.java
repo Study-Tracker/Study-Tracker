@@ -58,8 +58,7 @@ public class StudyAssayController extends AbstractAssayController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyAssayController.class);
 
-  @Autowired
-  private AssayMapper assayMapper;
+  @Autowired private AssayMapper assayMapper;
 
   @Autowired(required = false)
   private StudyNotebookService notebookService;
@@ -71,24 +70,25 @@ public class StudyAssayController extends AbstractAssayController {
   }
 
   @GetMapping("/{assayId}")
-  public AssayDetailsDto findById(@PathVariable("assayId") String assayId) throws RecordNotFoundException {
+  public AssayDetailsDto findById(@PathVariable("assayId") String assayId)
+      throws RecordNotFoundException {
     return assayMapper.toAssayDetails(getAssayFromIdentifier(assayId));
   }
 
   @PostMapping("")
-  public HttpEntity<AssayDetailsDto> create(@PathVariable("studyId") String studyId,
-      @RequestBody @Valid AssayFormDto dto)
-          throws RecordNotFoundException, NotebookException {
+  public HttpEntity<AssayDetailsDto> create(
+      @PathVariable("studyId") String studyId, @RequestBody @Valid AssayFormDto dto)
+      throws RecordNotFoundException, NotebookException {
 
     LOGGER.info("Creating assay");
     LOGGER.info(dto.toString());
 
     Study study = this.getStudyFromIdentifier(studyId);
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     Assay assay = assayMapper.fromAssayForm(dto);
     Assay created;
@@ -100,26 +100,25 @@ public class StudyAssayController extends AbstractAssayController {
       if (templateOptional.isPresent()) {
         created = this.createAssay(assay, study, user, templateOptional.get());
       } else {
-        throw new RecordNotFoundException("Could not find notebook entry template: "
-            + dto.getNotebookTemplateId());
+        throw new RecordNotFoundException(
+            "Could not find notebook entry template: " + dto.getNotebookTemplateId());
       }
     } else {
       created = this.createAssay(assay, study, user);
     }
 
     return new ResponseEntity<>(assayMapper.toAssayDetails(created), HttpStatus.CREATED);
-
   }
 
   @PutMapping("/{assayId}")
-  public HttpEntity<AssayDetailsDto> update(@PathVariable("assayId") String assayId,
-      @RequestBody @Valid AssayFormDto dto) {
+  public HttpEntity<AssayDetailsDto> update(
+      @PathVariable("assayId") String assayId, @RequestBody @Valid AssayFormDto dto) {
     LOGGER.info("Updating assay");
     LOGGER.info(dto.toString());
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     Assay assay = assayMapper.fromAssayForm(dto);
     this.updateAssay(assay, user);
     return new ResponseEntity<>(assayMapper.toAssayDetails(assay), HttpStatus.OK);
@@ -128,17 +127,18 @@ public class StudyAssayController extends AbstractAssayController {
   @DeleteMapping("/{assayId}")
   public HttpEntity<?> delete(@PathVariable("assayId") String id) {
     LOGGER.info("Deleting assay: " + id);
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     this.deleteAssay(id, user);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/{id}/status")
-  public HttpEntity<?> updateStatus(@PathVariable("id") String id,
-      @RequestBody Map<String, Object> params) throws StudyTrackerException {
+  public HttpEntity<?> updateStatus(
+      @PathVariable("id") String id, @RequestBody Map<String, Object> params)
+      throws StudyTrackerException {
 
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
@@ -149,8 +149,8 @@ public class StudyAssayController extends AbstractAssayController {
     // Get authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user = this.getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    User user =
+        this.getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     String label = (String) params.get("status");
     Status status = Status.valueOf(label);
@@ -159,7 +159,5 @@ public class StudyAssayController extends AbstractAssayController {
     this.updateAssayStatus(assay.getId(), status, user);
 
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
-
 }

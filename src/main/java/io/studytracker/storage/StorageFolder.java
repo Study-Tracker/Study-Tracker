@@ -24,8 +24,7 @@ import org.springframework.data.annotation.Transient;
 
 public class StorageFolder implements StorageObject {
 
-  @Transient
-  private StorageFolder parentFolder;
+  @Transient private StorageFolder parentFolder;
 
   private String url;
 
@@ -33,11 +32,9 @@ public class StorageFolder implements StorageObject {
 
   private String name;
 
-  @Transient
-  private List<StorageFolder> subFolders = new ArrayList<>();
+  @Transient private List<StorageFolder> subFolders = new ArrayList<>();
 
-  @Transient
-  private List<StorageFile> files = new ArrayList<>();
+  @Transient private List<StorageFile> files = new ArrayList<>();
 
   public StorageFolder getParentFolder() {
     return parentFolder;

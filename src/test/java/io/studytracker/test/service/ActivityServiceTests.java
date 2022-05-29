@@ -43,14 +43,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class ActivityServiceTests {
 
-  @Autowired
-  private StudyRepository studyRepository;
+  @Autowired private StudyRepository studyRepository;
 
-  @Autowired
-  private ActivityService activityService;
+  @Autowired private ActivityService activityService;
 
-  @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Before
   public void doBefore() {
@@ -68,9 +65,9 @@ public class ActivityServiceTests {
       System.out.println(activity.getEventType());
     }
     Assert.assertEquals(ACTION_COUNT, activityList.size());
-    Activity activity = StudyActivityUtils
-        .fromStudyStatusChange(study, study.getLastModifiedBy(), Status.IN_PLANNING,
-            Status.COMPLETE);
+    Activity activity =
+        StudyActivityUtils.fromStudyStatusChange(
+            study, study.getLastModifiedBy(), Status.IN_PLANNING, Status.COMPLETE);
 
     activityService.create(activity);
 
@@ -79,34 +76,35 @@ public class ActivityServiceTests {
     Assert.assertEquals(ACTION_COUNT + 1, activityList.size());
 
     activity = activityList.get(ACTION_COUNT);
-    Assert.assertEquals(study.getCode(), ((Map<String, Object>) activity.getData().get("study")).get("code"));
+    Assert.assertEquals(
+        study.getCode(), ((Map<String, Object>) activity.getData().get("study")).get("code"));
     Assert.assertEquals(study.getCreatedBy().getUsername(), activity.getUser().getUsername());
     Assert.assertEquals(EventType.STUDY_STATUS_CHANGED, activity.getEventType());
     Assert.assertEquals(Status.COMPLETE.toString(), activity.getData().get("newStatus"));
-
   }
 
-//  @Test
-//  public void findStudyActivityTest() {
-//    Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
-//    Study study2 = studyRepository.findByCode("PPB-10001")
-//        .orElseThrow(RecordNotFoundException::new);
-//
-//    List<Activity> activities = activityService.findByStudy(study);
-//    Assert.assertEquals(2, activities.size());
-//    activities = activityService.findByStudy(study2);
-//    Assert.assertEquals(4, activities.size());
-//
-//    activities = activityService.findByProgram(study.getProgram());
-//    Assert.assertEquals(4, activities.size());
-//    activities = activityService.findByProgram(study2.getProgram());
-//    Assert.assertEquals(6, activities.size());
-//
-//    activities = activityService.findByEventType(EventType.NEW_STUDY);
-//    Assert.assertEquals(6, activities.size());
-//    activities = activityService.findByEventType(EventType.DELETED_STUDY);
-//    Assert.assertEquals(0, activities.size());
-//
-//  }
+  //  @Test
+  //  public void findStudyActivityTest() {
+  //    Study study =
+  // studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+  //    Study study2 = studyRepository.findByCode("PPB-10001")
+  //        .orElseThrow(RecordNotFoundException::new);
+  //
+  //    List<Activity> activities = activityService.findByStudy(study);
+  //    Assert.assertEquals(2, activities.size());
+  //    activities = activityService.findByStudy(study2);
+  //    Assert.assertEquals(4, activities.size());
+  //
+  //    activities = activityService.findByProgram(study.getProgram());
+  //    Assert.assertEquals(4, activities.size());
+  //    activities = activityService.findByProgram(study2.getProgram());
+  //    Assert.assertEquals(6, activities.size());
+  //
+  //    activities = activityService.findByEventType(EventType.NEW_STUDY);
+  //    Assert.assertEquals(6, activities.size());
+  //    activities = activityService.findByEventType(EventType.DELETED_STUDY);
+  //    Assert.assertEquals(0, activities.size());
+  //
+  //  }
 
 }

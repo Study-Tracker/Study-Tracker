@@ -29,11 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping({"/api/assay/{assayId}/tasks", "/api/study/{studyId}/assays/{assayId}/tasks"})
 public class AssayTasksController extends AbstractAssayController {
 
-  @Autowired
-  private AssayTaskService assayTaskService;
+  @Autowired private AssayTaskService assayTaskService;
 
-  @Autowired
-  private AssayTaskMapper mapper;
+  @Autowired private AssayTaskMapper mapper;
 
   @GetMapping("")
   public List<AssayTaskDto> fetchTasks(@PathVariable("assayId") String assayId) {
@@ -42,15 +40,15 @@ public class AssayTasksController extends AbstractAssayController {
   }
 
   @PostMapping("")
-  public HttpEntity<AssayTaskDto> addTask(@PathVariable("assayId") String assayId,
-      @RequestBody AssayTaskDto dto) {
+  public HttpEntity<AssayTaskDto> addTask(
+      @PathVariable("assayId") String assayId, @RequestBody AssayTaskDto dto) {
 
     Assay assay = this.getAssayFromIdentifier(assayId);
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
 
     AssayTask task = mapper.fromDto(dto);
@@ -61,19 +59,18 @@ public class AssayTasksController extends AbstractAssayController {
     this.getEventsService().dispatchEvent(activity);
 
     return new ResponseEntity<>(mapper.toDto(task), HttpStatus.OK);
-
   }
 
   @PutMapping("")
-  public HttpEntity<AssayTaskDto> updateTask(@PathVariable("assayId") String assayId,
-      @RequestBody AssayTaskDto dto) {
+  public HttpEntity<AssayTaskDto> updateTask(
+      @PathVariable("assayId") String assayId, @RequestBody AssayTaskDto dto) {
 
     Assay assay = this.getAssayFromIdentifier(assayId);
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
 
     AssayTask task = mapper.fromDto(dto);
@@ -84,19 +81,18 @@ public class AssayTasksController extends AbstractAssayController {
     this.getEventsService().dispatchEvent(activity);
 
     return new ResponseEntity<>(mapper.toDto(task), HttpStatus.OK);
-
   }
 
   @DeleteMapping("")
-  public HttpEntity<?> removeTask(@PathVariable("assayId") String assayId,
-      @RequestBody AssayTaskDto dto) {
+  public HttpEntity<?> removeTask(
+      @PathVariable("assayId") String assayId, @RequestBody AssayTaskDto dto) {
 
     Assay assay = this.getAssayFromIdentifier(assayId);
 
-    String username = UserAuthenticationUtils
-        .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username)
-        .orElseThrow(RecordNotFoundException::new);
+    String username =
+        UserAuthenticationUtils.getUsernameFromAuthentication(
+            SecurityContextHolder.getContext().getAuthentication());
+    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
 
     AssayTask task = mapper.fromDto(dto);
@@ -107,7 +103,5 @@ public class AssayTasksController extends AbstractAssayController {
     this.getEventsService().dispatchEvent(activity);
 
     return new ResponseEntity<>(HttpStatus.OK);
-
   }
-
 }

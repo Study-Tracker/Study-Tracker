@@ -9,5 +9,4 @@ public class KeywordDto {
   private Long id;
   @NotNull private String keyword;
   @NotNull private String category;
-
 }

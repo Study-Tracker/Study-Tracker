@@ -9,9 +9,14 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface AssayTaskMapper {
   AssayTaskDto toDto(AssayTask task);
+
   Set<AssayTaskDto> toDtoSet(Set<AssayTask> tasks);
+
   List<AssayTaskDto> toDtoList(List<AssayTask> tasks);
+
   AssayTask fromDto(AssayTaskDto dto);
+
   Set<AssayTask> fromDtoSet(Set<AssayTaskDto> dtos);
+
   List<AssayTask> fromDtoList(List<AssayTaskDto> dtos);
 }

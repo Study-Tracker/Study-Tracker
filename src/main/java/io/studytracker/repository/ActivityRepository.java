@@ -68,5 +68,4 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
   @Query("select a from Activity a where a.eventType = 'STUDY_STATUS_CHANGED' and a.date >= ?1")
   List<Activity> findStatusChangeStudiesAfterDate(Date date);
-
 }

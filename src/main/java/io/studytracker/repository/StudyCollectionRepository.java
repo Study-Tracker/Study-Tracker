@@ -21,5 +21,4 @@ public interface StudyCollectionRepository extends JpaRepository<StudyCollection
 
   @EntityGraph("study-collection-summary")
   List<StudyCollection> findByStudiesId(Long id);
-
 }
