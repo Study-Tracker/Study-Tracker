@@ -16,6 +16,7 @@
 
 package io.studytracker.config;
 
+import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.User;
 import io.studytracker.security.AppUserDetails;
 import io.studytracker.security.AppUserDetails.AuthMethod;

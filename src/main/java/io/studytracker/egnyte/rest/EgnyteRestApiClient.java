@@ -27,6 +27,7 @@ import io.studytracker.egnyte.exception.DuplicateFolderException;
 import io.studytracker.egnyte.exception.EgnyteException;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.egnyte.exception.UnauthorizedException;
+import io.studytracker.exception.StudyTrackerException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
