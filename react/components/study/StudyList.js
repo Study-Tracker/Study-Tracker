@@ -123,7 +123,8 @@ const columns = [
       }
       return 0;
     },
-    csvFormatter: (c, d, i, x) => !!d.collaborator ? d.collaborator.organizationName : "",
+    csvFormatter: (c, d, i, x) => !!d.collaborator
+        ? d.collaborator.organizationName : "",
     formatter: (c, d, i, x) => !!d.collaborator
         ? (
             <div>
@@ -274,7 +275,7 @@ const StudyList = ({studies, title, filters, user}) => {
           <Col lg={12}>
             <Card>
               <Card.Body>
-                <StudyListTable studies={studies} />
+                <StudyListTable studies={studies}/>
               </Card.Body>
             </Card>
           </Col>

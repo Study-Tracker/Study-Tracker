@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Button, Card, Col, Row} from "react-bootstrap";
 import {
   Activity,
@@ -24,7 +24,7 @@ export const WelcomeBack = ({}) => {
                 <p className="mb-0">
                   Ready to get started?
                 </p>
-                <br />
+                <br/>
                 <Button variant={"outline-primary"} href={"/studies/new"}>
                   <FontAwesomeIcon icon={faPlus}/> New Study
                 </Button>
@@ -43,7 +43,7 @@ export const WelcomeBack = ({}) => {
   )
 }
 
-export const MyActiveStudies =({count}) => {
+export const MyActiveStudies = ({count}) => {
 
   return (
       <Card className="illustration flex-fill">
@@ -76,7 +76,7 @@ export const MyActiveStudies =({count}) => {
 
 }
 
-export const MyCompleteStudies =({count}) => {
+export const MyCompleteStudies = ({count}) => {
 
   return (
       <Card className="illustration flex-fill">
@@ -188,21 +188,24 @@ export const ActiveStudies = ({count}) => {
 }
 
 export const StudyUpdates = ({count}) => {
-  return <StatWidget label={"Updates this week"} icon={Activity} value={count} color={"warning"} />
+  return <StatWidget label={"Updates this week"} icon={Activity} value={count}
+                     color={"warning"}/>
 }
 
 export const ActiveUsers = ({count}) => {
-  return <StatWidget label="Active Users" value={count} icon={Users} />
+  return <StatWidget label="Active Users" value={count} icon={Users}/>
 }
 
 export const NewStudies = ({count}) => {
-  return <StatWidget label={"New studies this week"} icon={Star} value={count} color={"warning"} />
+  return <StatWidget label={"New studies this week"} icon={Star} value={count}
+                     color={"warning"}/>
 }
 
 export const CompletedStudies = ({count}) => {
-  return <StatWidget label={"Completed studies this month"} icon={ThumbsUp} value={count} color={"success"} />
+  return <StatWidget label={"Completed studies this month"} icon={ThumbsUp}
+                     value={count} color={"success"}/>
 }
 
 export const TotalStudies = ({count}) => {
-  return <StatWidget label={"Total studies"} icon={Clipboard} value={count} />
+  return <StatWidget label={"Total studies"} icon={Clipboard} value={count}/>
 }

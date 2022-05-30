@@ -78,14 +78,14 @@ export default class AssayForm extends React.Component {
 
   get submitUrl() {
     return this.state.isUpdateModeOn
-      ? this.state.baseUrl + this.state.assay.id
-      : this.state.baseUrl
+        ? this.state.baseUrl + this.state.assay.id
+        : this.state.baseUrl
   }
 
   get submitMethod() {
     return this.state.isUpdateModeOn
-      ? 'PUT'
-      : 'POST';
+        ? 'PUT'
+        : 'POST';
   }
 
   /**
@@ -110,8 +110,8 @@ export default class AssayForm extends React.Component {
       assay: {
         ...this.state.assay,
         notebookTemplateId: selectedItem
-          ? selectedItem.value
-          : '',
+            ? selectedItem.value
+            : '',
       },
     })
   }
@@ -266,9 +266,12 @@ export default class AssayForm extends React.Component {
             <Col>
               <Breadcrumbs crumbs={[
                 {label: "Home", url: "/"},
-                {label: "Study " + this.props.study.code, url: "/study/" + this.props.study.code},
+                {
+                  label: "Study " + this.props.study.code,
+                  url: "/study/" + this.props.study.code
+                },
                 {label: !!this.state.assay.id ? "Edit Assay" : "New Assay"}
-              ]} />
+              ]}/>
             </Col>
           </Row>
 
@@ -350,12 +353,12 @@ export default class AssayForm extends React.Component {
                         </FormGroup>
                       </Col>
                       <Col sm={5}>
-                        { !this.state.isUpdateModeOn &&
-                          <NotebookEntryTemplatesDropdown
-                            notebookTemplates={this.props.notebookTemplates}
-                            defaultTemplate={this.props.defaultNotebookTemplate}
-                            onChange={this.handleTemplateSelection}
-                          />
+                        {!this.state.isUpdateModeOn &&
+                            <NotebookEntryTemplatesDropdown
+                                notebookTemplates={this.props.notebookTemplates}
+                                defaultTemplate={this.props.defaultNotebookTemplate}
+                                onChange={this.handleTemplateSelection}
+                            />
                         }
 
                         <StatusDropdown
@@ -381,7 +384,8 @@ export default class AssayForm extends React.Component {
                             You must select a Start Date.
                           </Form.Control.Feedback>
                           <Form.Text>
-                            Select the date your assay began or is expected to begin.
+                            Select the date your assay began or is expected to
+                            begin.
                           </Form.Text>
                         </FormGroup>
 
@@ -441,8 +445,8 @@ export default class AssayForm extends React.Component {
                                           defaultValue={
                                             !!this.state.assay.notebookFolder
                                             && !!this.state.assay.notebookFolder.url
-                                              ? this.state.assay.notebookFolder.url
-                                              : ''
+                                                ? this.state.assay.notebookFolder.url
+                                                : ''
                                           }
                                           onChange={(e) => this.handleFormUpdate(
                                               {
@@ -553,7 +557,7 @@ export default class AssayForm extends React.Component {
                             owner={this.state.assay.owner}
                             onChange={this.handleFormUpdate}
                             isValid={this.state.validation.usersIsValid
-                            && this.state.validation.ownerIsValid}
+                                && this.state.validation.ownerIsValid}
                         />
                       </Col>
 

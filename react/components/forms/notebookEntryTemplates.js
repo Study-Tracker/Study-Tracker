@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Form} from "react-bootstrap";
 import Select from "react-select";
 import {FormGroup} from "./common";
@@ -25,35 +25,39 @@ export const NotebookEntryTemplatesDropdown = ({
   onChange,
 }) => {
   const options = notebookTemplates
-    .sort((a, b) => {
-      if (a.name > b.name) { return 1; }
-      if (a.name < b.name) { return -1; }
-      return 0;
-    })
-    .map(t => {
-      return {
-        value: t.templateId,
-        label: t.name,
-        default: t.default
-      };
-    });
+  .sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    }
+    if (a.name < b.name) {
+      return -1;
+    }
+    return 0;
+  })
+  .map(t => {
+    return {
+      value: t.templateId,
+      label: t.name,
+      default: t.default
+    };
+  });
   const selectedValue = !!defaultTemplate
       ? options.find(o => o.value === defaultTemplate.templateId) : null;
 
   return (
-    <FormGroup>
-      <Form.Label>Notebook Entry Template</Form.Label>
-      <Select
-        className="react-select-container"
-        classNamePrefix="react-select"
-        defaultValue={selectedValue}
-        options={options}
-        onChange={onChange}
-        isClearable={true}
-      />
-      <Form.Control.Feedback>
-        Select a template for notebook entry.
-      </Form.Control.Feedback>
-    </FormGroup>
+      <FormGroup>
+        <Form.Label>Notebook Entry Template</Form.Label>
+        <Select
+            className="react-select-container"
+            classNamePrefix="react-select"
+            defaultValue={selectedValue}
+            options={options}
+            onChange={onChange}
+            isClearable={true}
+        />
+        <Form.Control.Feedback>
+          Select a template for notebook entry.
+        </Form.Control.Feedback>
+      </FormGroup>
   );
 }

@@ -59,19 +59,19 @@ class StudyNotebookTabContent extends React.Component {
 
   render() {
     return (
-      <div>
-        <Row>
-          <Col sm={12}>
-            <StorageFolderFileList
-              folder={this.state.folder}
-              isLoaded={this.state.isLoaded}
-              isError={this.state.isError}
-              errorMessage={this.state.error}
-              folderFileKey={'entries'}
-            />
-          </Col>
-        </Row>
-      </div>
+        <div>
+          <Row>
+            <Col sm={12}>
+              <StorageFolderFileList
+                  folder={this.state.folder}
+                  isLoaded={this.state.isLoaded}
+                  isError={this.state.isError}
+                  errorMessage={this.state.error}
+                  folderFileKey={'entries'}
+              />
+            </Col>
+          </Row>
+        </div>
     )
   }
 }

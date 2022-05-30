@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Button, Col, Row} from "react-bootstrap";
 import {StatusIcon} from "./status";
 import {history} from '../App';
@@ -194,20 +194,24 @@ export const StudySummaryCards = ({studies, showDetails}) => {
         </Row>
     );
   } else {
-    content = studies.sort((a,b) => {
-      if (a.updatedAt > b.updatedAt) return -1;
-      else if (a.updatedAt < b.updatedAt) return 1;
-      else return 0;
+    content = studies.sort((a, b) => {
+      if (a.updatedAt > b.updatedAt) {
+        return -1;
+      } else if (a.updatedAt < b.updatedAt) {
+        return 1;
+      } else {
+        return 0;
+      }
     }).map((study, i) => {
       let card;
       if (!!showDetails) {
-        card = <StudySummaryCard key={"study-card-" + study.id} study={study} />;
+        card = <StudySummaryCard key={"study-card-" + study.id} study={study}/>;
       } else {
-        card = <StudySlimCard key={"study-card-" + study.id} study={study} />;
+        card = <StudySlimCard key={"study-card-" + study.id} study={study}/>;
       }
       return (
           <React.Fragment>
-            {i > 0 ? <hr key={"study-border-" + study.id}/> : '' }
+            {i > 0 ? <hr key={"study-border-" + study.id}/> : ''}
             {card}
           </React.Fragment>
       )

@@ -98,20 +98,21 @@ class UserDetails extends React.Component {
 
                   {
                     !!this.props.user && !!this.props.user.admin ? (
-                      <div className="card-actions float-end">
-                        <Dropdown align="end">
-                          <Dropdown.Toggle as="a" bsPrefix={"-"}>
-                            <Menu/>
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            <Dropdown.Item href={"/users/" + targetUser.id + "/edit"}>
-                              <FontAwesomeIcon icon={faEdit}/>
-                              &nbsp;
-                              Edit
-                            </Dropdown.Item>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      </div>
+                        <div className="card-actions float-end">
+                          <Dropdown align="end">
+                            <Dropdown.Toggle as="a" bsPrefix={"-"}>
+                              <Menu/>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item
+                                  href={"/users/" + targetUser.id + "/edit"}>
+                                <FontAwesomeIcon icon={faEdit}/>
+                                &nbsp;
+                                Edit
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </div>
                     ) : ''
                   }
 

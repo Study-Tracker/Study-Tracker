@@ -44,8 +44,10 @@ export default class CollaboratorInputs extends React.Component {
     this.handleCollaboratorSelect = this.handleCollaboratorSelect.bind(this);
     this.handleExternalCodeChange = this.handleExternalCodeChange.bind(this);
     this.showModal = this.showModal.bind(this);
-    this.handleNewCollaboratorChange = this.handleNewCollaboratorChange.bind(this);
-    this.handleNewCollaboratorSubmit = this.handleNewCollaboratorSubmit.bind(this);
+    this.handleNewCollaboratorChange = this.handleNewCollaboratorChange.bind(
+        this);
+    this.handleNewCollaboratorSubmit = this.handleNewCollaboratorSubmit.bind(
+        this);
     this.handleShowInputs = this.handleShowInputs.bind(this);
   }
 
@@ -240,7 +242,8 @@ export default class CollaboratorInputs extends React.Component {
               <Col sm={6}>
 
                 <div style={{marginTop: "2em"}}>
-                  <Button variant={"primary"} onClick={() => this.showModal(true)}>
+                  <Button variant={"primary"}
+                          onClick={() => this.showModal(true)}>
                     <FontAwesomeIcon icon={faPlusCircle}/> Add New Organization
                   </Button>
                 </div>

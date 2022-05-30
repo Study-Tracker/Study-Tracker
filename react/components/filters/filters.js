@@ -35,8 +35,10 @@ export const FilterSidebar = (props) => {
       >
 
         <div className="settings-toggle">
-          <div className="settings-toggle-option settings-toggle-option-text js-settings-toggle" onClick={() => setIsOpen(true)}>
-            <Filter size={24} className="feather align-middle" />
+          <div
+              className="settings-toggle-option settings-toggle-option-text js-settings-toggle"
+              onClick={() => setIsOpen(true)}>
+            <Filter size={24} className="feather align-middle"/>
             &nbsp;
             Filters
           </div>
@@ -97,7 +99,8 @@ export const FilterLabel = ({text, toggle}) => {
         {
           !!toggle ? (
               <span className="float-end">
-                <Button size="sm" variant="link" onClick={toggle}>Toggle All</Button>
+                <Button size="sm" variant="link"
+                        onClick={toggle}>Toggle All</Button>
               </span>
           ) : ''
         }

@@ -196,7 +196,10 @@ export default class AssayTypeForm extends React.Component {
                             crumbs={[
                               {label: "Home", url: "/"},
                               {label: "Admin Dashboard", url: "/admin"},
-                              {label: "Assay Type Detail", url: "/assaytype/" + this.state.assayType.id},
+                              {
+                                label: "Assay Type Detail",
+                                url: "/assaytype/" + this.state.assayType.id
+                              },
                               {label: "Edit Assay Type"}
                             ]}
                         />
@@ -302,7 +305,7 @@ export default class AssayTypeForm extends React.Component {
                           <Form.Control
                               as="textarea"
                               defaultValue={this.state.assayType.description
-                              || ''}
+                                  || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"description": e.target.value})}
                               rows={5}

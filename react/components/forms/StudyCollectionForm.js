@@ -153,15 +153,18 @@ export default class StudyCollectionForm extends React.Component {
                     ? (
                         <Breadcrumbs crumbs={[
                           {label: "Home", url: "/"},
-                          {label: "Collection Details", url: "/collection/" + this.state.collection.id},
+                          {
+                            label: "Collection Details",
+                            url: "/collection/" + this.state.collection.id
+                          },
                           {label: "Edit Collection"}
-                        ]} />
+                        ]}/>
                     )
                     : (
                         <Breadcrumbs crumbs={[
                           {label: "Collections", url: "/collections"},
                           {label: "New Collection"}
-                        ]} />
+                        ]}/>
                     )
               }
             </Col>
@@ -181,9 +184,11 @@ export default class StudyCollectionForm extends React.Component {
                 <Card.Header>
                   <Card.Title tag="h5">Collection Overview</Card.Title>
                   <h6 className="card-subtitle text-muted">
-                    Provide a unique name and a brief description for your collection.
+                    Provide a unique name and a brief description for your
+                    collection.
                     Collections are private and visible only to you, unless
-                    the 'Public' option is set to true. Any user can add or remove
+                    the 'Public' option is set to true. Any user can add or
+                    remove
                     studies from public collections.
                   </h6>
                 </Card.Header>
@@ -204,7 +209,8 @@ export default class StudyCollectionForm extends React.Component {
                               onChange={(e) => this.handleFormUpdate(
                                   {"name": e.target.value})}
                           />
-                          <Form.Control.Feedback type={"invalid"}>Name must not be empty.</Form.Control.Feedback>
+                          <Form.Control.Feedback type={"invalid"}>Name must not
+                            be empty.</Form.Control.Feedback>
                         </FormGroup>
                       </Col>
 
@@ -250,7 +256,7 @@ export default class StudyCollectionForm extends React.Component {
                           <Form.Control
                               as="textarea"
                               defaultValue={this.state.collection.description
-                              || ''}
+                                  || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"description": e.target.value})}
                               rows={5}

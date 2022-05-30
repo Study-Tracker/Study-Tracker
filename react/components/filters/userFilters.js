@@ -2,7 +2,7 @@ import React from "react";
 import {FormGroup} from '../forms/common';
 import {Form} from 'react-bootstrap';
 import {setFilters} from "../../redux/actions/filterActions";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import {compose} from 'redux';
 import {withRouter} from 'react-router-dom';
 import {history} from "../../App";
@@ -92,7 +92,7 @@ class UserFilters extends React.Component {
 
           <div className="settings-section">
 
-            <FilterLabel text={"Quick Views"} />
+            <FilterLabel text={"Quick Views"}/>
 
             <FormGroup>
               <Form.Check
@@ -113,7 +113,7 @@ class UserFilters extends React.Component {
 
           <div className="settings-section">
 
-            <FilterLabel text={"User Status"} />
+            <FilterLabel text={"User Status"}/>
 
             <FormGroup className="mb-2 ms-4">
               <Form.Check
@@ -121,8 +121,8 @@ class UserFilters extends React.Component {
                   type="radio"
                   name="user-status"
                   checked={
-                    !this.state.filters[labels.ACTIVE]
-                    && !this.state.filters[labels.INACTIVE]
+                      !this.state.filters[labels.ACTIVE]
+                      && !this.state.filters[labels.INACTIVE]
                   }
                   onChange={() => {
                     this.updateFilters({

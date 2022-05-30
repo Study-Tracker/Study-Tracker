@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Badge,
   Button,
@@ -82,9 +82,9 @@ class ProgramSettings extends React.Component {
           showModal={this.showModal}
       />
     } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage />;
+      content = <SettingsErrorMessage/>;
     } else {
-      content = <SettingsLoadingMessage />;
+      content = <SettingsLoadingMessage/>;
     }
 
     return (
@@ -135,7 +135,9 @@ const ProgramsTable = ({
       text: "Name",
       sort: true,
       // headerStyle: {width: '40%'},
-      formatter: (c, d, i, x) => <Button variant="link" onClick={() => showModal(d)}>{d.name}</Button>,
+      formatter: (c, d, i, x) => <Button variant="link"
+                                         onClick={() => showModal(
+                                             d)}>{d.name}</Button>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (rowA.name > rowB.name) {
           return order === "desc" ? -1 : 1;
@@ -198,7 +200,8 @@ const ProgramsTable = ({
       formatter: (c, d, i, x) => {
         if (!!d.storageFolder) {
           if (!!d.storageFolder.url) {
-            return <a href={d.storageFolder.url} target="_blank">Files Folder</a>
+            return <a href={d.storageFolder.url} target="_blank">Files
+              Folder</a>
           } else {
             return <Badge bg="warning">ERROR</Badge>
           }
@@ -225,7 +228,7 @@ const ProgramsTable = ({
                 <Dropdown.Menu>
 
                   <Dropdown.Item onClick={() => showModal(d)}>
-                    <FontAwesomeIcon icon={faInfoCircle} />
+                    <FontAwesomeIcon icon={faInfoCircle}/>
                     &nbsp;&nbsp;
                     View Details
                   </Dropdown.Item>
@@ -233,7 +236,7 @@ const ProgramsTable = ({
                   <Dropdown.Item
                       onClick={() => history.push("/program/" + d.id + "/edit")}
                   >
-                    <FontAwesomeIcon icon={faEdit} />
+                    <FontAwesomeIcon icon={faEdit}/>
                     &nbsp;&nbsp;
                     Edit Program
                   </Dropdown.Item>
@@ -330,12 +333,14 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
 
             <Col md={6}>
               <h4>Created</h4>
-              <p>{new Date(program.createdAt).toLocaleString()} by {program.createdBy.displayName}</p>
+              <p>{new Date(
+                  program.createdAt).toLocaleString()} by {program.createdBy.displayName}</p>
             </Col>
 
             <Col md={6}>
               <h4>Last Updated</h4>
-              <p>{new Date(program.createdAt).toLocaleString()} by {program.lastModifiedBy.displayName}</p>
+              <p>{new Date(
+                  program.createdAt).toLocaleString()} by {program.lastModifiedBy.displayName}</p>
             </Col>
 
             <Col md={6}>

@@ -195,7 +195,8 @@ class StudyCollectionDetails extends React.Component {
         formatter: (c, d, i, x) => {
           return (
               <div>
-                <a className="text-danger" title={"Remove study from collection"}
+                <a className="text-danger"
+                   title={"Remove study from collection"}
                    onClick={() => this.props.handleRemoveStudy(d.id)}>
                   <XCircle className="align-middle me-1" size={18}/>
                 </a>
@@ -255,7 +256,8 @@ class StudyCollectionDetails extends React.Component {
           </Row>
 
           {/* Header */}
-          <StudyCollectionDetailsHeader collection={collection} user={this.props.user}/>
+          <StudyCollectionDetailsHeader collection={collection}
+                                        user={this.props.user}/>
 
           <Row>
 
@@ -280,7 +282,8 @@ class StudyCollectionDetails extends React.Component {
                         {/*      <DropdownItem divider/> : ''*/}
                         {/*}*/}
 
-                        <Dropdown.Item href={"/collection/" + collection.id + "/edit"}>
+                        <Dropdown.Item
+                            href={"/collection/" + collection.id + "/edit"}>
                           <FontAwesomeIcon icon={faEdit}/>
                           &nbsp;
                           Edit

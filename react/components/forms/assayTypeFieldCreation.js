@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Button, Card, Col, Form, Row} from 'react-bootstrap'
 import {XCircle} from 'react-feather'
 import dragula from "react-dragula";
@@ -31,7 +31,12 @@ class AssayTypeFieldInputList extends React.Component {
 
 }
 
-const AssayTypeFieldInputCard = ({field, index, handleFieldUpdate, handleRemoveField}) => {
+const AssayTypeFieldInputCard = ({
+  field,
+  index,
+  handleFieldUpdate,
+  handleRemoveField
+}) => {
   return (
       <Card className="mb-3 bg-light cursor-grab border">
 

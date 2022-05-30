@@ -75,9 +75,9 @@ const StudyDetailHeader = ({study, user}) => {
                     className="me-1 mb-1"
                     variant="outline-danger"
                     disabled
-                  >
-                    Inactive Study
-                  </Button>
+                >
+                  Inactive Study
+                </Button>
                 : ''
           }
           {
@@ -194,7 +194,8 @@ class StudyDetails extends React.Component {
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
 
-                        <Dropdown.Item onClick={() => this.showCollectionModal(true)}>
+                        <Dropdown.Item
+                            onClick={() => this.showCollectionModal(true)}>
                           <FontAwesomeIcon icon={faFolderPlus}/>
                           &nbsp;
                           Add to Collection
@@ -206,7 +207,7 @@ class StudyDetails extends React.Component {
                         {/*  Share*/}
                         {/*</DropdownItem>*/}
 
-                        <Dropdown.Divider />
+                        <Dropdown.Divider/>
 
                         {
                           !!this.props.user ? (
@@ -376,19 +377,19 @@ class StudyDetails extends React.Component {
                 <Tab.Container defaultActiveKey="timeline">
                   <Nav variant="tabs">
                     <Nav.Item>
-                      <Nav.Link eventKey={"timeline"} >
+                      <Nav.Link eventKey={"timeline"}>
                         Timeline
                       </Nav.Link>
                     </Nav.Item>
 
                     <Nav.Item>
-                      <Nav.Link eventKey={"assays"} >
+                      <Nav.Link eventKey={"assays"}>
                         Assays
                       </Nav.Link>
                     </Nav.Item>
 
                     <Nav.Item>
-                      <Nav.Link eventKey={"files"} >
+                      <Nav.Link eventKey={"files"}>
                         Files
                       </Nav.Link>
                     </Nav.Item>
@@ -396,7 +397,7 @@ class StudyDetails extends React.Component {
                     {
                       !!study.notebookFolder ? (
                           <Nav.Item>
-                            <Nav.Link eventKey={"notebook"} >
+                            <Nav.Link eventKey={"notebook"}>
                               Notebook
                             </Nav.Link>
                           </Nav.Item>
@@ -404,19 +405,19 @@ class StudyDetails extends React.Component {
                     }
 
                     <Nav.Item>
-                      <Nav.Link eventKey={"conclusions"} >
+                      <Nav.Link eventKey={"conclusions"}>
                         Conclusions
                       </Nav.Link>
                     </Nav.Item>
 
                     <Nav.Item>
-                      <Nav.Link eventKey={"comments"} >
+                      <Nav.Link eventKey={"comments"}>
                         Comments
                       </Nav.Link>
                     </Nav.Item>
 
                     <Nav.Item>
-                      <Nav.Link eventKey={"collections"} >
+                      <Nav.Link eventKey={"collections"}>
                         Collections
                       </Nav.Link>
                     </Nav.Item>
@@ -448,7 +449,8 @@ class StudyDetails extends React.Component {
                     }
 
                     <Tab.Pane eventKey={"conclusions"}>
-                      <StudyConclusionsTab study={study} user={this.props.user}/>
+                      <StudyConclusionsTab study={study}
+                                           user={this.props.user}/>
                     </Tab.Pane>
 
                     <Tab.Pane eventKey={"comments"}>

@@ -239,7 +239,8 @@ class ExternalLinks extends React.Component {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant={"secondary"} onClick={() => this.showModal(false)}>
+              <Button variant={"secondary"}
+                      onClick={() => this.showModal(false)}>
                 Cancel
               </Button>
               <Button variant={"primary"}

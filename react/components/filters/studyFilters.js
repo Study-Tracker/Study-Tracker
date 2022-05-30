@@ -2,7 +2,7 @@ import React from "react";
 import {Form} from 'react-bootstrap';
 import {FormGroup} from '../forms/common';
 import {setFilters} from "../../redux/actions/filterActions";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import {statuses} from "../../config/statusConstants";
 import {setPrograms} from "../../redux/actions/programActions";
 import {compose} from 'redux';
@@ -175,7 +175,7 @@ class StudyFilters extends React.Component {
 
           <div className="settings-section">
 
-            <FilterLabel text={"Quick Views"} />
+            <FilterLabel text={"Quick Views"}/>
 
             {
               !!this.props.user ? (
@@ -260,7 +260,8 @@ class StudyFilters extends React.Component {
             {
               !!this.state.programs ? (
                   <FormGroup>
-                    <FilterLabel text={"Programs"} toggle={this.toggleAllProgramFilters}/>
+                    <FilterLabel text={"Programs"}
+                                 toggle={this.toggleAllProgramFilters}/>
                     <div>
                       {
                         this.state.programs.map(program => {

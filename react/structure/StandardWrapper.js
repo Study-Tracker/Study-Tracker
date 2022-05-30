@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import SideBar from "./SideBar";
 import NavBar from "./NavBar";
 import Footer from "./Footer";

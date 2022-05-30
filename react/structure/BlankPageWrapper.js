@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 
 export default class BlankPageWrapper extends React.Component {
 

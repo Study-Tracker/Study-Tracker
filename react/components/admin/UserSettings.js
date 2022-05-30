@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Badge,
   Button,
@@ -148,11 +148,11 @@ class UserSettings extends React.Component {
 
     let content = '';
     if (!!this.state.isLoaded) {
-      content = <UserTable users={this.state.users} showModal={this.showModal} />
+      content = <UserTable users={this.state.users} showModal={this.showModal}/>
     } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage />
+      content = <SettingsErrorMessage/>
     } else {
-      content = <SettingsLoadingMessage />
+      content = <SettingsLoadingMessage/>
     }
 
     return (
@@ -217,7 +217,9 @@ const UserTable = ({users, showModal}) => {
       text: "Username",
       sort: true,
       headerStyle: {width: '20%%'},
-      formatter: (c, d, i, x) => <Button variant={"link"} onClick={() => showModal(d)}>{d.username}</Button>,
+      formatter: (c, d, i, x) => <Button variant={"link"}
+                                         onClick={() => showModal(
+                                             d)}>{d.username}</Button>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (rowA.username > rowB.username) {
           return order === "desc" ? -1 : 1;
@@ -282,7 +284,7 @@ const UserTable = ({users, showModal}) => {
                 <Dropdown.Menu>
 
                   <Dropdown.Item onClick={() => showModal(d)}>
-                    <FontAwesomeIcon icon={faInfoCircle} />
+                    <FontAwesomeIcon icon={faInfoCircle}/>
                     &nbsp;&nbsp;
                     View Details
                   </Dropdown.Item>
@@ -290,12 +292,12 @@ const UserTable = ({users, showModal}) => {
                   <Dropdown.Item
                       onClick={() => history.push("/users/" + d.id + "/edit")}
                   >
-                    <FontAwesomeIcon icon={faEdit} />
+                    <FontAwesomeIcon icon={faEdit}/>
                     &nbsp;&nbsp;
                     Edit User
                   </Dropdown.Item>
 
-                  <Dropdown.Divider />
+                  <Dropdown.Divider/>
 
                   {
                     !!d.active ? (
@@ -303,7 +305,7 @@ const UserTable = ({users, showModal}) => {
                             className={"text-warning"}
                             onClick={() => toggleUserActive(d, false)}
                         >
-                          <FontAwesomeIcon icon={faTimesCircle} />
+                          <FontAwesomeIcon icon={faTimesCircle}/>
                           &nbsp;&nbsp;
                           Set Inactive
                         </Dropdown.Item>
@@ -312,7 +314,7 @@ const UserTable = ({users, showModal}) => {
                             className={"text-warning"}
                             onClick={() => toggleUserActive(d, true)}
                         >
-                          <FontAwesomeIcon icon={faCheckCircle} />
+                          <FontAwesomeIcon icon={faCheckCircle}/>
                           &nbsp;&nbsp;
                           Set Active
                         </Dropdown.Item>
@@ -323,7 +325,7 @@ const UserTable = ({users, showModal}) => {
                       className={"text-warning"}
                       onClick={() => resetUserPassword(d)}
                   >
-                    <FontAwesomeIcon icon={faRedo} />
+                    <FontAwesomeIcon icon={faRedo}/>
                     &nbsp;&nbsp;
                     Reset Password
                   </Dropdown.Item>
@@ -411,7 +413,8 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
           size={"lg"}
       >
         <Modal.Header closeButton>
-          User:&nbsp;<strong>{user.displayName}</strong>&nbsp;(<code>{user.username}</code>)
+          User:&nbsp;
+          <strong>{user.displayName}</strong>&nbsp;(<code>{user.username}</code>)
         </Modal.Header>
         <Modal.Body>
           <Row>

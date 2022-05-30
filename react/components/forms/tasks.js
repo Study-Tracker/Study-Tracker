@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
@@ -31,7 +31,12 @@ class TaskInputList extends React.Component {
 
 }
 
-const TaskInputCard = ({task, index, handleTaskUpdate, handleRemoveTaskClick}) => {
+const TaskInputCard = ({
+  task,
+  index,
+  handleTaskUpdate,
+  handleRemoveTaskClick
+}) => {
   return (
       <Card className="mb-3 bg-light cursor-grab border">
 

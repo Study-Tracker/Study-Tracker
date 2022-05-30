@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import StudyList from "../components/study/StudyList";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import {compose} from 'redux';
 import crossfilter from "crossfilter2";
-import StudyFilters, {labels as filter} from '../components/filters/studyFilters'
+import StudyFilters, {
+  labels as filter
+} from '../components/filters/studyFilters'
 import {withRouter} from 'react-router-dom';
 import SideBar from "../structure/SideBar";
 import NavBar from "../structure/NavBar";

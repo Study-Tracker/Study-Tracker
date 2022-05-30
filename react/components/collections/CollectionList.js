@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Button, Card, Col, Container, Row} from "react-bootstrap";
 import {File} from "react-feather";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
@@ -40,8 +40,11 @@ const myCollectionColumns = [
     text: "Visibility",
     sort: true,
     formatter: (cell, d, index, x) => {
-      if (!!d.shared) return <div className="badge badge-success">Public</div>
-      else return <div className="badge badge-warning">Private</div>
+      if (!!d.shared) {
+        return <div className="badge badge-success">Public</div>
+      } else {
+        return <div className="badge badge-warning">Private</div>
+      }
     }
   },
   {
@@ -206,52 +209,54 @@ export const PublicCollectionsTable = ({collections}) => {
 export const CollectionList = ({collections, user}) => {
 
   const myCollections = collections.filter(c => c.createdBy.id === user.id);
-  const publicCollections = collections.filter(c => c.createdBy.id !== user.id && !!c.shared);
+  const publicCollections = collections.filter(
+      c => c.createdBy.id !== user.id && !!c.shared);
 
   return (
-    <Container fluid className="animated fadeIn">
+      <Container fluid className="animated fadeIn">
 
-      <Row className="justify-content-between align-items-center mb-2">
-        <Col xs={8}>
-          <h3>Study Collections</h3>
-        </Col>
-        <Col xs={"auto"}>
-          <Button variant="primary" href="/collections/new" className="me-1 mb-1">
-            <FontAwesomeIcon icon={faPlusCircle}/> New Collection
-          </Button>
-        </Col>
-      </Row>
+        <Row className="justify-content-between align-items-center mb-2">
+          <Col xs={8}>
+            <h3>Study Collections</h3>
+          </Col>
+          <Col xs={"auto"}>
+            <Button variant="primary" href="/collections/new"
+                    className="me-1 mb-1">
+              <FontAwesomeIcon icon={faPlusCircle}/> New Collection
+            </Button>
+          </Col>
+        </Row>
 
-      <Row>
-        <Col lg={12}>
-          <Card className="details-card">
-            <Card.Header>
-              <Card.Title>
-                My Collections
-              </Card.Title>
-            </Card.Header>
-            <Card.Body>
-                <MyCollectionTable collections={myCollections} />
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+        <Row>
+          <Col lg={12}>
+            <Card className="details-card">
+              <Card.Header>
+                <Card.Title>
+                  My Collections
+                </Card.Title>
+              </Card.Header>
+              <Card.Body>
+                <MyCollectionTable collections={myCollections}/>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
 
-      <Row>
-        <Col lg={12}>
-          <Card className="details-card">
-            <Card.Header>
-              <Card.Title>
-                Public Collections
-              </Card.Title>
-            </Card.Header>
-            <Card.Body>
-              <PublicCollectionsTable collections={publicCollections} />
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+        <Row>
+          <Col lg={12}>
+            <Card className="details-card">
+              <Card.Header>
+                <Card.Title>
+                  Public Collections
+                </Card.Title>
+              </Card.Header>
+              <Card.Body>
+                <PublicCollectionsTable collections={publicCollections}/>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
 
-    </Container>
+      </Container>
   )
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Button, Card, Col, Dropdown, Form, Modal, Row} from 'react-bootstrap';
 import {Tag} from 'react-feather';
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
@@ -149,7 +149,7 @@ export default class KeywordSettings extends React.Component {
       }
     });
 
-    let content = <SettingsLoadingMessage />
+    let content = <SettingsLoadingMessage/>
     if (this.state.isLoaded) {
       content = <KeywordsTable
           keywords={this.state.keywords}
@@ -159,7 +159,7 @@ export default class KeywordSettings extends React.Component {
           showModal={this.showModal}
       />
     } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage />;
+      content = <SettingsErrorMessage/>;
     }
 
     return (
@@ -179,7 +179,7 @@ export default class KeywordSettings extends React.Component {
           </Card.Header>
           <Card.Body>
 
-            { content }
+            {content}
 
             <Modal
                 show={this.state.isModalOpen}
@@ -265,7 +265,7 @@ const KeywordsTable = ({
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <Dropdown.Item onClick={() => showModal(d)}>
-                    <FontAwesomeIcon icon={faEdit} />
+                    <FontAwesomeIcon icon={faEdit}/>
                     &nbsp;&nbsp;
                     Edit keyword
                   </Dropdown.Item>

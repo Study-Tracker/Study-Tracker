@@ -19,7 +19,14 @@ import {FormGroup} from "./common";
 import {Form} from "react-bootstrap";
 import Select from "react-select";
 
-export const ProgramDropdown = ({programs, selectedProgram, onChange, isValid, disabled, isLegacyStudy}) => {
+export const ProgramDropdown = ({
+  programs,
+  selectedProgram,
+  onChange,
+  isValid,
+  disabled,
+  isLegacyStudy
+}) => {
 
   const programOptions = programs
   .filter(p => !!isLegacyStudy || !!p.active)

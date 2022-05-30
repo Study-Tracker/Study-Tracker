@@ -139,14 +139,16 @@ class StudyRelationships extends React.Component {
     })
     .then(val => {
       if (val) {
-        fetch("/api/study/" + this.props.studyCode + "/relationships/" + relationship.id, {
+        fetch("/api/study/" + this.props.studyCode + "/relationships/"
+            + relationship.id, {
           method: 'DELETE',
           headers: {
             "Content-Type": "application/json"
           }
         }).then(response => {
           this.setState({
-            relationships: this.state.relationships.filter(r => r.id !== relationship.id)
+            relationships: this.state.relationships.filter(
+                r => r.id !== relationship.id)
           });
         })
         .catch(error => {
@@ -168,7 +170,7 @@ class StudyRelationships extends React.Component {
             {type.label}
             &nbsp;&nbsp;
             <a href={"/study/"
-            + relationship.targetStudy.code}>{relationship.targetStudy.code}</a>
+                + relationship.targetStudy.code}>{relationship.targetStudy.code}</a>
             &nbsp;&nbsp;&nbsp;&nbsp;
             {
               !!this.props.user ? (
@@ -285,7 +287,8 @@ class StudyRelationships extends React.Component {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant={"secondary"} onClick={() => this.showModal(false)}>
+              <Button variant={"secondary"}
+                      onClick={() => this.showModal(false)}>
                 Cancel
               </Button>
               <Button

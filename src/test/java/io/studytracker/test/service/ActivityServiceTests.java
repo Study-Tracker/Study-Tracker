@@ -43,6 +43,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class ActivityServiceTests {
 
+  private static final int ACTION_COUNT = 2;
+
   @Autowired private StudyRepository studyRepository;
 
   @Autowired private ActivityService activityService;
@@ -53,8 +55,6 @@ public class ActivityServiceTests {
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
   }
-
-  private static final int ACTION_COUNT = 2;
 
   @Test
   public void addStudyActivityTest() {

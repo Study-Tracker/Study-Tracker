@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import {compose} from 'redux';
 import crossfilter from "crossfilter2";
 import {withRouter} from 'react-router-dom';

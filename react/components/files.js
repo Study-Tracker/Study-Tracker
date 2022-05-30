@@ -132,7 +132,12 @@ const File = ({file}) => {
   )
 }
 
-const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth, showHeader}) => {
+const FolderContents = ({
+  folder,
+  folderFileKey = DEFAULT_FOLDER_FILE_KEY,
+  depth,
+  showHeader
+}) => {
   const subFolders = folder.subFolders
   .sort((a, b) => {
     if (a.name > b.name) {
@@ -144,7 +149,8 @@ const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth,
     }
   })
   .map((f, i) => {
-    return <Folder key={"folder-" + i + "-" + f.name} folder={f} depth={depth} folderFileKey={folderFileKey} />
+    return <Folder key={"folder-" + i + "-" + f.name} folder={f} depth={depth}
+                   folderFileKey={folderFileKey}/>
   });
 
   const files = folder[folderFileKey]
@@ -185,7 +191,7 @@ const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth,
 
 /**
  * Returns a ul list of all files and subfolders within the supplied folder.
- * 
+ *
  * @param folder
  * @param isError
  * @param isLoaded
@@ -211,7 +217,8 @@ export const StorageFolderFileList = ({
           </div>
       );
     } else {
-      return <FolderContents folder={folder} depth={3} showHeader={true} folderFileKey={folderFileKey}/>
+      return <FolderContents folder={folder} depth={3} showHeader={true}
+                             folderFileKey={folderFileKey}/>
     }
   } else {
     return <CardLoadingMessage/>;
@@ -305,7 +312,8 @@ export const UploadFilesModal = ({isOpen, showModal, handleSubmit}) => {
           <Button variant={"secondary"} onClick={() => showModal(false)}>
             Cancel
           </Button>
-          <Button variant={"primary"} onClick={() => handleSubmit(acceptedFiles)}>
+          <Button variant={"primary"}
+                  onClick={() => handleSubmit(acceptedFiles)}>
             Upload
           </Button>
         </Modal.Footer>
@@ -353,7 +361,8 @@ export const RepairableStorageFolderLink = ({folder, repairUrl}) => {
     return <a href={folder.url} target="_blank">Storage Folder</a>
   } else {
     return (
-        <Button variant="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
+        <Button variant="warning"
+                onClick={() => handleFolderRepairRequest(repairUrl)}>
           <RefreshCw size={14} className="mb-1"/>
           &nbsp;
           Repair Folder

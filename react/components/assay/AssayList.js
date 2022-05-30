@@ -131,7 +131,8 @@ const columns = [
       }
       return 0;
     },
-    csvFormatter: (c, d, i, x) => !!d.study.collaborator ? d.study.collaborator.organizationName : "",
+    csvFormatter: (c, d, i, x) => !!d.study.collaborator
+        ? d.study.collaborator.organizationName : "",
     formatter: (c, d, i, x) => !!d.study.collaborator
         ? (
             <div>

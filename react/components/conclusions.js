@@ -60,16 +60,18 @@ export const Conclusions = ({conclusions, showModal, isSignedIn}) => {
 
               <Col xs={12}>
                 <small>
-                  Added {new Date(conclusions.createdAt).toLocaleDateString()} by {conclusions.createdBy.displayName}
+                  Added {new Date(
+                    conclusions.createdAt).toLocaleDateString()} by {conclusions.createdBy.displayName}
                 </small>
               </Col>
 
               {
                 !!conclusions.lastModifiedBy
-                  ? (
+                    ? (
                         <Col xs={12}>
                           <small>
-                            Updated {new Date(conclusions.updatedAt).toLocaleDateString()} by {conclusions.lastModifiedBy.displayName}
+                            Updated {new Date(
+                              conclusions.updatedAt).toLocaleDateString()} by {conclusions.lastModifiedBy.displayName}
                           </small>
                         </Col>
                     ) : ''
@@ -102,7 +104,8 @@ export const Conclusions = ({conclusions, showModal, isSignedIn}) => {
                 isSignedIn
                     ? (
                         <div>
-                          <Button variant={"primary"} onClick={() => showModal(true)}>
+                          <Button variant={"primary"}
+                                  onClick={() => showModal(true)}>
                             Add Conclusions
                             &nbsp;&nbsp;
                             <FontAwesomeIcon icon={faPlusCircle}/>

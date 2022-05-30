@@ -171,7 +171,8 @@ export default class PasswordResetView extends React.Component {
                               size={"lg"}
                               variant="primary"
                               type="submit"
-                              disabled={!this.state.inputIsValid && !this.state.isLoaded}
+                              disabled={!this.state.inputIsValid
+                                  && !this.state.isLoaded}
                           >
                             Submit
                           </Button>

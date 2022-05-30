@@ -1,15 +1,24 @@
-import React from 'react';
+import React from "react";
 import {Col, Form, Row} from 'react-bootstrap'
 import DatePicker from "react-datepicker";
 import {FormGroup} from "./common";
 
-export const AssayTypeFieldCaptureInputList = ({assayType, assayFields, handleUpdate, fieldValidation}) => {
+export const AssayTypeFieldCaptureInputList = ({
+  assayType,
+  assayFields,
+  handleUpdate,
+  fieldValidation
+}) => {
 
   let inputs = assayType.fields
   .sort((a, b) => {
-    if (a.id > b.id) return 1;
-    else if (a.id < b.id) return -1;
-    else return 0;
+    if (a.id > b.id) {
+      return 1;
+    } else if (a.id < b.id) {
+      return -1;
+    } else {
+      return 0;
+    }
   })
   .map(f => {
 

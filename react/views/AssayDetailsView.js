@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import AssayDetails from "../components/assay/AssayDetails";
 import StandardWrapper from "../structure/StandardWrapper";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 
 class AssayDetailsView extends React.Component {
 

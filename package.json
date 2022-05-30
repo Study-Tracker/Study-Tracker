@@ -4,6 +4,10 @@
   "description": "Study Tracker React components.",
   "private": true,
   "author": "Will Oemler",
+  "engines": {
+    "node": ">=12.0.0",
+    "npm": "8.0.0"
+  },
   "scripts": {
     "sass:compile": "node-sass-chokidar --include-path ./react --include-path ./node_modules react/appstack/assets/scss/ -o public/css/",
     "sass:autoprefixer": "postcss public/css/*.css --use autoprefixer -d public/css",

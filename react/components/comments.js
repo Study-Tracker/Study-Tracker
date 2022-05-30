@@ -123,9 +123,9 @@ export class Comment extends React.Component {
                   </Button>
                   &nbsp;
                   <Button variant={'primary'} onClick={() => {
-                      this.toggleInput();
-                      this.props.handleUpdate(this.state.updatedComment)
-                    }}
+                    this.toggleInput();
+                    this.props.handleUpdate(this.state.updatedComment)
+                  }}
                   >
                     Submit
                   </Button>

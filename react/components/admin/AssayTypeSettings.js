@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Badge,
   Button,
@@ -129,7 +129,8 @@ const AssayTypeListCard = ({
       sort: true,
       headerStyle: {width: '20%'},
       formatter: (c, d, i, x) => <Button variant="link"
-                                    onClick={() => showModal(d)}>{d.name}</Button>,
+                                         onClick={() => showModal(
+                                             d)}>{d.name}</Button>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (rowA.name > rowB.name) {
           return order === "desc" ? -1 : 1;
@@ -177,7 +178,7 @@ const AssayTypeListCard = ({
                 <Dropdown.Menu>
 
                   <Dropdown.Item onClick={() => showModal(d)}>
-                    <FontAwesomeIcon icon={faInfoCircle} />
+                    <FontAwesomeIcon icon={faInfoCircle}/>
                     &nbsp;&nbsp;
                     View Details
                   </Dropdown.Item>
@@ -185,11 +186,12 @@ const AssayTypeListCard = ({
                   {
                     d.name === "Generic" ? "" : (
                         <React.Fragment>
-                          <Dropdown.Divider />
+                          <Dropdown.Divider/>
                           <Dropdown.Item
-                              onClick={() => history.push("/assaytypes/" + d.id + "/edit")}
+                              onClick={() => history.push(
+                                  "/assaytypes/" + d.id + "/edit")}
                           >
-                            <FontAwesomeIcon icon={faEdit} />
+                            <FontAwesomeIcon icon={faEdit}/>
                             &nbsp;&nbsp;
                             Edit assay type
                           </Dropdown.Item>
@@ -204,7 +206,7 @@ const AssayTypeListCard = ({
                                 className={"text-warning"}
                                 onClick={() => toggleActive(d)}
                             >
-                              <FontAwesomeIcon icon={faTimesCircle} />
+                              <FontAwesomeIcon icon={faTimesCircle}/>
                               &nbsp;&nbsp;
                               Set Inactive
                             </Dropdown.Item>
@@ -213,7 +215,7 @@ const AssayTypeListCard = ({
                                 className={"text-warning"}
                                 onClick={() => toggleActive(d)}
                             >
-                              <FontAwesomeIcon icon={faCheckCircle} />
+                              <FontAwesomeIcon icon={faCheckCircle}/>
                               &nbsp;&nbsp;
                               Set Active
                             </Dropdown.Item>
@@ -231,11 +233,11 @@ const AssayTypeListCard = ({
     }
   ];
 
-  let content = <SettingsLoadingMessage />
+  let content = <SettingsLoadingMessage/>
   if (!!isLoaded) {
-    content = <AssayTypeTable columns={columns} assayTypes={assayTypes} />
+    content = <AssayTypeTable columns={columns} assayTypes={assayTypes}/>
   } else if (!!isError) {
-    content = <SettingsErrorMessage />
+    content = <SettingsErrorMessage/>
   }
 
   return (
@@ -259,7 +261,7 @@ const AssayTypeListCard = ({
 
         <Card.Body>
 
-          { content }
+          {content}
 
           <AssayTypeDetailsModal
               assayType={selectedAssayType}

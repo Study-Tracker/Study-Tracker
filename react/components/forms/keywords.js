@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Col, Form, Row} from "react-bootstrap";
 import Select from "react-select";
 import {KeywordCategoryBadge} from "../keywords";
@@ -112,14 +112,14 @@ export default class KeywordInputs extends React.Component {
           category: k.category,
           keyword: k.keyword
         }
-      // }).sort((a, b) => {
-      //   if (a.keyword > b.keyword) {
-      //     return -1;
-      //   } else if (a.keyword < b.keyword) {
-      //     return 1;
-      //   } else {
-      //     return 0;
-      //   }
+        // }).sort((a, b) => {
+        //   if (a.keyword > b.keyword) {
+        //     return -1;
+        //   } else if (a.keyword < b.keyword) {
+        //     return 1;
+        //   } else {
+        //     return 0;
+        //   }
       });
       callback(keywords);
     }).catch(e => {
