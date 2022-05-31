@@ -13,7 +13,7 @@ CREATE TABLE study_collections
     shared           BOOLEAN,
     created_by       BIGINT                                  NOT NULL,
     last_modified_by BIGINT                                  NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at       TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_study_collections PRIMARY KEY (id)
 );
