@@ -20,6 +20,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faLink, faTimesCircle} from "@fortawesome/free-solid-svg-icons";
 import swal from 'sweetalert';
 import {PlusCircle} from "react-feather";
+import {getCsrfToken} from "../config/csrf";
 
 class ExternalLinks extends React.Component {
 
@@ -66,7 +67,8 @@ class ExternalLinks extends React.Component {
     fetch("/api/study/" + this.props.studyCode + "/links", {
       method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(l)
     }).then(response => {
@@ -104,7 +106,8 @@ class ExternalLinks extends React.Component {
         fetch("/api/study/" + this.props.studyCode + "/links/" + link.id, {
           method: 'DELETE',
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCsrfToken()
           },
           body: JSON.stringify(link)
         }).then(response => {
@@ -130,7 +133,7 @@ class ExternalLinks extends React.Component {
           <li key={"external-link-" + link.id}>
             <FontAwesomeIcon icon={faLink}/>
             &nbsp;&nbsp;
-            <a href={link.url} target="_blank">{link.label}</a>
+            <a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
             &nbsp;&nbsp;&nbsp;&nbsp;
             {
               !!this.props.user ? (
@@ -239,7 +242,8 @@ class ExternalLinks extends React.Component {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant={"secondary"} onClick={() => this.showModal(false)}>
+              <Button variant={"secondary"}
+                      onClick={() => this.showModal(false)}>
                 Cancel
               </Button>
               <Button variant={"primary"}

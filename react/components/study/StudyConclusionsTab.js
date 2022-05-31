@@ -16,6 +16,7 @@
 
 import React from "react";
 import {Conclusions, ConclusionsModal} from "../conclusions";
+import {getCsrfToken} from "../../config/csrf";
 
 class StudyConclusionsTab extends React.Component {
 
@@ -57,7 +58,8 @@ class StudyConclusionsTab extends React.Component {
       method: !!this.state.conclusions ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(this.state.updatedConclusions)
     })

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState} from "react";
 import {Card, Col, Container, Row} from "react-bootstrap";
 
 export const SearchHits = ({hits}) => {
@@ -9,7 +9,8 @@ export const SearchHits = ({hits}) => {
           <Card className={"illustration"}>
             <Card.Body>
               <div className="alert-message">
-                <h4 className="alert-heading">Your search did not return any results.</h4>
+                <h4 className="alert-heading">Your search did not return any
+                  results.</h4>
                 <p>Try broadening your search and try again.</p>
               </div>
             </Card.Body>
@@ -23,8 +24,12 @@ export const SearchHits = ({hits}) => {
     const list = hits.hits
     .filter(h => !!h.document.active)
     .sort((a, b) => {
-      if (a.score < b.score) return 1;
-      if (a.score > b.score) return -1;
+      if (a.score < b.score) {
+        return 1;
+      }
+      if (a.score > b.score) {
+        return -1;
+      }
       return 0;
     })
     .map((hit, i) => <SearchHit key={"search-hit-" + i} hit={hit}/>);
@@ -60,7 +65,8 @@ const SearchHitHighlight = ({field, text}) => {
       <Col lg={12} className={"search-hit-highlight"}>
         <h6>{field}</h6>
         <blockquote>
-          <div className="bg-light p-2 font-italic" dangerouslySetInnerHTML={createMarkup(text)}/>
+          <div className="bg-light p-2 font-italic"
+               dangerouslySetInnerHTML={createMarkup(text)}/>
         </blockquote>
       </Col>
   )
@@ -73,20 +79,21 @@ const SearchHitHighlights = ({hit}) => {
       const text = h.replace("<em>", "<mark>").replace("</em>", "</mark>");
       list.push(
           <SearchHitHighlight
-            key={"search-highlight-" + hit.document.id + "-" + field + "-" + i}
-            field={field}
-            text={text}
+              key={"search-highlight-" + hit.document.id + "-" + field + "-"
+                  + i}
+              field={field}
+              text={text}
           />
       );
     });
   }
   return (
-    <Col sm={12}>
-      <h6>Matched Fields</h6>
-      <Row>
-        {list}
-      </Row>
-    </Col>
+      <Col sm={12}>
+        <h6>Matched Fields</h6>
+        <Row>
+          {list}
+        </Row>
+      </Col>
   );
 }
 
@@ -115,23 +122,25 @@ const SearchHit = ({hit}) => {
             </Col>
 
             <Col sm={12}>
-              <p dangerouslySetInnerHTML={createMarkup(study.description)} />
+              <p dangerouslySetInnerHTML={createMarkup(study.description)}/>
             </Col>
 
             <Col xs={12}>
-              <a href={"/study/" + study.code} className="btn btn-sm btn-outline-primary">
+              <a href={"/study/" + study.code}
+                 className="btn btn-sm btn-outline-primary">
                 View Study
               </a>
               &nbsp;&nbsp;
-              <a className="btn btn-sm btn-outline-secondary" onClick={() => setToggle(!toggle)}>
-                {!!toggle ? "Hide": "Show"} Hit Details
+              <a className="btn btn-sm btn-outline-secondary"
+                 onClick={() => setToggle(!toggle)}>
+                {!!toggle ? "Hide" : "Show"} Hit Details
               </a>
             </Col>
 
             <div hidden={!toggle} style={{width: "100%"}}>
 
               <Col xs={12}>
-                <hr />
+                <hr/>
               </Col>
 
               <Col xs={12}>
@@ -141,7 +150,7 @@ const SearchHit = ({hit}) => {
 
               {
                 !!hit.highlightFields
-                    ? <SearchHitHighlights hit={hit} />
+                    ? <SearchHitHighlights hit={hit}/>
                     : ''
               }
 

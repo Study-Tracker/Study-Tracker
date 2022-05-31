@@ -24,6 +24,7 @@ import Select from "react-select";
 import AttributeInputs from "./attributes";
 import {Breadcrumbs} from "../common";
 import {FormGroup} from "./common";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class UserForm extends React.Component {
 
@@ -142,7 +143,8 @@ export default class UserForm extends React.Component {
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(this.state.user)
       })
@@ -206,16 +208,19 @@ export default class UserForm extends React.Component {
                         <Breadcrumbs crumbs={[
                           {label: "Home", url: "/"},
                           {label: "Admin Dashboard", url: "/admin"},
-                          {label: "User Details", url: "/user/" + this.state.user.id},
-                          {label:" Edit User"}
-                        ]} />
+                          {
+                            label: "User Details",
+                            url: "/user/" + this.state.user.id
+                          },
+                          {label: " Edit User"}
+                        ]}/>
                     )
                     : (
                         <Breadcrumbs crumbs={[
                           {label: "Home", url: "/"},
                           {label: "Admin Dashboard", url: "/admin"},
-                          {label:" New User"}
-                        ]} />
+                          {label: " New User"}
+                        ]}/>
                     )
               }
             </Col>
@@ -306,7 +311,7 @@ export default class UserForm extends React.Component {
                           <Form.Control
                               type="text"
                               isInvalid={!this.state.validation.usernameIsValid
-                              || !this.state.validation.usernameIsUnique}
+                                  || !this.state.validation.usernameIsUnique}
                               defaultValue={this.state.user.username || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"username": e.target.value})}
@@ -329,7 +334,7 @@ export default class UserForm extends React.Component {
                           <Form.Control
                               type="text"
                               isInvalid={!this.state.validation.emailIsValid
-                              || !this.state.validation.emailIsUnique}
+                                  || !this.state.validation.emailIsUnique}
                               defaultValue={this.state.user.email || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"email": e.target.value})}

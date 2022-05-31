@@ -21,7 +21,8 @@ class StudyCollectionFormView extends React.Component {
     .then(response => response.json())
     .then(collections => {
       if (!!this.state.collectionId) {
-        const collection = collections.find(p => String(p.id) === this.state.collectionId);
+        const collection = collections.find(
+            p => String(p.id) === this.state.collectionId);
         this.setState({
           collection,
           collections,

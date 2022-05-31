@@ -31,6 +31,7 @@ import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../loading";
 import {Breadcrumbs} from "../common";
 import {NotebookEntryTemplatesDropdown} from "./notebookEntryTemplates";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class StudyForm extends React.Component {
 
@@ -195,7 +196,8 @@ export default class StudyForm extends React.Component {
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(this.state.study)
       })
@@ -257,15 +259,18 @@ export default class StudyForm extends React.Component {
                     ? (
                         <Breadcrumbs crumbs={[
                           {label: "Home", url: "/"},
-                          {label: "Study Detail", url: "/study/" + this.state.study.code},
+                          {
+                            label: "Study Detail",
+                            url: "/study/" + this.state.study.code
+                          },
                           {label: "Edit Study"}
-                        ]} />
+                        ]}/>
                     )
                     : (
                         <Breadcrumbs crumbs={[
                           {label: "Home", url: "/"},
                           {label: "New Study"}
-                        ]} />
+                        ]}/>
                     )
               }
             </Col>
@@ -309,7 +314,8 @@ export default class StudyForm extends React.Component {
                                   {"name": e.target.value})}
                               disabled={!!this.state.study.id}
                           />
-                          <Form.Control.Feedback type={"invalid"}>Name must not be empty.</Form.Control.Feedback>
+                          <Form.Control.Feedback type={"invalid"}>Name must not
+                            be empty.</Form.Control.Feedback>
                           <Form.Text>Must be unique.</Form.Text>
                         </FormGroup>
                       </Col>
@@ -385,7 +391,8 @@ export default class StudyForm extends React.Component {
                             You must select a Start Date.
                           </Form.Control.Feedback>
                           <Form.Text>
-                            Select the date your study began or is expected to begin.
+                            Select the date your study began or is expected to
+                            begin.
                           </Form.Text>
                         </FormGroup>
 
@@ -446,7 +453,7 @@ export default class StudyForm extends React.Component {
                                           onChange={this.handleLegacyToggle}
                                           disabled={!!this.state.study.id}
                                           defaultChecked={!!this.state.study.id
-                                          && !!this.state.study.legacy}
+                                              && !!this.state.study.legacy}
                                       />
                                     </FormGroup>
                                   </Col>
@@ -468,7 +475,7 @@ export default class StudyForm extends React.Component {
                                               isInvalid={false}
                                               disabled={!!this.state.study.id}
                                               defaultValue={this.state.study.code
-                                              || ''}
+                                                  || ''}
                                               onChange={(e) => this.handleFormUpdate(
                                                   {"code": e.target.value})}
                                           />
@@ -557,7 +564,7 @@ export default class StudyForm extends React.Component {
                             owner={this.state.study.owner}
                             onChange={this.handleFormUpdate}
                             isValid={this.state.validation.usersIsValid
-                            && this.state.validation.ownerIsValid}
+                                && this.state.validation.ownerIsValid}
                         />
                       </Col>
 

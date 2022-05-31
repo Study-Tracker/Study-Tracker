@@ -26,6 +26,7 @@ import {AssayTypeFieldInputs} from "./assayTypeFieldCreation";
 import {TaskInputs} from "./tasks";
 import {Breadcrumbs} from "../common";
 import {FormGroup} from "./common";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class AssayTypeForm extends React.Component {
 
@@ -132,7 +133,8 @@ export default class AssayTypeForm extends React.Component {
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(assayType)
       })
@@ -196,7 +198,10 @@ export default class AssayTypeForm extends React.Component {
                             crumbs={[
                               {label: "Home", url: "/"},
                               {label: "Admin Dashboard", url: "/admin"},
-                              {label: "Assay Type Detail", url: "/assaytype/" + this.state.assayType.id},
+                              {
+                                label: "Assay Type Detail",
+                                url: "/assaytype/" + this.state.assayType.id
+                              },
                               {label: "Edit Assay Type"}
                             ]}
                         />
@@ -302,7 +307,7 @@ export default class AssayTypeForm extends React.Component {
                           <Form.Control
                               as="textarea"
                               defaultValue={this.state.assayType.description
-                              || ''}
+                                  || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"description": e.target.value})}
                               rows={5}

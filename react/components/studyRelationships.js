@@ -23,6 +23,7 @@ import {relationshipTypes} from "../config/studyRelationshipConstants";
 import Select from "react-select";
 import AsyncSelect from "react-select/async/dist/react-select.esm";
 import {PlusCircle} from "react-feather";
+import {getCsrfToken} from "../config/csrf";
 
 class StudyRelationships extends React.Component {
 
@@ -106,7 +107,8 @@ class StudyRelationships extends React.Component {
     fetch("/api/study/" + this.props.studyCode + "/relationships", {
       method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(r)
     })
@@ -139,14 +141,17 @@ class StudyRelationships extends React.Component {
     })
     .then(val => {
       if (val) {
-        fetch("/api/study/" + this.props.studyCode + "/relationships/" + relationship.id, {
+        fetch("/api/study/" + this.props.studyCode + "/relationships/"
+            + relationship.id, {
           method: 'DELETE',
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCsrfToken()
           }
         }).then(response => {
           this.setState({
-            relationships: this.state.relationships.filter(r => r.id !== relationship.id)
+            relationships: this.state.relationships.filter(
+                r => r.id !== relationship.id)
           });
         })
         .catch(error => {
@@ -168,7 +173,7 @@ class StudyRelationships extends React.Component {
             {type.label}
             &nbsp;&nbsp;
             <a href={"/study/"
-            + relationship.targetStudy.code}>{relationship.targetStudy.code}</a>
+                + relationship.targetStudy.code}>{relationship.targetStudy.code}</a>
             &nbsp;&nbsp;&nbsp;&nbsp;
             {
               !!this.props.user ? (
@@ -285,7 +290,8 @@ class StudyRelationships extends React.Component {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant={"secondary"} onClick={() => this.showModal(false)}>
+              <Button variant={"secondary"}
+                      onClick={() => this.showModal(false)}>
                 Cancel
               </Button>
               <Button

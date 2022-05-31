@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Badge} from 'react-bootstrap'
 
 export const KeywordCategoryBadge = ({category}) => {

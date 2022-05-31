@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Col, Form, Row} from "react-bootstrap";
 import AsyncSelect from "react-select/async";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -37,7 +37,11 @@ export class StudyInputs extends React.Component {
     .then(response => response.json())
     .then(json => {
       const options = json.map(study => {
-        return {label: study.code + ": " + study.name, value: study.id, obj: study}
+        return {
+          label: study.code + ": " + study.name,
+          value: study.id,
+          obj: study
+        }
       });
       callback(options);
     }).catch(e => {

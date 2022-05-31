@@ -98,7 +98,8 @@ export default class AssayFilesTab extends React.Component {
                 !!this.props.user
                     ? (
                         <span className="float-end">
-                          <Button variant="info" onClick={() => this.showModal(true)}>
+                          <Button variant="info"
+                                  onClick={() => this.showModal(true)}>
                             Upload Files
                             &nbsp;
                             <FontAwesomeIcon icon={faFile}/>

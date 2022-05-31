@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Col, Form, Row} from "react-bootstrap";
 import Select from "react-select";
 import {KeywordCategoryBadge} from "../keywords";
@@ -23,6 +23,7 @@ import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
 import AsyncCreatable from "react-select/async-creatable";
 import swal from "sweetalert";
 import {FormGroup} from "./common";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class KeywordInputs extends React.Component {
 
@@ -68,7 +69,8 @@ export default class KeywordInputs extends React.Component {
         }),
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          "Accept": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         }
       })
       .then(response => response.json())
@@ -112,14 +114,14 @@ export default class KeywordInputs extends React.Component {
           category: k.category,
           keyword: k.keyword
         }
-      // }).sort((a, b) => {
-      //   if (a.keyword > b.keyword) {
-      //     return -1;
-      //   } else if (a.keyword < b.keyword) {
-      //     return 1;
-      //   } else {
-      //     return 0;
-      //   }
+        // }).sort((a, b) => {
+        //   if (a.keyword > b.keyword) {
+        //     return -1;
+        //   } else if (a.keyword < b.keyword) {
+        //     return 1;
+        //   } else {
+        //     return 0;
+        //   }
       });
       callback(keywords);
     }).catch(e => {

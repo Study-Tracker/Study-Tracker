@@ -3,6 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import {statuses} from "../../config/userActivityConstants";
 import swal from "sweetalert";
+import {getCsrfToken} from "../../config/csrf";
 
 export const UserStatusButton = ({active}) => {
   const config = !!active ? statuses.ACTIVE : statuses.INACTIVE;
@@ -27,7 +28,8 @@ export class SelectableUserStatusButton extends React.Component {
     fetch("/api/user/" + this.props.userId + "/status?active=" + active, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       }
     })
     .then(async response => {

@@ -80,7 +80,8 @@ export default class PasswordResetRequestView extends React.Component {
                         />
                       </div>
 
-                      <Form action={"/auth/passwordresetrequest"} method={"post"}>
+                      <Form action={"/auth/passwordresetrequest"}
+                            method={"post"}>
 
                         <Form.Group>
                           <Form.Label>Email</Form.Label>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Alert, Col, Row} from 'react-bootstrap'
+import {Alert, Col, Row} from "react-bootstrap"
 import React from "react";
 
 export const DismissableAlert = ({header, message, color}) => {

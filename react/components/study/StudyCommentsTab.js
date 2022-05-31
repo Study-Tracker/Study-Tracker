@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
 import {Comment} from "../comments";
 import {MessageCircle} from 'react-feather';
 import swal from 'sweetalert';
+import {getCsrfToken} from "../../config/csrf";
 
 class StudyCommentsTab extends React.Component {
 
@@ -63,7 +64,8 @@ class StudyCommentsTab extends React.Component {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(comment)
     }).then(response => {
@@ -86,7 +88,8 @@ class StudyCommentsTab extends React.Component {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(comment)
     }).then(response => {
@@ -116,7 +119,8 @@ class StudyCommentsTab extends React.Component {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       }
     }).then(response => {
       if (response.ok) {
@@ -147,11 +151,11 @@ class StudyCommentsTab extends React.Component {
           <React.Fragment key={'hr-' + i}>
             {
               i > 0
-                ? (
-                    <Col sm={12}>
-                      <hr/>
-                    </Col>
-                ) : ""
+                  ? (
+                      <Col sm={12}>
+                        <hr/>
+                      </Col>
+                  ) : ""
             }
             <Col key={'thread-' + comment.createdAt} sm={12}>
               <Comment
@@ -184,7 +188,8 @@ class StudyCommentsTab extends React.Component {
               <div className="d-flex mt-3">
                 <div className="flex-grow-1 ms-3">
 
-                  <div className="mb-2 text-center" hidden={this.state.showInput}>
+                  <div className="mb-2 text-center"
+                       hidden={this.state.showInput}>
                     <Button variant={'info'} onClick={() => this.toggleInput()}>
                       Add Comment
                       &nbsp;

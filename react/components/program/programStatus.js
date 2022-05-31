@@ -3,6 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import {statuses} from "../../config/programActivityConstants";
 import swal from "sweetalert";
+import {getCsrfToken} from "../../config/csrf";
 
 export const ProgramStatusButton = ({active}) => {
   const config = !!active ? statuses.ACTIVE : statuses.INACTIVE;
@@ -27,7 +28,8 @@ export class SelectableProgramStatusButton extends React.Component {
     fetch("/api/program/" + this.props.programId + "/status?active=" + active, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       }
     })
     .then(async response => {

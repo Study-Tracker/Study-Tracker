@@ -1,7 +1,8 @@
-import React from 'react';
+import React from "react";
 import {Button} from "react-bootstrap";
 import {Folder as FolderIcon, RefreshCw} from "react-feather";
 import swal from "sweetalert";
+import {getCsrfToken} from "../config/csrf";
 
 const handleFolderRepairRequest = (url) => {
   swal({
@@ -15,7 +16,8 @@ const handleFolderRepairRequest = (url) => {
       fetch(url, {
         method: 'PATCH',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         }
       }).then(response => {
         if (response.ok) {
@@ -38,11 +40,13 @@ const handleFolderRepairRequest = (url) => {
 }
 
 export const RepairableNotebookFolderLink = ({folder, repairUrl}) => {
-  if (!!folder && !!folder.referenceId && !!folder.url && folder.url !== 'ERROR') {
-    return <a href={folder.url} target="_blank">Notebook Folder</a>
+  if (!!folder && !!folder.referenceId && !!folder.url && folder.url
+      !== 'ERROR') {
+    return <a href={folder.url} target="_blank" rel="noopener noreferrer">Notebook Folder</a>
   } else {
     return (
-        <Button variant="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
+        <Button variant="warning"
+                onClick={() => handleFolderRepairRequest(repairUrl)}>
           <RefreshCw size={14} className="mb-1"/>
           &nbsp;
           Repair Folder
@@ -52,10 +56,12 @@ export const RepairableNotebookFolderLink = ({folder, repairUrl}) => {
 }
 
 export const RepairableNotebookFolderButton = ({folder, repairUrl}) => {
-  if (!!folder && !!folder.referenceId && !!folder.url && folder.url !== 'ERROR') {
+  if (!!folder && !!folder.referenceId && !!folder.url && folder.url
+      !== 'ERROR') {
     return (
         <a href={folder.url}
            target="_blank"
+           rel="noopener noreferrer"
            className="btn btn-outline-info mt-2 me-2">
           Notebook Folder
           <FolderIcon

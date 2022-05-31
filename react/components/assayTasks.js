@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Card, Col, Row} from "react-bootstrap";
 import {CheckSquare, Square, XSquare} from "react-feather";
 

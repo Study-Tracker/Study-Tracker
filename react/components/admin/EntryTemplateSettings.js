@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import {
   Badge,
@@ -9,7 +9,7 @@ import {
   Form,
   Modal,
   Row
-} from 'react-bootstrap';
+} from "react-bootstrap";
 import {CheckCircle, Edit, MinusCircle, PlusCircle, Star} from "react-feather";
 
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
@@ -20,6 +20,7 @@ import Select from "react-select";
 import swal from "sweetalert";
 import {LoadingOverlay, SettingsLoadingMessage} from "../loading";
 import {SettingsErrorMessage} from "../errors";
+import {getCsrfToken} from "../../config/csrf";
 
 const defaultTemplate = {
   category: "STUDY",
@@ -43,7 +44,8 @@ export default class EntryTemplateSettings extends React.Component {
     };
     this.handleStatusChange = this.handleStatusChange.bind(this);
     this.updateTemplate = this.updateTemplate.bind(this);
-    this.handleSelectedTemplateUpdate = this.handleSelectedTemplateUpdate.bind(this);
+    this.handleSelectedTemplateUpdate = this.handleSelectedTemplateUpdate.bind(
+        this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.showModal = this.showModal.bind(this);
   }
@@ -99,25 +101,28 @@ export default class EntryTemplateSettings extends React.Component {
   }
 
   handleStatusChange = (template, statusToSet) => {
-    fetch(`/api/notebookentrytemplate/${ template.id }/status?${ new URLSearchParams({ active: statusToSet }) }`, {
-      method: 'POST',
-    }).then(response => {
+    fetch(
+        `/api/notebookentrytemplate/${template.id}/status?${new URLSearchParams(
+            {active: statusToSet})}`, {
+          method: 'POST',
+        }).then(response => {
       if (response.ok) {
         swal("Entry Template Updated",
             "Refresh the page to view updated records.",
             "success");
       } else {
-        throw new Error("Failed to update entry template status: " + response.statusText);
+        throw new Error(
+            "Failed to update entry template status: " + response.statusText);
       }
     })
-      .catch(error => {
-        console.log(error);
-        swal('Something went wrong', 'Template status change failed.');
-      });
+    .catch(error => {
+      console.log(error);
+      swal('Something went wrong', 'Template status change failed.');
+    });
   };
 
   handleSetDefault = (template) => {
-    fetch(`/api/notebookentrytemplate/${ template.id }/default`, {
+    fetch(`/api/notebookentrytemplate/${template.id}/default`, {
       method: 'POST',
     }).then(response => {
       if (response.ok) {
@@ -125,7 +130,8 @@ export default class EntryTemplateSettings extends React.Component {
             "Refresh the page to view updated records.",
             "success");
       } else {
-        throw new Error("Failed to update entry template status: " + response.statusText);
+        throw new Error(
+            "Failed to update entry template status: " + response.statusText);
       }
     })
     .catch(error => {
@@ -138,7 +144,8 @@ export default class EntryTemplateSettings extends React.Component {
     fetch('/api/notebookentrytemplate/', {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify({
         ...updatedTemplate,
@@ -166,7 +173,10 @@ export default class EntryTemplateSettings extends React.Component {
     }
     fetch(url, {
       method: method,
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
+      },
       body: JSON.stringify(payload)
     }).then(response => {
       if (response.status === 201) {
@@ -190,8 +200,12 @@ export default class EntryTemplateSettings extends React.Component {
 
   handleValidation = values => {
     const errors = {};
-    if (!values.name) errors.name = "You must select a template";
-    if (!values.category) errors.category = "You must select a category";
+    if (!values.name) {
+      errors.name = "You must select a template";
+    }
+    if (!values.category) {
+      errors.category = "You must select a category";
+    }
     console.log(errors);
     return errors;
   }
@@ -205,9 +219,13 @@ export default class EntryTemplateSettings extends React.Component {
 
     const availableTemplateOptions = this.state.availableTemplates
     .sort((a, b) => {
-      if (a.name < b.name) return -1;
-      else if (a.name > b.name) return 1;
-      else return 0;
+      if (a.name < b.name) {
+        return -1;
+      } else if (a.name > b.name) {
+        return 1;
+      } else {
+        return 0;
+      }
     })
     .map(t => {
       return {
@@ -216,10 +234,12 @@ export default class EntryTemplateSettings extends React.Component {
       }
     });
 
-    const studyTemplates = this.state.registeredTemplates.filter(t => t.category === "STUDY");
-    const assayTemplates = this.state.registeredTemplates.filter(t => t.category === "ASSAY");
+    const studyTemplates = this.state.registeredTemplates.filter(
+        t => t.category === "STUDY");
+    const assayTemplates = this.state.registeredTemplates.filter(
+        t => t.category === "ASSAY");
 
-    let content = <SettingsLoadingMessage />;
+    let content = <SettingsLoadingMessage/>;
     if (!!this.state.isLoaded) {
       content = <RegisteredEntryTemplateLists
           showModal={this.showModal}
@@ -229,7 +249,7 @@ export default class EntryTemplateSettings extends React.Component {
           assayTemplates={assayTemplates}
       />;
     } else if (this.state.isError) {
-      content = <SettingsErrorMessage />;
+      content = <SettingsErrorMessage/>;
     }
 
     return (
@@ -251,7 +271,7 @@ export default class EntryTemplateSettings extends React.Component {
 
           <Card.Body>
 
-            { content }
+            {content}
 
             {/* Modal Form */}
             <Modal
@@ -264,7 +284,7 @@ export default class EntryTemplateSettings extends React.Component {
                 {
                   !!this.state.selectedTemplate
                   && !!this.state.selectedTemplate.id
-                    ? "Edit Template" : "New Template"
+                      ? "Edit Template" : "New Template"
                 }
               </Modal.Header>
 
@@ -300,11 +320,13 @@ export default class EntryTemplateSettings extends React.Component {
                                   <Form.Group>
                                     <Form.Label>Available Templates</Form.Label>
                                     <Select
-                                        className={"react-select-container " + !errors.name ? "is-invalid" : ''}
+                                        className={"react-select-container "
+                                        + !errors.name ? "is-invalid" : ''}
                                         classNamePrefix="react-select"
                                         options={availableTemplateOptions}
                                         onChange={selected => {
-                                          this.handleSelectedTemplateUpdate(selected.value);
+                                          this.handleSelectedTemplateUpdate(
+                                              selected.value);
                                         }}
                                     />
                                     <div
@@ -348,10 +370,12 @@ export default class EntryTemplateSettings extends React.Component {
                             <Form.Group>
                               <Form.Label>Category</Form.Label>
                               <Select
-                                  className={"react-select-container " + !errors.category ? "is-invalid" : ''}
+                                  className={"react-select-container "
+                                  + !errors.category ? "is-invalid" : ''}
                                   classNamePrefix="react-select"
                                   name="category"
-                                  defaultValue={categoryOptions.find(d => d.value === values.category)}
+                                  defaultValue={categoryOptions.find(
+                                      d => d.value === values.category)}
                                   options={categoryOptions}
                                   onChange={(selected, e) => {
                                     setFieldValue("category", selected.value);
@@ -468,7 +492,7 @@ const RegisteredEntryTemplateLists = ({
     },
     {
       dataField: "controls",
-      text: "Options",
+      text: "",
       sort: false,
       headerStyle: {width: '10%'},
       formatter: (c, d, i, x) => {
@@ -482,19 +506,23 @@ const RegisteredEntryTemplateLists = ({
 
                   <Dropdown.Item
                       onClick={() => showModal(d)}>
-                    <Edit className="feather align-middle mt-n1" /> Edit template
+                    <Edit className="feather align-middle mt-n1"/> Edit template
                   </Dropdown.Item>
 
                   {
                     !d.active ? (
                         <Dropdown.Item
                             onClick={() => handleStatusChange(d, true)}>
-                          <CheckCircle className="feather align-middle mt-n1" /> Set active
+                          <CheckCircle
+                              className="feather align-middle mt-n1"/> Set
+                          active
                         </Dropdown.Item>
                     ) : (
                         <Dropdown.Item
                             onClick={() => handleStatusChange(d, false)}>
-                          <MinusCircle className="feather align-middle mt-n1" /> Set inactive
+                          <MinusCircle
+                              className="feather align-middle mt-n1"/> Set
+                          inactive
                         </Dropdown.Item>
                     )
                   }
@@ -503,7 +531,8 @@ const RegisteredEntryTemplateLists = ({
                     !d.default ? (
                         <Dropdown.Item
                             onClick={() => handleSetDefault(d)}>
-                          <Star className="feather align-middle mt-n1" /> Set as default
+                          <Star className="feather align-middle mt-n1"/> Set as
+                          default
                         </Dropdown.Item>
                     ) : ''
                   }

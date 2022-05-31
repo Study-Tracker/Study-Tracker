@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from "react";
 import {useLocation} from 'react-router-dom';
 import {
   Breadcrumb,
@@ -108,34 +108,52 @@ export const AdminDashboard = () => {
               <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
               <Breadcrumb.Item active>Admin Dashboard</Breadcrumb.Item>
             </Breadcrumb>
-        </Col>
-      </Row>
+          </Col>
+        </Row>
 
-      <Row className="justify-content-between align-items-center">
-        <Col>
-          <h3>Admin Dashboard</h3>
-        </Col>
-      </Row>
+        <Row className="justify-content-between align-items-center">
+          <Col>
+            <h3>Admin Dashboard</h3>
+          </Col>
+        </Row>
 
-      <Row>
-        <Col md="3" xl="2">
-          <Card>
-            <Card.Header>
-              <Card.Title tag="h5" className="mb-0">
-                Site Settings
-              </Card.Title>
-            </Card.Header>
-            <ListGroup variant={"flush"}>
-              {controls}
-            </ListGroup>
-          </Card>
-        </Col>
+        <Row>
+          <Col md="3" xl="2">
 
-        <Col md="9" xl="10">
-          { getDashboardContent() }
-        </Col>
-      </Row>
-    </Container>
+            <Card>
+              <Card.Header>
+                <Card.Title tag="h5" className="mb-0">
+                  Site Settings
+                </Card.Title>
+              </Card.Header>
+              <ListGroup variant={"flush"}>
+                {controls}
+              </ListGroup>
+            </Card>
+
+            <Card>
+              <Card.Header>
+                <Card.Title tag="h5" className="mb-0">
+                  Developer Tools
+                </Card.Title>
+              </Card.Header>
+              <ListGroup variant={"flush"}>
+                <ListGroup.Item
+                    action
+                    href={"/swagger-ui.html"}
+                >
+                  API Documentation
+                </ListGroup.Item>
+              </ListGroup>
+            </Card>
+
+          </Col>
+
+          <Col md="9" xl="10">
+            {getDashboardContent()}
+          </Col>
+        </Row>
+      </Container>
   );
 }
 

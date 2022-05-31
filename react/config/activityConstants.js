@@ -181,7 +181,7 @@ export const studyActions = {
     label: "NEW_ENTRY_TEMPLATE",
     visible: false,
   },
-  UPDATED_ENTRY_TEMPLATE : {
+  UPDATED_ENTRY_TEMPLATE: {
     value: "UPDATED_ENTRY_TEMPLATE",
     label: "UPDATED_ENTRY_TEMPLATE",
     visible: false,

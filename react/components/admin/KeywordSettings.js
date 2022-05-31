@@ -1,6 +1,6 @@
-import React from 'react';
-import {Button, Card, Col, Form, Modal, Row} from 'react-bootstrap';
-import {Edit, Tag} from 'react-feather';
+import React from "react";
+import {Button, Card, Col, Dropdown, Form, Modal, Row} from 'react-bootstrap';
+import {Tag} from 'react-feather';
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -8,6 +8,9 @@ import Select from 'react-select';
 import swal from "sweetalert";
 import {SettingsLoadingMessage} from "../loading";
 import {SettingsErrorMessage} from "../errors";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEdit} from "@fortawesome/free-solid-svg-icons";
+import {getCsrfToken} from "../../config/csrf";
 
 const emptyKeyword = {
   id: null,
@@ -107,7 +110,10 @@ export default class KeywordSettings extends React.Component {
 
     fetch(url, {
       method: method,
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
+      },
       body: JSON.stringify(keyword)
     })
     .then(response => response.json())
@@ -147,7 +153,7 @@ export default class KeywordSettings extends React.Component {
       }
     });
 
-    let content = <SettingsLoadingMessage />
+    let content = <SettingsLoadingMessage/>
     if (this.state.isLoaded) {
       content = <KeywordsTable
           keywords={this.state.keywords}
@@ -157,7 +163,7 @@ export default class KeywordSettings extends React.Component {
           showModal={this.showModal}
       />
     } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage />;
+      content = <SettingsErrorMessage/>;
     }
 
     return (
@@ -177,7 +183,7 @@ export default class KeywordSettings extends React.Component {
           </Card.Header>
           <Card.Body>
 
-            { content }
+            {content}
 
             <Modal
                 show={this.state.isModalOpen}
@@ -251,15 +257,24 @@ const KeywordsTable = ({
     },
     {
       dataField: "controls",
-      text: "Options",
+      text: "",
       sort: false,
       formatter: (c, d, i, x) => {
         return (
             <React.Fragment>
-              <a className="text-warning" title={"Edit keyword"}
-                 onClick={() => showModal(d)}>
-                <Edit className="align-middle me-1" size={18}/>
-              </a>
+              <Dropdown>
+                <Dropdown.Toggle variant={"outline-primary"}>
+                  {/*<FontAwesomeIcon icon={faBars} />*/}
+                  &nbsp;Options&nbsp;
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => showModal(d)}>
+                    <FontAwesomeIcon icon={faEdit}/>
+                    &nbsp;&nbsp;
+                    Edit keyword
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </React.Fragment>
         )
       }

@@ -2,7 +2,7 @@ import React from "react";
 import {Form} from 'react-bootstrap';
 import {FormGroup} from '../forms/common'
 import {setFilters} from "../../redux/actions/filterActions";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import {compose} from 'redux';
 import {withRouter} from 'react-router-dom';
 import {history} from "../../App";
@@ -125,8 +125,8 @@ class ProgramFilters extends React.Component {
                   type="radio"
                   name="program-status"
                   checked={
-                    !this.state.filters[labels.ACTIVE]
-                    && !this.state.filters[labels.INACTIVE]
+                      !this.state.filters[labels.ACTIVE]
+                      && !this.state.filters[labels.INACTIVE]
                   }
                   onChange={() => {
                     this.updateFilters({
@@ -140,18 +140,18 @@ class ProgramFilters extends React.Component {
 
             <FormGroup className="mb-2 ms-4">
 
-                <Form.Check
-                    label={"Active programs only"}
-                    type="radio"
-                    name="program-status"
-                    checked={!!this.state.filters[labels.ACTIVE]}
-                    onChange={() => {
-                      this.updateFilters({
-                        [labels.ACTIVE]: true,
-                        [labels.INACTIVE]: null
-                      })
-                    }}
-                />
+              <Form.Check
+                  label={"Active programs only"}
+                  type="radio"
+                  name="program-status"
+                  checked={!!this.state.filters[labels.ACTIVE]}
+                  onChange={() => {
+                    this.updateFilters({
+                      [labels.ACTIVE]: true,
+                      [labels.INACTIVE]: null
+                    })
+                  }}
+              />
             </FormGroup>
 
             <FormGroup className="mb-2 ms-4">

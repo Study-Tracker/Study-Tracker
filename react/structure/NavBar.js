@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Button, Dropdown, Form, InputGroup, Nav, Navbar} from "react-bootstrap";
 import {toggleSidebar} from "../redux/actions/sidebarActions";
 import {LogIn, LogOut, Search, Settings, User} from "react-feather";
@@ -159,7 +159,7 @@ class NavbarSearch extends React.Component {
               history.go(0);
             })}
         >
-          <Form inline={true} className="d-none d-sm-inline-block" >
+          <Form inline={true} className="d-none d-sm-inline-block">
             <InputGroup className="input-group-navbar">
               <Form.Control
                   name={"q"}
@@ -202,16 +202,16 @@ const NavbarUser = ({isAdmin, userName, displayName}) => {
             !!isAdmin
                 ? (
                     <Dropdown.Item as={"a"} href={"/admin"}>
-                        <Settings size={18}
-                                  className="align-middle me-2"/>
-                        Admin Dashboard
+                      <Settings size={18}
+                                className="align-middle me-2"/>
+                      Admin Dashboard
                     </Dropdown.Item>
                 ) : ''
           }
 
           <Dropdown.Item as={"a"} href={"/user/" + userName}>
-              <User size={18} className="align-middle me-2"/>
-              Profile
+            <User size={18} className="align-middle me-2"/>
+            Profile
           </Dropdown.Item>
 
           {/*<DropdownItem>*/}
@@ -223,9 +223,9 @@ const NavbarUser = ({isAdmin, userName, displayName}) => {
           {/*</DropdownItem>*/}
 
           <Dropdown.Item as={"a"} href={"/logout"}>
-              <LogOut size={18}
-                      className="align-middle me-2"/>
-              Sign out
+            <LogOut size={18}
+                    className="align-middle me-2"/>
+            Sign out
           </Dropdown.Item>
 
         </Dropdown.Menu>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Form} from 'react-bootstrap';
 
 export const FormGroup = (props) => {

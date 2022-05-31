@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import StandardWrapper from "../structure/StandardWrapper";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import StudyCollectionDetails
   from "../components/collections/StudyCollectionDetails";
 import swal from "sweetalert";

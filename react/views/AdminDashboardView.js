@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {connect} from "react-redux";
 import NavBar from "../structure/NavBar";
 import Footer from "../structure/Footer";

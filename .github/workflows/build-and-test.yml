@@ -47,13 +47,13 @@ jobs:
 
       # Run tests
       - name: Repository tests
-        run: mvn -Dtest="com.decibeltx.studytracker.test.repository.**" test
+        run: mvn -Dtest="io.studytracker.test.repository.**" test
 
       - name: Service tests
-        run: mvn -Dtest="com.decibeltx.studytracker.test.service.**" test
+        run: mvn -Dtest="io.studytracker.test.service.**" test
 
       - name: Web tests
-        run: mvn -Dtest="com.decibeltx.studytracker.test.web.**" test
+        run: mvn -Dtest="io.studytracker.test.web.**" test
 
       #- name: Maven Verify
       #  run: mvn -B clean verify

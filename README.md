@@ -1,4 +1,7 @@
-# Study Tracker 
+# Study Tracker
+
+![example branch parameter](https://github.com/Study-Tracker/Study-Tracker/actions/workflows/build-and-test.yml/badge.svg?branch=main)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ff2b66794fc540d5a74bda46d5913d37)](https://www.codacy.com/gh/Study-Tracker/Study-Tracker/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Study-Tracker/Study-Tracker&amp;utm_campaign=Badge_Grade)
 
 Study Tracker makes the job of managing your team's research easier by providing a user-friendly web
 application that serves as a single source-of-truth for your organization. Save time by
@@ -17,7 +20,7 @@ integrated REST API and event dispatcher service for sharing of data.
 ## Documentation
 
 For instructions about how to configure and deploy Study
-Tracker, [see the wiki](https://github.com/Decibel-Therapeutics/Study-Tracker/wiki).
+Tracker, [see the wiki](https://github.com/Study-Tracker/Study-Tracker/wiki).
 
 ## Supported Integrations
 
@@ -75,11 +78,11 @@ For a rapid build and deployment in development mode, follow the steps below. Fo
 
 For questions about Study Tracker, or if you would like to contribute, please contact:
 
-- [Will Oemler, Decibel Therapeutics](mailto:woemler@decibeltx.com)
+- [Will Oemler, Vesalius Therapeutics](mailto:woemler@vesaliustx.com)
 
 ## License
 
-Copyright 2021 Decibel Therapeutics
+Copyright 2022 the original authors
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
 compliance with the License. You may obtain a copy of the License at

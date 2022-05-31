@@ -28,6 +28,7 @@ import {
   XCircle
 } from 'react-feather';
 import {statuses} from "../config/statusConstants";
+import {getCsrfToken} from "../config/csrf";
 
 export const StatusButton = ({status}) => {
   const config = statuses[status];
@@ -57,7 +58,8 @@ export class SelectableStatusButton extends React.Component {
     fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify({status: e.target.dataset.value})
     })

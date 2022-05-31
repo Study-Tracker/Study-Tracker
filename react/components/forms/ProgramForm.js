@@ -15,6 +15,7 @@
  */
 
 import React from "react";
+import {getCsrfToken} from "../../config/csrf";
 import 'react-datepicker/dist/react-datepicker.css';
 import {
   Breadcrumb,
@@ -163,7 +164,8 @@ export default class ProgramForm extends React.Component {
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(this.state.program)
       })
@@ -225,7 +227,8 @@ export default class ProgramForm extends React.Component {
                     ? (
                         <Breadcrumb>
                           <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
-                          <Breadcrumb.Item href={"/program/" + this.state.program.id}>
+                          <Breadcrumb.Item
+                              href={"/program/" + this.state.program.id}>
                             Program Detail
                           </Breadcrumb.Item>
                           <Breadcrumb.Item active>Edit Program</Breadcrumb.Item>
@@ -277,7 +280,7 @@ export default class ProgramForm extends React.Component {
                           <Form.Control
                               type="text"
                               isInvalid={!this.state.validation.nameIsValid
-                              || !this.state.validation.nameIsUnique}
+                                  || !this.state.validation.nameIsUnique}
                               defaultValue={this.state.program.name || ''}
                               onChange={(e) => this.handleFormUpdate(
                                   {"name": e.target.value})}
@@ -338,7 +341,7 @@ export default class ProgramForm extends React.Component {
                                 theme="snow"
                                 className={"mb-2"}
                                 defaultValue={this.state.program.description
-                                || ''}
+                                    || ''}
                                 onChange={content => this.handleFormUpdate(
                                     {"description": content})}
                             />
@@ -412,7 +415,7 @@ export default class ProgramForm extends React.Component {
                               type="text"
                               isInvalid={!this.state.validation.programFolderIdIsValid}
                               defaultValue={this.state.program.notebookFolder.referenceId
-                              || ''}
+                                  || ''}
                               onChange={(e) => this.handleFormUpdate({
                                 "notebookFolder": {
                                   ...this.state.program.notebookFolder,
@@ -437,7 +440,7 @@ export default class ProgramForm extends React.Component {
                               type="text"
                               // invalid={!this.state.validation.programFolderNameIsValid}
                               defaultValue={this.state.program.notebookFolder.name
-                              || ''}
+                                  || ''}
                               onChange={(e) => this.handleFormUpdate({
                                 "notebookFolder": {
                                   ...this.state.program.notebookFolder,
@@ -460,7 +463,7 @@ export default class ProgramForm extends React.Component {
                               type="text"
                               // invalid={!this.state.validation.programFolderUrlIsValid}
                               defaultValue={this.state.program.notebookFolder.url
-                              || ''}
+                                  || ''}
                               onChange={(e) => this.handleFormUpdate({
                                 "notebookFolder": {
                                   ...this.state.program.notebookFolder,

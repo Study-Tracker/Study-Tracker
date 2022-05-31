@@ -119,7 +119,8 @@ export default class SignInView extends React.Component {
 
                         <div className="text-center mt-3">
                           <small>
-                            <a href="/auth/passwordresetrequest">Forgot password?</a>
+                            <a href="/auth/passwordresetrequest">Forgot
+                              password?</a>
                           </small>
                         </div>
 
@@ -162,7 +163,7 @@ export default class SignInView extends React.Component {
                         {
                           !!this.state.options && !!this.state.options.sso
                           && !!this.state.options.sso.okta
-                            ? (
+                              ? (
                                   <div className="text-center mt-3">
                                     <Button
                                         href={this.state.options.sso.okta}
@@ -172,7 +173,7 @@ export default class SignInView extends React.Component {
                                       Sign in with Okta
                                     </Button>
                                   </div>
-                            ) : ''
+                              ) : ''
                         }
 
                       </Form>

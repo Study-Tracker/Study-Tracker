@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
@@ -55,42 +55,48 @@ class Sidebar extends React.Component {
                 <li className="sidebar-header">Navigation</li>
 
                 <li className={"sidebar-item"}>
-                  <a className={"sidebar-link " + this.isActive([""])} href={"/"}>
+                  <a className={"sidebar-link " + this.isActive([""])}
+                     href={"/"}>
                     <Activity size={18} className="align-middle me-3"/>
                     <span className="align-middle">Activity</span>
                   </a>
                 </li>
 
                 <li className={"sidebar-item"}>
-                  <a className={"sidebar-link "  + this.isActive(["studies", "study"])} href={"/studies"}>
+                  <a className={"sidebar-link " + this.isActive(
+                      ["studies", "study"])} href={"/studies"}>
                     <Clipboard size={18} className="align-middle me-3"/>
                     <span className="align-middle">Studies</span>
                   </a>
                 </li>
 
                 <li className={"sidebar-item"}>
-                  <a className={"sidebar-link " + this.isActive(["assay", "assays"])} href={"/assays"}>
+                  <a className={"sidebar-link " + this.isActive(
+                      ["assay", "assays"])} href={"/assays"}>
                     <Layers size={18} className="align-middle me-3"/>
                     <span className="align-middle">Assays</span>
                   </a>
                 </li>
 
                 <li className={"sidebar-item"}>
-                  <a className={"sidebar-link " + this.isActive(["program", "programs"])} href={"/programs"}>
+                  <a className={"sidebar-link " + this.isActive(
+                      ["program", "programs"])} href={"/programs"}>
                     <Target size={18} className="align-middle me-3"/>
                     <span className="align-middle">Programs</span>
                   </a>
                 </li>
 
                 <li className={"sidebar-item"}>
-                  <a className={"sidebar-link "  + this.isActive(["users", "user"])} href={"/users"}>
+                  <a className={"sidebar-link " + this.isActive(
+                      ["users", "user"])} href={"/users"}>
                     <Users size={18} className="align-middle me-3"/>
                     <span className="align-middle">Users</span>
                   </a>
                 </li>
 
                 <li className={"sidebar-item"}>
-                  <a className={"sidebar-link " + this.isActive(["collections", "collection"])} href={"/collections"}>
+                  <a className={"sidebar-link " + this.isActive(
+                      ["collections", "collection"])} href={"/collections"}>
                     <List size={18} className="align-middle me-3"/>
                     <span className="align-middle">Collections</span>
                   </a>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import Select from "react-select";
 import swal from "sweetalert";
@@ -25,7 +25,8 @@ class AddToStudyCollectionModal extends React.Component {
 
   handleSubmit() {
     if (!!this.state.selected) {
-      fetch("/api/studycollection/" + this.state.selected + "/" + this.props.study.id, {
+      fetch("/api/studycollection/" + this.state.selected + "/"
+          + this.props.study.id, {
         method: "POST"
       }).then(response => {
         if (response.ok) {
@@ -74,14 +75,15 @@ class AddToStudyCollectionModal extends React.Component {
                   <Form.Group>
                     <Form.Label>Collection</Form.Label>
                     <Select
-                      className="react-select-container"
-                      classNamePrefix="react-select"
-                      value={options.filter(o => o.value === this.state.selected)}
-                      options={options}
-                      onChange={o => {
-                        console.log(o);
-                        this.setState({selected: o.value})
-                      }}
+                        className="react-select-container"
+                        classNamePrefix="react-select"
+                        value={options.filter(
+                            o => o.value === this.state.selected)}
+                        options={options}
+                        onChange={o => {
+                          console.log(o);
+                          this.setState({selected: o.value})
+                        }}
                     />
                   </Form.Group>
                 </Col>

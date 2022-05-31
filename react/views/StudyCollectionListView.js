@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import SideBar from "../structure/SideBar";
@@ -40,7 +40,7 @@ class StudyCollectionListView extends React.Component {
 
   render() {
 
-    let content = <LoadingMessage />;
+    let content = <LoadingMessage/>;
 
     try {
       if (this.state.isError) {
@@ -49,20 +49,20 @@ class StudyCollectionListView extends React.Component {
         content = <CollectionList
             collections={this.state.collections}
             user={this.props.user}
-        /> ;
+        />;
 
       }
     } catch (e) {
       console.error(e);
-      content = <ErrorMessage />;
+      content = <ErrorMessage/>;
     }
 
     return (
         <React.Fragment>
           <div className="wrapper">
-            <SideBar />
+            <SideBar/>
             <div className="main">
-              <NavBar user={this.props.user} />
+              <NavBar user={this.props.user}/>
               <div className="content">
                 {content}
               </div>

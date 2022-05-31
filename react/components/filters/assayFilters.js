@@ -2,7 +2,7 @@ import React from "react";
 import {FormGroup} from '../forms/common';
 import {Form} from 'react-bootstrap';
 import {setFilters} from "../../redux/actions/filterActions";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import {statuses} from "../../config/statusConstants";
 import {setPrograms} from "../../redux/actions/programActions";
 import {compose} from 'redux';
@@ -222,7 +222,7 @@ class AssayFilters extends React.Component {
 
           <div className="settings-section">
 
-            <FilterLabel text={"Quick Views"} />
+            <FilterLabel text={"Quick Views"}/>
 
             {
               !!this.props.user ? (
@@ -308,7 +308,8 @@ class AssayFilters extends React.Component {
             {
               !!this.state.programs ? (
                   <FormGroup>
-                    <FilterLabel text={"Programs"} toggle={this.toggleAllProgramFilters}/>
+                    <FilterLabel text={"Programs"}
+                                 toggle={this.toggleAllProgramFilters}/>
                     <div>
                       {
                         this.state.programs.map(program => {
@@ -345,7 +346,8 @@ class AssayFilters extends React.Component {
             {
               !!this.state.assayTypes ? (
                   <FormGroup>
-                    <FilterLabel text={"Assay Types"} toggle={this.toggleAllAssayTypeFilters}/>
+                    <FilterLabel text={"Assay Types"}
+                                 toggle={this.toggleAllAssayTypeFilters}/>
                     <div>
                       {
                         this.state.assayTypes.map(assayType => {

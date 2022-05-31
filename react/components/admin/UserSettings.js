@@ -1,12 +1,105 @@
-import React from 'react';
-import {Badge, Button, Card, Col, Modal, Row, Table} from 'react-bootstrap';
-import {Edit, Info, User, UserPlus} from 'react-feather';
+import React from "react";
+import {
+  Badge,
+  Button,
+  Card,
+  Col,
+  Dropdown,
+  Modal,
+  Row,
+  Table
+} from 'react-bootstrap';
+import {Edit, User, UserPlus} from 'react-feather';
 import {history} from "../../App";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {SettingsErrorMessage} from "../errors";
 import {SettingsLoadingMessage} from "../loading";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {
+  faCheckCircle,
+  faEdit,
+  faInfoCircle,
+  faRedo,
+  faTimesCircle
+} from "@fortawesome/free-solid-svg-icons";
+import swal from "sweetalert";
+import {getCsrfToken} from "../../config/csrf";
+
+const resetUserPassword = (user) => {
+  swal({
+    title: "Are you sure you want to reset the password for user: "
+        + user["displayName"] + " (" + user["email"] + ")?",
+    text: "This will override any existing password reset requests and send a "
+        + "new notification email to the user.",
+    icon: "warning",
+    buttons: true
+  })
+  .then(val => {
+    if (val) {
+      fetch("/api/user/" + user["id"] + "/password-reset", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
+        }
+      }).then(response => {
+        if (response.ok) {
+          swal("Password reset successful",
+              "A notification email has been sent to the user.",
+              "success")
+        } else {
+          swal("Request failed",
+              "Check the server log for more information.",
+              "warning");
+        }
+      })
+      .catch(error => {
+        swal("Request failed",
+            "Check the server log for more information.",
+            "warning");
+      })
+    }
+  })
+}
+
+const toggleUserActive = (user, active) => {
+  swal({
+    title: "Are you sure you want to " + (!!active ? "enable" : "disable")
+        + " user: " + user["displayName"] + " (" + user["email"] + ")?",
+    text: "Disabled users cannot be added to new studies and assays, but they "
+        + "will remain associated with existing studies and assays.",
+    icon: "warning",
+    buttons: true
+  })
+  .then(val => {
+    if (val) {
+      fetch("/api/user/" + user["id"] + "/status?active=" + active, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
+        }
+      }).then(response => {
+        if (response.ok) {
+          swal("User " + (!!active ? "enabled" : "disabled"),
+              "Refresh the page to view the updated user information.",
+              "success")
+        } else {
+          swal("Request failed",
+              "Check the server log for more information.",
+              "warning");
+        }
+      })
+      .catch(error => {
+        swal("Request failed",
+            "Check the server log for more information.",
+            "warning");
+      })
+    }
+  });
+}
 
 class UserSettings extends React.Component {
 
@@ -58,11 +151,11 @@ class UserSettings extends React.Component {
 
     let content = '';
     if (!!this.state.isLoaded) {
-      content = <UserTable users={this.state.users} showModal={this.showModal} />
+      content = <UserTable users={this.state.users} showModal={this.showModal}/>
     } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage />
+      content = <SettingsErrorMessage/>
     } else {
-      content = <SettingsLoadingMessage />
+      content = <SettingsLoadingMessage/>
     }
 
     return (
@@ -127,7 +220,9 @@ const UserTable = ({users, showModal}) => {
       text: "Username",
       sort: true,
       headerStyle: {width: '20%%'},
-      formatter: (c, d, i, x) => <Button variant={"link"} onClick={() => showModal(d)}>{d.username}</Button>,
+      formatter: (c, d, i, x) => <Button variant={"link"}
+                                         onClick={() => showModal(
+                                             d)}>{d.username}</Button>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (rowA.username > rowB.username) {
           return order === "desc" ? -1 : 1;
@@ -175,22 +270,81 @@ const UserTable = ({users, showModal}) => {
     },
     {
       dataField: "controls",
-      text: "Options",
+      text: "",
       sort: false,
       headerStyle: {width: '10%'},
       formatter: (c, d, i, x) => {
         return (
             <React.Fragment>
 
-              <a className="text-info" title={"View details"}
-                 onClick={() => showModal(d)}>
-                <Info className="align-middle me-1" size={18}/>
-              </a>
+              <Dropdown>
 
-              <a className="text-warning" title={"Edit user"}
-                 onClick={() => history.push("/users/" + d.id + "/edit")}>
-                <Edit className="align-middle me-1" size={18}/>
-              </a>
+                <Dropdown.Toggle variant={"outline-primary"}>
+                  {/*<FontAwesomeIcon icon={faBars} />*/}
+                  &nbsp;Options&nbsp;
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+
+                  <Dropdown.Item onClick={() => showModal(d)}>
+                    <FontAwesomeIcon icon={faInfoCircle}/>
+                    &nbsp;&nbsp;
+                    View Details
+                  </Dropdown.Item>
+
+                  <Dropdown.Item
+                      onClick={() => history.push("/users/" + d.id + "/edit")}
+                  >
+                    <FontAwesomeIcon icon={faEdit}/>
+                    &nbsp;&nbsp;
+                    Edit User
+                  </Dropdown.Item>
+
+                  <Dropdown.Divider/>
+
+                  {
+                    !!d.active ? (
+                        <Dropdown.Item
+                            className={"text-warning"}
+                            onClick={() => toggleUserActive(d, false)}
+                        >
+                          <FontAwesomeIcon icon={faTimesCircle}/>
+                          &nbsp;&nbsp;
+                          Set Inactive
+                        </Dropdown.Item>
+                    ) : (
+                        <Dropdown.Item
+                            className={"text-warning"}
+                            onClick={() => toggleUserActive(d, true)}
+                        >
+                          <FontAwesomeIcon icon={faCheckCircle}/>
+                          &nbsp;&nbsp;
+                          Set Active
+                        </Dropdown.Item>
+                    )
+                  }
+
+                  <Dropdown.Item
+                      className={"text-warning"}
+                      onClick={() => resetUserPassword(d)}
+                  >
+                    <FontAwesomeIcon icon={faRedo}/>
+                    &nbsp;&nbsp;
+                    Reset Password
+                  </Dropdown.Item>
+
+                </Dropdown.Menu>
+              </Dropdown>
+
+              {/*<a className="text-info" title={"View details"}*/}
+              {/*   onClick={() => showModal(d)}>*/}
+              {/*  <Info className="align-middle me-1" size={18}/>*/}
+              {/*</a>*/}
+
+              {/*<a className="text-warning" title={"Edit user"}*/}
+              {/*   onClick={() => history.push("/users/" + d.id + "/edit")}>*/}
+              {/*  <Edit className="align-middle me-1" size={18}/>*/}
+              {/*</a>*/}
 
               {/*<a className="text-danger" title={"Disable user"}*/}
               {/*   onClick={() => console.log("click")}>*/}
@@ -262,7 +416,8 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
           size={"lg"}
       >
         <Modal.Header closeButton>
-          User:&nbsp;<strong>{user.displayName}</strong>&nbsp;(<code>{user.username}</code>)
+          User:&nbsp;
+          <strong>{user.displayName}</strong>&nbsp;(<code>{user.username}</code>)
         </Modal.Header>
         <Modal.Body>
           <Row>

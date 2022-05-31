@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import StudyListView from "./views/StudyListView";
 import StudyDetailsView from "./views/StudyDetailsView";
-import {createBrowserHistory} from 'history';
+import {createBrowserHistory} from "history";
 import StudyFormView from "./views/StudyFormView";
 import store from "./redux/store";
 import {Provider} from "react-redux";
 import ReduxToastr from "react-redux-toastr";
 import {Route, Router, Switch} from "react-router-dom";
-import AssayFormView from './views/AssayFormView'
+import AssayFormView from "./views/AssayFormView";
 import AssayDetailsView from "./views/AssayDetailsView";
 import Error, {ErrorBoundary} from "./views/Error";
 import ScrollToTop from "./structure/ScrollToTop";
@@ -39,7 +39,7 @@ import AdminDashboardView from "./views/AdminDashboardView";
 import FrontPageView from "./views/FrontPageView";
 import AssayTypeFormView from "./views/AssayTypeFormView";
 import AssayListView from "./views/AssayListView";
-import {TemplateFormView} from './views/TemplateFormView';
+import {TemplateFormView} from "./views/TemplateFormView";
 import StudyCollectionFormView from "./views/StudyCollectionFormView";
 import StudyCollectionDetailsView from "./views/StudyCollectionDetailsView";
 import StudyCollectionListView from "./views/StudyCollectionListView";
@@ -151,22 +151,26 @@ export default class App extends React.Component {
 
                   {/*New Collection*/}
                   <Route exact path={"/collections/new"}
-                         render={props => <StudyCollectionFormView {...props} />}/>
+                         render={props =>
+                             <StudyCollectionFormView {...props} />}/>
 
                   {/*Edit Collection*/}
                   <Route exact path={"/collection/:collectionId/edit"}
-                         render={props => <StudyCollectionFormView {...props} />}/>
+                         render={props =>
+                             <StudyCollectionFormView {...props} />}/>
 
                   {/*Collection details*/}
                   <Route exact path={"/collection/:collectionId"}
-                         render={props => <StudyCollectionDetailsView {...props} />}/>
+                         render={props =>
+                             <StudyCollectionDetailsView {...props} />}/>
 
                   {/* Sign in */}
                   <Route exact path={"/login"}
                          render={props => <SignInView {...props} />}/>
 
                   <Route exact path={"/auth/passwordresetrequest"}
-                         render={props => <PasswordResetRequestView {...props} />}/>
+                         render={props =>
+                             <PasswordResetRequestView {...props} />}/>
 
                   <Route exact path={"/auth/passwordreset"}
                          render={props => <PasswordResetView {...props} />}/>
@@ -179,9 +183,9 @@ export default class App extends React.Component {
                          render={props => <AssayTypeFormView {...props} />}/>
 
                   <Route
-                     exact
-                     path="/template-types/new"
-                     render={ props => <TemplateFormView { ...props } /> }
+                      exact
+                      path="/template-types/new"
+                      render={props => <TemplateFormView {...props} />}
                   />
 
                   {/* Admin */}

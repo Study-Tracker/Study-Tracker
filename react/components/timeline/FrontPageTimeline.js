@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Card, Col, Container, Row} from "react-bootstrap";
 import {Timeline} from "../activity";
 import {
@@ -46,15 +46,15 @@ const FrontPageTimeline = ({
             <Row className="study-statistics">
 
               <Col xs={12} sm={6} md={4} lg={12} className="d-flex">
-                <WelcomeBack />
+                <WelcomeBack/>
               </Col>
 
               <Col xs={12} sm={6} md={4} lg={12} className="d-flex">
-                <ActiveStudies count={userStats.activeStudyCount} />
+                <ActiveStudies count={userStats.activeStudyCount}/>
               </Col>
 
               <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">
-                <NewStudies count={newStudies} />
+                <NewStudies count={newStudies}/>
               </Col>
 
               <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">

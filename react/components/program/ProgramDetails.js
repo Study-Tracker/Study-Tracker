@@ -119,7 +119,8 @@ class ProgramDetails extends React.Component {
                         {/*}*/}
                         {
                           !!this.props.user && !!this.props.user.admin ? (
-                              <Dropdown.Item href={"/program/" + program.id + "/edit"}>
+                              <Dropdown.Item
+                                  href={"/program/" + program.id + "/edit"}>
                                 <FontAwesomeIcon icon={faEdit}/>
                                 &nbsp;
                                 Edit

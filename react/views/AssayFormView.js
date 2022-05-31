@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import NoSidebarPageWrapper from "../structure/NoSidebarPageWrapper";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import AssayForm from "../components/forms/AssayForm";
 import {connect} from "react-redux";
-import {Redirect} from 'react-router'
+import PropTypes from "prop-types";
 
 class AssayFormView extends React.Component {
 
@@ -71,7 +71,8 @@ class AssayFormView extends React.Component {
       });
     });
 
-    const notebookTemplates = await fetch("/api/notebookentrytemplate?category=ASSAY&active=true")
+    const notebookTemplates = await fetch(
+        "/api/notebookentrytemplate?category=ASSAY&active=true")
     .then(async response => await response.json())
     .catch(error => {
       console.error(error);
@@ -80,7 +81,8 @@ class AssayFormView extends React.Component {
         error: error
       });
     });
-    const defaultNotebookTemplate = notebookTemplates.find(o => o.default === true);
+    const defaultNotebookTemplate = notebookTemplates.find(
+        o => o.default === true);
 
     this.setState({
       study: study,
@@ -97,9 +99,7 @@ class AssayFormView extends React.Component {
     let content = <LoadingMessage/>;
     if (this.state.isError) {
       content = <ErrorMessage/>;
-    } else if (!this.props.user) {
-      content = <Redirect to="/login"/>
-    } else if (this.state.isLoaded) {
+    } else if (!!this.props.user && this.state.isLoaded) {
       content = <AssayForm
           study={this.state.study}
           assay={this.state.assay}
@@ -116,6 +116,10 @@ class AssayFormView extends React.Component {
     );
   }
 
+}
+
+AssayFormView.propTypes = {
+  user: PropTypes.object.isRequired,
 }
 
 export default connect(store => ({

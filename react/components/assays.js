@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Col, Row} from "react-bootstrap";
 import ErrorMessage from "../structure/ErrorMessage";
 import LoadingMessage from "../structure/LoadingMessage";
@@ -58,12 +58,14 @@ const AssaySummaryCard = ({studyCode, assay}) => {
           <Row>
 
             <Col xs={12}>
-              <div className="bg-light p-3" dangerouslySetInnerHTML={createMarkup(assay.description)}/>
+              <div className="bg-light p-3"
+                   dangerouslySetInnerHTML={createMarkup(assay.description)}/>
             </Col>
 
             <Col xs={12}>
               <p className="text-muted">
-                Created {dateFormat(new Date(assay.createdAt), 'mm/dd/yy @ h:MM TT')}
+                Created {dateFormat(new Date(assay.createdAt),
+                  'mm/dd/yy @ h:MM TT')}
                 {/*{new Date(assay.createdAt).toLocaleString()}*/}
               </p>
             </Col>
@@ -72,7 +74,8 @@ const AssaySummaryCard = ({studyCode, assay}) => {
               !!assay.updatedAt ? (
                   <Col xs={12}>
                     <small className="text-muted">
-                      Updated {dateFormat(new Date(assay.updatedAt), 'mm/dd/yy @ h:MM TT')}
+                      Updated {dateFormat(new Date(assay.updatedAt),
+                        'mm/dd/yy @ h:MM TT')}
                       {/*Created {new Date(assay.updatedAt).toLocaleString()}*/}
                     </small>
                   </Col>

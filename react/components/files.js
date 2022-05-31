@@ -28,6 +28,7 @@ import {CardLoadingMessage} from "./loading";
 import {DismissableAlert} from "./errors";
 import {Folder as FolderIcon, RefreshCw} from "react-feather";
 import swal from "sweetalert";
+import {getCsrfToken} from "../config/csrf";
 
 const baseStyle = {
   flex: 1,
@@ -122,7 +123,7 @@ const File = ({file}) => {
   return (
       <li>
         <div className="ms-3">
-          <a href={file.url} target="_blank">
+          <a href={file.url} target="_blank" rel="noopener noreferrer">
             <FontAwesomeIcon icon={faFile}/>
             &nbsp;
             {file.name}
@@ -132,7 +133,12 @@ const File = ({file}) => {
   )
 }
 
-const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth, showHeader}) => {
+const FolderContents = ({
+  folder,
+  folderFileKey = DEFAULT_FOLDER_FILE_KEY,
+  depth,
+  showHeader
+}) => {
   const subFolders = folder.subFolders
   .sort((a, b) => {
     if (a.name > b.name) {
@@ -144,7 +150,8 @@ const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth,
     }
   })
   .map((f, i) => {
-    return <Folder key={"folder-" + i + "-" + f.name} folder={f} depth={depth} folderFileKey={folderFileKey} />
+    return <Folder key={"folder-" + i + "-" + f.name} folder={f} depth={depth}
+                   folderFileKey={folderFileKey}/>
   });
 
   const files = folder[folderFileKey]
@@ -170,7 +177,7 @@ const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth,
               !!showHeader
                   ? (
                       <h4>
-                        <a href={folder.url} target="_blank">{folder.path}</a>
+                        <a href={folder.url} target="_blank" rel="noopener noreferrer">{folder.path}</a>
                       </h4>
                   ) : ''
             }
@@ -185,7 +192,7 @@ const FolderContents = ({folder, folderFileKey = DEFAULT_FOLDER_FILE_KEY, depth,
 
 /**
  * Returns a ul list of all files and subfolders within the supplied folder.
- * 
+ *
  * @param folder
  * @param isError
  * @param isLoaded
@@ -211,7 +218,8 @@ export const StorageFolderFileList = ({
           </div>
       );
     } else {
-      return <FolderContents folder={folder} depth={3} showHeader={true} folderFileKey={folderFileKey}/>
+      return <FolderContents folder={folder} depth={3} showHeader={true}
+                             folderFileKey={folderFileKey}/>
     }
   } else {
     return <CardLoadingMessage/>;
@@ -305,7 +313,8 @@ export const UploadFilesModal = ({isOpen, showModal, handleSubmit}) => {
           <Button variant={"secondary"} onClick={() => showModal(false)}>
             Cancel
           </Button>
-          <Button variant={"primary"} onClick={() => handleSubmit(acceptedFiles)}>
+          <Button variant={"primary"}
+                  onClick={() => handleSubmit(acceptedFiles)}>
             Upload
           </Button>
         </Modal.Footer>
@@ -326,7 +335,8 @@ const handleFolderRepairRequest = (url) => {
       fetch(url, {
         method: 'PATCH',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         }
       }).then(response => {
         if (response.ok) {
@@ -350,10 +360,11 @@ const handleFolderRepairRequest = (url) => {
 
 export const RepairableStorageFolderLink = ({folder, repairUrl}) => {
   if (!!folder && !!folder.path && !!folder.url) {
-    return <a href={folder.url} target="_blank">Storage Folder</a>
+    return <a href={folder.url} target="_blank" rel="noopener noreferrer">Storage Folder</a>
   } else {
     return (
-        <Button variant="warning" onClick={() => handleFolderRepairRequest(repairUrl)}>
+        <Button variant="warning"
+                onClick={() => handleFolderRepairRequest(repairUrl)}>
           <RefreshCw size={14} className="mb-1"/>
           &nbsp;
           Repair Folder
@@ -367,6 +378,7 @@ export const RepairableStorageFolderButton = ({folder, repairUrl}) => {
     return (
         <a href={folder.url}
            target="_blank"
+           rel="noopener noreferrer"
            className="btn btn-outline-info mt-2 me-2">
           Storage Folder
           <FolderIcon

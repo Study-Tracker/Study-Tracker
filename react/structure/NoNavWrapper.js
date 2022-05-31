@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import Footer from "./Footer";
 
 const NoSidebarPageWrapper = ({children}) => (

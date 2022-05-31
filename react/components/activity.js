@@ -27,7 +27,7 @@ import {
   MessageCircle,
   Star,
   Trash2,
-} from 'react-feather';
+} from "react-feather";
 import {studyActions} from "../config/activityConstants";
 import {StatusBadge} from "./status";
 import {KeywordBadgeList} from "./keywords";
@@ -150,39 +150,39 @@ const ActivityIcon = ({action}) => {
 const ActivityMessage = ({activity}) => {
   switch (activity.eventType) {
 
-    // Notebook entry templates
+      // Notebook entry templates
 
     case studyActions.NEW_ENTRY_TEMPLATE.value:
       return (
-        <>
-          <p>
-            <a href={"/user/" + activity.user.username}>
-              {activity.user.displayName}
-            </a>
-            &nbsp;has created a new template:
-          </p>
-          <div className="bg-light text-secondary p-3">
-            <h5>TemplateId: { activity.data.entryTemplate.templateId }</h5>
-            <h4>Name: { activity.data.entryTemplate.name }</h4>
-            <p>Active: { String(activity.data.entryTemplate.active) }</p>
-          </div>
-        </>
+          <>
+            <p>
+              <a href={"/user/" + activity.user.username}>
+                {activity.user.displayName}
+              </a>
+              &nbsp;has created a new template:
+            </p>
+            <div className="bg-light text-secondary p-3">
+              <h5>TemplateId: {activity.data.entryTemplate.templateId}</h5>
+              <h4>Name: {activity.data.entryTemplate.name}</h4>
+              <p>Active: {String(activity.data.entryTemplate.active)}</p>
+            </div>
+          </>
       );
 
     case studyActions.UPDATED_ENTRY_TEMPLATE.value:
       return (
-        <>
-          <p>
-            <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
-            &nbsp;has edited a template:
-          </p>
-          <div className="bg-light text-secondary p-3">
-            <h5>TemplateId: { activity.data.entryTemplate.templateId }</h5>
-            <h4>Name: { activity.data.entryTemplate.name }</h4>
-            <p>Active: { String(activity.data.entryTemplate.active) }</p>
-          </div>
-        </>
+          <>
+            <p>
+              <a href={"/user/"
+                  + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has edited a template:
+            </p>
+            <div className="bg-light text-secondary p-3">
+              <h5>TemplateId: {activity.data.entryTemplate.templateId}</h5>
+              <h4>Name: {activity.data.entryTemplate.name}</h4>
+              <p>Active: {String(activity.data.entryTemplate.active)}</p>
+            </div>
+          </>
       );
 
     case studyActions.NEW_STUDY.value:
@@ -191,9 +191,9 @@ const ActivityMessage = ({activity}) => {
 
         return (
             <LegacyStudyLabel
-              legacyStudy={activity.data.legacyStudy}
-              user={activity.user}
-              text={"has created a new study"}
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has created a new study"}
             />
         );
 
@@ -203,12 +203,13 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has created a new study:
               </p>
               <div className="bg-light text-secondary p-3">
                 <h5><a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a></h5>
+                    + activity.data.study.code}>{activity.data.study.code}</a>
+                </h5>
                 <h4>{activity.data.study.name}</h4>
                 <h5 className="text-muted">{activity.data.study.program}</h5>
                 <div dangerouslySetInnerHTML={createMarkup(
@@ -241,12 +242,13 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has made an edit to a study:
               </p>
               <div className="bg-light text-secondary p-3">
                 <h5><a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a></h5>
+                    + activity.data.study.code}>{activity.data.study.code}</a>
+                </h5>
                 <h4>{activity.data.study.name}</h4>
                 <h5 className="text-muted">{activity.data.study.program}</h5>
                 <div dangerouslySetInnerHTML={createMarkup(
@@ -278,7 +280,7 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has removed study: {activity.data.study.code}
             </p>
         );
@@ -302,10 +304,10 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has updated the status of study&nbsp;
               <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
+                  + activity.data.study.code}>{activity.data.study.code}</a>
               &nbsp;from&nbsp;
               <StatusBadge status={activity.data.oldStatus}/>
               &nbsp;to&nbsp;
@@ -334,7 +336,7 @@ const ActivityMessage = ({activity}) => {
 
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has created a new assay:
               </p>
 
@@ -342,7 +344,7 @@ const ActivityMessage = ({activity}) => {
 
                 <h5>
                   <a href={"/study/" + activity.studyId + "/assay/"
-                  + activity.data.assay.code}>
+                      + activity.data.assay.code}>
                     {activity.data.assay.code}
                   </a>
                 </h5>
@@ -381,7 +383,7 @@ const ActivityMessage = ({activity}) => {
 
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has made an edit to an assay:
               </p>
 
@@ -389,7 +391,7 @@ const ActivityMessage = ({activity}) => {
 
                 <h5>
                   <a href={"/study/" + activity.studyId + "/assay/"
-                  + activity.data.assay.code}>
+                      + activity.data.assay.code}>
                     {activity.data.assay.code}
                   </a>
                 </h5>
@@ -426,7 +428,7 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has removed assay: {activity.data.assay.code}
             </p>
         );
@@ -450,10 +452,10 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has updated the status of assay&nbsp;
               <a href={"/study/" + activity.data.study + "/assay/"
-              + activity.data.assay.code}>{activity.data.assay.code}</a>
+                  + activity.data.assay.code}>{activity.data.assay.code}</a>
               &nbsp;from&nbsp;
               <StatusBadge status={activity.data.oldStatus}/>
               &nbsp;to&nbsp;
@@ -469,10 +471,10 @@ const ActivityMessage = ({activity}) => {
 
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has added a new task to assay&nbsp;
               <a href={"/study/" + activity.studyId + "/assay/"
-              + activity.data.assay.code}>
+                  + activity.data.assay.code}>
                 {activity.data.assay.code}
               </a>:
             </p>
@@ -488,10 +490,10 @@ const ActivityMessage = ({activity}) => {
 
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has updated a task in assay&nbsp;
               <a href={"/study/" + activity.studyId + "/assay/"
-              + activity.data.assay.code}>
+                  + activity.data.assay.code}>
                 {activity.data.assay.code}
               </a>:
             </p>
@@ -507,7 +509,7 @@ const ActivityMessage = ({activity}) => {
 
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has created a new program:
             </p>
 
@@ -533,7 +535,7 @@ const ActivityMessage = ({activity}) => {
 
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has made an edit to a program:
             </p>
 
@@ -557,7 +559,7 @@ const ActivityMessage = ({activity}) => {
       return (
           <p>
             <a href={"/user/"
-            + activity.user.username}>{activity.user.displayName}</a>
+                + activity.user.username}>{activity.user.displayName}</a>
             &nbsp;has removed program: {activity.data.assay.code}
           </p>
       );
@@ -579,7 +581,7 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has attached a new file to assay:&nbsp;
                 <a href={"/assay/" + activity.data.assay.code}>
                   {activity.data.assay.code}
@@ -587,7 +589,7 @@ const ActivityMessage = ({activity}) => {
               </p>
               <div className="bg-light text-secondary p-3">
                 <h4>
-                  <a href={activity.data.file.url} target="_blank">
+                  <a href={activity.data.file.url} target="_blank" rel="noopener noreferrer">
                     <File size={24}/>
                     &nbsp;
                     {activity.data.file.name}
@@ -602,7 +604,7 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has attached a new file to study:&nbsp;
                 <a href={"/study/" + activity.data.study.code}>
                   {activity.data.study.code}
@@ -610,7 +612,7 @@ const ActivityMessage = ({activity}) => {
               </p>
               <div className="bg-light text-secondary p-3">
                 <h4>
-                  <a href={activity.data.file.url} target="_blank">
+                  <a href={activity.data.file.url} target="_blank" rel="noopener noreferrer">
                     <File size={24}/>
                     &nbsp;
                     {activity.data.file.name}
@@ -640,10 +642,10 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has added new conclusions for study:&nbsp;
                 <a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a>
+                    + activity.data.study.code}>{activity.data.study.code}</a>
               </p>
               <div className="bg-light font-italic text-secondary p-3"
                    dangerouslySetInnerHTML={createMarkup(
@@ -671,10 +673,10 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has updated the conclusions for study:&nbsp;
                 <a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a>
+                    + activity.data.study.code}>{activity.data.study.code}</a>
               </p>
               <div className="bg-light font-italic text-secondary p-3"
                    dangerouslySetInnerHTML={createMarkup(
@@ -702,10 +704,10 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has removed the conclusions for study:&nbsp;
               <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
+                  + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
         );
 
@@ -729,13 +731,13 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has posted a new comment to study&nbsp;
                 <a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a>:
+                    + activity.data.study.code}>{activity.data.study.code}</a>:
               </p>
               <p className="bg-light font-italic text-secondary p-3">
-                "{activity.data.comment.text}"
+                &quot;{activity.data.comment.text}&quot;
               </p>
             </React.Fragment>
 
@@ -761,10 +763,10 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has edited their comment to study:&nbsp;
                 <a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a>
+                    + activity.data.study.code}>{activity.data.study.code}</a>
               </p>
               <p className="bg-light font-italic text-secondary p-3">
                 "{activity.data.comment.text}"
@@ -791,10 +793,10 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has removed their comment to study:&nbsp;
               <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
+                  + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
         );
 
@@ -817,13 +819,13 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has added a new study relationship:&nbsp;
               <a href={"/study/"
-              + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
+                  + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
               &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
               <a href={"/study/"
-              + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
+                  + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
             </p>
         );
 
@@ -846,13 +848,13 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has added a new study relationship:&nbsp;
               <a href={"/study/"
-              + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
+                  + activity.data.sourceStudy.code}>{activity.data.sourceStudy.code}</a>
               &nbsp;{relationshipTypes[activity.data.relationship.type].label}&nbsp;
               <a href={"/study/"
-              + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
+                  + activity.data.targetStudy.code}>{activity.data.targetStudy.code}</a>
             </p>
         );
 
@@ -875,10 +877,10 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has removed a study relationship for study:&nbsp;
               <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
+                  + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
         );
 
@@ -902,16 +904,16 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has added a new external link for study:&nbsp;
                 <a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a>
+                    + activity.data.study.code}>{activity.data.study.code}</a>
               </p>
               <p className="bg-light text-secondary p-3">
                 <Link size={16}/>
                 &nbsp;
                 <a href={activity.data.link.url}
-                   target="_blank">{activity.data.link.label}</a>
+                   target="_blank" rel="noopener noreferrer">{activity.data.link.label}</a>
               </p>
             </React.Fragment>
         );
@@ -936,16 +938,16 @@ const ActivityMessage = ({activity}) => {
             <React.Fragment>
               <p>
                 <a href={"/user/"
-                + activity.user.username}>{activity.user.displayName}</a>
+                    + activity.user.username}>{activity.user.displayName}</a>
                 &nbsp;has edited an external link for study:&nbsp;
                 <a href={"/study/"
-                + activity.data.study.code}>{activity.data.study.code}</a>
+                    + activity.data.study.code}>{activity.data.study.code}</a>
               </p>
               <p className="bg-light text-secondary p-3">
                 <Link size={16}/>
                 &nbsp;
                 <a href={activity.data.link.url}
-                   target="_blank">{activity.data.link.label}</a>
+                   target="_blank" rel="noopener noreferrer">{activity.data.link.label}</a>
               </p>
             </React.Fragment>
         );
@@ -969,10 +971,10 @@ const ActivityMessage = ({activity}) => {
         return (
             <p>
               <a href={"/user/"
-              + activity.user.username}>{activity.user.displayName}</a>
+                  + activity.user.username}>{activity.user.displayName}</a>
               &nbsp;has removed an external link for study:&nbsp;
               <a href={"/study/"
-              + activity.data.study.code}>{activity.data.study.code}</a>
+                  + activity.data.study.code}>{activity.data.study.code}</a>
             </p>
         );
 

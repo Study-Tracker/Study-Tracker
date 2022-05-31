@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {Button, Col, Form, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
@@ -74,7 +74,7 @@ class AttributeInputs extends React.Component {
           <Row key={'attributes-inputs-' + i}>
             <Col xs={5}>
               <FormGroup>
-                <Form.Label />
+                <Form.Label/>
                 <Form.Control
                     type="text"
                     value={a.key}
@@ -85,7 +85,7 @@ class AttributeInputs extends React.Component {
             </Col>
             <Col xs={5}>
               <FormGroup>
-                <Form.Label />
+                <Form.Label/>
                 <Form.Control
                     type="text"
                     value={a.value}

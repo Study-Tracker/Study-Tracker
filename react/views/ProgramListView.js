@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
-import {connect} from 'react-redux';
+import {connect} from "react-redux";
 import {compose} from 'redux';
 import crossfilter from "crossfilter2";
 import {withRouter} from 'react-router-dom';
@@ -25,7 +25,9 @@ import ProgramList from "../components/program/ProgramList";
 import SideBar from "../structure/SideBar";
 import NavBar from "../structure/NavBar";
 import Footer from "../structure/Footer";
-import ProgramFilters, {labels as filter} from "../components/filters/programFilters";
+import ProgramFilters, {
+  labels as filter
+} from "../components/filters/programFilters";
 
 const qs = require('qs');
 

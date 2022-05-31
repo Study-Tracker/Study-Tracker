@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Button,
   Card,
@@ -23,6 +23,7 @@ import {AssayTaskList} from "../assayTasks";
 import {RepairableStorageFolderButton} from "../files";
 import {RepairableNotebookFolderButton} from "../eln";
 import {Breadcrumbs} from "../common";
+import {getCsrfToken} from "../../config/csrf";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -46,7 +47,7 @@ const AssayDetailHeader = ({assay, user}) => {
                     <Button className="me-1 mb-1" variant="danger" disabled>
                       Inactive Assay
                     </Button>
-                ): ''
+                ) : ''
           }
           {
             !!user
@@ -63,10 +64,14 @@ const AssayDetailHeader = ({assay, user}) => {
 const AssayFieldData = ({assay}) => {
 
   let fields = [];
-  const assayTypeFields = assay.assayType.fields.sort((a,b) => {
-    if (a.id > b.id) return 1;
-    else if (a.id < b.id) return -1;
-    else return 0;
+  const assayTypeFields = assay.assayType.fields.sort((a, b) => {
+    if (a.id > b.id) {
+      return 1;
+    } else if (a.id < b.id) {
+      return -1;
+    } else {
+      return 0;
+    }
   });
   const assayFields = assay.fields;
   for (let f of assayTypeFields) {
@@ -191,7 +196,8 @@ export default class AssayDetails extends React.Component {
     fetch(url, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(updatedTask)
     })
@@ -230,7 +236,8 @@ export default class AssayDetails extends React.Component {
         fetch("/api/assay/" + this.state.assay.code, {
           method: 'DELETE',
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCsrfToken()
           }
         }).then(response => {
           history.push("/assays")
@@ -259,7 +266,7 @@ export default class AssayDetails extends React.Component {
                 {label: "Home", url: "/"},
                 {label: "Study " + study.code, url: "/study/" + study.code},
                 {label: "Assay Details"}
-              ]} />
+              ]}/>
             </Col>
           </Row>
 
@@ -290,7 +297,9 @@ export default class AssayDetails extends React.Component {
 
                         {
                           !!this.props.user ? (
-                              <Dropdown.Item href={"/study/" + study.code + "/assay/" + assay.code + "/edit"}>
+                              <Dropdown.Item
+                                  href={"/study/" + study.code + "/assay/"
+                                      + assay.code + "/edit"}>
                                 <FontAwesomeIcon icon={faEdit}/>
                                 &nbsp;
                                 Edit
@@ -467,7 +476,8 @@ export default class AssayDetails extends React.Component {
                     {
                       !!assay.notebookFolder ? (
                           <Tab.Pane eventKey={"notebook"}>
-                            <AssayNotebookTab assay={assay} user={this.props.user}/>
+                            <AssayNotebookTab assay={assay}
+                                              user={this.props.user}/>
                           </Tab.Pane>
                       ) : ""
                     }

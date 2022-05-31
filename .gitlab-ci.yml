@@ -6,6 +6,9 @@ stages:
   - deploy-production
 
 build:
+  image: $BUILD_IMAGE
+  tags:
+    - $BUILD_TAG
   stage: build
   script:
     - npm install
@@ -13,6 +16,9 @@ build:
     - mvn clean install -DskipTests
 
 run_tests:
+  image: $TESTS_IMAGE
+  tags:
+    - $TESTS_TAG
   stage: test
   script:
     - cat $RUN_TESTS_SCRIPT >> run_tests.sh
@@ -20,6 +26,9 @@ run_tests:
     - source run_tests.sh
 
 run_deploy_staging:
+  image: $DEPLOY_STAGING_IMAGE
+  tags:
+    - $DEPLOY_STAGING_TAG
   stage: deploy-staging
   only:
     - development
@@ -31,6 +40,9 @@ run_deploy_staging:
     - source run_deploy_staging.sh
 
 run_deploy_production:
+  image: $DEPLOY_PRODUCTION_IMAGE
+  tags:
+    - $DEPLOY_PRODUCTION_TAG
   stage: deploy-production
   only:
     - main

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {Badge, Button, Col, Row, Table} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
@@ -59,8 +59,8 @@ class StudyCollectionsTab extends React.Component {
             <td>
               {
                 !!collection.shared
-                  ? <Badge bg="success">Public</Badge>
-                  : <Badge bg="warning">Private</Badge>
+                    ? <Badge bg="success">Public</Badge>
+                    : <Badge bg="warning">Private</Badge>
               }
             </td>
           </tr>
@@ -93,14 +93,14 @@ class StudyCollectionsTab extends React.Component {
                         <Col xs={12}>
                           <Table striped style={{fontSize: "inherit"}}>
                             <thead>
-                              <tr>
-                                <th>Name</th>
-                                <th># Studies</th>
-                                <th>Visibility</th>
-                              </tr>
+                            <tr>
+                              <th>Name</th>
+                              <th># Studies</th>
+                              <th>Visibility</th>
+                            </tr>
                             </thead>
                             <tbody>
-                              {collections}
+                            {collections}
                             </tbody>
                           </Table>
                         </Col>
