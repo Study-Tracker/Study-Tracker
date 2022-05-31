@@ -37,11 +37,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class EgnyteRestClientFolderBrowsingTests {
 
   private static final String EGNYTE_ROOT =
-      "Shared/General/Informatics & IT/Egnyte API Testing/StudyTrackerTest/Test";
+      "Shared/StudyTrackerDemo/Test";
 
-  private static final String FOLDER_ID = "efd92932-46c1-4f50-877f-a31128d3b71e";
+  private static final String FOLDER_ID = "6e56926d-095e-4e38-9cb1-138157682cff";
 
-  private static final String FILE_ID = "158be718-e35c-4abd-a5a4-b96b61bfb2fe";
+  private static final String FILE_ID = "24d19373-f172-45f3-a8d6-92e4f2996ac3";
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired

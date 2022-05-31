@@ -19,6 +19,7 @@ package io.studytracker.test.web.controller;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -77,7 +78,7 @@ public class StudyLinkControllerTests {
   @Test
   public void fetchStudyLinksTest() throws Exception {
     mockMvc
-        .perform(get("/api/study/CPA-10001/links").with(user(username)))
+        .perform(get("/api/study/CPA-10001/links").with(user(username)).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
@@ -87,11 +88,11 @@ public class StudyLinkControllerTests {
         .andExpect(jsonPath("$[0].url", is("https://google.com")));
 
     mockMvc
-        .perform(get("/api/study/CPA-XXXX/links").with(user(username)))
+        .perform(get("/api/study/CPA-XXXX/links").with(user(username)).with(csrf()))
         .andExpect(status().isNotFound());
 
     mockMvc
-        .perform(get("/api/study/PPB-10001/links").with(user(username)))
+        .perform(get("/api/study/PPB-10001/links").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }
@@ -100,7 +101,7 @@ public class StudyLinkControllerTests {
   public void createStudyLinkTest() throws Exception {
 
     mockMvc
-        .perform(get("/api/study/CPA-10001/links").with(user(username)))
+        .perform(get("/api/study/CPA-10001/links").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
@@ -114,11 +115,11 @@ public class StudyLinkControllerTests {
             post("/api/study/CPA-10001/links")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(link))
-                .with(user(user.getUsername())))
+                .with(user(user.getUsername())).with(csrf()))
         .andExpect(status().isCreated());
 
     mockMvc
-        .perform(get("/api/study/CPA-10001/links").with(user(username)))
+        .perform(get("/api/study/CPA-10001/links").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
@@ -127,7 +128,7 @@ public class StudyLinkControllerTests {
   public void deleteStudyLinkTest() throws Exception {
 
     mockMvc
-        .perform(get("/api/study/CPA-10001/links").with(user(username)))
+        .perform(get("/api/study/CPA-10001/links").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
@@ -139,13 +140,12 @@ public class StudyLinkControllerTests {
     mockMvc
         .perform(
             delete("/api/study/CPA-10001/links/" + link.getId())
-                //        .contentType(MediaType.APPLICATION_JSON)
-                //        .content(objectMapper.writeValueAsBytes(link))
-                .with(user(user.getUsername())))
+                .with(user(user.getUsername()))
+                .with(csrf()))
         .andExpect(status().isOk());
 
     mockMvc
-        .perform(get("/api/study/CPA-10001/links").with(user(username)))
+        .perform(get("/api/study/CPA-10001/links").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
   }

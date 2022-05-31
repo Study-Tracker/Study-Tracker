@@ -20,6 +20,7 @@ import Select from "react-select";
 import swal from "sweetalert";
 import {LoadingOverlay, SettingsLoadingMessage} from "../loading";
 import {SettingsErrorMessage} from "../errors";
+import {getCsrfToken} from "../../config/csrf";
 
 const defaultTemplate = {
   category: "STUDY",
@@ -143,7 +144,8 @@ export default class EntryTemplateSettings extends React.Component {
     fetch('/api/notebookentrytemplate/', {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify({
         ...updatedTemplate,
@@ -171,7 +173,10 @@ export default class EntryTemplateSettings extends React.Component {
     }
     fetch(url, {
       method: method,
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
+      },
       body: JSON.stringify(payload)
     }).then(response => {
       if (response.status === 201) {

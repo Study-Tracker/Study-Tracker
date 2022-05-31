@@ -19,6 +19,7 @@ package io.studytracker.test.web.controller;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -74,7 +75,7 @@ public class KeywordControllerTests {
   @Test
   public void getAllKeywordsTest() throws Exception {
     mockMvc
-        .perform(get("/api/keyword").with(user(username)))
+        .perform(get("/api/keyword").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(KEYWORD_COUNT)));
@@ -83,7 +84,7 @@ public class KeywordControllerTests {
   @Test
   public void getAllKeywordCategoryTest() throws Exception {
     mockMvc
-        .perform(get("/api/keyword/categories").with(user(username)))
+        .perform(get("/api/keyword/categories").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(CATEGORY_COUNT)));
@@ -92,19 +93,19 @@ public class KeywordControllerTests {
   @Test
   public void keywordSearchTest() throws Exception {
     mockMvc
-        .perform(get("/api/keyword?q=akt").with(user(username)))
+        .perform(get("/api/keyword?q=akt").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
     mockMvc
-        .perform(get("/api/keyword?q=akt&category=Gene").with(user(username)))
+        .perform(get("/api/keyword?q=akt&category=Gene").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
     mockMvc
-        .perform(get("/api/keyword?q=akt&category=Cell Line").with(user(username)))
+        .perform(get("/api/keyword?q=akt&category=Cell Line").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", empty()));
   }
@@ -116,7 +117,7 @@ public class KeywordControllerTests {
     mockMvc
         .perform(
             post("/api/keyword")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(keyword)))
         .andExpect(status().isCreated());
@@ -129,7 +130,7 @@ public class KeywordControllerTests {
     mockMvc
         .perform(
             post("/api/keyword")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(keyword)))
         .andDo(MockMvcResultHandlers.print())

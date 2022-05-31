@@ -114,6 +114,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -179,7 +180,9 @@ public class WebSecurityConfiguration {
           .disable()
           .and()
           .csrf()
-          .disable();
+          .ignoringAntMatchers("/login", "/auth/passwordresetrequest", "/auth/passwordreset")
+          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+      ;
     }
   }
 
@@ -233,7 +236,9 @@ public class WebSecurityConfiguration {
           .disable()
           .and()
           .csrf()
-          .disable();
+          .ignoringAntMatchers("/login", "/auth/passwordresetrequest", "/auth/passwordreset")
+          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+      ;
     }
   }
 
@@ -668,7 +673,10 @@ public class WebSecurityConfiguration {
 
       http.headers().frameOptions().disable().httpStrictTransportSecurity().disable();
 
-      http.csrf().disable();
+      http
+          .csrf()
+          .ignoringAntMatchers("/login", "/auth/passwordresetrequest", "/auth/passwordreset")
+          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 
     @Override

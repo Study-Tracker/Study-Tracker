@@ -31,6 +31,7 @@ import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../loading";
 import {Breadcrumbs} from "../common";
 import {NotebookEntryTemplatesDropdown} from "./notebookEntryTemplates";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class StudyForm extends React.Component {
 
@@ -195,7 +196,8 @@ export default class StudyForm extends React.Component {
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(this.state.study)
       })

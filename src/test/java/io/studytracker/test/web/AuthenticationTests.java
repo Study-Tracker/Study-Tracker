@@ -16,6 +16,8 @@
 
 package io.studytracker.test.web;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
@@ -126,6 +128,7 @@ public class AuthenticationTests {
     mockMvc
         .perform(
             MockMvcRequestBuilders.post("/api/study")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(MockMvcResultMatchers.status().isUnauthorized());
@@ -159,6 +162,7 @@ public class AuthenticationTests {
                     SecurityMockMvcRequestPostProcessors.httpBasic(
                         env.getRequiredProperty("security.example.user"),
                         env.getRequiredProperty("security.example.password")))
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -177,6 +181,7 @@ public class AuthenticationTests {
     mockMvc
         .perform(
             MockMvcRequestBuilders.post("/auth/passwordresetrequest")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content(
                     EntityUtils.toString(

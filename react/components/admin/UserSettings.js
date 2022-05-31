@@ -25,6 +25,7 @@ import {
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
+import {getCsrfToken} from "../../config/csrf";
 
 const resetUserPassword = (user) => {
   swal({
@@ -40,7 +41,8 @@ const resetUserPassword = (user) => {
       fetch("/api/user/" + user["id"] + "/password-reset", {
         method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         }
       }).then(response => {
         if (response.ok) {
@@ -76,7 +78,8 @@ const toggleUserActive = (user, active) => {
       fetch("/api/user/" + user["id"] + "/status?active=" + active, {
         method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         }
       }).then(response => {
         if (response.ok) {

@@ -19,6 +19,7 @@ import {Button, Col, Form, Row} from 'react-bootstrap';
 import {Comment} from "../comments";
 import {MessageCircle} from 'react-feather';
 import swal from 'sweetalert';
+import {getCsrfToken} from "../../config/csrf";
 
 class StudyCommentsTab extends React.Component {
 
@@ -63,7 +64,8 @@ class StudyCommentsTab extends React.Component {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(comment)
     }).then(response => {
@@ -86,7 +88,8 @@ class StudyCommentsTab extends React.Component {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(comment)
     }).then(response => {
@@ -116,7 +119,8 @@ class StudyCommentsTab extends React.Component {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        "X-XSRF-TOKEN": getCsrfToken()
       }
     }).then(response => {
       if (response.ok) {

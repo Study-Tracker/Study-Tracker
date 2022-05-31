@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -90,7 +91,7 @@ public class StudyBaseControllerTests {
   @Test
   public void allStudiesTest() throws Exception {
     mockMvc
-        .perform(get("/api/study").with(user(username)))
+        .perform(get("/api/study").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STUDY_COUNT - 1)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -101,7 +102,7 @@ public class StudyBaseControllerTests {
   @Test
   public void findStudyByIdTest() throws Exception {
     mockMvc
-        .perform(get("/api/study/CPA-10001").with(user(username)))
+        .perform(get("/api/study/CPA-10001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("CPA-10001")))
@@ -115,7 +116,7 @@ public class StudyBaseControllerTests {
   @Test
   public void findNonExistantStudyTest() throws Exception {
     mockMvc
-        .perform(get("/api/study/CPA-XXXX").with(user(username)))
+        .perform(get("/api/study/CPA-XXXX").with(user(username)).with(csrf()))
         .andExpect(status().isNotFound());
   }
 
@@ -143,7 +144,7 @@ public class StudyBaseControllerTests {
     mockMvc
         .perform(
             post("/api/study/")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(status().isCreated())
@@ -178,7 +179,7 @@ public class StudyBaseControllerTests {
             post("/api/study/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study)))
-                .with(user(user.getUsername())))
+                .with(user(user.getUsername())).with(csrf()))
         .andExpect(status().isBadRequest());
   }
 
@@ -186,7 +187,7 @@ public class StudyBaseControllerTests {
   public void createStudyWithoutAuthorizationTest() throws Exception {
     mockMvc
         .perform(
-            post("/api/study/")
+            post("/api/study/").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(new Study())))
         .andExpect(status().isUnauthorized());
@@ -196,7 +197,7 @@ public class StudyBaseControllerTests {
   public void updateStudyTest() throws Exception {
 
     mockMvc
-        .perform(get("/api/study/CPA-10001").with(user(username)))
+        .perform(get("/api/study/CPA-10001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("IN_PLANNING")));
@@ -207,7 +208,7 @@ public class StudyBaseControllerTests {
     mockMvc
         .perform(
             put("/api/study/CPA-XXXXX")
-                .with(user(study.getOwner().getUsername()))
+                .with(user(study.getOwner().getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isNotFound());
@@ -215,7 +216,7 @@ public class StudyBaseControllerTests {
     mockMvc
         .perform(
             put("/api/study/CPA-10001")
-                .with(user(study.getOwner().getUsername()))
+                .with(user(study.getOwner().getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isOk());
@@ -228,7 +229,7 @@ public class StudyBaseControllerTests {
 
     mockMvc
         .perform(
-            put("/api/study/CPA-10001")
+            put("/api/study/CPA-10001").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isUnauthorized());
@@ -236,14 +237,14 @@ public class StudyBaseControllerTests {
 
   @Test
   public void deleteStudyTest() throws Exception {
-    mockMvc.perform(delete("/api/study/CPA-10001").with(user("jsmith"))).andExpect(status().isOk());
+    mockMvc.perform(delete("/api/study/CPA-10001").with(user("jsmith")).with(csrf())).andExpect(status().isOk());
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(study.isActive());
   }
 
   @Test
   public void deleteWithoutAuthorizationTest() throws Exception {
-    mockMvc.perform(delete("/api/study/CPA-10001")).andExpect(status().isUnauthorized());
+    mockMvc.perform(delete("/api/study/CPA-10001").with(csrf())).andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -251,7 +252,7 @@ public class StudyBaseControllerTests {
     User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
 
     mockMvc
-        .perform(get("/api/study/CPA-10001").with(user(username)))
+        .perform(get("/api/study/CPA-10001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("IN_PLANNING")));
@@ -264,11 +265,11 @@ public class StudyBaseControllerTests {
             post("/api/study/CPA-10001/status")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(params))
-                .with(user(user.getUsername())))
+                .with(user(user.getUsername())).with(csrf()))
         .andExpect(status().isOk());
 
     mockMvc
-        .perform(get("/api/study/CPA-10001").with(user(username)))
+        .perform(get("/api/study/CPA-10001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("ON_HOLD")));
@@ -282,6 +283,7 @@ public class StudyBaseControllerTests {
     mockMvc
         .perform(
             post("/api/study/CPA-10001/status")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(params)))
         .andExpect(status().isUnauthorized());

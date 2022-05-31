@@ -28,6 +28,7 @@ import {CardLoadingMessage} from "./loading";
 import {DismissableAlert} from "./errors";
 import {Folder as FolderIcon, RefreshCw} from "react-feather";
 import swal from "sweetalert";
+import {getCsrfToken} from "../config/csrf";
 
 const baseStyle = {
   flex: 1,
@@ -122,7 +123,7 @@ const File = ({file}) => {
   return (
       <li>
         <div className="ms-3">
-          <a href={file.url} target="_blank">
+          <a href={file.url} target="_blank" rel="noopener noreferrer">
             <FontAwesomeIcon icon={faFile}/>
             &nbsp;
             {file.name}
@@ -176,7 +177,7 @@ const FolderContents = ({
               !!showHeader
                   ? (
                       <h4>
-                        <a href={folder.url} target="_blank">{folder.path}</a>
+                        <a href={folder.url} target="_blank" rel="noopener noreferrer">{folder.path}</a>
                       </h4>
                   ) : ''
             }
@@ -334,7 +335,8 @@ const handleFolderRepairRequest = (url) => {
       fetch(url, {
         method: 'PATCH',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         }
       }).then(response => {
         if (response.ok) {
@@ -358,7 +360,7 @@ const handleFolderRepairRequest = (url) => {
 
 export const RepairableStorageFolderLink = ({folder, repairUrl}) => {
   if (!!folder && !!folder.path && !!folder.url) {
-    return <a href={folder.url} target="_blank">Storage Folder</a>
+    return <a href={folder.url} target="_blank" rel="noopener noreferrer">Storage Folder</a>
   } else {
     return (
         <Button variant="warning"
@@ -376,6 +378,7 @@ export const RepairableStorageFolderButton = ({folder, repairUrl}) => {
     return (
         <a href={folder.url}
            target="_blank"
+           rel="noopener noreferrer"
            className="btn btn-outline-info mt-2 me-2">
           Storage Folder
           <FolderIcon

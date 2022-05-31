@@ -92,6 +92,8 @@ public class ProgramService {
       } catch (Exception e) {
         throw new StudyTrackerException(e);
       }
+    } else {
+      program.setNotebookFolder(null);
     }
 
     programRepository.save(program);

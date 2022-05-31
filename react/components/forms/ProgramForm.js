@@ -15,6 +15,7 @@
  */
 
 import React from "react";
+import {getCsrfToken} from "../../config/csrf";
 import 'react-datepicker/dist/react-datepicker.css';
 import {
   Breadcrumb,
@@ -163,7 +164,8 @@ export default class ProgramForm extends React.Component {
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(this.state.program)
       })

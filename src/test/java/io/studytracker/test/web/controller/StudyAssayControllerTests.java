@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -95,26 +96,26 @@ public class StudyAssayControllerTests {
   @Test
   public void findStudyAssaysTest() throws Exception {
     mockMvc
-        .perform(get("/api/study/PPB-10001/assays").with(user(username)))
+        .perform(get("/api/study/PPB-10001/assays").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
         .andExpect(jsonPath("$[0].code", is("PPB-10001-001")));
 
     mockMvc
-        .perform(get("/api/study/CPA-10001/assays").with(user(username)))
+        .perform(get("/api/study/CPA-10001/assays").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 
     mockMvc
-        .perform(get("/api/study/PPB-XXXX/assays").with(user(username)))
+        .perform(get("/api/study/PPB-XXXX/assays").with(user(username)).with(csrf()))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void findAssayByIdTest() throws Exception {
     mockMvc
-        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("PPB-10001-001")))
@@ -123,7 +124,7 @@ public class StudyAssayControllerTests {
         .andExpect(jsonPath("$.assayType.name", is("Generic")));
 
     mockMvc
-        .perform(get("/api/study/PPB-10001/assay/PPB-10001-XXXXX").with(user(username)))
+        .perform(get("/api/study/PPB-10001/assay/PPB-10001-XXXXX").with(user(username)).with(csrf()))
         .andExpect(status().isNotFound());
   }
 
@@ -162,7 +163,7 @@ public class StudyAssayControllerTests {
     mockMvc
         .perform(
             post("/api/study/XXXXXX/assays/")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
@@ -171,6 +172,7 @@ public class StudyAssayControllerTests {
     mockMvc
         .perform(
             post("/api/study/" + study.getCode() + "/assays/")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
@@ -179,7 +181,7 @@ public class StudyAssayControllerTests {
     mockMvc
         .perform(
             post("/api/study/" + study.getCode() + "/assays/")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
@@ -192,7 +194,7 @@ public class StudyAssayControllerTests {
         .andExpect(jsonPath("$.code", is("CPA-10001-001")));
 
     mockMvc
-        .perform(get("/api/study/CPA-10001/assays").with(user(username)))
+        .perform(get("/api/study/CPA-10001/assays").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
@@ -203,7 +205,7 @@ public class StudyAssayControllerTests {
   public void updateAssayTest() throws Exception {
 
     mockMvc
-        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status", is("ACTIVE")));
 
@@ -216,7 +218,7 @@ public class StudyAssayControllerTests {
             put("/api/study/PPB-10001/assays/PPB-10001-001")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assay))
-                .with(user(assay.getOwner().getUsername())))
+                .with(user(assay.getOwner().getUsername())).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("COMPLETE")));
@@ -226,16 +228,16 @@ public class StudyAssayControllerTests {
   public void deleteAssayTest() throws Exception {
 
     mockMvc
-        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(true)));
 
     mockMvc
-        .perform(delete("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
+        .perform(delete("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)).with(csrf()))
         .andExpect(status().isOk());
 
     mockMvc
-        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)))
+        .perform(get("/api/study/PPB-10001/assays/PPB-10001-001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.active", is(false)));
   }

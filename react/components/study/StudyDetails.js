@@ -45,6 +45,7 @@ import AddToStudyCollectionModal from "../modals/AddToStudyCollectionModal";
 import StudyCollectionsTab from "./StudyCollectionsTab";
 import {RepairableStorageFolderButton} from "../files";
 import {RepairableNotebookFolderButton} from "../eln";
+import {getCsrfToken} from "../../config/csrf";
 
 const StudyDetailHeader = ({study, user}) => {
   return (
@@ -143,7 +144,8 @@ class StudyDetails extends React.Component {
         fetch("/api/study/" + this.props.study.code, {
           method: 'DELETE',
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCsrfToken()
           }
         }).then(response => {
           history.push("/studies")

@@ -157,7 +157,7 @@ const columns = [
       let links = [];
       if (!!d.storageFolder) {
         links.push(
-            <a key={'files-links-' + d.id} target="_blank"
+            <a key={'files-links-' + d.id} target="_blank" rel="noopener noreferrer"
                href={d.storageFolder.url}>Files</a>
         )
       }
@@ -166,7 +166,7 @@ const columns = [
           links.push(" | ");
         }
         links.push(
-            <a key={'eln-links-' + d.id} target="_blank"
+            <a key={'eln-links-' + d.id} target="_blank" rel="noopener noreferrer"
                href={d.notebookFolder.url}>ELN</a>
         )
       }

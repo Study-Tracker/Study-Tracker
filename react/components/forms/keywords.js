@@ -23,6 +23,7 @@ import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
 import AsyncCreatable from "react-select/async-creatable";
 import swal from "sweetalert";
 import {FormGroup} from "./common";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class KeywordInputs extends React.Component {
 
@@ -68,7 +69,8 @@ export default class KeywordInputs extends React.Component {
         }),
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          "Accept": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         }
       })
       .then(response => response.json())

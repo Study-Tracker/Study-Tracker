@@ -23,6 +23,7 @@ import {AssayTaskList} from "../assayTasks";
 import {RepairableStorageFolderButton} from "../files";
 import {RepairableNotebookFolderButton} from "../eln";
 import {Breadcrumbs} from "../common";
+import {getCsrfToken} from "../../config/csrf";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -195,7 +196,8 @@ export default class AssayDetails extends React.Component {
     fetch(url, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(updatedTask)
     })
@@ -234,7 +236,8 @@ export default class AssayDetails extends React.Component {
         fetch("/api/assay/" + this.state.assay.code, {
           method: 'DELETE',
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCsrfToken()
           }
         }).then(response => {
           history.push("/assays")

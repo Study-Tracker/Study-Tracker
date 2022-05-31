@@ -19,6 +19,7 @@ package io.studytracker.test.web.controller;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -77,7 +78,7 @@ public class StudyRelationshipControllerTests {
   public void createStudyRelationshipTest() throws Exception {
 
     mockMvc
-        .perform(get("/api/study/CPA-10001/relationships").with(user(username)))
+        .perform(get("/api/study/CPA-10001/relationships").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 
@@ -98,7 +99,7 @@ public class StudyRelationshipControllerTests {
             post("/api/study/CPA-10001/relationships")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(dto))
-                .with(user("jsmith")))
+                .with(user("jsmith")).with(csrf()))
         .andExpect(status().isCreated());
 
     sourceStudy = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
@@ -123,7 +124,7 @@ public class StudyRelationshipControllerTests {
   public void fetchStudyRelationshipsTest() throws Exception {
     this.createStudyRelationshipTest();
     mockMvc
-        .perform(get("/api/study/CPA-10001/relationships").with(user(username)))
+        .perform(get("/api/study/CPA-10001/relationships").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("type")))
@@ -153,7 +154,7 @@ public class StudyRelationshipControllerTests {
         .perform(
             delete("/api/study/CPA-10001/relationships/" + relationship.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(user("jsmith")))
+                .with(user("jsmith")).with(csrf()))
         .andExpect(status().isOk());
 
     Study targetStudy2 =

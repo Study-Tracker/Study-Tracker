@@ -589,7 +589,7 @@ const ActivityMessage = ({activity}) => {
               </p>
               <div className="bg-light text-secondary p-3">
                 <h4>
-                  <a href={activity.data.file.url} target="_blank">
+                  <a href={activity.data.file.url} target="_blank" rel="noopener noreferrer">
                     <File size={24}/>
                     &nbsp;
                     {activity.data.file.name}
@@ -612,7 +612,7 @@ const ActivityMessage = ({activity}) => {
               </p>
               <div className="bg-light text-secondary p-3">
                 <h4>
-                  <a href={activity.data.file.url} target="_blank">
+                  <a href={activity.data.file.url} target="_blank" rel="noopener noreferrer">
                     <File size={24}/>
                     &nbsp;
                     {activity.data.file.name}
@@ -913,7 +913,7 @@ const ActivityMessage = ({activity}) => {
                 <Link size={16}/>
                 &nbsp;
                 <a href={activity.data.link.url}
-                   target="_blank">{activity.data.link.label}</a>
+                   target="_blank" rel="noopener noreferrer">{activity.data.link.label}</a>
               </p>
             </React.Fragment>
         );
@@ -947,7 +947,7 @@ const ActivityMessage = ({activity}) => {
                 <Link size={16}/>
                 &nbsp;
                 <a href={activity.data.link.url}
-                   target="_blank">{activity.data.link.label}</a>
+                   target="_blank" rel="noopener noreferrer">{activity.data.link.label}</a>
               </p>
             </React.Fragment>
         );

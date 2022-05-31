@@ -19,6 +19,7 @@ package io.studytracker.test.web.controller;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -83,7 +84,7 @@ public class AssayTaskControllerTests {
         assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
 
     mockMvc
-        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)))
+        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("label")))
@@ -107,7 +108,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             post("/api/assay/xxxxxxx/tasks")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -116,6 +117,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             post("/api/assay/" + assay.getCode() + "/tasks")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -124,14 +126,14 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             post("/api/assay/" + assay.getCode() + "/tasks")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
     mockMvc
-        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)))
+        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
@@ -148,7 +150,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             put("/api/assay/xxxxxxx/tasks")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -157,6 +159,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             put("/api/assay/" + assay.getCode() + "/tasks")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -165,14 +168,14 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             put("/api/assay/" + assay.getCode() + "/tasks")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
     mockMvc
-        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)))
+        .perform(get("/api/assay/" + assay.getCode() + "/tasks").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("status")))
@@ -190,7 +193,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             delete("/api/assay/xxxxxxx/tasks")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -199,6 +202,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             delete("/api/assay/" + assay.getCode() + "/tasks")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -207,7 +211,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             delete("/api/assay/" + assay.getCode() + "/tasks")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())

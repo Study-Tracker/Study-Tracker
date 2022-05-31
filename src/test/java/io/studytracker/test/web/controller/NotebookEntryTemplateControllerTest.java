@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -68,7 +69,7 @@ public class NotebookEntryTemplateControllerTest {
   @Test
   public void allEntryTemplateTest() throws Exception {
     mockMvc
-        .perform(get("/api/notebookentrytemplate").with(user(username)))
+        .perform(get("/api/notebookentrytemplate").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(ENTRY_TEMPLATE_COUNT)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -84,7 +85,7 @@ public class NotebookEntryTemplateControllerTest {
     mockMvc
         .perform(
             post("/api/notebookentrytemplate")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(notebookEntryTemplate)))
         .andExpect(status().isCreated())
@@ -114,7 +115,7 @@ public class NotebookEntryTemplateControllerTest {
                     + testTemplate.getId()
                     + "/status/?active="
                     + !previousStatus)
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
   }
@@ -125,7 +126,7 @@ public class NotebookEntryTemplateControllerTest {
     mockMvc
         .perform(
             post("/api/notebookentrytemplate/99999/status/?active=" + false)
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }
@@ -140,7 +141,7 @@ public class NotebookEntryTemplateControllerTest {
     mockMvc
         .perform(
             put("/api/notebookentrytemplate/" + testTemplate.getId())
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))
         .andExpect(status().isCreated())
@@ -161,7 +162,7 @@ public class NotebookEntryTemplateControllerTest {
     mockMvc
         .perform(
             put("/api/notebookentrytemplate/" + testTemplate.getId())
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))
         .andExpect(status().isNotFound());
@@ -179,11 +180,11 @@ public class NotebookEntryTemplateControllerTest {
     mockMvc
         .perform(
             post("/api/notebookentrytemplate/" + testTemplate.getId() + "/status/?active=" + false)
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
     mockMvc
-        .perform(get("/api/notebookentrytemplate/active").with(user(username)))
+        .perform(get("/api/notebookentrytemplate/active").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(size - 1)));
   }

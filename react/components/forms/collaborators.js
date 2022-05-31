@@ -20,6 +20,7 @@ import {FormGroup} from "./common";
 import Select from "react-select";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class CollaboratorInputs extends React.Component {
 
@@ -136,7 +137,8 @@ export default class CollaboratorInputs extends React.Component {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(c)
       })

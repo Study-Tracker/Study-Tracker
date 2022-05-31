@@ -23,6 +23,7 @@ import {relationshipTypes} from "../config/studyRelationshipConstants";
 import Select from "react-select";
 import AsyncSelect from "react-select/async/dist/react-select.esm";
 import {PlusCircle} from "react-feather";
+import {getCsrfToken} from "../config/csrf";
 
 class StudyRelationships extends React.Component {
 
@@ -106,7 +107,8 @@ class StudyRelationships extends React.Component {
     fetch("/api/study/" + this.props.studyCode + "/relationships", {
       method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
       },
       body: JSON.stringify(r)
     })
@@ -143,7 +145,8 @@ class StudyRelationships extends React.Component {
             + relationship.id, {
           method: 'DELETE',
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": getCsrfToken()
           }
         }).then(response => {
           this.setState({

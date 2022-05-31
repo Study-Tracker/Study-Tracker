@@ -32,6 +32,7 @@ import {LoadingOverlay} from "../loading";
 import ReactQuill from "react-quill";
 import {Breadcrumbs} from "../common";
 import {FormGroup} from "./common";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class AssayForm extends React.Component {
 
@@ -206,7 +207,8 @@ export default class AssayForm extends React.Component {
       fetch(this.submitUrl, {
         method: this.submitMethod,
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(assay)
       })

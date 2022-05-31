@@ -183,23 +183,21 @@ public class StudyService {
       }
     } else {
       // New study and notebook integration active
-      if (notebookService != null) {
-        LOGGER.info(String.format("Creating ELN entry for study: %s", study.getCode()));
-        if (program.getNotebookFolder() != null) {
-          try {
+      LOGGER.info(String.format("Creating ELN entry for study: %s", study.getCode()));
+      if (program.getNotebookFolder() != null) {
+        try {
 
-            // Create the notebook folder
-            NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
-            elnFolder = ELNFolder.from(notebookFolder);
+          // Create the notebook folder
+          NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
+          elnFolder = ELNFolder.from(notebookFolder);
 
-          } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.warn("Failed to create notebook folder and entry for study: " + study.getCode());
-          }
-        } else {
-          LOGGER.warn(
-              String.format("Study program %s does not have ELN folder set.", program.getName()));
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOGGER.warn("Failed to create notebook folder and entry for study: " + study.getCode());
         }
+      } else {
+        LOGGER.warn(
+            String.format("Study program %s does not have ELN folder set.", program.getName()));
       }
     }
     return elnFolder;
@@ -254,11 +252,13 @@ public class StudyService {
     study.setStorageFolder(FileStoreFolder.from(this.createStudyStorageFolder(study)));
 
     // Create the ELN folder
-    ELNFolder elnFolder = this.createStudyElnFolder(study, program);
     NotebookEntry studySummaryEntry = null;
-    study.setNotebookFolder(elnFolder);
-    if (!study.isLegacy()) {
-      studySummaryEntry = notebookService.createStudyNotebookEntry(study, template);
+    if (notebookService != null) {
+      ELNFolder elnFolder = this.createStudyElnFolder(study, program);
+      study.setNotebookFolder(elnFolder);
+      if (!study.isLegacy()) {
+        studySummaryEntry = notebookService.createStudyNotebookEntry(study, template);
+      }
     }
 
     // Persist the record

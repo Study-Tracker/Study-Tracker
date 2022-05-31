@@ -10,6 +10,7 @@ import {SettingsLoadingMessage} from "../loading";
 import {SettingsErrorMessage} from "../errors";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
+import {getCsrfToken} from "../../config/csrf";
 
 const emptyKeyword = {
   id: null,
@@ -109,7 +110,10 @@ export default class KeywordSettings extends React.Component {
 
     fetch(url, {
       method: method,
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
+      },
       body: JSON.stringify(keyword)
     })
     .then(response => response.json())

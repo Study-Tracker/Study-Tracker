@@ -183,7 +183,7 @@ const ProgramsTable = ({
       formatter: (c, d, i, x) => {
         if (!!d.notebookFolder) {
           if (!!d.notebookFolder.url && d.notebookFolder.url !== "ERROR") {
-            return <a href={d.notebookFolder.url} target="_blank">ELN Folder</a>
+            return <a href={d.notebookFolder.url} target="_blank" rel="noopener noreferrer">ELN Folder</a>
           } else {
             return <Badge bg="warning">ERROR</Badge>
           }
@@ -200,7 +200,7 @@ const ProgramsTable = ({
       formatter: (c, d, i, x) => {
         if (!!d.storageFolder) {
           if (!!d.storageFolder.url) {
-            return <a href={d.storageFolder.url} target="_blank">Files
+            return <a href={d.storageFolder.url} target="_blank" rel="noopener noreferrer">Files
               Folder</a>
           } else {
             return <Badge bg="warning">ERROR</Badge>

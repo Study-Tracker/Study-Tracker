@@ -19,6 +19,7 @@ package io.studytracker.test.web.controller;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -65,7 +66,7 @@ public class AssayControllerTests {
   @Test
   public void findAllTest() throws Exception {
     mockMvc
-        .perform(get("/api/assay").with(user(username)))
+        .perform(get("/api/assay").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(NUM_ASSAYS)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -76,7 +77,7 @@ public class AssayControllerTests {
   @Test
   public void findByIdTest() throws Exception {
     mockMvc
-        .perform(get("/api/assay/PPB-10001-001").with(user(username)))
+        .perform(get("/api/assay/PPB-10001-001").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is("PPB-10001-001")))
@@ -90,7 +91,7 @@ public class AssayControllerTests {
   @Test
   public void findNonExistentAssayTest() throws Exception {
     mockMvc
-        .perform(get("/api/assay/CPA-XXXX-XXXX").with(user(username)))
+        .perform(get("/api/assay/CPA-XXXX-XXXX").with(user(username)).with(csrf()))
         .andExpect(status().isNotFound());
   }
 }

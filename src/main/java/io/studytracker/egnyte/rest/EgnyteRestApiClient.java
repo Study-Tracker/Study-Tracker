@@ -85,7 +85,9 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
     try {
       ResponseEntity<EgnyteFolder> response =
           restTemplate.exchange(url.toString(), HttpMethod.POST, request, EgnyteFolder.class);
-      return response.getBody();
+      EgnyteFolder egnyteFolder = response.getBody();
+      LOGGER.debug(egnyteFolder.toString());
+      return egnyteFolder;
     } catch (HttpStatusCodeException e) {
       String responseBody = e.getResponseBodyAsString();
       Map<String, String> json = null;

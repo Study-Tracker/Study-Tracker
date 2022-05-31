@@ -7,6 +7,7 @@ import Select from "react-select";
 import {StudyInputs} from "./studies";
 import {Breadcrumbs} from "../common";
 import {FormGroup} from "./common";
+import {getCsrfToken} from "../../config/csrf";
 
 export default class StudyCollectionForm extends React.Component {
 
@@ -89,7 +90,8 @@ export default class StudyCollectionForm extends React.Component {
       fetch(url, {
         method: isUpdate ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": getCsrfToken()
         },
         body: JSON.stringify(this.state.collection)
       })

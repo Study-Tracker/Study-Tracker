@@ -16,6 +16,7 @@
 
 package io.studytracker.test.web.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,7 +64,7 @@ public class StudyActivityControllerTests {
     mockMvc
         .perform(
             get("/api/study/" + study.getCode() + "/activity")
-                .with(user(study.getOwner().getUsername())))
+                .with(user(study.getOwner().getUsername())).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
   }

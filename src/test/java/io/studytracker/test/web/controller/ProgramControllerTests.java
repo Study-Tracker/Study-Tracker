@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -84,7 +85,7 @@ public class ProgramControllerTests {
   @Test
   public void allProgramsTest() throws Exception {
     mockMvc
-        .perform(get("/api/program").with(user(username)))
+        .perform(get("/api/program").with(user(username)).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(NUM_PROGRAMS)))
@@ -102,7 +103,7 @@ public class ProgramControllerTests {
             .orElseThrow(RecordNotFoundException::new);
 
     mockMvc
-        .perform(get("/api/program/" + program.getId()).with(user(username)))
+        .perform(get("/api/program/" + program.getId()).with(user(username)).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("code")))
@@ -119,7 +120,7 @@ public class ProgramControllerTests {
   @Test
   public void findNonExistantProgramTest() throws Exception {
     mockMvc
-        .perform(get("/api/program/999999").with(user(username)))
+        .perform(get("/api/program/999999").with(user(username)).with(csrf()))
         .andExpect(status().isNotFound());
   }
 
@@ -136,7 +137,7 @@ public class ProgramControllerTests {
     mockMvc
         .perform(
             post("/api/program/")
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
         .andExpect(status().isCreated())
@@ -151,6 +152,7 @@ public class ProgramControllerTests {
     mockMvc
         .perform(
             post("/api/program/")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(new Program())))
         .andExpect(status().isUnauthorized());
@@ -166,7 +168,7 @@ public class ProgramControllerTests {
     User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
 
     mockMvc
-        .perform(get("/api/program/" + program.getId()).with(user(user.getUsername())))
+        .perform(get("/api/program/" + program.getId()).with(user(user.getUsername())).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("active")))
         .andExpect(jsonPath("$.active", is(true)));
@@ -176,7 +178,7 @@ public class ProgramControllerTests {
     mockMvc
         .perform(
             put("/api/program/" + program.getId())
-                .with(user(user.getUsername()))
+                .with(user(user.getUsername())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
         .andExpect(status().isOk());
@@ -192,6 +194,7 @@ public class ProgramControllerTests {
     mockMvc
         .perform(
             put("/api/program/" + program.getId())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(program)))
         .andExpect(status().isUnauthorized());
@@ -205,7 +208,7 @@ public class ProgramControllerTests {
             .orElseThrow(RecordNotFoundException::new);
     User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
     mockMvc
-        .perform(delete("/api/program/" + program.getId()).with(user(user.getUsername())))
+        .perform(delete("/api/program/" + program.getId()).with(user(user.getUsername())).with(csrf()))
         .andExpect(status().isOk());
     program =
         programRepository
@@ -220,6 +223,6 @@ public class ProgramControllerTests {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    mockMvc.perform(delete("/api/program/" + program.getId())).andExpect(status().isUnauthorized());
+    mockMvc.perform(delete("/api/program/" + program.getId()).with(csrf())).andExpect(status().isUnauthorized());
   }
 }
