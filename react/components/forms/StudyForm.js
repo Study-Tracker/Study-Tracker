@@ -25,7 +25,7 @@ import {statuses} from "../../config/statusConstants";
 import {UserInputs} from "./users";
 import swal from 'sweetalert';
 import {history} from '../../App';
-import KeywordInputs from "./keywords";
+import {KeywordInputs} from "./keywords";
 import CollaboratorInputs from "./collaborators";
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../loading";

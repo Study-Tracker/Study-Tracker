@@ -17,8 +17,8 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.ActivityDetailsDto;
-import io.studytracker.mapstruct.dto.ActivitySummaryDto;
+import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
+import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;

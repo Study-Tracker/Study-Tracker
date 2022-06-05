@@ -2,7 +2,7 @@ package io.studytracker.test.service;
 
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
-import io.studytracker.mapstruct.dto.SummaryStatisticsDto;
+import io.studytracker.mapstruct.dto.response.SummaryStatisticsDto;
 import io.studytracker.service.StatisticsService;
 import java.util.Calendar;
 import java.util.Date;

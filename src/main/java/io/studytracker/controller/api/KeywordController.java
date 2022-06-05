@@ -18,13 +18,15 @@ package io.studytracker.controller.api;
 
 import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.KeywordDto;
+import io.studytracker.mapstruct.dto.form.KeywordFormDto;
+import io.studytracker.mapstruct.dto.response.KeywordDto;
 import io.studytracker.mapstruct.mapper.KeywordMapper;
 import io.studytracker.model.Keyword;
+import io.studytracker.model.KeywordCategory;
+import io.studytracker.service.KeywordCategoryService;
 import io.studytracker.service.KeywordService;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,8 @@ public class KeywordController {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeywordController.class);
 
   @Autowired private KeywordService keywordService;
+
+  @Autowired private KeywordCategoryService keywordCategoryService;
 
   @Autowired private KeywordMapper keywordMapper;
 
@@ -79,18 +83,27 @@ public class KeywordController {
     }
   }
 
-  @GetMapping("/categories")
-  public Set<String> findKeywordCategories() {
-    return keywordService.findAllCategories();
-  }
+//  @GetMapping("/categories")
+//  public Set<String> findKeywordCategories() {
+//    return keywordService.findAllCategories();
+//  }
 
   @PostMapping("")
-  public HttpEntity<KeywordDto> create(@RequestBody @Valid KeywordDto dto) {
+  public HttpEntity<KeywordDto> create(@RequestBody @Valid KeywordFormDto dto) {
+
     LOGGER.info("Creating keyword");
     LOGGER.info(dto.toString());
-    Keyword keyword = keywordMapper.fromDto(dto);
+    Keyword keyword = keywordMapper.fromFormDto(dto);
+
+    // If the category does not exist, create it
+    if (keyword.getCategory().getId() == null) {
+      KeywordCategory created = keywordCategoryService.create(keyword.getCategory());
+      keyword.setCategory(created);
+    }
+
+    // Check to see if the keyword already exists
     Optional<Keyword> optional =
-        keywordService.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
+        keywordService.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory().getName());
     if (optional.isPresent()) {
       throw new DuplicateRecordException(
           String.format(
@@ -107,7 +120,7 @@ public class KeywordController {
     LOGGER.info(dto.toString());
     Keyword updated = keywordMapper.fromDto(dto);
     Optional<Keyword> optional =
-        keywordService.findByKeywordAndCategory(updated.getKeyword(), updated.getCategory());
+        keywordService.findByKeywordAndCategory(updated.getKeyword(), updated.getCategory().getName());
     if (optional.isPresent()) {
       Keyword keyword = optional.get();
       if (!keyword.getId().equals(id)) {

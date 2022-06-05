@@ -19,7 +19,7 @@ package io.studytracker.controller.api;
 import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.ExternalLinkDto;
+import io.studytracker.mapstruct.dto.response.ExternalLinkDto;
 import io.studytracker.mapstruct.mapper.ExternalLinkMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.ExternalLink;

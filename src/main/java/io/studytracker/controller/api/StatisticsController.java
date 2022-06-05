@@ -2,8 +2,8 @@ package io.studytracker.controller.api;
 
 import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.SummaryStatisticsDto;
-import io.studytracker.mapstruct.dto.UserStatisticsDto;
+import io.studytracker.mapstruct.dto.response.SummaryStatisticsDto;
+import io.studytracker.mapstruct.dto.response.UserStatisticsDto;
 import io.studytracker.model.User;
 import io.studytracker.service.StatisticsService;
 import io.studytracker.service.UserService;

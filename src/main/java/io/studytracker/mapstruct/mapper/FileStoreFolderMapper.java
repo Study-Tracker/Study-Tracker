@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.FileStoreFolderDto;
+import io.studytracker.mapstruct.dto.response.FileStoreFolderDto;
 import io.studytracker.model.FileStoreFolder;
 import org.mapstruct.Mapper;
 

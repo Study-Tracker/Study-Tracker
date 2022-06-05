@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ElasticsearchDocumentMapper {
@@ -59,6 +60,7 @@ public interface ElasticsearchDocumentMapper {
 
   Set<ElasticsearchFolderDocument> fromFileStoreFolderSet(Set<FileStoreFolder> folders);
 
+  @Mapping(target = "category", source="category.name")
   ElasticsearchKeywordDocument fromKeyword(Keyword keyword);
 
   List<ElasticsearchKeywordDocument> fromKeywordList(List<Keyword> keywords);

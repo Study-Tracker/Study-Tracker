@@ -151,16 +151,12 @@ class ExternalLinks extends React.Component {
 
           <Card.Title>
             External Links
-            {
-              !!this.props.user ? (
-                  <span className="float-end">
-                  <Button size={"sm"} variant={"primary"}
-                          onClick={() => this.showModal(true)}>
-                    Add <PlusCircle className="feather feather-button-sm"/>
-                  </Button>
-                </span>
-              ) : ''
-            }
+            <span className="float-end">
+              <Button size={"sm"} variant={"primary"}
+                      onClick={() => this.showModal(true)}>
+                Add <PlusCircle className="feather feather-button-sm"/>
+              </Button>
+            </span>
           </Card.Title>
 
           {

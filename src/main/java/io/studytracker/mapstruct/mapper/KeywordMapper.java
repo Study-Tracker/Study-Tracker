@@ -1,6 +1,7 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.KeywordDto;
+import io.studytracker.mapstruct.dto.form.KeywordFormDto;
+import io.studytracker.mapstruct.dto.response.KeywordDto;
 import io.studytracker.model.Keyword;
 import java.util.List;
 import java.util.Set;
@@ -19,4 +20,6 @@ public interface KeywordMapper {
   List<Keyword> fromDtoList(List<KeywordDto> dtos);
 
   Set<Keyword> fromDtoSet(Set<KeywordDto> dtos);
+
+  Keyword fromFormDto(KeywordFormDto dto);
 }

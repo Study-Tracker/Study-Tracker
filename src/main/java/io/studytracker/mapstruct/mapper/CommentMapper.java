@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.CommentDto;
+import io.studytracker.mapstruct.dto.response.CommentDto;
 import io.studytracker.model.Comment;
 import java.util.List;
 import java.util.Set;

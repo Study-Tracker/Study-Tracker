@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.AssayTypeFieldDto;
+import io.studytracker.mapstruct.dto.response.AssayTypeFieldDto;
 import io.studytracker.model.AssayTypeField;
 import java.util.List;
 import java.util.Set;

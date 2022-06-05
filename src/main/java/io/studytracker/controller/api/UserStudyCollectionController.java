@@ -1,7 +1,7 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.StudyCollectionSummaryDto;
+import io.studytracker.mapstruct.dto.response.StudyCollectionSummaryDto;
 import io.studytracker.mapstruct.mapper.StudyCollectionMapper;
 import io.studytracker.model.StudyCollection;
 import io.studytracker.model.User;

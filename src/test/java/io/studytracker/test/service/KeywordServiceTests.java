@@ -3,7 +3,10 @@ package io.studytracker.test.service;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.DuplicateRecordException;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Keyword;
+import io.studytracker.model.KeywordCategory;
+import io.studytracker.service.KeywordCategoryService;
 import io.studytracker.service.KeywordService;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,8 @@ public class KeywordServiceTests {
   private static final int KEYWORD_COUNT = 7;
 
   @Autowired private KeywordService keywordService;
+
+  @Autowired private KeywordCategoryService keywordCategoryService;
 
   @Autowired private ExampleDataGenerator exampleDataGenerator;
 
@@ -53,17 +58,19 @@ public class KeywordServiceTests {
     keywords = keywordService.search("AKT", "Cell Line");
     Assert.assertEquals(0, keywords.size());
 
-    Assert.assertEquals(2, keywordService.findAllCategories().size());
+    Assert.assertEquals(2, keywordCategoryService.findAll().size());
   }
 
   @Test
   public void createTest() throws Exception {
     Assert.assertEquals(KEYWORD_COUNT, keywordService.findAll().size());
-    keywordService.create(new Keyword("TP53", "Gene"));
+    KeywordCategory category = keywordCategoryService.findByName("Gene")
+        .orElseThrow(RecordNotFoundException::new);
+    keywordService.create(new Keyword(category, "TP53"));
     Assert.assertEquals(KEYWORD_COUNT + 1, keywordService.findAll().size());
     Exception exception = null;
     try {
-      keywordService.create(new Keyword("TP53", "Gene"));
+      keywordService.create(new Keyword(category, "TP53"));
     } catch (Exception e) {
       exception = e;
     }

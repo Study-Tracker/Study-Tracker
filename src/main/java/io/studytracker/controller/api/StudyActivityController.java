@@ -16,7 +16,7 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.mapstruct.dto.ActivitySummaryDto;
+import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.model.Study;
 import io.studytracker.service.ActivityService;

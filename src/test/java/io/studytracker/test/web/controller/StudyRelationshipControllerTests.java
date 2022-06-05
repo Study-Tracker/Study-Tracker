@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.StudyRelationshipSlimDto;
+import io.studytracker.mapstruct.dto.response.StudyRelationshipSlimDto;
 import io.studytracker.model.RelationshipType;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyRelationship;

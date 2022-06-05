@@ -62,7 +62,7 @@ export default class KeywordSettings extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/api/keyword/categories")
+    fetch("/api/keyword-category")
     .then(response => response.json())
     .then(json => {
       this.setState({

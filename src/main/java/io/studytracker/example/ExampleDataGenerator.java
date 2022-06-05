@@ -32,6 +32,7 @@ import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Keyword;
+import io.studytracker.model.KeywordCategory;
 import io.studytracker.model.NotebookEntryTemplate;
 import io.studytracker.model.NotebookEntryTemplate.Category;
 import io.studytracker.model.Program;
@@ -49,6 +50,7 @@ import io.studytracker.repository.AssayTypeTaskRepository;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.CommentRepository;
 import io.studytracker.repository.ExternalLinkRepository;
+import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.KeywordRepository;
 import io.studytracker.repository.NotebookEntryTemplateRepository;
 import io.studytracker.repository.PasswordResetTokenRepository;
@@ -130,6 +132,8 @@ public class ExampleDataGenerator {
   @Autowired private ExternalLinkRepository externalLinkRepository;
 
   @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
+
+  @Autowired private KeywordCategoryRepository keywordCategoryRepository;
 
   public List<NotebookEntryTemplate> generateExampleEntryTemplates() {
     User user = userRepository.findAll().get(0);
@@ -323,16 +327,26 @@ public class ExampleDataGenerator {
     return users;
   }
 
-  public List<Keyword> generateExampleKeywords() {
+  public List<KeywordCategory> generateExampleKeywordCategories() {
+    List<KeywordCategory> categories = new ArrayList<>();
+    categories.add(new KeywordCategory("Cell Line"));
+    categories.add(new KeywordCategory("Gene"));
+    return categories;
+  }
+
+  public List<Keyword> generateExampleKeywords(List<KeywordCategory> categories) {
+
+    KeywordCategory category = categories.get(0);
+    KeywordCategory category2 = categories.get(1);
 
     List<Keyword> keywords = new ArrayList<>();
-    keywords.add(new Keyword("MCF7", "Cell Line"));
-    keywords.add(new Keyword("HELA", "Cell Line"));
-    keywords.add(new Keyword("A375", "Cell Line"));
-    keywords.add(new Keyword("AKT1", "Gene"));
-    keywords.add(new Keyword("AKT2", "Gene"));
-    keywords.add(new Keyword("AKT3", "Gene"));
-    keywords.add(new Keyword("PTEN", "Gene"));
+    keywords.add(new Keyword(category, "MCF7"));
+    keywords.add(new Keyword(category, "HELA"));
+    keywords.add(new Keyword(category, "A375"));
+    keywords.add(new Keyword(category2, "AKT1"));
+    keywords.add(new Keyword(category2, "AKT2"));
+    keywords.add(new Keyword(category2, "AKT3"));
+    keywords.add(new Keyword(category2, "PTEN"));
     return keywords;
   }
 
@@ -817,6 +831,7 @@ public class ExampleDataGenerator {
     assayTypeRepository.deleteAll();
     collaboratorRepository.deleteAll();
     keywordRepository.deleteAll();
+    keywordCategoryRepository.deleteAll();
     programRepository.deleteAll();
     userRepository.deleteAll();
   }
@@ -830,7 +845,11 @@ public class ExampleDataGenerator {
       userRepository.saveAll(generateExampleUsers());
       programRepository.saveAll(generateExamplePrograms(userRepository.findAll()));
       generateExampleAssayTypes();
-      keywordRepository.saveAll(generateExampleKeywords());
+
+      List<KeywordCategory> categories = generateExampleKeywordCategories();
+      keywordCategoryRepository.saveAll(categories);
+      keywordRepository.saveAll(generateExampleKeywords(categories));
+
       collaboratorRepository.saveAll(generateExampleCollaborators());
       notebookEntryTemplateRepository.saveAll(generateExampleEntryTemplates());
       generateExampleStudies();

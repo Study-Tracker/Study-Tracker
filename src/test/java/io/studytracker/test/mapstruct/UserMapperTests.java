@@ -2,7 +2,7 @@ package io.studytracker.test.mapstruct;
 
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
-import io.studytracker.mapstruct.dto.UserSummaryDto;
+import io.studytracker.mapstruct.dto.response.UserSummaryDto;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.User;
 import io.studytracker.repository.UserRepository;

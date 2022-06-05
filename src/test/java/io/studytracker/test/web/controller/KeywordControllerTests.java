@@ -31,7 +31,9 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Keyword;
+import io.studytracker.model.KeywordCategory;
 import io.studytracker.model.User;
+import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +65,8 @@ public class KeywordControllerTests {
   @Autowired private ObjectMapper objectMapper;
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private KeywordCategoryRepository keywordCategoryRepository;
 
   private String username;
 
@@ -113,7 +117,10 @@ public class KeywordControllerTests {
   @Test
   public void createKeywordTest() throws Exception {
     User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
-    Keyword keyword = new Keyword("TTN", "Gene");
+    KeywordCategory category = keywordCategoryRepository.findByName("Gene")
+        .orElseThrow(RecordNotFoundException::new);
+
+    Keyword keyword = new Keyword(category, "TTN");
     mockMvc
         .perform(
             post("/api/keyword")
@@ -126,7 +133,9 @@ public class KeywordControllerTests {
   @Test
   public void duplicateKeywordTest() throws Exception {
     User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
-    Keyword keyword = new Keyword("AKT1", "Gene");
+    KeywordCategory category = keywordCategoryRepository.findByName("Gene")
+        .orElseThrow(RecordNotFoundException::new);
+    Keyword keyword = new Keyword(category, "AKT1");
     mockMvc
         .perform(
             post("/api/keyword")

@@ -1,10 +1,10 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.AssayDetailsDto;
-import io.studytracker.mapstruct.dto.AssayFormDto;
-import io.studytracker.mapstruct.dto.AssayParentDto;
-import io.studytracker.mapstruct.dto.AssaySlimDto;
-import io.studytracker.mapstruct.dto.AssaySummaryDto;
+import io.studytracker.mapstruct.dto.form.AssayFormDto;
+import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
+import io.studytracker.mapstruct.dto.response.AssayParentDto;
+import io.studytracker.mapstruct.dto.response.AssaySlimDto;
+import io.studytracker.mapstruct.dto.response.AssaySummaryDto;
 import io.studytracker.model.Assay;
 import java.util.List;
 import java.util.Set;

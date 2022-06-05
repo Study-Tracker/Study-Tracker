@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.StudyConclusionsDto;
+import io.studytracker.mapstruct.dto.response.StudyConclusionsDto;
 import io.studytracker.model.StudyConclusions;
 import org.mapstruct.Mapper;
 

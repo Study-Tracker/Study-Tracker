@@ -18,39 +18,43 @@ package io.studytracker.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(
     name = "keywords",
-    indexes = {@Index(name = "idx_keyword", columnList = "category, keyword")})
+    indexes = {@Index(name = "idx_keyword", columnList = "category_id, keyword")})
 public class Keyword {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
+  private KeywordCategory category;
+
   @Column(name = "keyword", nullable = false)
   private String keyword;
 
-  @Column(name = "category", nullable = false)
-  private String category;
-
   public Keyword() {}
 
-  public Keyword(String keyword, String category) {
-    this.keyword = keyword;
+  public Keyword(KeywordCategory category, String keyword) {
     this.category = category;
+    this.keyword = keyword;
   }
 
-  public Keyword(Long id, String keyword, String category) {
+  public Keyword(Long id, KeywordCategory category, String keyword) {
     this.id = id;
-    this.keyword = keyword;
     this.category = category;
+    this.keyword = keyword;
   }
 
   public Long getId() {
@@ -69,11 +73,11 @@ public class Keyword {
     this.keyword = keyword;
   }
 
-  public String getCategory() {
+  public KeywordCategory getCategory() {
     return category;
   }
 
-  public void setCategory(String category) {
+  public void setCategory(KeywordCategory category) {
     this.category = category;
   }
 }

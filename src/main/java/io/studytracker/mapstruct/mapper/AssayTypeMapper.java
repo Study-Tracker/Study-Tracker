@@ -1,7 +1,7 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.AssayTypeDetailsDto;
-import io.studytracker.mapstruct.dto.AssayTypeSlimDto;
+import io.studytracker.mapstruct.dto.response.AssayTypeDetailsDto;
+import io.studytracker.mapstruct.dto.response.AssayTypeSlimDto;
 import io.studytracker.model.AssayType;
 import java.util.List;
 import org.mapstruct.Mapper;

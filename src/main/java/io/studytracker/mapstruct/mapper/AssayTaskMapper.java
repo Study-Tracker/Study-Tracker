@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.AssayTaskDto;
+import io.studytracker.mapstruct.dto.response.AssayTaskDto;
 import io.studytracker.model.AssayTask;
 import java.util.List;
 import java.util.Set;

@@ -20,7 +20,7 @@ import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.mapstruct.dto.StudyConclusionsDto;
+import io.studytracker.mapstruct.dto.response.StudyConclusionsDto;
 import io.studytracker.mapstruct.mapper.StudyConclusionsMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Study;

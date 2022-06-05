@@ -3,7 +3,7 @@ package io.studytracker.controller.api;
 import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.AssayTaskDto;
+import io.studytracker.mapstruct.dto.response.AssayTaskDto;
 import io.studytracker.mapstruct.mapper.AssayTaskMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
