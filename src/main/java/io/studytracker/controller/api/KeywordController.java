@@ -59,6 +59,7 @@ public class KeywordController {
   @GetMapping("")
   public List<KeywordDto> findAll(
       @RequestParam(required = false) String category,
+      @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false, value = "q") String query) {
     List<Keyword> keywords;
     if (query != null && category != null) {
@@ -67,6 +68,8 @@ public class KeywordController {
       keywords = keywordService.search(query);
     } else if (category != null) {
       keywords = keywordService.findByCategory(category);
+    } else if (categoryId != null) {
+      keywords = keywordService.findByCategoryId(categoryId);
     } else {
       keywords = keywordService.findAll();
     }

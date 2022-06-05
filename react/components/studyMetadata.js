@@ -138,7 +138,7 @@ export class StudyKeywords extends React.Component {
                 Cancel
               </Button>
               <Button variant={"primary"}
-                      onClick={}>
+                      onClick={() => console.log("Click!")}>
                 Save
               </Button>
             </Modal.Footer>

@@ -14,8 +14,14 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
   @Query("select k from Keyword k where k.category.name = ?1")
   List<Keyword> findByCategory(String category);
 
+  @Query("select k from Keyword k where k.category.id = ?1")
+  List<Keyword> findByCategoryId(Long categoryId);
+
   @Query("select k from Keyword k where k.keyword = ?1 and k.category.name = ?2")
   Optional<Keyword> findByKeywordAndCategory(String keyword, String category);
+
+  @Query("select k from Keyword k where k.keyword = ?1 and k.category.id = ?2")
+  Optional<Keyword> findByKeywordAndCategoryId(String keyword, Long categoryId);
 
 //  @Query("select distinct(k.category) from Keyword k")
 //  Set<String> findAllCategories();

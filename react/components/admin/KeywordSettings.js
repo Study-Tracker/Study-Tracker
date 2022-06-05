@@ -79,10 +79,11 @@ export default class KeywordSettings extends React.Component {
     });
   }
 
-  handleCategorySelect(category) {
-    fetch("/api/keyword?category=" + category)
+  handleCategorySelect(categoryId) {
+    fetch("/api/keyword?categoryId=" + categoryId)
     .then(response => response.json())
     .then(keywords => {
+      const category = this.state.categories.find(c => c.id === categoryId);
       this.setState({
         selectedCategory: category,
         keywords: keywords
@@ -138,9 +139,9 @@ export default class KeywordSettings extends React.Component {
 
     const categoryOptions = this.state.categories
     .sort((a, b) => {
-      if (a > b) {
+      if (a.name > b.name) {
         return 1;
-      } else if (a < b) {
+      } else if (a.name < b.name) {
         return -1;
       } else {
         return 0;
@@ -148,8 +149,8 @@ export default class KeywordSettings extends React.Component {
     })
     .map(c => {
       return {
-        value: c,
-        label: c
+        value: c.id,
+        label: c.name
       }
     });
 
@@ -386,18 +387,18 @@ const ModalInputs = ({
                 classNamePrefix="react-select"
                 options={categories}
                 defaultValue={{
-                  label: keyword.category,
-                  value: keyword.category
+                  label: keyword.category.name,
+                  value: keyword.category.id
                 }}
                 onChange={(selected) => handleUpdate(
-                    {category: selected.value})}
+                    {category: {"id": selected.value, "name": selected.label}})}
             />
           </Form.Group>
           <Form.Group hidden={categoryInput !== "input"}>
             <Form.Label>Category</Form.Label>
             <Form.Control
                 type={"text"}
-                onChange={(e) => handleUpdate({category: e.target.value})}
+                onChange={(e) => handleUpdate({category: {"name": e.target.value}})}
             />
           </Form.Group>
         </Col>

@@ -51,8 +51,16 @@ public class KeywordService {
     return keywordRepository.findByCategory(category);
   }
 
+  public List<Keyword> findByCategoryId(Long categoryId) {
+    return keywordRepository.findByCategoryId(categoryId);
+  }
+
   public Optional<Keyword> findByKeywordAndCategory(String keyword, String category) {
     return keywordRepository.findByKeywordAndCategory(keyword, category);
+  }
+
+  public Optional<Keyword> findByKeywordAndCategoryId(String keyword, Long categoryId) {
+    return keywordRepository.findByKeywordAndCategoryId(keyword, categoryId);
   }
 
   public List<Keyword> search(String fragment) {

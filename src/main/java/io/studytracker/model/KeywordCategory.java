@@ -40,7 +40,7 @@ public class KeywordCategory {
     this.name = name;
   }
 
-  public KeywordCategory(Long id, String keyword, String name) {
+  public KeywordCategory(Long id, String name) {
     this.id = id;
     this.name = name;
   }
