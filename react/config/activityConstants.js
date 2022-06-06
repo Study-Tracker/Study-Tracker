@@ -102,6 +102,11 @@ export const studyActions = {
     label: "Study External Link Removed",
     visible: true
   },
+  UPDATED_STUDY_KEYWORDS: {
+    value: "UPDATED_STUDY_KEYWORDS",
+    label: "Updated Study Keywords",
+    visible: true
+  },
 
   // Assays
 

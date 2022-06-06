@@ -21,6 +21,7 @@ import {KeywordCategoryBadge} from "./keywords";
 import {Button, Card, Modal} from "react-bootstrap";
 import {PlusCircle} from "react-feather";
 import {KeywordInputs} from "./forms/keywords";
+import {getCsrfToken} from "../config/csrf";
 
 export const StudyTeam = ({users, owner}) => {
   const list = users.map(user => {
@@ -56,18 +57,22 @@ export class StudyKeywords extends React.Component {
     super(props);
     this.state = {
       keywords: props.keywords,
+      previousKeywords: props.keywords,
       modalIsOpen: false
     }
     this.handleKeywordsUpdate = this.handleKeywordsUpdate.bind(this);
+    this.handleKeywordsSave = this.handleKeywordsSave.bind(this);
+    this.handleKeywordsCancel = this.handleKeywordsCancel.bind(this);
   }
 
   async showModal(bool) {
     let keywordCategories = this.state.keywordCategories;
     if (bool && !keywordCategories) {
-      keywordCategories = await fetch("/api/keyword-categories").then(res => res.json());
+      keywordCategories = await fetch("/api/keyword-category").then(res => res.json());
     }
     this.setState({
-      modalIsOpen: bool
+      modalIsOpen: bool,
+      keywordCategories: keywordCategories
     })
   }
 
@@ -76,12 +81,46 @@ export class StudyKeywords extends React.Component {
     this.setState({keywords: data.keywords});
   }
 
+  handleKeywordsSave() {
+    fetch("/api/study/" + this.props.studyId + "/keywords", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": getCsrfToken()
+      },
+      body: JSON.stringify(this.state.keywords)
+    })
+    .then(res => {
+      if (res.ok) {
+        swal("Study keywords updated successfully", "", "success");
+        this.setState({
+          previousKeywords: this.state.keywords,
+          modalIsOpen: false
+        });
+      } else {
+        throw new Error("Failed to update study keywords");
+      }
+    })
+    .catch(e => {
+      console.error(e);
+      swal("Keyword update failed", "Please try again. If the error persists, "
+          + "contact the system administrator.", "warning");
+    })
+  }
+
+  handleKeywordsCancel() {
+    this.setState({
+      keywords: this.state.previousKeywords,
+      modalIsOpen: false
+    })
+  }
+
   render() {
 
     const links = this.state.keywords.map(keyword => {
       return (
           <li key={"keyword-" + keyword.id} className="mt-1">
-            <KeywordCategoryBadge category={keyword.category}/>
+            <KeywordCategoryBadge label={keyword.category.name}/>
             &nbsp;&nbsp;
             {keyword.keyword}
           </li>
@@ -127,18 +166,18 @@ export class StudyKeywords extends React.Component {
             <Modal.Body className="m-3">
               <KeywordInputs
                   keywords={this.state.keywords}
-                  keywordCategories={['Genes']}
+                  keywordCategories={this.state.keywordCategories}
                   onChange={this.handleKeywordsUpdate}
               />
             </Modal.Body>
 
             <Modal.Footer>
               <Button variant={"secondary"}
-                      onClick={() => this.showModal(false)}>
+                      onClick={this.handleKeywordsCancel}>
                 Cancel
               </Button>
               <Button variant={"primary"}
-                      onClick={() => console.log("Click!")}>
+                      onClick={this.handleKeywordsSave}>
                 Save
               </Button>
             </Modal.Footer>

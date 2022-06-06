@@ -17,9 +17,9 @@
 import React from "react";
 import {Badge} from 'react-bootstrap'
 
-export const KeywordCategoryBadge = ({category}) => {
+export const KeywordCategoryBadge = ({label}) => {
   return (
-      <Badge bg={"info"}>{category}</Badge>
+      <Badge bg={"info"}>{label}</Badge>
   );
 };
 
@@ -31,9 +31,10 @@ export const KeywordBadge = ({category, label}) => {
   );
 };
 
-export const KeywordBadgeList = ({keywords}) => {
+export const KeywordActivityBadgeList = ({keywords}) => {
   let flag = false;
   return keywords.map(k => {
+    console.debug(k);
     const br = flag ? <span>&nbsp;</span> : '';
     flag = true;
     return (

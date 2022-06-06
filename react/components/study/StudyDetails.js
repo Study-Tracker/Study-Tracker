@@ -339,7 +339,7 @@ class StudyDetails extends React.Component {
                 <Card.Body>
                   <Row>
                     <Col xs={12}>
-                      <StudyKeywords keywords={study.keywords} />
+                      <StudyKeywords keywords={study.keywords} studyId={study.id} />
                     </Col>
                   </Row>
                 </Card.Body>

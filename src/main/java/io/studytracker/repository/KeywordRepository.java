@@ -26,6 +26,10 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 //  @Query("select distinct(k.category) from Keyword k")
 //  Set<String> findAllCategories();
 
+  @Query(value = "select k.* from keywords k join study_keywords sk on k.id = sk.keyword_id where sk.study_id = ?1",
+      nativeQuery = true)
+  List<Keyword> findByStudyId(Long studyId);
+
   @Query("select k from Keyword k where lower(k.keyword) like lower(concat('%', ?1, '%'))")
   List<Keyword> search(String fragment, Pageable pageable);
 

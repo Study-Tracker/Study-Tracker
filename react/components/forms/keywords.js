@@ -31,7 +31,7 @@ export class KeywordInputs extends React.Component {
     super(props);
     this.state = {
       categories: props.keywordCategories.map(c => {
-        return {label: c, value: c}
+        return {label: c.name, value: c.id}
       })
     };
     this.handleCategoryChange = this.handleCategoryChange.bind(this);
@@ -43,7 +43,7 @@ export class KeywordInputs extends React.Component {
   handleCategoryChange(selected) {
     console.debug(selected);
     this.setState({
-      category: selected.value
+      category: this.props.keywordCategories.find(c => c.id === selected.value)
     })
   }
 
@@ -57,7 +57,7 @@ export class KeywordInputs extends React.Component {
 
   handleKeywordSelect(selected) {
     console.debug(selected);
-    if (!!selected.__isNew__) {
+    if (selected.__isNew__) {
       fetch("/api/keyword", {
         method: 'POST',
         body: JSON.stringify({
@@ -100,7 +100,7 @@ export class KeywordInputs extends React.Component {
       return;
     }
     fetch('/api/keyword/?q=' + input
-        + (!!this.state.category ? "&category=" + this.state.category : ''))
+        + (!!this.state.category ? "&categoryId=" + this.state.category.id : ''))
     .then(response => response.json())
     .then(json => {
       const keywords = json.map(k => {
@@ -128,7 +128,7 @@ export class KeywordInputs extends React.Component {
               className="align-items-center justify-content-center mt-1"
           >
             <Col xs={3}>
-              <KeywordCategoryBadge category={keyword.category}/>
+              <KeywordCategoryBadge label={keyword.category.name}/>
             </Col>
             <Col xs={7}>
               {keyword.keyword}

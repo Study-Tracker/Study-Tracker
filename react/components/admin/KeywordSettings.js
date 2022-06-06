@@ -14,7 +14,10 @@ import {getCsrfToken} from "../../config/csrf";
 
 const emptyKeyword = {
   id: null,
-  category: null,
+  category: {
+    id: null,
+    name: null
+  },
   keyword: ''
 };
 
@@ -39,9 +42,9 @@ export default class KeywordSettings extends React.Component {
   }
 
   showModal(keyword) {
-    if (!!keyword) {
+    if (keyword) {
       this.setState({
-        selectedKeyword: keyword || emptyKeyword,
+        selectedKeyword: keyword.hasOwnProperty("keyword") ? keyword : emptyKeyword,
         isModalOpen: true,
         categoryInput: "select"
       })

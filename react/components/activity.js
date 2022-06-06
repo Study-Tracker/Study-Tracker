@@ -26,11 +26,12 @@ import {
   Link,
   MessageCircle,
   Star,
+  Tag,
   Trash2,
 } from "react-feather";
 import {studyActions} from "../config/activityConstants";
 import {StatusBadge} from "./status";
-import {KeywordBadgeList} from "./keywords";
+import {KeywordActivityBadgeList} from "./keywords";
 import {AssayTaskCard} from "./assayTasks";
 import {relationshipTypes} from "../config/studyRelationshipConstants";
 import dateFormat from "dateformat";
@@ -141,6 +142,9 @@ const ActivityIcon = ({action}) => {
     case studyActions.ASSAY_TASK_UPDATED.value:
       return <CheckSquare size={36} className="align-middle text-info me-4"/>;
 
+    case studyActions.UPDATED_STUDY_KEYWORDS.value:
+      return <Tag size={36} className="align-middle text-info me-4"/>;
+
     default:
       return <Bell size={36} className="align-middle text-info me-4"/>;
 
@@ -215,7 +219,7 @@ const ActivityMessage = ({activity}) => {
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
                 <p>
-                  <KeywordBadgeList
+                  <KeywordActivityBadgeList
                       keywords={activity.data.study.keywords || []}/>
                 </p>
               </div>
@@ -254,7 +258,7 @@ const ActivityMessage = ({activity}) => {
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
                 <p>
-                  <KeywordBadgeList
+                  <KeywordActivityBadgeList
                       keywords={activity.data.study.keywords || []}/>
                 </p>
               </div>
@@ -316,6 +320,30 @@ const ActivityMessage = ({activity}) => {
         );
 
       }
+
+    case studyActions.UPDATED_STUDY_KEYWORDS.value:
+
+      return (
+          <React.Fragment>
+            <p>
+              <a href={"/user/"
+                  + activity.user.username}>{activity.user.displayName}</a>
+              &nbsp;has updated the keywords of study:
+            </p>
+            <div className="bg-light text-secondary p-3">
+              <h5><a href={"/study/"
+                  + activity.data.study.code}>{activity.data.study.code}</a>
+              </h5>
+              <h4>{activity.data.study.name}</h4>
+              <h5 className="text-muted">{activity.data.study.program}</h5>
+              <p>
+                <KeywordActivityBadgeList
+                    keywords={activity.data.study.keywords || []}/>
+              </p>
+            </div>
+          </React.Fragment>
+      );
+
 
     case studyActions.NEW_ASSAY.value:
 

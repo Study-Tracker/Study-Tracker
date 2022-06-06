@@ -22,4 +22,8 @@ public interface KeywordMapper {
   Set<Keyword> fromDtoSet(Set<KeywordDto> dtos);
 
   Keyword fromFormDto(KeywordFormDto dto);
+
+  List<Keyword> fromFormDtoList(List<KeywordFormDto> dtos);
+
+  Set<Keyword> fromFormDtoSet(Set<KeywordFormDto> dtos);
 }

@@ -25,12 +25,20 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
 
 @Entity
 @Table(
     name = "keywords",
     indexes = {@Index(name = "idx_keyword", columnList = "category_id, keyword")})
+@NamedEntityGraphs({
+  @NamedEntityGraph(
+      name = "keyword-details",
+      attributeNodes = {@NamedAttributeNode("category")})
+})
 public class Keyword {
 
   @Id
