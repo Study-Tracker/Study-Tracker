@@ -331,14 +331,14 @@ class StudyDetails extends React.Component {
 
                       <RepairableStorageFolderButton
                           folder={study.storageFolder}
-                          repairUrl={"/api/study/" + study.id + "/storage"}
+                          repairUrl={"/api/study/" + study.id + "/storage/repair"}
                       />
 
                       &nbsp;&nbsp;
 
                       <RepairableNotebookFolderButton
                           folder={study.notebookFolder}
-                          repairUrl={"/api/study/" + study.id + "/notebook"}
+                          repairUrl={"/api/study/" + study.id + "/notebook/repair"}
                       />
 
                     </Col>

@@ -359,7 +359,7 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
               <p>
                 <RepairableStorageFolderLink
                     folder={program.storageFolder}
-                    repairUrl={"/api/program/" + program.id + "/storage"}
+                    repairUrl={"/api/program/" + program.id + "/storage/repair"}
                 />
               </p>
             </Col>
@@ -369,7 +369,7 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
               <p>
                 <RepairableNotebookFolderLink
                     folder={program.notebookFolder}
-                    repairUrl={"/api/program/" + program.id + "/notebook"}
+                    repairUrl={"/api/program/" + program.id + "/notebook/repair"}
                 />
               </p>
             </Col>

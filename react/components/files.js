@@ -333,7 +333,7 @@ const handleFolderRepairRequest = (url) => {
   .then(val => {
     if (val) {
       fetch(url, {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           "Content-Type": "application/json",
           "X-XSRF-TOKEN": getCsrfToken()

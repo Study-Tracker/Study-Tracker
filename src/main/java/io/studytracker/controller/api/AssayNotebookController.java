@@ -12,8 +12,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,7 +39,7 @@ public class AssayNotebookController extends AbstractAssayController {
         () -> new RecordNotFoundException("Could not load assay folder"));
   }
 
-  @PatchMapping("")
+  @PostMapping("")
   public HttpEntity<?> repairNotebookFolder(@PathVariable("assayId") Long assayId) {
 
     // Check that the study exists

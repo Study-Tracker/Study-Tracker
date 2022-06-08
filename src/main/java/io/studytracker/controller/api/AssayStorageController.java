@@ -36,7 +36,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,21 +89,9 @@ public class AssayStorageController extends AbstractAssayController {
     return new ResponseEntity<>(storageFile, HttpStatus.CREATED);
   }
 
-  @PatchMapping("/{id}/storage")
+  @PostMapping("/repair")
   public HttpEntity<?> repairStorageFolder(@PathVariable("id") String assayId) {
-
-    //    // Check user privileges
-    //    String username = UserAuthenticationUtils
-    //
-    // .getUsernameFromAuthentication(SecurityContextHolder.getContext().getAuthentication());
-    //    User user = this.getUserService().findByUsername(username)
-    //        .orElseThrow(RecordNotFoundException::new);
-    //    if (!user.isAdmin()) {
-    //      throw new InsufficientPrivilegesException("You do not have permission to perform this
-    // action.");
-    //    }
-
-    // Repair the storage folder
+    LOGGER.info("Repairing storage folder for assay: " + assayId);
     Assay assay = this.getAssayFromIdentifier(assayId);
     getAssayService().repairStorageFolder(assay);
     return new ResponseEntity<>(HttpStatus.OK);
