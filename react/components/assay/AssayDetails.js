@@ -418,11 +418,11 @@ export default class AssayDetails extends React.Component {
                       <Card.Title>Workspaces</Card.Title>
                       <RepairableStorageFolderButton
                           folder={assay.storageFolder}
-                          repairUrl={"/api/assay/" + assay.id + "/storage"}
+                          repairUrl={"/api/assay/" + assay.id + "/storage/repair"}
                       />
                       <RepairableNotebookFolderButton
                           folder={assay.notebookFolder}
-                          repairUrl={"/api/assay/" + assay.id + "/notebook"}
+                          repairUrl={"/api/assay/" + assay.id + "/notebook/repair"}
                       />
                     </Col>
                   </Row>
