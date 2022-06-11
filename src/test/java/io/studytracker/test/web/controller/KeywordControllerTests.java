@@ -88,7 +88,7 @@ public class KeywordControllerTests {
   @Test
   public void getAllKeywordCategoryTest() throws Exception {
     mockMvc
-        .perform(get("/api/keyword/categories").with(user(username)).with(csrf()))
+        .perform(get("/api/keyword-category").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(CATEGORY_COUNT)));

@@ -11,6 +11,7 @@ import {SettingsErrorMessage} from "../errors";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
 import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 const emptyKeyword = {
   id: null,
@@ -44,7 +45,7 @@ export default class KeywordSettings extends React.Component {
   showModal(keyword) {
     if (keyword) {
       this.setState({
-        selectedKeyword: keyword.hasOwnProperty("keyword") ? keyword : emptyKeyword,
+        selectedKeyword: Object.prototype.hasOwnProperty.call(keyword, "keyword") ? keyword : emptyKeyword,
         isModalOpen: true,
         categoryInput: "select"
       })
@@ -420,3 +421,7 @@ const ModalInputs = ({
       </Row>
   )
 };
+
+ModalInputs.propTypes = {
+  keyword: PropTypes.object.isRequired
+}
