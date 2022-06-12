@@ -20,6 +20,7 @@ import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import ProgramForm from "../components/forms/ProgramForm";
 import {connect} from "react-redux";
+import PropTypes from "prop-types";
 
 class ProgramFormView extends React.Component {
 
@@ -74,6 +75,7 @@ class ProgramFormView extends React.Component {
           program={this.state.program}
           programs={this.state.programs}
           user={this.props.user}
+          features={this.props.features}
       />;
     }
     return (
@@ -85,6 +87,11 @@ class ProgramFormView extends React.Component {
 
 }
 
+ProgramFormView.propTypes = {
+  features: PropTypes.object,
+}
+
 export default connect(store => ({
-  user: store.user
+  user: store.user,
+  features: store.features,
 }))(ProgramFormView);

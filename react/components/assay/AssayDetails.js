@@ -24,6 +24,7 @@ import {RepairableStorageFolderButton} from "../files";
 import {RepairableNotebookFolderButton} from "../eln";
 import {Breadcrumbs} from "../common";
 import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -415,15 +416,25 @@ export default class AssayDetails extends React.Component {
                 <Card.Body>
                   <Row>
                     <Col xs={12}>
+
                       <Card.Title>Workspaces</Card.Title>
+
                       <RepairableStorageFolderButton
                           folder={assay.storageFolder}
                           repairUrl={"/api/assay/" + assay.id + "/storage/repair"}
                       />
-                      <RepairableNotebookFolderButton
-                          folder={assay.notebookFolder}
-                          repairUrl={"/api/assay/" + assay.id + "/notebook/repair"}
-                      />
+
+                      {
+                          this.props.features
+                          && this.props.features.notebook
+                          && this.props.features.notebook.isEnabled ? (
+                              <RepairableNotebookFolderButton
+                                  folder={assay.notebookFolder}
+                                  repairUrl={"/api/assay/" + assay.id + "/notebook/repair"}
+                              />
+                          ) : ""
+                      }
+
                     </Col>
                   </Row>
                 </Card.Body>
@@ -451,7 +462,10 @@ export default class AssayDetails extends React.Component {
                     </Nav.Item>
 
                     {
-                      !!assay.notebookFolder ? (
+                      this.props.features
+                      && this.props.features.notebook
+                      && this.props.features.notebook.isEnabled
+                      && assay.notebookFolder ? (
                           <Nav.Item>
                             <Nav.Link eventKey={"notebook"}>
                               Notebook
@@ -474,7 +488,10 @@ export default class AssayDetails extends React.Component {
                     </Tab.Pane>
 
                     {
-                      !!assay.notebookFolder ? (
+                      this.props.features
+                      && this.props.features.notebook
+                      && this.props.features.notebook.isEnabled
+                      && assay.notebookFolder ? (
                           <Tab.Pane eventKey={"notebook"}>
                             <AssayNotebookTab assay={assay}
                                               user={this.props.user}/>
@@ -492,5 +509,13 @@ export default class AssayDetails extends React.Component {
         </Container>
     );
   }
+
+}
+
+AssayDetails.propTypes = {
+  user: PropTypes.object,
+  study: PropTypes.object.isRequired,
+  assay: PropTypes.object.isRequired,
+  features: PropTypes.object,
 
 }

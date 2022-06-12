@@ -22,6 +22,8 @@ import {connect} from "react-redux";
 import {setUser} from '../redux/actions/userActions'
 import {Formik} from "formik";
 import {history} from "../App";
+import {setFeatures} from "../redux/actions/featureActions";
+import PropTypes from "prop-types";
 
 class NavBarComponent extends React.Component {
 
@@ -34,16 +36,31 @@ class NavBarComponent extends React.Component {
   }
 
   componentDidMount() {
+
+    // Get the signed-in user
     fetch("/auth/user")
     .then(response => response.json())
     .then(json => {
-      if (!!json.user) {
+      if (json.user) {
         this.props.dispatch(setUser(json.user));
         this.setState({
           user: json.user
         });
       }
     });
+
+    fetch("/api/config/features")
+    .then(response => response.json())
+    .then(json => {
+      this.props.dispatch(setFeatures(json));
+      this.setState({
+        features: json
+      })
+    })
+    .catch(error => {
+      console.error(error);
+    })
+
   }
 
   render() {
@@ -77,40 +94,46 @@ class NavBarComponent extends React.Component {
 
           }
 
-          <Formik
-              initialValues={{q: ''}}
-              onSubmit={(values => {
-                console.log("Searching for: " + values.q);
-                history.push("/search?q=" + values.q);
-                history.go(0);
-              })}
-          >
-            {({
-              handleSubmit,
-              handleChange,
-              values
-            }) => (
-                <Form
-                    inline="true"
-                    className="d-none d-sm-inline-block"
-                    onSubmit={handleSubmit}
-                >
-                  <InputGroup className="input-group-navbar">
-                    <Form.Control
-                        type="text"
-                        name={"q"}
-                        placeholder={"Search"}
-                        aria-label={"Search"}
-                        onChange={handleChange}
-                    />
-                    <Button type="submit" variant="">
-                      <Search className={"feather"}/>
-                    </Button>
-                  </InputGroup>
-                </Form>
-            )}
+          {
+            this.state.features
+              && this.state.features.search
+              && this.state.features.search.isEnabled
+              ? (
+                    <Formik
+                        initialValues={{q: ''}}
+                        onSubmit={(values => {
+                          console.log("Searching for: " + values.q);
+                          history.push("/search?q=" + values.q);
+                          history.go(0);
+                        })}
+                    >
+                      {({
+                        handleSubmit,
+                        handleChange,
+                      }) => (
+                          <Form
+                              inline="true"
+                              className="d-none d-sm-inline-block"
+                              onSubmit={handleSubmit}
+                          >
+                            <InputGroup className="input-group-navbar">
+                              <Form.Control
+                                  type="text"
+                                  name={"q"}
+                                  placeholder={"Search"}
+                                  aria-label={"Search"}
+                                  onChange={handleChange}
+                              />
+                              <Button type="submit" variant="">
+                                <Search className={"feather"}/>
+                              </Button>
+                            </InputGroup>
+                          </Form>
+                      )}
 
-          </Formik>
+                    </Formik>
+              ) : ""
+          }
 
           <Navbar.Collapse>
             <Nav className="navbar-align">
@@ -141,40 +164,8 @@ class NavBarComponent extends React.Component {
 
 }
 
-class NavbarSearch extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      "q": ""
-    };
-  }
-
-  render() {
-    return (
-        <Formik
-            initialValues={{q: ''}}
-            onSubmit={(values => {
-              history.push("/search?q=" + values.q);
-              history.go(0);
-            })}
-        >
-          <Form inline={true} className="d-none d-sm-inline-block">
-            <InputGroup className="input-group-navbar">
-              <Form.Control
-                  name={"q"}
-                  placeholder={"Search"}
-                  aria-label={"Search"}
-              />
-              <Button variant="">
-                <Search className={"feather"}/>
-              </Button>
-            </InputGroup>
-          </Form>
-        </Formik>
-    )
-  }
-
+NavBarComponent.propTypes = {
+  dispatch: PropTypes.func.isRequired,
 }
 
 const NavbarUser = ({isAdmin, userName, displayName}) => {

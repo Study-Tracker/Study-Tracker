@@ -46,6 +46,7 @@ import StudyCollectionsTab from "./StudyCollectionsTab";
 import {RepairableStorageFolderButton} from "../files";
 import {RepairableNotebookFolderButton} from "../eln";
 import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 const StudyDetailHeader = ({study, user}) => {
   return (
@@ -211,25 +212,19 @@ class StudyDetails extends React.Component {
 
                         <Dropdown.Divider/>
 
-                        {
-                          !!this.props.user ? (
-                              <Dropdown.Item onClick={() => history.push(
-                                  "/study/" + study.code + "/edit")}>
-                                <FontAwesomeIcon icon={faEdit}/>
-                                &nbsp;
-                                Edit
-                              </Dropdown.Item>
-                          ) : ''
-                        }
-                        {
-                          !!this.props.user ? (
-                              <Dropdown.Item onClick={this.handleStudyDelete}>
-                                <FontAwesomeIcon icon={faTrash}/>
-                                &nbsp;
-                                Remove
-                              </Dropdown.Item>
-                          ) : ''
-                        }
+                        <Dropdown.Item onClick={() => history.push(
+                            "/study/" + study.code + "/edit")}>
+                          <FontAwesomeIcon icon={faEdit}/>
+                          &nbsp;
+                          Edit
+                        </Dropdown.Item>
+
+                        <Dropdown.Item onClick={this.handleStudyDelete}>
+                          <FontAwesomeIcon icon={faTrash}/>
+                          &nbsp;
+                          Remove
+                        </Dropdown.Item>
+
                       </Dropdown.Menu>
                     </Dropdown>
                   </div>
@@ -287,7 +282,7 @@ class StudyDetails extends React.Component {
                 </Card.Body>
 
                 {
-                  !!study.collaborator
+                  study.collaborator
                       ? (
                           <Card.Body>
                             <Row>
@@ -336,10 +331,15 @@ class StudyDetails extends React.Component {
 
                       &nbsp;&nbsp;
 
-                      <RepairableNotebookFolderButton
-                          folder={study.notebookFolder}
-                          repairUrl={"/api/study/" + study.id + "/notebook/repair"}
-                      />
+                      {
+                        this.props.features && this.props.features.notebook
+                          && this.props.features.notebook.isEnabled ? (
+                            <RepairableNotebookFolderButton
+                                folder={study.notebookFolder}
+                                repairUrl={"/api/study/" + study.id + "/notebook/repair"}
+                            />
+                        ) : ""
+                      }
 
                     </Col>
                   </Row>
@@ -442,7 +442,10 @@ class StudyDetails extends React.Component {
                     </Tab.Pane>
 
                     {
-                      !!study.notebookFolder ? (
+                      this.props.features
+                      && this.props.features.notebook
+                      && this.props.features.notebook.isEnabled
+                      && study.notebookFolder ? (
                           <Tab.Pane eventKey={"notebook"}>
                             <StudyNotebookTab study={study}
                                               user={this.props.user}/>
@@ -483,6 +486,12 @@ class StudyDetails extends React.Component {
     );
   }
 
+}
+
+StudyDetails.propTypes = {
+  user: PropTypes.object,
+  study: PropTypes.object.isRequired,
+  features: PropTypes.object,
 }
 
 export default StudyDetails;

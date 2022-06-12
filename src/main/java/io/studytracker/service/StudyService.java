@@ -259,6 +259,8 @@ public class StudyService {
       if (!study.isLegacy()) {
         studySummaryEntry = notebookService.createStudyNotebookEntry(study, template);
       }
+    } else {
+      study.setNotebookFolder(null);
     }
 
     // Persist the record

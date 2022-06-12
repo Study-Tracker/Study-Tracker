@@ -19,6 +19,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFile} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {StorageFolderFileList, UploadFilesModal} from "../files";
+import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 class StudyFilesTabContent extends React.Component {
 
@@ -27,19 +29,24 @@ class StudyFilesTabContent extends React.Component {
     this.state = {
       modalIsOpen: false,
       isLoaded: false,
-      isError: false
+      isError: false,
+      showFolder: false,
     };
     this.showModal = this.showModal.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.refreshData = this.refreshData.bind(this);
+    this.handleShowFolder = this.handleShowFolder.bind(this);
   }
 
-  componentDidMount() {
+  handleShowFolder() {
+    this.setState({
+      showFolder: true
+    });
     this.refreshData();
   }
 
   refreshData() {
-    fetch("/api/study/" + this.props.study.code + "/storage")
+    fetch("/api/study/" + this.props.study.id + "/storage")
     .then(response => {
       if (response.ok) {
         return response.json();
@@ -72,8 +79,9 @@ class StudyFilesTabContent extends React.Component {
     const requests = files.map(file => {
       const data = new FormData();
       data.set("file", file);
-      return fetch('/api/study/' + this.props.study.code + '/storage', {
+      return fetch('/api/study/' + this.props.study.id + '/storage', {
         method: 'POST',
+        headers: {"X-XSRF-TOKEN": getCsrfToken()},
         body: data
       });
     });
@@ -94,30 +102,76 @@ class StudyFilesTabContent extends React.Component {
 
           <Row className="justify-content-between align-items-center mb-2">
             <Col>
-              {
-                !!this.props.user
-                    ? (
-                        <span className="float-end">
-                          <Button variant="info"
-                                  onClick={() => this.showModal(true)}>
-                            Upload Files
-                            &nbsp;
-                            <FontAwesomeIcon icon={faFile}/>
-                          </Button>
-                        </span>
-                    ) : ''
-              }
+              <span className="float-end">
+                <Button variant="info"
+                        onClick={() => this.showModal(true)}>
+                  Upload Files
+                  &nbsp;
+                  <FontAwesomeIcon icon={faFile}/>
+                </Button>
+              </span>
             </Col>
           </Row>
 
           <Row>
-            <Col sm={12}>
-              <StorageFolderFileList
-                  folder={this.state.folder}
-                  isLoaded={this.state.isLoaded}
-                  isError={this.state.isError}
-              />
-            </Col>
+
+            {
+              this.state.showFolder ? (
+                  <Col sm={12}>
+                    <StorageFolderFileList
+                        folder={this.state.folder}
+                        isLoaded={this.state.isLoaded}
+                        isError={this.state.isError}
+                    />
+                  </Col>
+              ) : (
+                  <Col sm={12} className={"text-center"}>
+
+                    <p>
+                      <img
+                          src={"/static/images/clip/data-storage.png"}
+                          alt="File storage"
+                          className="img-fluid"
+                          width={250}
+                      />
+                    </p>
+
+                    <p>
+                      Study files can be viewed in the native file browser,
+                      or viewed as a partial folder tree here. <em>Note:</em>
+                      &nbsp;loading and viewing files here may be slow and
+                      subject to rate limits.
+                    </p>
+
+                    {
+                      this.props.study.storageFolder.url ? (
+                        <React.Fragment>
+
+                          <Button
+                              variant="info"
+                              target={"_blank noopener noreferrer"}
+                              href={this.props.study.storageFolder.url}
+                          >
+                            View files in Egnyte
+                          </Button>
+
+                          &nbsp;&nbsp;or&nbsp;&nbsp;
+
+                        </React.Fragment>
+                      ) : ""
+                    }
+
+                    <Button
+                        variant="primary"
+                        onClick={this.handleShowFolder}
+                    >
+                      Show files here
+                    </Button>
+
+                  </Col>
+              )
+            }
+
           </Row>
 
           <UploadFilesModal
@@ -130,6 +184,10 @@ class StudyFilesTabContent extends React.Component {
     )
   }
 
+}
+
+StudyFilesTabContent.propTypes = {
+  study: PropTypes.object,
 }
 
 export default StudyFilesTabContent;

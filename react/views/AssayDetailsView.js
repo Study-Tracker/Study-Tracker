@@ -20,6 +20,7 @@ import ErrorMessage from "../structure/ErrorMessage";
 import AssayDetails from "../components/assay/AssayDetails";
 import StandardWrapper from "../structure/StandardWrapper";
 import {connect} from "react-redux";
+import PropTypes from "prop-types";
 
 class AssayDetailsView extends React.Component {
 
@@ -70,8 +71,12 @@ class AssayDetailsView extends React.Component {
     if (this.state.isError) {
       content = <ErrorMessage/>;
     } else if (this.state.isLoaded) {
-      content = <AssayDetails study={this.state.study} assay={this.state.assay}
-                              user={this.props.user}/>;
+      content = <AssayDetails
+          study={this.state.study}
+          assay={this.state.assay}
+          user={this.props.user}
+          features={this.props.features}
+      />;
     }
     return (
         <StandardWrapper {...this.props}>
@@ -82,6 +87,12 @@ class AssayDetailsView extends React.Component {
 
 }
 
+AssayDetailsView.propTypes = {
+  user: PropTypes.object,
+  features: PropTypes.object,
+}
+
 export default connect(store => ({
-  user: store.user
+  user: store.user,
+  features: store.features,
 }))(AssayDetailsView);

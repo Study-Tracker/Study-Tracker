@@ -107,6 +107,7 @@ class AssayFormView extends React.Component {
           assayTypes={this.state.assayTypes}
           notebookTemplates={this.state.notebookTemplates}
           defaultNotebookTemplate={this.state.defaultNotebookTemplate}
+          features={this.props.features}
       />;
     }
     return (
@@ -120,8 +121,10 @@ class AssayFormView extends React.Component {
 
 AssayFormView.propTypes = {
   user: PropTypes.object.isRequired,
+  features: PropTypes.object,
 }
 
 export default connect(store => ({
-  user: store.user
+  user: store.user,
+  features: store.features,
 }))(AssayFormView);

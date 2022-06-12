@@ -33,6 +33,7 @@ import ReactQuill from "react-quill";
 import {Breadcrumbs} from "../common";
 import {FormGroup} from "./common";
 import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 export default class AssayForm extends React.Component {
 
@@ -355,12 +356,17 @@ export default class AssayForm extends React.Component {
                         </FormGroup>
                       </Col>
                       <Col sm={5}>
-                        {!this.state.isUpdateModeOn &&
+                        {
+                          this.props.features
+                          && this.props.features.notebook
+                          && this.props.features.notebook.isEnabled
+                          && !this.state.isUpdateModeOn ? (
                             <NotebookEntryTemplatesDropdown
                                 notebookTemplates={this.props.notebookTemplates}
                                 defaultTemplate={this.props.defaultNotebookTemplate}
                                 onChange={this.handleTemplateSelection}
                             />
+                          ): ""
                         }
 
                         <StatusDropdown
@@ -627,4 +633,8 @@ export default class AssayForm extends React.Component {
     );
   }
 
+}
+
+AssayForm.propTypes = {
+  features: PropTypes.object,
 }
