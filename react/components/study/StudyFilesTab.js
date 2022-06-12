@@ -20,6 +20,7 @@ import {faFile} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {StorageFolderFileList, UploadFilesModal} from "../files";
 import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 class StudyFilesTabContent extends React.Component {
 
@@ -183,6 +184,10 @@ class StudyFilesTabContent extends React.Component {
     )
   }
 
+}
+
+StudyFilesTabContent.propTypes = {
+  study: PropTypes.object,
 }
 
 export default StudyFilesTabContent;

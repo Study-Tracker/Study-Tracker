@@ -20,6 +20,7 @@ import {faFile} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {StorageFolderFileList, UploadFilesModal} from "../files";
 import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 export default class AssayFilesTab extends React.Component {
 
@@ -188,4 +189,8 @@ export default class AssayFilesTab extends React.Component {
     )
   }
 
+}
+
+AssayFilesTab.propTypes = {
+  assay: PropTypes.object.isRequired,
 }

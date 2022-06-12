@@ -20,6 +20,7 @@ import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import ProgramForm from "../components/forms/ProgramForm";
 import {connect} from "react-redux";
+import PropTypes from "prop-types";
 
 class ProgramFormView extends React.Component {
 
@@ -84,6 +85,10 @@ class ProgramFormView extends React.Component {
     );
   }
 
+}
+
+ProgramFormView.propTypes = {
+  features: PropTypes.object,
 }
 
 export default connect(store => ({

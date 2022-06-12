@@ -121,6 +121,7 @@ class AssayFormView extends React.Component {
 
 AssayFormView.propTypes = {
   user: PropTypes.object.isRequired,
+  features: PropTypes.object,
 }
 
 export default connect(store => ({

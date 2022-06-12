@@ -20,6 +20,7 @@ import ErrorMessage from "../structure/ErrorMessage";
 import AssayDetails from "../components/assay/AssayDetails";
 import StandardWrapper from "../structure/StandardWrapper";
 import {connect} from "react-redux";
+import PropTypes from "prop-types";
 
 class AssayDetailsView extends React.Component {
 
@@ -84,6 +85,11 @@ class AssayDetailsView extends React.Component {
     );
   }
 
+}
+
+AssayDetailsView.propTypes = {
+  user: PropTypes.object,
+  features: PropTypes.object,
 }
 
 export default connect(store => ({

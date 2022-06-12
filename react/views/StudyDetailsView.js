@@ -20,6 +20,7 @@ import ErrorMessage from "../structure/ErrorMessage";
 import StandardWrapper from "../structure/StandardWrapper";
 import {connect} from "react-redux";
 import StudyDetails from '../components/study/StudyDetails';
+import PropTypes from "prop-types";
 
 class StudyDetailsView extends React.Component {
 
@@ -71,6 +72,11 @@ class StudyDetailsView extends React.Component {
     );
   }
 
+}
+
+StudyDetailsView.propTypes = {
+  user: PropTypes.object,
+  features: PropTypes.object
 }
 
 export default connect(store => ({
