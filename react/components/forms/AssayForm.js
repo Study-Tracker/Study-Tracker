@@ -355,12 +355,17 @@ export default class AssayForm extends React.Component {
                         </FormGroup>
                       </Col>
                       <Col sm={5}>
-                        {!this.state.isUpdateModeOn &&
+                        {
+                          this.props.features
+                          && this.props.features.notebook
+                          && this.props.features.notebook.isEnabled
+                          && !this.state.isUpdateModeOn ? (
                             <NotebookEntryTemplatesDropdown
                                 notebookTemplates={this.props.notebookTemplates}
                                 defaultTemplate={this.props.defaultNotebookTemplate}
                                 onChange={this.handleTemplateSelection}
                             />
+                          ): ""
                         }
 
                         <StatusDropdown

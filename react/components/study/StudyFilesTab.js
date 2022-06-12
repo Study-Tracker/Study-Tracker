@@ -19,6 +19,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFile} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {StorageFolderFileList, UploadFilesModal} from "../files";
+import {getCsrfToken} from "../../config/csrf";
 
 class StudyFilesTabContent extends React.Component {
 
@@ -39,7 +40,7 @@ class StudyFilesTabContent extends React.Component {
   }
 
   refreshData() {
-    fetch("/api/study/" + this.props.study.code + "/storage")
+    fetch("/api/study/" + this.props.study.id + "/storage")
     .then(response => {
       if (response.ok) {
         return response.json();
@@ -72,8 +73,9 @@ class StudyFilesTabContent extends React.Component {
     const requests = files.map(file => {
       const data = new FormData();
       data.set("file", file);
-      return fetch('/api/study/' + this.props.study.code + '/storage', {
+      return fetch('/api/study/' + this.props.study.id + '/storage', {
         method: 'POST',
+        headers: {"X-XSRF-TOKEN": getCsrfToken()},
         body: data
       });
     });
@@ -94,19 +96,14 @@ class StudyFilesTabContent extends React.Component {
 
           <Row className="justify-content-between align-items-center mb-2">
             <Col>
-              {
-                !!this.props.user
-                    ? (
-                        <span className="float-end">
-                          <Button variant="info"
-                                  onClick={() => this.showModal(true)}>
-                            Upload Files
-                            &nbsp;
-                            <FontAwesomeIcon icon={faFile}/>
-                          </Button>
-                        </span>
-                    ) : ''
-              }
+              <span className="float-end">
+                <Button variant="info"
+                        onClick={() => this.showModal(true)}>
+                  Upload Files
+                  &nbsp;
+                  <FontAwesomeIcon icon={faFile}/>
+                </Button>
+              </span>
             </Col>
           </Row>
 

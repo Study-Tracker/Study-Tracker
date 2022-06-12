@@ -58,7 +58,11 @@ class StudyDetailsView extends React.Component {
     if (this.state.isError) {
       content = <ErrorMessage/>;
     } else if (this.state.isLoaded) {
-      content = <StudyDetails study={this.state.study} user={this.props.user}/>;
+      content = <StudyDetails
+          study={this.state.study}
+          user={this.props.user}
+          features={this.props.features}
+      />;
     }
     return (
         <StandardWrapper {...this.props}>
@@ -70,5 +74,6 @@ class StudyDetailsView extends React.Component {
 }
 
 export default connect(store => ({
-  user: store.user
+  user: store.user,
+  features: store.features,
 }))(StudyDetailsView);

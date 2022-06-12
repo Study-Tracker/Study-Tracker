@@ -74,6 +74,7 @@ class ProgramFormView extends React.Component {
           program={this.state.program}
           programs={this.state.programs}
           user={this.props.user}
+          features={this.props.features}
       />;
     }
     return (
@@ -86,5 +87,6 @@ class ProgramFormView extends React.Component {
 }
 
 export default connect(store => ({
-  user: store.user
+  user: store.user,
+  features: store.features,
 }))(ProgramFormView);
