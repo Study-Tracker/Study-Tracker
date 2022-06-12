@@ -28,14 +28,19 @@ class StudyFilesTabContent extends React.Component {
     this.state = {
       modalIsOpen: false,
       isLoaded: false,
-      isError: false
+      isError: false,
+      showFolder: false,
     };
     this.showModal = this.showModal.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.refreshData = this.refreshData.bind(this);
+    this.handleShowFolder = this.handleShowFolder.bind(this);
   }
 
-  componentDidMount() {
+  handleShowFolder() {
+    this.setState({
+      showFolder: true
+    });
     this.refreshData();
   }
 
@@ -108,13 +113,64 @@ class StudyFilesTabContent extends React.Component {
           </Row>
 
           <Row>
-            <Col sm={12}>
-              <StorageFolderFileList
-                  folder={this.state.folder}
-                  isLoaded={this.state.isLoaded}
-                  isError={this.state.isError}
-              />
-            </Col>
+
+            {
+              this.state.showFolder ? (
+                  <Col sm={12}>
+                    <StorageFolderFileList
+                        folder={this.state.folder}
+                        isLoaded={this.state.isLoaded}
+                        isError={this.state.isError}
+                    />
+                  </Col>
+              ) : (
+                  <Col sm={12} className={"text-center"}>
+
+                    <p>
+                      <img
+                          src={"/static/images/clip/data-storage.png"}
+                          alt="File storage"
+                          className="img-fluid"
+                          width={250}
+                      />
+                    </p>
+
+                    <p>
+                      Study files can be viewed in the native file browser,
+                      or viewed as a partial folder tree here. <em>Note:</em>
+                      &nbsp;loading and viewing files here may be slow and
+                      subject to rate limits.
+                    </p>
+
+                    {
+                      this.props.study.storageFolder.url ? (
+                        <React.Fragment>
+
+                          <Button
+                              variant="info"
+                              target={"_blank noopener noreferrer"}
+                              href={this.props.study.storageFolder.url}
+                          >
+                            View files in Egnyte
+                          </Button>
+
+                          &nbsp;&nbsp;or&nbsp;&nbsp;
+
+                        </React.Fragment>
+                      ) : ""
+                    }
+
+                    <Button
+                        variant="primary"
+                        onClick={this.handleShowFolder}
+                    >
+                      Show files here
+                    </Button>
+
+                  </Col>
+              )
+            }
+
           </Row>
 
           <UploadFilesModal
