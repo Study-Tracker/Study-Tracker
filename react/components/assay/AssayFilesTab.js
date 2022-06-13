@@ -149,7 +149,8 @@ export default class AssayFilesTab extends React.Component {
                     </p>
 
                     {
-                      this.props.assay.storageFolder.url ? (
+                      this.props.assay.storageFolder
+                      && this.props.assay.storageFolder.url ? (
                           <React.Fragment>
 
                             <Button

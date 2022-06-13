@@ -90,7 +90,7 @@ public class AssayStorageController extends AbstractAssayController {
   }
 
   @PostMapping("/repair")
-  public HttpEntity<?> repairStorageFolder(@PathVariable("id") String assayId) {
+  public HttpEntity<?> repairStorageFolder(@PathVariable("assayId") String assayId) {
     LOGGER.info("Repairing storage folder for assay: " + assayId);
     Assay assay = this.getAssayFromIdentifier(assayId);
     getAssayService().repairStorageFolder(assay);

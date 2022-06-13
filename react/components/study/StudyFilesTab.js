@@ -144,7 +144,8 @@ class StudyFilesTabContent extends React.Component {
                     </p>
 
                     {
-                      this.props.study.storageFolder.url ? (
+                      this.props.study.storageFolder
+                      && this.props.study.storageFolder.url ? (
                         <React.Fragment>
 
                           <Button

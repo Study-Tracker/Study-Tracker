@@ -99,4 +99,16 @@ public class StorageFolder implements StorageObject {
   public void setFiles(List<StorageFile> files) {
     this.files = files;
   }
+
+  @Override
+  public String toString() {
+    return "StorageFolder{" +
+        "parentFolder=" + parentFolder +
+        ", url='" + url + '\'' +
+        ", path='" + path + '\'' +
+        ", name='" + name + '\'' +
+        ", subFolders=" + subFolders +
+        ", files=" + files +
+        '}';
+  }
 }
