@@ -374,11 +374,25 @@ public class WebSecurityConfiguration {
 
     @Bean
     public KeyManager keyManager() {
+
       DefaultResourceLoader loader = new DefaultResourceLoader();
+
+      // Enforce absolute paths for non-relative paths
+      if (!samlKeystoreLocation.startsWith("classpath:")
+          && !samlKeystoreLocation.startsWith("/")
+          && !samlKeystoreLocation.startsWith("file:")) {
+        samlKeystoreLocation = "file:" + samlKeystoreLocation;
+      }
       Resource storeFile = loader.getResource(samlKeystoreLocation);
+      if (!storeFile.exists()) {
+        throw new IllegalArgumentException(
+            "Keystore file not found: " + samlKeystoreLocation);
+      }
+
       Map<String, String> passwords = new HashMap<>();
       passwords.put(samlKeystoreAlias, samlKeystorePassword);
       return new JKSKeyManager(storeFile, samlKeystorePassword, passwords, samlKeystoreAlias);
+
     }
 
     @Bean
