@@ -8,5 +8,6 @@ public class FeaturesSummaryDto {
   private StorageFeaturesDto storage;
   private NotebookFeaturesDto notebook;
   private SearchFeaturesDto search;
+  private AuthFeaturesDto auth;
 
 }

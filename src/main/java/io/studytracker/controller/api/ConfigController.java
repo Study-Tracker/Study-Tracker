@@ -1,5 +1,6 @@
 package io.studytracker.controller.api;
 
+import io.studytracker.mapstruct.dto.features.AuthFeaturesDto;
 import io.studytracker.mapstruct.dto.features.FeaturesSummaryDto;
 import io.studytracker.mapstruct.dto.features.NotebookFeaturesDto;
 import io.studytracker.mapstruct.dto.features.SearchFeaturesDto;
@@ -42,6 +43,15 @@ public class ConfigController {
     SearchFeaturesDto searchFeaturesDto = new SearchFeaturesDto();
     searchFeaturesDto.setMode(env.getProperty("search.mode", "none"));
     features.setSearch(searchFeaturesDto);
+
+    // Authentication
+    AuthFeaturesDto authFeaturesDto = new AuthFeaturesDto();
+    String authMode = env.getProperty("security.sso", "none");
+    authFeaturesDto.getSso().setMode(authMode);
+    if (authMode.equals("okta-saml")) {
+      authFeaturesDto.getSso().setSsoUrl(env.getRequiredProperty("sso.okta.url"));
+    }
+    features.setAuth(authFeaturesDto);
 
     return features;
 
