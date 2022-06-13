@@ -91,7 +91,7 @@ public class StudyStorageController extends AbstractStudyController {
   }
 
   @PostMapping("/repair")
-  public HttpEntity<?> repairStorageFolder(@PathVariable("id") String studyId) {
+  public HttpEntity<?> repairStorageFolder(@PathVariable("studyId") String studyId) {
     LOGGER.info("Repairing storage folder for study: " + studyId);
     Study study = this.getStudyFromIdentifier(studyId);
     getStudyService().repairStorageFolder(study);

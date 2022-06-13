@@ -299,19 +299,44 @@ public class AssayService {
     try {
       folder = storageService.getAssayFolder(assay, false);
     } catch (StudyStorageNotFoundException e) {
+      LOGGER.warn("Storage folder not found for assay: " + assay.getCode());
       try {
         folder = storageService.createAssayFolder(assay);
       } catch (Exception ex) {
         throw new StudyTrackerException(ex);
       }
     }
+    LOGGER.debug(folder.toString());
 
-    // Update the  program record
-    FileStoreFolder f = fileStoreFolderRepository.getById(assay.getStorageFolder().getId());
-    f.setName(folder.getName());
-    f.setPath(folder.getPath());
-    f.setUrl(folder.getUrl());
-    fileStoreFolderRepository.save(f);
+    // Check if a folder record exists in the database
+    List<FileStoreFolder> folders = fileStoreFolderRepository.findByPath(folder.getPath());
+    FileStoreFolder dbFolder = null;
+    if (!folders.isEmpty()) {
+      dbFolder = folders.get(0);
+    }
+
+    // Assay has no folder record associated
+    if (assay.getStorageFolder() == null) {
+      if (dbFolder != null) {
+        LOGGER.info("Repairing assay folder missing association.");
+        assay.setStorageFolder(dbFolder);
+      } else {
+        LOGGER.info("Repairing assay folder with no record.");
+        assay.setStorageFolder(FileStoreFolder.from(folder));
+      }
+      assayRepository.save(assay);
+    }
+
+    // Assay does have a folder record, but it is malformed
+    else {
+      LOGGER.info("Repairing malformed assay folder record.");
+      FileStoreFolder f = fileStoreFolderRepository.getById(assay.getStorageFolder().getId());
+      f.setName(folder.getName());
+      f.setPath(folder.getPath());
+      f.setUrl(folder.getUrl());
+      fileStoreFolderRepository.save(f);
+    }
+
   }
 
   @Transactional
