@@ -332,8 +332,9 @@ class StudyDetails extends React.Component {
                       &nbsp;&nbsp;
 
                       {
-                        this.props.features && this.props.features.notebook
-                          && this.props.features.notebook.isEnabled ? (
+                        this.props.features
+                        && this.props.features.notebook
+                        && this.props.features.notebook.isEnabled ? (
                             <RepairableNotebookFolderButton
                                 folder={study.notebookFolder}
                                 repairUrl={"/api/study/" + study.id + "/notebook/repair"}
@@ -397,7 +398,7 @@ class StudyDetails extends React.Component {
                     </Nav.Item>
 
                     {
-                      !!study.notebookFolder ? (
+                      study.notebookFolder ? (
                           <Nav.Item>
                             <Nav.Link eventKey={"notebook"}>
                               Notebook

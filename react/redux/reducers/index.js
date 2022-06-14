@@ -22,6 +22,7 @@ import theme from "./themeReducer";
 import user from "./userReducers";
 import filters from './filterReducers';
 import programs from './programReducers';
+import features from './featuresReducers';
 
 import {reducer as toastr} from "react-redux-toastr";
 
@@ -32,5 +33,6 @@ export default combineReducers({
   user,
   filters,
   programs,
-  toastr
+  features,
+  toastr,
 });

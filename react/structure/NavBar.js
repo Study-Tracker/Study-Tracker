@@ -52,6 +52,7 @@ class NavBarComponent extends React.Component {
     fetch("/api/config/features")
     .then(response => response.json())
     .then(json => {
+      console.debug(json);
       this.props.dispatch(setFeatures(json));
       this.setState({
         features: json
