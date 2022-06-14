@@ -150,12 +150,12 @@ export default class SignInView extends React.Component {
                         }
 
                         <div className="text-center mt-3">
-                          <Button href={"/"} size="lg" variant="secondary">
-                            Cancel
-                          </Button>
-                          &nbsp;&nbsp;
-                          <Button size="lg" variant="primary"
-                                  type="submit">
+                          <Button
+                              size="lg"
+                              variant="primary"
+                              type="submit"
+                              style={{paddingLeft: 50, paddingRight: 50}}
+                          >
                             Sign In
                           </Button>
                         </div>
