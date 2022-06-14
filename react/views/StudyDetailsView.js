@@ -42,7 +42,7 @@ class StudyDetailsView extends React.Component {
         study: study,
         isLoaded: true
       });
-      console.log(study);
+      console.debug(study);
 
     })
     .catch(error => {
@@ -55,6 +55,7 @@ class StudyDetailsView extends React.Component {
   }
 
   render() {
+    console.debug(this.props.features);
     let content = <LoadingMessage/>;
     if (this.state.isError) {
       content = <ErrorMessage/>;

@@ -1,16 +1,17 @@
-import * as types from "../constants";
+import * as types from '../constants'
 
 const initialState = null;
 
-export default function (state = initialState, action) {
-  switch (action.type) {
+export default function reducer(state = initialState, actions) {
+  switch (actions.type) {
     case types.SET_FEATURES:
       return {
         ...state,
-        ...action.payload
+        ...actions.payload
       };
 
     default:
       return state;
   }
+
 }

@@ -70,7 +70,7 @@ export default class SignInView extends React.Component {
         <NoNavWrapper>
           <Container fluid className="animated fadeIn">
             <Row className="justify-content-center">
-              <Col xs={12} sm={8} md={8} lg={6} xl={4}>
+              <Col xs={12} sm={10} md={8} lg={6} xl={6}>
 
                 <div className="text-center mt-4">
                   <h2>Welcome to Study Tracker</h2>
@@ -150,12 +150,12 @@ export default class SignInView extends React.Component {
                         }
 
                         <div className="text-center mt-3">
-                          <Button href={"/"} size="lg" variant="secondary">
-                            Cancel
-                          </Button>
-                          &nbsp;&nbsp;
-                          <Button size="lg" variant="primary"
-                                  type="submit">
+                          <Button
+                              size="lg"
+                              variant="primary"
+                              type="submit"
+                              style={{paddingLeft: 50, paddingRight: 50}}
+                          >
                             Sign In
                           </Button>
                         </div>

@@ -52,6 +52,7 @@ class NavBarComponent extends React.Component {
     fetch("/api/config/features")
     .then(response => response.json())
     .then(json => {
+      console.debug(json);
       this.props.dispatch(setFeatures(json));
       this.setState({
         features: json
@@ -139,12 +140,19 @@ class NavBarComponent extends React.Component {
             <Nav className="navbar-align">
 
               {
-                !!this.state.user
+                this.state.user
                     ? (
                         <NavbarUser
                             isAdmin={this.state.user.admin}
                             userName={this.state.user.username}
                             displayName={this.state.user.displayName}
+                            logoutUrl={
+                              this.state.features
+                              && this.state.features.auth
+                              && this.state.features.auth.logoutUrl
+                                  ? this.state.features.auth.logoutUrl
+                                  : "/logout"
+                            }
                         />
                     ) : (
                         <li>
@@ -168,7 +176,7 @@ NavBarComponent.propTypes = {
   dispatch: PropTypes.func.isRequired,
 }
 
-const NavbarUser = ({isAdmin, userName, displayName}) => {
+const NavbarUser = ({isAdmin, userName, displayName, logoutUrl}) => {
   return (
       <Dropdown className="nav-item" align="end">
 
@@ -213,7 +221,7 @@ const NavbarUser = ({isAdmin, userName, displayName}) => {
           {/*  </a>*/}
           {/*</DropdownItem>*/}
 
-          <Dropdown.Item as={"a"} href={"/logout"}>
+          <Dropdown.Item as={"a"} href={logoutUrl}>
             <LogOut size={18}
                     className="align-middle me-2"/>
             Sign out
