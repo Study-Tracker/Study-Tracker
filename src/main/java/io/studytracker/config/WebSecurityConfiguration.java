@@ -179,10 +179,10 @@ public class WebSecurityConfiguration {
           .httpStrictTransportSecurity()
           .disable()
           .and()
-          .csrf()
-          .ignoringAntMatchers("/login", "/auth/passwordresetrequest", "/auth/passwordreset")
-          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-      ;
+          .csrf().disable();
+//          .ignoringAntMatchers("/login", "/auth/passwordresetrequest", "/auth/passwordreset")
+//          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//      ;
     }
   }
 
