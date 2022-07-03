@@ -1,7 +1,7 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.StudyCollectionDetailsDto;
-import io.studytracker.mapstruct.dto.StudyCollectionSummaryDto;
+import io.studytracker.mapstruct.dto.response.StudyCollectionDetailsDto;
+import io.studytracker.mapstruct.dto.response.StudyCollectionSummaryDto;
 import io.studytracker.model.StudyCollection;
 import java.util.List;
 import org.mapstruct.Mapper;

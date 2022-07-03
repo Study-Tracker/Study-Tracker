@@ -11,10 +11,14 @@ import {SettingsErrorMessage} from "../errors";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
 import {getCsrfToken} from "../../config/csrf";
+import PropTypes from "prop-types";
 
 const emptyKeyword = {
   id: null,
-  category: null,
+  category: {
+    id: null,
+    name: null
+  },
   keyword: ''
 };
 
@@ -39,9 +43,9 @@ export default class KeywordSettings extends React.Component {
   }
 
   showModal(keyword) {
-    if (!!keyword) {
+    if (keyword) {
       this.setState({
-        selectedKeyword: keyword || emptyKeyword,
+        selectedKeyword: Object.prototype.hasOwnProperty.call(keyword, "keyword") ? keyword : emptyKeyword,
         isModalOpen: true,
         categoryInput: "select"
       })
@@ -62,7 +66,7 @@ export default class KeywordSettings extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/api/keyword/categories")
+    fetch("/api/keyword-category")
     .then(response => response.json())
     .then(json => {
       this.setState({
@@ -79,10 +83,11 @@ export default class KeywordSettings extends React.Component {
     });
   }
 
-  handleCategorySelect(category) {
-    fetch("/api/keyword?category=" + category)
+  handleCategorySelect(categoryId) {
+    fetch("/api/keyword?categoryId=" + categoryId)
     .then(response => response.json())
     .then(keywords => {
+      const category = this.state.categories.find(c => c.id === categoryId);
       this.setState({
         selectedCategory: category,
         keywords: keywords
@@ -138,9 +143,9 @@ export default class KeywordSettings extends React.Component {
 
     const categoryOptions = this.state.categories
     .sort((a, b) => {
-      if (a > b) {
+      if (a.name > b.name) {
         return 1;
-      } else if (a < b) {
+      } else if (a.name < b.name) {
         return -1;
       } else {
         return 0;
@@ -148,8 +153,8 @@ export default class KeywordSettings extends React.Component {
     })
     .map(c => {
       return {
-        value: c,
-        label: c
+        value: c.id,
+        label: c.name
       }
     });
 
@@ -386,18 +391,18 @@ const ModalInputs = ({
                 classNamePrefix="react-select"
                 options={categories}
                 defaultValue={{
-                  label: keyword.category,
-                  value: keyword.category
+                  label: keyword.category.name,
+                  value: keyword.category.id
                 }}
                 onChange={(selected) => handleUpdate(
-                    {category: selected.value})}
+                    {category: {"id": selected.value, "name": selected.label}})}
             />
           </Form.Group>
           <Form.Group hidden={categoryInput !== "input"}>
             <Form.Label>Category</Form.Label>
             <Form.Control
                 type={"text"}
-                onChange={(e) => handleUpdate({category: e.target.value})}
+                onChange={(e) => handleUpdate({category: {"name": e.target.value}})}
             />
           </Form.Group>
         </Col>
@@ -416,3 +421,7 @@ const ModalInputs = ({
       </Row>
   )
 };
+
+ModalInputs.propTypes = {
+  keyword: PropTypes.object.isRequired
+}

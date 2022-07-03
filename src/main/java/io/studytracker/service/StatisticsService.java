@@ -1,7 +1,7 @@
 package io.studytracker.service;
 
-import io.studytracker.mapstruct.dto.SummaryStatisticsDto;
-import io.studytracker.mapstruct.dto.UserStatisticsDto;
+import io.studytracker.mapstruct.dto.response.SummaryStatisticsDto;
+import io.studytracker.mapstruct.dto.response.UserStatisticsDto;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
 import java.util.Calendar;

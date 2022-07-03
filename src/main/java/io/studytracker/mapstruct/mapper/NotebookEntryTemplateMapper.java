@@ -1,8 +1,8 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.NotebookEntryTemplateDetailsDto;
-import io.studytracker.mapstruct.dto.NotebookEntryTemplateFormDto;
-import io.studytracker.mapstruct.dto.NotebookEntryTemplateSlimDto;
+import io.studytracker.mapstruct.dto.form.NotebookEntryTemplateFormDto;
+import io.studytracker.mapstruct.dto.response.NotebookEntryTemplateDetailsDto;
+import io.studytracker.mapstruct.dto.response.NotebookEntryTemplateSlimDto;
 import io.studytracker.model.NotebookEntryTemplate;
 import java.util.List;
 import org.mapstruct.Mapper;

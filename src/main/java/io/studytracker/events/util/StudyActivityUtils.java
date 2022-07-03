@@ -185,6 +185,18 @@ public class StudyActivityUtils {
     return activity;
   }
 
+  public static Activity fromUpdatedStudyKeywords(Study study, User triggeredBy) {
+    Activity activity = new Activity();
+    activity.setStudy(study);
+    activity.setEventType(EventType.UPDATED_STUDY_KEYWORDS);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    Map<String, Object> data = new HashMap<>();
+    data.put("study", EntityViewUtils.createStudyView(study));
+    activity.setData(data);
+    return activity;
+  }
+
   public static Activity fromDeletedStudyRelationship(Study study, User triggeredBy) {
     Activity activity = new Activity();
     activity.setStudy(study);

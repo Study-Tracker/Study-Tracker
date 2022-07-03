@@ -312,15 +312,6 @@ class StudyDetails extends React.Component {
                 <Card.Body>
                   <Row>
                     <Col xs={12}>
-                      <Card.Title>Keywords</Card.Title>
-                      <StudyKeywords keywords={study.keywords}/>
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
 
                       <Card.Title>Workspaces</Card.Title>
 
@@ -342,6 +333,14 @@ class StudyDetails extends React.Component {
                         ) : ""
                       }
 
+                    </Col>
+                  </Row>
+                </Card.Body>
+
+                <Card.Body>
+                  <Row>
+                    <Col xs={12}>
+                      <StudyKeywords keywords={study.keywords} studyId={study.id} />
                     </Col>
                   </Row>
                 </Card.Body>

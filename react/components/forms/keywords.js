@@ -25,13 +25,13 @@ import swal from "sweetalert";
 import {FormGroup} from "./common";
 import {getCsrfToken} from "../../config/csrf";
 
-export default class KeywordInputs extends React.Component {
+export class KeywordInputs extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       categories: props.keywordCategories.map(c => {
-        return {label: c, value: c}
+        return {label: c.name, value: c.id}
       })
     };
     this.handleCategoryChange = this.handleCategoryChange.bind(this);
@@ -41,9 +41,9 @@ export default class KeywordInputs extends React.Component {
   }
 
   handleCategoryChange(selected) {
-    console.log(selected);
+    console.debug(selected);
     this.setState({
-      category: selected.value
+      category: this.props.keywordCategories.find(c => c.id === selected.value)
     })
   }
 
@@ -56,14 +56,11 @@ export default class KeywordInputs extends React.Component {
   }
 
   handleKeywordSelect(selected) {
-    console.log(selected);
-    if (!!selected.__isNew__) {
+    console.debug(selected);
+    if (selected.__isNew__) {
       fetch("/api/keyword", {
         method: 'POST',
         body: JSON.stringify({
-          // id: null,
-          // label: selected.label,
-          // value: null,
           keyword: selected.label,
           category: this.state.category
         }),
@@ -103,7 +100,7 @@ export default class KeywordInputs extends React.Component {
       return;
     }
     fetch('/api/keyword/?q=' + input
-        + (!!this.state.category ? "&category=" + this.state.category : ''))
+        + (!!this.state.category ? "&categoryId=" + this.state.category.id : ''))
     .then(response => response.json())
     .then(json => {
       const keywords = json.map(k => {
@@ -114,14 +111,6 @@ export default class KeywordInputs extends React.Component {
           category: k.category,
           keyword: k.keyword
         }
-        // }).sort((a, b) => {
-        //   if (a.keyword > b.keyword) {
-        //     return -1;
-        //   } else if (a.keyword < b.keyword) {
-        //     return 1;
-        //   } else {
-        //     return 0;
-        //   }
       });
       callback(keywords);
     }).catch(e => {
@@ -132,14 +121,14 @@ export default class KeywordInputs extends React.Component {
   render() {
 
     const selectedKeywords = this.props.keywords.map(keyword => {
-      console.log(keyword);
+      console.debug(keyword);
       return (
           <Row
               key={"keyword-" + keyword.id}
               className="align-items-center justify-content-center mt-1"
           >
             <Col xs={3}>
-              <KeywordCategoryBadge category={keyword.category}/>
+              <KeywordCategoryBadge label={keyword.category.name}/>
             </Col>
             <Col xs={7}>
               {keyword.keyword}

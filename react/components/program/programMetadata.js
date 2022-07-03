@@ -58,7 +58,7 @@ export const ProgramKeywords = ({studies}) => {
   const list = Object.values(keywords).map(keyword => {
     return (
         <li key={"keyword-" + keyword.id} className="mt-1">
-          <KeywordCategoryBadge category={keyword.type}/>
+          <KeywordCategoryBadge label={keyword.type}/>
           &nbsp;&nbsp;
           {keyword.keyword}
         </li>

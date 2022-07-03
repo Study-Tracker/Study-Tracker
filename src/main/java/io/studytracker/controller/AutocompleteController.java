@@ -16,8 +16,8 @@
 
 package io.studytracker.controller;
 
-import io.studytracker.mapstruct.dto.StudySlimDto;
-import io.studytracker.mapstruct.dto.UserSlimDto;
+import io.studytracker.mapstruct.dto.response.StudySlimDto;
+import io.studytracker.mapstruct.dto.response.UserSlimDto;
 import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.service.StudyService;

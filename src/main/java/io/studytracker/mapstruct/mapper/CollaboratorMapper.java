@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.CollaboratorDto;
+import io.studytracker.mapstruct.dto.response.CollaboratorDto;
 import io.studytracker.model.Collaborator;
 import java.util.List;
 import org.mapstruct.Mapper;

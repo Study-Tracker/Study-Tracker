@@ -69,14 +69,14 @@ class StudyFormView extends React.Component {
     });
 
     // Keyword categories
-    fetch("/api/keyword/categories")
+    fetch("/api/keyword-category")
     .then(response => response.json())
     .then(keywordCategories => {
       this.setState({
         keywordCategories: keywordCategories.sort((a, b) => {
-          if (a > b) {
+          if (a.name > b.name) {
             return 1;
-          } else if (a < b) {
+          } else if (a.name < b.name) {
             return -1;
           } else {
             return 0;

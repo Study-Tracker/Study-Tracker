@@ -17,7 +17,7 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.CollaboratorDto;
+import io.studytracker.mapstruct.dto.response.CollaboratorDto;
 import io.studytracker.mapstruct.mapper.CollaboratorMapper;
 import io.studytracker.model.Collaborator;
 import io.studytracker.service.CollaboratorService;

@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.ExternalLinkDto;
+import io.studytracker.mapstruct.dto.response.ExternalLinkDto;
 import io.studytracker.model.ExternalLink;
 import java.util.List;
 import org.mapstruct.Mapper;

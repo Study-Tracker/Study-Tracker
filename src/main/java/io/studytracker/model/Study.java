@@ -41,6 +41,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -84,12 +85,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("users"),
-        @NamedAttributeNode("keywords"),
+        @NamedAttributeNode(value = "keywords", subgraph = "keyword-details"),
         @NamedAttributeNode("externalLinks"),
         @NamedAttributeNode("conclusions"),
         @NamedAttributeNode("comments"),
         @NamedAttributeNode("studyRelationships")
-      })
+      },
+    subgraphs = {
+          @NamedSubgraph(
+              name = "keyword-details",
+              attributeNodes = {@NamedAttributeNode("category")}
+          )
+    }
+  )
 })
 public class Study {
 

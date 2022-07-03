@@ -17,7 +17,7 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.AssayTypeDetailsDto;
+import io.studytracker.mapstruct.dto.response.AssayTypeDetailsDto;
 import io.studytracker.mapstruct.mapper.AssayTypeMapper;
 import io.studytracker.model.AssayType;
 import io.studytracker.service.AssayTypeService;

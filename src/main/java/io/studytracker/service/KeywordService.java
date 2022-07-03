@@ -21,7 +21,6 @@ import io.studytracker.model.Keyword;
 import io.studytracker.repository.KeywordRepository;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +51,16 @@ public class KeywordService {
     return keywordRepository.findByCategory(category);
   }
 
+  public List<Keyword> findByCategoryId(Long categoryId) {
+    return keywordRepository.findByCategoryId(categoryId);
+  }
+
   public Optional<Keyword> findByKeywordAndCategory(String keyword, String category) {
     return keywordRepository.findByKeywordAndCategory(keyword, category);
+  }
+
+  public Optional<Keyword> findByKeywordAndCategoryId(String keyword, Long categoryId) {
+    return keywordRepository.findByKeywordAndCategoryId(keyword, categoryId);
   }
 
   public List<Keyword> search(String fragment) {
@@ -72,15 +79,15 @@ public class KeywordService {
     return keywordRepository.search(fragment, category, pageable);
   }
 
-  public Set<String> findAllCategories() {
-    return keywordRepository.findAllCategories();
-  }
+//  public Set<String> findAllCategories() {
+//    return keywordRepository.findAllCategories();
+//  }
 
   @Transactional
   public Keyword create(Keyword keyword) {
     LOGGER.info("Registering new keyword: " + keyword.toString());
     Optional<Keyword> optional =
-        this.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
+        this.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory().getName());
     if (optional.isPresent()) {
       throw new DuplicateRecordException(
           String.format(

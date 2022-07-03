@@ -19,7 +19,7 @@ package io.studytracker.controller.api;
 import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.CommentDto;
+import io.studytracker.mapstruct.dto.response.CommentDto;
 import io.studytracker.mapstruct.mapper.CommentMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Comment;
