@@ -1,0 +1,65 @@
+import React, {useEffect, useState} from "react";
+import LoadingMessage from "../structure/LoadingMessage";
+import ErrorMessage from "../structure/ErrorMessage";
+import NoSidebarPageWrapper from "../structure/NoSidebarPageWrapper";
+import StudyCollectionForm from "../components/forms/StudyCollectionForm";
+import {useSelector} from "react-redux";
+import axios from "axios";
+
+const StudyCollectionFormView = props => {
+
+  const [state, setState] = useState({
+    collectionId: props.match.params.collectionId || null,
+    isLoaded: false,
+    isError: false
+  });
+  const user = useSelector(s => s.user.value);
+
+  useEffect(() => {
+    axios.get("/api/studycollection")
+    .then(response => {
+      if (!!state.collectionId) {
+        const collection = response.data.find(
+            p => String(p.id) === state.collectionId);
+        setState({ 
+          ...state,
+          collection,
+          collections: response.data,
+          isLoaded: true
+        });
+      } else {
+        setState({ 
+          ...state,
+          collections: response.data,
+          isLoaded: true
+        });
+      }
+    }).catch(error => {
+      setState({
+        ...state,
+        isError: true,
+        error: error
+      });
+    });
+  }, []);
+
+
+  let content = <LoadingMessage/>;
+  if (state.isError) {
+    content = <ErrorMessage/>;
+  } else if (!!user && state.isLoaded) {
+    content = <StudyCollectionForm
+        collection={state.collection}
+        collections={state.collections}
+        user={user}
+    />;
+  }
+  return (
+      <NoSidebarPageWrapper>
+        {content}
+      </NoSidebarPageWrapper>
+  );
+
+}
+
+export default StudyCollectionFormView;
