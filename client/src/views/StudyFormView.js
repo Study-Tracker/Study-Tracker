@@ -21,11 +21,13 @@ import ErrorMessage from "../structure/ErrorMessage";
 import StudyForm from "../components/forms/StudyForm";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const StudyFormView = props => {
-  
+
+  const params = useParams();
   const [state, setState] = useState({
-    studyCode: props.match.params.studyCode || null,
+    studyCode: params.studyCode || null,
     studyLoaded: false,
     programsLoaded: false,
     collaboratorsLoaded: false,

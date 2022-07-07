@@ -20,12 +20,14 @@ import ErrorMessage from "../structure/ErrorMessage";
 import StandardWrapper from "../structure/StandardWrapper";
 import ProgramDetails from "../components/program/ProgramDetails";
 import {useSelector} from "react-redux";
+import {useParams} from "react-router-dom";
 
 const ProgramDetailsView = props => {
-  
+
+  const params = useParams();
   const user = useSelector(s => s.user.value);
   const [state, setState] = useState({
-    programId: props.match.params.programId,
+    programId: params.programId,
     isLoaded: false,
     isError: false
   });

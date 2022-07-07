@@ -5,11 +5,13 @@ import NoSidebarPageWrapper from "../structure/NoSidebarPageWrapper";
 import StudyCollectionForm from "../components/forms/StudyCollectionForm";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const StudyCollectionFormView = props => {
 
+  const params = useParams();
   const [state, setState] = useState({
-    collectionId: props.match.params.collectionId || null,
+    collectionId: params.collectionId || null,
     isLoaded: false,
     isError: false
   });

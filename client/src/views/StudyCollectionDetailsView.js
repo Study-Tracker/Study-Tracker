@@ -23,11 +23,13 @@ import StudyCollectionDetails
 import swal from "sweetalert";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const StudyCollectionDetailsView = props => {
-  
+
+  const params = useParams();
   const [state, setState] = useState({
-    collectionId: props.match.params.collectionId,
+    collectionId: params.collectionId,
     isLoaded: false,
     isError: false
   });

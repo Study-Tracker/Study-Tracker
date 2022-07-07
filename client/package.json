@@ -10,10 +10,10 @@
   },
   "scripts": {
     "build:less": "less-watch-compiler --run-once --main-file=app.less src/less/ build/static/css/",
-    "build:js": "react-scripts build",
+    "build:js": "react-app-rewired build",
     "lint": "eslint src --ext .js,.jsx --fix",
     "build": "npm-run-all build:js build:less",
-    "test": "react-scripts test",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -89,6 +89,7 @@
     "postcss": "8.4.13",
     "postcss-cli": "9.1.0",
     "prettier": "2.6.2",
+    "react-app-rewired": "^2.2.1",
     "react-scripts": "4.0.3",
     "sass": "1.51.0"
   }

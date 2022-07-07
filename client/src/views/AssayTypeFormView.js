@@ -21,11 +21,13 @@ import ErrorMessage from "../structure/ErrorMessage";
 import AssayTypeForm from "../components/forms/AssayTypeForm";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const AssayTypeFormView = props => {
-  
+
+  const params = useParams();
   const [state, setState] = useState({
-    assayTypeId: props.match.params.assayTypeId || null,
+    assayTypeId: params.assayTypeId || null,
     isLoaded: false,
     isError: false,
   });

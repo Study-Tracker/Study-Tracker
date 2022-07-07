@@ -22,11 +22,13 @@ import StudyDetails from '../components/study/StudyDetails';
 import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const StudyDetailsView = props => {
-  
+
+  const params = useParams();
   const [state, setState] = useState({
-    studyCode: props.match.params.studyCode,
+    studyCode: params.studyCode,
     isLoaded: false,
     isError: false
   });

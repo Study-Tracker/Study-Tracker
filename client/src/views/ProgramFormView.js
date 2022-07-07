@@ -22,13 +22,15 @@ import ProgramForm from "../components/forms/ProgramForm";
 import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const ProgramFormView = props => {
 
+  const params = useParams();
   const user = useSelector(s => s.user.value);
   const features = useSelector(s => s.features.value);
   const [state, setState] = useState({
-    programId: props.match.params.programId || null,
+    programId: params.programId || null,
     isLoaded: false,
     isError: false,
   });

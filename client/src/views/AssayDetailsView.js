@@ -21,14 +21,16 @@ import AssayDetails from "../components/assay/AssayDetails";
 import StandardWrapper from "../structure/StandardWrapper";
 import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
+import {useParams} from "react-router-dom";
 
 const AssayDetailsView = props => {
 
+  const params = useParams();
   const user = useSelector(state => state.user.value)
   const features = useSelector(state => state.features.value);
   const [state, setState] = useState({
-    studyCode: props.match.params.studyCode,
-    assayCode: props.match.params.assayCode,
+    studyCode: params.studyCode,
+    assayCode: params.assayCode,
     isLoaded: false,
     isError: false
   });

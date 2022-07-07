@@ -15,7 +15,7 @@
  */
 
 import React, {useMemo} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import swal from 'sweetalert';
 import {
   Breadcrumb,
@@ -32,8 +32,9 @@ import NoSidebarPageWrapper from "../structure/NoSidebarPageWrapper";
 
 export const TemplateFormView = (props) => {
 
+  const params = useParams();
   const navigate = useNavigate();
-  const templateTypeId = props.match.params.templateTypeId;
+  const templateTypeId = params.templateTypeId;
 
   const templateFormHeading = useMemo(() => {
     return templateTypeId

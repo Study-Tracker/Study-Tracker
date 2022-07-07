@@ -20,11 +20,13 @@ import ErrorMessage from "../structure/ErrorMessage";
 import StandardWrapper from "../structure/StandardWrapper";
 import UserDetails from "../components/user/UserDetails";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const UserDetailsView = props => {
 
+  const params = useParams();
   const [state, setState] = useState({
-    userId: props.match.params.userId,
+    userId: params.userId,
     isLoaded: false,
     isError: false
   });

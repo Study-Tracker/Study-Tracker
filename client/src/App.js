@@ -58,12 +58,12 @@ export default class App extends React.Component {
             <Routes>
 
               {/*Home page */}
-              <Route path={["/"]}
+              <Route path={"/"}
                      element={<FrontPageView />}
               />
 
               {/* Study List */}
-              <Route path={["/studies"]}
+              <Route path={"/studies"}
                      element={<StudyListView title={"All Studies"}/>}
               />
 
@@ -80,7 +80,7 @@ export default class App extends React.Component {
                      element={<StudyFormView />}/>
 
               {/* Assay List */}
-              <Route path={["/assays"]}
+              <Route path={"/assays"}
                      element={<AssayListView title={"All Assays"}/>}/>
 
               {/*New assay*/}

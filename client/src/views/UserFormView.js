@@ -21,11 +21,13 @@ import ErrorMessage from "../structure/ErrorMessage";
 import UserForm from "../components/forms/UserForm";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import {useParams} from "react-router-dom";
 
 const UserFormView = props => {
-  
+
+  const params = useParams();
   const [state, setState] = useState({
-    userId: props.match.params.userId || null,
+    userId: params.userId || null,
     isLoaded: false,
     isError: false,
   });
