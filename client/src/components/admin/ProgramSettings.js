@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
   Badge,
   Button,
@@ -19,108 +19,105 @@ import {SettingsLoadingMessage} from "../loading";
 import {SettingsErrorMessage} from "../errors";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
-import {history} from "../../App";
+import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 const createMarkup = (content) => {
   return {__html: content};
 };
 
-class ProgramSettings extends React.Component {
+const ProgramSettings = props => {
+  
+  const [state, setState] = useState({
+    programs: [],
+    isLoaded: false,
+    isError: false,
+    showDetails: false,
+    selectedProgram: null,
+    isModalOpen: false
+  });
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      programs: [],
-      isLoaded: false,
-      isError: false,
-      showDetails: false,
-      selectedProgram: null,
-      isModalOpen: false
-    };
-    this.showModal = this.showModal.bind(this);
-  }
-
-  showModal(selected) {
-    console.log(selected);
+  const showModal = (selected) => {
+    console.debug(selected);
     if (!!selected) {
-      this.setState({
-        isModalOpen: true,
-        selectedProgram: selected
-      });
+      setState(prevState => ({
+        ...prevState,
+        selectedProgram: selected,
+        isModalOpen: true
+      }));
     } else {
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isModalOpen: false,
         selectedProgram: null
-      })
+      }))
     }
-  }
+  };
 
-  componentDidMount() {
-    fetch("/api/program?details=true")
-    .then(response => response.json())
-    .then(async programs => {
-      this.setState({
-        programs: programs,
+  useEffect(() => {
+    axios.get("/api/program?details=true")
+    .then(async response => {
+      setState(prevState => ({
+        ...prevState,
+        programs: response.data,
         isLoaded: true
-      })
+      }))
     })
     .catch(error => {
       console.error(error);
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
+  }, []);
+
+  let content = '';
+  if (state.isLoaded) {
+    content = <ProgramsTable
+        programs={state.programs}
+        showModal={showModal}
+    />
+  } else if (state.isError) {
+    content = <SettingsErrorMessage/>;
+  } else {
+    content = <SettingsLoadingMessage/>;
   }
 
-  render() {
+  return (
+      <Card>
 
-    let content = '';
-    if (!!this.state.isLoaded) {
-      content = <ProgramsTable
-          programs={this.state.programs}
-          showModal={this.showModal}
-      />
-    } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage/>;
-    } else {
-      content = <SettingsLoadingMessage/>;
-    }
+        <Card.Header>
+          <Card.Title tag="h5" className="mb-0">
+            Registered Programs
+            <span className="float-end">
+              <Button
+                  variant={"primary"}
+                  href={"/programs/new"}
+              >
+                New Program
+                &nbsp;
+                <FolderPlus className="feather align-middle ms-2 mb-1"/>
+              </Button>
+            </span>
+          </Card.Title>
+        </Card.Header>
 
-    return (
-        <Card>
+        <Card.Body>
 
-          <Card.Header>
-            <Card.Title tag="h5" className="mb-0">
-              Registered Programs
-              <span className="float-end">
-                <Button
-                    variant={"primary"}
-                    href={"/programs/new"}
-                >
-                  New Program
-                  &nbsp;
-                  <FolderPlus className="feather align-middle ms-2 mb-1"/>
-                </Button>
-              </span>
-            </Card.Title>
-          </Card.Header>
+          {content}
 
-          <Card.Body>
+          <ProgramDetailsModal
+              isOpen={state.isModalOpen}
+              program={state.selectedProgram}
+              showModal={showModal}
+          />
 
-            {content}
+        </Card.Body>
 
-            <ProgramDetailsModal
-                isOpen={this.state.isModalOpen}
-                program={this.state.selectedProgram}
-                showModal={this.showModal}
-            />
-
-          </Card.Body>
-
-        </Card>
-    );
-  }
+      </Card>
+  );
 
 }
 
@@ -128,6 +125,8 @@ const ProgramsTable = ({
   programs,
   showModal
 }) => {
+
+  const navigate = useNavigate();
 
   const columns = [
     {
@@ -234,7 +233,7 @@ const ProgramsTable = ({
                   </Dropdown.Item>
 
                   <Dropdown.Item
-                      onClick={() => history.push("/program/" + d.id + "/edit")}
+                      onClick={() => navigate("/program/" + d.id + "/edit")}
                   >
                     <FontAwesomeIcon icon={faEdit}/>
                     &nbsp;&nbsp;

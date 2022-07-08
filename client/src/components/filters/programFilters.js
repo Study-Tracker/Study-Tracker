@@ -2,11 +2,9 @@ import React, {useEffect, useState} from "react";
 import {Form} from 'react-bootstrap';
 import {FormGroup} from '../forms/common';
 import {setFilters} from "../../redux/filterSlice";
-import {cleanQueryParams, FilterSidebar} from "./filters";
+import {FilterSidebar} from "./filters";
 import {useDispatch, useSelector} from "react-redux";
 import {useLocation, useSearchParams} from "react-router-dom";
-
-const qs = require('qs');
 
 export const labels = {
   ACTIVE: "active",
@@ -31,36 +29,20 @@ const ProgramFilters = props => {
   const user = useSelector(s => s.user.value);
   const location = useLocation();
 
-  // dispatch(setFilters(defaults));
-
-  const encodeFiltersAsQueryString = (filters) => {
-    const keys = Object.keys(filters);
-    let params = [];
-    for (const k of keys) {
-      if (!!filters[k]) {
-        const param = k + "=" + filters[k];
-        params.push(param);
-      }
-    }
-    return params.join("&");
-  }
-
   useEffect(() => {
 
     dispatch(setFilters(defaults));
     
-    const params = cleanQueryParams(
-        qs.parse(location.search, {ignoreQueryPrefix: true}));
     const filters = {
       ...state.defaults,
-      ...params
+      ...searchParams
     };
     console.debug(filters);
 
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       filters: filters
-    });
+    }));
 
     dispatch(setFilters(filters));
 
@@ -72,10 +54,10 @@ const ProgramFilters = props => {
       ...filter
     };
     dispatch(setFilters(filters));
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       filters
-    });
+    }));
     setSearchParams(filters);
   };
 

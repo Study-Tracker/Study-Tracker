@@ -52,11 +52,11 @@ const ProgramListView = props => {
     // data.dimensions[filter.MY_PROGRAM] = data.cf.dimension(
     //     d => props.user && d.owner.id === props.user.id);
 
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       data: data,
       isLoaded: true
-    });
+    }));
   }
 
   const applyFilters = (filters) => {
@@ -75,7 +75,10 @@ const ProgramListView = props => {
 
   useEffect(() => {
     let title = searchParams.has("title") ? searchParams.get("title") : state.title;
-    setState({title: title});
+    setState(prevState => ({
+      ...prevState,
+      title: title
+    }));
 
     axios.get("/api/program")
     .then(async response => {
@@ -83,10 +86,11 @@ const ProgramListView = props => {
     })
     .catch(error => {
       console.error(error);
-      setState({
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   }, []);
 

@@ -2,14 +2,12 @@ import React, {useEffect, useState} from "react";
 import {FormGroup} from '../forms/common';
 import {Form} from 'react-bootstrap';
 import {statuses} from "../../config/statusConstants";
-import {cleanQueryParams, FilterLabel, FilterSidebar} from "./filters";
+import {FilterLabel, FilterSidebar} from "./filters";
 import {setPrograms} from "../../redux/programSlice";
 import {setFilters} from "../../redux/filterSlice";
 import {setAssayTypes} from "../../redux/assayTypeSlice";
 import {useDispatch} from "react-redux";
 import {useSearchParams} from "react-router-dom";
-
-const qs = require("qs");
 
 export const labels = {
   LEGACY: "legacy",
@@ -41,42 +39,6 @@ const AssayFilters = props => {
     programs: [],
     assayTypes: []
   });
-  
-  //dispatch(setFilters(defaults));
-
-  const encodeFiltersAsQueryString = (filters) => {
-    const keys = Object.keys(filters);
-    let params = [];
-    for (const k of keys) {
-      if (k === labels.PROGRAM) {
-        if (filters[k].length < state.programs.length) {
-          const param = k + "=" + filters[k].join(",");
-          params.push(param);
-        }
-      } else if (k === labels.ASSAY_TYPE) {
-        if (filters[k].length < state.assayTypes.length) {
-          const param = k + "=" + filters[k].join(",");
-          params.push(param);
-        }
-      } else if (k === labels.STATUS) {
-        if (filters[k].length < Object.keys(statuses).length) {
-          const param = k + "=" + filters[k].join(",");
-          params.push(param);
-        }
-      } else {
-        if (Array.isArray(filters[k])) {
-          const param = k + "=" + filters[k].join(",");
-          params.push(param);
-        } else {
-          if (!!filters[k]) {
-            const param = k + "=" + filters[k];
-            params.push(param);
-          }
-        }
-      }
-    }
-    return params.join("&");
-  }
 
   const toggleAllStatusFilters = () => {
     let filter = state.filters[labels.STATUS];
@@ -142,22 +104,20 @@ const AssayFilters = props => {
           }
         });
 
-        const params = cleanQueryParams(
-            qs.parse(props.location.search, {ignoreQueryPrefix: true}));
-        if (params.hasOwnProperty(labels.PROGRAM)) {
-          const p = String(params[labels.PROGRAM])
+        if (searchParams.has(labels.PROGRAM)) {
+          const p = String(searchParams.get([labels.PROGRAM]))
           .split(",")
           .map(p => parseInt(p));
-          params[labels.PROGRAM] = [...p];
+          searchParams.set([labels.PROGRAM], [...p]);
         }
-        if (params.hasOwnProperty(labels.ASSAY_TYPE)) {
-          const t = String(params[labels.ASSAY_TYPE])
+        if (searchParams.has(labels.ASSAY_TYPE)) {
+          const t = String(searchParams.get([labels.ASSAY_TYPE]))
           .split(",")
           .map(p => parseInt(p));
-          params[labels.ASSAY_TYPE] = [...t];
+          searchParams.set([labels.ASSAY_TYPE], [...t]);
         }
-        if (params.hasOwnProperty(labels.STATUS)) {
-          params[labels.STATUS] = [...params[labels.STATUS].split(",")];
+        if (searchParams.has(labels.STATUS)) {
+          searchParams.set([labels.STATUS], [...searchParams.get([labels.STATUS]).split(",")]);
         }
 
         const updatedDefaults = {
@@ -168,16 +128,17 @@ const AssayFilters = props => {
 
         const filters = {
           ...updatedDefaults,
-          ...params
+          ...searchParams
         };
-        console.log(filters);
+        console.debug(filters);
 
-        setState({ ...state,
+        setState(prevState => ({
+          ...prevState,
           programs: programs,
           assayTypes: assayTypes,
           defaults: updatedDefaults,
           filters: filters
-        });
+        }));
 
         dispatch(setPrograms(programs));
         dispatch(setAssayTypes(assayTypes));
@@ -196,9 +157,10 @@ const AssayFilters = props => {
       ...filter
     };
     dispatch(setFilters(filters));
-    setState({ ...state,
+    setState(prevState => ({
+      ...prevState,
       filters
-    });
+    }));
     setSearchParams(filters);
   };
 
@@ -274,7 +236,7 @@ const AssayFilters = props => {
                           checked={state.filters[labels.STATUS].indexOf(
                               status.value) > -1}
                           onChange={(e) => {
-                            let values = state.filters[labels.STATUS];
+                            let values = [...state.filters[labels.STATUS]];
                             if (e.target.checked) {
                               values.push(
                                   status.value);
@@ -311,7 +273,7 @@ const AssayFilters = props => {
                                 checked={state.filters[labels.PROGRAM].indexOf(
                                     program.id) > -1}
                                 onChange={(e) => {
-                                  let values = state.filters[labels.PROGRAM];
+                                  let values = [...state.filters[labels.PROGRAM]];
                                   if (e.target.checked) {
                                     values.push(program.id);
                                   } else {
@@ -349,7 +311,7 @@ const AssayFilters = props => {
                                 checked={state.filters[labels.ASSAY_TYPE].indexOf(
                                     assayType.id) > -1}
                                 onChange={(e) => {
-                                  let values = state.filters[labels.ASSAY_TYPE];
+                                  let values = [...state.filters[labels.ASSAY_TYPE]];
                                   if (e.target.checked) {
                                     values.push(assayType.id);
                                   } else {
@@ -377,4 +339,4 @@ const AssayFilters = props => {
 
 }
 
-export default  AssayFilters;
+export default AssayFilters;

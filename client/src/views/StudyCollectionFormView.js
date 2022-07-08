@@ -23,25 +23,25 @@ const StudyCollectionFormView = props => {
       if (!!state.collectionId) {
         const collection = response.data.find(
             p => String(p.id) === state.collectionId);
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           collection,
           collections: response.data,
           isLoaded: true
-        });
+        }));
       } else {
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           collections: response.data,
           isLoaded: true
-        });
+        }));
       }
     }).catch(error => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   }, []);
 

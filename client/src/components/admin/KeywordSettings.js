@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Card, Col, Dropdown, Form, Modal, Row} from 'react-bootstrap';
 import {Tag} from 'react-feather';
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
@@ -12,6 +12,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
 import {getCsrfToken} from "../../config/csrf";
 import PropTypes from "prop-types";
+import axios from "axios";
 
 const emptyKeyword = {
   id: null,
@@ -22,92 +23,89 @@ const emptyKeyword = {
   keyword: ''
 };
 
-export default class KeywordSettings extends React.Component {
+const KeywordSettings = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isModalOpen: false,
-      keywords: [],
-      categories: [],
-      isLoaded: false,
-      isError: false,
-      selectedKeyword: emptyKeyword,
-      categoryInput: "select"
-    };
-    this.showModal = this.showModal.bind(this);
-    this.handleCategorySelect = this.handleCategorySelect.bind(this);
-    this.handleInputUpdate = this.handleInputUpdate.bind(this);
-    this.handleKeywordSubmit = this.handleKeywordSubmit.bind(this);
-    this.toggleCategoryInput = this.toggleCategoryInput.bind(this);
-  }
+  const [state, setState] = useState({
+    isModalOpen: false,
+    keywords: [],
+    categories: [],
+    isLoaded: false,
+    isError: false,
+    selectedKeyword: emptyKeyword,
+    categoryInput: "select"
+  });
 
-  showModal(keyword) {
+  const showModal = (keyword) => {
     if (keyword) {
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         selectedKeyword: Object.prototype.hasOwnProperty.call(keyword, "keyword") ? keyword : emptyKeyword,
         isModalOpen: true,
         categoryInput: "select"
-      })
+      }))
     } else {
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isModalOpen: false
-      })
+      }));
     }
-  }
+  };
 
-  toggleCategoryInput(e) {
+  const toggleCategoryInput = (e) => {
     console.debug(e.target.value);
     if (e.target.checked) {
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         categoryInput: e.target.value
-      })
+      }));
     }
-  }
+  };
 
-  componentDidMount() {
-    fetch("/api/keyword-category")
-    .then(response => response.json())
-    .then(json => {
-      this.setState({
-        categories: json,
+  useEffect(() => {
+    axios.get("/api/keyword-category")
+    .then(response => {
+      setState(prevState => ({
+        ...prevState,
+        categories: response.data,
         isLoaded: true
-      })
+      }));
     })
     .catch(e => {
       console.error(e);
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: e
-      })
+      }));
     });
-  }
+  }, []);
 
-  handleCategorySelect(categoryId) {
-    fetch("/api/keyword?categoryId=" + categoryId)
-    .then(response => response.json())
-    .then(keywords => {
-      const category = this.state.categories.find(c => c.id === categoryId);
-      this.setState({
+  const handleCategorySelect = (categoryId) => {
+    axios.get("/api/keyword?categoryId=" + categoryId)
+    .then(response => {
+      const category = state.categories.find(c => c.id === categoryId);
+      setState(prevState => ({
+        ...prevState,
         selectedCategory: category,
-        keywords: keywords
-      })
+        keywords: response.data
+      }));
     })
-  }
+  };
 
-  handleInputUpdate(input) {
-    const keyword = this.state.selectedKeyword;
-    this.setState({
+  const handleInputUpdate = (input) => {
+    const keyword = state.selectedKeyword;
+    setState(prevState => ({
+      ...prevState,
       selectedKeyword: {
         ...keyword,
         ...input
       }
-    })
-  }
+    }));
+  };
 
-  handleKeywordSubmit() {
+  const handleKeywordSubmit = () => {
 
-    let keyword = this.state.selectedKeyword;
+    let keyword = state.selectedKeyword;
     const url = "/api/keyword/" + (keyword.id || "");
     const method = !!keyword.id ? "PUT" : "POST";
     console.log(keyword);
@@ -127,7 +125,7 @@ export default class KeywordSettings extends React.Component {
           "Refresh the keywords table to view updated records. You must refresh the page before new categories will show up.",
           "success")
       .then(() => {
-        this.showModal();
+        showModal();
       })
     })
     .catch(e => {
@@ -139,100 +137,97 @@ export default class KeywordSettings extends React.Component {
 
   }
 
-  render() {
-
-    const categoryOptions = this.state.categories
-    .sort((a, b) => {
-      if (a.name > b.name) {
-        return 1;
-      } else if (a.name < b.name) {
-        return -1;
-      } else {
-        return 0;
-      }
-    })
-    .map(c => {
-      return {
-        value: c.id,
-        label: c.name
-      }
-    });
-
-    let content = <SettingsLoadingMessage/>
-    if (this.state.isLoaded) {
-      content = <KeywordsTable
-          keywords={this.state.keywords}
-          categoryOptions={categoryOptions}
-          handleCategorySelect={this.handleCategorySelect}
-          selectedCategory={this.state.selectedCategory}
-          showModal={this.showModal}
-      />
-    } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage/>;
+  const categoryOptions = state.categories
+  .sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    } else if (a.name < b.name) {
+      return -1;
+    } else {
+      return 0;
     }
+  })
+  .map(c => {
+    return {
+      value: c.id,
+      label: c.name
+    }
+  });
 
-    return (
-        <Card>
-          <Card.Header>
-            <Card.Title tag={"h5"} className={"mb-0"}>
-              Keywords
-              <span className="float-end">
-                <Button color={"primary"}
-                        onClick={() => this.showModal(true)}>
-                  New Keyword
-                  &nbsp;
-                  <Tag className="feather align-middle ms-2 mb-1"/>
-                </Button>
-              </span>
-            </Card.Title>
-          </Card.Header>
-          <Card.Body>
-
-            {content}
-
-            <Modal
-                show={this.state.isModalOpen}
-                onHide={() => this.showModal()}
-                size={"lg"}
-            >
-              <Modal.Header closeButton>
-                {
-                  !!this.state.selectedKeyword && this.state.selectedKeyword.id
-                      ? "Edit Keyword" : "New Keyword"
-                }
-              </Modal.Header>
-              <Modal.Body className="m-3">
-                {
-                  !!this.state.isModalOpen
-                      ? <ModalInputs
-                          categories={categoryOptions}
-                          keyword={this.state.selectedKeyword}
-                          handleUpdate={this.handleInputUpdate}
-                          categoryInput={this.state.categoryInput}
-                          toggleCategoryInput={this.toggleCategoryInput}
-                      />
-                      : ""
-                }
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={() => this.showModal()}>
-                  Cancel
-                </Button>
-                <Button
-                    variant="primary"
-                    onClick={this.handleKeywordSubmit}
-                    disabled={!(!!this.state.selectedKeyword.keyword
-                        && !!this.state.selectedKeyword.category)}
-                >
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Modal>
-
-          </Card.Body>
-        </Card>
-    )
+  let content = <SettingsLoadingMessage/>
+  if (state.isLoaded) {
+    content = <KeywordsTable
+        keywords={state.keywords}
+        categoryOptions={categoryOptions}
+        handleCategorySelect={handleCategorySelect}
+        selectedCategory={state.selectedCategory}
+        showModal={showModal}
+    />
+  } else if (!!state.isError) {
+    content = <SettingsErrorMessage/>;
   }
+
+  return (
+      <Card>
+        <Card.Header>
+          <Card.Title tag={"h5"} className={"mb-0"}>
+            Keywords
+            <span className="float-end">
+              <Button color={"primary"}
+                      onClick={() => showModal(true)}>
+                New Keyword
+                &nbsp;
+                <Tag className="feather align-middle ms-2 mb-1"/>
+              </Button>
+            </span>
+          </Card.Title>
+        </Card.Header>
+        <Card.Body>
+
+          {content}
+
+          <Modal
+              show={state.isModalOpen}
+              onHide={() => showModal()}
+              size={"lg"}
+          >
+            <Modal.Header closeButton>
+              {
+                !!state.selectedKeyword && state.selectedKeyword.id
+                    ? "Edit Keyword" : "New Keyword"
+              }
+            </Modal.Header>
+            <Modal.Body className="m-3">
+              {
+                !!state.isModalOpen
+                    ? <ModalInputs
+                        categories={categoryOptions}
+                        keyword={state.selectedKeyword}
+                        handleUpdate={handleInputUpdate}
+                        categoryInput={state.categoryInput}
+                        toggleCategoryInput={toggleCategoryInput}
+                    />
+                    : ""
+              }
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => showModal()}>
+                Cancel
+              </Button>
+              <Button
+                  variant="primary"
+                  onClick={handleKeywordSubmit}
+                  disabled={!(!!state.selectedKeyword.keyword
+                      && !!state.selectedKeyword.category)}
+              >
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+        </Card.Body>
+      </Card>
+  );
 
 }
 
@@ -425,3 +420,5 @@ const ModalInputs = ({
 ModalInputs.propTypes = {
   keyword: PropTypes.object.isRequired
 }
+
+export default KeywordSettings;

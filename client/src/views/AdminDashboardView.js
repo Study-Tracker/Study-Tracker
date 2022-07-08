@@ -14,30 +14,19 @@
  * limitations under the License.
  */
 
-import React, {useState} from "react";
-import {useSelector} from "react-redux";
+import React from "react";
 import NavBar from "../structure/NavBar";
 import Footer from "../structure/Footer";
 import AdminDashboard from "../components/admin/AdminDashboard";
-import {useSearchParams} from "react-router-dom";
 
 const AdminDashboardView = props => {
-
-  const user = useSelector(state => state.user.value);
-  const [isActive, setActive] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  if (searchParams.has("active")) {
-    setActive(true);
-  }
 
   return (
       <div className="wrapper">
         <div className="main">
           <NavBar hideToggle={true} hideSearch={true}/>
           <div className="content">
-            <AdminDashboard user={user}
-                            active={isActive}/>
+            <AdminDashboard />
           </div>
           <Footer/>
         </div>

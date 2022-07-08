@@ -41,25 +41,25 @@ const UserFormView = props => {
       const users = response.data;
       if (!!state.userId) {
         const user = users.find(p => p.id === parseInt(state.userId));
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           selectedUser: user,
           users: users,
           isLoaded: true
-        });
+        }));
       } else {
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           users: users,
           isLoaded: true
-        });
+        }));
       }
     }).catch(error => {
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
   }, []);

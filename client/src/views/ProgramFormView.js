@@ -47,26 +47,26 @@ const ProgramFormView = props => {
         .then(async response => response.json());
         console.log(program);
 
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           program: program,
           programs: programs,
           isLoaded: true
-        });
+        }));
 
       } else {
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           programs: programs,
           isLoaded: true
-        });
+        }));
       }
     }).catch(error => {
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
   }, []);

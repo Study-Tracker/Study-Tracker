@@ -37,11 +37,11 @@ const PasswordResetRequestView = props => {
     if (auth.email != null && auth.email !== '') {
       inputIsValid = true;
     }
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       auth,
       inputIsValid
-    });
+    }));
   };
 
   let isError = searchParams.has("error");

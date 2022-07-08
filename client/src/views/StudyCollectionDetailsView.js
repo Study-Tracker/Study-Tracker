@@ -51,10 +51,10 @@ const StudyCollectionDetailsView = props => {
         }).then(response => {
           let collection = state.collection;
           collection.studies = collection.studies.filter(s => s.id === id);
-          setState({ 
-            ...state, 
+          setState(prevState => ({
+            ...prevState,
             collection 
-          });
+          }));
         })
         .catch(error => {
           console.error(error);
@@ -67,20 +67,20 @@ const StudyCollectionDetailsView = props => {
   useEffect(() => {
     axios.get("/api/studycollection/" + state.collectionId)
     .then(response => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         collection: response.data,
         isLoaded: true
-      });
+      }));
       console.debug(response.data);
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     })
   }, []);
 

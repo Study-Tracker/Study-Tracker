@@ -39,22 +39,22 @@ const ProgramDetailsView = props => {
       fetch("/api/study?program=" + program.id)
       .then(response => response.json())
       .then(studies => {
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           program: program,
           studies: studies,
           isLoaded: true
-        });
+        }));
         console.log(program);
       })
     })
     .catch(error => {
       console.error(error);
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     })
   }, []);
 

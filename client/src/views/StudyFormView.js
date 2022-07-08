@@ -42,40 +42,40 @@ const StudyFormView = props => {
     // Programs
     axios.get("/api/program")
     .then(response => {
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         programs: response.data,
         programsLoaded: true
-      });
+      }));
     }).catch(error => {
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
     // Contacts
     axios.get("/api/collaborator")
     .then(response => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         collaborators: response.data,
         collaboratorsLoaded: true
-      });
+      }));
     }).catch(error => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
     // Keyword categories
     axios.get("/api/keyword-category")
     .then(response => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         keywordCategories: response.data.sort((a, b) => {
           if (a.name > b.name) {
             return 1;
@@ -86,32 +86,33 @@ const StudyFormView = props => {
           }
         }),
         keywordCategoriesLoaded: true
-      })
+      }))
     }).catch(error => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
     // Entry Templates
     axios.get("/api/notebookentrytemplate?category=STUDY&active=true")
     .then(response => {
       const defaultNotebookTemplate = response.data.find(o => o.default === true);
-      setState({ ...state,
+      setState(prevState => ({
+        ...prevState,
         notebookTemplates: response.data,
         defaultNotebookTemplate: defaultNotebookTemplate,
         notebookTemplatesLoaded: true
-      });
+      }));
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
     // Selected study
@@ -119,24 +120,24 @@ const StudyFormView = props => {
       axios.get("/api/study/" + state.studyCode)
       .then(response => {
         console.debug(response.data);
-        setState({
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           study: response.data,
           studyLoaded: true
-        });
+        }));
       })
       .catch(error => {
-        setState({
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           isError: true,
           error: error
-        });
+        }));
       })
     } else {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         studyLoaded: true
-      })
+      }))
     }
   }, []);
 

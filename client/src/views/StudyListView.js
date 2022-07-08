@@ -66,21 +66,21 @@ const StudyListView = props => {
           d => user && d.owner.id === user.id);
       data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
 
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         data: data,
         isLoaded: true,
         title: title
-      });
+      }));
 
     })
     .catch(error => {
       console.error(error);
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   }, []);
 

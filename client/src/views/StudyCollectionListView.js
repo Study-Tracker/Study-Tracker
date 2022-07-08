@@ -18,19 +18,19 @@ const StudyCollectionListView = props => {
   useEffect(() => {
     axios.get("/api/studycollection")
     .then(response => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         collections: response.data,
         isLoaded: true
-      })
+      }))
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   
   }, [user]);

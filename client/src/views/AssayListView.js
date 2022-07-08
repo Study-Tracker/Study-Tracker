@@ -69,21 +69,21 @@ const AssayListView = props => {
       data.dimensions[filter.ASSAY_TYPE] = data.cf.dimension(
           d => d.assayType.id);
 
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         data: data,
         isLoaded: true,
         title: title
-      });
+      }));
 
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   }, []);
 

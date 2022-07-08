@@ -56,20 +56,20 @@ const SearchResultsView = props => {
       //     d => props.user && d.owner.id === props.user.id);
       // data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
 
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         hits: response.data,
         isLoaded: true
-      });
+      }));
 
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   }, []);
 

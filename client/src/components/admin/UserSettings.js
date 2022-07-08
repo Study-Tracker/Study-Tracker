@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
   Badge,
   Button,
@@ -10,7 +10,6 @@ import {
   Table
 } from 'react-bootstrap';
 import {Edit, User, UserPlus} from 'react-feather';
-import {history} from "../../App";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -26,6 +25,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
 import {getCsrfToken} from "../../config/csrf";
+import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 const resetUserPassword = (user) => {
   swal({
@@ -101,102 +102,95 @@ const toggleUserActive = (user, active) => {
   });
 }
 
-class UserSettings extends React.Component {
+const UserSettings = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      users: [],
-      isLoaded: false,
-      isError: false,
-      showDetails: false,
-      selectedUser: null,
-      isModalOpen: false
-    };
-    this.showModal = this.showModal.bind(this);
-  }
+  const [state, setState] = React.useState({
+    users: [],
+    isLoaded: false,
+    isError: false,
+    showDetails: false,
+    selectedUser: null
+  });
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const navigate = useNavigate();
 
-  showModal(selected) {
-    if (!!selected) {
-      this.setState({
-        isModalOpen: true,
-        selectedUser: selected
-      });
+  const showModal = (selected) => {
+    if (selected) {
+      setState(prevState => ({...prevState, selectedUser: selected}));
+      setIsModalOpen(true)
     } else {
-      this.setState({
-        isModalOpen: false
-      })
+      setIsModalOpen(false);
     }
   }
 
-  componentDidMount() {
-    fetch("/api/user")
-    .then(response => response.json())
-    .then(async users => {
-      this.setState({
-        users: users,
+  useEffect(() => {
+    axios.get("/api/user")
+    .then(async response => {
+      setState(prevState => ({
+        ...prevState,
+        users: response.data,
         isLoaded: true
-      })
+      }));
     })
     .catch(error => {
       console.error(error);
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
+  }, []);
+
+  let content = '';
+  if (state.isLoaded) {
+    content = <UserTable users={state.users} showModal={showModal}/>
+  } else if (state.isError) {
+    content = <SettingsErrorMessage/>
+  } else {
+    content = <SettingsLoadingMessage/>
   }
 
-  render() {
+  return (
+      <React.Fragment>
 
-    let content = '';
-    if (!!this.state.isLoaded) {
-      content = <UserTable users={this.state.users} showModal={this.showModal}/>
-    } else if (!!this.state.isError) {
-      content = <SettingsErrorMessage/>
-    } else {
-      content = <SettingsLoadingMessage/>
-    }
+        <Card>
+          <Card.Header>
+            <Card.Title tag="h5" className="mb-0">
+              Registered Users
+              <span className="float-end">
+                <Button
+                    color={"primary"}
+                    onClick={() => navigate("/users/new")}
+                >
+                  New User
+                  &nbsp;
+                  <UserPlus className="feather align-middle ms-2 mb-1"/>
+                </Button>
+              </span>
+            </Card.Title>
+          </Card.Header>
+          <Card.Body>
 
-    return (
-        <React.Fragment>
+            {content}
 
-          <Card>
-            <Card.Header>
-              <Card.Title tag="h5" className="mb-0">
-                Registered Users
-                <span className="float-end">
-                  <Button
-                      color={"primary"}
-                      onClick={() => history.push("/users/new")}
-                  >
-                    New User
-                    &nbsp;
-                    <UserPlus className="feather align-middle ms-2 mb-1"/>
-                  </Button>
-                </span>
-              </Card.Title>
-            </Card.Header>
-            <Card.Body>
+            <UserDetailsModal
+                showModal={showModal}
+                isOpen={state.isModalOpen}
+                user={state.selectedUser}
+            />
 
-              {content}
+          </Card.Body>
+        </Card>
 
-              <UserDetailsModal
-                  showModal={this.showModal}
-                  isOpen={this.state.isModalOpen}
-                  user={this.state.selectedUser}
-              />
-
-            </Card.Body>
-          </Card>
-
-        </React.Fragment>
-    );
-  }
+      </React.Fragment>
+  );
 
 }
 
 const UserTable = ({users, showModal}) => {
+
+  const navigate = useNavigate();
 
   const columns = [
     {
@@ -293,7 +287,7 @@ const UserTable = ({users, showModal}) => {
                   </Dropdown.Item>
 
                   <Dropdown.Item
-                      onClick={() => history.push("/users/" + d.id + "/edit")}
+                      onClick={() => navigate("/users/" + d.id + "/edit")}
                   >
                     <FontAwesomeIcon icon={faEdit}/>
                     &nbsp;&nbsp;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
   Badge,
   Button,
@@ -9,7 +9,6 @@ import {
   Row,
   Table
 } from "react-bootstrap";
-import {history} from "../../App";
 import {PlusCircle} from "react-feather";
 import ToolkitProvider from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -24,89 +23,89 @@ import {
   faInfoCircle,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
-class AssayTypeSettings extends React.Component {
+const AssayTypeSettings = props => {
+  
+  const [state, setState] = useState({
+    assayTypes: [],
+    isModalOpen: false,
+    isLoaded: false,
+    isError: false
+  });
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      assayTypes: [],
-      isModalOpen: false,
-      isLoaded: false,
-      isError: false
-    };
-    this.showModal = this.showModal.bind(this);
-    this.toggleActive = this.toggleActive.bind(this);
-  }
-
-  showModal(selected) {
+  const showModal = (selected) => {
     if (!!selected) {
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isModalOpen: true,
         selectedAssayType: selected
-      });
+      }));
     } else {
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isModalOpen: false
-      })
+      }));
     }
   }
 
-  toggleActive(selected) {
-    fetch("/api/assaytype/" + selected.id, {
-      method: "PATCH"
-    })
+  const toggleActive = (selected) => {
+    axios.patch("/api/assaytype/" + selected.id)
     .then(response => {
-      if (response.ok) {
-        let assayTypes = this.state.assayTypes;
+      if (response.status === 200) {
+        let assayTypes = state.assayTypes;
         const i = assayTypes.findIndex(d => d.id === selected.id);
         assayTypes[i].active = !assayTypes[i].active;
-        this.setState({assayTypes})
+        setState(prevState => ({
+          ...prevState,
+          assayTypes,
+        }))
       }
     })
     .catch(error => {
       console.error(error);
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   }
 
-  componentDidMount() {
-    fetch("/api/assaytype")
-    .then(response => response.json())
-    .then(json => {
-      this.setState({
-        assayTypes: json,
+  useEffect(() => {
+    axios.get("/api/assaytype")
+    .then(response => {
+      setState(prevState => ({
+        ...prevState,
+        assayTypes: response.data,
         isLoaded: true
-      })
+      }));
     })
     .catch(error => {
       console.error(error);
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
-  }
+  }, []);
 
-  render() {
-    return (
-        <React.Fragment>
-          <AssayTypeListCard
-              assayTypes={this.state.assayTypes}
-              isModalOpen={this.state.isModalOpen}
-              selectedAssayType={this.state.selectedAssayType}
-              showModal={this.showModal}
-              toggleActive={this.toggleActive}
-              isLoaded={this.state.isLoaded}
-              isError={this.state.isError}
-          />
-        </React.Fragment>
-    )
-  }
+  return (
+      <React.Fragment>
+        <AssayTypeListCard
+            assayTypes={state.assayTypes}
+            isModalOpen={state.isModalOpen}
+            selectedAssayType={state.selectedAssayType}
+            showModal={showModal}
+            toggleActive={toggleActive}
+            isLoaded={state.isLoaded}
+            isError={state.isError}
+        />
+      </React.Fragment>
+  )
 
 }
 
@@ -121,6 +120,8 @@ const AssayTypeListCard = ({
   showModal,
   toggleActive
 }) => {
+
+  const navigate = useNavigate();
 
   const columns = [
     {
@@ -188,7 +189,7 @@ const AssayTypeListCard = ({
                         <React.Fragment>
                           <Dropdown.Divider/>
                           <Dropdown.Item
-                              onClick={() => history.push(
+                              onClick={() => navigate(
                                   "/assaytypes/" + d.id + "/edit")}
                           >
                             <FontAwesomeIcon icon={faEdit}/>

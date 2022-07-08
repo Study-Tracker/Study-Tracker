@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {
   Breadcrumb,
   Card,
@@ -10,8 +10,6 @@ import {
 } from "react-bootstrap";
 import UserSettings from "./UserSettings";
 import AssayTypeSettings from "./AssayTypeSettings";
-import EntryTemplateSettings from './EntryTemplateSettings';
-import {history} from '../../App';
 import KeywordSettings from "./KeywordSettings";
 import ProgramSettings from "./ProgramSettings";
 
@@ -25,11 +23,6 @@ const settings = {
     id: "assay-types",
     label: "Assay Types",
     tag: AssayTypeSettings
-  },
-  "eln-entry-templates": {
-    id: "eln-entry-templates",
-    label: "ELN Entry Templates",
-    tag: EntryTemplateSettings
   },
   "keywords": {
     id: "keywords",
@@ -47,10 +40,12 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-export const AdminDashboard = () => {
+export const AdminDashboard = props => {
+
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(null);
   const activeTabQuery = useQuery().get('active');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (Object.keys(settings).includes(activeTabQuery) && activeTab
@@ -71,10 +66,7 @@ export const AdminDashboard = () => {
   }
 
   const onSetActiveTab = (tabName) => {
-    history.push({
-      pathname: '/admin',
-      search: `?active=${tabName}`,
-    });
+    navigate('/admin?active=' + tabName);
   }
 
   const controls = Object.values(settings)

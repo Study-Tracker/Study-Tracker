@@ -39,21 +39,21 @@ const StudyDetailsView = props => {
     axios.get("/api/study/" + state.studyCode)
     .then(async response => {
 
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         study: response.data,
         isLoaded: true
-      });
+      }));
       console.debug(response.data);
 
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     })
   }, []);
 

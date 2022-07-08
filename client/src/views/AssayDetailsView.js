@@ -43,30 +43,30 @@ const AssayDetailsView = props => {
           + state.assayCode)
       .then(response => response.json())
       .then(assay => {
-        setState({
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           study: study,
           assay: assay,
           isLoaded: true
-        });
+        }));
         console.log(assay);
       })
       .catch(error => {
         console.error(error);
-        setState({
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           isError: true,
           error: error
-        });
+        }));
       });
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     })
   }, []);
 

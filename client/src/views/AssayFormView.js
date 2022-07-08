@@ -41,10 +41,11 @@ const AssayFormView = props => {
     .then(async response => await response.json())
     .catch(error => {
       console.error(error);
-      setState({ ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
     let assay = null;
@@ -54,10 +55,11 @@ const AssayFormView = props => {
       .then(async response => await response.json())
       .catch(error => {
         console.error(error);
-        setState({ ...state,
+        setState(prevState => ({
+          ...prevState,
           isError: true,
           error: error
-        });
+        }));
       });
 
     }
@@ -66,10 +68,11 @@ const AssayFormView = props => {
     .then(async response => await response.json())
     .catch(error => {
       console.error(error);
-      setState({ ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
     const notebookTemplates = await fetch(
@@ -77,22 +80,24 @@ const AssayFormView = props => {
     .then(async response => await response.json())
     .catch(error => {
       console.error(error);
-      setState({ ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
     const defaultNotebookTemplate = notebookTemplates.find(
         o => o.default === true);
 
-    setState({ ...state,
+    setState(prevState => ({
+      ...prevState,
       study: study,
       assay: assay,
       assayTypes: assayTypes,
       notebookTemplates: notebookTemplates,
       defaultNotebookTemplate,
       isLoaded: true
-    });
+    }));
 
   }, []);
 

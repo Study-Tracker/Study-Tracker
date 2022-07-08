@@ -41,25 +41,25 @@ const AssayTypeFormView = props => {
       if (!!state.assayTypeId) {
         const assayType = assayTypes.find(
             p => p.id === parseInt(state.assayTypeId));
-        setState({
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           selectedAssayType: assayType,
           assayTypes: assayTypes,
           isLoaded: true
-        });
+        }));
       } else {
-        setState({
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           assayTypes: assayTypes,
           isLoaded: true
-        });
+        }));
       }
     }).catch(error => {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
 
   }, []);

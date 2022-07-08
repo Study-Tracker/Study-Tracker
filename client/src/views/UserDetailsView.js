@@ -37,22 +37,22 @@ const UserDetailsView = props => {
       const user = response.data;
       axios.get("/api/study?user=" + user.id)
       .then(r2 => {
-        setState({ 
-          ...state,
+        setState(prevState => ({
+          ...prevState,
           user: user,
           studies: r2.data,
           isLoaded: true
-        });
+        }));
         console.debug(user);
       })
     })
     .catch(error => {
       console.error(error);
-      setState({ 
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     })
   }, []);
 

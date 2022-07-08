@@ -49,11 +49,11 @@ const UserListView = props => {
     data.dimensions[filter.INACTIVE] = data.cf.dimension(d => !d.active)
     data.dimensions[filter.ADMIN] = data.cf.dimension(d => d.admin)
 
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       data: data,
       isLoaded: true
-    });
+    }));
   }
 
   const applyFilters = (filters) => {
@@ -72,10 +72,10 @@ const UserListView = props => {
 
   useEffect(() => {
     let title = searchParams.has("title") ? searchParams.get("title") : state.title;
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       title: title
-    });
+    }));
 
     axios.get("/api/user")
     .then(async response => {
@@ -83,11 +83,11 @@ const UserListView = props => {
     })
     .catch(error => {
       console.error(error);
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: error
-      });
+      }));
     });
   }, []);
   

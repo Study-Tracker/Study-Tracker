@@ -32,14 +32,14 @@ const PasswordResetView = props => {
 
   useEffect(() => {
     if (searchParams.has("token") && searchParams.has("email")) {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         auth: {
           email: searchParams.get("email"),
           token: searchParams.get("token")
         },
         isLoaded: true
-      })
+      }))
     }
   }, []);
 
@@ -54,11 +54,11 @@ const PasswordResetView = props => {
         && auth.password === auth.passwordAgain) {
       inputIsValid = true;
     }
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       auth,
       inputIsValid
-    });
+    }));
   }
   
   let isError = searchParams.has("error");
