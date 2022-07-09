@@ -24,122 +24,103 @@ const arrayToAttributeMap = (array) => {
   return map;
 }
 
-class AttributeInputs extends React.Component {
+const AttributeInputs = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      attributes: mapToAttributeArray(props.attributes)
-    }
+  const [attributes, setAttributes] = React.useState(mapToAttributeArray(props.attributes));
 
-    this.handleAddAttributeClick = this.handleAddAttributeClick.bind(this);
-    this.handleRemoveAttributeClick = this.handleRemoveAttributeClick.bind(
-        this);
-    this.handleValueUpdate = this.handleValueUpdate.bind(this);
-  }
+  const handleValueUpdate = (key, value, index) => {
+    const updated = [...attributes];
+    updated[index] = {key: key, value: value};
+    setAttributes(updated);
+    props.handleUpdate(arrayToAttributeMap(updated));
+  };
 
-  handleValueUpdate(key, value, index) {
-    let attributes = this.state.attributes;
-    attributes[index] = {key: key, value: value};
-    this.setState({
-      attributes: attributes
-    });
-    this.props.handleUpdate(arrayToAttributeMap(attributes));
-  }
-
-  handleAddAttributeClick() {
+  const handleAddAttributeClick = () => {
     const newAttributes = [
-      ...this.state.attributes,
+      ...attributes,
       {key: "New Attribute", value: ""}
     ];
-    this.setState({
-      attributes: newAttributes
-    });
-    this.props.handleUpdate(arrayToAttributeMap(newAttributes));
+    setAttributes(newAttributes);
+    props.handleUpdate(arrayToAttributeMap(newAttributes));
   }
 
-  handleRemoveAttributeClick(index) {
-    let updated = this.state.attributes;
+  const handleRemoveAttributeClick = (index) => {
+    let updated = [...attributes];
     updated.splice(index, 1);
-    this.setState({
-      attributes: updated
-    });
-    this.props.handleUpdate(arrayToAttributeMap(updated));
+    setAttributes(updated);
+    props.handleUpdate(arrayToAttributeMap(updated));
   }
 
-  render() {
-
-    let inputs = this.state.attributes.map((a, i) => {
-      return (
-          <Row key={'attributes-inputs-' + i}>
-            <Col xs={5}>
-              <FormGroup>
-                <Form.Label/>
-                <Form.Control
-                    type="text"
-                    value={a.key}
-                    onChange={(e) => this.handleValueUpdate(e.target.value,
-                        a.value, i)}
-                />
-              </FormGroup>
-            </Col>
-            <Col xs={5}>
-              <FormGroup>
-                <Form.Label/>
-                <Form.Control
-                    type="text"
-                    value={a.value}
-                    onChange={(e) => this.handleValueUpdate(a.key,
-                        e.target.value, i)}
-                />
-              </FormGroup>
-            </Col>
-            <Col xs={2}>
-              <a
-                  className="text-danger"
-                  title={"Remove attribute"}
-                  onClick={() => this.handleRemoveAttributeClick(i)}
-              >
-                <Trash className="align-middle mt-3" size={18}/>
-              </a>
-            </Col>
-          </Row>
-      )
-    });
-
+  let inputs = attributes.map((a, i) => {
     return (
-        <React.Fragment>
+        <Row key={'attributes-inputs-' + i}>
+          <Col xs={5}>
+            <FormGroup>
+              <Form.Label/>
+              <Form.Control
+                  type="text"
+                  value={a.key}
+                  onChange={(e) => handleValueUpdate(e.target.value,
+                      a.value, i)}
+              />
+            </FormGroup>
+          </Col>
+          <Col xs={5}>
+            <FormGroup>
+              <Form.Label/>
+              <Form.Control
+                  type="text"
+                  value={a.value}
+                  onChange={(e) => handleValueUpdate(a.key,
+                      e.target.value, i)}
+              />
+            </FormGroup>
+          </Col>
+          <Col xs={2}>
+            <a
+                className="text-danger"
+                title={"Remove attribute"}
+                onClick={() => handleRemoveAttributeClick(i)}
+            >
+              <Trash className="align-middle mt-3" size={18}/>
+            </a>
+          </Col>
+        </Row>
+    )
+  });
 
-          <Row>
-            <Col xs={5}>
-              <FormGroup>
-                <Form.Label>Name</Form.Label>
-              </FormGroup>
-            </Col>
-            <Col xs={5}>
-              <FormGroup>
-                <Form.Label>Value</Form.Label>
-              </FormGroup>
-            </Col>
-            <Col xs={2}></Col>
-          </Row>
+  return (
+      <React.Fragment>
 
-          {inputs}
+        <Row>
+          <Col xs={5}>
+            <FormGroup>
+              <Form.Label>Name</Form.Label>
+            </FormGroup>
+          </Col>
+          <Col xs={5}>
+            <FormGroup>
+              <Form.Label>Value</Form.Label>
+            </FormGroup>
+          </Col>
+          <Col xs={2}></Col>
+        </Row>
 
-          <Row>
-            <Col md={12} className="mt-2">
-              <Button
-                  variant="info"
-                  onClick={this.handleAddAttributeClick}>
-                <FontAwesomeIcon icon={faPlusCircle}/> Add Attribute
-              </Button>
-            </Col>
-          </Row>
+        {inputs}
 
-        </React.Fragment>
-    );
+        <Row>
+          <Col md={12} className="mt-2">
+            <Button
+                variant="info"
+                onClick={handleAddAttributeClick}>
+              <FontAwesomeIcon icon={faPlusCircle}/> Add Attribute
+            </Button>
+          </Col>
+        </Row>
 
-  }
+      </React.Fragment>
+  );
+
 
 }
 
