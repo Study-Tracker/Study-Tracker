@@ -22,76 +22,86 @@ import {FormGroup} from "./common";
 import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {StatusDropdown} from "./status";
 import {statuses} from "../../config/statusConstants";
-import {UserInputs} from "./users";
+import UserInputs from "./UserInputs";
 import swal from 'sweetalert';
-import {history} from '../../App';
-import {KeywordInputs} from "./keywords";
-import CollaboratorInputs from "./collaborators";
+import KeywordInputs from "./KeywordInputs";
+import CollaboratorInputs from "./CollaboratorInputs";
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../loading";
 import {Breadcrumbs} from "../common";
 import {NotebookEntryTemplatesDropdown} from "./notebookEntryTemplates";
-import {getCsrfToken} from "../../config/csrf";
+import {useNavigate} from "react-router-dom";
+import {Form as FormikForm, Formik} from "formik";
+import FormikFormErrorNotification from "./FormikFormErrorNotification";
+import * as yup from "yup";
+import axios from "axios";
 
-export default class StudyForm extends React.Component {
+const StudyForm = props => {
 
-  constructor(props) {
-    super(props);
+  const navigate = useNavigate();
 
-    if (!!props.study) {
-      props.study.lastModifiedBy = this.props.user;
-    }
+  const defaultStudyValues = {
+    name: '',
+    code: null,
+    description: '',
+    status: statuses.IN_PLANNING.value,
+    legacy: false,
+    external: false,
+    startDate: null,
+    endDate: null,
+    collaborator: null,
+    users: [{
+      ...props.user,
+      owner: true
+    }],
+    owner: props.user,
+    notebookFolder: {},
+    notebookTemplateId: !!props.defaultNotebookTemplate
+        ? props.defaultNotebookTemplate.templateId : null
+  };
 
-    this.state = {
-      study: props.study || {
-        status: statuses.IN_PLANNING.value,
-        users: [{
-          ...this.props.user,
-          owner: true
-        }],
-        owner: this.props.user,
-        notebookFolder: {},
-        notebookTemplateId: !!props.defaultNotebookTemplate
-            ? props.defaultNotebookTemplate.templateId : null
-      },
-      validation: {
-        nameIsValid: true,
-        descriptionIsValid: true,
-        programIsValid: true,
-        startDateIsValid: true,
-        usersIsValid: true,
-        ownerIsValid: true,
-        collaboratorIsValid: true
-      },
-      showLoadingOverlay: false
-    };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
-    this.handleFormUpdate = this.handleFormUpdate.bind(this);
-    this.handleLegacyToggle = this.handleLegacyToggle.bind(this);
-    this.validateForm = this.validateForm.bind(this);
-  }
-
-  /**
-   * Updates the study state when an input is changed.
-   *
-   * @param data
-   */
-  handleFormUpdate(data) {
-    const study = {
-      ...this.state.study,
-      ...data
-    };
-    console.log(study);
-    this.setState({
-      study: study
-    })
-  }
+  const studySchema = yup.object().shape({
+    name: yup.string()
+      .required("Name is required")
+      .max(255, "Name cannot be larger than 255 characters"),
+    code: yup.string()
+      .nullable(true)
+      .when("legacy", {
+        is: true,
+        then: yup.string()
+          .typeError("Code is required for legacy studies.")
+          .required("Code is required for legacy studies.")
+          .matches("^[A-Za-z0-9_-]+$", "Code must contain only alphanumeric, hyphen, and underscore characters.")
+          .max(255, "Code cannot be larger than 255 characters")
+    }),
+    externalCode: yup.string()
+      .nullable(true)
+      .max(255, "External code cannot be larger than 255 characters")
+      .matches("[A-Za-z0-9_-]+", "External code must contain only alphanumeric, hyphen, and underscore characters."),
+    status: yup.string().required("Status is required"),
+    program: yup.object().required("Program is required"),
+    description: yup.string().required("Description is required"),
+    legacy: yup.bool(),
+    external: yup.bool(),
+    startDate: yup.date()
+      .typeError("Start date is required")
+      .required("Start date is required"),
+    endDate: yup.date().nullable(true),
+    users: yup.array().of(yup.object()).min(1, "At least one user is required"),
+    owner: yup.object().required("Owner is required"),
+    collaborator: yup.object()
+      .nullable(true)
+      .when("external", {
+        is: true,
+        then: yup.object()
+        .required("Collaborator is required for external studies.")
+      }),
+  });
 
   /**
    * Handles toggling display of legacy study container when checkbox is checked.
    */
-  handleLegacyToggle(e) {
+  const handleLegacyToggle = (e) => {
     const container = document.getElementById("legacy-input-container");
     if (e.target.checked) {
       container.style.display = "block";
@@ -102,133 +112,52 @@ export default class StudyForm extends React.Component {
       container.classList.remove("animated");
       container.style.display = "none";
     }
-    this.handleFormUpdate({
-      legacy: e.target.checked
+  }
+
+  const submitForm = (values, {setSubmitting}) => {
+
+    const isUpdate = !!values.id;
+    const url = isUpdate
+        ? "/api/study/" + values.id
+        : "/api/study";
+
+    axios({
+      url: url,
+      method: isUpdate ? "put" : "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      data: values
     })
-  }
+    .then(async response => {
 
-  validateForm(study) {
-    let isError = false;
-    let validation = this.state.validation;
-
-    // Name
-    if (!study.name) {
-      isError = true;
-      validation.nameIsValid = false;
-    } else {
-      validation.nameIsValid = true;
-    }
-
-    // Description
-    if (!study.description) {
-      isError = true;
-      validation.descriptionIsValid = false;
-    } else {
-      validation.descriptionIsValid = true;
-    }
-
-    // Start Date
-    if (!study.startDate) {
-      isError = true;
-      validation.startDateIsValid = false;
-    } else {
-      validation.startDateIsValid = true;
-    }
-
-    // Program
-    if (!study.program) {
-      isError = true;
-      validation.programIsValid = false;
-    } else {
-      validation.programIsValid = true;
-    }
-
-    // Study team
-    if (!study.users || study.users.length === 0) {
-      isError = true;
-      validation.usersIsValid = false;
-    } else {
-      validation.usersIsValid = true;
-    }
-
-    // Owner
-    if (!!study.owner) {
-      validation.isOwnerValid = true;
-    } else {
-      isError = true;
-      validation.ownerIsValid = false;
-    }
-
-    // Collaborator
-    if (study.collaborator === -1) {
-      validation.collaboratorIsValid = false
-      isError = true;
-    } else {
-      validation.collaboratorIsValid = true;
-    }
-
-    this.setState({
-      validation: validation
-    });
-    return isError;
-  }
-
-  handleSubmit() {
-
-    let isError = this.validateForm(this.state.study);
-    console.log(this.state);
-
-    if (isError) {
-
-      swal("Looks like you forgot something...",
-          "Check that all of the required inputs have been filled and then try again.",
-          "warning");
-      console.warn("Validation failed.");
-
-    } else {
-
-      const isUpdate = !!this.state.study.id;
-      const url = isUpdate
-          ? "/api/study/" + this.state.study.id
-          : "/api/study";
-      this.setState({showLoadingOverlay: true});
-
-      fetch(url, {
-        method: isUpdate ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": getCsrfToken()
-        },
-        body: JSON.stringify(this.state.study)
-      })
-      .then(async response => {
-
-        const json = await response.json();
-        console.log(json);
-        if (response.ok) {
-          history.push("/study/" + json.code);
-        } else {
-          this.setState({showLoadingOverlay: false})
-          swal("Something went wrong",
-              !!json.message
-                  ? "Error: " + json.message :
-                  "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-          );
-          console.error("Request failed.");
-        }
-
-      }).catch(e => {
-        this.setState({showLoadingOverlay: false})
-        swal(
-            "Something went wrong",
-            "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
+      const json = response.data;
+      console.debug(json);
+      if (response.status === 200 || response.status === 201) {
+        setSubmitting(false);
+        navigate("/study/" + json.code);
+      } else {
+        setSubmitting(false);
+        swal("Something went wrong",
+            !!json.message
+                ? "Error: " + json.message :
+                "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
         );
-        console.error(e);
-      });
-    }
+        console.error("Request failed.");
+      }
+
+    }).catch(e => {
+      setSubmitting(false);
+      swal(
+          "Something went wrong",
+          "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
+      );
+      console.error(e);
+    });
+
   }
 
-  handleCancel() {
+  const handleCancel = () => {
     swal({
       title: "Are you sure you want to leave the page?",
       text: "Any unsaved work will be lost.",
@@ -237,395 +166,430 @@ export default class StudyForm extends React.Component {
     })
     .then(val => {
       if (val) {
-        history.push("/");
+        navigate("/");
       }
     });
   }
 
-  render() {
+  return (
 
-    return (
-        <Container fluid className="animated fadeIn max-width-1200">
+    <Formik
+        initialValues={props.study
+            ? {
+                ...props.study,
+                lastModifiedBy: props.user
+            } : defaultStudyValues
+        }
+        onSubmit={submitForm}
+        validationSchema={studySchema}
+        validateOnBlur={false}
+        validateOnChange={false}
+    >
+      {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          setFieldValue,
+          isSubmitting,
+      }) => (
+          <Container fluid className="animated fadeIn max-width-1200">
 
-          <LoadingOverlay
-              isVisible={this.state.showLoadingOverlay}
-              message={"Saving your study..."}
-          />
+            <LoadingOverlay
+                isVisible={isSubmitting}
+                message={"Saving your study..."}
+            />
 
-          <Row>
-            <Col>
-              {
-                !!this.state.study.id
-                    ? (
-                        <Breadcrumbs crumbs={[
-                          {label: "Home", url: "/"},
+            <FormikFormErrorNotification />
+
+            <Row>
+              <Col>
+                {
+                  !!props.study
+                      ? (
+                          <Breadcrumbs crumbs={[
+                            {label: "Home", url: "/"},
+                            {
+                              label: "Study Detail",
+                              url: "/study/" + props.study.code
+                            },
+                            {label: "Edit Study"}
+                          ]}/>
+                      )
+                      : (
+                          <Breadcrumbs crumbs={[
+                            {label: "Home", url: "/"},
+                            {label: "New Study"}
+                          ]}/>
+                      )
+                }
+              </Col>
+            </Row>
+
+            <Row className="justify-content-end align-items-center">
+              <Col>
+                <h3>{!!props.study ? "Edit Study" : "New Study"}</h3>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col xs={12}>
+                <Card>
+
+                  <Card.Header>
+                    <Card.Title tag="h5">Study Overview</Card.Title>
+                    <h6 className="card-subtitle text-muted">Tell us something
+                      about your study. Study names should be unique. Describe the
+                      objective of your study in one or two sentences. Select the
+                      status that best reflects the current state of your study.
+                      Choose the date your study is expected to start. If the
+                      study has already completed, you may select an end
+                      date.</h6>
+                  </Card.Header>
+
+                  <Card.Body>
+                    <FormikForm className="study-form">
+
+                      {/*Overview*/}
+                      <Row>
+
+                        <Col md={7}>
+                          <FormGroup>
+                            <Form.Label>Name *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                isInvalid={!!errors.name}
+                                value={values.name}
+                                onChange={handleChange}
+                                disabled={!!props.study}
+                            />
+                            <Form.Control.Feedback type={"invalid"}>
+                              {errors.name}
+                            </Form.Control.Feedback>
+                            <Form.Text>Must be unique.</Form.Text>
+                          </FormGroup>
+                        </Col>
+
+                        <Col md={5}>
+                          <ProgramDropdown
+                              programs={props.programs}
+                              selectedProgram={!!values.program
+                                  ? values.program.id : -1}
+                              onChange={(value) => setFieldValue("program", value)}
+                              isInvalid={!!errors.program}
+                              disabled={!!props.study}
+                              isLegacyStudy={values.legacy}
+                          />
+                        </Col>
+
+                      </Row>
+
+                      <Row>
+                        <Col md={7}>
+                          <FormGroup>
+                            <Form.Label>Description *</Form.Label>
+                            <ReactQuill
+                                theme="snow"
+                                name={"description"}
+                                value={values.description}
+                                className={(!!errors.description ? " is-invalid" : '')}
+                                onChange={content =>
+                                    setFieldValue("description", content)}
+                            />
+                            <Form.Control.Feedback type={"invalid"}>
+                              Description must not be empty.
+                            </Form.Control.Feedback>
+                          </FormGroup>
+                        </Col>
+
+                        <Col md={5}>
+
+                          <StatusDropdown
+                              selected={values.status}
+                              onChange={(value) => setFieldValue("status", value)}
+                          />
+
                           {
-                            label: "Study Detail",
-                            url: "/study/" + this.state.study.code
-                          },
-                          {label: "Edit Study"}
-                        ]}/>
-                    )
-                    : (
-                        <Breadcrumbs crumbs={[
-                          {label: "Home", url: "/"},
-                          {label: "New Study"}
-                        ]}/>
-                    )
-              }
-            </Col>
-          </Row>
+                            !props.study
+                            && props.features
+                            && props.features.notebook
+                            && props.features.notebook.isEnabled ? (
+                                <NotebookEntryTemplatesDropdown
+                                    notebookTemplates={props.notebookTemplates}
+                                    defaultTemplate={props.defaultNotebookTemplate}
+                                    onChange={selectedItem =>
+                                        setFieldValue(
+                                            "notebookTemplateId",
+                                            selectedItem ? selectedItem.value : ''
+                                        )
+                                    }
+                                />
+                            ) : ''
+                          }
 
-          <Row className="justify-content-end align-items-center">
-            <Col>
-              <h3>{!!this.state.study.id ? "Edit Study" : "New Study"}</h3>
-            </Col>
-          </Row>
+                          <FormGroup>
+                            <Form.Label>Start Date *</Form.Label>
+                            <DatePicker
+                                maxlength="2"
+                                className={"form-control " + (!!errors.startDate ? " is-invalid" : '')}
+                                invalid={!!errors.startDate}
+                                wrapperClassName="form-control"
+                                selected={values.startDate}
+                                name="startDate"
+                                onChange={(date) => setFieldValue("startDate", date)}
+                                isClearable={true}
+                                dateFormat=" MM / dd / yyyy"
+                                placeholderText="MM / DD / YYYY"
+                            />
+                            <Form.Control.Feedback type={"invalid"}>
+                              You must select a Start Date.
+                            </Form.Control.Feedback>
+                            <Form.Text>
+                              Select the date your study began or is expected to
+                              begin.
+                            </Form.Text>
+                          </FormGroup>
 
-          <Row>
-            <Col xs={12}>
-              <Card>
+                          <FormGroup>
+                            <Form.Label>End Date</Form.Label>
+                            <DatePicker
+                                maxlength="2"
+                                className="form-control"
+                                name={"endDate"}
+                                wrapperClassName="form-control"
+                                selected={values.endDate}
+                                onChange={(date) => setFieldValue("endDate", date)}
+                                isClearable={true}
+                                dateFormat=" MM / dd / yyyy"
+                                placeholderText="MM / DD / YYYY"
+                            />
+                            <Form.Text>
+                              Select the date your study was completed.
+                            </Form.Text>
+                          </FormGroup>
 
-                <Card.Header>
-                  <Card.Title tag="h5">Study Overview</Card.Title>
-                  <h6 className="card-subtitle text-muted">Tell us something
-                    about your study. Study names should be unique. Describe the
-                    objective of your study in one or two sentences. Select the
-                    status that best reflects the current state of your study.
-                    Choose the date your study is expected to start. If the
-                    study has already completed, you may select an end
-                    date.</h6>
-                </Card.Header>
+                        </Col>
+                      </Row>
 
-                <Card.Body>
-                  <Form className="study-form">
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
 
-                    {/*Overview*/}
-                    <Row>
+                      {/*Legacy studies*/}
+                      {
+                        !!values.id && !values.legacy
+                            ? ""
+                            : (
+                                <React.Fragment>
+                                  <Row>
 
-                      <Col md={7}>
-                        <FormGroup>
-                          <Form.Label>Name *</Form.Label>
-                          <Form.Control
-                              type="text"
-                              isInvalid={!this.state.validation.nameIsValid}
-                              defaultValue={this.state.study.name || ''}
-                              onChange={(e) => this.handleFormUpdate(
-                                  {"name": e.target.value})}
-                              disabled={!!this.state.study.id}
+                                    <Col md={12}>
+                                      <h5 className="card-title">Legacy Study</h5>
+                                      <h6 className="card-subtitle text-muted">Studies
+                                        created
+                                        prior to the introduction of Study Tracker are
+                                        considered legacy. Enabling this option allows
+                                        you to
+                                        specify certain attributes that would
+                                        otherwise be
+                                        automatically generated.</h6>
+                                      <br/>
+                                    </Col>
+
+                                    <Col md={12}>
+                                      <FormGroup>
+                                        <Form.Check
+                                            id="legacy-check"
+                                            type="checkbox"
+                                            label="Is this a legacy study?"
+                                            onChange={e => {
+                                              handleLegacyToggle(e);
+                                              setFieldValue("legacy", e.target.checked);
+                                            }}
+                                            disabled={!!props.study}
+                                            defaultChecked={!!props.study
+                                                && !!values.legacy}
+                                        />
+                                      </FormGroup>
+                                    </Col>
+
+                                    <Col md={12} id="legacy-input-container"
+                                         style={{
+                                           display: !!props.study
+                                            && !!values.legacy
+                                               ? "block"
+                                               : "none"
+                                         }}>
+
+                                      <Row>
+
+                                        <Col md={6}>
+                                          <FormGroup>
+                                            <Form.Label>Study Code *</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                isInvalid={!!errors.code}
+                                                disabled={!!props.study}
+                                                name={"code"}
+                                                value={values.code}
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Control.Feedback type={"invalid"}>
+                                              {errors.code}
+                                            </Form.Control.Feedback>
+                                            <Form.Text>
+                                              Provide the existing code or ID
+                                              for the study.
+                                            </Form.Text>
+                                          </FormGroup>
+                                        </Col>
+
+                                        <Col md={6}>
+                                          <FormGroup>
+                                            <Form.Label>Notebook URL</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name={"notebookFolder.url"}
+                                                disabled={!!props.study}
+                                                value={values.notebookFolder.url}
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Text>
+                                              If the study already has an ELN
+                                              entry, provide the URL here.
+                                            </Form.Text>
+                                          </FormGroup>
+                                        </Col>
+
+                                      </Row>
+
+                                    </Col>
+
+                                  </Row>
+
+                                  <Row>
+                                    <Col>
+                                      <hr/>
+                                    </Col>
+                                  </Row>
+
+                                </React.Fragment>
+                            )
+                      }
+
+
+                      {/*CRO*/}
+
+                      <CollaboratorInputs
+                          isExternalStudy={values.external}
+                          collaborator={values.collaborator}
+                          externalCode={values.externalCode}
+                          onChange={(key, value) => setFieldValue(key, value)}
+                      />
+
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
+
+                      {/*Study Team*/}
+                      <Row>
+                        <Col md={12}>
+                          <h5 className="card-title">Study Team</h5>
+                          <h6 className="card-subtitle text-muted">Who will be
+                            working on this study? One user must be assigned as
+                            the study owner. This person will be the primary
+                            contact person for the study.</h6>
+                          <br/>
+                        </Col>
+
+                        <Col md={12}>
+                          <UserInputs
+                              users={values.users}
+                              owner={values.owner}
+                              onChange={(key, value) => setFieldValue(key, value)}
+                              isValid={!errors.users && !errors.owner}
                           />
-                          <Form.Control.Feedback type={"invalid"}>Name must not
-                            be empty.</Form.Control.Feedback>
-                          <Form.Text>Must be unique.</Form.Text>
-                        </FormGroup>
-                      </Col>
+                        </Col>
 
-                      <Col md={5}>
-                        <ProgramDropdown
-                            programs={this.props.programs}
-                            selectedProgram={!!this.state.study.program
-                                ? this.state.study.program.id : -1}
-                            onChange={this.handleFormUpdate}
-                            isValid={this.state.validation.programIsValid}
-                            disabled={!!this.state.study.id}
-                            isLegacyStudy={!!this.state.study.legacy}
-                        />
-                      </Col>
+                      </Row>
 
-                    </Row>
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
 
-                    <Row>
-                      <Col md={7}>
-                        <FormGroup>
-                          <Form.Label>Description *</Form.Label>
-                          <ReactQuill
-                              theme="snow"
-                              defaultValue={this.state.study.description || ''}
-                              onChange={content => this.handleFormUpdate(
-                                  {"description": content})}
+                      {/*Keywords*/}
+                      <Row>
+                        <Col md={12}>
+                          <h5 className="card-title">Keywords</h5>
+                          <h6 className="card-subtitle text-muted">Tag your study
+                            with keywords to make it more searchable and
+                            identifiable. Select a keyword category and then use
+                            the searchable select input to find available keyword
+                            terms. You may choose as many keywords as you'd
+                            like.</h6>
+                          <br/>
+                        </Col>
+
+                        <Col md={12}>
+                          <KeywordInputs
+                              keywords={values.keywords || []}
+                              keywordCategories={props.keywordCategories}
+                              onChange={(value) => setFieldValue("keywords", value)}
                           />
-                          <Form.Control.Feedback type={"invalid"}>
-                            Description must not be empty.
-                          </Form.Control.Feedback>
-                        </FormGroup>
-                      </Col>
+                        </Col>
 
-                      <Col md={5}>
+                      </Row>
 
-                        <StatusDropdown
-                            selected={this.state.study.status}
-                            onChange={this.handleFormUpdate}
-                        />
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
 
-                        {
-                          !this.state.study.id ? (
-                              <NotebookEntryTemplatesDropdown
-                                  notebookTemplates={this.props.notebookTemplates}
-                                  defaultTemplate={this.props.defaultNotebookTemplate}
-                                  onChange={selectedItem => {
-                                    this.handleFormUpdate({
-                                      notebookTemplateId: selectedItem
-                                          ? selectedItem.value
-                                          : ''
-                                    })
-                                  }}
-                              />
-                          ) : ''
-                        }
+                      {/*Buttons*/}
+                      <Row>
+                        <Col className="text-center">
+                          <FormGroup>
+                            <Button
+                              size="lg"
+                              variant="primary"
+                              type="submit"
+                            >
+                              Submit
+                            </Button>
+                            &nbsp;&nbsp;
+                            <Button
+                              size="lg"
+                              variant="secondary"
+                              onClick={handleCancel}
+                            >
+                              Cancel
+                            </Button>
+                          </FormGroup>
+                        </Col>
+                      </Row>
 
-                        <FormGroup>
-                          <Form.Label>Start Date *</Form.Label>
-                          <DatePicker
-                              maxlength="2"
-                              className={"form-control"}
-                              invalid={!this.state.validation.startDateIsValid}
-                              wrapperClassName="form-control"
-                              selected={this.state.study.startDate || null}
-                              onChange={(date) => this.handleFormUpdate(
-                                  {"startDate": date})}
-                              isClearable={true}
-                              dateFormat=" MM / dd / yyyy"
-                              placeholderText="MM / DD / YYYY"
-                          />
-                          <Form.Control.Feedback type={"invalid"}>
-                            You must select a Start Date.
-                          </Form.Control.Feedback>
-                          <Form.Text>
-                            Select the date your study began or is expected to
-                            begin.
-                          </Form.Text>
-                        </FormGroup>
+                    </FormikForm>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
 
-                        <FormGroup>
-                          <Form.Label>End Date</Form.Label>
-                          <DatePicker
-                              maxlength="2"
-                              className="form-control"
-                              wrapperClassName="form-control"
-                              selected={this.state.study.endDate || null}
-                              onChange={(date) => this.handleFormUpdate(
-                                  {"endDate": date})}
-                              isClearable={true}
-                              dateFormat=" MM / dd / yyyy"
-                              placeholderText="MM / DD / YYYY"
-                          />
-                          <Form.Text>
-                            Select the date your study was completed.
-                          </Form.Text>
-                        </FormGroup>
+          </Container>
 
-                      </Col>
-                    </Row>
+        )}
 
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
+    </Formik>
 
-                    {/*Legacy studies*/}
-                    {
-                      !!this.state.study.id && !this.state.study.legacy
-                          ? ""
-                          : (
-                              <React.Fragment>
-                                <Row>
-
-                                  <Col md={12}>
-                                    <h5 className="card-title">Legacy Study</h5>
-                                    <h6 className="card-subtitle text-muted">Studies
-                                      created
-                                      prior to the introduction of Study Tracker are
-                                      considered legacy. Enabling this option allows
-                                      you to
-                                      specify certain attributes that would
-                                      otherwise be
-                                      automatically generated.</h6>
-                                    <br/>
-                                  </Col>
-
-                                  <Col md={12}>
-                                    <FormGroup>
-                                      <Form.Check
-                                          id="legacy-check"
-                                          type="checkbox"
-                                          label="Is this a legacy study?"
-                                          onChange={this.handleLegacyToggle}
-                                          disabled={!!this.state.study.id}
-                                          defaultChecked={!!this.state.study.id
-                                              && !!this.state.study.legacy}
-                                      />
-                                    </FormGroup>
-                                  </Col>
-
-                                  <Col md={12} id="legacy-input-container"
-                                       style={{
-                                         display: !!this.state.study.id
-                                         && !!this.state.study.legacy ? "block"
-                                             : "none"
-                                       }}>
-
-                                    <Row>
-
-                                      <Col md={6}>
-                                        <FormGroup>
-                                          <Form.Label>Study Code *</Form.Label>
-                                          <Form.Control
-                                              type="text"
-                                              isInvalid={false}
-                                              disabled={!!this.state.study.id}
-                                              defaultValue={this.state.study.code
-                                                  || ''}
-                                              onChange={(e) => this.handleFormUpdate(
-                                                  {"code": e.target.value})}
-                                          />
-                                          <Form.Control.Feedback type={"invalid"}>
-                                            Legacy studies must be provided a
-                                            Study Code.
-                                          </Form.Control.Feedback>
-                                          <Form.Text>
-                                            Provide the existing code or ID
-                                            for the study.
-                                          </Form.Text>
-                                        </FormGroup>
-                                      </Col>
-
-                                      <Col md={6}>
-                                        <FormGroup>
-                                          <Form.Label>Notebook URL</Form.Label>
-                                          <Form.Control
-                                              type="text"
-                                              disabled={!!this.state.study.id}
-                                              defaultValue={
-                                                !!this.state.study.notebookFolder
-                                                && !!this.state.study.notebookFolder.url
-                                                    ? this.state.study.notebookFolder.url
-                                                    : ''
-                                              }
-                                              onChange={(e) => this.handleFormUpdate(
-                                                  {
-                                                    "notebookFolder": {
-                                                      url: e.target.value
-                                                    }
-                                                  })}
-                                          />
-                                          <Form.Text>
-                                            If the study already has an ELN
-                                            entry, provide the URL here.
-                                          </Form.Text>
-                                        </FormGroup>
-                                      </Col>
-
-                                    </Row>
-
-                                  </Col>
-
-                                </Row>
-
-                                <Row>
-                                  <Col>
-                                    <hr/>
-                                  </Col>
-                                </Row>
-
-                              </React.Fragment>
-                          )
-                    }
-
-
-                    {/*CRO*/}
-
-                    <CollaboratorInputs
-                        collaborator={this.state.study.collaborator}
-                        externalCode={this.state.study.externalCode}
-                        onChange={this.handleFormUpdate}
-                    />
-
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
-
-                    {/*Study Team*/}
-                    <Row>
-                      <Col md={12}>
-                        <h5 className="card-title">Study Team</h5>
-                        <h6 className="card-subtitle text-muted">Who will be
-                          working on this study? One user must be assigned as
-                          the study owner. This person will be the primary
-                          contact person for the study.</h6>
-                        <br/>
-                      </Col>
-
-                      <Col md={12}>
-                        <UserInputs
-                            users={this.state.study.users || []}
-                            owner={this.state.study.owner}
-                            onChange={this.handleFormUpdate}
-                            isValid={this.state.validation.usersIsValid
-                                && this.state.validation.ownerIsValid}
-                        />
-                      </Col>
-
-                    </Row>
-
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
-
-                    {/*Keywords*/}
-                    <Row>
-                      <Col md={12}>
-                        <h5 className="card-title">Keywords</h5>
-                        <h6 className="card-subtitle text-muted">Tag your study
-                          with keywords to make it more searchable and
-                          identifiable. Select a keyword category and then use
-                          the searchable select input to find available keyword
-                          terms. You may choose as many keywords as you'd
-                          like.</h6>
-                        <br/>
-                      </Col>
-
-                      <Col md={12}>
-                        <KeywordInputs
-                            keywords={this.state.study.keywords || []}
-                            keywordCategories={this.props.keywordCategories}
-                            onChange={this.handleFormUpdate}
-                        />
-                      </Col>
-
-                    </Row>
-
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
-
-                    {/*Buttons*/}
-                    <Row>
-                      <Col className="text-center">
-                        <FormGroup>
-                          <Button size="lg" variant="primary"
-                                  onClick={this.handleSubmit}>Submit</Button>
-                          &nbsp;&nbsp;
-                          <Button size="lg" variant="secondary"
-                                  onClick={this.handleCancel}>Cancel</Button>
-                        </FormGroup>
-                      </Col>
-                    </Row>
-
-                  </Form>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-        </Container>
-    );
-  }
+  );
 
 }
+
+export default StudyForm;

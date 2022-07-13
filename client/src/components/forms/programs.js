@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {FormGroup} from "./common";
 import {Form} from "react-bootstrap";
 import Select from "react-select";
@@ -23,36 +23,41 @@ export const ProgramDropdown = ({
   programs,
   selectedProgram,
   onChange,
-  isValid,
+  isInvalid,
   disabled,
   isLegacyStudy
 }) => {
 
-  const programOptions = programs
-  .filter(p => !!isLegacyStudy || !!p.active)
-  .sort((a, b) => {
-    if (a.name > b.name) {
-      return 1;
-    } else if (a.name < b.name) {
-      return -1;
-    } else {
-      return 0;
-    }
-  })
-  .map(program => {
-    return {
-      value: program.id,
-      label: !!program.subProgram ? program.name + ": " + program.subProgram
-          : program.name
-    };
-  });
+  const [programOptions, setProgramOptions] = useState([]);
+
+  useEffect(() => {
+    const options = programs
+    .filter(p => isLegacyStudy || p.active)
+    .sort((a, b) => {
+      if (a.name > b.name) {
+        return 1;
+      } else if (a.name < b.name) {
+        return -1;
+      } else {
+        return 0;
+      }
+    })
+    .map(program => {
+      return {
+        value: program.id,
+        label: !!program.subProgram ? program.name + ": " + program.subProgram
+            : program.name
+      };
+    });
+    setProgramOptions(options);
+  }, [programs, isLegacyStudy]);
 
   return (
       <FormGroup>
         <Form.Label>Program *</Form.Label>
         <Select
-            className={"react-select-container "}
-            invalid={!isValid}
+            className={"react-select-container " + (isInvalid ? "is-invalid" : "")}
+            invalid={isInvalid}
             classNamePrefix="react-select"
             value={programOptions.filter(option => {
               return option.value === selectedProgram
@@ -62,13 +67,16 @@ export const ProgramDropdown = ({
               const program = programs.filter(p => {
                 return p.id === selected.value;
               })[0];
-              onChange({"program": program});
+              onChange(program);
             }}
             isDisabled={disabled}
         />
-        <Form.Control.Feedback>
-          Select the program your study is associated with.
+        <Form.Control.Feedback type={"invalid"}>
+          You must select a program.
         </Form.Control.Feedback>
+        <Form.Text>
+          Select the program your study is associated with.
+        </Form.Text>
       </FormGroup>
   );
 

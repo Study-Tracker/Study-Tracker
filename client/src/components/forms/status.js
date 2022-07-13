@@ -40,7 +40,7 @@ export const StatusDropdown = ({onChange, selected}) => {
             classNamePrefix="react-select"
             options={statusOptions}
             defaultValue={defaultValue}
-            onChange={(selected) => onChange({"status": selected.value})}
+            onChange={(selected) => onChange(selected.value)}
         />
       </FormGroup>
   );

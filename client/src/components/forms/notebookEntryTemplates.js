@@ -19,6 +19,7 @@ import {Form} from "react-bootstrap";
 import Select from "react-select";
 import {FormGroup} from "./common";
 
+//TODO: Replace predefined list with on-demand lookup.
 export const NotebookEntryTemplatesDropdown = ({
   notebookTemplates,
   defaultTemplate,

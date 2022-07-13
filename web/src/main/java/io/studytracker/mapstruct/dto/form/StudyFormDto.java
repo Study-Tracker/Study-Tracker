@@ -33,6 +33,7 @@ public class StudyFormDto {
   private CollaboratorDto collaborator;
   private boolean legacy = false;
   private boolean active = true;
+  private boolean external = false;
   private ELNFolderDto notebookFolder;
   private FileStoreFolderDto storageFolder;
   private UserSummaryDto createdBy;

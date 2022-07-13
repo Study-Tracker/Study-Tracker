@@ -15,7 +15,6 @@
  */
 
 import React, {useState} from "react";
-import {getCsrfToken} from "../../config/csrf";
 import 'react-datepicker/dist/react-datepicker.css';
 import {
   Breadcrumb,
@@ -36,6 +35,8 @@ import PropTypes from "prop-types";
 import {Form as FormikForm, Formik} from "formik";
 import {useNavigate} from "react-router-dom";
 import FormikFormErrorNotification from "./FormikFormErrorNotification";
+import axios from "axios";
+import * as yup from "yup";
 
 const ProgramForm = props => {
 
@@ -52,139 +53,85 @@ const ProgramForm = props => {
     }
   ];
 
-  // constructor(props) {
-  //   super(props);
-  //
-  //   this.state = {
-  //     program: props.program || {
-  //       active: true,
-  //       attributes: {},
-  //       notebookFolder: {}
-  //     },
-  //     validation: {
-  //       nameIsValid: true,
-  //       nameIsUnique: true,
-  //       descriptionIsValid: true,
-  //       codeIsValid: true,
-  //       programFolderIdIsValid: true
-  //     },
-  //     showLoadingOverlay: false
-  //   };
-  //   this.handleSubmit = this.handleSubmit.bind(this);
-  //   this.handleCancel = this.handleCancel.bind(this);
-  //   this.handleFormUpdate = this.handleFormUpdate.bind(this);
-  //   this.validateForm = this.validateForm.bind(this);
-  // }
+  const programSchema = yup.object().shape({
+    id: yup.number(),
+    name: yup.string()
+      .required("Name is required.")
+      .max(255, "Name cannot be larger than 255 characters")
+      .test(
+        "unique",
+        "Name must be unique",
+        value => !props.programs.find(p => !!value && p.name.toLowerCase() === value.toLowerCase())
+      ),
+    description: yup.string()
+      .required("Description is required."),
+    code: yup.string()
+      .required("Code is required.")
+      .matches("[A-Za-z0-9]+", "Code must be alphanumeric."),
+    active: yup.boolean(),
+    notebookFolder: yup.object()
+      .when("id", {
+        is: id => id !== null && props.features && props.features.notebook.isEnabled,
+        then: yup.object().shape({
+          referenceId: yup.string()
+            .required("Notebook folder reference ID is required."),
+          name: yup.string(),
+          url: yup.string().url()
+        })
+      })
+  });
 
-  // /**
-  //  * Updates the program state when an input is changed.
-  //  *
-  //  * @param data
-  //  */
-  // const handleFormUpdate = (data) => {
-  //   const program = {
-  //     ...state.program,
-  //     ...data
-  //   };
-  //   console.log(program);
-  //   this.setState({
-  //     program: program
-  //   })
-  // }
+  const defaultProgramValues = {
+    name: '',
+    code: '',
+    description: '',
+    active: true,
+    attributes: {},
+    notebookFolder: {},
+  };
 
-  // const validateForm = (program) => {
-  //
-  //   const errors = {};
-  //
-  //   // Name
-  //   if (!program.name) {
-  //     errors.name = 'Name is required';
-  //   }
-  //   if (!program.id) {
-  //     for (let p of this.props.programs) {
-  //       if (!!program.name && p.name.toLowerCase()
-  //           === program.name.toLowerCase()) {
-  //         errors.name = 'Name is not unique';
-  //       }
-  //     }
-  //   }
-  //
-  //   // Description
-  //   if (!program.description) {
-  //     errors.description = 'Description is required';
-  //   }
-  //
-  //   // Code
-  //   if (/[^A-Za-z0-9]/.test(program.code)) {
-  //     errors.code = "Code is invalid";
-  //   }
-  //
-  //   // ELN
-  //   if (this.props.features
-  //       && this.props.features.notebook.isEnabled
-  //       && !program.notebookFolder.referenceId
-  //   ) {
-  //     errors.notebookFolder.referenceId = "Notebook folder ID is required";
-  //   }
-  //
-  //   return errors;
-  //
-  // }
+  const submitForm = (values, {setSubmitting}) => {
+    console.debug(values);
+    const isUpdate = !!values.id;
+    const url = isUpdate
+        ? "/api/program/" + values.id
+        : "/api/program";
+    setShowLoadingOverlay(true);
 
-  // const handleSubmit = (values, {setSubmitting}) => {
-  //
-  //   let isError = this.validateForm(this.state.program);
-  //   console.log(this.state);
-  //
-  //   if (isError) {
-  //
-  //     swal("Looks like you forgot something...",
-  //         "Check that all of the required inputs have been filled and then try again.",
-  //         "warning");
-  //     console.warn("Validation failed.");
-  //
-  //   } else {
-  //
-  //     const isUpdate = !!this.state.program.id;
-  //     const url = isUpdate
-  //         ? "/api/program/" + this.state.program.id
-  //         : "/api/program";
-  //     this.setState({showLoadingOverlay: true});
-  //
-  //     fetch(url, {
-  //       method: isUpdate ? "PUT" : "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "X-XSRF-TOKEN": getCsrfToken()
-  //       },
-  //       body: JSON.stringify(this.state.program)
-  //     })
-  //     .then(async response => {
-  //
-  //       const json = await response.json();
-  //       console.log(json);
-  //       if (response.ok) {
-  //         history.push("/program/" + json.id);
-  //       } else {
-  //         this.setState({showLoadingOverlay: false})
-  //         swal("Something went wrong",
-  //             !!json.message
-  //                 ? "Error: " + json.message :
-  //                 "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-  //         );
-  //         console.error("Request failed.");
-  //       }
-  //
-  //     }).catch(e => {
-  //       this.setState({showLoadingOverlay: false})
-  //       swal(
-  //           "Something went wrong",
-  //           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-  //       );
-  //       console.error(e);
-  //     });
-  //   }
-  // };
+    axios({
+      url: url,
+      method: isUpdate ? "put" : "post",
+      headers: {
+        "Content-Type": "application/json",
+        // "X-XSRF-TOKEN": getCsrfToken()
+      },
+      data: values
+    })
+    .then(async response => {
+      const json = await response.data;
+      console.log(json);
+      setSubmitting(false);
+      if (response.status === 201 || response.status === 200) {
+        navigate("/program/" + json.id);
+      } else {
+        setShowLoadingOverlay(false);
+        swal("Something went wrong",
+            !!json.message
+                ? "Error: " + json.message :
+                "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
+        );
+        console.error("Request failed.");
+      }
+
+    }).catch(e => {
+      setShowLoadingOverlay(false);
+      swal(
+          "Something went wrong",
+          "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
+      );
+      console.error(e);
+    });
+  };
 
   const handleCancel = () => {
     swal({
@@ -258,93 +205,11 @@ const ProgramForm = props => {
 
               <Card.Body>
                 <Formik
-                    initialValues={props.program || {
-                      active: true,
-                      attributes: {},
-                      notebookFolder: {},
-                    }}
-                    validate={(program) => {
-
-                      const errors = {};
-
-                      // Name
-                      if (!program.name) {
-                        errors.name = 'Name is required';
-                      }
-                      if (!program.id) {
-                        for (let p of props.programs) {
-                          if (!!program.name && p.name.toLowerCase()
-                              === program.name.toLowerCase()) {
-                            errors.name = 'Name is not unique';
-                          }
-                        }
-                      }
-
-                      // Description
-                      if (!program.description) {
-                        errors.description = 'Description is required';
-                      }
-
-                      // Code
-                      if (!program.code) {
-                        errors.code = "Code is required";
-                      }
-                      if (/[^A-Za-z0-9]/.test(program.code)) {
-                        errors.code = "Code is invalid";
-                      }
-
-                      // ELN
-                      if (props.features
-                          && props.features.notebook.isEnabled
-                          && !program.notebookFolder.referenceId
-                      ) {
-                        errors.notebookFolder.referenceId = "Notebook folder ID is required";
-                      }
-
-                      return errors;
-
-                    }}
-                    onSubmit={(values, {setSubmitting}) => {
-                      console.debug(values);
-                      const isUpdate = !!values.id;
-                      const url = isUpdate
-                          ? "/api/program/" + values.id
-                          : "/api/program";
-                      setShowLoadingOverlay(true);
-
-                      fetch(url, {
-                        method: isUpdate ? "PUT" : "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          "X-XSRF-TOKEN": getCsrfToken()
-                        },
-                        body: JSON.stringify(values)
-                      })
-                      .then(async response => {
-                        const json = await response.json();
-                        console.log(json);
-                        setSubmitting(false);
-                        if (response.ok) {
-                          navigate("/program/" + json.id);
-                        } else {
-                          setShowLoadingOverlay(false);
-                          swal("Something went wrong",
-                              !!json.message
-                                  ? "Error: " + json.message :
-                                  "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-                          );
-                          console.error("Request failed.");
-                        }
-
-                      }).catch(e => {
-                        setShowLoadingOverlay(false);
-                        swal(
-                            "Something went wrong",
-                            "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-                        );
-                        console.error(e);
-                      });
-                    }}
+                    initialValues={props.program || defaultProgramValues}
+                    validationSchema={programSchema}
+                    onSubmit={submitForm}
+                    validateOnBlur={false}
+                    validateOnChange={false}
                 >
                   {({
                     values,
@@ -354,7 +219,7 @@ const ProgramForm = props => {
                     handleBlur,
                     handleSubmit,
                     isSubmitting,
-                    setFieldValue
+                    setFieldValue,
                   }) => (
                       <FormikForm className="program-form">
 
@@ -406,17 +271,16 @@ const ProgramForm = props => {
                           <Col md={7} className={"mb-3"}>
                             <FormGroup>
                               <Form.Label>Description *</Form.Label>
-                              <div>
-                                <ReactQuill
-                                    theme="snow"
-                                    className={"mb-2"}
-                                    name={"description"}
-                                    value={values.description}
-                                    onChange={content => setFieldValue("description", content)}
-                                />
-                              </div>
+                              <ReactQuill
+                                  theme="snow"
+                                  className={"mb-2 " + (!!errors.description ? "is-invalid" : '')}
+                                  name={"description"}
+                                  value={values.description}
+                                  onChange={content =>
+                                      setFieldValue("description", content)}
+                              />
                               <Form.Control.Feedback type="invalid">
-                                Description must not be empty.
+                                {errors.description}
                               </Form.Control.Feedback>
                               <Form.Text>
                                 Provide a brief description of the project.
@@ -436,9 +300,7 @@ const ProgramForm = props => {
                                   disabled={!!values.id}
                               />
                               <Form.Control.Feedback type={"invalid"}>
-                                Code must not be empty and must not
-                                contain any whitespace or non-alphanumeric
-                                characters.
+                                {errors.code}
                               </Form.Control.Feedback>
                               <Form.Text>
                                 This code will be used as a prefix when

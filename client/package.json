@@ -80,7 +80,8 @@
     "react-table": "7.7.0",
     "react-transition-group": "4.4.2",
     "sweetalert": "^2.1.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "eslint-config-prettier": "8.5.0",

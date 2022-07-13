@@ -20,7 +20,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {StatusDropdown} from "./status";
 import {statuses} from "../../config/statusConstants";
-import {UserInputs} from "./users";
+import UserInputs from "./UserInputs";
 import swal from 'sweetalert';
 import {history} from '../../App';
 import {AssayTypeDropdown} from "./assayTypes";

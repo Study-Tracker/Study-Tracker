@@ -20,7 +20,7 @@ import {faUserCircle} from "@fortawesome/free-solid-svg-icons";
 import {KeywordCategoryBadge} from "./keywords";
 import {Button, Card, Modal} from "react-bootstrap";
 import {PlusCircle} from "react-feather";
-import {KeywordInputs} from "./forms/keywords";
+import KeywordInputs from "./forms/KeywordInputs";
 import {getCsrfToken} from "../config/csrf";
 import swal from "sweetalert";
 

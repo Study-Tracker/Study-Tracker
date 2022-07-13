@@ -103,8 +103,8 @@ class ProgramDetails extends React.Component {
 
                 <Card.Header>
                   <div className="card-actions float-end">
-                    <Dropdown>
-                      <Dropdown.Toggle tag="a">
+                    <Dropdown align="end">
+                      <Dropdown.Toggle tag="a" bsPrefix="-">
                         <Menu/>
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
