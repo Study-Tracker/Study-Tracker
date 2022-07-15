@@ -37,7 +37,7 @@ const StudyDetailsView = props => {
 
   useEffect(() => {
     axios.get("/api/study/" + state.studyCode)
-    .then(async response => {
+    .then(response => {
 
       setState(prevState => ({
         ...prevState,

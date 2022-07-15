@@ -14,61 +14,53 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Col, Row} from 'react-bootstrap'
 import {Timeline} from "../activity";
 import {CardLoadingMessage} from "../loading";
 import {DismissableAlert} from "../errors";
+import axios from "axios";
+import PropTypes from "prop-types";
 
-class StudyTimelineTab extends React.Component {
+const StudyTimelineTab = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoaded: false,
-      isError: false
-    };
-  }
+  const {study} = props;
+  const [activity, setActivity] = useState(null);
+  const [error, setError] = useState(null);
 
-  componentDidMount() {
-    fetch("/api/study/" + this.props.study.code + "/activity")
-    .then(response => response.json())
-    .then(json => {
-      this.setState({
-        activity: json,
-        isLoaded: true
-      });
-    })
+  useEffect(() => {
+    axios.get("/api/study/" + study.code + "/activity")
+    .then(response => setActivity(response.data))
     .catch(e => {
-      this.setState({
-        isError: true,
-        error: e.message
-      })
+      setError(e);
+      console.error(e);
     })
+  }, []);
+
+  let content = <CardLoadingMessage/>;
+  if (error !== null) {
+    content = <DismissableAlert
+        color={'warning'}
+        message={'Failed to load study activity.'}
+    />;
+  } else if (activity !== null) {
+    content = <Timeline activity={activity}/>;
   }
 
-  render() {
+  return (
+      <div className="timeline-tab">
+        <Row>
+          <Col sm={12}>
+            {content}
+          </Col>
+        </Row>
+      </div>
+  )
 
-    let content = <CardLoadingMessage/>;
-    if (!!this.state.isLoaded && !!this.state.activity) {
-      content = <Timeline activities={this.state.activity}/>;
-    } else if (this.state.isError) {
-      content = <DismissableAlert color={'warning'}
-                                  message={'Failed to load study activity.'}/>;
-    }
+}
 
-    return (
-        <div className="timeline-tab">
-          <Row>
-            <Col sm={12}>
-              {content}
-            </Col>
-          </Row>
-        </div>
-    )
-
-  }
-
+StudyTimelineTab.propTypes = {
+  study: PropTypes.object.isRequired
 }
 
 export default StudyTimelineTab;

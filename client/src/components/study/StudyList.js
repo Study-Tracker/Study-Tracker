@@ -23,6 +23,7 @@ import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {ExportToCsv} from "../tables";
+import PropTypes from "prop-types";
 
 const columns = [
   {
@@ -248,7 +249,11 @@ export const StudyListTable = ({studies}) => {
   )
 }
 
-const StudyList = ({studies, title, filters, user}) => {
+StudyListTable.propTypes = {
+  studies: PropTypes.array.isRequired
+}
+
+const StudyList = ({studies, user}) => {
 
   return (
       <Container fluid className="animated fadeIn">
@@ -285,5 +290,10 @@ const StudyList = ({studies, title, filters, user}) => {
   );
 
 };
+
+StudyList.propTypes = {
+  studies: PropTypes.array.isRequired,
+  user: PropTypes.object
+}
 
 export default StudyList;

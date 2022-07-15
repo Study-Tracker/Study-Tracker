@@ -16,6 +16,7 @@
 
 import {Alert, Col, Row} from "react-bootstrap"
 import React from "react";
+import PropTypes from "prop-types";
 
 export const DismissableAlert = ({header, message, color}) => {
   return (
@@ -29,6 +30,12 @@ export const DismissableAlert = ({header, message, color}) => {
       </Alert>
   )
 };
+
+DismissableAlert.propTypes = {
+  header: PropTypes.string,
+  message: PropTypes.string.isRequired,
+  color: PropTypes.string
+}
 
 export const SettingsErrorMessage = () => {
   return (

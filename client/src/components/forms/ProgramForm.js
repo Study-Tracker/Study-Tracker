@@ -102,8 +102,7 @@ const ProgramForm = props => {
       url: url,
       method: isUpdate ? "put" : "post",
       headers: {
-        "Content-Type": "application/json",
-        // "X-XSRF-TOKEN": getCsrfToken()
+        "Content-Type": "application/json"
       },
       data: values
     })

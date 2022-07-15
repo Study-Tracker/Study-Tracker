@@ -28,7 +28,8 @@ import {CardLoadingMessage} from "./loading";
 import {DismissableAlert} from "./errors";
 import {Folder as FolderIcon, RefreshCw} from "react-feather";
 import swal from "sweetalert";
-import {getCsrfToken} from "../config/csrf";
+import PropTypes from "prop-types";
+import axios from "axios";
 
 const baseStyle = {
   flex: 1,
@@ -79,45 +80,54 @@ const formatFileSize = (size) => {
 const DEFAULT_FOLDER_FILE_KEY = 'files';
 const DEfAULT_ERROR_MESSAGE = 'Failed to load files folder.';
 
-class Folder extends React.Component {
+const Folder = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      folder: props.folder,
-      folderFileKey: props.folderFileKey || DEFAULT_FOLDER_FILE_KEY,
-      isExpanded: false,
-      depth: props.depth || 0
-    }
-    this.toggleExpanded = this.toggleExpanded.bind(this);
-  }
+  const {folder} = props;
+  const folderFileKey = props.folderFileKey || DEFAULT_FOLDER_FILE_KEY;
+  const depth = props.depth || 0;
+  const [expanded, setExpanded] = React.useState(false);
 
-  toggleExpanded() {
-    this.setState({
-      isExpanded: !this.state.isExpanded
-    });
-  }
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     folder: props.folder,
+  //     folderFileKey: props.folderFileKey || DEFAULT_FOLDER_FILE_KEY,
+  //     isExpanded: false,
+  //     depth: props.depth || 0
+  //   }
+  //   this.toggleExpanded = this.toggleExpanded.bind(this);
+  // }
 
-  render() {
-    return (
-        <li>
-          <a onClick={this.toggleExpanded}>
-            <FontAwesomeIcon
-                icon={this.state.isExpanded ? faCaretDown : faCaretRight}
-                style={{width: "10px"}}
-            />
-            &nbsp;&nbsp;
-            <FontAwesomeIcon icon={faFolder}/> {this.state.folder.name}
-          </a>
-          <div hidden={!this.state.isExpanded}>
-            <FolderContents folder={this.state.folder}
-                            depth={this.state.depth + 1}
-                            folderFileKey={this.state.folderFileKey}/>
-          </div>
-        </li>
-    )
-  }
-}
+  // toggleExpanded() {
+  //   this.setState({
+  //     isExpanded: !this.state.isExpanded
+  //   });
+  // }
+
+  return (
+      <li>
+        <a onClick={() => setExpanded(!expanded)}>
+          <FontAwesomeIcon
+              icon={expanded ? faCaretDown : faCaretRight}
+              style={{width: "10px"}}
+          />
+          &nbsp;&nbsp;
+          <FontAwesomeIcon icon={faFolder}/> {folder.name}
+        </a>
+        <div hidden={!expanded}>
+          <FolderContents folder={folder}
+                          depth={depth + 1}
+                          folderFileKey={folderFileKey}/>
+        </div>
+      </li>
+  )
+};
+
+Folder.propTypes = {
+  folder: PropTypes.object.isRequired,
+  folderFileKey: PropTypes.string,
+  depth: PropTypes.number
+};
 
 const File = ({file}) => {
   return (
@@ -332,24 +342,14 @@ const handleFolderRepairRequest = (url) => {
   })
   .then(val => {
     if (val) {
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": getCsrfToken()
-        }
-      }).then(response => {
-        if (response.ok) {
-          swal("Folder Repair Complete",
-              "Refresh the page to view the updated storage folder information.",
-              "success")
-        } else {
-          swal("Request failed",
-              "Check the server log for more information.",
-              "warning");
-        }
+      axios.post(url)
+      .then(response => {
+        swal("Folder Repair Complete",
+            "Refresh the page to view the updated storage folder information.",
+            "success")
       })
       .catch(error => {
+        console.error(error);
         swal("Request failed",
             "Check the server log for more information.",
             "warning");

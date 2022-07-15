@@ -26,11 +26,10 @@ import {
   Tab
 } from 'react-bootstrap';
 import {SelectableStatusButton, StatusButton} from "../status";
-import React from "react";
+import React, {useState} from "react";
 import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faFolderPlus, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {history} from "../../App";
 import {StudyCollaborator, StudyKeywords, StudyTeam} from "../studyMetadata";
 import ExternalLinks from "../externalLinks";
 import StudyRelationships from "../studyRelationships";
@@ -45,8 +44,9 @@ import AddToStudyCollectionModal from "../modals/AddToStudyCollectionModal";
 import StudyCollectionsTab from "./StudyCollectionsTab";
 import {RepairableStorageFolderButton} from "../files";
 import {RepairableNotebookFolderButton} from "../eln";
-import {getCsrfToken} from "../../config/csrf";
 import PropTypes from "prop-types";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const StudyDetailHeader = ({study, user}) => {
   return (
@@ -106,34 +106,21 @@ const StudyDetailHeader = ({study, user}) => {
   );
 };
 
-class StudyDetails extends React.Component {
+const StudyDetails = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeTab: "1",
-      showCollectionModal: false
-    };
-    this.handleStudyDelete = this.handleStudyDelete.bind(this);
-    this.toggleTab = this.toggleTab.bind(this);
-    this.showCollectionModal = this.showCollectionModal.bind(this);
-  }
+  const {study, user, features} = props;
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
+  const [modalError, setModalError] = useState(null);
+  const [activeTab, setActiveTab] = useState(1);
+  const navigate = useNavigate();
 
-  toggleTab(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
+  const toggleTab = (tab) => {
+    if (activeTab !== tab) {
+      setActiveTab(tab);
     }
-  }
+  };
 
-  showCollectionModal(bool) {
-    this.setState({
-      showCollectionModal: bool
-    });
-  }
-
-  handleStudyDelete() {
+  const handleStudyDelete = () => {
     swal({
       title: "Are you sure you want to remove this study?",
       text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered in the admin dashboard.",
@@ -142,349 +129,341 @@ class StudyDetails extends React.Component {
     })
     .then(val => {
       if (val) {
-        fetch("/api/study/" + this.props.study.code, {
-          method: 'DELETE',
+        axios({
+          url: "/api/study/" + this.props.study.code,
+          method: 'delete',
           headers: {
-            "Content-Type": "application/json",
-            "X-XSRF-TOKEN": getCsrfToken()
+            "Content-Type": "application/json"
           }
         }).then(response => {
-          history.push("/studies")
+          navigate("/studies")
         })
         .catch(error => {
           console.error(error);
-          this.setState({
-            modalError: "Failed to remove study. Please try again."
-          });
+          setModalError("Failed to remove study. Please try again.");
         })
       }
     });
   }
 
-  render() {
+  const createMarkup = (content) => {
+    return {__html: content};
+  };
 
-    const study = this.props.study;
-    const createMarkup = (content) => {
-      return {__html: content};
-    };
+  return (
+      <Container fluid className="animated fadeIn">
 
-    return (
-        <Container fluid className="animated fadeIn">
+        {/* Breadcrumb */}
+        <Row>
+          <Col>
+            <Breadcrumb>
+              <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
+              <Breadcrumb.Item active>Study Detail</Breadcrumb.Item>
+            </Breadcrumb>
+          </Col>
+        </Row>
 
-          {/* Breadcrumb */}
-          <Row>
-            <Col>
-              <Breadcrumb>
-                <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
-                <Breadcrumb.Item active>Study Detail</Breadcrumb.Item>
-              </Breadcrumb>
-            </Col>
-          </Row>
+        {/* Header */}
+        <StudyDetailHeader study={study} user={user}/>
 
-          {/* Header */}
-          <StudyDetailHeader study={study} user={this.props.user}/>
+        <Row>
 
-          <Row>
+          <Col lg={5}>
+            <Card className="details-card">
 
-            <Col lg={5}>
-              <Card className="details-card">
+              <Card.Header>
+                <div className="card-actions float-end">
+                  <Dropdown align="end">
+                    <Dropdown.Toggle as="a" bsPrefix="-">
+                      <Menu/>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
 
-                <Card.Header>
-                  <div className="card-actions float-end">
-                    <Dropdown align="end">
-                      <Dropdown.Toggle as="a" bsPrefix="-">
-                        <Menu/>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
+                      <Dropdown.Item
+                          onClick={() => setShowCollectionModal(true)}>
+                        <FontAwesomeIcon icon={faFolderPlus}/>
+                        &nbsp;
+                        Add to Collection
+                      </Dropdown.Item>
 
-                        <Dropdown.Item
-                            onClick={() => this.showCollectionModal(true)}>
-                          <FontAwesomeIcon icon={faFolderPlus}/>
-                          &nbsp;
-                          Add to Collection
-                        </Dropdown.Item>
+                      {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
+                      {/*  <FontAwesomeIcon icon={faShare}/>*/}
+                      {/*  &nbsp;*/}
+                      {/*  Share*/}
+                      {/*</DropdownItem>*/}
 
-                        {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
-                        {/*  <FontAwesomeIcon icon={faShare}/>*/}
-                        {/*  &nbsp;*/}
-                        {/*  Share*/}
-                        {/*</DropdownItem>*/}
+                      <Dropdown.Divider/>
 
-                        <Dropdown.Divider/>
+                      <Dropdown.Item onClick={() =>
+                          navigate("/study/" + study.code + "/edit")}>
+                        <FontAwesomeIcon icon={faEdit}/>
+                        &nbsp;
+                        Edit
+                      </Dropdown.Item>
 
-                        <Dropdown.Item onClick={() => history.push(
-                            "/study/" + study.code + "/edit")}>
-                          <FontAwesomeIcon icon={faEdit}/>
-                          &nbsp;
-                          Edit
-                        </Dropdown.Item>
+                      <Dropdown.Item onClick={handleStudyDelete}>
+                        <FontAwesomeIcon icon={faTrash}/>
+                        &nbsp;
+                        Remove
+                      </Dropdown.Item>
 
-                        <Dropdown.Item onClick={this.handleStudyDelete}>
-                          <FontAwesomeIcon icon={faTrash}/>
-                          &nbsp;
-                          Remove
-                        </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
 
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
+                <Card.Title tag="h5" className="mb-0 text-muted">
+                  Summary
+                </Card.Title>
 
-                  <Card.Title tag="h5" className="mb-0 text-muted">
-                    Summary
-                  </Card.Title>
+              </Card.Header>
 
-                </Card.Header>
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
 
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
+                    <h6 className="details-label">Program</h6>
+                    <p>{study.program.name}</p>
 
-                      <h6 className="details-label">Program</h6>
-                      <p>{study.program.name}</p>
-
-                      <h6 className="details-label">Code</h6>
-                      <p>{study.code}</p>
-
-                      {
-                        !!study.externalCode
-                            ? (
-                                <React.Fragment>
-                                  <h6 className="details-label">External Code</h6>
-                                  <p>{study.externalCode}</p>
-                                </React.Fragment>
-                            ) : ''
-                      }
-
-                      <h6 className="details-label">Description</h6>
-                      <div dangerouslySetInnerHTML={createMarkup(
-                          study.description)}/>
-
-                      <h6 className="details-label">Created By</h6>
-                      <p>{study.createdBy.displayName}</p>
-
-                      <h6 className="details-label">Last Updated</h6>
-                      <p>{new Date(study.updatedAt).toLocaleString()}</p>
-
-                      <h6 className="details-label">Start Date</h6>
-                      <p>{new Date(study.startDate).toLocaleString()}</p>
-
-                      <h6 className="details-label">End Date</h6>
-                      <p>
-                        {
-                          !!study.endDate
-                              ? new Date(study.endDate).toLocaleString()
-                              : "n/a"
-                        }
-                      </p>
-
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                {
-                  study.collaborator
-                      ? (
-                          <Card.Body>
-                            <Row>
-                              <Col xs={12}>
-                                <div>
-                                  <Card.Title>CRO/Collaborator</Card.Title>
-                                  <StudyCollaborator
-                                      collaborator={study.collaborator}
-                                      externalCode={study.externalCode}
-                                  />
-                                </div>
-                              </Col>
-                            </Row>
-                          </Card.Body>
-                      ) : ''
-                }
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
-                      <Card.Title>Study Team</Card.Title>
-                      <StudyTeam users={study.users} owner={study.owner}/>
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
-
-                      <Card.Title>Workspaces</Card.Title>
-
-                      <RepairableStorageFolderButton
-                          folder={study.storageFolder}
-                          repairUrl={"/api/study/" + study.id + "/storage/repair"}
-                      />
-
-                      &nbsp;&nbsp;
-
-                      {
-                        this.props.features
-                        && this.props.features.notebook
-                        && this.props.features.notebook.isEnabled ? (
-                            <RepairableNotebookFolderButton
-                                folder={study.notebookFolder}
-                                repairUrl={"/api/study/" + study.id + "/notebook/repair"}
-                            />
-                        ) : ""
-                      }
-
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
-                      <StudyKeywords keywords={study.keywords} studyId={study.id} />
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
-                      <ExternalLinks
-                          links={study.externalLinks || []}
-                          studyCode={study.code}
-                          user={this.props.user}
-                      />
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
-                      <StudyRelationships
-                          relationships={study.studyRelationships}
-                          studyCode={study.code}
-                          user={this.props.user}
-                      />
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-              </Card>
-            </Col>
-
-            <Col lg="7">
-
-              {/* Tabs */}
-              <div className="tab">
-                <Tab.Container defaultActiveKey="timeline">
-                  <Nav variant="tabs">
-                    <Nav.Item>
-                      <Nav.Link eventKey={"timeline"}>
-                        Timeline
-                      </Nav.Link>
-                    </Nav.Item>
-
-                    <Nav.Item>
-                      <Nav.Link eventKey={"assays"}>
-                        Assays
-                      </Nav.Link>
-                    </Nav.Item>
-
-                    <Nav.Item>
-                      <Nav.Link eventKey={"files"}>
-                        Files
-                      </Nav.Link>
-                    </Nav.Item>
+                    <h6 className="details-label">Code</h6>
+                    <p>{study.code}</p>
 
                     {
-                      study.notebookFolder ? (
-                          <Nav.Item>
-                            <Nav.Link eventKey={"notebook"}>
-                              Notebook
-                            </Nav.Link>
-                          </Nav.Item>
+                      !!study.externalCode
+                          ? (
+                              <React.Fragment>
+                                <h6 className="details-label">External Code</h6>
+                                <p>{study.externalCode}</p>
+                              </React.Fragment>
+                          ) : ''
+                    }
+
+                    <h6 className="details-label">Description</h6>
+                    <div dangerouslySetInnerHTML={createMarkup(
+                        study.description)}/>
+
+                    <h6 className="details-label">Created By</h6>
+                    <p>{study.createdBy.displayName}</p>
+
+                    <h6 className="details-label">Last Updated</h6>
+                    <p>{new Date(study.updatedAt).toLocaleString()}</p>
+
+                    <h6 className="details-label">Start Date</h6>
+                    <p>{new Date(study.startDate).toLocaleString()}</p>
+
+                    <h6 className="details-label">End Date</h6>
+                    <p>
+                      {
+                        !!study.endDate
+                            ? new Date(study.endDate).toLocaleString()
+                            : "n/a"
+                      }
+                    </p>
+
+                  </Col>
+                </Row>
+              </Card.Body>
+
+              {
+                study.collaborator
+                    ? (
+                        <Card.Body>
+                          <Row>
+                            <Col xs={12}>
+                              <div>
+                                <Card.Title>CRO/Collaborator</Card.Title>
+                                <StudyCollaborator
+                                    collaborator={study.collaborator}
+                                    externalCode={study.externalCode}
+                                />
+                              </div>
+                            </Col>
+                          </Row>
+                        </Card.Body>
+                    ) : ''
+              }
+
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+                    <Card.Title>Study Team</Card.Title>
+                    <StudyTeam users={study.users} owner={study.owner}/>
+                  </Col>
+                </Row>
+              </Card.Body>
+
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+
+                    <Card.Title>Workspaces</Card.Title>
+
+                    <RepairableStorageFolderButton
+                        folder={study.storageFolder}
+                        repairUrl={"/api/study/" + study.id + "/storage/repair"}
+                    />
+
+                    &nbsp;&nbsp;
+
+                    {
+                      features
+                      && features.notebook
+                      && features.notebook.isEnabled ? (
+                          <RepairableNotebookFolderButton
+                              folder={study.notebookFolder}
+                              repairUrl={"/api/study/" + study.id + "/notebook/repair"}
+                          />
                       ) : ""
                     }
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"conclusions"}>
-                        Conclusions
-                      </Nav.Link>
-                    </Nav.Item>
+                  </Col>
+                </Row>
+              </Card.Body>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"comments"}>
-                        Comments
-                      </Nav.Link>
-                    </Nav.Item>
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+                    <StudyKeywords keywords={study.keywords} studyId={study.id} />
+                  </Col>
+                </Row>
+              </Card.Body>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"collections"}>
-                        Collections
-                      </Nav.Link>
-                    </Nav.Item>
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+                    <ExternalLinks
+                        links={study.externalLinks || []}
+                        studyCode={study.code}
+                        user={user}
+                    />
+                  </Col>
+                </Row>
+              </Card.Body>
 
-                  </Nav>
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+                    <StudyRelationships
+                        relationships={study.studyRelationships}
+                        studyCode={study.code}
+                        user={user}
+                    />
+                  </Col>
+                </Row>
+              </Card.Body>
 
-                  <Tab.Content>
+            </Card>
+          </Col>
 
-                    {/* Assay Tab */}
-                    <Tab.Pane eventKey={"timeline"}>
-                      <StudyTimelineTab study={study} user={this.props.user}/>
-                    </Tab.Pane>
+          <Col lg="7">
 
-                    <Tab.Pane eventKey={"assays"}>
-                      <StudyAssaysTab study={study} user={this.props.user}/>
-                    </Tab.Pane>
+            {/* Tabs */}
+            <div className="tab">
+              <Tab.Container defaultActiveKey="timeline">
+                <Nav variant="tabs">
+                  <Nav.Item>
+                    <Nav.Link eventKey={"timeline"}>
+                      Timeline
+                    </Nav.Link>
+                  </Nav.Item>
 
-                    <Tab.Pane eventKey={"files"}>
-                      <StudyFilesTab study={study} user={this.props.user}/>
-                    </Tab.Pane>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"assays"}>
+                      Assays
+                    </Nav.Link>
+                  </Nav.Item>
 
-                    {
-                      this.props.features
-                      && this.props.features.notebook
-                      && this.props.features.notebook.isEnabled
-                      && study.notebookFolder ? (
-                          <Tab.Pane eventKey={"notebook"}>
-                            <StudyNotebookTab study={study}
-                                              user={this.props.user}/>
-                          </Tab.Pane>
-                      ) : ""
-                    }
+                  <Nav.Item>
+                    <Nav.Link eventKey={"files"}>
+                      Files
+                    </Nav.Link>
+                  </Nav.Item>
 
-                    <Tab.Pane eventKey={"conclusions"}>
-                      <StudyConclusionsTab study={study}
-                                           user={this.props.user}/>
-                    </Tab.Pane>
+                  {
+                    study.notebookFolder ? (
+                        <Nav.Item>
+                          <Nav.Link eventKey={"notebook"}>
+                            Notebook
+                          </Nav.Link>
+                        </Nav.Item>
+                    ) : ""
+                  }
 
-                    <Tab.Pane eventKey={"comments"}>
-                      <StudyCommentsTab study={study} user={this.props.user}/>
-                    </Tab.Pane>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"conclusions"}>
+                      Conclusions
+                    </Nav.Link>
+                  </Nav.Item>
 
-                    <Tab.Pane eventKey={"collections"}>
-                      <StudyCollectionsTab
-                          study={study}
-                          showCollectionModal={this.showCollectionModal}
-                      />
-                    </Tab.Pane>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"comments"}>
+                      Comments
+                    </Nav.Link>
+                  </Nav.Item>
 
-                  </Tab.Content>
-                </Tab.Container>
-              </div>
-            </Col>
-          </Row>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"collections"}>
+                      Collections
+                    </Nav.Link>
+                  </Nav.Item>
 
-          {/* Add to collection modal */}
-          <AddToStudyCollectionModal
-              showModal={this.showCollectionModal}
-              isOpen={this.state.showCollectionModal}
-              study={study}
-          />
+                </Nav>
 
-        </Container>
-    );
-  }
+                <Tab.Content>
+
+                  {/* Assay Tab */}
+                  <Tab.Pane eventKey={"timeline"}>
+                    <StudyTimelineTab study={study} user={user}/>
+                  </Tab.Pane>
+
+                  <Tab.Pane eventKey={"assays"}>
+                    <StudyAssaysTab study={study} user={user}/>
+                  </Tab.Pane>
+
+                  <Tab.Pane eventKey={"files"}>
+                    <StudyFilesTab study={study} user={user}/>
+                  </Tab.Pane>
+
+                  {
+                    features
+                    && features.notebook
+                    && features.notebook.isEnabled
+                    && study.notebookFolder ? (
+                        <Tab.Pane eventKey={"notebook"}>
+                          <StudyNotebookTab study={study} user={user}/>
+                        </Tab.Pane>
+                    ) : ""
+                  }
+
+                  <Tab.Pane eventKey={"conclusions"}>
+                    <StudyConclusionsTab study={study} user={user}/>
+                  </Tab.Pane>
+
+                  <Tab.Pane eventKey={"comments"}>
+                    <StudyCommentsTab study={study} user={user}/>
+                  </Tab.Pane>
+
+                  <Tab.Pane eventKey={"collections"}>
+                    <StudyCollectionsTab
+                        study={study}
+                        showCollectionModal={setShowCollectionModal}
+                    />
+                  </Tab.Pane>
+
+                </Tab.Content>
+              </Tab.Container>
+            </div>
+          </Col>
+        </Row>
+
+        {/* Add to collection modal */}
+        <AddToStudyCollectionModal
+            showModal={setShowCollectionModal}
+            isOpen={showCollectionModal}
+            study={study}
+        />
+
+      </Container>
+  );
 
 }
 

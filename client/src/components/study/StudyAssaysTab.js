@@ -20,6 +20,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import {AssaySummaryCards} from "../assays";
 import React from "react";
+import PropTypes from "prop-types";
 
 const StudyAssaysTab = ({study, user}) => {
 
@@ -48,5 +49,10 @@ const StudyAssaysTab = ({study, user}) => {
   );
 
 };
+
+StudyAssaysTab.propTypes = {
+  study: PropTypes.object.isRequired,
+  user: PropTypes.object
+}
 
 export default StudyAssaysTab;

@@ -14,91 +14,140 @@
  * limitations under the License.
  */
 
-import React from "react";
-import {Conclusions, ConclusionsModal} from "../conclusions";
-import {getCsrfToken} from "../../config/csrf";
+import React, {useState} from "react";
+import Conclusions from "../Conclusions";
+import axios from "axios";
+import PropTypes from "prop-types";
+import {Form as FormikForm, Formik} from "formik";
+import {Button, Col, Form, Modal, Row} from "react-bootstrap";
+import ReactQuill from "react-quill";
+import {FormGroup} from "../forms/common";
+import FormikFormErrorNotification from "../forms/FormikFormErrorNotification";
+import * as yup from "yup";
 
-class StudyConclusionsTab extends React.Component {
+const StudyConclusionsTab = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      modalIsOpen: false,
-      conclusions: props.study.conclusions,
-      updatedConclusions: !!props.study.conclusions ? {
-        ...props.study.conclusions,
-        lastModifiedBy: props.user
-      } : {
-        content: '',
-        createdBy: props.user
-      }
-    };
-    this.showModal = this.showModal.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleUpdate = this.handleUpdate.bind(this);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [conclusions, setConclusions] = useState(props.study.conclusions);
+  const conclusionsDefaults = {
+    id: null,
+    content: ""
   }
+  const conclusionsSchema = yup.object().shape({
+    id: yup.number(),
+    content: yup.string().required("Please enter the study conclusions")
+  });
 
-  showModal(bool) {
-    this.setState({
-      modalIsOpen: bool
+  const handleFormSubmit = (values, {setSubmitting}) => {
+    axios({
+      url: "/api/study/" + props.study.code + "/conclusions",
+      method: !!conclusions.id ? 'put' : 'post',
+      data: values
     })
-  }
-
-  handleUpdate(content) {
-    this.setState({
-      updatedConclusions: {
-        ...this.state.updatedConclusions,
-        content: content
-      }
-    })
-  }
-
-  handleSubmit() {
-    fetch("/api/study/" + this.props.study.code + "/conclusions", {
-      method: !!this.state.conclusions ? 'PUT' : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        "X-XSRF-TOKEN": getCsrfToken()
-      },
-      body: JSON.stringify(this.state.updatedConclusions)
-    })
-    .then(response => response.json())
-    .then(json => {
-      this.setState({
-        conclusions: json,
-        updatedConclusions: json
-      });
-      this.showModal(false);
+    .then(response => {
+      setSubmitting(false);
+      setConclusions(response.data);
+      setModalIsOpen(false);
     }).catch(e => {
+      setSubmitting(false);
       console.error(e);
     })
   }
 
-  render() {
+  return (
+      <div>
 
-    return (
-        <div>
+        <Conclusions
+            conclusions={conclusions}
+            showModal={setModalIsOpen}
+            isSignedIn={!!props.user}
+        />
 
-          <Conclusions
-              conclusions={this.state.conclusions}
-              showModal={this.showModal}
-              isSignedIn={!!this.props.user}
-          />
+        <Formik
+            initialValues={conclusions || conclusionsDefaults}
+            onSubmit={handleFormSubmit}
+            validationSchema={conclusionsSchema}
+        >
+          {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleSubmit,
+              setFieldValue
+          }) => (
 
-          <ConclusionsModal
-              isOpen={this.state.modalIsOpen}
-              showModal={this.showModal}
-              conclusions={this.state.updatedConclusions}
-              handleSubmit={this.handleSubmit}
-              handleUpdate={this.handleUpdate}
-              user={this.props.user}
-          />
+              <>
 
-        </div>
-    );
-  }
+                <FormikFormErrorNotification />
+
+                <Modal
+                    show={modalIsOpen}
+                    onHide={() => setModalIsOpen(false)}
+                    size={"lg"}
+                >
+
+                  <Modal.Header closeButton>
+                    Add Conclusions
+                  </Modal.Header>
+
+                  <Modal.Body className="m-3">
+
+                    <Row>
+
+                      <Col sm={12}>
+                        <p>
+                          Add a brief summary of your study's conclusions. Supporting
+                          documents may be uploaded as attachments.
+                        </p>
+                      </Col>
+
+                      <FormikForm>
+
+                        <Col sm={12}>
+                          <FormGroup>
+                            <ReactQuill
+                                theme="snow"
+                                name={'content'}
+                                value={values.content}
+                                onChange={(content) => {setFieldValue('content', content)}}
+                                className={(errors.content && touched.content) ? 'is-invalid' : ''}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.content}
+                            </Form.Control.Feedback>
+                          </FormGroup>
+                        </Col>
+
+                      </FormikForm>
+
+                    </Row>
+
+                  </Modal.Body>
+
+                  <Modal.Footer>
+                    <Button variant={"secondary"}
+                            onClick={() => setModalIsOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button variant={"primary"} onClick={handleSubmit}>
+                      Save
+                    </Button>
+                  </Modal.Footer>
+
+                </Modal>
+
+              </>
+          )}
+        </Formik>
+
+      </div>
+  );
 
 }
 
+StudyConclusionsTab.propTypes = {
+  study: PropTypes.object.isRequired,
+  user: PropTypes.object
+}
 export default StudyConclusionsTab;

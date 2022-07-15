@@ -14,108 +14,101 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Badge, Button, Col, Row, Table} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
-class StudyCollectionsTab extends React.Component {
+const StudyCollectionsTab = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      collections: [],
-      isError: false
-    };
-  }
+  const {study, showCollectionModal} = props;
+  const [collections, setCollections] = useState([]);
+  const [error, setError] = useState(null);
 
-  componentDidMount() {
-    fetch("/api/study/" + this.props.study.id + "/studycollection")
-    .then(response => response.json())
-    .then(collections => {
-      this.setState({
-        collections
-      })
-    })
-  }
-
-  render() {
-
-    let collections = this.state.collections.sort((a, b) => {
-      if (a.name > b.name) {
-        return 1;
-      } else if (a.name < b.name) {
-        return -1;
-      } else {
-        return 0;
-      }
-    }).map((collection, i) => {
-      return (
-          <tr key={'cr-' + i}>
-            <td>
-              <a href={"/collection/" + collection.id}>{collection.name}</a>
-            </td>
-            <td>{collection.studies.length}</td>
-            <td>
-              {
-                !!collection.shared
-                    ? <Badge bg="success">Public</Badge>
-                    : <Badge bg="warning">Private</Badge>
-              }
-            </td>
-          </tr>
-      )
+  useEffect(() => {
+    axios.get("/api/study/" + study.id + "/studycollection")
+    .then(response => {
+      setCollections(response.data);
+    }).catch(error => {
+      setError(error);
     });
+  }, []);
 
+  let rows = collections.sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    } else if (a.name < b.name) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }).map((collection, i) => {
     return (
-        <div>
+        <tr key={'cr-' + i}>
+          <td>
+            <a href={"/collection/" + collection.id}>{collection.name}</a>
+          </td>
+          <td>{collection.studies.length}</td>
+          <td>
+            {
+              !!collection.shared
+                  ? <Badge bg="success">Public</Badge>
+                  : <Badge bg="warning">Private</Badge>
+            }
+          </td>
+        </tr>
+    )
+  });
 
-          <Row className="justify-content-between align-items-center mb-4">
-            <Col>
-              <span className="float-end">
-                <Button
-                    variant="info"
-                    onClick={() => this.props.showCollectionModal(true)}
-                >
-                  Add to Collection
-                  &nbsp;
-                  <FontAwesomeIcon icon={faPlusCircle}/>
-                </Button>
-              </span>
-            </Col>
-          </Row>
+  return (
+      <div>
 
-          <Row>
-            <Col xs={12}>
-              {
-                collections.length > 0
-                    ? (
-                        <Col xs={12}>
-                          <Table striped style={{fontSize: "inherit"}}>
-                            <thead>
-                            <tr>
-                              <th>Name</th>
-                              <th># Studies</th>
-                              <th>Visibility</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {collections}
-                            </tbody>
-                          </Table>
-                        </Col>
-                    )
-                    : (
-                        <div className={"text-center"}>
-                          <h4>This study does not belong to any collections.</h4>
-                        </div>
-                    )
-              }
-            </Col>
-          </Row>
-        </div>
-    );
-  }
+        <Row className="justify-content-between align-items-center mb-4">
+          <Col>
+            <span className="float-end">
+              <Button
+                  variant="info"
+                  onClick={() => showCollectionModal(true)}
+              >
+                Add to Collection
+                &nbsp;
+                <FontAwesomeIcon icon={faPlusCircle}/>
+              </Button>
+            </span>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col xs={12}>
+            {
+              rows.length > 0
+                  ? (
+                      <Col xs={12}>
+                        <Table striped style={{fontSize: "inherit"}}>
+                          <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th># Studies</th>
+                            <th>Visibility</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                            {rows}
+                          </tbody>
+                        </Table>
+                      </Col>
+                  )
+                  : (
+                      <div className={"text-center"}>
+                        <h4>This study does not belong to any collections.</h4>
+                      </div>
+                  )
+            }
+          </Col>
+        </Row>
+      </div>
+  );
 
 }
 

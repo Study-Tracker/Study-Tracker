@@ -45,13 +45,14 @@ public class StudyConclusionsService {
   }
 
   @Transactional
-  public void updateStudyConclusions(Study study, StudyConclusions conclusions) {
+  public StudyConclusions updateStudyConclusions(Study study, StudyConclusions conclusions) {
     StudyConclusions c = studyConclusionsRepository.getById(conclusions.getId());
     c.setContent(conclusions.getContent());
     studyConclusionsRepository.save(c);
     Study s = studyRepository.getById(study.getId());
     s.setUpdatedAt(new Date());
     studyRepository.save(s);
+    return c;
   }
 
   @Transactional

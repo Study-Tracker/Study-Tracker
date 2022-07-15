@@ -17,71 +17,60 @@
 import {Button, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFile} from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import React, {useState} from "react";
 import {StorageFolderFileList, UploadFilesModal} from "../files";
-import {getCsrfToken} from "../../config/csrf";
 import PropTypes from "prop-types";
+import axios from "axios";
 
-class StudyFilesTabContent extends React.Component {
+const StudyFilesTabContent = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      modalIsOpen: false,
-      isLoaded: false,
-      isError: false,
-      showFolder: false,
-    };
-    this.showModal = this.showModal.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.refreshData = this.refreshData.bind(this);
-    this.handleShowFolder = this.handleShowFolder.bind(this);
+  const {study} = props;
+  const [folder, setFolder] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [showFolder, setShowFolder] = useState(false);
+  const [error, setError] = useState(null);
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     modalIsOpen: false,
+  //     isLoaded: false,
+  //     isError: false,
+  //     showFolder: false,
+  //   };
+  //   this.showModal = this.showModal.bind(this);
+  //   this.handleSubmit = this.handleSubmit.bind(this);
+  //   this.refreshData = this.refreshData.bind(this);
+  //   this.handleShowFolder = this.handleShowFolder.bind(this);
+  // }
+
+  const handleShowFolder = () => {
+    setShowFolder(true);
+    refreshData();
   }
 
-  handleShowFolder() {
-    this.setState({
-      showFolder: true
-    });
-    this.refreshData();
-  }
-
-  refreshData() {
-    fetch("/api/study/" + this.props.study.id + "/storage")
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Failed to load study folder.");
-    })
-    .then(json => {
-      this.setState({
-        folder: json,
-        isLoaded: true
-      })
-    })
+  const refreshData = () => {
+    axios.get("/api/study/" + this.props.study.id + "/storage")
+    .then(response => setFolder(response.data))
     .catch(e => {
       console.error(e);
-      this.setState({
-        isError: true,
-        error: e.message
-      })
+      setError(e);
     });
   }
 
-  showModal(bool) {
-    this.setState({
-      modalIsOpen: bool
-    })
-  }
+  // showModal(bool) {
+  //   this.setState({
+  //     modalIsOpen: bool
+  //   })
+  // }
 
-  handleSubmit(files) {
-    console.log(files);
+  const handleSubmit = (files) => {
+    console.debug(files);
     const requests = files.map(file => {
       const data = new FormData();
       data.set("file", file);
       return fetch('/api/study/' + this.props.study.id + '/storage', {
         method: 'POST',
-        headers: {"X-XSRF-TOKEN": getCsrfToken()},
         body: data
       });
     });
@@ -96,94 +85,92 @@ class StudyFilesTabContent extends React.Component {
     });
   }
 
-  render() {
-    return (
-        <div>
+  return (
+      <div>
 
-          <Row className="justify-content-between align-items-center mb-2">
-            <Col>
-              <span className="float-end">
-                <Button variant="info"
-                        onClick={() => this.showModal(true)}>
-                  Upload Files
-                  &nbsp;
-                  <FontAwesomeIcon icon={faFile}/>
-                </Button>
-              </span>
-            </Col>
-          </Row>
+        <Row className="justify-content-between align-items-center mb-2">
+          <Col>
+            <span className="float-end">
+              <Button variant="info"
+                      onClick={() => this.showModal(true)}>
+                Upload Files
+                &nbsp;
+                <FontAwesomeIcon icon={faFile}/>
+              </Button>
+            </span>
+          </Col>
+        </Row>
 
-          <Row>
+        <Row>
 
-            {
-              this.state.showFolder ? (
-                  <Col sm={12}>
-                    <StorageFolderFileList
-                        folder={this.state.folder}
-                        isLoaded={this.state.isLoaded}
-                        isError={this.state.isError}
+          {
+            showFolder ? (
+                <Col sm={12}>
+                  <StorageFolderFileList
+                      folder={folder}
+                      isLoaded={folder !== null}
+                      isError={error !== null}
+                  />
+                </Col>
+            ) : (
+                <Col sm={12} className={"text-center"}>
+
+                  <p>
+                    <img
+                        src={"/static/images/clip/data-storage.png"}
+                        alt="File storage"
+                        className="img-fluid"
+                        width={250}
                     />
-                  </Col>
-              ) : (
-                  <Col sm={12} className={"text-center"}>
+                  </p>
 
-                    <p>
-                      <img
-                          src={"/static/images/clip/data-storage.png"}
-                          alt="File storage"
-                          className="img-fluid"
-                          width={250}
-                      />
-                    </p>
+                  <p>
+                    Study files can be viewed in the native file browser,
+                    or viewed as a partial folder tree here. <em>Note:</em>
+                    &nbsp;loading and viewing files here may be slow and
+                    subject to rate limits.
+                  </p>
 
-                    <p>
-                      Study files can be viewed in the native file browser,
-                      or viewed as a partial folder tree here. <em>Note:</em>
-                      &nbsp;loading and viewing files here may be slow and
-                      subject to rate limits.
-                    </p>
+                  {
+                    study.storageFolder
+                    && study.storageFolder.url ? (
+                      <React.Fragment>
 
-                    {
-                      this.props.study.storageFolder
-                      && this.props.study.storageFolder.url ? (
-                        <React.Fragment>
+                        <Button
+                            variant="info"
+                            target={"_blank noopener noreferrer"}
+                            href={study.storageFolder.url}
+                        >
+                          View files in Egnyte
+                        </Button>
 
-                          <Button
-                              variant="info"
-                              target={"_blank noopener noreferrer"}
-                              href={this.props.study.storageFolder.url}
-                          >
-                            View files in Egnyte
-                          </Button>
+                        &nbsp;&nbsp;or&nbsp;&nbsp;
 
-                          &nbsp;&nbsp;or&nbsp;&nbsp;
+                      </React.Fragment>
+                    ) : ""
+                  }
 
-                        </React.Fragment>
-                      ) : ""
-                    }
+                  <Button
+                      variant="primary"
+                      onClick={handleShowFolder}
+                  >
+                    Show files here
+                  </Button>
 
-                    <Button
-                        variant="primary"
-                        onClick={this.handleShowFolder}
-                    >
-                      Show files here
-                    </Button>
+                </Col>
+            )
+          }
 
-                  </Col>
-              )
-            }
+        </Row>
 
-          </Row>
+        <UploadFilesModal
+            isOpen={modalIsOpen}
+            showModal={(bool) => setModalIsOpen(bool)}
+            handleSubmit={handleSubmit}
+        />
 
-          <UploadFilesModal
-              isOpen={this.state.modalIsOpen}
-              showModal={this.showModal}
-              handleSubmit={this.handleSubmit}
-          />
-
-        </div>
-    )
-  }
+      </div>
+  )
 
 }
 

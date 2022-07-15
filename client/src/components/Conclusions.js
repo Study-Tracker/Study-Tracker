@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import {Button, Col, Modal, Row} from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import React from "react";
-import ReactQuill from "react-quill";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faPlusCircle,} from "@fortawesome/free-solid-svg-icons";
 import {Clipboard} from "react-feather";
+import PropTypes from "prop-types";
 
 /**
  * Displays the study conclusions or a placeholder.
@@ -30,7 +30,7 @@ import {Clipboard} from "react-feather";
  * @returns {*}
  * @constructor
  */
-export const Conclusions = ({conclusions, showModal, isSignedIn}) => {
+const Conclusions = ({conclusions, showModal, isSignedIn}) => {
 
   if (!!conclusions) {
 
@@ -121,65 +121,10 @@ export const Conclusions = ({conclusions, showModal, isSignedIn}) => {
 
 };
 
-/**
- * Modal for adding conclusions.
- */
-export const ConclusionsModal = ({
-  conclusions,
-  isOpen,
-  showModal,
-  handleUpdate,
-  handleSubmit
-}) => {
-
-  console.log(conclusions)
-  return (
-      <Modal
-          show={isOpen}
-          onHide={() => showModal(false)}
-          size={"lg"}
-      >
-
-        <Modal.Header closeButton>
-          Add Conclusions
-        </Modal.Header>
-
-        <Modal.Body className="m-3">
-
-          <Row>
-
-            <Col sm={12}>
-              <p>
-                Add a brief summary of your study's conclusions. Supporting
-                documents may be uploaded as attachments.
-              </p>
-            </Col>
-
-            <Col sm={12}>
-              <ReactQuill
-                  theme="snow"
-                  defaultValue={conclusions.content}
-                  onChange={(content, delta, source, editor) => {
-                    handleUpdate(content);
-                  }}
-              />
-            </Col>
-
-          </Row>
-
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button variant={"secondary"}
-                  onClick={() => showModal(false)}>
-            Cancel
-          </Button>
-          <Button variant={"primary"} onClick={() => handleSubmit()}>
-            Save
-          </Button>
-        </Modal.Footer>
-
-      </Modal>
-  );
-
+Conclusions.propTypes = {
+  conclusions: PropTypes.object,
+  showModal: PropTypes.func.isRequired,
+  isSignedIn: PropTypes.bool.isRequired,
 }
+
+export default Conclusions;

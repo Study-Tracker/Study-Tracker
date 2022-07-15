@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Col, Row} from "react-bootstrap";
 import ErrorMessage from "../structure/ErrorMessage";
 import LoadingMessage from "../structure/LoadingMessage";
 import {StatusIcon} from "./status";
 import {StudyTeam} from "./studyMetadata";
 import dateFormat from "dateformat";
+import axios from "axios";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -110,72 +111,61 @@ const AssaySummaryCard = ({studyCode, assay}) => {
   );
 };
 
-export class AssaySummaryCards extends React.Component {
+export const AssaySummaryCards = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      assays: [],
-      isLoaded: false,
-      isError: false
-    }
-  }
+  const {studyCode} = props;
+  const [assays, setAssays] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  componentDidMount() {
-    fetch("/api/study/" + this.props.studyCode + "/assays")
-    .then(response => response.json())
-    .then(assays => {
-      console.log(assays);
-      this.setState({
-        assays: assays,
-        isLoaded: true
-      });
+  useEffect(() => {
+    axios.get("/api/study/" + studyCode + "/assays")
+    .then(response => {
+      console.debug(response.data);
+      setAssays(response.data);
+      setIsLoaded(true);
     })
     .catch(error => {
-      this.setState({
-        isError: true,
-        error: error
-      });
+      setError(error);
+      console.error(error);
     })
-  }
+  }, [studyCode]);
 
-  render() {
-
-    let content = <LoadingMessage/>;
-    if (!!this.state.error) {
-      content = <ErrorMessage/>;
-    } else if (this.state.isLoaded) {
-      content = [];
-      if (this.state.assays.length === 0) {
-        content.push(
-            <Row className="text-center" key={"no-assay-message"}>
-              <Col>
-                <h4>This study does not have any assays</h4>
-                <p>Click the 'New Assay' button to register a new one.</p>
-              </Col>
-            </Row>
-        );
-      } else {
-        for (let i = 0; i < this.state.assays.length; i++) {
-          let assay = this.state.assays[i];
-          if (i > 0) {
-            content.push(<hr key={"assay-border-" + assay.id}/>);
-          }
-          content.push(
-              <AssaySummaryCard
-                  key={"assay-card-" + assay.id}
-                  studyCode={this.props.studyCode}
-                  assay={assay}
-              />
-          );
+  let content = <LoadingMessage/>;
+  if (!!error) {
+    content = <ErrorMessage/>;
+  } else if (isLoaded) {
+    content = [];
+    if (assays.length === 0) {
+      content.push(
+          <Row className="text-center" key={"no-assay-message"}>
+            <Col>
+              <h4>This study does not have any assays</h4>
+              <p>Click the 'New Assay' button to register a new one.</p>
+            </Col>
+          </Row>
+      );
+    } else {
+      for (let i = 0; i < assays.length; i++) {
+        let assay = assays[i];
+        if (i > 0) {
+          content.push(<hr key={"assay-border-" + assay.id}/>);
         }
+        content.push(
+            <AssaySummaryCard
+                key={"assay-card-" + assay.id}
+                studyCode={studyCode}
+                assay={assay}
+            />
+        );
       }
     }
-
-    return (
-        <div>
-          {content}
-        </div>
-    );
   }
+
+  return (
+      <div>
+        {content}
+      </div>
+  );
+
 }

@@ -14,222 +14,226 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {createRef, useState} from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
-import {Comment} from "../comments";
+import Comment from "../Comment";
 import {MessageCircle} from 'react-feather';
 import swal from 'sweetalert';
-import {getCsrfToken} from "../../config/csrf";
+import {Form as FormikForm, Formik} from 'formik';
+import axios from "axios";
+import * as yup from 'yup';
+import PropTypes from "prop-types";
 
-class StudyCommentsTab extends React.Component {
+const StudyCommentsTab = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      comments: this.props.study.comments || [],
-      showInput: false,
-      newComment: '',
-      isError: false
-    };
-    this.textInput = React.createRef();
-    this.toggleInput = this.toggleInput.bind(this);
-    this.submitComment = this.submitComment.bind(this);
-    this.handleUpdate = this.handleUpdate.bind(this);
-    this.updateComment = this.updateComment.bind(this);
-    this.deleteComment = this.deleteComment.bind(this);
-  }
+  const {user, study} = props;
+  const [showInput, setShowInput] = useState(false);
+  const [comments, setComments] = useState(study.comments || []);
+  const commentDefault = {
+    text: ""
+  };
+  const textInput = createRef();
 
-  toggleInput() {
-    const show = !this.state.showInput;
-    this.setState({
-      showInput: show
-    });
+  const commentSchema = yup.object().shape({
+    text: yup.string().required("Comment is required")
+  });
+
+  const handleFormSubmit = (values, {resetForm, setSubmitting}) => {
+    console.debug("commentFormValues", values);
+    setSubmitting(true);
+    axios.post("/api/study/" + study.code + "/comments", values)
+    .then(response => {
+      const newComment = response.data;
+      setComments([...comments, newComment]);
+      setShowInput(false);
+      resetForm();
+      setSubmitting(false);
+    })
+    .catch(error => {
+      console.error(error);
+      setSubmitting(false);
+      swal("Your comment failed to create.",
+          "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
+    })
+  };
+
+  const toggleInput = () => {
+    const show = !showInput;
+    setShowInput(show);
     if (show) {
-      this.textInput.current.focus();
+      textInput.current.focus();
     }
   }
 
-  handleUpdate(text) {
-    this.setState({
-      newComment: text
-    })
-  }
-
-  submitComment() {
-    const comment = {
-      createdBy: this.props.user,
-      text: this.state.newComment
-    };
-    fetch("/api/study/" + this.props.study.code + "/comments", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        "X-XSRF-TOKEN": getCsrfToken()
-      },
-      body: JSON.stringify(comment)
-    }).then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Failed to create comment");
-      }
-    }).then(newComment => {
-      this.setState({
-        comments: [...this.state.comments, newComment],
-        newComment: '',
-        showInput: false
-      });
-    })
-  }
-
-  updateComment(comment) {
-    fetch("/api/study/" + this.props.study.code + "/comments/" + comment.id, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        "X-XSRF-TOKEN": getCsrfToken()
-      },
-      body: JSON.stringify(comment)
-    }).then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      swal("Your comment failed to update.",
-          "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
-      throw new Error("Failed to update comment");
-    }).then(json => {
-      let comments = this.state.comments;
-      for (let i = 0; i < comments.length; i++) {
-        if (comments[i].createdAt === json.createdAt
-            && comments[i].createdBy.accountName
-            === json.createdBy.accountName) {
-          comments[i] = json;
+  const handleCommentUpdate = (comment) => {
+    axios.put("/api/study/" + study.code + "/comments/" + comment.id, comment)
+    .then(response => {
+      let updated = [...comments];
+      for (let i = 0; i < updated.length; i++) {
+        if (updated[i].createdAt === response.data.createdAt
+            && updated[i].createdBy.accountName === response.data.createdBy.accountName) {
+          updated[i] = response.data;
         }
       }
-      this.setState({
-        comments: comments
-      });
+      setComments(updated);
     })
+    .catch(error => {
+      console.error(error);
+      swal("Your comment failed to update.",
+          "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
+    });
   }
 
-  deleteComment(comment) {
-    fetch("/api/study/" + this.props.study.code + "/comments/" + comment.id, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        "X-XSRF-TOKEN": getCsrfToken()
-      }
-    }).then(response => {
-      if (response.ok) {
-        const comments = this.state.comments.filter(c => c.id !== comment.id);
-        this.setState({
-          comments: comments
+  const handleCommentDelete = (comment) => {
+    swal({
+      title: "Are you sure you want to delete this comment?",
+      icon: "warning",
+      buttons: true
+    })
+    .then(val => {
+      if (val) {
+        axios.delete("/api/study/" + study.code + "/comments/" + comment.id)
+        .then(response => {
+          const updated = comments.filter(c => c.id !== comment.id);
+          setComments(updated);
+        })
+        .catch(e => {
+          console.error(e)
+          swal("Your comment failed to delete.",
+              "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
         });
-      } else {
-        swal("Your comment failed to delete.",
-            "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
-        throw new Error("Failed to delete comment");
       }
-    }).catch(e => console.error(e));
+    });
   }
 
-  render() {
-
-    let comments = this.state.comments.sort((a, b) => {
-      if (a.createdAt > b.createdAt) {
-        return 1;
-      } else if (a.createdAt < b.createdAt) {
-        return -1;
-      } else {
-        return 0;
-      }
-    }).map((comment, i) => {
-      return (
-          <React.Fragment key={'hr-' + i}>
-            {
-              i > 0
-                  ? (
-                      <Col sm={12}>
-                        <hr/>
-                      </Col>
-                  ) : ""
-            }
-            <Col key={'thread-' + comment.createdAt} sm={12}>
-              <Comment
-                  comment={comment} user={this.props.user}
-                  handleUpdate={this.updateComment}
-                  handleDelete={this.deleteComment}
-              />
-            </Col>
-          </React.Fragment>
-      )
-    })
-
-    let content = comments.length > 0 ? comments : (
-        <Col sm={12}>
-          <div className={"text-center"}>
-            <h4>No comments have been added.</h4>
-          </div>
-        </Col>
-    );
-
+  let commentCards = comments.sort((a, b) => {
+    if (a.createdAt > b.createdAt) {
+      return 1;
+    } else if (a.createdAt < b.createdAt) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }).map((comment, i) => {
     return (
-        <div>
+        <React.Fragment key={'hr-' + i}>
+          {
+            i > 0
+                ? (
+                    <Col sm={12}>
+                      <hr/>
+                    </Col>
+                ) : ""
+          }
+          <Col key={'thread-' + comment.createdAt} sm={12}>
+            <Comment
+                study={study}
+                comment={comment}
+                user={user}
+                handleUpdate={handleCommentUpdate}
+                handleDelete={handleCommentDelete}
+            />
+          </Col>
+        </React.Fragment>
+    )
+  })
 
-          <Row>
-            {content}
-          </Row>
+  let content = commentCards.length > 0
+      ? commentCards
+      : (
+          <Col sm={12}>
+            <div className={"text-center"}>
+              <h4>No comments have been added.</h4>
+            </div>
+          </Col>
+      );
 
-          <Row>
-            <Col sm={12}>
-              <div className="d-flex mt-3">
-                <div className="flex-grow-1 ms-3">
+  return (
+      <div>
 
-                  <div className="mb-2 text-center"
-                       hidden={this.state.showInput}>
-                    <Button variant={'info'} onClick={() => this.toggleInput()}>
-                      Add Comment
-                      &nbsp;
-                      <MessageCircle className="feather align-middle mb-1"/>
-                    </Button>
-                  </div>
+        <Row>
+          {content}
+        </Row>
 
-                  <div className="mb-2" hidden={!this.state.showInput}>
+        <Row>
+          <Col sm={12}>
+            <div className="d-flex mt-3">
+              <div className="flex-grow-1 ms-3">
 
-                    <Form.Group className="mb-2">
-                      <Form.Label>New Comment</Form.Label>
-                      <Form.Control
-                          ref={this.textInput}
-                          as={'textarea'}
-                          rows={3}
-                          value={this.state.newComment}
-                          onChange={(e) => this.handleUpdate(e.target.value)}
-                      />
-                    </Form.Group>
+                <div className="mb-2 text-center" hidden={showInput}>
+                  <Button variant={'info'} onClick={() => toggleInput()}>
+                    Add Comment
+                    &nbsp;
+                    <MessageCircle className="feather align-middle mb-1"/>
+                  </Button>
+                </div>
 
-                    <Button variant={'secondary'}
-                            onClick={() => this.toggleInput()}>
-                      Cancel
-                    </Button>
-                    &nbsp;&nbsp;
-                    <Button variant={'primary'} onClick={this.submitComment}>
-                      Submit
-                    </Button>
+                <div className="mb-2" hidden={!showInput}>
 
-                  </div>
+                  <Formik
+                      initialValues={commentDefault}
+                      onSubmit={handleFormSubmit}
+                      validationSchema={commentSchema}
+                  >
+                    {({
+                      values,
+                      errors,
+                      touched,
+                      handleChange
+                    }) => (
+                        <FormikForm>
+
+                          <Form.Group className="mb-2">
+                            <Form.Label>New Comment</Form.Label>
+                            <Form.Control
+                                ref={textInput}
+                                as={'textarea'}
+                                name={"text"}
+                                className={(!!errors.text && touched.text) ? 'is-invalid' : ''}
+                                rows={3}
+                                value={values.text}
+                                onChange={handleChange}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {errors.text}
+                            </Form.Control.Feedback>
+                          </Form.Group>
+
+                          <Button
+                              variant={'secondary'}
+                              onClick={() => toggleInput()}
+                          >
+                            Cancel
+                          </Button>
+                          &nbsp;&nbsp;
+                          <Button
+                              variant={'primary'}
+                              type="submit"
+                          >
+                            Submit
+                          </Button>
+
+                        </FormikForm>
+
+                    )}
+
+                  </Formik>
 
                 </div>
+
               </div>
-            </Col>
-          </Row>
+            </div>
+          </Col>
+        </Row>
 
-        </div>
-    );
-  }
+      </div>
+  );
 
+}
+
+StudyCommentsTab.propTypes = {
+  study: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
 }
 
 export default StudyCommentsTab;

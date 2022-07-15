@@ -1048,13 +1048,13 @@ export const StudyTimelineActivity = ({activity}) => {
   )
 };
 
-export const Timeline = ({activities}) => {
-  console.log(activities);
-  if (!activities || activities.length === 0) {
+export const Timeline = ({activity}) => {
+  console.debug("Study activity", activity);
+  if (!activity || activity.length === 0) {
     return <h5 className="text-muted">There is no activity to display</h5>;
   }
   let flag = false;
-  const elements = activities
+  const elements = activity
   .filter(a => studyActions.hasOwnProperty(a.eventType)
       && studyActions[a.eventType].visible)
   .sort((a, b) => {

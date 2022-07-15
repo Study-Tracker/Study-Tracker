@@ -19,6 +19,7 @@ package io.studytracker.controller.api;
 import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.form.CommentFormDto;
 import io.studytracker.mapstruct.dto.response.CommentDto;
 import io.studytracker.mapstruct.mapper.CommentMapper;
 import io.studytracker.model.Activity;
@@ -63,11 +64,13 @@ public class StudyCommentsController extends AbstractStudyController {
 
   @PostMapping("")
   public HttpEntity<CommentDto> addStudyComment(
-      @PathVariable("studyId") String studyId, @RequestBody @Valid CommentDto dto) {
+      @PathVariable("studyId") String studyId,
+      @RequestBody @Valid CommentFormDto dto
+  ) {
 
     LOGGER.info(String.format("Creating new comment for study %s: %s", studyId, dto.toString()));
 
-    Comment comment = commentMapper.fromDto(dto);
+    Comment comment = commentMapper.fromFormDto(dto);
 
     Study study = getStudyFromIdentifier(studyId);
     String username =
@@ -89,7 +92,7 @@ public class StudyCommentsController extends AbstractStudyController {
   public HttpEntity<CommentDto> editedStudyComment(
       @PathVariable("studyId") String studyId,
       @PathVariable("commentId") Long commentId,
-      @RequestBody @Valid CommentDto dto) {
+      @RequestBody @Valid CommentFormDto dto) {
 
     LOGGER.info(String.format("Editing comment for study %s: %s", studyId, dto.toString()));
 
@@ -99,17 +102,18 @@ public class StudyCommentsController extends AbstractStudyController {
     User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     Study study = getStudyFromIdentifier(studyId);
-    Comment comment = commentMapper.fromDto(dto);
+    Comment comment = commentMapper.fromFormDto(dto);
+    comment.setId(commentId);
 
-    studyCommentService.updateStudyComment(comment);
+    Comment updated = studyCommentService.updateStudyComment(comment);
     this.getStudyService().markAsUpdated(study, user);
 
     // Publish events
-    Activity activity = StudyActivityUtils.fromEditiedComment(study, user, comment);
+    Activity activity = StudyActivityUtils.fromEditiedComment(study, user, updated);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(commentMapper.toDto(comment), HttpStatus.OK);
+    return new ResponseEntity<>(commentMapper.toDto(updated), HttpStatus.OK);
   }
 
   @DeleteMapping("/{commentId}")
