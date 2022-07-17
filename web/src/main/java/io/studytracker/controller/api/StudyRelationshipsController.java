@@ -19,8 +19,8 @@ package io.studytracker.controller.api;
 import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.form.StudyRelationshipFormDto;
 import io.studytracker.mapstruct.dto.response.StudyRelationshipDetailsDto;
-import io.studytracker.mapstruct.dto.response.StudyRelationshipSlimDto;
 import io.studytracker.mapstruct.mapper.StudyRelationshipMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.RelationshipType;
@@ -65,7 +65,7 @@ public class StudyRelationshipsController extends AbstractStudyController {
 
   @PostMapping("")
   public HttpEntity<StudyRelationshipDetailsDto> createStudyRelationship(
-      @PathVariable("id") String sourceStudyId, @RequestBody @Valid StudyRelationshipSlimDto dto) {
+      @PathVariable("id") String sourceStudyId, @RequestBody @Valid StudyRelationshipFormDto dto) {
 
     LOGGER.info(
         String.format(

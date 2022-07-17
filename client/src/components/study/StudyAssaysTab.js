@@ -15,14 +15,16 @@
  */
 
 import {Button, Col, Row} from "react-bootstrap";
-import {history} from "../../App";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import {AssaySummaryCards} from "../assays";
 import React from "react";
 import PropTypes from "prop-types";
+import {useNavigate} from "react-router-dom";
 
 const StudyAssaysTab = ({study, user}) => {
+
+  const navigate = useNavigate();
 
   return (
       <div>
@@ -32,7 +34,7 @@ const StudyAssaysTab = ({study, user}) => {
               !!user
                   ? (
                       <span className="float-end">
-                        <Button variant="info" onClick={() => history.push(
+                        <Button variant="info" onClick={() => navigate(
                             "/study/" + study.code + "/assays/new")}>
                           New Assay
                           &nbsp;

@@ -20,8 +20,8 @@ import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import AssayForm from "../components/forms/AssayForm";
 import {useSelector} from "react-redux";
-import PropTypes from "prop-types";
 import {useParams} from "react-router-dom";
+import axios from "axios";
 
 const AssayFormView = props => {
 
@@ -37,8 +37,8 @@ const AssayFormView = props => {
 
   useEffect(async () => {
 
-    const study = await fetch("/api/study/" + state.studyCode)
-    .then(async response => await response.json())
+    const study = await axios.get("/api/study/" + state.studyCode)
+    .then(async response => await response.data)
     .catch(error => {
       console.error(error);
       setState(prevState => ({
@@ -51,8 +51,8 @@ const AssayFormView = props => {
     let assay = null;
     if (!!state.assayCode) {
 
-      assay = await fetch("/api/assay/" + state.assayCode)
-      .then(async response => await response.json())
+      assay = await axios.get("/api/assay/" + state.assayCode)
+      .then(async response => await response.data)
       .catch(error => {
         console.error(error);
         setState(prevState => ({
@@ -64,8 +64,8 @@ const AssayFormView = props => {
 
     }
 
-    const assayTypes = await fetch("/api/assaytype/")
-    .then(async response => await response.json())
+    const assayTypes = await axios.get("/api/assaytype/")
+    .then(async response => await response.data)
     .catch(error => {
       console.error(error);
       setState(prevState => ({
@@ -75,9 +75,9 @@ const AssayFormView = props => {
       }));
     });
 
-    const notebookTemplates = await fetch(
+    const notebookTemplates = await axios.get(
         "/api/notebookentrytemplate?category=ASSAY&active=true")
-    .then(async response => await response.json())
+    .then(async response => await response.data)
     .catch(error => {
       console.error(error);
       setState(prevState => ({
@@ -125,8 +125,6 @@ const AssayFormView = props => {
 }
 
 AssayFormView.propTypes = {
-  user: PropTypes.object.isRequired,
-  features: PropTypes.object,
 }
 
 export default AssayFormView;

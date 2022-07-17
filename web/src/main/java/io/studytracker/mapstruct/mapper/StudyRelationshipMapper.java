@@ -1,5 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
+import io.studytracker.mapstruct.dto.form.StudyRelationshipFormDto;
 import io.studytracker.mapstruct.dto.response.StudyRelationshipDetailsDto;
 import io.studytracker.mapstruct.dto.response.StudyRelationshipSlimDto;
 import io.studytracker.model.StudyRelationship;
@@ -12,6 +13,8 @@ import org.mapstruct.Mapping;
 public interface StudyRelationshipMapper {
 
   StudyRelationship fromDetails(StudyRelationshipDetailsDto dto);
+
+  StudyRelationship fromFormDto(StudyRelationshipFormDto dto);
 
   List<StudyRelationship> fromDetailsList(List<StudyRelationshipDetailsDto> dtos);
 

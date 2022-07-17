@@ -76,7 +76,7 @@ const FrontPageTimeline = ({
                 <Row>
 
                   <Col xs={12}>
-                    <Timeline activities={activity}/>
+                    <Timeline activity={activity}/>
                   </Col>
 
                   <Col xs={12}>

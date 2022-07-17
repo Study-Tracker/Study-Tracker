@@ -373,6 +373,11 @@ export const RepairableStorageFolderLink = ({folder, repairUrl}) => {
   }
 }
 
+RepairableStorageFolderLink.propTypes = {
+  folder: PropTypes.object.isRequired,
+  repairUrl: PropTypes.string.isRequired
+};
+
 export const RepairableStorageFolderButton = ({folder, repairUrl}) => {
   if (!!folder && !!folder.path && !!folder.url) {
     return (
@@ -399,3 +404,8 @@ export const RepairableStorageFolderButton = ({folder, repairUrl}) => {
     )
   }
 }
+
+RepairableStorageFolderButton.propTypes = {
+  folder: PropTypes.object.isRequired,
+  repairUrl: PropTypes.string.isRequired
+};
