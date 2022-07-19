@@ -220,7 +220,7 @@ const ProgramForm = props => {
                     isSubmitting,
                     setFieldValue,
                   }) => (
-                      <FormikForm className="program-form">
+                      <FormikForm className="program-form" autoComplete={"off"}>
 
                         <FormikFormErrorNotification />
 

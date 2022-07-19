@@ -248,7 +248,7 @@ const StudyForm = props => {
                   </Card.Header>
 
                   <Card.Body>
-                    <FormikForm className="study-form">
+                    <FormikForm className="study-form" autoComplete={"off"}>
 
                       {/*Overview*/}
                       <Row>

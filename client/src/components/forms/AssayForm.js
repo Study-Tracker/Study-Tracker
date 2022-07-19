@@ -22,7 +22,6 @@ import {StatusDropdown} from "./status";
 import {statuses} from "../../config/statusConstants";
 import UserInputs from "./UserInputs";
 import swal from 'sweetalert';
-import {history} from '../../App';
 import {AssayTypeDropdown} from "./assayTypes";
 import {NotebookEntryTemplatesDropdown} from './notebookEntryTemplates';
 import {AssayTypeFieldCaptureInputList} from "./assayTypeFieldCapture";
@@ -32,216 +31,247 @@ import {LoadingOverlay} from "../loading";
 import ReactQuill from "react-quill";
 import {Breadcrumbs} from "../common";
 import {FormGroup} from "./common";
-import {getCsrfToken} from "../../config/csrf";
 import PropTypes from "prop-types";
+import {Form as FormikForm, Formik} from "formik";
+import {useNavigate} from "react-router-dom";
+import * as yup from "yup";
+import axios from "axios";
+import FormikFormErrorNotification from "./FormikFormErrorNotification";
 
-export default class AssayForm extends React.Component {
+const AssayForm = props => {
 
-  constructor(props) {
+  const {
+    study,
+    assay,
+    user,
+    defaultNotebookTemplate,
+    assayTypes,
+    notebookTemplates,
+    features
+  } = props;
+  const navigate = useNavigate();
 
-    super(props);
+  const assayDefaults = {
+    name: "",
+    description: "",
+    status: statuses.IN_PLANNING.value,
+    users: study.users,
+    owner: study.owner,
+    createdBy: user,
+    lastModifiedBy: user,
+    fields: {},
+    tasks: [],
+    attributes: {},
+    notebookFolder: {},
+    notebookTemplateId: !!defaultNotebookTemplate
+        ? defaultNotebookTemplate.templateId : null
+  };
 
-    let assay = props.assay || {
-      status: statuses.IN_PLANNING.value,
-      users: this.props.study.users,
-      owner: this.props.study.owner,
-      createdBy: this.props.user,
-      lastModifiedBy: this.props.user,
-      fields: {},
-      tasks: [],
-      attributes: {},
-      notebookTemplateId: !!props.defaultNotebookTemplate
-          ? props.defaultNotebookTemplate.templateId : null
-    };
-    assay.lastModifiedBy = this.props.user;
+  const assaySchema = yup.object().shape({
+    name: yup.string()
+      .required("Name is required")
+      .max(255, "Name cannot be larger than 255 characters"),
+    status: yup.string().required("Status is required"),
+    description: yup.string().required("Description is required"),
+    users: yup.array().of(yup.object()).min(1, "At least one user is required"),
+    owner: yup.object().required("Owner is required"),
+    startDate: yup.date()
+      .typeError("Start date is required")
+      .required("Start date is required"),
+    assayType: yup.object().required("Assay type is required"),
+  });
 
-    this.state = {
-      assay: assay,
-      validation: {
-        nameIsValid: true,
-        descriptionIsValid: true,
-        startDateIsValid: true,
-        usersIsValid: true,
-        ownerIsValid: true
-      },
-      showLoadingOverlay: false,
+  // constructor(props) {
+  //
+  //   super(props);
+  //
+  //   let assay = props.assay || {
+  //     status: statuses.IN_PLANNING.value,
+  //     users: this.props.study.users,
+  //     owner: this.props.study.owner,
+  //     createdBy: this.props.user,
+  //     lastModifiedBy: this.props.user,
+  //     fields: {},
+  //     tasks: [],
+  //     attributes: {},
+  //     notebookTemplateId: !!props.defaultNotebookTemplate
+  //         ? props.defaultNotebookTemplate.templateId : null
+  //   };
+  //   assay.lastModifiedBy = this.props.user;
+  //
+  //   this.state = {
+  //     assay: assay,
+  //     validation: {
+  //       nameIsValid: true,
+  //       descriptionIsValid: true,
+  //       startDateIsValid: true,
+  //       usersIsValid: true,
+  //       ownerIsValid: true
+  //     },
+  //     showLoadingOverlay: false,
+  //
+  //     isUpdateModeOn: !!assay.id,
+  //     baseUrl: '/api/study/' + this.props.study.code + '/assays/',
+  //   };
+  //
+  //   this.handleSubmit = this.handleSubmit.bind(this);
+  //   this.handleCancel = this.handleCancel.bind(this);
+  //   this.handleFormUpdate = this.handleFormUpdate.bind(this);
+  //   this.handleTemplateSelection = this.handleTemplateSelection.bind(this);
+  //   this.validateForm = this.validateForm.bind(this);
+  //   this.handleFieldUpdate = this.handleFieldUpdate.bind(this);
+  // }
 
-      isUpdateModeOn: !!assay.id,
-      baseUrl: '/api/study/' + this.props.study.code + '/assays/',
-    };
+  // get submitUrl() {
+  //   return this.state.isUpdateModeOn
+  //       ? this.state.baseUrl + this.state.assay.id
+  //       : this.state.baseUrl
+  // }
+  //
+  // get submitMethod() {
+  //   return this.state.isUpdateModeOn
+  //       ? 'PUT'
+  //       : 'POST';
+  // }
+  //
+  // /**
+  //  * Updates the study state when an input is changed.
+  //  *
+  //  * @param data
+  //  */
+  // handleFormUpdate(data) {
+  //   console.log(data);
+  //   const assay = {
+  //     ...this.state.assay,
+  //     ...data
+  //   };
+  //   console.log(assay);
+  //   this.setState({
+  //     assay: assay
+  //   })
+  // }
 
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
-    this.handleFormUpdate = this.handleFormUpdate.bind(this);
-    this.handleTemplateSelection = this.handleTemplateSelection.bind(this);
-    this.validateForm = this.validateForm.bind(this);
-    this.handleFieldUpdate = this.handleFieldUpdate.bind(this);
-  }
+  // handleTemplateSelection(selectedItem) {
+  //   this.setState({
+  //     assay: {
+  //       ...this.state.assay,
+  //       notebookTemplateId: selectedItem
+  //           ? selectedItem.value
+  //           : '',
+  //     },
+  //   })
+  // }
 
-  get submitUrl() {
-    return this.state.isUpdateModeOn
-        ? this.state.baseUrl + this.state.assay.id
-        : this.state.baseUrl
-  }
-
-  get submitMethod() {
-    return this.state.isUpdateModeOn
-        ? 'PUT'
-        : 'POST';
-  }
-
-  /**
-   * Updates the study state when an input is changed.
-   *
-   * @param data
-   */
-  handleFormUpdate(data) {
-    console.log(data);
-    const assay = {
-      ...this.state.assay,
-      ...data
-    };
-    console.log(assay);
-    this.setState({
-      assay: assay
-    })
-  }
-
-  handleTemplateSelection(selectedItem) {
-    this.setState({
-      assay: {
-        ...this.state.assay,
-        notebookTemplateId: selectedItem
-            ? selectedItem.value
-            : '',
-      },
-    })
-  }
-
-  handleFieldUpdate(data) {
+  const handleFieldUpdate = (data) => {
     const fields = {
       ...this.state.assay.fields,
       ...data
     };
     this.handleFormUpdate({"fields": fields})
   }
+  //
+  // validateForm(assay) {
+  //   let isError = false;
+  //   let validation = this.state.validation;
+  //
+  //   // Name
+  //   if (!assay.name) {
+  //     isError = true;
+  //     validation.nameIsValid = false;
+  //   } else {
+  //     validation.nameIsValid = true;
+  //   }
+  //
+  //   // Description
+  //   if (!assay.description) {
+  //     isError = true;
+  //     validation.descriptionIsValid = false;
+  //   } else {
+  //     validation.descriptionIsValid = true;
+  //   }
+  //
+  //   // Start Date
+  //   if (!assay.startDate) {
+  //     isError = true;
+  //     validation.startDateIsValid = false;
+  //   } else {
+  //     validation.startDateIsValid = true;
+  //   }
+  //
+  //   // Study team
+  //   if (!assay.users || assay.users.length === 0) {
+  //     isError = true;
+  //     validation.usersIsValid = false;
+  //   } else {
+  //     validation.usersIsValid = true;
+  //   }
+  //
+  //   // Owner
+  //   if (!!assay.owner) {
+  //     validation.isOwnerValid = true;
+  //   } else {
+  //     isError = true;
+  //     validation.ownerIsValid = false;
+  //   }
+  //
+  //   this.setState({
+  //     validation: validation
+  //   });
+  //   return isError;
+  // }
 
-  validateForm(assay) {
-    let isError = false;
-    let validation = this.state.validation;
+  const handleFormSubmit = (values, {setSubmitting}) => {
 
-    // Name
-    if (!assay.name) {
-      isError = true;
-      validation.nameIsValid = false;
-    } else {
-      validation.nameIsValid = true;
-    }
+    console.debug("Submit values: ", values);
+    const isUpdate = !!values.id;
+    const url = isUpdate
+        ? '/api/study/' + study.code + '/assays/' + values.id
+        : '/api/study/' + study.code + '/assays'
 
-    // Description
-    if (!assay.description) {
-      isError = true;
-      validation.descriptionIsValid = false;
-    } else {
-      validation.descriptionIsValid = true;
-    }
-
-    // Start Date
-    if (!assay.startDate) {
-      isError = true;
-      validation.startDateIsValid = false;
-    } else {
-      validation.startDateIsValid = true;
-    }
-
-    // Study team
-    if (!assay.users || assay.users.length === 0) {
-      isError = true;
-      validation.usersIsValid = false;
-    } else {
-      validation.usersIsValid = true;
-    }
-
-    // Owner
-    if (!!assay.owner) {
-      validation.isOwnerValid = true;
-    } else {
-      isError = true;
-      validation.ownerIsValid = false;
-    }
-
-    this.setState({
-      validation: validation
-    });
-    return isError;
-  }
-
-  handleSubmit() {
-
-    let assay = this.state.assay;
-
-    let isError = this.validateForm(assay);
-    console.log(this.state);
-
-    if (isError) {
-
-      swal("Looks like you forgot something...",
-          "Check that all of the required inputs have been filled and then try again.",
-          "warning");
-      console.warn("Validation failed.");
-
-    } else {
-
-      // Sort the tasks
-      if (!!assay.tasks && assay.tasks.length > 0) {
-        const tasks = document.getElementById("task-input-container").children;
-        if (tasks.length > 0) {
-          for (let i = 0; i < tasks.length; i++) {
-            let idx = parseInt(tasks[i].dataset.index);
-            assay.tasks[idx].order = i;
-          }
+    // Sort the tasks
+    if (!!values.tasks && values.tasks.length > 0) {
+      const tasks = document.getElementById("task-input-container").children;
+      if (tasks.length > 0) {
+        for (let i = 0; i < tasks.length; i++) {
+          let idx = parseInt(tasks[i].dataset.index);
+          values.tasks[idx].order = i;
         }
       }
-
-      this.setState({showLoadingOverlay: true});
-
-      fetch(this.submitUrl, {
-        method: this.submitMethod,
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": getCsrfToken()
-        },
-        body: JSON.stringify(assay)
-      })
-      .then(async response => {
-
-        const json = await response.json();
-        console.log(json);
-        if (response.ok) {
-          history.push(
-              "/study/" + this.props.study.code + "/assay/" + json.code);
-        } else {
-          this.setState({showLoadingOverlay: false})
-          swal("Something went wrong",
-              !!json.message
-                  ? "Error: " + json.message :
-                  "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-          );
-          console.error("Request failed.");
-        }
-
-      }).catch(e => {
-        this.setState({showLoadingOverlay: false})
-        swal(
-            "Something went wrong",
-            "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-        );
-        console.error(e);
-      });
     }
+    console.debug("Submit values with sorted tasks: ", values);
+
+    axios({
+      url: url,
+      method: isUpdate ? 'put': 'post',
+      data: values
+    })
+    .then(async response => {
+      const json = response.data;
+      console.debug(json);
+      setSubmitting(false);
+      if (response.status === 200 || response.status === 201) {
+        navigate("/study/" + study.code + "/assay/" + json.code);
+      } else {
+        swal("Something went wrong",
+            !!json.message
+                ? "Error: " + json.message :
+                "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
+        );
+        console.error("Request failed.");
+      }
+    })
+    .catch(e => {
+      setSubmitting(false);
+      swal(
+          "Something went wrong",
+          "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
+      );
+      console.error(e);
+    });
+
   }
 
-  handleCancel() {
+  const handleCancel = () => {
     swal({
       title: "Are you sure you want to leave the page?",
       text: "Any unsaved work will be lost.",
@@ -250,391 +280,427 @@ export default class AssayForm extends React.Component {
     })
     .then(val => {
       if (val) {
-        history.push("/");
+        navigate(-1);
       }
     });
   }
 
-  render() {
+  return (
 
-    return (
-        <Container fluid className="animated fadeIn max-width-1200">
+      <Formik
+          initialValues={assay || assayDefaults}
+          validationSchema={assaySchema}
+          onSubmit={handleFormSubmit}
+          validateOnBlur={false}
+          validateOnChange={false}
+      >
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          setFieldValue,
+          isSubmitting,
+        }) => (
 
-          <LoadingOverlay
-              isVisible={this.state.showLoadingOverlay}
-              message={"Saving your assay..."}
-          />
+          <Container fluid className="animated fadeIn max-width-1200">
 
-          <Row>
-            <Col>
-              <Breadcrumbs crumbs={[
-                {label: "Home", url: "/"},
-                {
-                  label: "Study " + this.props.study.code,
-                  url: "/study/" + this.props.study.code
-                },
-                {label: !!this.state.assay.id ? "Edit Assay" : "New Assay"}
-              ]}/>
-            </Col>
-          </Row>
+            <LoadingOverlay
+                isVisible={isSubmitting}
+                message={"Saving your assay..."}
+            />
 
-          <Row className="justify-content-end align-items-center">
-            <Col>
-              <h3>{!!this.state.assay.id ? "Edit Assay" : "New Assay"}</h3>
-            </Col>
-          </Row>
+            <FormikFormErrorNotification />
 
-          <Row>
-            <Col xs={12}>
-              <Card>
+            <Row>
+              <Col>
+                <Breadcrumbs crumbs={[
+                  {label: "Home", url: "/"},
+                  {
+                    label: "Study " + study.code,
+                    url: "/study/" + study.code
+                  },
+                  {label: !!values.id ? "Edit Assay" : "New Assay"}
+                ]}/>
+              </Col>
+            </Row>
 
-                <Card.Header>
-                  <Card.Title tag="h5">Assay Overview</Card.Title>
-                  <h6 className="card-subtitle text-muted">Select the assay type
-                    that best reflects the experiment being done. If an accurate
-                    option does not exist, or if this is a new assay type,
-                    select 'Generic'. If Assay names should be descriptive, but
-                    do not need to be unique. Describe the
-                    objective of your assay in one or two sentences. Select the
-                    status that best reflects the current state of your assay.
-                    Choose the date your assay is expected to start. If the
-                    assay has already completed, you may select an end
-                    date.</h6>
-                </Card.Header>
+            <Row className="justify-content-end align-items-center">
+              <Col>
+                <h3>{!!values.id ? "Edit Assay" : "New Assay"}</h3>
+              </Col>
+            </Row>
 
-                <Card.Body>
-                  <Form>
+            <Row>
+              <Col xs={12}>
+                <Card>
 
-                    {/*Overview*/}
-                    <Row>
+                  <Card.Header>
+                    <Card.Title tag="h5">Assay Overview</Card.Title>
+                    <h6 className="card-subtitle text-muted">Select the assay type
+                      that best reflects the experiment being done. If an accurate
+                      option does not exist, or if this is a new assay type,
+                      select 'Generic'. If Assay names should be descriptive, but
+                      do not need to be unique. Describe the
+                      objective of your assay in one or two sentences. Select the
+                      status that best reflects the current state of your assay.
+                      Choose the date your assay is expected to start. If the
+                      assay has already completed, you may select an end
+                      date.</h6>
+                  </Card.Header>
 
-                      <Col sm={7}>
-                        <FormGroup>
-                          <Form.Label>Name *</Form.Label>
-                          <Form.Control
-                              type="text"
-                              isInvalid={!this.state.validation.nameIsValid}
-                              defaultValue={this.state.assay.name || ''}
-                              onChange={(e) => this.handleFormUpdate(
-                                  {"name": e.target.value})}
-                              disabled={!!this.state.assay.id}
-                          />
-                          <Form.Control.Feedback type={"invalid"}>
-                            Name must not be empty.
-                          </Form.Control.Feedback>
-                        </FormGroup>
-                      </Col>
+                  <Card.Body>
+                    <FormikForm autoComplete={"off"}>
 
-                      <Col sm={5}>
-                        <AssayTypeDropdown
-                            assayTypes={this.props.assayTypes}
-                            selectedType={!!this.state.assay.assayType
-                                ? this.state.assay.assayType.id : -1}
-                            onChange={this.handleFormUpdate}
-                            disabled={!!this.state.assay.id}
-                        />
-                      </Col>
+                      {/*Overview*/}
+                      <Row>
 
-                    </Row>
-
-                    <Row>
-                      <Col sm={7}>
-                        <FormGroup>
-                          <Form.Label>Description *</Form.Label>
-                          <ReactQuill
-                              theme="snow"
-                              defaultValue={this.state.assay.description || ''}
-                              onChange={content => this.handleFormUpdate(
-                                  {"description": content})}
-                          />
-                          <Form.Control.Feedback type={"invalid"}>
-                            Description must not be empty.
-                          </Form.Control.Feedback>
-                          <Form.Text>
-                            Provide a brief description of your assay.
-                          </Form.Text>
-                        </FormGroup>
-                      </Col>
-                      <Col sm={5}>
-                        {
-                          this.props.features
-                          && this.props.features.notebook
-                          && this.props.features.notebook.isEnabled
-                          && !this.state.isUpdateModeOn ? (
-                            <NotebookEntryTemplatesDropdown
-                                notebookTemplates={this.props.notebookTemplates}
-                                defaultTemplate={this.props.defaultNotebookTemplate}
-                                onChange={this.handleTemplateSelection}
+                        <Col sm={7}>
+                          <FormGroup>
+                            <Form.Label>Name *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                isInvalid={!!errors.name}
+                                value={values.name}
+                                onChange={handleChange}
+                                disabled={!!values.id}
                             />
-                          ): ""
-                        }
+                            <Form.Control.Feedback type={"invalid"}>
+                              {errors.name}
+                            </Form.Control.Feedback>
+                          </FormGroup>
+                        </Col>
 
-                        <StatusDropdown
-                            selected={this.state.assay.status}
-                            onChange={this.handleFormUpdate}
-                        />
-
-                        <FormGroup>
-                          <Form.Label>Start Date *</Form.Label>
-                          <DatePicker
-                              maxlength="2"
-                              className={"form-control"}
-                              invalid={!this.state.validation.startDateIsValid}
-                              wrapperClassName="form-control"
-                              selected={this.state.assay.startDate}
-                              onChange={(date) => this.handleFormUpdate(
-                                  {"startDate": date})}
-                              isClearable={true}
-                              dateFormat=" MM / dd / yyyy"
-                              placeholderText="MM / DD / YYYY"
+                        <Col sm={5}>
+                          <AssayTypeDropdown
+                              assayTypes={assayTypes}
+                              selectedType={!!values.assayType
+                                  ? values.assayType.id : -1}
+                              onChange={(data) => {
+                                setFieldValue("assayType", data.assayType);
+                                setFieldValue("tasks", data.tasks);
+                                setFieldValue("fields", data.fields);
+                              }}
+                              disabled={!!values.id}
+                              isInvalid={!!errors.assayType}
                           />
-                          <Form.Control.Feedback type={"invalid"}>
-                            You must select a Start Date.
-                          </Form.Control.Feedback>
-                          <Form.Text>
-                            Select the date your assay began or is expected to
-                            begin.
-                          </Form.Text>
-                        </FormGroup>
+                        </Col>
 
-                        <FormGroup>
-                          <Form.Label>End Date</Form.Label>
-                          <DatePicker
-                              maxlength="2"
-                              className="form-control"
-                              wrapperClassName="form-control"
-                              selected={this.state.assay.endDate}
-                              onChange={(date) => this.handleFormUpdate(
-                                  {"endDate": date})}
-                              isClearable={true}
-                              dateFormat=" MM / dd / yyyy"
-                              placeholderText="MM / DD / YYYY"
+                      </Row>
+
+                      <Row>
+                        <Col sm={7}>
+                          <FormGroup>
+                            <Form.Label>Description *</Form.Label>
+                            <ReactQuill
+                                theme="snow"
+                                name="description"
+                                value={values.description}
+                                className={!!errors.description ? "is-invalid" : ""}
+                                onChange={content => setFieldValue("description", content)}
+                            />
+                            <Form.Control.Feedback type={"invalid"}>
+                              Description must not be empty.
+                            </Form.Control.Feedback>
+                            <Form.Text>
+                              Provide a brief description of your assay.
+                            </Form.Text>
+                          </FormGroup>
+                        </Col>
+                        <Col sm={5}>
+                          {
+                            features
+                            && features.notebook
+                            && features.notebook.isEnabled
+                            && !values.id ? (
+                              <NotebookEntryTemplatesDropdown
+                                  notebookTemplates={notebookTemplates}
+                                  defaultTemplate={defaultNotebookTemplate}
+                                  onChange={(selectedItem) => {
+                                    setFieldValue("notebookTemplateId", selectedItem ? selectedItem.value : '')
+                                  }}
+                              />
+                            ): ""
+                          }
+
+                          <StatusDropdown
+                              selected={values.status}
+                              onChange={(value) => setFieldValue("status", value)}
                           />
-                          <Form.Text>Select the date your assay was
-                            completed.</Form.Text>
-                        </FormGroup>
 
-                      </Col>
-                    </Row>
+                          <FormGroup>
+                            <Form.Label>Start Date *</Form.Label>
+                            <DatePicker
+                                maxlength="2"
+                                className={"form-control " + (!!errors.startDate ? " is-invalid" : "")}
+                                invalid={!!errors.startDate}
+                                name="startDate"
+                                wrapperClassName="form-control"
+                                selected={values.startDate}
+                                onChange={(date) => setFieldValue("startDate", date)}
+                                isClearable={true}
+                                dateFormat=" MM / dd / yyyy"
+                                placeholderText="MM / DD / YYYY"
+                            />
+                            <Form.Control.Feedback type={"invalid"}>
+                              You must select a Start Date.
+                            </Form.Control.Feedback>
+                            <Form.Text>
+                              Select the date your assay began or is expected to
+                              begin.
+                            </Form.Text>
+                          </FormGroup>
 
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
+                          <FormGroup>
+                            <Form.Label>End Date</Form.Label>
+                            <DatePicker
+                                maxlength="2"
+                                name="endDate"
+                                className="form-control"
+                                wrapperClassName="form-control"
+                                selected={values.endDate}
+                                onChange={(date) => setFieldValue("endDate", date)}
+                                isClearable={true}
+                                dateFormat=" MM / dd / yyyy"
+                                placeholderText="MM / DD / YYYY"
+                            />
+                            <Form.Text>
+                              Select the date your assay was completed.
+                            </Form.Text>
+                          </FormGroup>
 
-                    {/* Legacy study assay */}
+                        </Col>
+                      </Row>
 
-                    {
-                      !!this.props.study.legacy
-                          ? (
-                              <React.Fragment>
-                                <Row>
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
 
-                                  <Col md={12}>
-                                    <h5 className="card-title">Legacy Study</h5>
-                                    <h6 className="card-subtitle text-muted">Studies
-                                      created
-                                      prior to the introduction of Study Tracker are
-                                      considered legacy. Enabling this option allows
-                                      you to
-                                      specify certain attributes that would
-                                      otherwise be
-                                      automatically generated.</h6>
-                                    <br/>
-                                  </Col>
+                      {/* Legacy study assay */}
 
-                                  <Col md={12}>
+                      {
+                        !!study.legacy
+                            ? (
+                                <React.Fragment>
+                                  <Row>
 
-                                    <FormGroup>
-                                      <Form.Label>Notebook URL</Form.Label>
-                                      <Form.Control
-                                          type="text"
-                                          defaultValue={
-                                            !!this.state.assay.notebookFolder
-                                            && !!this.state.assay.notebookFolder.url
-                                                ? this.state.assay.notebookFolder.url
-                                                : ''
-                                          }
-                                          onChange={(e) => this.handleFormUpdate(
-                                              {
-                                                "notebookEntry": {
-                                                  label: "ELN",
-                                                  url: e.target.value
-                                                }
-                                              })}
-                                      />
-                                      <Form.Text>If the study already has an ELN
-                                        entry,
-                                        provide the URL here.</Form.Text>
-                                    </FormGroup>
-                                  </Col>
+                                    <Col md={12}>
+                                      <h5 className="card-title">Legacy Study</h5>
+                                      <h6 className="card-subtitle text-muted">Studies
+                                        created
+                                        prior to the introduction of Study Tracker are
+                                        considered legacy. Enabling this option allows
+                                        you to
+                                        specify certain attributes that would
+                                        otherwise be
+                                        automatically generated.</h6>
+                                      <br/>
+                                    </Col>
 
-                                </Row>
+                                    <Col md={12}>
 
-                                <Row>
-                                  <Col>
-                                    <hr/>
-                                  </Col>
-                                </Row>
+                                      <FormGroup>
+                                        <Form.Label>Notebook URL</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name={"notebookFolder.url"}
+                                            value={values.notebookFolder.url}
+                                            onChange={handleChange}
+                                        />
+                                        <Form.Text>
+                                          If the study already has an ELN
+                                          entry, provide the URL here.
+                                        </Form.Text>
+                                      </FormGroup>
+                                    </Col>
 
-                              </React.Fragment>
-                          ) : ''
-                    }
+                                  </Row>
 
-                    {/* Assay type fields */}
+                                  <Row>
+                                    <Col>
+                                      <hr/>
+                                    </Col>
+                                  </Row>
 
-                    {
-                      !!this.state.assay.assayType
-                      && this.state.assay.assayType.fields.length > 0
-                          ? (
-                              <React.Fragment>
+                                </React.Fragment>
+                            ) : ''
+                      }
 
-                                <Row>
+                      {/* Assay type fields */}
 
-                                  <Col md={12}>
-                                    <h5 className="card-title">
-                                      {this.state.assay.assayType.name} Fields
-                                    </h5>
-                                    <h6 className="card-subtitle text-muted">
-                                      {this.state.assay.assayType.description}
-                                    </h6>
-                                    <br/>
-                                  </Col>
+                      {
+                        !!values.assayType
+                        && values.assayType.fields.length > 0
+                            ? (
+                                <React.Fragment>
 
-                                </Row>
+                                  <Row>
 
-                                <AssayTypeFieldCaptureInputList
-                                    assayType={this.state.assay.assayType}
-                                    assayFields={this.state.assay.fields}
-                                    handleUpdate={this.handleFieldUpdate}
-                                />
+                                    <Col md={12}>
+                                      <h5 className="card-title">
+                                        {values.assayType.name} Fields
+                                      </h5>
+                                      <h6 className="card-subtitle text-muted">
+                                        {values.assayType.description}
+                                      </h6>
+                                      <br/>
+                                    </Col>
 
-                                <Row>
-                                  <Col>
-                                    <hr/>
-                                  </Col>
-                                </Row>
+                                  </Row>
 
-                              </React.Fragment>
-                          )
-                          : ''
-                    }
+                                  <AssayTypeFieldCaptureInputList
+                                      assayType={values.assayType}
+                                      assayFields={values.fields}
+                                      handleUpdate={data => {
+                                        setFieldValue("fields", {
+                                          ...values.fields,
+                                          ...data
+                                        });
+                                      }}
+                                  />
 
-                    {/* Tasks */}
+                                  <Row>
+                                    <Col>
+                                      <hr/>
+                                    </Col>
+                                  </Row>
 
-                    <Row>
-                      <Col sm={12}>
-                        <h5 className="card-title">Tasks</h5>
-                        <h6 className="card-subtitle text-muted">
-                          You can define an ordered list of tasks that must be
-                          completed for your assay here. Task status changes are
-                          captured with user-associated timestamps.
-                        </h6>
-                        <br/>
-                      </Col>
-                    </Row>
+                                </React.Fragment>
+                            )
+                            : ''
+                      }
 
-                    <TaskInputs
-                        tasks={this.state.assay.tasks}
-                        handleUpdate={(tasks) => {
-                          this.handleFormUpdate({tasks: tasks})
-                        }}
-                    />
+                      {/* Tasks */}
 
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
+                      <Row>
+                        <Col sm={12}>
+                          <h5 className="card-title">Tasks</h5>
+                          <h6 className="card-subtitle text-muted">
+                            You can define an ordered list of tasks that must be
+                            completed for your assay here. Task status changes are
+                            captured with user-associated timestamps.
+                          </h6>
+                          <br/>
+                        </Col>
+                      </Row>
 
-                    {/* Assay Team */}
-                    <Row>
-                      <Col sm={12}>
-                        <h5 className="card-title">Assay Team</h5>
-                        <h6 className="card-subtitle text-muted">Who will be
-                          working on this assay? One user must be assigned as
-                          the assay owner. This person will be the primary
-                          contact person for the experiment.</h6>
-                        <br/>
-                      </Col>
+                      <TaskInputs
+                          tasks={values.tasks}
+                          handleUpdate={(tasks) => setFieldValue("tasks", tasks)}
+                      />
 
-                      <Col sm={12}>
-                        <UserInputs
-                            users={this.state.assay.users || []}
-                            owner={this.state.assay.owner}
-                            onChange={this.handleFormUpdate}
-                            isValid={this.state.validation.usersIsValid
-                                && this.state.validation.ownerIsValid}
-                        />
-                      </Col>
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
 
-                    </Row>
+                      {/* Assay Team */}
+                      <Row>
+                        <Col sm={12}>
+                          <h5 className="card-title">Assay Team</h5>
+                          <h6 className="card-subtitle text-muted">Who will be
+                            working on this assay? One user must be assigned as
+                            the assay owner. This person will be the primary
+                            contact person for the experiment.</h6>
+                          <br/>
+                        </Col>
 
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
+                        <Col sm={12}>
+                          <UserInputs
+                              users={values.users}
+                              owner={values.owner}
+                              onChange={(key, value) => setFieldValue(key, value)}
+                              isValid={!errors.users && !errors.owner}
+                          />
+                        </Col>
 
-                    {/* Attributes */}
+                      </Row>
 
-                    <Row>
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
 
-                      <Col md={12}>
-                        <h5 className="card-title">Assay Attributes</h5>
-                        <h6 className="card-subtitle text-muted">
-                          Key-value attributes for adding additional information
-                          about the assay, or for adding application-aware
-                          attributes for external integrations (for example, ELN
-                          identifiers). You can add as many or as few attributes
-                          as you'd like. Attribute values should not be left
-                          empty. All values are saved as simple character
-                          strings.
-                        </h6>
-                        <br/>
-                      </Col>
+                      {/* Attributes */}
 
-                    </Row>
+                      <Row>
 
-                    <AttributeInputs
-                        attributes={this.state.assay.attributes}
-                        handleUpdate={(attributes) => this.handleFormUpdate({
-                          attributes: attributes
-                        })}
-                    />
+                        <Col md={12}>
+                          <h5 className="card-title">Assay Attributes</h5>
+                          <h6 className="card-subtitle text-muted">
+                            Key-value attributes for adding additional information
+                            about the assay, or for adding application-aware
+                            attributes for external integrations (for example, ELN
+                            identifiers). You can add as many or as few attributes
+                            as you'd like. Attribute values should not be left
+                            empty. All values are saved as simple character
+                            strings.
+                          </h6>
+                          <br/>
+                        </Col>
 
-                    <Row>
-                      <Col>
-                        <hr/>
-                      </Col>
-                    </Row>
+                      </Row>
 
-                    {/*Buttons*/}
-                    <Row>
-                      <Col className="text-center">
-                        <FormGroup>
-                          <Button size="lg" variant="primary"
-                                  onClick={this.handleSubmit}>Submit</Button>
-                          &nbsp;&nbsp;
-                          <Button size="lg" variant="secondary"
-                                  onClick={this.handleCancel}>Cancel</Button>
-                        </FormGroup>
-                      </Col>
-                    </Row>
+                      <AttributeInputs
+                          attributes={values.attributes}
+                          handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
+                      />
 
-                  </Form>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+                      <Row>
+                        <Col>
+                          <hr/>
+                        </Col>
+                      </Row>
 
-        </Container>
-    );
-  }
+                      {/*Buttons*/}
+                      <Row>
+                        <Col className="text-center">
+                          <FormGroup>
+                            <Button
+                                size="lg"
+                                variant="primary"
+                                type="submit"
+                            >
+                              Submit
+                            </Button>
+                            &nbsp;&nbsp;
+                            <Button
+                                size="lg"
+                                variant="secondary"
+                                onClick={handleCancel}
+                            >
+                              Cancel
+                            </Button>
+                          </FormGroup>
+                        </Col>
+                      </Row>
+
+                    </FormikForm>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+
+          </Container>
+        )}
+      </Formik>
+  );
 
 }
 
 AssayForm.propTypes = {
   features: PropTypes.object,
+  study: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  assay: PropTypes.object,
+  assayTypes: PropTypes.array.isRequired,
+  notebookTemplates: PropTypes.array.isRequired,
+  defaultNotebookTemplate: PropTypes.object,
 }
+
+export default AssayForm;

@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,9 +221,21 @@ public class AssayService {
       } else {
         LOGGER.warn(String.format("Assay study %s does not have ELN folder set.", study.getCode()));
       }
+    } else {
+      assay.setNotebookFolder(null);
     }
 
-    assayRepository.save(assay);
+    try {
+      assayRepository.save(assay);
+      LOGGER.info(
+          String.format(
+              "Successfully created new assay with code %s and ID %s",
+              assay.getCode(), assay.getId()));
+    } catch (ConstraintViolationException e) {
+      throw new InvalidConstraintException(e);
+    } catch (Exception e) {
+      throw e;
+    }
   }
 
   @Transactional

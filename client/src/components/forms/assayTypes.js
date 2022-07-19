@@ -23,9 +23,37 @@ export const AssayTypeDropdown = ({
   assayTypes,
   selectedType,
   onChange,
-  isValid,
+  isInvalid,
   disabled
 }) => {
+
+  const handleAssayTypeChange = (selected) => {
+
+    console.debug("Selected assay type", selected);
+    const assayType = assayTypes.filter(
+        t => t.id === selected.value)[0];
+
+    const fields = {};
+    for (let f of assayType.fields) {
+      fields[f.fieldName] = f.type === "BOOLEAN" ? false : null;
+    }
+
+    const tasks = [];
+    for (let t of assayType.tasks) {
+      tasks.push({
+        "label": t.label,
+        "status": t.status,
+        "order": t.order
+      });
+    }
+
+    onChange({
+      "assayType": assayType,
+      "tasks": tasks,
+      "fields": fields
+    });
+
+  };
 
   const options = assayTypes
   .sort((a, b) => {
@@ -48,44 +76,23 @@ export const AssayTypeDropdown = ({
       <FormGroup>
         <Form.Label>Assay Type *</Form.Label>
         <Select
-            className={"react-select-container "}
-            invalid={!isValid}
+            className={"react-select-container " + (isInvalid ? "is-invalid" : "")}
+            invalid={isInvalid}
             classNamePrefix="react-select"
-            defaultValue={options.filter(option => {
+            value={options.filter(option => {
               return option.value === selectedType
             })}
             isDisabled={disabled}
             options={options}
-            onChange={(selected) => {
-
-              console.log(selected);
-              const assayType = assayTypes.filter(
-                  t => t.id === selected.value)[0];
-
-              const fields = {};
-              for (let f of assayType.fields) {
-                fields[f.fieldName] = f.type === "BOOLEAN" ? false : null;
-              }
-
-              const tasks = [];
-              for (let t of assayType.tasks) {
-                tasks.push({
-                  "label": t.label,
-                  "status": t.status,
-                  "order": t.order
-                });
-              }
-
-              onChange({
-                "assayType": assayType,
-                "tasks": tasks,
-                "fields": fields
-              });
-
-            }}
+            onChange={handleAssayTypeChange}
         />
-        <Form.Text>Select the assay type that best corresponds to the
-          experiment to be performed.</Form.Text>
+        <Form.Control.Feedback type={"invalid"}>
+          You must select an assay type.
+        </Form.Control.Feedback>
+        <Form.Text>
+          Select the assay type that best corresponds to the
+          experiment to be performed.
+        </Form.Text>
       </FormGroup>
   );
 

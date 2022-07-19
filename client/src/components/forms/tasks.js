@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
@@ -6,28 +6,19 @@ import {XCircle} from "react-feather";
 import dragula from 'react-dragula';
 import {FormGroup} from "./common";
 
-class TaskInputList extends React.Component {
+const TaskInputList = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  handleContainerLoaded = container => {
+  const handleContainerLoaded = container => {
     if (container) {
-      this.props.onContainerLoaded(container);
+      props.onContainerLoaded(container);
     }
   }
 
-  render() {
-
-    return (
-        <div id="task-input-container" ref={this.handleContainerLoaded}>
-          {this.props.children}
-        </div>
-    )
-
-  }
+  return (
+      <div id="task-input-container" ref={handleContainerLoaded}>
+        {props.children}
+      </div>
+  )
 
 }
 
@@ -86,97 +77,96 @@ const TaskInputCard = ({
   )
 };
 
-export class TaskInputs extends React.Component {
+export const TaskInputs = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {};
+  const {tasks, handleUpdate} = props;
 
-    this.containers = [];
+  const containers = [];
 
-    this.handleAddTaskClick = this.handleAddTaskClick.bind(this);
-    this.handleRemoveTaskClick = this.handleRemoveTaskClick.bind(this);
-    this.handleTaskUpdate = this.handleTaskUpdate.bind(this);
-  }
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {};
+  //
+  //   this.containers = [];
+  //
+  //   this.handleAddTaskClick = this.handleAddTaskClick.bind(this);
+  //   this.handleRemoveTaskClick = this.handleRemoveTaskClick.bind(this);
+  //   this.handleTaskUpdate = this.handleTaskUpdate.bind(this);
+  // }
 
-  componentDidMount() {
-    dragula(this.containers);
-  }
+  useEffect(() => {
+    dragula(containers);
+  }, []);
 
-  onContainerReady = container => {
-    console.log(container);
-    this.containers.push(container);
+  const onContainerReady = container => {
+    console.debug("Task container", container);
+    containers.push(container);
   };
 
-  handleTaskUpdate(data, index) {
-    let tasks = this.props.tasks;
+  const handleTaskUpdate = (data, index) => {
     tasks[index] = {
       ...tasks[index],
       ...data
     };
-    this.props.handleUpdate(tasks);
+    handleUpdate(tasks);
   }
 
-  handleAddTaskClick() {
+  const handleAddTaskClick = () => {
     const newTasks = [
-      ...this.props.tasks,
+      ...tasks,
       {label: "", status: "TODO"}
     ];
-    this.props.handleUpdate(newTasks);
+    handleUpdate(newTasks);
   }
 
-  handleRemoveTaskClick(index) {
-    let updated = this.props.tasks;
+  const handleRemoveTaskClick = (index) => {
+    let updated = tasks;
     updated.splice(index, 1);
-    this.props.handleUpdate(updated);
+    handleUpdate(updated);
   }
 
-  render() {
-
-    const cards = this.props.tasks
-    .sort((a, b) => {
-      if (a.order > b.order) {
-        return 1;
-      } else if (b.order > a.order) {
-        return -1;
-      }
-      return 0;
-    })
-    .map((task, index) => {
-      return (
-          <Row key={'task-inputs-' + index} data-index={index}>
-            <Col md={12} lg={8} xl={6}>
-              <TaskInputCard
-                  task={task}
-                  index={index}
-                  handleRemoveTaskClick={this.handleRemoveTaskClick}
-                  handleTaskUpdate={this.handleTaskUpdate}
-              />
-            </Col>
-          </Row>
-      )
-    });
-
+  const cards = tasks
+  .sort((a, b) => {
+    if (a.order > b.order) {
+      return 1;
+    } else if (b.order > a.order) {
+      return -1;
+    }
+    return 0;
+  })
+  .map((task, index) => {
     return (
-        <React.Fragment>
+        <Row key={'task-inputs-' + index} data-index={index}>
+          <Col md={12} lg={8} xl={6}>
+            <TaskInputCard
+                task={task}
+                index={index}
+                handleRemoveTaskClick={handleRemoveTaskClick}
+                handleTaskUpdate={handleTaskUpdate}
+            />
+          </Col>
+        </Row>
+    )
+  });
 
-          <TaskInputList onContainerLoaded={this.onContainerReady}>
-            {cards}
-          </TaskInputList>
+  return (
+      <React.Fragment>
 
-          <Row>
-            <Col md={12}>
-              <Button
-                  variant="info"
-                  onClick={this.handleAddTaskClick}>
-                <FontAwesomeIcon icon={faPlusCircle}/> Add Task
-              </Button>
-            </Col>
-          </Row>
+        <TaskInputList onContainerLoaded={onContainerReady}>
+          {cards}
+        </TaskInputList>
 
-        </React.Fragment>
-    );
+        <Row>
+          <Col md={12}>
+            <Button
+                variant="info"
+                onClick={handleAddTaskClick}>
+              <FontAwesomeIcon icon={faPlusCircle}/> Add Task
+            </Button>
+          </Col>
+        </Row>
 
-  }
+      </React.Fragment>
+  );
 
 }
