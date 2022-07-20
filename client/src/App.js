@@ -15,32 +15,36 @@
  */
 
 import React from "react";
-import StudyListView from "./views/StudyListView";
-import StudyDetailsView from "./views/StudyDetailsView";
+import StudyListView from "./pages/studyList/StudyListView";
+import StudyDetailsView from "./pages/studyDetails/StudyDetailsView";
 import {createBrowserHistory} from "history";
-import StudyFormView from "./views/StudyFormView";
+import StudyFormView from "./pages/studyForm/StudyFormView";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import AssayFormView from "./views/AssayFormView";
-import AssayDetailsView from "./views/AssayDetailsView";
-import Error, {ErrorBoundary} from "./views/Error";
-import ProgramListView from "./views/ProgramListView";
-import ProgramDetailsView from "./views/ProgramDetailsView";
-import ProgramFormView from "./views/ProgramFormView";
-import UserListView from "./views/UserListView";
-import UserDetailsView from "./views/UserDetailsView";
-import UserFormView from "./views/UserFormView";
-import SignInView from "./views/SignInView";
-import PasswordResetView from "./views/PasswordResetView";
-import AdminDashboardView from "./views/AdminDashboardView";
-import FrontPageView from "./views/FrontPageView";
-import AssayTypeFormView from "./views/AssayTypeFormView";
-import AssayListView from "./views/AssayListView";
-import {TemplateFormView} from "./views/TemplateFormView";
-import StudyCollectionFormView from "./views/StudyCollectionFormView";
-import StudyCollectionDetailsView from "./views/StudyCollectionDetailsView";
-import StudyCollectionListView from "./views/StudyCollectionListView";
-import PasswordResetRequestView from "./views/PasswordResetRequestView";
-import SearchResultsView from "./views/SearchResultsView";
+import AssayFormView from "./pages/assayForm/AssayFormView";
+import AssayDetailsView from "./pages/assayDetails/AssayDetailsView";
+import Error, {ErrorBoundary} from "./pages/error/Error";
+import ProgramListView from "./pages/programList/ProgramListView";
+import ProgramDetailsView from "./pages/programDetails/ProgramDetailsView";
+import ProgramFormView from "./pages/programForm/ProgramFormView";
+import UserListView from "./pages/userList/UserListView";
+import UserDetailsView from "./pages/userDetails/UserDetailsView";
+import UserFormView from "./pages/userForm/UserFormView";
+import SignInView from "./pages/signIn/SignInView";
+import PasswordResetView from "./pages/passwordReset/PasswordResetView";
+import AdminDashboardView from "./pages/adminDashboard/AdminDashboardView";
+import FrontPageView from "./pages/frontPage/FrontPageView";
+import AssayTypeFormView from "./pages/assayTypeForm/AssayTypeFormView";
+import AssayListView from "./pages/assayList/AssayListView";
+import {TemplateFormView} from "./pages/templateForm/TemplateFormView";
+import StudyCollectionFormView
+  from "./pages/studyCollectionForm/StudyCollectionFormView";
+import StudyCollectionDetailsView
+  from "./pages/studyCollectionsDetails/StudyCollectionDetailsView";
+import StudyCollectionListView
+  from "./pages/studyCollectionList/StudyCollectionListView";
+import PasswordResetRequestView
+  from "./pages/passwordResetRequest/PasswordResetRequestView";
+import SearchResultsView from "./pages/searchResults/SearchResultsView";
 
 export const history = createBrowserHistory();
 
