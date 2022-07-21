@@ -9,7 +9,7 @@ import TaskInputList from "./TaskInputList";
 
 const TaskInputs = props => {
 
-  const {tasks, handleUpdate} = props;
+  const {tasks, handleUpdate, error} = props;
 
   const containers = [];
 
@@ -71,9 +71,18 @@ const TaskInputs = props => {
   return (
       <React.Fragment>
 
-        <TaskInputList onContainerLoaded={onContainerReady}>
+        <TaskInputList
+            isInvalid={!!error}
+            onContainerLoaded={onContainerReady}
+        >
           {cards}
         </TaskInputList>
+
+        {
+          !!error
+              ? (<div className={"invalid-feedback"}>{error}</div>)
+              : ''
+        }
 
         <Row>
           <Col md={12}>

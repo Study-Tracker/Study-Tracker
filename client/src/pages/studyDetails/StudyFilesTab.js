@@ -30,27 +30,13 @@ const StudyFilesTabContent = props => {
   const [showFolder, setShowFolder] = useState(false);
   const [error, setError] = useState(null);
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     modalIsOpen: false,
-  //     isLoaded: false,
-  //     isError: false,
-  //     showFolder: false,
-  //   };
-  //   this.showModal = this.showModal.bind(this);
-  //   this.handleSubmit = this.handleSubmit.bind(this);
-  //   this.refreshData = this.refreshData.bind(this);
-  //   this.handleShowFolder = this.handleShowFolder.bind(this);
-  // }
-
   const handleShowFolder = () => {
     setShowFolder(true);
     refreshData();
   }
 
   const refreshData = () => {
-    axios.get("/api/study/" + this.props.study.id + "/storage")
+    axios.get("/api/study/" + study.id + "/storage")
     .then(response => setFolder(response.data))
     .catch(e => {
       console.error(e);
@@ -58,21 +44,12 @@ const StudyFilesTabContent = props => {
     });
   }
 
-  // showModal(bool) {
-  //   this.setState({
-  //     modalIsOpen: bool
-  //   })
-  // }
-
   const handleSubmit = (files) => {
     console.debug(files);
     const requests = files.map(file => {
       const data = new FormData();
-      data.set("file", file);
-      return fetch('/api/study/' + this.props.study.id + '/storage', {
-        method: 'POST',
-        body: data
-      });
+      data.append("file", file);
+      return axios.post('/api/study/' + study.id + '/storage', data);
     });
     Promise.all(requests)
     .then(() => {

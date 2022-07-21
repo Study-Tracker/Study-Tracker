@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 
 const AssayTypeFieldInputs = props => {
 
-  const {handleUpdate} = props;
+  const {handleUpdate, error} = props;
   const [fields, setFields] = useState(props.fields || []);
   const containers = [];
 
@@ -85,9 +85,18 @@ const AssayTypeFieldInputs = props => {
   return (
       <React.Fragment>
 
-        <AssayTypeFieldInputList onContainerLoaded={onContainerReady}>
+        <AssayTypeFieldInputList
+            isInvalid={!!error}
+            onContainerLoaded={onContainerReady}
+        >
           {cards}
         </AssayTypeFieldInputList>
+
+        {
+          !!error
+              ? (<div className={"invalid-feedback"}>{error}</div>)
+              : ''
+        }
 
         <Row>
           <Col md={12}>

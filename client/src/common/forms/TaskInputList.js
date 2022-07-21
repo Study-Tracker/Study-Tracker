@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const TaskInputList = props => {
 
@@ -9,11 +10,20 @@ const TaskInputList = props => {
   }
 
   return (
-      <div id="task-input-container" ref={handleContainerLoaded}>
+      <div
+          id="task-input-container"
+          ref={handleContainerLoaded}
+          className={props.isInvalid ? "is-invalid" : ""}
+      >
         {props.children}
       </div>
   )
 
+}
+
+TaskInputList.propTypes = {
+  onContainerLoaded: PropTypes.func.isRequired,
+  isInvalid: PropTypes.bool
 }
 
 export default TaskInputList;

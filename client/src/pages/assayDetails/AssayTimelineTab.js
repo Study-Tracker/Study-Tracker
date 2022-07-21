@@ -14,63 +14,72 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Col, Row} from 'react-bootstrap'
 import {Timeline} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
+import axios from "axios";
+import PropTypes from "prop-types";
 
-class AssayTimelineTab extends React.Component {
+const AssayTimelineTab = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoaded: false,
-      isError: false
-    };
-  }
+  const {assay} = props;
 
-  componentDidMount() {
-    fetch("/api/assay/" + this.props.assay.code + "/activity")
-    .then(response => response.json())
-    .then(json => {
-      this.setState({
-        activity: json,
+  const [state, setState] = useState({
+    isLoaded: false,
+    isError: false,
+  });
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     isLoaded: false,
+  //     isError: false
+  //   };
+  // }
+
+  useEffect(() => {
+    axios.get("/api/assay/" + assay.code + "/activity")
+    .then(response => {
+      setState(prevState => ({
+        ...prevState,
+        activity: response.data,
         isLoaded: true
-      });
+      }));
     })
     .catch(e => {
-      this.setState({
+      setState(prevState => ({
+        ...prevState,
         isError: true,
         error: e.message
-      })
+      }));
     })
+  }, []);
+
+
+  let content = <CardLoadingMessage/>;
+  if (!!state.isLoaded && !!state.activity) {
+    content = <Timeline activity={state.activity}/>;
+  } else if (state.isError) {
+    content = <DismissableAlert color={'warning'}
+                                message={'Failed to load assay activity.'}/>;
   }
 
-  render() {
+  return (
+      <div className="timeline-tab">
+        <Row>
+          <Col sm={12}>
+            {content}
+          </Col>
+        </Row>
+      </div>
+  )
 
-    let content = <CardLoadingMessage/>;
-    if (!!this.state.isLoaded && !!this.state.activity) {
-      content = <Timeline activities={this.state.activity}/>;
-    } else if (this.state.isError) {
-      content = <DismissableAlert color={'warning'}
-                                  message={'Failed to load assay activity.'}/>;
-    }
+}
 
-    return (
-        <div className="timeline-tab">
-
-          <Row>
-            <Col sm={12}>
-              {content}
-            </Col>
-          </Row>
-
-        </div>
-    )
-
-  }
-
+AssayTimelineTab.propTypes = {
+  assay: PropTypes.object.isRequired
 }
 
 export default AssayTimelineTab;

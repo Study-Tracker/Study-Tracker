@@ -17,78 +17,60 @@
 import {Button, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFile} from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import React, {useState} from "react";
 import {StorageFolderFileList, UploadFilesModal} from "../../common/files";
-import {getCsrfToken} from "../../config/csrf";
 import PropTypes from "prop-types";
+import axios from "axios";
 
-export default class AssayFilesTab extends React.Component {
+const AssayFilesTab = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      modalIsOpen: false,
-      isLoaded: false,
-      isError: false,
-      showFolder: false,
-    };
-    this.showModal = this.showModal.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.refreshData = this.refreshData.bind(this);
-    this.handleShowFolder = this.handleShowFolder.bind(this);
+  const {assay, user} = props;
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [showFolder, setShowFolder] = useState(false);
+  const [folder, setFolder] = useState(null);
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     modalIsOpen: false,
+  //     isLoaded: false,
+  //     isError: false,
+  //     showFolder: false,
+  //   };
+  //   this.showModal = this.showModal.bind(this);
+  //   this.handleSubmit = this.handleSubmit.bind(this);
+  //   this.refreshData = this.refreshData.bind(this);
+  //   this.handleShowFolder = this.handleShowFolder.bind(this);
+  // }
+
+  const handleShowFolder = () => {
+    setShowFolder(true);
+    refreshData();
   }
 
-  handleShowFolder() {
-    this.setState({
-      showFolder: true
-    });
-    this.refreshData();
-  }
-
-  refreshData() {
-    fetch("/api/assay/" + this.props.assay.code + "/storage")
+  const refreshData = () => {
+    axios.get("/api/assay/" + assay.code + "/storage")
     .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Failed to load assay folder.");
-    })
-    .then(json => {
-      this.setState({
-        folder: json,
-        isLoaded: true
-      })
+      setFolder(response.data);
     })
     .catch(e => {
       console.error(e);
-      this.setState({
-        isError: true,
-        error: e.message
-      })
+      setError(e.message);
     });
   }
 
-  showModal(bool) {
-    this.setState({
-      modalIsOpen: bool
-    })
-  }
-
-  handleSubmit(files) {
-    console.log(files);
+  const handleSubmit = (files) => {
+    console.debug("Files", files);
     const requests = files.map(file => {
       const data = new FormData();
-      data.set("file", file);
-      return fetch('/api/assay/' + this.props.assay.code + '/storage', {
-        method: 'POST',
-        headers: {"X-XSRF-TOKEN": getCsrfToken()},
-        body: data
-      });
+      data.append("file", file);
+      return axios.post('/api/assay/' + assay.code + '/storage', data);
     });
     Promise.all(requests)
     .then(() => {
-      this.showModal(false);
-      this.refreshData();
+      setModalIsOpen(false);
+      refreshData();
     })
     .catch(e => {
       console.error(e);
@@ -96,102 +78,103 @@ export default class AssayFilesTab extends React.Component {
     });
   }
 
-  render() {
-    return (
-        <Col>
+  return (
+      <Col>
 
-          <Row className="justify-content-between align-items-center">
-            <Col>
-              {
-                !!this.props.user
-                    ? (
-                        <span className="float-end">
-                          <Button variant="info"
-                                  onClick={() => this.showModal(true)}>
-                            Upload Files
-                            &nbsp;
-                            <FontAwesomeIcon icon={faFile}/>
-                          </Button>
-                        </span>
-                    ) : ''
-              }
-            </Col>
-          </Row>
-
-          <Row>
-
+        <Row className="justify-content-between align-items-center">
+          <Col>
             {
-              this.state.showFolder ? (
-                  <Col sm={12}>
-                    <StorageFolderFileList
-                        folder={this.state.folder}
-                        isLoaded={this.state.isLoaded}
-                        isError={this.state.isError}
-                    />
-                  </Col>
-              ) : (
-                  <Col sm={12} className={"text-center"}>
-
-                    <p>
-                      <img
-                          src={"/static/images/clip/data-storage.png"}
-                          alt="File storage"
-                          className="img-fluid"
-                          width={250}
-                      />
-                    </p>
-
-                    <p>
-                      Study files can be viewed in the native file browser,
-                      or viewed as a partial folder tree here. <em>Note:</em>
-                      &nbsp;loading and viewing files here may be slow and
-                      subject to rate limits.
-                    </p>
-
-                    {
-                      this.props.assay.storageFolder
-                      && this.props.assay.storageFolder.url ? (
-                          <React.Fragment>
-
-                            <Button
-                                variant="info"
-                                target={"_blank noopener noreferrer"}
-                                href={this.props.assay.storageFolder.url}
-                            >
-                              View files in Egnyte
-                            </Button>
-
-                            &nbsp;&nbsp;or&nbsp;&nbsp;
-
-                          </React.Fragment>
-                      ) : ""
-                    }
-
-                    <Button
-                        variant="primary"
-                        onClick={this.handleShowFolder}
-                    >
-                      Show files here
-                    </Button>
-
-                  </Col>
-              )
+              !!user
+                  ? (
+                      <span className="float-end">
+                        <Button variant="info"
+                                onClick={() => setModalIsOpen(true)}>
+                          Upload Files
+                          &nbsp;
+                          <FontAwesomeIcon icon={faFile}/>
+                        </Button>
+                      </span>
+                  ) : ''
             }
+          </Col>
+        </Row>
 
-          </Row>
+        <Row>
 
-          <UploadFilesModal
-              isOpen={this.state.modalIsOpen}
-              showModal={this.showModal}
-              handleSubmit={this.handleSubmit}
-          />
+          {
+            showFolder ? (
+                <Col sm={12}>
+                  <StorageFolderFileList
+                      folder={folder}
+                      isLoaded={!!folder}
+                      isError={!!error}
+                  />
+                </Col>
+            ) : (
+                <Col sm={12} className={"text-center"}>
 
-        </Col>
-    )
-  }
+                  <p>
+                    <img
+                        src={"/static/images/clip/data-storage.png"}
+                        alt="File storage"
+                        className="img-fluid"
+                        width={250}
+                    />
+                  </p>
+
+                  <p>
+                    Study files can be viewed in the native file browser,
+                    or viewed as a partial folder tree here. <em>Note:</em>
+                    &nbsp;loading and viewing files here may be slow and
+                    subject to rate limits.
+                  </p>
+
+                  {
+                    assay.storageFolder
+                    && assay.storageFolder.url ? (
+                        <React.Fragment>
+
+                          <Button
+                              variant="info"
+                              target={"_blank noopener noreferrer"}
+                              href={assay.storageFolder.url}
+                          >
+                            View files in Egnyte
+                          </Button>
+
+                          &nbsp;&nbsp;or&nbsp;&nbsp;
+
+                        </React.Fragment>
+                    ) : ""
+                  }
+
+                  <Button
+                      variant="primary"
+                      onClick={handleShowFolder}
+                  >
+                    Show files here
+                  </Button>
+
+                </Col>
+            )
+          }
+
+        </Row>
+
+        <UploadFilesModal
+            isOpen={modalIsOpen}
+            showModal={(bool) => setModalIsOpen(bool)}
+            handleSubmit={handleSubmit}
+        />
+
+      </Col>
+  )
 
 }
 
 AssayFilesTab.propTypes = {
   assay: PropTypes.object.isRequired,
+  user: PropTypes.object,
 }
+
+export default AssayFilesTab;

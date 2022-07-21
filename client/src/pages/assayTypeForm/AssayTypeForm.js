@@ -30,6 +30,8 @@ import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import axios from "axios";
 import PropTypes from "prop-types";
+import FormikFormErrorNotification
+  from "../../common/forms/FormikFormErrorNotification";
 
 const AssayTypeForm = props => {
 
@@ -48,11 +50,32 @@ const AssayTypeForm = props => {
   const assayTypeSchema = yup.object().shape({
     name: yup.string()
       .required("Name is required")
-      .max(255, "Name must be less than 255 characters"),
+      .max(255, "Name must be less than 255 characters")
+      .test(
+          "unique",
+          "Name must be unique",
+          value => !assayTypes.find(d => !!value && d.name.toLowerCase() === value.toLowerCase())
+      ),
     description: yup.string().required("Description is required"),
     active: yup.boolean(),
-    fields: yup.array().of(yup.object()),
-    tasks: yup.array().of(yup.object()),
+    fields: yup.array().of(yup.object())
+      .test(
+          "not empty",
+          "Field labels must not be empty",
+          value => !value.find(d => !d.fieldName || d.fieldName.trim() === '')
+      ),
+    tasks: yup.array().of(yup.object())
+      .test(
+          "not empty",
+          "Task labels must not be empty",
+          value => !value.find(d => !d.label || d.label.trim() === '')
+      ),
+    attributes: yup.object()
+      .test(
+          "not empty",
+          "Attribute names must not be empty",
+          value => !Object.keys(value).find(d => d.trim() === '')
+      )
   });
 
   // constructor(props) {
@@ -195,6 +218,8 @@ const AssayTypeForm = props => {
         }) => (
 
             <Container fluid className="animated fadeIn max-width-1200">
+
+              <FormikFormErrorNotification />
 
               <LoadingOverlay
                   isVisible={isSubmitting}
@@ -365,6 +390,7 @@ const AssayTypeForm = props => {
                             handleUpdate={(fields) => {
                               setFieldValue("fields", fields)
                             }}
+                            error={errors.fields}
                         />
 
                         <Row>
@@ -395,6 +421,7 @@ const AssayTypeForm = props => {
                             handleUpdate={(tasks) => {
                               setFieldValue("tasks", tasks)
                             }}
+                            error={errors.tasks}
                         />
 
                         <Row>
@@ -423,6 +450,7 @@ const AssayTypeForm = props => {
                         <AttributeInputs
                             handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
                             attributes={values.attributes}
+                            error={errors.attributes}
                         />
 
                         <Row>

@@ -10,7 +10,11 @@ const AssayTypeFieldInputList = props => {
   }
 
   return (
-      <div id="field-input-container" ref={handleContainerLoaded}>
+      <div
+          id="field-input-container"
+          ref={handleContainerLoaded}
+          className={props.isInvalid ? "is-invalid" : ""}
+      >
         {props.children}
       </div>
   )
@@ -18,7 +22,8 @@ const AssayTypeFieldInputList = props => {
 }
 
 AssayTypeFieldInputList.propTypes = {
-  onContainerLoaded: PropTypes.func.isRequired
+  onContainerLoaded: PropTypes.func.isRequired,
+  isInvalid: PropTypes.bool
 }
 
 export default AssayTypeFieldInputList;

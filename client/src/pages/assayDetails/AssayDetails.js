@@ -13,7 +13,6 @@ import {SelectableStatusButton, StatusButton} from "../../common/status";
 import {Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {history} from "../../App";
 import {StudyTeam} from "../../common/studyMetadata";
 import AssayTimelineTab from "./AssayTimelineTab";
 import AssayFilesTab from "./AssayFilesTab";
@@ -23,8 +22,9 @@ import {AssayTaskList} from "../../common/assayTasks";
 import {RepairableStorageFolderButton} from "../../common/files";
 import {RepairableNotebookFolderButton} from "../../common/eln";
 import {Breadcrumbs} from "../../common/common";
-import {getCsrfToken} from "../../config/csrf";
 import PropTypes from "prop-types";
+import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -144,30 +144,34 @@ const AssayAttributes = ({attributes}) => {
   )
 };
 
-export default class AssayDetails extends React.Component {
+const AssayDetails = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeTab: "1",
-      assay: props.assay
+  const {user, study, features} = props;
+  const [assay, setAssay] = React.useState(props.assay);
+  const [activeTab, setActiveTab] = React.useState(1);
+  const [error, setError] = React.useState(null);
+  const navigate = useNavigate();
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     activeTab: "1",
+  //     assay: props.assay
+  //   }
+  //   this.handleAssayDelete = this.handleAssayDelete.bind(this);
+  //   this.handleTaskUpdate = this.handleTaskUpdate.bind(this);
+  //   this.toggle = this.toggle.bind(this);
+  // }
+
+  const toggle = (tab) => {
+    if (activeTab !== tab) {
+      setActiveTab(tab);
     }
-    this.handleAssayDelete = this.handleAssayDelete.bind(this);
-    this.handleTaskUpdate = this.handleTaskUpdate.bind(this);
-    this.toggle = this.toggle.bind(this);
   }
 
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
-    }
-  }
+  const handleTaskUpdate = (task) => {
 
-  handleTaskUpdate(task) {
-
-    let tasks = this.state.assay.tasks;
+    let tasks = assay.tasks;
     let oldTasks = tasks;
     let updatedTask = null;
     for (let i = 0; i < tasks.length; i++) {
@@ -187,36 +191,19 @@ export default class AssayDetails extends React.Component {
     }
 
     // Update before the request
-    let assay = this.state.assay;
-    assay.tasks = tasks;
-    this.setState({
-      assay: assay
-    });
+    let updated = assay;
+    updated.tasks = tasks;
+    setAssay(updated);
 
-    const url = "/api/assay/" + this.state.assay.code + "/tasks";
-    fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-XSRF-TOKEN": getCsrfToken()
-      },
-      body: JSON.stringify(updatedTask)
-    })
+    axios.put("/api/assay/" + this.state.assay.code + "/tasks", updatedTask)
     .then(response => {
-      if (response.ok) {
-        console.log("Task successfully updated.");
-      } else {
-        throw Error("Failed to update assay tasks.");
-      }
+      console.log("Task successfully updated.");
     })
     .catch(e => {
       console.error("Failed to update assay tasks.");
       console.error(e);
-      let assay = this.state.assay;
-      assay.tasks = oldTasks;
-      this.setState({
-        assay: assay
-      });
+      updated.tasks = oldTasks;
+      setAssay(updated);
       swal(
           "Task update failed",
           "Please try updating the task again and contact Study Tracker support if the problem persists."
@@ -225,7 +212,7 @@ export default class AssayDetails extends React.Component {
 
   }
 
-  handleAssayDelete() {
+  const handleAssayDelete = () => {
     swal({
       title: "Are you sure you want to remove this assay?",
       text: "Removed assays will be hidden from view, but their records will not be deleted. Assays can be recovered in the admin dashboard.",
@@ -234,281 +221,266 @@ export default class AssayDetails extends React.Component {
     })
     .then(val => {
       if (val) {
-        fetch("/api/assay/" + this.state.assay.code, {
-          method: 'DELETE',
-          headers: {
-            "Content-Type": "application/json",
-            "X-XSRF-TOKEN": getCsrfToken()
-          }
-        }).then(response => {
-          history.push("/assays")
+        axios.delete("/api/assay/" + this.state.assay.code)
+        .then(response => {
+          navigate("/assays")
         })
         .catch(error => {
           console.error(error);
-          this.setState({
-            modalError: "Failed to remove study. Please try again."
-          });
+          setError("Failed to remove study. Please try again.");
         })
       }
     });
   }
 
-  render() {
+  return (
+      <Container fluid className="animated fadeIn">
 
-    const assay = this.state.assay;
-    const study = this.props.study;
+        <Row>
+          <Col>
+            <Breadcrumbs crumbs={[
+              {label: "Home", url: "/"},
+              {label: "Study " + study.code, url: "/study/" + study.code},
+              {label: "Assay Details"}
+            ]}/>
+          </Col>
+        </Row>
 
-    return (
-        <Container fluid className="animated fadeIn">
+        <AssayDetailHeader assay={assay} study={study} user={user}/>
 
-          <Row>
-            <Col>
-              <Breadcrumbs crumbs={[
-                {label: "Home", url: "/"},
-                {label: "Study " + study.code, url: "/study/" + study.code},
-                {label: "Assay Details"}
-              ]}/>
-            </Col>
-          </Row>
+        <Row>
 
-          <AssayDetailHeader assay={assay} study={study}
-                             user={this.props.user}/>
+          <Col lg={5}>
+            <Card className="details-card">
 
-          <Row>
+              <Card.Header>
+                <div className="card-actions float-end">
+                  <Dropdown align="end">
+                    <Dropdown.Toggle as="a" bsPrefix="-">
+                      <Menu/>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
 
-            <Col lg={5}>
-              <Card className="details-card">
-
-                <Card.Header>
-                  <div className="card-actions float-end">
-                    <Dropdown align="end">
-                      <Dropdown.Toggle as="a" bsPrefix="-">
-                        <Menu/>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-
-                        {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
-                        {/*  <FontAwesomeIcon icon={faShare}/>*/}
-                        {/*  &nbsp;*/}
-                        {/*  Share*/}
-                        {/*</DropdownItem>*/}
-                        {/*{*/}
-                        {/*  !!this.props.user ? <DropdownItem divider/> : ''*/}
-                        {/*}*/}
-
-                        {
-                          !!this.props.user ? (
-                              <Dropdown.Item
-                                  href={"/study/" + study.code + "/assay/"
-                                      + assay.code + "/edit"}>
-                                <FontAwesomeIcon icon={faEdit}/>
-                                &nbsp;
-                                Edit
-                              </Dropdown.Item>
-                          ) : ''
-                        }
-                        {
-                          !!this.props.user ? (
-                              <Dropdown.Item onClick={this.handleAssayDelete}>
-                                <FontAwesomeIcon icon={faTrash}/>
-                                &nbsp;
-                                Delete
-                              </Dropdown.Item>
-                          ) : ''
-                        }
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-
-                  <Card.Title tag="h5" className="mb-0 text-muted">
-                    Summary
-                  </Card.Title>
-
-                </Card.Header>
-
-                <Card.Body>
-                  <Row>
-                    <Col xs="12">
-
-                      <h6 className="details-label">Description</h6>
-                      <div dangerouslySetInnerHTML={createMarkup(
-                          assay.description)}/>
-
-                      <h6 className="details-label">Created By</h6>
-                      <p>{assay.createdBy.displayName}</p>
-
-                      <h6 className="details-label">Last Updated</h6>
-                      <p>{new Date(assay.updatedAt).toLocaleString()}</p>
-
-                      <h6 className="details-label">Start Date</h6>
-                      <p>{new Date(assay.startDate).toLocaleString()}</p>
-
-                      <h6 className="details-label">End Date</h6>
-                      <p>
-                        {
-                          !!assay.endDate
-                              ? new Date(assay.endDate).toLocaleString()
-                              : "n/a"
-                        }
-                      </p>
-
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                {
-                  Object.keys(assay.fields).length > 0
-                      ? (
-                          <Card.Body>
-                            <Card.Title>{assay.assayType.name} Fields</Card.Title>
-                            <AssayFieldData assay={assay}/>
-                          </Card.Body>
-                      )
-                      : ''
-                }
-
-                {
-                  assay.tasks.length > 0
-                      ? (
-                          <Card.Body>
-                            <Card.Title>
-                              Tasks
-                              {
-                                !!this.props.user
-                                    ? (
-                                        <small
-                                            className="float-end text-muted font-italic">
-                                          Click to toggle status
-                                        </small>
-                                    )
-                                    : ''
-                              }
-                            </Card.Title>
-                            <AssayTaskList
-                                tasks={assay.tasks}
-                                user={this.props.user}
-                                handleUpdate={this.handleTaskUpdate}
-                            />
-                          </Card.Body>
-                      ) : ''
-                }
-
-                {
-                  Object.keys(assay.attributes).length > 0
-                      ? (
-                          <Card.Body>
-                            <Card.Title>Attributes</Card.Title>
-                            <AssayAttributes attributes={assay.attributes}/>
-                          </Card.Body>
-                      )
-                      : ''
-                }
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
-                      <Card.Title>Assay Team</Card.Title>
-                      <StudyTeam users={assay.users} owner={assay.owner}/>
-                    </Col>
-                  </Row>
-                </Card.Body>
-
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
-
-                      <Card.Title>Workspaces</Card.Title>
-
-                      <RepairableStorageFolderButton
-                          folder={assay.storageFolder}
-                          repairUrl={"/api/assay/" + assay.id + "/storage/repair"}
-                      />
+                      {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
+                      {/*  <FontAwesomeIcon icon={faShare}/>*/}
+                      {/*  &nbsp;*/}
+                      {/*  Share*/}
+                      {/*</DropdownItem>*/}
+                      {/*{*/}
+                      {/*  !!this.props.user ? <DropdownItem divider/> : ''*/}
+                      {/*}*/}
 
                       {
-                          this.props.features
-                          && this.props.features.notebook
-                          && this.props.features.notebook.isEnabled ? (
-                              <RepairableNotebookFolderButton
-                                  folder={assay.notebookFolder}
-                                  repairUrl={"/api/assay/" + assay.id + "/notebook/repair"}
-                              />
-                          ) : ""
+                        !!user ? (
+                            <Dropdown.Item
+                                href={"/study/" + study.code + "/assay/"
+                                    + assay.code + "/edit"}>
+                              <FontAwesomeIcon icon={faEdit}/>
+                              &nbsp;
+                              Edit
+                            </Dropdown.Item>
+                        ) : ''
                       }
+                      {
+                        !!user ? (
+                            <Dropdown.Item onClick={handleAssayDelete}>
+                              <FontAwesomeIcon icon={faTrash}/>
+                              &nbsp;
+                              Delete
+                            </Dropdown.Item>
+                        ) : ''
+                      }
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
 
-                    </Col>
-                  </Row>
-                </Card.Body>
+                <Card.Title tag="h5" className="mb-0 text-muted">
+                  Summary
+                </Card.Title>
 
-              </Card>
-            </Col>
+              </Card.Header>
 
-            <Col lg={7}>
+              <Card.Body>
+                <Row>
+                  <Col xs="12">
 
-              {/*Tabs*/}
-              <div className="tab">
-                <Tab.Container defaultActiveKey="timeline">
-                  <Nav variant="tabs">
+                    <h6 className="details-label">Description</h6>
+                    <div dangerouslySetInnerHTML={createMarkup(
+                        assay.description)}/>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"timeline"}>
-                        Timeline
-                      </Nav.Link>
-                    </Nav.Item>
+                    <h6 className="details-label">Created By</h6>
+                    <p>{assay.createdBy.displayName}</p>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"files"}>
-                        Files
-                      </Nav.Link>
-                    </Nav.Item>
+                    <h6 className="details-label">Last Updated</h6>
+                    <p>{new Date(assay.updatedAt).toLocaleString()}</p>
+
+                    <h6 className="details-label">Start Date</h6>
+                    <p>{new Date(assay.startDate).toLocaleString()}</p>
+
+                    <h6 className="details-label">End Date</h6>
+                    <p>
+                      {
+                        !!assay.endDate
+                            ? new Date(assay.endDate).toLocaleString()
+                            : "n/a"
+                      }
+                    </p>
+
+                  </Col>
+                </Row>
+              </Card.Body>
+
+              {
+                Object.keys(assay.fields).length > 0
+                    ? (
+                        <Card.Body>
+                          <Card.Title>{assay.assayType.name} Fields</Card.Title>
+                          <AssayFieldData assay={assay}/>
+                        </Card.Body>
+                    )
+                    : ''
+              }
+
+              {
+                assay.tasks.length > 0
+                    ? (
+                        <Card.Body>
+                          <Card.Title>
+                            Tasks
+                            {
+                              !!user
+                                  ? (
+                                      <small
+                                          className="float-end text-muted font-italic">
+                                        Click to toggle status
+                                      </small>
+                                  )
+                                  : ''
+                            }
+                          </Card.Title>
+                          <AssayTaskList
+                              tasks={assay.tasks}
+                              user={user}
+                              handleUpdate={handleTaskUpdate}
+                          />
+                        </Card.Body>
+                    ) : ''
+              }
+
+              {
+                Object.keys(assay.attributes).length > 0
+                    ? (
+                        <Card.Body>
+                          <Card.Title>Attributes</Card.Title>
+                          <AssayAttributes attributes={assay.attributes}/>
+                        </Card.Body>
+                    )
+                    : ''
+              }
+
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+                    <Card.Title>Assay Team</Card.Title>
+                    <StudyTeam users={assay.users} owner={assay.owner}/>
+                  </Col>
+                </Row>
+              </Card.Body>
+
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+
+                    <Card.Title>Workspaces</Card.Title>
+
+                    <RepairableStorageFolderButton
+                        folder={assay.storageFolder}
+                        repairUrl={"/api/assay/" + assay.id + "/storage/repair"}
+                    />
 
                     {
-                      this.props.features
-                      && this.props.features.notebook
-                      && this.props.features.notebook.isEnabled
-                      && assay.notebookFolder ? (
-                          <Nav.Item>
-                            <Nav.Link eventKey={"notebook"}>
-                              Notebook
-                            </Nav.Link>
-                          </Nav.Item>
-                      ) : ""
+                        features
+                        && features.notebook
+                        && features.notebook.isEnabled ? (
+                            <RepairableNotebookFolderButton
+                                folder={assay.notebookFolder}
+                                repairUrl={"/api/assay/" + assay.id + "/notebook/repair"}
+                            />
+                        ) : ""
                     }
 
-                  </Nav>
+                  </Col>
+                </Row>
+              </Card.Body>
 
-                  {/*Tab content*/}
-                  <Tab.Content>
+            </Card>
+          </Col>
 
-                    <Tab.Pane eventKey={"timeline"}>
-                      <AssayTimelineTab assay={assay} user={this.props.user}/>
-                    </Tab.Pane>
+          <Col lg={7}>
 
-                    <Tab.Pane eventKey={"files"}>
-                      <AssayFilesTab assay={assay} user={this.props.user}/>
-                    </Tab.Pane>
+            {/*Tabs*/}
+            <div className="tab">
+              <Tab.Container defaultActiveKey="timeline">
+                <Nav variant="tabs">
 
-                    {
-                      this.props.features
-                      && this.props.features.notebook
-                      && this.props.features.notebook.isEnabled
-                      && assay.notebookFolder ? (
-                          <Tab.Pane eventKey={"notebook"}>
-                            <AssayNotebookTab assay={assay}
-                                              user={this.props.user}/>
-                          </Tab.Pane>
-                      ) : ""
-                    }
+                  <Nav.Item>
+                    <Nav.Link eventKey={"timeline"}>
+                      Timeline
+                    </Nav.Link>
+                  </Nav.Item>
 
-                  </Tab.Content>
-                </Tab.Container>
-              </div>
-            </Col>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"files"}>
+                      Files
+                    </Nav.Link>
+                  </Nav.Item>
 
-          </Row>
+                  {
+                    features
+                    && features.notebook
+                    && features.notebook.isEnabled
+                    && assay.notebookFolder ? (
+                        <Nav.Item>
+                          <Nav.Link eventKey={"notebook"}>
+                            Notebook
+                          </Nav.Link>
+                        </Nav.Item>
+                    ) : ""
+                  }
 
-        </Container>
-    );
-  }
+                </Nav>
+
+                {/*Tab content*/}
+                <Tab.Content>
+
+                  <Tab.Pane eventKey={"timeline"}>
+                    <AssayTimelineTab assay={assay} user={user}/>
+                  </Tab.Pane>
+
+                  <Tab.Pane eventKey={"files"}>
+                    <AssayFilesTab assay={assay} user={user}/>
+                  </Tab.Pane>
+
+                  {
+                    features
+                    && features.notebook
+                    && features.notebook.isEnabled
+                    && assay.notebookFolder ? (
+                        <Tab.Pane eventKey={"notebook"}>
+                          <AssayNotebookTab assay={assay} user={user}/>
+                        </Tab.Pane>
+                    ) : ""
+                  }
+
+                </Tab.Content>
+              </Tab.Container>
+            </div>
+          </Col>
+
+        </Row>
+
+      </Container>
+  );
 
 }
 
@@ -519,3 +491,5 @@ AssayDetails.propTypes = {
   features: PropTypes.object,
 
 }
+
+export default AssayDetails;
