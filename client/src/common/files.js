@@ -87,23 +87,6 @@ const Folder = props => {
   const depth = props.depth || 0;
   const [expanded, setExpanded] = React.useState(false);
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     folder: props.folder,
-  //     folderFileKey: props.folderFileKey || DEFAULT_FOLDER_FILE_KEY,
-  //     isExpanded: false,
-  //     depth: props.depth || 0
-  //   }
-  //   this.toggleExpanded = this.toggleExpanded.bind(this);
-  // }
-
-  // toggleExpanded() {
-  //   this.setState({
-  //     isExpanded: !this.state.isExpanded
-  //   });
-  // }
-
   return (
       <li>
         <a onClick={() => setExpanded(!expanded)}>

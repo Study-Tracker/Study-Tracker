@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {useSearchParams} from "react-router-dom";
 import {setFilters} from "../../redux/filterSlice";
 import {setPrograms} from "../../redux/programSlice";
+import axios from "axios";
 
 export const labels = {
   LEGACY: "legacy",
@@ -39,11 +40,10 @@ const StudyFilters = props => {
 
   useEffect(() => {
     dispatch(setFilters(defaults));
-    fetch("/api/program")
-    .then(response => response.json())
-    .then(programs => {
+    axios.get("/api/program")
+    .then(response => {
 
-      programs = programs.sort((a, b) => {
+      const programs = response.data.sort((a, b) => {
         if (a.name < b.name) {
           return -1;
         } else if (a.name > b.name) {

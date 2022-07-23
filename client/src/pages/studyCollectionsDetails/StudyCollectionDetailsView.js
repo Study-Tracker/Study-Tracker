@@ -42,12 +42,8 @@ const StudyCollectionDetailsView = props => {
     })
     .then(val => {
       if (val) {
-        fetch("/api/studycollection/" + state.collection.id + "/" + id, {
-          method: 'DELETE',
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }).then(response => {
+        axios.delete("/api/studycollection/" + state.collection.id + "/" + id)
+        .then(response => {
           let collection = state.collection;
           collection.studies = collection.studies.filter(s => s.id === id);
           setState(prevState => ({

@@ -10,7 +10,6 @@ import {SettingsLoadingMessage} from "../../common/loading";
 import {SettingsErrorMessage} from "../../common/errors";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
-import {getCsrfToken} from "../../config/csrf";
 import PropTypes from "prop-types";
 import axios from "axios";
 
@@ -107,20 +106,16 @@ const KeywordSettings = props => {
 
     let keyword = state.selectedKeyword;
     const url = "/api/keyword/" + (keyword.id || "");
-    const method = !!keyword.id ? "PUT" : "POST";
+    const method = !!keyword.id ? "put" : "post";
     console.log(keyword);
     console.log(url);
 
-    fetch(url, {
+    axios({
+      url: url,
       method: method,
-      headers: {
-        "Content-Type": "application/json",
-        "X-XSRF-TOKEN": getCsrfToken()
-      },
-      body: JSON.stringify(keyword)
+      data: keyword
     })
-    .then(response => response.json())
-    .then(json => {
+    .then(response => {
       swal("Keyword saved",
           "Refresh the keywords table to view updated records. You must refresh the page before new categories will show up.",
           "success")

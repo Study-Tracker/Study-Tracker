@@ -148,26 +148,8 @@ const AssayDetails = props => {
 
   const {user, study, features} = props;
   const [assay, setAssay] = React.useState(props.assay);
-  const [activeTab, setActiveTab] = React.useState(1);
   const [error, setError] = React.useState(null);
   const navigate = useNavigate();
-
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     activeTab: "1",
-  //     assay: props.assay
-  //   }
-  //   this.handleAssayDelete = this.handleAssayDelete.bind(this);
-  //   this.handleTaskUpdate = this.handleTaskUpdate.bind(this);
-  //   this.toggle = this.toggle.bind(this);
-  // }
-
-  const toggle = (tab) => {
-    if (activeTab !== tab) {
-      setActiveTab(tab);
-    }
-  }
 
   const handleTaskUpdate = (task) => {
 
@@ -195,7 +177,7 @@ const AssayDetails = props => {
     updated.tasks = tasks;
     setAssay(updated);
 
-    axios.put("/api/assay/" + this.state.assay.code + "/tasks", updatedTask)
+    axios.put("/api/assay/" + assay.code + "/tasks", updatedTask)
     .then(response => {
       console.log("Task successfully updated.");
     })
@@ -221,7 +203,7 @@ const AssayDetails = props => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/assay/" + this.state.assay.code)
+        axios.delete("/api/assay/" + assay.code)
         .then(response => {
           navigate("/assays")
         })
@@ -260,15 +242,6 @@ const AssayDetails = props => {
                       <Menu/>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-
-                      {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
-                      {/*  <FontAwesomeIcon icon={faShare}/>*/}
-                      {/*  &nbsp;*/}
-                      {/*  Share*/}
-                      {/*</DropdownItem>*/}
-                      {/*{*/}
-                      {/*  !!this.props.user ? <DropdownItem divider/> : ''*/}
-                      {/*}*/}
 
                       {
                         !!user ? (

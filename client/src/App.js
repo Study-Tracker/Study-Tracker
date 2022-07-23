@@ -17,7 +17,6 @@
 import React from "react";
 import StudyListView from "./pages/studyList/StudyListView";
 import StudyDetailsView from "./pages/studyDetails/StudyDetailsView";
-import {createBrowserHistory} from "history";
 import StudyFormView from "./pages/studyForm/StudyFormView";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import AssayFormView from "./pages/assayForm/AssayFormView";
@@ -46,159 +45,152 @@ import PasswordResetRequestView
   from "./pages/passwordResetRequest/PasswordResetRequestView";
 import SearchResultsView from "./pages/searchResults/SearchResultsView";
 
-export const history = createBrowserHistory();
+const App = props => {
 
-export default class App extends React.Component {
+  return (
+      <ErrorBoundary>
+        <BrowserRouter>
+          <Routes>
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+            {/*Home page */}
+            <Route path={"/"}
+                   element={<FrontPageView />}
+            />
 
-  render() {
-    return (
-        <ErrorBoundary>
-          <BrowserRouter>
-            <Routes>
+            {/* Study List */}
+            <Route path={"/studies"}
+                   element={<StudyListView title={"All Studies"}/>}
+            />
 
-              {/*Home page */}
-              <Route path={"/"}
-                     element={<FrontPageView />}
-              />
+            {/* New study*/}
+            <Route path={"/studies/new"}
+                   element={<StudyFormView />}/>
 
-              {/* Study List */}
-              <Route path={"/studies"}
-                     element={<StudyListView title={"All Studies"}/>}
-              />
+            {/*Study details*/}
+            <Route path={"/study/:studyCode"}
+                   element={<StudyDetailsView />}/>
 
-              {/* New study*/}
-              <Route path={"/studies/new"}
-                     element={<StudyFormView />}/>
+            {/* Edit study*/}
+            <Route path={"/study/:studyCode/edit"}
+                   element={<StudyFormView />}/>
 
-              {/*Study details*/}
-              <Route path={"/study/:studyCode"}
-                     element={<StudyDetailsView />}/>
+            {/* Assay List */}
+            <Route path={"/assays"}
+                   element={<AssayListView title={"All Assays"}/>}/>
 
-              {/* Edit study*/}
-              <Route path={"/study/:studyCode/edit"}
-                     element={<StudyFormView />}/>
+            {/*New assay*/}
+            <Route path={"/study/:studyCode/assays/new"}
+                   element={<AssayFormView />}/>
 
-              {/* Assay List */}
-              <Route path={"/assays"}
-                     element={<AssayListView title={"All Assays"}/>}/>
+            {/*Assay details*/}
+            <Route path={"/study/:studyCode/assay/:assayCode"}
+                   element={<AssayDetailsView />}/>
 
-              {/*New assay*/}
-              <Route path={"/study/:studyCode/assays/new"}
-                     element={<AssayFormView />}/>
+            {/*Edit assay*/}
+            <Route path={"/study/:studyCode/assay/:assayCode/edit"}
+                   element={<AssayFormView />}/>
 
-              {/*Assay details*/}
-              <Route path={"/study/:studyCode/assay/:assayCode"}
-                     element={<AssayDetailsView />}/>
+            {/*Program list*/}
+            <Route
+                exact
+                path={"/programs"}
+                element={<ProgramListView />}
+            />
 
-              {/*Edit assay*/}
-              <Route path={"/study/:studyCode/assay/:assayCode/edit"}
-                     element={<AssayFormView />}/>
+            {/*Program details*/}
+            <Route path={"/program/:programId"}
+                   element={<ProgramDetailsView />}/>
 
-              {/*Program list*/}
-              <Route
-                  exact
-                  path={"/programs"}
-                  element={<ProgramListView />}
-              />
+            {/*New Program*/}
+            <Route path={"/programs/new"}
+                   element={<ProgramFormView />}/>
 
-              {/*Program details*/}
-              <Route path={"/program/:programId"}
-                     element={<ProgramDetailsView />}/>
+            {/*Edit Program*/}
+            <Route path={"/program/:programId/edit"}
+                   element={<ProgramFormView />}/>
 
-              {/*New Program*/}
-              <Route path={"/programs/new"}
-                     element={<ProgramFormView />}/>
+            {/* User list */}
+            <Route
+                exact
+                path={"/users"}
+                element={<UserListView />}
+            />
 
-              {/*Edit Program*/}
-              <Route path={"/program/:programId/edit"}
-                     element={<ProgramFormView />}/>
+            {/*User details*/}
+            <Route path={"/user/:userId"}
+                   element={<UserDetailsView />}/>
 
-              {/* User list */}
-              <Route
-                  exact
-                  path={"/users"}
-                  element={<UserListView />}
-              />
+            {/*New User*/}
+            <Route path={"/users/new"}
+                   element={<UserFormView />}/>
 
-              {/*User details*/}
-              <Route path={"/user/:userId"}
-                     element={<UserDetailsView />}/>
+            {/*Edit User*/}
+            <Route path={"/users/:userId/edit"}
+                   element={<UserFormView />}/>
 
-              {/*New User*/}
-              <Route path={"/users/new"}
-                     element={<UserFormView />}/>
+            {/* Collection list */}
+            <Route
+                exact
+                path={"/collections"}
+                element={<StudyCollectionListView />}
+            />
 
-              {/*Edit User*/}
-              <Route path={"/users/:userId/edit"}
-                     element={<UserFormView />}/>
+            {/*New Collection*/}
+            <Route path={"/collections/new"}
+                   element={<StudyCollectionFormView />}/>
 
-              {/* Collection list */}
-              <Route
-                  exact
-                  path={"/collections"}
-                  element={<StudyCollectionListView />}
-              />
+            {/*Edit Collection*/}
+            <Route path={"/collection/:collectionId/edit"}
+                   element={<StudyCollectionFormView />}/>
 
-              {/*New Collection*/}
-              <Route path={"/collections/new"}
-                     element={<StudyCollectionFormView />}/>
+            {/*Collection details*/}
+            <Route path={"/collection/:collectionId"}
+                   element={<StudyCollectionDetailsView />}/>
 
-              {/*Edit Collection*/}
-              <Route path={"/collection/:collectionId/edit"}
-                     element={<StudyCollectionFormView />}/>
+            {/* Sign in */}
+            <Route path={"/login"}
+                   element={<SignInView />}/>
 
-              {/*Collection details*/}
-              <Route path={"/collection/:collectionId"}
-                     element={<StudyCollectionDetailsView />}/>
+            <Route path={"/auth/passwordresetrequest"}
+                   element={<PasswordResetRequestView />}/>
 
-              {/* Sign in */}
-              <Route path={"/login"}
-                     element={<SignInView />}/>
+            <Route path={"/auth/passwordreset"}
+                   element={<PasswordResetView />}/>
 
-              <Route path={"/auth/passwordresetrequest"}
-                     element={<PasswordResetRequestView />}/>
+            {/* Assay Type Form */}
+            <Route path={"/assaytypes/new"}
+                   element={<AssayTypeFormView />}/>
 
-              <Route path={"/auth/passwordreset"}
-                     element={<PasswordResetView />}/>
+            <Route path={"/assaytypes/:assayTypeId/edit"}
+                   element={<AssayTypeFormView />}/>
 
-              {/* Assay Type Form */}
-              <Route path={"/assaytypes/new"}
-                     element={<AssayTypeFormView />}/>
+            <Route
+                path="/template-types/new"
+                element={<TemplateFormView />}
+            />
 
-              <Route path={"/assaytypes/:assayTypeId/edit"}
-                     element={<AssayTypeFormView />}/>
+            {/* Admin */}
 
-              <Route
-                  path="/template-types/new"
-                  element={<TemplateFormView />}
-              />
+            <Route path={"/admin"}
+                   element={<AdminDashboardView />}/>
 
-              {/* Admin */}
+            {/* Search */}
 
-              <Route path={"/admin"}
-                     element={<AdminDashboardView />}/>
+            <Route path={"/search"}
+                   element={<SearchResultsView />}/>
 
-              {/* Search */}
+            {/* Error */}
+            <Route path={"/error"}
+                   element={<Error />}/>
 
-              <Route path={"/search"}
-                     element={<SearchResultsView />}/>
+            {/*404*/}
+            <Route element={<Error code={404}/>}/>
 
-              {/* Error */}
-              <Route path={"/error"}
-                     element={<Error />}/>
-
-              {/*404*/}
-              <Route element={<Error code={404}/>}/>
-
-            </Routes>  
-          </BrowserRouter>
-        </ErrorBoundary>
-    );
-  }
+          </Routes>
+        </BrowserRouter>
+      </ErrorBoundary>
+  );
 
 }
+
+export default App;

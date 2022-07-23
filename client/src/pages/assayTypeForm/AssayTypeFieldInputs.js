@@ -13,19 +13,6 @@ const AssayTypeFieldInputs = props => {
   const [fields, setFields] = useState(props.fields || []);
   const containers = [];
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     fields: props.fields || []
-  //   }
-  //
-  //   this.containers = [];
-  //
-  //   this.handleAddFieldClick = this.handleAddFieldClick.bind(this);
-  //   this.handleRemoveFieldClick = this.handleRemoveFieldClick.bind(this);
-  //   this.handleFieldUpdate = this.handleFieldUpdate.bind(this);
-  // }
-
   useEffect(() => {
     dragula(containers);
   }, []);

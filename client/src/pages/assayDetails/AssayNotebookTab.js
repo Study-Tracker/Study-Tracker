@@ -15,66 +15,52 @@
  */
 
 import {Col, Row} from "react-bootstrap";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {StorageFolderFileList} from "../../common/files";
+import axios from "axios";
+import PropTypes from "prop-types";
 
-class AssayNotebookTabContent extends React.Component {
+const AssayNotebookTabContent = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoaded: false,
-      isError: false,
-    };
+  const {assay} = props;
+  const [folder, setFolder] = useState(null);
+  const [error, setError] = useState(null);
 
-    this.fetchUrl = '/api/assay/' + this.props.assay.code + '/notebook';
-    this.refreshData = this.refreshData.bind(this);
-  }
+  useEffect(() => {
+    refreshData();
+  }, []);
 
-  componentDidMount() {
-    this.refreshData();
-  }
-
-  refreshData() {
-    fetch(this.fetchUrl)
+  const refreshData = () => {
+    axios.get('/api/assay/' + assay.code + '/notebook')
     .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Failed to load notebook folder.");
-    })
-    .then(json => {
-      this.setState({
-        folder: json,
-        isLoaded: true
-      })
+      setFolder(response.data);
     })
     .catch(e => {
       console.error(e);
-      this.setState({
-        isError: true,
-        error: e.message,
-      })
+      setError(e);
     });
   }
 
-  render() {
-    return (
-        <div>
-          <Row>
-            <Col sm={12}>
-              <StorageFolderFileList
-                  folder={this.state.folder}
-                  isLoaded={this.state.isLoaded}
-                  isError={this.state.isError}
-                  errorMessage={this.state.error}
-                  folderFileKey={'entries'}
-              />
-            </Col>
-          </Row>
-        </div>
-    )
-  }
+  return (
+      <div>
+        <Row>
+          <Col sm={12}>
+            <StorageFolderFileList
+                folder={folder}
+                isLoaded={!!folder}
+                isError={!!error}
+                errorMessage={error.message}
+                folderFileKey={'entries'}
+            />
+          </Col>
+        </Row>
+      </div>
+  )
+
+}
+
+AssayNotebookTabContent.propTypes = {
+  assay: PropTypes.object.isRequired
 }
 
 export default AssayNotebookTabContent;

@@ -8,6 +8,7 @@ import {setFilters} from "../../redux/filterSlice";
 import {setAssayTypes} from "../../redux/assayTypeSlice";
 import {useDispatch} from "react-redux";
 import {useSearchParams} from "react-router-dom";
+import axios from "axios";
 
 export const labels = {
   LEGACY: "legacy",
@@ -76,11 +77,10 @@ const AssayFilters = props => {
 
     dispatch(setFilters(defaults));
 
-    fetch("/api/program")
-    .then(response => response.json())
-    .then(programs => {
+    axios.get("/api/program")
+    .then(response => {
 
-      programs = programs.sort((a, b) => {
+      const programs = response.data.sort((a, b) => {
         if (a.name < b.name) {
           return -1;
         } else if (a.name > b.name) {
@@ -90,11 +90,10 @@ const AssayFilters = props => {
         }
       });
 
-      fetch("/api/assaytype")
-      .then(response => response.json())
-      .then(assayTypes => {
+      axios.get("/api/assaytype")
+      .then(response => {
 
-        assayTypes = assayTypes.sort((a, b) => {
+        const assayTypes = response.data.sort((a, b) => {
           if (a.name < b.name) {
             return -1;
           } else if (a.name > b.name) {

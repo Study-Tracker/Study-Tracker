@@ -94,18 +94,6 @@ const AssaySummaryCard = ({studyCode, assay}) => {
 
           </Row>
 
-          {/*<Row className="mt-2">*/}
-          {/*  <Col>*/}
-          {/*    <Button size="md" variant="outline-primary"*/}
-          {/*            onClick={() => history.push(*/}
-          {/*                "/study/" + studyCode + "/assay/" + assay.code)}>*/}
-          {/*      Details*/}
-          {/*      &nbsp;*/}
-          {/*      <FontAwesomeIcon icon={faSignInAlt}/>*/}
-          {/*    </Button>*/}
-          {/*  </Col>*/}
-          {/*</Row>*/}
-
         </div>
       </div>
   );

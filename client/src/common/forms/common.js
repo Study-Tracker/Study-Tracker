@@ -26,19 +26,17 @@ export const FormGroup = (props) => {
   )
 }
 
-export class InputWrapper extends React.Component {
+export const InputWrapper = props => {
 
-  render() {
-    return (
-        <div className="form-group row justify-content-center">
-          <label className="col-sm-2 col-form-label">{this.props.label}</label>
-          <div className="col-sm-8">
-            {this.props.children}
-          </div>
-          <div className="col-sm-1">
-            <i className="fa fa-2x fa-info-circle text-muted"></i>
-          </div>
+  return (
+      <div className="form-group row justify-content-center">
+        <label className="col-sm-2 col-form-label">{props.label}</label>
+        <div className="col-sm-8">
+          {props.children}
         </div>
-    );
-  }
+        <div className="col-sm-1">
+          <i className="fa fa-2x fa-info-circle text-muted"></i>
+        </div>
+      </div>
+  );
 }

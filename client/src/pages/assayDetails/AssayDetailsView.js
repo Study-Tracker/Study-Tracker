@@ -22,6 +22,7 @@ import StandardWrapper from "../../common/structure/StandardWrapper";
 import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
+import axios from "axios";
 
 const AssayDetailsView = props => {
 
@@ -36,20 +37,20 @@ const AssayDetailsView = props => {
   });
 
   useEffect(() => {
-    fetch("/api/study/" + state.studyCode)
-    .then(response => response.json())
-    .then(async study => {
-      fetch("/api/study/" + state.studyCode + "/assays/"
+    axios.get("/api/study/" + state.studyCode)
+    .then(async response => {
+      const study = response.data;
+      axios.get("/api/study/" + state.studyCode + "/assays/"
           + state.assayCode)
-      .then(response => response.json())
-      .then(assay => {
+      .then(response2 => {
+        const assay = response2.data;
         setState(prevState => ({
           ...prevState,
           study: study,
           assay: assay,
           isLoaded: true
         }));
-        console.log(assay);
+        console.debug("Assay", assay);
       })
       .catch(error => {
         console.error(error);

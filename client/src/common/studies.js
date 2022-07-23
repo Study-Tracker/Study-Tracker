@@ -17,16 +17,20 @@
 import React from "react";
 import {Button, Col, Row} from "react-bootstrap";
 import {StatusIcon} from "./status";
-import {history} from '../App';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSignInAlt} from "@fortawesome/free-solid-svg-icons";
 import {StudyTeam} from "./studyMetadata";
+import PropTypes from "prop-types";
+import {useNavigate} from "react-router-dom";
 
 const createMarkup = (content) => {
   return {__html: content};
 };
 
 const StudySummaryCard = ({study}) => {
+
+  const navigate = useNavigate();
+
   return (
       <div className="d-flex assay-card">
 
@@ -105,7 +109,7 @@ const StudySummaryCard = ({study}) => {
           <Row className="mt-2">
             <Col>
               <Button size="md" variant="outline-primary"
-                      onClick={() => history.push("/study/" + study.code)}>
+                      onClick={() => navigate("/study/" + study.code)}>
                 Details
                 &nbsp;
                 <FontAwesomeIcon icon={faSignInAlt}/>
@@ -117,6 +121,10 @@ const StudySummaryCard = ({study}) => {
       </div>
   );
 };
+
+StudySummaryCard.propTypes = {
+  study: PropTypes.object.isRequired
+}
 
 const StudySlimCard = ({study}) => {
   return (
@@ -182,6 +190,10 @@ const StudySlimCard = ({study}) => {
   );
 };
 
+StudySlimCard.propTypes = {
+  study: PropTypes.object.isRequired
+}
+
 export const StudySummaryCards = ({studies, showDetails}) => {
   let content = [];
   if (studies.length === 0) {
@@ -223,4 +235,9 @@ export const StudySummaryCards = ({studies, showDetails}) => {
         {content}
       </div>
   );
+}
+
+StudySummaryCards.propTypes = {
+  studies: PropTypes.array.isRequired,
+  showDetails: PropTypes.bool
 }

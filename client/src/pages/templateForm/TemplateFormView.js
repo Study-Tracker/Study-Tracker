@@ -29,6 +29,7 @@ import {
 import {Form as FormikForm, Formik} from "formik";
 import {LoadingOverlay} from '../../common/loading';
 import NoSidebarPageWrapper from "../../common/structure/NoSidebarPageWrapper";
+import axios from "axios";
 
 export const TemplateFormView = (props) => {
 
@@ -90,20 +91,14 @@ export const TemplateFormView = (props) => {
                     return errors;
                   }}
                   onSubmit={(values, {setSubmitting}) => {
-                    fetch('/api/entryTemplate', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify(values),
-                    })
+                    axios.post('/api/entryTemplate', values)
                     .then(async response => {
-                      if (response.ok) {
+                      if (response.status === 200 || response.status === 201) {
                         setTimeout(() => {
                           navigate('/admin?active=template-types');
                         }, 1000);
                       } else {
-                        const json = await response.json();
+                        const json = await response.data;
                         swal('Something went wrong',
                             json.message
                                 ? 'Error: ' + json.message

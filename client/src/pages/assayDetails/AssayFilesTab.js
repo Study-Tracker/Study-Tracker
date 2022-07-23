@@ -30,20 +30,6 @@ const AssayFilesTab = props => {
   const [showFolder, setShowFolder] = useState(false);
   const [folder, setFolder] = useState(null);
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     modalIsOpen: false,
-  //     isLoaded: false,
-  //     isError: false,
-  //     showFolder: false,
-  //   };
-  //   this.showModal = this.showModal.bind(this);
-  //   this.handleSubmit = this.handleSubmit.bind(this);
-  //   this.refreshData = this.refreshData.bind(this);
-  //   this.handleShowFolder = this.handleShowFolder.bind(this);
-  // }
-
   const handleShowFolder = () => {
     setShowFolder(true);
     refreshData();

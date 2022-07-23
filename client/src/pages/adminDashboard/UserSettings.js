@@ -24,7 +24,6 @@ import {
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
-import {getCsrfToken} from "../../config/csrf";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 
@@ -39,24 +38,14 @@ const resetUserPassword = (user) => {
   })
   .then(val => {
     if (val) {
-      fetch("/api/user/" + user["id"] + "/password-reset", {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": getCsrfToken()
-        }
-      }).then(response => {
-        if (response.ok) {
-          swal("Password reset successful",
-              "A notification email has been sent to the user.",
-              "success")
-        } else {
-          swal("Request failed",
-              "Check the server log for more information.",
-              "warning");
-        }
+      axios.post("/api/user/" + user["id"] + "/password-reset")
+      .then(response => {
+        swal("Password reset successful",
+            "A notification email has been sent to the user.",
+            "success")
       })
       .catch(error => {
+        console.error(error);
         swal("Request failed",
             "Check the server log for more information.",
             "warning");
@@ -76,24 +65,14 @@ const toggleUserActive = (user, active) => {
   })
   .then(val => {
     if (val) {
-      fetch("/api/user/" + user["id"] + "/status?active=" + active, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": getCsrfToken()
-        }
-      }).then(response => {
-        if (response.ok) {
-          swal("User " + (!!active ? "enabled" : "disabled"),
-              "Refresh the page to view the updated user information.",
-              "success")
-        } else {
-          swal("Request failed",
-              "Check the server log for more information.",
-              "warning");
-        }
+      axios.post("/api/user/" + user["id"] + "/status?active=" + active)
+      .then(response => {
+        swal("User " + (!!active ? "enabled" : "disabled"),
+            "Refresh the page to view the updated user information.",
+            "success")
       })
       .catch(error => {
+        console.error(error);
         swal("Request failed",
             "Check the server log for more information.",
             "warning");
@@ -329,21 +308,6 @@ const UserTable = ({users, showModal}) => {
 
                 </Dropdown.Menu>
               </Dropdown>
-
-              {/*<a className="text-info" title={"View details"}*/}
-              {/*   onClick={() => showModal(d)}>*/}
-              {/*  <Info className="align-middle me-1" size={18}/>*/}
-              {/*</a>*/}
-
-              {/*<a className="text-warning" title={"Edit user"}*/}
-              {/*   onClick={() => history.push("/users/" + d.id + "/edit")}>*/}
-              {/*  <Edit className="align-middle me-1" size={18}/>*/}
-              {/*</a>*/}
-
-              {/*<a className="text-danger" title={"Disable user"}*/}
-              {/*   onClick={() => console.log("click")}>*/}
-              {/*  <Trash className="align-middle me-1" size={18}/>*/}
-              {/*</a>*/}
 
             </React.Fragment>
         )

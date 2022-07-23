@@ -14,60 +14,48 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Col, Row} from 'react-bootstrap'
 import {Timeline} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
+import axios from "axios";
 
-class UserTimelineTab extends React.Component {
+const UserTimelineTab = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoaded: false,
-      isError: false
-    };
-  }
+  const {targetUser} = props;
+  const [activity, setActivity] = useState(null);
+  const [error, setError] = useState(null);
 
-  componentDidMount() {
-    fetch("/api/user/" + this.props.targetUser.id + "/activity")
-    .then(response => response.json())
-    .then(json => {
-      this.setState({
-        activity: json,
-        isLoaded: true
-      });
+  useEffect(() => {
+    axios.get("/api/user/" + targetUser.id + "/activity")
+    .then(response => {
+      setActivity(response.data);
     })
     .catch(e => {
-      this.setState({
-        isError: true,
-        error: e.message
-      })
+      console.error(e);
+      setError(e);
     })
+  }, []);
+
+  let content = <CardLoadingMessage/>;
+  if (!!error) {
+    content = <DismissableAlert color={'warning'}
+                                message={'Failed to load user activity.'}/>;
+  }
+  else if (!!activity) {
+    content = <Timeline activity={activity}/>;
   }
 
-  render() {
-
-    let content = <CardLoadingMessage/>;
-    if (!!this.state.isLoaded && !!this.state.activity) {
-      content = <Timeline activities={this.state.activity}/>;
-    } else if (this.state.isError) {
-      content = <DismissableAlert color={'warning'}
-                                  message={'Failed to load user activity.'}/>;
-    }
-
-    return (
-        <div className="timeline-tab">
-          <Row>
-            <Col sm={12}>
-              {content}
-            </Col>
-          </Row>
-        </div>
-    )
-
-  }
+  return (
+      <div className="timeline-tab">
+        <Row>
+          <Col sm={12}>
+            {content}
+          </Col>
+        </Row>
+      </div>
+  )
 
 }
 

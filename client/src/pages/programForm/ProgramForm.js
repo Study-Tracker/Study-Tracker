@@ -79,7 +79,13 @@ const ProgramForm = props => {
           name: yup.string(),
           url: yup.string().url()
         })
-      })
+      }),
+    attributes: yup.object()
+    .test(
+        "not empty",
+        "Attribute names must not be empty",
+        value => !Object.keys(value).find(d => d.trim() === '')
+    )
   });
 
   const defaultProgramValues = {

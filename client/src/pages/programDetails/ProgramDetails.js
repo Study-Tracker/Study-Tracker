@@ -37,6 +37,7 @@ import ProgramStudiesTab from "./ProgramStudiesTab";
 import {
   ModelDetailsAttributeList
 } from "../../common/ModelDetailsAttributeList";
+import PropTypes from "prop-types";
 
 const ProgramDetailHeader = ({program, user}) => {
   return (
@@ -58,164 +59,133 @@ const ProgramDetailHeader = ({program, user}) => {
   );
 };
 
-class ProgramDetails extends React.Component {
+const ProgramDetails = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeTab: "1"
-    };
-  }
+  const {program, studies, user} = props;
+  const createMarkup = (content) => {
+    return {__html: content};
+  };
 
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
-    }
-  }
+  return (
+      <Container fluid className="animated fadeIn">
 
-  render() {
+        {/* Breadcrumb */}
+        <Row>
+          <Col>
+            <Breadcrumb>
+              <Breadcrumb.Item href={"/programs"}>Programs</Breadcrumb.Item>
+              <Breadcrumb.Item active>Program Detail</Breadcrumb.Item>
+            </Breadcrumb>
+          </Col>
+        </Row>
 
-    const {program, studies} = this.props;
-    const createMarkup = (content) => {
-      return {__html: content};
-    };
+        {/* Header */}
+        <ProgramDetailHeader program={program} user={user}/>
 
-    return (
-        <Container fluid className="animated fadeIn">
+        <Row>
 
-          {/* Breadcrumb */}
-          <Row>
-            <Col>
-              <Breadcrumb>
-                <Breadcrumb.Item href={"/programs"}>Programs</Breadcrumb.Item>
-                <Breadcrumb.Item active>Program Detail</Breadcrumb.Item>
-              </Breadcrumb>
-            </Col>
-          </Row>
+          <Col lg={5}>
+            <Card className="details-card">
 
-          {/* Header */}
-          <ProgramDetailHeader program={program} user={this.props.user}/>
+              <Card.Header>
+                <div className="card-actions float-end">
+                  <Dropdown align="end">
+                    <Dropdown.Toggle tag="a" bsPrefix="-">
+                      <Menu/>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
 
-          <Row>
+                      {
+                        !!user && !!user.admin ? (
+                            <Dropdown.Item
+                                href={"/program/" + program.id + "/edit"}>
+                              <FontAwesomeIcon icon={faEdit}/>
+                              &nbsp;
+                              Edit
+                            </Dropdown.Item>
+                        ) : ''
+                      }
 
-            <Col lg={5}>
-              <Card className="details-card">
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+                <Card.Title tag="h5" className="mb-0 text-muted">
+                  Summary
+                </Card.Title>
+              </Card.Header>
 
-                <Card.Header>
-                  <div className="card-actions float-end">
-                    <Dropdown align="end">
-                      <Dropdown.Toggle tag="a" bsPrefix="-">
-                        <Menu/>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
-                        {/*  <FontAwesomeIcon icon={faShare}/>*/}
-                        {/*  &nbsp;*/}
-                        {/*  Share*/}
-                        {/*</DropdownItem>*/}
-                        {/*{*/}
-                        {/*  !!this.props.user && !!this.props.user.admin ?*/}
-                        {/*      <DropdownItem divider/> : ''*/}
-                        {/*}*/}
-                        {
-                          !!this.props.user && !!this.props.user.admin ? (
-                              <Dropdown.Item
-                                  href={"/program/" + program.id + "/edit"}>
-                                <FontAwesomeIcon icon={faEdit}/>
-                                &nbsp;
-                                Edit
-                              </Dropdown.Item>
-                          ) : ''
-                        }
-                        {/*{*/}
-                        {/*  !!this.props.user && !!this.props.user.admin ? (*/}
-                        {/*      <DropdownItem*/}
-                        {/*          onClick={() => console.log("Delete!")}>*/}
-                        {/*        <FontAwesomeIcon icon={faTrash}/>*/}
-                        {/*        &nbsp;*/}
-                        {/*        Delete*/}
-                        {/*      </DropdownItem>*/}
-                        {/*  ) : ''*/}
-                        {/*}*/}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <Card.Title tag="h5" className="mb-0 text-muted">
-                    Summary
-                  </Card.Title>
-                </Card.Header>
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
 
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
+                    <h3>{program.name}</h3>
 
-                      <h3>{program.name}</h3>
+                    <h6 className="details-label">Description</h6>
+                    <div dangerouslySetInnerHTML={
+                      createMarkup(program.description)
+                    }/>
 
-                      <h6 className="details-label">Description</h6>
-                      <div dangerouslySetInnerHTML={
-                        createMarkup(program.description)
-                      }/>
+                    <h6 className="details-label">Created By</h6>
+                    <p>{program.createdBy.displayName}</p>
 
-                      <h6 className="details-label">Created By</h6>
-                      <p>{program.createdBy.displayName}</p>
+                    <h6 className="details-label">Last Updated</h6>
+                    <p>{new Date(program.updatedAt).toLocaleString()}</p>
 
-                      <h6 className="details-label">Last Updated</h6>
-                      <p>{new Date(program.updatedAt).toLocaleString()}</p>
+                    <ModelDetailsAttributeList
+                        attributes={program.attributes}/>
 
-                      <ModelDetailsAttributeList
-                          attributes={program.attributes}/>
+                  </Col>
+                </Row>
+              </Card.Body>
 
-                    </Col>
-                  </Row>
-                </Card.Body>
+            </Card>
+          </Col>
 
-              </Card>
-            </Col>
+          <Col lg={7}>
 
-            <Col lg={7}>
+            {/* Tabs */}
+            <div className="tab">
+              <Tab.Container defaultActiveKey={"timeline"}>
+                <Nav variant={"tabs"}>
 
-              {/* Tabs */}
-              <div className="tab">
-                <Tab.Container defaultActiveKey={"timeline"}>
-                  <Nav variant={"tabs"}>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"timeline"}>
+                      Timeline
+                    </Nav.Link>
+                  </Nav.Item>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"timeline"}>
-                        Timeline
-                      </Nav.Link>
-                    </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"studies"}>
+                      Studies
+                    </Nav.Link>
+                  </Nav.Item>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"studies"}>
-                        Studies
-                      </Nav.Link>
-                    </Nav.Item>
+                </Nav>
 
-                  </Nav>
+                <Tab.Content>
 
-                  <Tab.Content>
+                  <Tab.Pane eventKey={"timeline"}>
+                    <ProgramTimelineTab program={program} user={user}/>
+                  </Tab.Pane>
 
-                    <Tab.Pane eventKey={"timeline"}>
-                      <ProgramTimelineTab program={program}
-                                          user={this.props.user}/>
-                    </Tab.Pane>
+                  <Tab.Pane eventKey={"studies"}>
+                    <ProgramStudiesTab studies={studies} user={user}/>
+                  </Tab.Pane>
 
-                    <Tab.Pane eventKey={"studies"}>
-                      <ProgramStudiesTab studies={studies}
-                                         user={this.props.user}/>
-                    </Tab.Pane>
+                </Tab.Content>
+              </Tab.Container>
+            </div>
+          </Col>
+        </Row>
+      </Container>
+  );
 
-                  </Tab.Content>
-                </Tab.Container>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-    );
-  }
+}
 
+ProgramDetails.propTypes = {
+  program: PropTypes.object.isRequired,
+  studies: PropTypes.array.isRequired,
+  user: PropTypes.object
 }
 
 export default ProgramDetails;

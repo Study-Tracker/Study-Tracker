@@ -53,8 +53,8 @@ const StudyFilesTabContent = props => {
     });
     Promise.all(requests)
     .then(() => {
-      this.showModal(false);
-      this.refreshData();
+      setModalIsOpen(false);
+      refreshData();
     })
     .catch(e => {
       console.error(e);
@@ -69,7 +69,7 @@ const StudyFilesTabContent = props => {
           <Col>
             <span className="float-end">
               <Button variant="info"
-                      onClick={() => this.showModal(true)}>
+                      onClick={() => setModalIsOpen(true)}>
                 Upload Files
                 &nbsp;
                 <FontAwesomeIcon icon={faFile}/>

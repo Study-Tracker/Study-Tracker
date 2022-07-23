@@ -116,14 +116,7 @@ const StudyDetails = props => {
   const {study, user, features} = props;
   const [showCollectionModal, setShowCollectionModal] = useState(false);
   const [modalError, setModalError] = useState(null);
-  const [activeTab, setActiveTab] = useState(1);
   const navigate = useNavigate();
-
-  const toggleTab = (tab) => {
-    if (activeTab !== tab) {
-      setActiveTab(tab);
-    }
-  };
 
   const handleStudyDelete = () => {
     swal({
@@ -135,7 +128,7 @@ const StudyDetails = props => {
     .then(val => {
       if (val) {
         axios({
-          url: "/api/study/" + this.props.study.code,
+          url: "/api/study/" + study.code,
           method: 'delete',
           headers: {
             "Content-Type": "application/json"

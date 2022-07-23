@@ -31,6 +31,7 @@ import {faEdit} from "@fortawesome/free-solid-svg-icons";
 import {SelectableUserStatusButton, UserStatusButton} from "./userStatus";
 import UserTimelineTab from "./UserTimelineTab";
 import UserStudiesTab from "./UserStudiesTab";
+import PropTypes from "prop-types";
 
 const UserDetailHeader = ({targetUser, user}) => {
   return (
@@ -52,145 +53,131 @@ const UserDetailHeader = ({targetUser, user}) => {
   );
 };
 
-class UserDetails extends React.Component {
+const UserDetails = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeTab: "1"
-    };
-  }
+  const {targetUser, studies, user} = props;
 
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
-    }
-  }
+  return (
+      <Container fluid className="animated fadeIn">
 
-  render() {
+        {/* Breadcrumb */}
+        <Row>
+          <Col>
+            <Breadcrumb>
+              <Breadcrumb.Item href={"/users"}>Users</Breadcrumb.Item>
+              <Breadcrumb.Item active>User Detail</Breadcrumb.Item>
+            </Breadcrumb>
+          </Col>
+        </Row>
 
-    const {targetUser, studies} = this.props;
+        {/* Header */}
+        <UserDetailHeader targetUser={targetUser} user={user}/>
 
-    return (
-        <Container fluid className="animated fadeIn">
+        <Row>
 
-          {/* Breadcrumb */}
-          <Row>
-            <Col>
-              <Breadcrumb>
-                <Breadcrumb.Item href={"/users"}>Users</Breadcrumb.Item>
-                <Breadcrumb.Item active>User Detail</Breadcrumb.Item>
-              </Breadcrumb>
-            </Col>
-          </Row>
+          <Col lg={5}>
+            <Card className="details-card">
 
-          {/* Header */}
-          <UserDetailHeader targetUser={targetUser} user={this.props.user}/>
+              <Card.Header>
 
-          <Row>
+                {
+                  !!user && !!user.admin ? (
+                      <div className="card-actions float-end">
+                        <Dropdown align="end">
+                          <Dropdown.Toggle as="a" bsPrefix={"-"}>
+                            <Menu/>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                            <Dropdown.Item
+                                href={"/users/" + targetUser.id + "/edit"}>
+                              <FontAwesomeIcon icon={faEdit}/>
+                              &nbsp;
+                              Edit
+                            </Dropdown.Item>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </div>
+                  ) : ''
+                }
 
-            <Col lg={5}>
-              <Card className="details-card">
+                <Card.Title tag="h5" className="mb-0 text-muted">
+                  Summary
+                </Card.Title>
 
-                <Card.Header>
+              </Card.Header>
 
-                  {
-                    !!this.props.user && !!this.props.user.admin ? (
-                        <div className="card-actions float-end">
-                          <Dropdown align="end">
-                            <Dropdown.Toggle as="a" bsPrefix={"-"}>
-                              <Menu/>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                              <Dropdown.Item
-                                  href={"/users/" + targetUser.id + "/edit"}>
-                                <FontAwesomeIcon icon={faEdit}/>
-                                &nbsp;
-                                Edit
-                              </Dropdown.Item>
-                            </Dropdown.Menu>
-                          </Dropdown>
-                        </div>
-                    ) : ''
-                  }
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
 
-                  <Card.Title tag="h5" className="mb-0 text-muted">
-                    Summary
-                  </Card.Title>
+                    <h3>{targetUser.displayName}</h3>
 
-                </Card.Header>
+                    <h6 className="details-label">Email</h6>
+                    <p>
+                      <a href={"mailto:" + targetUser.email}>
+                        {targetUser.email}
+                      </a>
+                    </p>
 
-                <Card.Body>
-                  <Row>
-                    <Col xs={12}>
+                    <h6 className="details-label">Department</h6>
+                    <p>{targetUser.department || 'n/a'}</p>
 
-                      <h3>{targetUser.displayName}</h3>
+                    <h6 className="details-label">Title</h6>
+                    <p>{targetUser.title || 'n/a'}</p>
 
-                      <h6 className="details-label">Email</h6>
-                      <p>
-                        <a href={"mailto:" + targetUser.email}>
-                          {targetUser.email}
-                        </a>
-                      </p>
+                  </Col>
+                </Row>
+              </Card.Body>
 
-                      <h6 className="details-label">Department</h6>
-                      <p>{targetUser.department || 'n/a'}</p>
+            </Card>
+          </Col>
 
-                      <h6 className="details-label">Title</h6>
-                      <p>{targetUser.title || 'n/a'}</p>
+          <Col lg={7}>
 
-                    </Col>
-                  </Row>
-                </Card.Body>
+            {/* Tabs */}
+            <div className="tab">
+              <Tab.Container defaultActiveKey="timeline">
+                <Nav variant="tabs">
 
-              </Card>
-            </Col>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"timeline"}>
+                      Timeline
+                    </Nav.Link>
+                  </Nav.Item>
 
-            <Col lg={7}>
+                  <Nav.Item>
+                    <Nav.Link eventKey={"studies"}>
+                      Studies
+                    </Nav.Link>
+                  </Nav.Item>
 
-              {/* Tabs */}
-              <div className="tab">
-                <Tab.Container defaultActiveKey="timeline">
-                  <Nav variant="tabs">
+                </Nav>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"timeline"}>
-                        Timeline
-                      </Nav.Link>
-                    </Nav.Item>
+                <Tab.Content>
 
-                    <Nav.Item>
-                      <Nav.Link eventKey={"studies"}>
-                        Studies
-                      </Nav.Link>
-                    </Nav.Item>
+                  <Tab.Pane eventKey={"timeline"}>
+                    <UserTimelineTab targetUser={targetUser} user={user}/>
+                  </Tab.Pane>
 
-                  </Nav>
+                  <Tab.Pane eventKey={"studies"}>
+                    <UserStudiesTab studies={studies} user={user}/>
+                  </Tab.Pane>
 
-                  <Tab.Content>
+                </Tab.Content>
 
-                    <Tab.Pane eventKey={"timeline"}>
-                      <UserTimelineTab targetUser={targetUser}
-                                       user={this.props.user}/>
-                    </Tab.Pane>
+              </Tab.Container>
+            </div>
+          </Col>
+        </Row>
+      </Container>
+  );
 
-                    <Tab.Pane eventKey={"studies"}>
-                      <UserStudiesTab studies={studies}
-                                      user={this.props.user}/>
-                    </Tab.Pane>
+}
 
-                  </Tab.Content>
-
-                </Tab.Container>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-    );
-  }
-
+UserDetails.propTypes = {
+  targetUser: PropTypes.object.isRequired,
+  studies: PropTypes.array.isRequired,
+  user: PropTypes.object
 }
 
 export default UserDetails;

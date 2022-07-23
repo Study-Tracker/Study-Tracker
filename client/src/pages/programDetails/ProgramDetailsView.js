@@ -21,6 +21,7 @@ import StandardWrapper from "../../common/structure/StandardWrapper";
 import ProgramDetails from "./ProgramDetails";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
+import axios from "axios";
 
 const ProgramDetailsView = props => {
 
@@ -33,19 +34,19 @@ const ProgramDetailsView = props => {
   });
 
   useEffect(() => {
-    fetch("/api/program/" + state.programId)
-    .then(response => response.json())
-    .then(async program => {
-      fetch("/api/study?program=" + program.id)
-      .then(response => response.json())
-      .then(studies => {
+    axios.get("/api/program/" + state.programId)
+    .then(async response => {
+      const program = response.data;
+      axios.get("/api/study?program=" + program.id)
+      .then(response2 => {
+        const studies = response2.data;
         setState(prevState => ({
           ...prevState,
           program: program,
           studies: studies,
           isLoaded: true
         }));
-        console.log(program);
+        console.debug("Program", program);
       })
     })
     .catch(error => {

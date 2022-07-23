@@ -31,14 +31,6 @@ const AssayTimelineTab = props => {
     isError: false,
   });
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     isLoaded: false,
-  //     isError: false
-  //   };
-  // }
-
   useEffect(() => {
     axios.get("/api/assay/" + assay.code + "/activity")
     .then(response => {

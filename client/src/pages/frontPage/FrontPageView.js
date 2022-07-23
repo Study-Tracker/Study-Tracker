@@ -23,6 +23,7 @@ import {useLocation} from "react-router-dom";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import FrontPageTimeline from "./FrontPageTimeline";
 import {useSelector} from "react-redux";
+import axios from "axios";
 
 const qs = require('qs');
 
@@ -49,19 +50,18 @@ const FrontPageView = props => {
       query = "?search=" + params.search;
     }
 
-    fetch("/api/activity?sort=" + sort + "&page=" + page + "&size=" + size)
-    .then(response => response.json())
-    .then(activityPage => {
-      fetch("/api/stats/frontpage")
-      .then(response => response.json())
-      .then(stats => {
-        fetch("/api/stats/user")
-        .then(response => response.json())
-        .then(userStats => {
-          setState({
-            ...state,
+    axios.get("/api/activity?sort=" + sort + "&page=" + page + "&size=" + size)
+    .then(r1 => {
+      const activityPage = r1.data;
+      axios.get("/api/stats/frontpage")
+      .then(r2 => {
+        const stats = r2.data;
+        axios.get("/api/stats/user")
+        .then(r3 => {
+          setState(prevState => ({
+            ...prevState,
             stats: stats,
-            userStats: userStats,
+            userStats: r3.data,
             activity: activityPage.content,
             isLoaded: true,
             pageNumber: page,
@@ -71,7 +71,7 @@ const FrontPageView = props => {
             totalPages: activityPage.totalPages,
             hasNextPage: !activityPage.last,
             hasPreviousPage: page > 0
-          })
+          }))
         })
       })
     })

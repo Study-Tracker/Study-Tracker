@@ -28,7 +28,7 @@ import {
   XCircle
 } from 'react-feather';
 import {statuses} from "../config/statusConstants";
-import {getCsrfToken} from "../config/csrf";
+import axios from "axios";
 
 export const StatusButton = ({status}) => {
   const config = statuses[status];
@@ -40,36 +40,18 @@ export const StatusButton = ({status}) => {
   )
 };
 
-export class SelectableStatusButton extends React.Component {
+export const SelectableStatusButton = props => {
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(e) {
+  const handleChange = (e) => {
     let url = null;
-    if (!!this.props.studyId) {
-      url = "/api/study/" + this.props.studyId + "/status";
-    } else if (!!this.props.assayId) {
-      url = "/api/assay/" + this.props.assayId + "/status"
+    if (!!props.studyId) {
+      url = "/api/study/" + props.studyId + "/status";
+    } else if (!!props.assayId) {
+      url = "/api/assay/" + props.assayId + "/status"
     }
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-XSRF-TOKEN": getCsrfToken()
-      },
-      body: JSON.stringify({status: e.target.dataset.value})
-    })
-    .then(async response => {
-      if (response.ok) {
-        window.location.reload();
-      } else {
-        throw new Error("Request failed");
-      }
-    }).catch(e => {
+    axios.post(url, {status: e.target.dataset.value})
+    .then(() => window.location.reload())
+    .catch(e => {
       swal(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
@@ -78,35 +60,34 @@ export class SelectableStatusButton extends React.Component {
     });
   }
 
-  render() {
-    const {status} = this.props;
-    const config = statuses[status];
-    const options = [];
-    for (const k in statuses) {
-      const s = statuses[k];
-      options.push(
-          <Dropdown.Item
-              key={'status-option-' + s.label}
-              onClick={this.handleChange}
-              data-value={s.value}
-          >
-            {s.label}
-          </Dropdown.Item>
-      );
-    }
-    return (
-        <Dropdown className="me-1 mb-1">
-          <Dropdown.Toggle variant={config.color}>
-            <FontAwesomeIcon icon={config.icon}/>
-            &nbsp;&nbsp;
-            {config.label}
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            {options}
-          </Dropdown.Menu>
-        </Dropdown>
-    )
+  const {status} = props;
+  const config = statuses[status];
+  const options = [];
+  for (const k in statuses) {
+    const s = statuses[k];
+    options.push(
+        <Dropdown.Item
+            key={'status-option-' + s.label}
+            onClick={handleChange}
+            data-value={s.value}
+        >
+          {s.label}
+        </Dropdown.Item>
+    );
   }
+  return (
+      <Dropdown className="me-1 mb-1">
+        <Dropdown.Toggle variant={config.color}>
+          <FontAwesomeIcon icon={config.icon}/>
+          &nbsp;&nbsp;
+          {config.label}
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {options}
+        </Dropdown.Menu>
+      </Dropdown>
+  )
+
 }
 
 export const StatusBadge = ({status}) => {

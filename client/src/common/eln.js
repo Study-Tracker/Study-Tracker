@@ -2,7 +2,7 @@ import React from "react";
 import {Button} from "react-bootstrap";
 import {Folder as FolderIcon, RefreshCw} from "react-feather";
 import swal from "sweetalert";
-import {getCsrfToken} from "../config/csrf";
+import axios from "axios";
 
 const handleFolderRepairRequest = (url) => {
   swal({
@@ -13,22 +13,11 @@ const handleFolderRepairRequest = (url) => {
   })
   .then(val => {
     if (val) {
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": getCsrfToken()
-        }
-      }).then(response => {
-        if (response.ok) {
-          swal("Folder Repair Complete",
-              "Refresh the page to view the updated storage folder information.",
-              "success")
-        } else {
-          swal("Request failed",
-              "Check the server log for more information.",
-              "warning");
-        }
+      axios.post(url)
+      .then(response => {
+        swal("Folder Repair Complete",
+            "Refresh the page to view the updated storage folder information.",
+            "success")
       })
       .catch(error => {
         swal("Request failed",

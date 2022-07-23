@@ -43,8 +43,8 @@ const ProgramFormView = props => {
       const programs = response.data;
       if (!!state.programId) {
 
-        const program = await fetch("/api/program/" + state.programId)
-        .then(async response => response.json());
+        const program = await axios.get("/api/program/" + state.programId)
+        .then(response => response.data);
         console.log(program);
 
         setState(prevState => ({
