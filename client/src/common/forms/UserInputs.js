@@ -31,13 +31,17 @@ const UserInputs = ({
 }) => {
 
   const userAutocomplete = (input, callback) => {
-    if (input.length < 1) {
-      return;
-    }
     axios.get("/api/autocomplete/user?q=" + input)
     .then(response => {
-      const options = response.data.map(user => {
+      const options = response.data
+      .filter(user => !users.find(u => u.id === user.id))
+      .map(user => {
         return {label: user.displayName, value: user.id, obj: user}
+      })
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        else if (a.label > b.label) return 1;
+        else return 0;
       });
       callback(options);
     }).catch(e => {
@@ -126,6 +130,7 @@ const UserInputs = ({
                 loadOptions={userAutocomplete}
                 onChange={handleUserSelect}
                 controlShouldRenderValue={false}
+                defaultOptions={true}
             />
             <Form.Control.Feedback type={"invalid"}>
               You must select at least one user.

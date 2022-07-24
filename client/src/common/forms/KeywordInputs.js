@@ -46,19 +46,10 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
   const handleKeywordSelect = (selected) => {
     console.debug(selected);
     if (selected.__isNew__) {
-      axios({
-        url: "/api/keyword",
-        method: 'POST',
-        data: {
+      axios.post("/api/keyword", {
           keyword: selected.label,
           category: selectedCategory
-        },
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          // "X-XSRF-TOKEN": getCsrfToken()
-        }
-      })
+        })
       .then(response => {
         onChange([
           ...keywords,
@@ -80,9 +71,6 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
   }
 
   const keywordAutocomplete = (input, callback) => {
-    if (input.length < 1) {
-      return;
-    }
     axios.get('/api/keyword/?q=' + input
         + (!!selectedCategory ? "&categoryId=" + selectedCategory.id : ''))
     .then(response => {
@@ -90,6 +78,7 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
         return {
           id: k.id,
           label: k.keyword,
+          // label: k.category.name + ": " + k.keyword,
           value: k.id,
           category: k.category,
           keyword: k.keyword
@@ -152,6 +141,7 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
                 controlShouldRenderValue={false}
                 isDisabled={!selectedCategory}
                 createOptionPosition={"first"}
+                // defaultOptions={true}
             />
           </FormGroup>
         </Col>

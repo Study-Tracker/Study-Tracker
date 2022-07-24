@@ -155,7 +155,7 @@ const UserSettings = props => {
 
             <UserDetailsModal
                 showModal={showModal}
-                isOpen={state.isModalOpen}
+                isOpen={isModalOpen}
                 user={state.selectedUser}
             />
 

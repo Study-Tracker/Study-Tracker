@@ -194,10 +194,11 @@ const DateFieldInput = ({field, value, handleUpdate, isValid, error}) => {
             className="form-control"
             invalid={!isValid}
             wrapperClassName="form-control"
-            selected={!!value ? new Date(value) : null}
+            // selected={!!value ? new Date(value) : null}
+            selected={value}
             onChange={(date) => handleUpdate(
                 {
-                  [field.fieldName]: date
+                  [field.fieldName]: date.getTime()
                 }
             )}
             isClearable={true}

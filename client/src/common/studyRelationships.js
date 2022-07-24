@@ -45,9 +45,6 @@ const StudyRelationships = props => {
   });
 
   const studyAutocomplete = (input, callback) => {
-    if (input.length < 1) {
-      return;
-    }
     axios.get("/api/autocomplete/study?q=" + input)
     .then(response => {
       const options = response.data
@@ -230,6 +227,7 @@ const StudyRelationships = props => {
                               classNamePrefix="react-select"
                               loadOptions={studyAutocomplete}
                               onChange={(selected) => setFieldValue("targetStudyId", selected.obj.id)}
+                              defaultOptions={true}
                           />
                           <Form.Control.Feedback type="invalid">
                             {errors.targetStudyId}

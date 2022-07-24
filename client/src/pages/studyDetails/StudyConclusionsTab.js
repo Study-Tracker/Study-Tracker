@@ -35,14 +35,14 @@ const StudyConclusionsTab = props => {
     content: ""
   }
   const conclusionsSchema = yup.object().shape({
-    id: yup.number(),
+    id: yup.number().nullable(true),
     content: yup.string().required("Please enter the study conclusions")
   });
 
   const handleFormSubmit = (values, {setSubmitting}) => {
     axios({
       url: "/api/study/" + props.study.code + "/conclusions",
-      method: !!conclusions.id ? 'put' : 'post',
+      method: !!values.id ? 'put' : 'post',
       data: values
     })
     .then(response => {

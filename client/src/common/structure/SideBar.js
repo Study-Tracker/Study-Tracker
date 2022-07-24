@@ -40,7 +40,7 @@ const Sidebar = props => {
         <div className="sidebar-content">
           <PerfectScrollbar>
 
-            <a className="sidebar-brand" href="/Users/woemler/Code/Projects/Study-Tracker/client/src/pages">
+            <a className="sidebar-brand" href="/">
               <img className="img-fluid" alt="Study Tracker"
                    src="/static/images/logo.png"/>
             </a>

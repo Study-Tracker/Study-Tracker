@@ -28,12 +28,21 @@ const StudyInputs = props => {
   const {studies, onChange} = props;
 
   const studyAutocomplete = (input, callback) => {
-    if (input.length < 1) {
-      return;
-    }
     axios.get("/api/autocomplete/study?q=" + input)
     .then(response => {
-      const options = response.data.map(study => {
+      const options = response.data
+      .sort((a, b) => {
+        const aLabel = a.code + ": " + a.name;
+        const bLabel = b.code + ": " + b.name;
+        if (aLabel < bLabel) {
+          return -1;
+        }
+        if (aLabel > bLabel) {
+          return 1;
+        }
+        return 0;
+      })
+      .map(study => {
         return {
           label: study.code + ": " + study.name,
           value: study.id,
@@ -94,6 +103,7 @@ const StudyInputs = props => {
                 loadOptions={studyAutocomplete}
                 onChange={handleStudySelect}
                 controlShouldRenderValue={false}
+                defaultOptions={true}
             />
           </FormGroup>
         </Col>

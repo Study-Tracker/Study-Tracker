@@ -11,6 +11,8 @@ import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import PropTypes from "prop-types";
 import axios from "axios";
+import FormikFormErrorNotification
+  from "../../common/forms/FormikFormErrorNotification";
 
 const StudyCollectionForm = props => {
 
@@ -94,6 +96,8 @@ const StudyCollectionForm = props => {
         }) => (
 
             <Container fluid className="animated fadeIn max-width-1200">
+
+              <FormikFormErrorNotification />
 
               <LoadingOverlay
                   isVisible={isSubmitting}

@@ -48,21 +48,27 @@ const UserForm = props => {
     username: yup.string()
       .required("Username is required")
       .max(255, "Username must be less than 255 characters")
-      .test(
-          "unique",
-          "Username is already in use",
-          value => !props.users.find(u => !!value && u.username.toLowerCase() === value.toLowerCase())
-      ),
+      .when("id", {
+        is: (value) => !value,
+        then: yup.string().test(
+            "unique",
+            "Username is already in use",
+            value => !props.users.find(u => !!value && u.username.toLowerCase() === value.toLowerCase())
+        )
+      }),
     displayName: yup.string().required("Name is required"),
     admin: yup.boolean(),
     email: yup.string()
       .email("Invalid email address")
       .required("Email is required")
-      .test(
-          "unique",
-          "A user with this email is already registered.",
-          value => !props.users.find(u => !!value && u.email.toLowerCase() === value.toLowerCase())
-      ),
+      .when("id", {
+        is: (value) => !value,
+        then: yup.string().test(
+            "unique",
+            "A user with this email is already registered.",
+            value => !props.users.find(u => !!value && u.email.toLowerCase() === value.toLowerCase())
+        )
+      }),
     title: yup.string(),
     department: yup.string(),
     attributes: yup.object()

@@ -60,8 +60,8 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
   @EntityGraph("keyword-details")
   @Query(
-      "select k from Keyword k where lower(k.keyword) like lower(concat('%', ?1, '%')) and k.category.name = ?2")
-  List<Keyword> search(String fragment, String category);
+      "select k from Keyword k where lower(k.keyword) like lower(concat('%', ?1, '%')) and k.category.id = ?2")
+  List<Keyword> search(String fragment, Long categoryId);
 
 //  @EntityGraph("keyword-details")
 //  @Query(

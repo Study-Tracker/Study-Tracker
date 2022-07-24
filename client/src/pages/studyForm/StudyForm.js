@@ -86,10 +86,10 @@ const StudyForm = props => {
     description: yup.string().required("Description is required"),
     legacy: yup.bool(),
     external: yup.bool(),
-    startDate: yup.date()
+    startDate: yup.number()
       .typeError("Start date is required")
       .required("Start date is required"),
-    endDate: yup.date().nullable(true),
+    endDate: yup.number().nullable(true),
     users: yup.array().of(yup.object()).min(1, "At least one user is required"),
     owner: yup.object().required("Owner is required"),
     collaborator: yup.object()
@@ -340,7 +340,7 @@ const StudyForm = props => {
                                 wrapperClassName="form-control"
                                 selected={values.startDate}
                                 name="startDate"
-                                onChange={(date) => setFieldValue("startDate", date)}
+                                onChange={(date) => setFieldValue("startDate", date.getTime())}
                                 isClearable={true}
                                 dateFormat=" MM / dd / yyyy"
                                 placeholderText="MM / DD / YYYY"
@@ -362,7 +362,7 @@ const StudyForm = props => {
                                 name={"endDate"}
                                 wrapperClassName="form-control"
                                 selected={values.endDate}
-                                onChange={(date) => setFieldValue("endDate", date)}
+                                onChange={(date) => setFieldValue("endDate", date.getTime())}
                                 isClearable={true}
                                 dateFormat=" MM / dd / yyyy"
                                 placeholderText="MM / DD / YYYY"

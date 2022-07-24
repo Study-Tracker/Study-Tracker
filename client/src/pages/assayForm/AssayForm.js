@@ -80,9 +80,10 @@ const AssayForm = props => {
     description: yup.string().required("Description is required"),
     users: yup.array().of(yup.object()).min(1, "At least one user is required"),
     owner: yup.object().required("Owner is required"),
-    startDate: yup.date()
+    startDate: yup.number()
       .typeError("Start date is required")
-      .required("Start date is required"),
+      .required("Start date is required."),
+    endDate: yup.number(),
     assayType: yup.object().required("Assay type is required"),
     attributes: yup.object()
     .test(
@@ -310,7 +311,7 @@ const AssayForm = props => {
                                 name="startDate"
                                 wrapperClassName="form-control"
                                 selected={values.startDate}
-                                onChange={(date) => setFieldValue("startDate", date)}
+                                onChange={(date) => setFieldValue("startDate", date.getTime())}
                                 isClearable={true}
                                 dateFormat=" MM / dd / yyyy"
                                 placeholderText="MM / DD / YYYY"
@@ -332,7 +333,7 @@ const AssayForm = props => {
                                 className="form-control"
                                 wrapperClassName="form-control"
                                 selected={values.endDate}
-                                onChange={(date) => setFieldValue("endDate", date)}
+                                onChange={(date) => setFieldValue("endDate", date.getTime())}
                                 isClearable={true}
                                 dateFormat=" MM / dd / yyyy"
                                 placeholderText="MM / DD / YYYY"
