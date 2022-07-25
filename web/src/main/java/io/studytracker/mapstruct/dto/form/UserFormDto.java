@@ -3,18 +3,17 @@ package io.studytracker.mapstruct.dto.form;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class UserFormDto {
 
   private Long id;
-  private @NotNull String username;
+  private @NotBlank String displayName;
+  private @NotBlank String email;
   private String department;
   private String title;
-  private @NotNull String displayName;
-  private @NotNull String email;
   private boolean admin = false;
   private Date createdAt;
   private Date updatedAt;

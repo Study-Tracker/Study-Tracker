@@ -104,7 +104,7 @@ public class Activity {
 
   @JsonProperty("triggeredBy")
   public String triggeredBy() {
-    return user.getUsername();
+    return user.getEmail();
   }
 
   public Long getId() {

@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -21,9 +22,9 @@ public class AssayFormDto {
   private Long id;
   private Status status;
   private AssayTypeDetailsDto assayType;
-  @NotNull private String name;
+  @NotBlank private String name;
   private String code;
-  @NotNull private String description;
+  @NotBlank private String description;
   private UserSlimDto createdBy;
   private UserSlimDto lastModifiedBy;
   private UserSlimDto owner;

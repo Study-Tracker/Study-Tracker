@@ -71,7 +71,7 @@ public class StudyRelationshipControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userRepository.findAll().get(0).getUsername();
+    username = userRepository.findAll().get(0).getEmail();
   }
 
   @Test
@@ -99,7 +99,7 @@ public class StudyRelationshipControllerTests {
             post("/api/study/CPA-10001/relationships")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(dto))
-                .with(user("jsmith")).with(csrf()))
+                .with(user("jsmith@email.com")).with(csrf()))
         .andExpect(status().isCreated());
 
     sourceStudy = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
@@ -154,7 +154,7 @@ public class StudyRelationshipControllerTests {
         .perform(
             delete("/api/study/CPA-10001/relationships/" + relationship.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(user("jsmith")).with(csrf()))
+                .with(user("jsmith@email.com")).with(csrf()))
         .andExpect(status().isOk());
 
     Study targetStudy2 =

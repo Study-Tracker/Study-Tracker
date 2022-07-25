@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -26,9 +27,9 @@ public class StudyFormDto {
   private String code;
   private String externalCode;
   private @NotNull Status status;
-  private @NotNull String name;
+  private @NotBlank String name;
   private ProgramSummaryDto program;
-  private @NotNull String description;
+  private @NotBlank String description;
   private String notebookTemplateId;
   private CollaboratorDto collaborator;
   private boolean legacy = false;

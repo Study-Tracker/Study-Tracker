@@ -17,7 +17,7 @@ public class EventBridgeEvent implements StudyTrackerEvent {
 
   public EventBridgeEvent(Activity activity) {
     this.eventType = activity.getEventType();
-    this.triggeredBy = activity.getUser().getUsername();
+    this.triggeredBy = activity.getUser().getEmail();
     this.date = activity.getDate();
     this.data = activity.getData();
   }

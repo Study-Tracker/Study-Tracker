@@ -16,7 +16,6 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.StudyRelationshipFormDto;
@@ -37,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,18 +63,15 @@ public class StudyRelationshipsController extends AbstractStudyController {
 
   @PostMapping("")
   public HttpEntity<StudyRelationshipDetailsDto> createStudyRelationship(
-      @PathVariable("id") String sourceStudyId, @RequestBody @Valid StudyRelationshipFormDto dto) {
+      @PathVariable("id") String sourceStudyId,
+      @RequestBody @Valid StudyRelationshipFormDto dto
+  ) {
 
     LOGGER.info(
         String.format(
             "Creating new study relationship for study %s: type=%s targetStudy=%s",
             sourceStudyId, dto.getType(), dto.getTargetStudyId()));
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
+    User user = this.getAuthenticatedUser();
     Study sourceStudy = this.getStudyFromIdentifier(sourceStudyId);
     Study targetStudy = this.getStudyFromIdentifier(dto.getTargetStudyId().toString());
     StudyRelationship studyRelationship =
@@ -108,13 +103,10 @@ public class StudyRelationshipsController extends AbstractStudyController {
   @DeleteMapping("/{relationshipId}")
   public HttpEntity<?> deleteStudyRelationship(
       @PathVariable("id") String sourceStudyId,
-      @PathVariable("relationshipId") Long relationshipId) {
+      @PathVariable("relationshipId") Long relationshipId
+  ) {
 
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
+    User user = this.getAuthenticatedUser();
     Optional<StudyRelationship> optional = studyRelationshipService.findById(relationshipId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Cannot find study relationship: " + relationshipId);

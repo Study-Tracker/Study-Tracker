@@ -31,7 +31,7 @@ import io.studytracker.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class AbstractStudyController {
+abstract class AbstractStudyController extends AbstractAPIController {
 
   private StudyService studyService;
 

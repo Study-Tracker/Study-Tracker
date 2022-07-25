@@ -16,7 +16,6 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.events.util.StudyActivityUtils;
@@ -45,8 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -122,12 +119,7 @@ public class StudyBaseController extends AbstractStudyController {
     //
     else if (my) {
       try {
-        String username =
-            UserAuthenticationUtils.getUsernameFromAuthentication(
-                SecurityContextHolder.getContext().getAuthentication());
-        User user =
-            getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-        studies = getStudyService().findByUser(user);
+        studies = getStudyService().findByUser(this.getAuthenticatedUser());
       } catch (Exception e) {
         throw new StudyTrackerException(e);
       }
@@ -182,15 +174,8 @@ public class StudyBaseController extends AbstractStudyController {
 
   @PostMapping("")
   public HttpEntity<StudyDetailsDto> createStudy(@RequestBody @Valid StudyFormDto dto) {
-
     LOGGER.info("Creating study");
     LOGGER.info(dto.toString());
-
-    // Get authenticated user
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
     Study study = this.getStudyMapper().fromStudyForm(dto);
 
     // Study team
@@ -230,7 +215,7 @@ public class StudyBaseController extends AbstractStudyController {
     Assert.notNull(study.getId(), "Study not persisted.");
 
     // Publish events
-    Activity activity = StudyActivityUtils.fromNewStudy(study, user);
+    Activity activity = StudyActivityUtils.fromNewStudy(study, this.getAuthenticatedUser());
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
@@ -239,16 +224,12 @@ public class StudyBaseController extends AbstractStudyController {
 
   @PutMapping("/{id}")
   public HttpEntity<StudyDetailsDto> updateStudy(
-      @PathVariable("id") String id, @RequestBody @Valid StudyFormDto dto) {
+      @PathVariable("id") String id,
+      @RequestBody @Valid StudyFormDto dto
+  ) {
 
     LOGGER.info("Updating study: " + id);
     LOGGER.info(dto.toString());
-
-    // Get current user
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     // Make sure the study exists
     this.getStudyFromIdentifier(id);
@@ -276,7 +257,7 @@ public class StudyBaseController extends AbstractStudyController {
     getStudyService().update(study);
 
     // Publish events
-    Activity activity = StudyActivityUtils.fromUpdatedStudy(study, user);
+    Activity activity = StudyActivityUtils.fromUpdatedStudy(study, this.getAuthenticatedUser());
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
@@ -289,10 +270,7 @@ public class StudyBaseController extends AbstractStudyController {
     LOGGER.info("Deleting study: " + id);
 
     Study study = getStudyFromIdentifier(id);
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     study.setLastModifiedBy(user);
 
     getStudyService().delete(study);
@@ -307,8 +285,9 @@ public class StudyBaseController extends AbstractStudyController {
 
   @PostMapping("/{id}/status")
   public void updateStudyStatus(
-      @PathVariable("id") String id, @RequestBody Map<String, Object> params)
-      throws StudyTrackerException {
+      @PathVariable("id") String id,
+      @RequestBody Map<String, Object> params
+  ) throws StudyTrackerException {
 
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
@@ -316,11 +295,7 @@ public class StudyBaseController extends AbstractStudyController {
 
     Study study = getStudyFromIdentifier(id);
     Status oldStatus = study.getStatus();
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     study.setLastModifiedBy(user);
 
     String label = (String) params.get("status");

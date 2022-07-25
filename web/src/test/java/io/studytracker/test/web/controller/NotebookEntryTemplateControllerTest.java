@@ -63,7 +63,7 @@ public class NotebookEntryTemplateControllerTest {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userService.findAll().get(0).getUsername();
+    username = userService.findAll().get(0).getEmail();
   }
 
   @Test
@@ -79,13 +79,13 @@ public class NotebookEntryTemplateControllerTest {
 
   @Test
   public void createEntryTemplateTest() throws Exception {
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     NotebookEntryTemplate notebookEntryTemplate =
         NotebookEntryTemplate.of(user, "id9999", "table3", Category.STUDY, new Date());
     mockMvc
         .perform(
             post("/api/notebookentrytemplate")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(notebookEntryTemplate)))
         .andExpect(status().isCreated())
@@ -105,7 +105,7 @@ public class NotebookEntryTemplateControllerTest {
 
   @Test
   public void updateEntryTemplateStatusTest() throws Exception {
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll();
     NotebookEntryTemplate testTemplate = templates.get(0);
     boolean previousStatus = testTemplate.isActive();
@@ -115,25 +115,25 @@ public class NotebookEntryTemplateControllerTest {
                     + testTemplate.getId()
                     + "/status/?active="
                     + !previousStatus)
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
   }
 
   @Test
   public void updateNonExistentEntryTemplateStatusTest() throws Exception {
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     mockMvc
         .perform(
             post("/api/notebookentrytemplate/99999/status/?active=" + false)
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void updateEntryTemplateTest() throws Exception {
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll();
     NotebookEntryTemplate testTemplate = templates.get(0);
     testTemplate.setName("updated name");
@@ -141,7 +141,7 @@ public class NotebookEntryTemplateControllerTest {
     mockMvc
         .perform(
             put("/api/notebookentrytemplate/" + testTemplate.getId())
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))
         .andExpect(status().isCreated())
@@ -155,14 +155,14 @@ public class NotebookEntryTemplateControllerTest {
 
   @Test
   public void updateNonExistentEntryTemplateTest() throws Exception {
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     List<NotebookEntryTemplate> templates = notebookEntryTemplateRepository.findAll();
     NotebookEntryTemplate testTemplate = templates.get(0);
     testTemplate.setId(999999L);
     mockMvc
         .perform(
             put("/api/notebookentrytemplate/" + testTemplate.getId())
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(testTemplate)))
         .andExpect(status().isNotFound());
@@ -170,7 +170,7 @@ public class NotebookEntryTemplateControllerTest {
 
   @Test
   public void getActiveTemplatesTest() throws Exception {
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     List<NotebookEntryTemplate> templates =
         notebookEntryTemplateRepository.findAll().stream()
             .filter(NotebookEntryTemplate::isActive)
@@ -180,7 +180,7 @@ public class NotebookEntryTemplateControllerTest {
     mockMvc
         .perform(
             post("/api/notebookentrytemplate/" + testTemplate.getId() + "/status/?active=" + false)
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
     mockMvc

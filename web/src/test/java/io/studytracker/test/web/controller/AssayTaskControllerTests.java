@@ -75,7 +75,7 @@ public class AssayTaskControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userService.findAll().get(0).getUsername();
+    username = userService.findAll().get(0).getEmail();
   }
 
   @Test
@@ -108,7 +108,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             post("/api/assay/xxxxxxx/tasks")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -126,7 +126,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             post("/api/assay/" + assay.getCode() + "/tasks")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -150,7 +150,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             put("/api/assay/xxxxxxx/tasks")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -168,7 +168,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             put("/api/assay/" + assay.getCode() + "/tasks")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -193,7 +193,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             delete("/api/assay/xxxxxxx/tasks")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())
@@ -211,7 +211,7 @@ public class AssayTaskControllerTests {
     mockMvc
         .perform(
             delete("/api/assay/" + assay.getCode() + "/tasks")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
         .andDo(MockMvcResultHandlers.print())

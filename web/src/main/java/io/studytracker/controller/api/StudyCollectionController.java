@@ -1,6 +1,5 @@
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.StudyCollectionActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -27,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/studycollection")
-public class StudyCollectionController {
+public class StudyCollectionController extends AbstractAPIController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyCollectionController.class);
 
@@ -61,16 +59,11 @@ public class StudyCollectionController {
   @GetMapping("")
   public List<StudyCollectionSummaryDto> getStudyCollections(
       @RequestParam(name = "userId", required = false) Long userId,
-      @RequestParam(name = "studyId", required = false) Long studyId) {
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+      @RequestParam(name = "studyId", required = false) Long studyId
+  ) {
 
     List<StudyCollection> collections;
-
+    User authenticatedUser = this.getAuthenticatedUser();
     if (userId != null) {
       User user =
           userService
@@ -94,8 +87,8 @@ public class StudyCollectionController {
             .filter(
                 c ->
                     c.isShared()
-                        || c.getCreatedBy().getId().equals(currentUser.getId())
-                        || currentUser.isAdmin())
+                        || c.getCreatedBy().getId().equals(authenticatedUser.getId())
+                        || authenticatedUser.isAdmin())
             .collect(Collectors.toList());
 
     return mapper.toSummaryDtoList(collections);
@@ -104,19 +97,14 @@ public class StudyCollectionController {
   @GetMapping("/{id}")
   public StudyCollectionDetailsDto findById(@PathVariable("id") Long id) {
 
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
     Optional<StudyCollection> optional = studyCollectionService.findById(id);
+    User user = this.getAuthenticatedUser();
 
     if (optional.isPresent()) {
       StudyCollection collection = optional.get();
       if (collection.isShared()
-          || collection.getCreatedBy().getId().equals(currentUser.getId())
-          || currentUser.isAdmin()) {
+          || collection.getCreatedBy().getId().equals(user.getId())
+          || user.isAdmin()) {
         return mapper.toDetailsDto(collection);
       }
     }
@@ -126,20 +114,15 @@ public class StudyCollectionController {
 
   @PostMapping("")
   public HttpEntity<StudyCollectionSummaryDto> createCollection(
-      @RequestBody @Valid StudyCollectionSummaryDto payload) {
+      @RequestBody @Valid StudyCollectionSummaryDto payload
+  ) {
 
     LOGGER.info("Creating new study collections: " + payload.toString());
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
+    User user = this.getAuthenticatedUser();
     StudyCollection collection = mapper.fromSummaryDto(payload);
 
     // Make sure a collection owned by the same user does not exist already
-    if (studyCollectionService.collectionWithNameExists(collection, currentUser)) {
+    if (studyCollectionService.collectionWithNameExists(collection, user)) {
       throw new InvalidConstraintException("A study collection with this name already exists.");
     }
 
@@ -147,7 +130,7 @@ public class StudyCollectionController {
 
     // Publish the event
     Activity activity =
-        StudyCollectionActivityUtils.fromNewStudyCollection(collection, currentUser);
+        StudyCollectionActivityUtils.fromNewStudyCollection(collection, user);
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 
@@ -156,7 +139,9 @@ public class StudyCollectionController {
 
   @PutMapping("/{id}")
   public HttpEntity<StudyCollectionSummaryDto> updateCollection(
-      @PathVariable("id") Long id, @RequestBody @Valid StudyCollectionSummaryDto dto) {
+      @PathVariable("id") Long id,
+      @RequestBody @Valid StudyCollectionSummaryDto dto
+  ) {
 
     LOGGER.info("Attempting to update existing study collections: " + dto.toString());
 
@@ -164,21 +149,16 @@ public class StudyCollectionController {
         .findById(id)
         .orElseThrow(() -> new RecordNotFoundException("Study collection not found: " + id));
     StudyCollection collection = mapper.fromSummaryDto(dto);
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
 
     // If collections is not public, only owner can edit
-    if (!dto.isShared() && !currentUser.getId().equals(collection.getCreatedBy().getId())) {
+    if (!dto.isShared() && !user.getId().equals(collection.getCreatedBy().getId())) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to modify this study collection.");
     }
 
     // Make sure a collection owned by the same user does not exist already
-    if (studyCollectionService.collectionWithNameExists(collection, currentUser)) {
+    if (studyCollectionService.collectionWithNameExists(collection, user)) {
       throw new InvalidConstraintException("A study collection with this name already exists.");
     }
 
@@ -191,7 +171,7 @@ public class StudyCollectionController {
 
     // Publish the event
     Activity activity =
-        StudyCollectionActivityUtils.fromUpdatedStudyCollection(collection, currentUser);
+        StudyCollectionActivityUtils.fromUpdatedStudyCollection(collection, user);
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 
@@ -207,14 +187,8 @@ public class StudyCollectionController {
         studyCollectionService
             .findById(id)
             .orElseThrow(() -> new RecordNotFoundException("Study collection not found: " + id));
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
-    if (!currentUser.getId().equals(collection.getCreatedBy().getId())) {
+    User user = this.getAuthenticatedUser();
+    if (!user.getId().equals(collection.getCreatedBy().getId())) {
       throw new InsufficientPrivilegesException("Only the study collection owner may delete it.");
     }
 
@@ -222,7 +196,7 @@ public class StudyCollectionController {
 
     // Publish the event
     Activity activity =
-        StudyCollectionActivityUtils.fromDeletedStudyCollection(collection, currentUser);
+        StudyCollectionActivityUtils.fromDeletedStudyCollection(collection, user);
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 
@@ -231,13 +205,9 @@ public class StudyCollectionController {
 
   @PostMapping("/{collectionId}/{studyId}")
   public HttpEntity<?> addStudyToCollection(
-      @PathVariable("collectionId") Long collectionId, @PathVariable("studyId") Long studyId) {
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+      @PathVariable("collectionId") Long collectionId,
+      @PathVariable("studyId") Long studyId
+  ) {
 
     StudyCollection collection =
         studyCollectionService
@@ -254,7 +224,8 @@ public class StudyCollectionController {
 
     // Publish the event
     Activity activity =
-        StudyCollectionActivityUtils.fromStudyAddedToCollection(study, collection, currentUser);
+        StudyCollectionActivityUtils.fromStudyAddedToCollection(
+            study, collection, this.getAuthenticatedUser());
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 
@@ -263,13 +234,9 @@ public class StudyCollectionController {
 
   @DeleteMapping("/{collectionId}/{studyId}")
   public HttpEntity<?> removeStudyFromCollection(
-      @PathVariable("collectionId") Long collectionId, @PathVariable("studyId") Long studyId) {
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+      @PathVariable("collectionId") Long collectionId,
+      @PathVariable("studyId") Long studyId
+  ) {
 
     StudyCollection collection =
         studyCollectionService
@@ -286,7 +253,8 @@ public class StudyCollectionController {
 
     // Publish the event
     Activity activity =
-        StudyCollectionActivityUtils.fromStudyRemovedFromCollection(study, collection, currentUser);
+        StudyCollectionActivityUtils.fromStudyRemovedFromCollection(
+            study, collection, this.getAuthenticatedUser());
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 

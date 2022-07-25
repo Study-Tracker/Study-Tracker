@@ -54,7 +54,6 @@ public class StudyCollectionRepositoryTests {
   private void createUser() {
     User user = new User();
     user.setAdmin(false);
-    user.setUsername("test");
     user.setEmail("test@email.com");
     user.setDisplayName("Joe Person");
     user.setActive(true);
@@ -66,7 +65,7 @@ public class StudyCollectionRepositoryTests {
 
   private void createProgram() {
 
-    User user = userRepository.findByUsername("test").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
 
     Program program = new Program();
     program.setActive(true);
@@ -87,7 +86,7 @@ public class StudyCollectionRepositoryTests {
 
   private void createStudy() {
 
-    User user = userRepository.findByUsername("test").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
     Program program =
         programRepository.findByName("Test Program").orElseThrow(RecordNotFoundException::new);
 

@@ -21,7 +21,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-public abstract class AbstractAssayController {
+public abstract class AbstractAssayController extends AbstractAPIController {
 
   private AssayService assayService;
 

@@ -9,7 +9,6 @@ import lombok.Data;
 public class UserDetailsDto {
 
   private Long id;
-  private String username;
   private String department;
   private String title;
   private String displayName;

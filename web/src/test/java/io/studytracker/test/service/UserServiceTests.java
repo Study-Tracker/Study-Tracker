@@ -76,18 +76,8 @@ public class UserServiceTests {
   }
 
   @Test
-  public void findByUsernameTest() {
-    Optional<User> optional = userService.findByUsername("jsmith");
-    Assert.assertTrue(optional.isPresent());
-    Assert.assertEquals("jsmith", optional.get().getUsername());
-    optional = userService.findByUsername("bad");
-    Assert.assertTrue(!optional.isPresent());
-  }
-
-  @Test
   public void createNewUserTest() {
     User user = new User();
-    user.setUsername("jperson");
     user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Person");
     user.setEmail("jperson@email.com");
@@ -103,7 +93,6 @@ public class UserServiceTests {
   public void fieldValidationTest() {
     Exception exception = null;
     User user = new User();
-    user.setUsername("jperson");
     user.setDisplayName("Joe Person");
     user.setTitle("Director");
     user.setAdmin(false);
@@ -119,14 +108,13 @@ public class UserServiceTests {
   }
 
   @Test
-  public void duplicateUsernameTest() {
+  public void duplicateEmailTest() {
     Assert.assertEquals(USER_COUNT, userRepository.count());
     Exception exception = null;
     User user = new User();
-    user.setUsername("jsmith");
     user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Smith");
-    user.setEmail("jperson@email.com");
+    user.setEmail("jsmith@email.com");
     user.setTitle("Director");
     user.setAdmin(false);
     user.setDepartment("Biology");
@@ -144,17 +132,17 @@ public class UserServiceTests {
   public void userModificationTest() {
     Assert.assertEquals(USER_COUNT, userRepository.count());
     createNewUserTest();
-    Optional<User> optional = userService.findByUsername("jperson");
+    Optional<User> optional = userService.findByEmail("jperson@email.com");
     Assert.assertTrue(optional.isPresent());
     User user = optional.get();
     user.setTitle("VP");
     userService.update(user);
-    optional = userService.findByUsername("jperson");
+    optional = userService.findByEmail("jperson@email.com");
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals("VP", optional.get().getTitle());
     userService.delete(optional.get());
     Assert.assertEquals(USER_COUNT, userRepository.count());
-    optional = userService.findByUsername("jperson");
+    optional = userService.findByEmail("jperson@email.com");
     Assert.assertFalse(optional.isPresent());
   }
 

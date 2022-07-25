@@ -63,7 +63,7 @@ public class ActivityControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userService.findAll().get(0).getUsername();
+    username = userService.findAll().get(0).getEmail();
   }
 
   @Test

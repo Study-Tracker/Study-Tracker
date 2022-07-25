@@ -16,7 +16,6 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -26,7 +25,6 @@ import io.studytracker.mapstruct.mapper.StudyConclusionsMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyConclusions;
-import io.studytracker.model.User;
 import io.studytracker.service.StudyConclusionsService;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -36,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,23 +65,21 @@ public class StudyConclusionsController extends AbstractStudyController {
 
   @PostMapping("")
   public HttpEntity<StudyConclusionsDto> newStudyConclusions(
-      @PathVariable("studyId") String studyId, @RequestBody @Valid StudyConclusionsFormDto dto) {
+      @PathVariable("studyId") String studyId,
+      @RequestBody @Valid StudyConclusionsFormDto dto
+  ) {
     Study study = getStudyFromIdentifier(studyId);
     if (dto.getId() != null || study.getConclusions() != null) {
       throw new StudyTrackerException("Study conclusions object already exists.");
     }
     LOGGER.info(String.format("Creating conclusions for study %s: %s", studyId, dto));
 
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
     StudyConclusions conclusions = conclusionsMapper.fromFormDto(dto);
     studyConclusionsService.addStudyConclusions(study, conclusions);
 
     // Publish events
-    Activity activity = StudyActivityUtils.fromNewConclusions(study, user, conclusions);
+    Activity activity =
+        StudyActivityUtils.fromNewConclusions(study, this.getAuthenticatedUser(), conclusions);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
@@ -93,18 +88,17 @@ public class StudyConclusionsController extends AbstractStudyController {
 
   @PutMapping("")
   public HttpEntity<StudyConclusionsDto> editStudyConclusions(
-      @PathVariable("studyId") String studyId, @RequestBody @Valid StudyConclusionsFormDto dto) {
+      @PathVariable("studyId") String studyId,
+      @RequestBody @Valid StudyConclusionsFormDto dto
+  ) {
     LOGGER.info(String.format("Updating conclusions for study %s: %s", studyId, dto.toString()));
     Study study = getStudyFromIdentifier(studyId);
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
 
     StudyConclusions conclusions = conclusionsMapper.fromFormDto(dto);
     StudyConclusions updated = studyConclusionsService.updateStudyConclusions(study, conclusions);
 
-    Activity activity = StudyActivityUtils.fromUpdatedConclusions(study, user, updated);
+    Activity activity =
+        StudyActivityUtils.fromUpdatedConclusions(study, this.getAuthenticatedUser(), updated);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
@@ -115,14 +109,9 @@ public class StudyConclusionsController extends AbstractStudyController {
   public HttpEntity<?> deleteStudyConclusions(@PathVariable("studyId") String studyId) {
     LOGGER.info(String.format("Deleting conclusions for study %s", studyId));
     Study study = getStudyFromIdentifier(studyId);
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
     studyConclusionsService.deleteStudyConclusions(study);
 
-    Activity activity = StudyActivityUtils.fromDeletedConclusions(study, user);
+    Activity activity = StudyActivityUtils.fromDeletedConclusions(study, this.getAuthenticatedUser());
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 

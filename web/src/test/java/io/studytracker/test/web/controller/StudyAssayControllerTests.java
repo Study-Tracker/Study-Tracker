@@ -90,7 +90,7 @@ public class StudyAssayControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userRepository.findAll().get(0).getUsername();
+    username = userRepository.findAll().get(0).getEmail();
   }
 
   @Test
@@ -163,7 +163,7 @@ public class StudyAssayControllerTests {
     mockMvc
         .perform(
             post("/api/study/XXXXXX/assays/")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
@@ -181,7 +181,7 @@ public class StudyAssayControllerTests {
     mockMvc
         .perform(
             post("/api/study/" + study.getCode() + "/assays/")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
         .andDo(MockMvcResultHandlers.print())
@@ -218,7 +218,7 @@ public class StudyAssayControllerTests {
             put("/api/study/PPB-10001/assays/PPB-10001-001")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assay))
-                .with(user(assay.getOwner().getUsername())).with(csrf()))
+                .with(user(assay.getOwner().getEmail())).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))
         .andExpect(jsonPath("$.status", is("COMPLETE")));

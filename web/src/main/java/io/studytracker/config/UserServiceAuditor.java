@@ -44,7 +44,7 @@ public class UserServiceAuditor implements AuditorAware<User> {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         username = userDetails.getUsername();
       }
-      user = userService.findByUsername(username).orElse(null);
+      user = userService.findByEmail(username).orElse(null);
     }
     return Optional.ofNullable(user);
   }

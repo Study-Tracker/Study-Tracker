@@ -11,10 +11,9 @@ integrated REST API and event dispatcher service for sharing of data.
 
 ## Requirements
 
-- JDK 11+
+- JDK 17+
 - Maven 3+
 - PostgreSQL 12+
-- NPM 8+ and Node.JS 12+
 - Elasticsearch 7.10+ (optional)
 
 ## Documentation

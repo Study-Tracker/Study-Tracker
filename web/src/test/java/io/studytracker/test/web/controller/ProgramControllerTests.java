@@ -77,7 +77,7 @@ public class ProgramControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userRepository.findAll().get(0).getUsername();
+    username = userRepository.findAll().get(0).getEmail();
   }
 
   // Study methods
@@ -127,7 +127,7 @@ public class ProgramControllerTests {
   @Test
   public void createProgramTest() throws Exception {
 
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
 
     Program program = new Program();
     program.setName("Program X");
@@ -137,7 +137,7 @@ public class ProgramControllerTests {
     mockMvc
         .perform(
             post("/api/program/")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
         .andExpect(status().isCreated())
@@ -165,10 +165,10 @@ public class ProgramControllerTests {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
 
     mockMvc
-        .perform(get("/api/program/" + program.getId()).with(user(user.getUsername())).with(csrf()))
+        .perform(get("/api/program/" + program.getId()).with(user(user.getEmail())).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("active")))
         .andExpect(jsonPath("$.active", is(true)));
@@ -178,7 +178,7 @@ public class ProgramControllerTests {
     mockMvc
         .perform(
             put("/api/program/" + program.getId())
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
         .andExpect(status().isOk());
@@ -206,9 +206,9 @@ public class ProgramControllerTests {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     mockMvc
-        .perform(delete("/api/program/" + program.getId()).with(user(user.getUsername())).with(csrf()))
+        .perform(delete("/api/program/" + program.getId()).with(user(user.getEmail())).with(csrf()))
         .andExpect(status().isOk());
     program =
         programRepository

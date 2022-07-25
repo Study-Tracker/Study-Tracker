@@ -3,7 +3,6 @@ package io.studytracker.security;
 import io.studytracker.model.User;
 import io.studytracker.security.AppUserDetails.AuthMethod;
 import io.studytracker.service.UserService;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +19,7 @@ public class AppUserDetailsService implements UserDetailsService {
 
   @Override
   public AppUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-    User user = null;
-
-    Optional<User> optional = userService.findByUsername(username);
-    if (optional.isPresent()) {
-      user = optional.get();
-    } else {
-      optional = userService.findByEmail(username);
-      user = optional.orElse(null);
-    }
-
+    User user = userService.findByEmail(username).orElse(null);
     if (user != null) {
       LOGGER.info("Loaded user details for username: {}", username);
       return new AppUserDetails(user, AuthMethod.DATABASE);
@@ -39,5 +28,4 @@ public class AppUserDetailsService implements UserDetailsService {
       throw new UsernameNotFoundException(username);
     }
   }
-
 }

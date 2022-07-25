@@ -28,7 +28,7 @@ public class AppUserDetails implements UserDetails {
 
   @Override
   public String getUsername() {
-    return user.getUsername();
+    return user.getEmail();
   }
 
   @Override
@@ -61,6 +61,7 @@ public class AppUserDetails implements UserDetails {
 
   public enum AuthMethod {
     DATABASE,
-    SAML
+    SAML,
+    OAUTH
   }
 }

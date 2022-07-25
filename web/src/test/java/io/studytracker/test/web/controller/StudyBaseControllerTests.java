@@ -83,7 +83,7 @@ public class StudyBaseControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userRepository.findAll().get(0).getUsername();
+    username = userRepository.findAll().get(0).getEmail();
   }
 
   // Study methods
@@ -127,7 +127,7 @@ public class StudyBaseControllerTests {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setStatus(Status.ACTIVE);
@@ -144,7 +144,7 @@ public class StudyBaseControllerTests {
     mockMvc
         .perform(
             post("/api/study/")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(study)))
         .andExpect(status().isCreated())
@@ -161,7 +161,7 @@ public class StudyBaseControllerTests {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setStatus(Status.ACTIVE);
@@ -179,7 +179,7 @@ public class StudyBaseControllerTests {
             post("/api/study/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study)))
-                .with(user(user.getUsername())).with(csrf()))
+                .with(user(user.getEmail())).with(csrf()))
         .andExpect(status().isBadRequest());
   }
 
@@ -208,7 +208,7 @@ public class StudyBaseControllerTests {
     mockMvc
         .perform(
             put("/api/study/CPA-XXXXX")
-                .with(user(study.getOwner().getUsername())).with(csrf())
+                .with(user(study.getOwner().getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isNotFound());
@@ -216,7 +216,7 @@ public class StudyBaseControllerTests {
     mockMvc
         .perform(
             put("/api/study/CPA-10001")
-                .with(user(study.getOwner().getUsername())).with(csrf())
+                .with(user(study.getOwner().getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
         .andExpect(status().isOk());
@@ -237,7 +237,10 @@ public class StudyBaseControllerTests {
 
   @Test
   public void deleteStudyTest() throws Exception {
-    mockMvc.perform(delete("/api/study/CPA-10001").with(user("jsmith")).with(csrf())).andExpect(status().isOk());
+    mockMvc.perform(delete("/api/study/CPA-10001")
+        .with(user("jsmith@email.com"))
+        .with(csrf()))
+        .andExpect(status().isOk());
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(study.isActive());
   }
@@ -249,7 +252,7 @@ public class StudyBaseControllerTests {
 
   @Test
   public void updateStatusTest() throws Exception {
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
 
     mockMvc
         .perform(get("/api/study/CPA-10001").with(user(username)).with(csrf()))
@@ -265,7 +268,7 @@ public class StudyBaseControllerTests {
             post("/api/study/CPA-10001/status")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(params))
-                .with(user(user.getUsername())).with(csrf()))
+                .with(user(user.getEmail())).with(csrf()))
         .andExpect(status().isOk());
 
     mockMvc

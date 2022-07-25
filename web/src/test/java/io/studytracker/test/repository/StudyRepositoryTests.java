@@ -75,7 +75,6 @@ public class StudyRepositoryTests {
   private void createUser() {
     User user = new User();
     user.setAdmin(false);
-    user.setUsername("test");
     user.setEmail("test@email.com");
     user.setDisplayName("Joe Person");
     user.setActive(true);
@@ -87,7 +86,7 @@ public class StudyRepositoryTests {
 
   private void createProgram() {
 
-    User user = userRepository.findByUsername("test").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
 
     Program program = new Program();
     program.setActive(true);
@@ -119,7 +118,7 @@ public class StudyRepositoryTests {
       createUser();
       createProgram();
 
-      User user = userRepository.findByUsername("test").orElseThrow(RecordNotFoundException::new);
+      User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
       Program program =
           programRepository.findByName("Test Program").orElseThrow(RecordNotFoundException::new);
 
@@ -149,14 +148,14 @@ public class StudyRepositoryTests {
       Hibernate.initialize(created.getOwner());
       User owner = created.getOwner();
       Assert.assertNotNull(owner);
-      Assert.assertEquals("test", owner.getUsername());
+      Assert.assertEquals("test@email.com", owner.getEmail());
 
       created = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
 
       Set<User> users = created.getUsers();
       Assert.assertFalse(users.isEmpty());
       User studyUser = users.stream().findFirst().orElseThrow(RecordNotFoundException::new);
-      Assert.assertEquals("test", studyUser.getUsername());
+      Assert.assertEquals("test@email.com", studyUser.getEmail());
 
       Comment comment = new Comment();
       comment.setText("This is a test");
@@ -288,7 +287,6 @@ public class StudyRepositoryTests {
 
       User user = new User();
       user.setAdmin(false);
-      user.setUsername("jperson");
       user.setEmail("jperson@email.com");
       user.setDisplayName("Joe Person");
       user.setActive(true);
@@ -301,7 +299,7 @@ public class StudyRepositoryTests {
           studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       User owner = study.getOwner();
       User otherUser =
-          userRepository.findByUsername("jperson").orElseThrow(RecordNotFoundException::new);
+          userRepository.findByEmail("jperson@email.com").orElseThrow(RecordNotFoundException::new);
 
       study.addUser(otherUser);
       study.addUser(owner);

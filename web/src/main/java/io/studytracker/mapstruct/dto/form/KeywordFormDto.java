@@ -1,5 +1,6 @@
 package io.studytracker.mapstruct.dto.form;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -7,6 +8,6 @@ import lombok.Data;
 public class KeywordFormDto {
 
   private Long id;
-  @NotNull private String keyword;
+  @NotBlank private String keyword;
   @NotNull private KeywordCategoryFormDto category;
 }

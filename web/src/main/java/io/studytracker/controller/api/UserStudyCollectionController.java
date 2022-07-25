@@ -27,30 +27,19 @@ public class UserStudyCollectionController {
   @Autowired
   private StudyCollectionMapper mapper;
 
-  private User getUserFromIdentifier(String id) {
-    Optional<User> optional = userService.findByUsername(id);
-    User user;
-    if (optional.isPresent()) {
-      user = optional.get();
-    } else {
-      try {
-        optional = userService.findById(Long.parseLong(id));
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      if (optional.isPresent()) {
-        user = optional.get();
-      } else {
-        throw new RecordNotFoundException("User not found: " + id);
-      }
+  private User getUserFromIdentifier(Long id) {
+    Optional<User> optional = userService.findById(id);
+    if (optional.isEmpty()) {
+      throw new RecordNotFoundException("User not found: " + id);
     }
-    return user;
+    return optional.get();
   }
 
   @GetMapping("")
   public List<StudyCollectionSummaryDto> getUserStudyCollections(
-      @PathVariable("userId") String userId) {
-    User user = getUserFromIdentifier(userId);
+      @PathVariable("userId") Long userId) {
+    User user = userService.findById(userId)
+        .orElseThrow(() -> new RecordNotFoundException("User not found: " + userId));
     List<StudyCollection> collections = studyCollectionService.findByUser(user);
     return mapper.toSummaryDtoList(collections);
   }

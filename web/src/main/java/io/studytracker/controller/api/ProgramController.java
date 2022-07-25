@@ -16,7 +16,6 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.events.EventsService;
@@ -45,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -60,7 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/program")
-public class ProgramController {
+public class ProgramController extends AbstractAPIController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgramController.class);
 
@@ -106,12 +104,7 @@ public class ProgramController {
   public HttpEntity<ProgramDetailsDto> createProgram(@RequestBody @Valid ProgramDetailsDto dto) {
 
     LOGGER.info("Creating new program: " + dto.toString());
-
-    // Get authenticated user
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to perform this action.");
@@ -130,12 +123,11 @@ public class ProgramController {
 
   @PutMapping("/{id}")
   public HttpEntity<ProgramDetailsDto> updateProgram(
-      @PathVariable("id") Long programId, @RequestBody @Valid ProgramDetailsDto dto) {
+      @PathVariable("id") Long programId,
+      @RequestBody @Valid ProgramDetailsDto dto
+  ) {
 
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to perform this action.");
@@ -160,10 +152,7 @@ public class ProgramController {
   public HttpEntity<?> deleteProgram(@PathVariable("id") Long programId) {
 
     // Get authenticated user
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to perform this action.");
@@ -187,12 +176,11 @@ public class ProgramController {
 
   @PostMapping("/{id}/status")
   public HttpEntity<?> updateProgramStatus(
-      @PathVariable("id") Long programId, @RequestParam("active") boolean active) {
+      @PathVariable("id") Long programId,
+      @RequestParam("active") boolean active
+  ) {
 
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to perform this action.");
@@ -259,10 +247,7 @@ public class ProgramController {
   public HttpEntity<?> repairProgramStorageFolder(@PathVariable("id") Long programId) {
 
     // Check user privileges
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to perform this action.");
@@ -304,10 +289,7 @@ public class ProgramController {
   public HttpEntity<?> repairNotebookFolder(@PathVariable("id") Long programId) {
 
     // Check user privileges
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to perform this action.");

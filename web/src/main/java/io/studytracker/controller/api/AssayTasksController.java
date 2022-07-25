@@ -1,8 +1,6 @@
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.AssayActivityUtils;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.response.AssayTaskDto;
 import io.studytracker.mapstruct.mapper.AssayTaskMapper;
 import io.studytracker.model.Activity;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,20 +38,15 @@ public class AssayTasksController extends AbstractAssayController {
 
   @PostMapping("")
   public HttpEntity<AssayTaskDto> addTask(
-      @PathVariable("assayId") String assayId, @RequestBody AssayTaskDto dto) {
+      @PathVariable("assayId") String assayId,
+      @RequestBody AssayTaskDto dto
+  ) {
 
     Assay assay = this.getAssayFromIdentifier(assayId);
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-    assay.setLastModifiedBy(user);
-
     AssayTask task = mapper.fromDto(dto);
     assayTaskService.addAssayTask(task, assay);
 
-    Activity activity = AssayActivityUtils.fromTaskAdded(assay, user, task);
+    Activity activity = AssayActivityUtils.fromTaskAdded(assay, this.getAuthenticatedUser(), task);
     this.getActivityService().create(activity);
     this.getEventsService().dispatchEvent(activity);
 
@@ -63,16 +55,13 @@ public class AssayTasksController extends AbstractAssayController {
 
   @PutMapping("")
   public HttpEntity<AssayTaskDto> updateTask(
-      @PathVariable("assayId") String assayId, @RequestBody AssayTaskDto dto) {
+      @PathVariable("assayId") String assayId,
+      @RequestBody AssayTaskDto dto
+  ) {
 
+    User user = this.getAuthenticatedUser();
     Assay assay = this.getAssayFromIdentifier(assayId);
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
-
     AssayTask task = mapper.fromDto(dto);
     assayTaskService.updateAssayTask(task, assay);
 
@@ -85,16 +74,13 @@ public class AssayTasksController extends AbstractAssayController {
 
   @DeleteMapping("")
   public HttpEntity<?> removeTask(
-      @PathVariable("assayId") String assayId, @RequestBody AssayTaskDto dto) {
+      @PathVariable("assayId") String assayId,
+      @RequestBody AssayTaskDto dto
+  ) {
 
+    User user = this.getAuthenticatedUser();
     Assay assay = this.getAssayFromIdentifier(assayId);
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     assay.setLastModifiedBy(user);
-
     AssayTask task = mapper.fromDto(dto);
     assayTaskService.deleteAssayTask(task, assay);
 

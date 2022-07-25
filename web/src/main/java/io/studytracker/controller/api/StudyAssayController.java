@@ -16,7 +16,6 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.exception.NotebookException;
@@ -40,8 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,20 +74,16 @@ public class StudyAssayController extends AbstractAssayController {
 
   @PostMapping("")
   public HttpEntity<AssayDetailsDto> create(
-      @PathVariable("studyId") String studyId, @RequestBody @Valid AssayFormDto dto)
-      throws RecordNotFoundException, NotebookException {
+      @PathVariable("studyId") String studyId,
+      @RequestBody @Valid AssayFormDto dto
+  ) throws RecordNotFoundException, NotebookException {
 
     LOGGER.info("Creating assay");
     LOGGER.info(dto.toString());
 
     Study study = this.getStudyFromIdentifier(studyId);
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
     Assay assay = assayMapper.fromAssayForm(dto);
+    User user = this.getAuthenticatedUser();
     Assay created;
 
     // If a notebook template was requested, find it
@@ -112,51 +105,39 @@ public class StudyAssayController extends AbstractAssayController {
 
   @PutMapping("/{assayId}")
   public HttpEntity<AssayDetailsDto> update(
-      @PathVariable("assayId") String assayId, @RequestBody @Valid AssayFormDto dto) {
+      @PathVariable("assayId") String assayId,
+      @RequestBody @Valid AssayFormDto dto
+  ) {
     LOGGER.info("Updating assay");
     LOGGER.info(dto.toString());
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     Assay assay = assayMapper.fromAssayForm(dto);
-    this.updateAssay(assay, user);
+    this.updateAssay(assay, this.getAuthenticatedUser());
     return new ResponseEntity<>(assayMapper.toAssayDetails(assay), HttpStatus.OK);
   }
 
   @DeleteMapping("/{assayId}")
   public HttpEntity<?> delete(@PathVariable("assayId") String id) {
     LOGGER.info("Deleting assay: " + id);
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-    this.deleteAssay(id, user);
+    this.deleteAssay(id, this.getAuthenticatedUser());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/{id}/status")
   public HttpEntity<?> updateStatus(
-      @PathVariable("id") String id, @RequestBody Map<String, Object> params)
-      throws StudyTrackerException {
+      @PathVariable("id") String id,
+      @RequestBody Map<String, Object> params
+  ) throws StudyTrackerException {
 
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
     }
 
     Assay assay = this.getAssayFromIdentifier(id);
-
-    // Get authenticated user
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user =
-        this.getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
     String label = (String) params.get("status");
     Status status = Status.valueOf(label);
     LOGGER.info(String.format("Setting status of assay %s to %s", id, label));
 
-    this.updateAssayStatus(assay.getId(), status, user);
+    this.updateAssayStatus(assay.getId(), status, this.getAuthenticatedUser());
 
     return new ResponseEntity<>(HttpStatus.OK);
   }

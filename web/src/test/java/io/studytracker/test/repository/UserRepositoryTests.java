@@ -40,7 +40,6 @@ public class UserRepositoryTests {
 
     User user = new User();
     user.setAdmin(false);
-    user.setUsername("test");
     user.setEmail("test@email.com");
     user.setDisplayName("Joe Person");
     user.setActive(true);
@@ -57,7 +56,7 @@ public class UserRepositoryTests {
     Assert.assertNotNull(user.getId());
     Assert.assertNotNull(user.getCreatedAt());
 
-    Optional<User> optional = userRepository.findByUsername("test");
+    Optional<User> optional = userRepository.findByEmail("test@email.com");
     Assert.assertTrue(optional.isPresent());
     User created = optional.get();
     Assert.assertEquals("Director", created.getTitle());
@@ -70,7 +69,6 @@ public class UserRepositoryTests {
 
     User user = new User();
     user.setAdmin(false);
-    user.setUsername("test");
     user.setDisplayName("Joe Person");
     user.setActive(true);
     user.setPassword("password");
@@ -91,13 +89,13 @@ public class UserRepositoryTests {
   @Test
   public void updateUserTest() {
     newUserTest();
-    Optional<User> optional = userRepository.findByUsername("test");
+    Optional<User> optional = userRepository.findByEmail("test@email.com");
     Assert.assertTrue(optional.isPresent());
     User user = optional.get();
     user.setTitle("VP");
     userRepository.save(user);
 
-    optional = userRepository.findByUsername("test");
+    optional = userRepository.findByEmail("test@email.com");
     Assert.assertTrue(optional.isPresent());
     User updated = optional.get();
     Assert.assertEquals("VP", updated.getTitle());
@@ -108,7 +106,7 @@ public class UserRepositoryTests {
     Assert.assertEquals(0, userRepository.count());
     newUserTest();
     Assert.assertEquals(1, userRepository.count());
-    Optional<User> optional = userRepository.findByUsername("test");
+    Optional<User> optional = userRepository.findByEmail("test@email.com");
     Assert.assertTrue(optional.isPresent());
     User user = optional.get();
     userRepository.delete(user);

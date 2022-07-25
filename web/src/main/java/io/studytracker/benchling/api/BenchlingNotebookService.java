@@ -642,7 +642,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     boolean hasNext = true;
     while (hasNext) {
       BenchlingUserList userList =
-          client.findUsersByUsername(user.getUsername(), authHeader, nextToken);
+          client.findUsersByUsername(user.getEmail(), authHeader, nextToken);
       users.addAll(userList.getUsers());
       nextToken = userList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);

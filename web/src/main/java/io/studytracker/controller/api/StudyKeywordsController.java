@@ -16,16 +16,13 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.KeywordFormDto;
 import io.studytracker.mapstruct.dto.response.KeywordDto;
 import io.studytracker.mapstruct.mapper.KeywordMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.Study;
-import io.studytracker.model.User;
 import io.studytracker.service.StudyKeywordsService;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -62,22 +58,17 @@ public class StudyKeywordsController extends AbstractStudyController {
 
   @PutMapping("")
   public HttpEntity<?> updateStudyKeywords(
-      @PathVariable("studyId") String studyId, @RequestBody @Valid Set<KeywordFormDto> dtos) {
+      @PathVariable("studyId") String studyId,
+      @RequestBody @Valid Set<KeywordFormDto> dtos
+  ) {
 
     LOGGER.info(String.format("Updating keywords for study %s: %s", studyId, dtos.toString()));
-
     Set<Keyword> keywords = keywordMapper.fromFormDtoSet(dtos);
-
     Study study = getStudyFromIdentifier(studyId);
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
     studyKeywordsService.updateStudyKeywords(study, keywords);
 
     // Publish events
-    Activity activity = StudyActivityUtils.fromUpdatedStudyKeywords(study, user);
+    Activity activity = StudyActivityUtils.fromUpdatedStudyKeywords(study, this.getAuthenticatedUser());
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 

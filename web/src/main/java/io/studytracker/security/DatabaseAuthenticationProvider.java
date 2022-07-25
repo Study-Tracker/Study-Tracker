@@ -39,7 +39,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
     if (passwordEncoder.matches(pw, userDetails.getPassword())) {
       LOGGER.warn("User successfully logged in: {}", authentication.getPrincipal().toString());
       return new UsernamePasswordAuthenticationToken(
-          userDetails.getUser().getUsername(), pw, Collections.emptyList());
+          userDetails.getUser().getEmail(), pw, Collections.emptyList());
     } else {
       LOGGER.error("User failed to log in: {}", authentication.getPrincipal().toString());
       throw new BadCredentialsException("Bad password");

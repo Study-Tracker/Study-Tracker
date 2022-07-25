@@ -73,7 +73,7 @@ public class KeywordControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userRepository.findAll().get(0).getUsername();
+    username = userRepository.findAll().get(0).getEmail();
   }
 
   @Test
@@ -102,21 +102,25 @@ public class KeywordControllerTests {
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
+    KeywordCategory category = keywordCategoryRepository.findByName("Gene")
+        .orElseThrow(RecordNotFoundException::new);
     mockMvc
-        .perform(get("/api/keyword?q=akt&category=Gene").with(user(username)).with(csrf()))
+        .perform(get("/api/keyword?q=akt&categoryId=" + category.getId()).with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
+    category = keywordCategoryRepository.findByName("Cell Line")
+        .orElseThrow(RecordNotFoundException::new);
     mockMvc
-        .perform(get("/api/keyword?q=akt&category=Cell Line").with(user(username)).with(csrf()))
+        .perform(get("/api/keyword?q=akt&categoryId=" + category.getId()).with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", empty()));
   }
 
   @Test
   public void createKeywordTest() throws Exception {
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     KeywordCategory category = keywordCategoryRepository.findByName("Gene")
         .orElseThrow(RecordNotFoundException::new);
 
@@ -124,7 +128,7 @@ public class KeywordControllerTests {
     mockMvc
         .perform(
             post("/api/keyword")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(keyword)))
         .andExpect(status().isCreated());
@@ -132,14 +136,14 @@ public class KeywordControllerTests {
 
   @Test
   public void duplicateKeywordTest() throws Exception {
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     KeywordCategory category = keywordCategoryRepository.findByName("Gene")
         .orElseThrow(RecordNotFoundException::new);
     Keyword keyword = new Keyword(category, "AKT1");
     mockMvc
         .perform(
             post("/api/keyword")
-                .with(user(user.getUsername())).with(csrf())
+                .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(keyword)))
         .andDo(MockMvcResultHandlers.print())

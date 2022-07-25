@@ -36,7 +36,6 @@ public class AdminUserInitializer {
       return;
     }
     LOGGER.info("No users present in the Study Tracker database. Initializing admin user...");
-    String username = "admin";
     String password =
         env.containsProperty("admin.password")
             ? env.getRequiredProperty("admin.password")
@@ -48,7 +47,6 @@ public class AdminUserInitializer {
     User user = new User();
     user.setActive(true);
     user.setDisplayName("Study Tracker Admin");
-    user.setUsername(username);
     user.setEmail(email);
     user.setAdmin(true);
     user.setPassword(passwordEncoder.encode(password));
@@ -57,6 +55,6 @@ public class AdminUserInitializer {
         String.format(
             "Created admin user with username '%s' and password '%s'. You should change this "
                 + "password from the login page as soon as possible.",
-            username, password));
+            email, password));
   }
 }

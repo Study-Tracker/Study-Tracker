@@ -16,13 +16,10 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.FileStorageException;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Study;
-import io.studytracker.model.User;
 import io.studytracker.service.FileSystemStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
@@ -34,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,13 +60,10 @@ public class StudyStorageController extends AbstractStudyController {
 
   @PostMapping("")
   public HttpEntity<StorageFile> uploadStudyFile(
-      @PathVariable("studyId") String studyId, @RequestParam("file") MultipartFile file)
-      throws Exception {
+      @PathVariable("studyId") String studyId,
+      @RequestParam("file") MultipartFile file
+  ) throws Exception {
     LOGGER.info("Uploaded file: " + file.getOriginalFilename());
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User user = getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
     Study study = getStudyFromIdentifier(studyId);
     Path path;
     try {
@@ -83,7 +76,8 @@ public class StudyStorageController extends AbstractStudyController {
     StorageFile storageFile = studyStorageService.saveStudyFile(path.toFile(), study);
 
     // Publish events
-    Activity activity = StudyActivityUtils.fromFileUpload(study, user, storageFile);
+    Activity activity =
+        StudyActivityUtils.fromFileUpload(study, this.getAuthenticatedUser(), storageFile);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 

@@ -83,11 +83,6 @@ public class KeywordController {
     }
   }
 
-//  @GetMapping("/categories")
-//  public Set<String> findKeywordCategories() {
-//    return keywordService.findAllCategories();
-//  }
-
   @PostMapping("")
   public HttpEntity<KeywordDto> create(@RequestBody @Valid KeywordFormDto dto) {
 

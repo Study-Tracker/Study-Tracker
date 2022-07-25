@@ -65,7 +65,7 @@ public class ElasticsearchSearchControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userService.findAll().get(0).getUsername();
+    username = userService.findAll().get(0).getEmail();
     for (Study s : studyService.findAll()) {
       Study study = studyService.findById(s.getId()).orElseThrow(RecordNotFoundException::new);
       searchService.indexStudy(study);

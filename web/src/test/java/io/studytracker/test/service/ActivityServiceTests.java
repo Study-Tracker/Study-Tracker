@@ -78,7 +78,7 @@ public class ActivityServiceTests {
     activity = activityList.get(ACTION_COUNT);
     Assert.assertEquals(
         study.getCode(), ((Map<String, Object>) activity.getData().get("study")).get("code"));
-    Assert.assertEquals(study.getCreatedBy().getUsername(), activity.getUser().getUsername());
+    Assert.assertEquals(study.getCreatedBy().getEmail(), activity.getUser().getEmail());
     Assert.assertEquals(EventType.STUDY_STATUS_CHANGED, activity.getEventType());
     Assert.assertEquals(Status.COMPLETE.toString(), activity.getData().get("newStatus"));
   }

@@ -85,7 +85,7 @@ public class LocalStorageStudyStorageServiceTests {
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();
-    Optional<User> optionalUser = userRepository.findByUsername("jsmith");
+    Optional<User> optionalUser = userRepository.findByEmail("jsmith@email.com");
     Assert.assertTrue(optionalUser.isPresent());
     User user = optionalUser.get();
     Study study = new Study();
@@ -142,7 +142,7 @@ public class LocalStorageStudyStorageServiceTests {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setName("Test study");
     study.setProgram(program);
@@ -171,7 +171,7 @@ public class LocalStorageStudyStorageServiceTests {
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();
-    Optional<User> optionalUser = userRepository.findByUsername("jsmith");
+    Optional<User> optionalUser = userRepository.findByEmail("jsmith@email.com");
     Assert.assertTrue(optionalUser.isPresent());
     User user = optionalUser.get();
     Study study = new Study();

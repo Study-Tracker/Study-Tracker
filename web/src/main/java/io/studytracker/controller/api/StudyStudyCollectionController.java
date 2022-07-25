@@ -1,7 +1,5 @@
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.response.StudyCollectionSummaryDto;
 import io.studytracker.mapstruct.mapper.StudyCollectionMapper;
 import io.studytracker.model.Study;
@@ -11,7 +9,6 @@ import io.studytracker.service.StudyCollectionService;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,22 +26,17 @@ public class StudyStudyCollectionController extends AbstractStudyController {
 
   @GetMapping("")
   public List<StudyCollectionSummaryDto> getStudyStudyCollections(
-      @PathVariable("studyId") String studyId) {
-
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    User currentUser =
-        this.getUserService().findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
+      @PathVariable("studyId") String studyId
+  ) {
+    User authenticatedUser = this.getAuthenticatedUser();
     Study study = this.getStudyFromIdentifier(studyId);
     List<StudyCollection> collections =
         studyCollectionService.findByStudy(study).stream()
             .filter(
                 c ->
                     c.isShared()
-                        || c.getCreatedBy().getId().equals(currentUser.getId())
-                        || currentUser.isAdmin())
+                        || c.getCreatedBy().getId().equals(authenticatedUser.getId())
+                        || authenticatedUser.isAdmin())
             .collect(Collectors.toList());
 
     return mapper.toSummaryDtoList(collections);

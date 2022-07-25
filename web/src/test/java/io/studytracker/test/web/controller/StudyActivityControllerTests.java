@@ -64,7 +64,7 @@ public class StudyActivityControllerTests {
     mockMvc
         .perform(
             get("/api/study/" + study.getCode() + "/activity")
-                .with(user(study.getOwner().getUsername())).with(csrf()))
+                .with(user(study.getOwner().getEmail())).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
   }

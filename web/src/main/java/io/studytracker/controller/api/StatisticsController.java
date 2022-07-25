@@ -1,17 +1,11 @@
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.response.SummaryStatisticsDto;
 import io.studytracker.mapstruct.dto.response.UserStatisticsDto;
-import io.studytracker.model.User;
 import io.studytracker.service.StatisticsService;
-import io.studytracker.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,11 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/stats")
 @Hidden
-public class StatisticsController {
+public class StatisticsController extends AbstractAPIController {
 
   private StatisticsService statisticsService;
-
-  private UserService userService;
 
   @GetMapping("")
   public SummaryStatisticsDto getCurrentStats(
@@ -48,13 +40,7 @@ public class StatisticsController {
 
   @GetMapping("/user")
   public UserStatisticsDto getActiveUserStatistics() {
-
-    // Get authenticated user
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String username = UserAuthenticationUtils.getUsernameFromAuthentication(authentication);
-    User user = userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
-
-    return statisticsService.getUserStatistics(user);
+    return statisticsService.getUserStatistics(this.getAuthenticatedUser());
   }
 
   @Autowired
@@ -62,8 +48,4 @@ public class StatisticsController {
     this.statisticsService = statisticsService;
   }
 
-  @Autowired
-  public void setUserService(UserService userService) {
-    this.userService = userService;
-  }
 }

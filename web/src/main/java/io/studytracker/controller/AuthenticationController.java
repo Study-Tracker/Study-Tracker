@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -119,14 +117,14 @@ public class AuthenticationController {
       Object principal = authentication.getPrincipal();
       if (principal instanceof User) {
         user = (User) principal;
-        LOGGER.debug("Loaded user from principal: {}", user.getUsername());
+        LOGGER.debug("Loaded user from principal: {}", user.getEmail());
       } else if (principal instanceof AppUserDetails) {
         AppUserDetails userDetails = (AppUserDetails) principal;
         user = userDetails.getUser();
         LOGGER.debug("Loaded user from userDetails: {}", userDetails.getUsername());
       } else {
         String username = principal.toString();
-        user = userService.findByUsername(username).orElseThrow(UnknownUserException::new);
+        user = userService.findByEmail(username).orElseThrow(UnknownUserException::new);
         LOGGER.debug("Loaded user from username: {}", username);
       }
     } else {
@@ -208,16 +206,6 @@ public class AuthenticationController {
     } else {
       return "redirect:/login?message=The password reset token is invalid or expired. Please try again.";
     }
-  }
-
-  @GetMapping(value="/auth/csrf-token")
-  public HttpEntity<Map<String, String>> getCsrfToken(HttpServletRequest request) {
-    CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-    Map<String, String> map = new HashMap<>();
-    map.put("token", token.getToken());
-    map.put("headerName", token.getHeaderName());
-    map.put("parameterName", token.getParameterName());
-    return new ResponseEntity<>(map, HttpStatus.OK);
   }
 
 }

@@ -295,7 +295,6 @@ public class ExampleDataGenerator {
     List<User> users = new ArrayList<>();
 
     User user = new User();
-    user.setUsername("jsmith");
     user.setPassword(encoder.encode("password"));
     user.setDisplayName("Joe Smith");
     user.setEmail("jsmith@email.com");
@@ -305,7 +304,6 @@ public class ExampleDataGenerator {
     users.add(user);
 
     user = new User();
-    user.setUsername("ajohnson");
     user.setPassword(encoder.encode("password"));
     user.setDisplayName("Ann Johnson");
     user.setEmail("ajohnson@email.com");
@@ -315,7 +313,6 @@ public class ExampleDataGenerator {
     users.add(user);
 
     user = new User();
-    user.setUsername("rblack");
     user.setPassword(encoder.encode("password"));
     user.setDisplayName("Rob Black");
     user.setEmail("rblack@email.com");
@@ -412,7 +409,7 @@ public class ExampleDataGenerator {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     Collaborator collaborator =
         collaboratorRepository
             .findByLabel("University of Somewhere")
@@ -461,7 +458,7 @@ public class ExampleDataGenerator {
         programRepository
             .findByName("Preclinical Project B")
             .orElseThrow(RecordNotFoundException::new);
-    user = userRepository.findByUsername("ajohnson").orElseThrow(RecordNotFoundException::new);
+    user = userRepository.findByEmail("ajohnson@email.com").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
     study.setName("Example Study");
@@ -522,7 +519,7 @@ public class ExampleDataGenerator {
         programRepository
             .findByName("Preclinical Project B")
             .orElseThrow(RecordNotFoundException::new);
-    user = userRepository.findByUsername("ajohnson").orElseThrow(RecordNotFoundException::new);
+    user = userRepository.findByEmail("ajohnson@email.com").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
     study.setName("Example Legacy Study");
@@ -559,7 +556,7 @@ public class ExampleDataGenerator {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
     study.setName("Example Inactive Study");
@@ -591,7 +588,7 @@ public class ExampleDataGenerator {
         programRepository
             .findByName("Target ID Project D")
             .orElseThrow(RecordNotFoundException::new);
-    user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
     study.setName("Example Target ID Study 1");
@@ -622,7 +619,7 @@ public class ExampleDataGenerator {
         programRepository
             .findByName("Target ID Project E")
             .orElseThrow(RecordNotFoundException::new);
-    user = userRepository.findByUsername("rblack").orElseThrow(RecordNotFoundException::new);
+    user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setStatus(Status.IN_PLANNING);
     study.setName("Example Target ID Study 2");

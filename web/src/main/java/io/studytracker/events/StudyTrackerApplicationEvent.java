@@ -30,7 +30,7 @@ public class StudyTrackerApplicationEvent extends ApplicationEvent implements St
 
   @Override
   public String getTriggeredBy() {
-    return activity.getUser().getUsername();
+    return activity.getUser().getEmail();
   }
 
   @Override

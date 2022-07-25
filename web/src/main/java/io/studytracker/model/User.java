@@ -51,8 +51,11 @@ public class User {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @Column(name = "username", unique = true, nullable = false)
-  private String username;
+  @Column(name = "display_name", nullable = false)
+  private String displayName;
+
+  @Column(name = "email", unique = true, nullable = false)
+  private String email;
 
   @Column(name = "password")
   private String password;
@@ -62,12 +65,6 @@ public class User {
 
   @Column(name = "title")
   private String title;
-
-  @Column(name = "display_name", nullable = false)
-  private String displayName;
-
-  @Column(name = "email", unique = true, nullable = false)
-  private String email;
 
   @Column(name = "created_at", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -119,14 +116,6 @@ public class User {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
   }
 
   public String getDepartment() {

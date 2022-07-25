@@ -1,6 +1,5 @@
 package io.studytracker.controller.api;
 
-import io.studytracker.controller.UserAuthenticationUtils;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.EntryTemplateActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/notebookentrytemplate")
-public class NotebookEntryTemplateController {
+public class NotebookEntryTemplateController extends AbstractAPIController {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(NotebookEntryTemplateController.class);
@@ -51,13 +49,6 @@ public class NotebookEntryTemplateController {
   @Autowired private EventsService eventsService;
 
   @Autowired private NotebookEntryTemplateMapper mapper;
-
-  private User getAuthenticatedUser() throws RecordNotFoundException {
-    String username =
-        UserAuthenticationUtils.getUsernameFromAuthentication(
-            SecurityContextHolder.getContext().getAuthentication());
-    return userService.findByUsername(username).orElseThrow(RecordNotFoundException::new);
-  }
 
   private NotebookEntryTemplate getTemplateById(Long id) throws RecordNotFoundException {
     return entryTemplateService
@@ -92,15 +83,16 @@ public class NotebookEntryTemplateController {
 
   @PostMapping("")
   public HttpEntity<NotebookEntryTemplateDetailsDto> createTemplate(
-      @RequestBody @Valid NotebookEntryTemplateFormDto dto) {
+      @RequestBody @Valid NotebookEntryTemplateFormDto dto
+  ) {
 
     LOGGER.info("Creating new entry template : " + dto.toString());
-    User user = getAuthenticatedUser();
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "User does not have sufficient privileges "
               + "to perform this action: "
-              + user.getUsername());
+              + user.getEmail());
     }
 
     NotebookEntryTemplate notebookEntryTemplate = mapper.fromForm(dto);
@@ -116,17 +108,18 @@ public class NotebookEntryTemplateController {
 
   @PostMapping("/{id}/status")
   public HttpEntity<?> updateTemplateStatus(
-      @PathVariable("id") Long id, @RequestParam("active") boolean active)
-      throws RecordNotFoundException {
+      @PathVariable("id") Long id,
+      @RequestParam("active") boolean active
+  ) throws RecordNotFoundException {
 
     LOGGER.info("Updating template with id: " + id);
 
-    User user = getAuthenticatedUser();
     NotebookEntryTemplate notebookEntryTemplate = getTemplateById(id);
     entryTemplateService.updateActive(notebookEntryTemplate, active);
 
     Activity activity =
-        EntryTemplateActivityUtils.fromUpdatedEntryTemplate(notebookEntryTemplate, user);
+        EntryTemplateActivityUtils.fromUpdatedEntryTemplate(notebookEntryTemplate,
+            this.getAuthenticatedUser());
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 
@@ -139,12 +132,12 @@ public class NotebookEntryTemplateController {
 
     LOGGER.info("Updating template with id: " + id);
 
-    User user = getAuthenticatedUser();
     NotebookEntryTemplate notebookEntryTemplate = getTemplateById(id);
     entryTemplateService.updateDefault(notebookEntryTemplate);
 
     Activity activity =
-        EntryTemplateActivityUtils.fromUpdatedEntryTemplate(notebookEntryTemplate, user);
+        EntryTemplateActivityUtils.fromUpdatedEntryTemplate(
+            notebookEntryTemplate, this.getAuthenticatedUser());
     activityService.create(activity);
     eventsService.dispatchEvent(activity);
 
@@ -153,14 +146,16 @@ public class NotebookEntryTemplateController {
 
   @PutMapping("/{id}")
   public HttpEntity<NotebookEntryTemplateDetailsDto> updateEntryTemplate(
-      @PathVariable("id") Long id, @RequestBody @Valid NotebookEntryTemplateFormDto dto) {
+      @PathVariable("id") Long id,
+      @RequestBody @Valid NotebookEntryTemplateFormDto dto
+  ) {
 
-    User user = getAuthenticatedUser();
+    User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
       throw new InsufficientPrivilegesException(
           "User does not have sufficient privileges "
               + "to perform this action: "
-              + user.getUsername());
+              + user.getEmail());
     }
 
     if (!entryTemplateService.exists(id)) {

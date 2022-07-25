@@ -46,7 +46,6 @@ public class ProgramRepositoryTests {
   private User createUser() {
     User user = new User();
     user.setAdmin(false);
-    user.setUsername("test");
     user.setEmail("test@email.com");
     user.setDisplayName("Joe Person");
     user.setActive(true);
@@ -97,7 +96,7 @@ public class ProgramRepositoryTests {
 
     User createdBy = program.getCreatedBy();
     Assert.assertNotNull(createdBy);
-    Assert.assertEquals("test", createdBy.getUsername());
+    Assert.assertEquals("test@email.com", createdBy.getEmail());
 
     FileStoreFolder programFolder = created.getStorageFolder();
     Assert.assertNotNull(programFolder.getId());

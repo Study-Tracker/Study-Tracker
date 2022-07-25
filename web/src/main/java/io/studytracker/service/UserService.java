@@ -50,13 +50,9 @@ public class UserService {
     return userRepository.findAll();
   }
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Optional<User> findByEmail(String email) {
     return userRepository.findByEmail(email);
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public Optional<User> findByUsername(String username) {
-    return userRepository.findByUsername(username);
   }
 
   public List<User> search(String keyword) {

@@ -72,7 +72,7 @@ public class StudyLinkControllerTests {
   @Before
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
-    username = userRepository.findAll().get(0).getUsername();
+    username = userRepository.findAll().get(0).getEmail();
   }
 
   @Test
@@ -105,7 +105,7 @@ public class StudyLinkControllerTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     ExternalLink link = new ExternalLink();
     link.setLabel("Twitter");
     link.setUrl(new URL("https://twitter.com"));
@@ -115,7 +115,7 @@ public class StudyLinkControllerTests {
             post("/api/study/CPA-10001/links")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(link))
-                .with(user(user.getUsername())).with(csrf()))
+                .with(user(user.getEmail())).with(csrf()))
         .andExpect(status().isCreated());
 
     mockMvc
@@ -132,7 +132,7 @@ public class StudyLinkControllerTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)));
 
-    User user = userRepository.findByUsername("jsmith").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assert.assertFalse(study.getExternalLinks().isEmpty());
     ExternalLink link = study.getExternalLinks().stream().findFirst().get();
@@ -140,7 +140,7 @@ public class StudyLinkControllerTests {
     mockMvc
         .perform(
             delete("/api/study/CPA-10001/links/" + link.getId())
-                .with(user(user.getUsername()))
+                .with(user(user.getEmail()))
                 .with(csrf()))
         .andExpect(status().isOk());
 
