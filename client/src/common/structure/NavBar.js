@@ -127,7 +127,7 @@ const NavBar = props => {
                   ? (
                       <NavbarUser
                           isAdmin={user.admin}
-                          userName={user.username}
+                          userId={user.id}
                           displayName={user.displayName}
                           logoutUrl={
                             features && features.auth && features.auth.logoutUrl
@@ -151,7 +151,7 @@ const NavBar = props => {
 
 }
 
-const NavbarUser = ({isAdmin, userName, displayName, logoutUrl}) => {
+const NavbarUser = ({isAdmin, userId, displayName, logoutUrl}) => {
   return (
       <Dropdown className="nav-item" align="end">
 
@@ -183,7 +183,7 @@ const NavbarUser = ({isAdmin, userName, displayName, logoutUrl}) => {
                 ) : ''
           }
 
-          <Dropdown.Item as={"a"} href={"/user/" + userName}>
+          <Dropdown.Item as={"a"} href={"/user/" + userId}>
             <User size={18} className="align-middle me-2"/>
             Profile
           </Dropdown.Item>

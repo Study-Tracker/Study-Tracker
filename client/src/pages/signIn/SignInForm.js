@@ -39,12 +39,12 @@ const SignInForm = ({ssoOptions, isError, message}) => {
                   <Form action={"/auth/login"} method={"post"}>
 
                     <Form.Group>
-                      <Form.Label>Username or email</Form.Label>
+                      <Form.Label>Email</Form.Label>
                       <Form.Control
                           size="lg"
                           type="text"
                           name="username"
-                          placeholder="Enter your username or email address"
+                          placeholder="Enter your email address"
                           onChange={e => handleInputChange(
                               {username: e.target.value})}
                       />

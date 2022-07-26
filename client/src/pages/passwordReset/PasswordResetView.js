@@ -72,7 +72,7 @@ const PasswordResetView = props => {
               <div className="text-center mt-4">
                 <h2>Password Reset</h2>
                 <p className="lead">
-                  Please enter your username and a new password.
+                  Please enter your email and a new password.
                 </p>
               </div>
 

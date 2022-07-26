@@ -189,29 +189,21 @@ const UserTable = ({users, showModal}) => {
       },
     },
     {
-      dataField: "username",
-      text: "Username",
+      dataField: "email",
+      text: "Email",
       sort: true,
       headerStyle: {width: '20%%'},
       formatter: (c, d, i, x) => <Button variant={"link"}
-                                         onClick={() => showModal(
-                                             d)}>{d.username}</Button>,
+                                         onClick={() => showModal(d)}>{d.email}</Button>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
-        if (rowA.username > rowB.username) {
+        if (rowA.email > rowB.email) {
           return order === "desc" ? -1 : 1;
         }
-        if (rowB.username > rowA.username) {
+        if (rowB.email > rowA.email) {
           return order === "desc" ? 1 : -1;
         }
         return 0;
       },
-    },
-    {
-      dataField: "email",
-      text: "Email",
-      sort: true,
-      headerStyle: {width: '25%'},
-      formatter: (cell, d, index, x) => d.email
     },
     {
       dataField: "type",
@@ -375,7 +367,7 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
       >
         <Modal.Header closeButton>
           User:&nbsp;
-          <strong>{user.displayName}</strong>&nbsp;(<code>{user.username}</code>)
+          <strong>{user.displayName}</strong>&nbsp;(<code>{user.email}</code>)
         </Modal.Header>
         <Modal.Body>
           <Row>
@@ -383,10 +375,6 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
             <Col md={6}>
               <h4>Name</h4>
               <p>{user.displayName}</p>
-            </Col>
-            <Col md={6}>
-              <h4>Username</h4>
-              <p>{user.username}</p>
             </Col>
             <Col md={6}>
               <h4>Email</h4>
@@ -463,7 +451,7 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="info" href={"/user/" + user.username}>
+          <Button variant="info" href={"/user/" + user.id}>
             <User size={14} className="mb-1"/>
             &nbsp;
             View Profile

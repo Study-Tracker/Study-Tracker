@@ -35,7 +35,6 @@ const UserForm = props => {
 
   const navigate = useNavigate();
   const userDefaults = {
-    username: "",
     displayName: "",
     email: "",
     title: "",
@@ -45,17 +44,6 @@ const UserForm = props => {
     credentialsExpired: true
   };
   const userSchema = yup.object().shape({
-    username: yup.string()
-      .required("Username is required")
-      .max(255, "Username must be less than 255 characters")
-      .when("id", {
-        is: (value) => !value,
-        then: yup.string().test(
-            "unique",
-            "Username is already in use",
-            value => !props.users.find(u => !!value && u.username.toLowerCase() === value.toLowerCase())
-        )
-      }),
     displayName: yup.string().required("Name is required"),
     admin: yup.boolean(),
     email: yup.string()
@@ -188,10 +176,9 @@ const UserForm = props => {
                     <Card.Header>
                       <Card.Title tag="h5">User Details</Card.Title>
                       <h6 className="card-subtitle text-muted">
-                        Users must have unique usernames and email addresses. Users
+                        Users must have unique email addresses. Users
                         granted admin privileges can create or modify programs,
-                        users,
-                        and other system attributes.
+                        users, and other system attributes.
                       </h6>
                     </Card.Header>
 
@@ -213,6 +200,22 @@ const UserForm = props => {
                               />
                               <Form.Control.Feedback type={"invalid"}>
                                 {errors.displayName}
+                              </Form.Control.Feedback>
+                            </FormGroup>
+                          </Col>
+
+                          <Col md={6}>
+                            <FormGroup>
+                              <Form.Label>Email *</Form.Label>
+                              <Form.Control
+                                  type="text"
+                                  name={"email"}
+                                  isInvalid={!!errors.email}
+                                  value={values.email}
+                                  onChange={handleChange}
+                              />
+                              <Form.Control.Feedback type={"invalid"}>
+                                {errors.email}
                               </Form.Control.Feedback>
                             </FormGroup>
                           </Col>
@@ -245,41 +248,6 @@ const UserForm = props => {
                                   }
                                   onChange={(selected) => setFieldValue("admin", selected.value)}
                               />
-                            </FormGroup>
-                          </Col>
-
-                          <Col md={6}>
-                            <FormGroup>
-                              <Form.Label>Username *</Form.Label>
-                              <Form.Control
-                                  type="text"
-                                  name={"username"}
-                                  className={(errors.username && touched.username) ? "is-invalid" : ""}
-                                  isInvalid={!!errors.username}
-                                  value={values.username}
-                                  onChange={handleChange}
-                                  disabled={!!values.id}
-                              />
-                              <Form.Control.Feedback type={"invalid"}>
-                                {errors.username}
-                              </Form.Control.Feedback>
-                              <Form.Text>Must be unique.</Form.Text>
-                            </FormGroup>
-                          </Col>
-
-                          <Col md={6}>
-                            <FormGroup>
-                              <Form.Label>Email *</Form.Label>
-                              <Form.Control
-                                  type="text"
-                                  name={"email"}
-                                  isInvalid={!!errors.email}
-                                  value={values.email}
-                                  onChange={handleChange}
-                              />
-                              <Form.Control.Feedback type={"invalid"}>
-                                {errors.email}
-                              </Form.Control.Feedback>
                             </FormGroup>
                           </Col>
 
