@@ -16,7 +16,7 @@ const StudyCollectionListView = props => {
   });
 
   useEffect(() => {
-    axios.get("/api/studycollection")
+    axios.get("/api/internal/studycollection")
     .then(response => {
       setState(prevState => ({
         ...prevState,

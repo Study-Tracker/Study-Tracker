@@ -177,7 +177,7 @@ const AssayDetails = props => {
     updated.tasks = tasks;
     setAssay(updated);
 
-    axios.put("/api/assay/" + assay.code + "/tasks", updatedTask)
+    axios.put("/api/internal/assay/" + assay.code + "/tasks", updatedTask)
     .then(response => {
       console.log("Task successfully updated.");
     })
@@ -203,7 +203,7 @@ const AssayDetails = props => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/assay/" + assay.code)
+        axios.delete("/api/internal/assay/" + assay.code)
         .then(response => {
           navigate("/assays")
         })
@@ -368,7 +368,7 @@ const AssayDetails = props => {
 
                     <RepairableStorageFolderButton
                         folder={assay.storageFolder}
-                        repairUrl={"/api/assay/" + assay.id + "/storage/repair"}
+                        repairUrl={"/api/internal/assay/" + assay.id + "/storage/repair"}
                     />
 
                     {
@@ -377,7 +377,7 @@ const AssayDetails = props => {
                         && features.notebook.isEnabled ? (
                             <RepairableNotebookFolderButton
                                 folder={assay.notebookFolder}
-                                repairUrl={"/api/assay/" + assay.id + "/notebook/repair"}
+                                repairUrl={"/api/internal/assay/" + assay.id + "/notebook/repair"}
                             />
                         ) : ""
                     }

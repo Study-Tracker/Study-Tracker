@@ -67,14 +67,14 @@ export const StudyKeywords = props => {
 
   const showModal = async (bool) => {
     if (bool && !keywordCategories) {
-      await axios.get("/api/keyword-category")
+      await axios.get("/api/internal/keyword-category")
         .then(res => setKeywordCategories(res.data));
     }
     setModalIsOpen(bool);
   }
 
   const handleKeywordsSave = () => {
-    axios.put("/api/study/" + props.studyId + "/keywords", keywords)
+    axios.put("/api/internal/study/" + props.studyId + "/keywords", keywords)
     .then(res => {
       setPreviousKeywords(keywords);
       setModalIsOpen(false);

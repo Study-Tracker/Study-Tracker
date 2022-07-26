@@ -35,7 +35,7 @@ const AssayTypeFormView = props => {
 
   useEffect(() => {
 
-    axios.get("/api/assaytype/")
+    axios.get("/api/internal/assaytype/")
     .then(response => {
       const assayTypes = response.data;
       if (!!state.assayTypeId) {

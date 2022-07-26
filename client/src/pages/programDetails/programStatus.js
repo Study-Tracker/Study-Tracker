@@ -20,7 +20,7 @@ export const SelectableProgramStatusButton = props => {
 
   const handleChange = (e) => {
     const active = e.target.dataset.value === statuses.ACTIVE.value;
-    axios.post("/api/program/" + props.programId + "/status?active=" + active)
+    axios.post("/api/internal/program/" + props.programId + "/status?active=" + active)
     .then(async response => {
       if (response.status === 200) {
         window.location.reload();

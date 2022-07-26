@@ -32,7 +32,7 @@ const AssayTimelineTab = props => {
   });
 
   useEffect(() => {
-    axios.get("/api/assay/" + assay.code + "/activity")
+    axios.get("/api/internal/assay/" + assay.code + "/activity")
     .then(response => {
       setState(prevState => ({
         ...prevState,

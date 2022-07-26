@@ -42,7 +42,7 @@ const NavBar = props => {
       }
     });
 
-    axios.get("/api/config/features")
+    axios.get("/api/internal/config/features")
     .then(response => {
       dispatch(setFeatures(response.data));
     })

@@ -12,7 +12,7 @@ const AddToStudyCollectionModal = props => {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/studycollection?visibleToMe=true")
+    axios.get("/api/internal/studycollection?visibleToMe=true")
     .then(response => setCollections(response.data))
     .catch(e => {
       console.error(e);
@@ -21,7 +21,7 @@ const AddToStudyCollectionModal = props => {
 
   const handleSubmit = () => {
     if (!!selected) {
-      axios.post("/api/studycollection/" + selected + "/" + study.id)
+      axios.post("/api/internal/studycollection/" + selected + "/" + study.id)
       .then(() => showModal(false))
       .catch(e => {
         console.error(e);

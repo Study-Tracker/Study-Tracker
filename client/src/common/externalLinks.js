@@ -43,7 +43,7 @@ const ExternalLinks = props => {
   });
 
   const handleFormSubmit = (values, {setSubmitting}) => {
-    axios.post("/api/study/" + props.studyCode + "/links", values)
+    axios.post("/api/internal/study/" + props.studyCode + "/links", values)
     .then(response => {
       setSubmitting(false);
       setLinks([...links, response.data]);
@@ -65,7 +65,7 @@ const ExternalLinks = props => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/study/" + props.studyCode + "/links/" + link.id, link)
+        axios.delete("/api/internal/study/" + props.studyCode + "/links/" + link.id, link)
         .then(response => {
           setLinks(links.filter(l => l.label !== link.label && l.url !== link.url));
         })

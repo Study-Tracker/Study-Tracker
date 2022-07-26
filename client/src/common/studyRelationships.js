@@ -45,7 +45,7 @@ const StudyRelationships = props => {
   });
 
   const studyAutocomplete = (input, callback) => {
-    axios.get("/api/autocomplete/study?q=" + input)
+    axios.get("/api/internal/autocomplete/study?q=" + input)
     .then(response => {
       const options = response.data
       .filter(s => s.code !== props.studyCode && s.active)
@@ -75,7 +75,7 @@ const StudyRelationships = props => {
   }
 
   const handleFormSubmit = (values, {setSubmitting}) => {
-    axios.post("/api/study/" + props.studyCode + "/relationships", values)
+    axios.post("/api/internal/study/" + props.studyCode + "/relationships", values)
     .then(response => {
       setSubmitting(false);
       setRelationships([...relationships, response.data]);
@@ -97,7 +97,7 @@ const StudyRelationships = props => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/study/" + props.studyCode + "/relationships/"
+        axios.delete("/api/internal/study/" + props.studyCode + "/relationships/"
             + relationship.id)
         .then(response => {
           setRelationships(relationships.filter(r => r.id !== relationship.id))

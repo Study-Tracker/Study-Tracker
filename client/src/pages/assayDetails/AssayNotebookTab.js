@@ -31,7 +31,7 @@ const AssayNotebookTabContent = props => {
   }, []);
 
   const refreshData = () => {
-    axios.get('/api/assay/' + assay.code + '/notebook')
+    axios.get('/api/internal/assay/' + assay.code + '/notebook')
     .then(response => {
       setFolder(response.data);
     })

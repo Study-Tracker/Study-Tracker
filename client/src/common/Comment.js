@@ -45,7 +45,7 @@ const Comment = props => {
   }
 
   const handleFormSubmit = (values, {setSubmitting}) => {
-    axios.put("/api/study/" + study.code + "/comments/" + comment.id, values)
+    axios.put("/api/internal/study/" + study.code + "/comments/" + comment.id, values)
     .then(response => {
       setSubmitting(false);
       toggleInput();

@@ -31,7 +31,7 @@ const UserInputs = ({
 }) => {
 
   const userAutocomplete = (input, callback) => {
-    axios.get("/api/autocomplete/user?q=" + input)
+    axios.get("/api/internal/autocomplete/user?q=" + input)
     .then(response => {
       const options = response.data
       .filter(user => !users.find(u => u.id === user.id))

@@ -77,7 +77,7 @@ const AssayFilters = props => {
 
     dispatch(setFilters(defaults));
 
-    axios.get("/api/program")
+    axios.get("/api/internal/program")
     .then(response => {
 
       const programs = response.data.sort((a, b) => {
@@ -90,7 +90,7 @@ const AssayFilters = props => {
         }
       });
 
-      axios.get("/api/assaytype")
+      axios.get("/api/internal/assaytype")
       .then(response => {
 
         const assayTypes = response.data.sort((a, b) => {

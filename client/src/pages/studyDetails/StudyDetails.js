@@ -128,7 +128,7 @@ const StudyDetails = props => {
     .then(val => {
       if (val) {
         axios({
-          url: "/api/study/" + study.code,
+          url: "/api/internal/study/" + study.code,
           method: 'delete',
           headers: {
             "Content-Type": "application/json"
@@ -297,7 +297,7 @@ const StudyDetails = props => {
 
                     <RepairableStorageFolderButton
                         folder={study.storageFolder}
-                        repairUrl={"/api/study/" + study.id + "/storage/repair"}
+                        repairUrl={"/api/internal/study/" + study.id + "/storage/repair"}
                     />
 
                     &nbsp;&nbsp;
@@ -308,7 +308,7 @@ const StudyDetails = props => {
                       && features.notebook.isEnabled ? (
                           <RepairableNotebookFolderButton
                               folder={study.notebookFolder}
-                              repairUrl={"/api/study/" + study.id + "/notebook/repair"}
+                              repairUrl={"/api/internal/study/" + study.id + "/notebook/repair"}
                           />
                       ) : ""
                     }

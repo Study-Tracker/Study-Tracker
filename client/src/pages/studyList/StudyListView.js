@@ -47,7 +47,7 @@ const StudyListView = props => {
       title = 'Search Results';
     }
 
-    axios.get("/api/study" + query)
+    axios.get("/api/internal/study" + query)
     .then(response => {
 
       console.debug(response.data);

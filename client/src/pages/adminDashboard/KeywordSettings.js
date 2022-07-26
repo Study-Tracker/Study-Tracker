@@ -61,7 +61,7 @@ const KeywordSettings = props => {
   };
 
   useEffect(() => {
-    axios.get("/api/keyword-category")
+    axios.get("/api/internal/keyword-category")
     .then(response => {
       setState(prevState => ({
         ...prevState,
@@ -80,7 +80,7 @@ const KeywordSettings = props => {
   }, []);
 
   const handleCategorySelect = (categoryId) => {
-    axios.get("/api/keyword?categoryId=" + categoryId)
+    axios.get("/api/internal/keyword?categoryId=" + categoryId)
     .then(response => {
       const category = state.categories.find(c => c.id === categoryId);
       setState(prevState => ({
@@ -105,7 +105,7 @@ const KeywordSettings = props => {
   const handleKeywordSubmit = () => {
 
     let keyword = state.selectedKeyword;
-    const url = "/api/keyword/" + (keyword.id || "");
+    const url = "/api/internal/keyword/" + (keyword.id || "");
     const method = !!keyword.id ? "put" : "post";
     console.log(keyword);
     console.log(url);

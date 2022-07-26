@@ -23,7 +23,7 @@ export const SelectableUserStatusButton = props => {
 
   const handleChange = (e) => {
     const active = e.target.dataset.value === statuses.ACTIVE;
-    axios.post("/api/user/" + userId + "/status?active=" + active)
+    axios.post("/api/internal/user/" + userId + "/status?active=" + active)
     .then(() => window.location.reload())
     .catch(e => {
       swal(

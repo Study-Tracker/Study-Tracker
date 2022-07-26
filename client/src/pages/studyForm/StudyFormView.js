@@ -40,7 +40,7 @@ const StudyFormView = props => {
   useEffect(() => {
 
     // Programs
-    axios.get("/api/program")
+    axios.get("/api/internal/program")
     .then(response => {
       setState(prevState => ({
         ...prevState,
@@ -56,7 +56,7 @@ const StudyFormView = props => {
     });
 
     // Contacts
-    axios.get("/api/collaborator")
+    axios.get("/api/internal/collaborator")
     .then(response => {
       setState(prevState => ({
         ...prevState,
@@ -72,7 +72,7 @@ const StudyFormView = props => {
     });
 
     // Keyword categories
-    axios.get("/api/keyword-category")
+    axios.get("/api/internal/keyword-category")
     .then(response => {
       setState(prevState => ({
         ...prevState,
@@ -96,7 +96,7 @@ const StudyFormView = props => {
     });
 
     // Entry Templates
-    axios.get("/api/notebookentrytemplate?category=STUDY&active=true")
+    axios.get("/api/internal/notebookentrytemplate?category=STUDY&active=true")
     .then(response => {
       const defaultNotebookTemplate = response.data.find(o => o.default === true);
       setState(prevState => ({
@@ -117,7 +117,7 @@ const StudyFormView = props => {
 
     // Selected study
     if (!!state.studyCode) {
-      axios.get("/api/study/" + state.studyCode)
+      axios.get("/api/internal/study/" + state.studyCode)
       .then(response => {
         console.debug(response.data);
         setState(prevState => ({

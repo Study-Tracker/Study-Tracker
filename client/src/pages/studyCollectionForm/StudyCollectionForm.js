@@ -37,8 +37,8 @@ const StudyCollectionForm = props => {
 
     const isUpdate = !!values.id;
     const url = isUpdate
-        ? "/api/studycollection/" + values.id
-        : "/api/studycollection";
+        ? "/api/internal/studycollection/" + values.id
+        : "/api/internal/studycollection";
 
     axios({
       url: url,

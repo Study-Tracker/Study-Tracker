@@ -18,7 +18,7 @@ const StudyCollectionFormView = props => {
   const user = useSelector(s => s.user.value);
 
   useEffect(() => {
-    axios.get("/api/studycollection")
+    axios.get("/api/internal/studycollection")
     .then(response => {
       if (!!state.collectionId) {
         const collection = response.data.find(

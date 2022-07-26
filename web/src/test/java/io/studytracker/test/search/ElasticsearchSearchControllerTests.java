@@ -76,7 +76,7 @@ public class ElasticsearchSearchControllerTests {
   public void searchStudies() throws Exception {
 
     mockMvc
-        .perform(get("/api/search?keyword=legacy").with(user(username)))
+        .perform(get("/api/internal/search?keyword=legacy").with(user(username)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("numHits")))

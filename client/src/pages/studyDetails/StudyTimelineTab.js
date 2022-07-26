@@ -29,7 +29,7 @@ const StudyTimelineTab = props => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/study/" + study.code + "/activity")
+    axios.get("/api/internal/study/" + study.code + "/activity")
     .then(response => setActivity(response.data))
     .catch(e => {
       setError(e);

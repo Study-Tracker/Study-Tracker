@@ -90,7 +90,7 @@ public class WebSecurityConfiguration {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-      http.antMatcher("/api/public/**")
+      http.antMatcher("/api/v1/**")
           .csrf().disable()
           .httpBasic().disable()
           .cors()

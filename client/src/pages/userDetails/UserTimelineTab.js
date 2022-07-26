@@ -28,7 +28,7 @@ const UserTimelineTab = props => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/user/" + targetUser.id + "/activity")
+    axios.get("/api/internal/user/" + targetUser.id + "/activity")
     .then(response => {
       setActivity(response.data);
     })

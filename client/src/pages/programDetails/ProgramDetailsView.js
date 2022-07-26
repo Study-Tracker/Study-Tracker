@@ -34,10 +34,10 @@ const ProgramDetailsView = props => {
   });
 
   useEffect(() => {
-    axios.get("/api/program/" + state.programId)
+    axios.get("/api/internal/program/" + state.programId)
     .then(async response => {
       const program = response.data;
-      axios.get("/api/study?program=" + program.id)
+      axios.get("/api/internal/study?program=" + program.id)
       .then(response2 => {
         const studies = response2.data;
         setState(prevState => ({

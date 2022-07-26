@@ -36,7 +36,7 @@ const UserFormView = props => {
   useEffect(() => {
 
     // Programs
-    axios.get("/api/user")
+    axios.get("/api/internal/user")
     .then(response => {
       const users = response.data;
       if (!!state.userId) {

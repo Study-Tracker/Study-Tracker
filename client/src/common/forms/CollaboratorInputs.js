@@ -46,7 +46,7 @@ const CollaboratorInputs = ({
   const [newCollaborator, setNewCollaborator] = useState(newCollaboratorDefaults);
 
   useEffect(() => {
-    axios.get("/api/collaborator")
+    axios.get("/api/internal/collaborator")
     .then(response => {
       setCollaborators(response.data.map(collaborator => {
         return {
@@ -104,7 +104,7 @@ const CollaboratorInputs = ({
       return;
     }
 
-    return axios.get("/api/collaborator?label=" + c.label)
+    return axios.get("/api/internal/collaborator?label=" + c.label)
     .then(response => {
       if (response.data.length > 0) {
         setModalState(prevState => ({
@@ -114,7 +114,7 @@ const CollaboratorInputs = ({
         return;
       }
       axios({
-        url: "/api/collaborator",
+        url: "/api/internal/collaborator",
         method: "post",
         headers: {
           'Content-Type': 'application/json',

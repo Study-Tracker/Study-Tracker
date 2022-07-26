@@ -42,7 +42,7 @@ const StudyCollectionDetailsView = props => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/studycollection/" + state.collection.id + "/" + id)
+        axios.delete("/api/internal/studycollection/" + state.collection.id + "/" + id)
         .then(response => {
           let collection = state.collection;
           collection.studies = collection.studies.filter(s => s.id === id);
@@ -60,7 +60,7 @@ const StudyCollectionDetailsView = props => {
   }
 
   useEffect(() => {
-    axios.get("/api/studycollection/" + state.collectionId)
+    axios.get("/api/internal/studycollection/" + state.collectionId)
     .then(response => {
       setState(prevState => ({
         ...prevState,

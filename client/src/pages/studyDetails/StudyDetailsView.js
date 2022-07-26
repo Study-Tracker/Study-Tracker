@@ -36,7 +36,7 @@ const StudyDetailsView = props => {
   const features = useSelector(s => s.features.value);
 
   useEffect(() => {
-    axios.get("/api/study/" + state.studyCode)
+    axios.get("/api/internal/study/" + state.studyCode)
     .then(response => {
 
       setState(prevState => ({

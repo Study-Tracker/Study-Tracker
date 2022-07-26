@@ -95,8 +95,8 @@ const AssayTypeForm = props => {
 
     const isUpdate = !!values.id;
     const url = isUpdate
-        ? "/api/assaytype/" + values.id
-        : "/api/assaytype";
+        ? "/api/internal/assaytype/" + values.id
+        : "/api/internal/assaytype";
 
     axios({
       url: url,

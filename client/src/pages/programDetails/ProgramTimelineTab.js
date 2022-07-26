@@ -29,7 +29,7 @@ const ProgramTimelineTab = props => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/program/" + program.id + "/activity")
+    axios.get("/api/internal/program/" + program.id + "/activity")
     .then(response => {
       setActivity(response.data);
     })

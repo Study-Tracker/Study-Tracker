@@ -28,7 +28,7 @@ const StudyInputs = props => {
   const {studies, onChange} = props;
 
   const studyAutocomplete = (input, callback) => {
-    axios.get("/api/autocomplete/study?q=" + input)
+    axios.get("/api/internal/autocomplete/study?q=" + input)
     .then(response => {
       const options = response.data
       .sort((a, b) => {

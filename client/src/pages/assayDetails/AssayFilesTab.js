@@ -36,7 +36,7 @@ const AssayFilesTab = props => {
   }
 
   const refreshData = () => {
-    axios.get("/api/assay/" + assay.code + "/storage")
+    axios.get("/api/internal/assay/" + assay.code + "/storage")
     .then(response => {
       setFolder(response.data);
     })
@@ -51,7 +51,7 @@ const AssayFilesTab = props => {
     const requests = files.map(file => {
       const data = new FormData();
       data.append("file", file);
-      return axios.post('/api/assay/' + assay.code + '/storage', data);
+      return axios.post('/api/internal/assay/' + assay.code + '/storage', data);
     });
     Promise.all(requests)
     .then(() => {

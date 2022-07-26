@@ -41,7 +41,7 @@ const StudyCommentsTab = props => {
   const handleFormSubmit = (values, {resetForm, setSubmitting}) => {
     console.debug("commentFormValues", values);
     setSubmitting(true);
-    axios.post("/api/study/" + study.code + "/comments", values)
+    axios.post("/api/internal/study/" + study.code + "/comments", values)
     .then(response => {
       const newComment = response.data;
       setComments([...comments, newComment]);
@@ -66,7 +66,7 @@ const StudyCommentsTab = props => {
   }
 
   const handleCommentUpdate = (comment) => {
-    axios.put("/api/study/" + study.code + "/comments/" + comment.id, comment)
+    axios.put("/api/internal/study/" + study.code + "/comments/" + comment.id, comment)
     .then(response => {
       let updated = [...comments];
       for (let i = 0; i < updated.length; i++) {
@@ -92,7 +92,7 @@ const StudyCommentsTab = props => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/study/" + study.code + "/comments/" + comment.id)
+        axios.delete("/api/internal/study/" + study.code + "/comments/" + comment.id)
         .then(response => {
           const updated = comments.filter(c => c.id !== comment.id);
           setComments(updated);

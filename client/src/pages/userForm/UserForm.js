@@ -71,8 +71,8 @@ const UserForm = props => {
 
     const isUpdate = !!values.id;
     const url = isUpdate
-        ? "/api/user/" + values.id
-        : "/api/user";
+        ? "/api/internal/user/" + values.id
+        : "/api/internal/user";
 
     axios({
       url: url,

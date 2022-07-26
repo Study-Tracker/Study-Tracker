@@ -50,13 +50,13 @@ const FrontPageView = props => {
       query = "?search=" + params.search;
     }
 
-    axios.get("/api/activity?sort=" + sort + "&page=" + page + "&size=" + size)
+    axios.get("/api/internal/activity?sort=" + sort + "&page=" + page + "&size=" + size)
     .then(r1 => {
       const activityPage = r1.data;
-      axios.get("/api/stats/frontpage")
+      axios.get("/api/internal/stats/frontpage")
       .then(r2 => {
         const stats = r2.data;
-        axios.get("/api/stats/user")
+        axios.get("/api/internal/stats/user")
         .then(r3 => {
           setState(prevState => ({
             ...prevState,

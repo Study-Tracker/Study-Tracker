@@ -37,10 +37,10 @@ const AssayDetailsView = props => {
   });
 
   useEffect(() => {
-    axios.get("/api/study/" + state.studyCode)
+    axios.get("/api/internal/study/" + state.studyCode)
     .then(async response => {
       const study = response.data;
-      axios.get("/api/study/" + state.studyCode + "/assays/"
+      axios.get("/api/internal/study/" + state.studyCode + "/assays/"
           + state.assayCode)
       .then(response2 => {
         const assay = response2.data;

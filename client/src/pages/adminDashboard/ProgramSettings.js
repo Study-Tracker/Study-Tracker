@@ -55,7 +55,7 @@ const ProgramSettings = props => {
   };
 
   useEffect(() => {
-    axios.get("/api/program?details=true")
+    axios.get("/api/internal/program?details=true")
     .then(async response => {
       setState(prevState => ({
         ...prevState,
@@ -358,7 +358,7 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
               <p>
                 <RepairableStorageFolderLink
                     folder={program.storageFolder}
-                    repairUrl={"/api/program/" + program.id + "/storage/repair"}
+                    repairUrl={"/api/internal/program/" + program.id + "/storage/repair"}
                 />
               </p>
             </Col>
@@ -368,7 +368,7 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
               <p>
                 <RepairableNotebookFolderLink
                     folder={program.notebookFolder}
-                    repairUrl={"/api/program/" + program.id + "/notebook/repair"}
+                    repairUrl={"/api/internal/program/" + program.id + "/notebook/repair"}
                 />
               </p>
             </Col>

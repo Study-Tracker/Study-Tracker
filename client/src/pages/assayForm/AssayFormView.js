@@ -37,7 +37,7 @@ const AssayFormView = props => {
 
   useEffect(async () => {
 
-    const study = await axios.get("/api/study/" + state.studyCode)
+    const study = await axios.get("/api/internal/study/" + state.studyCode)
     .then(async response => await response.data)
     .catch(error => {
       console.error(error);
@@ -51,7 +51,7 @@ const AssayFormView = props => {
     let assay = null;
     if (!!state.assayCode) {
 
-      assay = await axios.get("/api/assay/" + state.assayCode)
+      assay = await axios.get("/api/internal/assay/" + state.assayCode)
       .then(async response => await response.data)
       .catch(error => {
         console.error(error);
@@ -64,7 +64,7 @@ const AssayFormView = props => {
 
     }
 
-    const assayTypes = await axios.get("/api/assaytype/")
+    const assayTypes = await axios.get("/api/internal/assaytype/")
     .then(async response => await response.data)
     .catch(error => {
       console.error(error);
@@ -76,7 +76,7 @@ const AssayFormView = props => {
     });
 
     const notebookTemplates = await axios.get(
-        "/api/notebookentrytemplate?category=ASSAY&active=true")
+        "/api/internal/notebookentrytemplate?category=ASSAY&active=true")
     .then(async response => await response.data)
     .catch(error => {
       console.error(error);

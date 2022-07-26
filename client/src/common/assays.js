@@ -107,7 +107,7 @@ export const AssaySummaryCards = props => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    axios.get("/api/study/" + studyCode + "/assays")
+    axios.get("/api/internal/study/" + studyCode + "/assays")
     .then(response => {
       console.debug(response.data);
       setAssays(response.data);

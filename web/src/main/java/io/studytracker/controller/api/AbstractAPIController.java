@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-abstract class AbstractAPIController {
+public abstract class AbstractAPIController {
 
   private AppUserDetailsService userDetailsService;
 
@@ -18,7 +18,7 @@ abstract class AbstractAPIController {
    *
    * @return the currently logged in user
    */
-  User getAuthenticatedUser() {
+  protected User getAuthenticatedUser() {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     try {
       AppUserDetails userDetails = userDetailsService.loadUserByUsername(username);

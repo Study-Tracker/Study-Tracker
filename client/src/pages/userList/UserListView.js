@@ -77,7 +77,7 @@ const UserListView = props => {
       title: title
     }));
 
-    axios.get("/api/user")
+    axios.get("/api/internal/user")
     .then(async response => {
       indexUsers(response.data);
     })

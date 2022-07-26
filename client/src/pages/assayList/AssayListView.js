@@ -49,7 +49,7 @@ const AssayListView = props => {
       title = 'Search Results';
     }
 
-    axios.get("/api/assay" + query)
+    axios.get("/api/internal/assay" + query)
     .then(response => {
 
       console.log(response.data);

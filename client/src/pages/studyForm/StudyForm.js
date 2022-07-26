@@ -121,8 +121,8 @@ const StudyForm = props => {
 
     const isUpdate = !!values.id;
     const url = isUpdate
-        ? "/api/study/" + values.id
-        : "/api/study";
+        ? "/api/internal/study/" + values.id
+        : "/api/internal/study";
 
     axios({
       url: url,

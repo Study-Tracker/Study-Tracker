@@ -38,12 +38,12 @@ const ProgramFormView = props => {
   useEffect(() => {
 
     // Programs
-    axios.get("/api/program")
+    axios.get("/api/internal/program")
     .then(async response => {
       const programs = response.data;
       if (!!state.programId) {
 
-        const program = await axios.get("/api/program/" + state.programId)
+        const program = await axios.get("/api/internal/program/" + state.programId)
         .then(response => response.data);
         console.log(program);
 

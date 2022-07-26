@@ -98,8 +98,8 @@ const AssayForm = props => {
     console.debug("Submit values: ", values);
     const isUpdate = !!values.id;
     const url = isUpdate
-        ? '/api/study/' + study.code + '/assays/' + values.id
-        : '/api/study/' + study.code + '/assays'
+        ? '/api/internal/study/' + study.code + '/assays/' + values.id
+        : '/api/internal/study/' + study.code + '/assays'
 
     // Sort the tasks
     if (!!values.tasks && values.tasks.length > 0) {

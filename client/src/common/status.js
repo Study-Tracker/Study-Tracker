@@ -45,9 +45,9 @@ export const SelectableStatusButton = props => {
   const handleChange = (e) => {
     let url = null;
     if (!!props.studyId) {
-      url = "/api/study/" + props.studyId + "/status";
+      url = "/api/internal/study/" + props.studyId + "/status";
     } else if (!!props.assayId) {
-      url = "/api/assay/" + props.assayId + "/status"
+      url = "/api/internal/assay/" + props.assayId + "/status"
     }
     axios.post(url, {status: e.target.dataset.value})
     .then(() => window.location.reload())

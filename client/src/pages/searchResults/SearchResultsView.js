@@ -39,7 +39,7 @@ const SearchResultsView = props => {
       query = "?keyword=" + searchParams.get("q");
     }
 
-    axios.get("/api/search" + query)
+    axios.get("/api/internal/search" + query)
     .then(response => {
 
       console.debug(response.data);

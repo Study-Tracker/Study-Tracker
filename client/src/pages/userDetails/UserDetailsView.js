@@ -32,10 +32,10 @@ const UserDetailsView = props => {
   });
 
   useEffect(() => {
-    axios.get("/api/user/" + state.userId)
+    axios.get("/api/internal/user/" + state.userId)
     .then(async response => {
       const user = response.data;
-      axios.get("/api/study?user=" + user.id)
+      axios.get("/api/internal/study?user=" + user.id)
       .then(r2 => {
         setState(prevState => ({
           ...prevState,

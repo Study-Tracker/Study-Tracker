@@ -80,7 +80,7 @@ const ProgramListView = props => {
       title: title
     }));
 
-    axios.get("/api/program")
+    axios.get("/api/internal/program")
     .then(async response => {
       indexPrograms(response.data);
     })

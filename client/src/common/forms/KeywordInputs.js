@@ -46,7 +46,7 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
   const handleKeywordSelect = (selected) => {
     console.debug(selected);
     if (selected.__isNew__) {
-      axios.post("/api/keyword", {
+      axios.post("/api/internal/keyword", {
           keyword: selected.label,
           category: selectedCategory
         })
@@ -71,7 +71,7 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
   }
 
   const keywordAutocomplete = (input, callback) => {
-    axios.get('/api/keyword/?q=' + input
+    axios.get('/api/internal/keyword/?q=' + input
         + (!!selectedCategory ? "&categoryId=" + selectedCategory.id : ''))
     .then(response => {
       const kw = response.data.map(k => {

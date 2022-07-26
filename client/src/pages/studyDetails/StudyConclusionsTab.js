@@ -41,7 +41,7 @@ const StudyConclusionsTab = props => {
 
   const handleFormSubmit = (values, {setSubmitting}) => {
     axios({
-      url: "/api/study/" + props.study.code + "/conclusions",
+      url: "/api/internal/study/" + props.study.code + "/conclusions",
       method: !!values.id ? 'put' : 'post',
       data: values
     })

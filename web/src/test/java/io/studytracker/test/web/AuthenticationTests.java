@@ -111,8 +111,8 @@ public class AuthenticationTests {
   @Test
   public void accessOpenEndpointTest() throws Exception {
     mockMvc
-        .perform(MockMvcRequestBuilders.get("/api/study/"))
-        .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+        .perform(MockMvcRequestBuilders.get("/api/internal/study/"))
+        .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
   }
 
   @Test
@@ -150,11 +150,11 @@ public class AuthenticationTests {
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/study")
+            MockMvcRequestBuilders.post("/api/internal/study")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(study)))
-        .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+        .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
   }
 
   @Test
@@ -180,7 +180,7 @@ public class AuthenticationTests {
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/study")
+            MockMvcRequestBuilders.post("/api/internal/study")
                 .with(user(user.getEmail()))
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)

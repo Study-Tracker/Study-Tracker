@@ -27,7 +27,7 @@ const StudyCollectionsTab = props => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/study/" + study.id + "/studycollection")
+    axios.get("/api/internal/study/" + study.id + "/studycollection")
     .then(response => {
       setCollections(response.data);
     }).catch(error => {

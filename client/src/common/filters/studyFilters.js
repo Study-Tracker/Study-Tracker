@@ -40,7 +40,7 @@ const StudyFilters = props => {
 
   useEffect(() => {
     dispatch(setFilters(defaults));
-    axios.get("/api/program")
+    axios.get("/api/internal/program")
     .then(response => {
 
       const programs = response.data.sort((a, b) => {

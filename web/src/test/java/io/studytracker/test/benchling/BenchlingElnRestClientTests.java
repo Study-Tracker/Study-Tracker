@@ -261,7 +261,7 @@ public class BenchlingElnRestClientTests {
     params.set(
         "nextToken",
         "W3siX19iZW5jaGxpbmdUeXBlIjogImRhdGV0aW1lIiwgInZhbHVlIjogIjIwMjEtMDctMjRUMDM6MTc6MTUuNjk4NjE0In0sICJlbnRfZE9ZQW4wdXQiXQ==");
-    URL url = new URL(rootUrl, "/api/v2/users");
+    URL url = new URL(rootUrl, "/api/internal/v2/users");
     UriComponentsBuilder uriComponentsBuilder =
         UriComponentsBuilder.fromHttpUrl(url.toString()).queryParams(params);
     UriComponents components = uriComponentsBuilder.build().encode();

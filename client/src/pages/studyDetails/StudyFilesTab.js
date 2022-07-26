@@ -36,7 +36,7 @@ const StudyFilesTabContent = props => {
   }
 
   const refreshData = () => {
-    axios.get("/api/study/" + study.id + "/storage")
+    axios.get("/api/internal/study/" + study.id + "/storage")
     .then(response => setFolder(response.data))
     .catch(e => {
       console.error(e);
@@ -49,7 +49,7 @@ const StudyFilesTabContent = props => {
     const requests = files.map(file => {
       const data = new FormData();
       data.append("file", file);
-      return axios.post('/api/study/' + study.id + '/storage', data);
+      return axios.post('/api/internal/study/' + study.id + '/storage', data);
     });
     Promise.all(requests)
     .then(() => {

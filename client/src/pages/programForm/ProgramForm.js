@@ -101,8 +101,8 @@ const ProgramForm = props => {
     console.debug(values);
     const isUpdate = !!values.id;
     const url = isUpdate
-        ? "/api/program/" + values.id
-        : "/api/program";
+        ? "/api/internal/program/" + values.id
+        : "/api/internal/program";
     setShowLoadingOverlay(true);
 
     axios({

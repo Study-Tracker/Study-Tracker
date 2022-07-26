@@ -91,7 +91,7 @@ export const TemplateFormView = (props) => {
                     return errors;
                   }}
                   onSubmit={(values, {setSubmitting}) => {
-                    axios.post('/api/entryTemplate', values)
+                    axios.post('/api/internal/entryTemplate', values)
                     .then(async response => {
                       if (response.status === 200 || response.status === 201) {
                         setTimeout(() => {

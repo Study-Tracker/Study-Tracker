@@ -38,7 +38,7 @@ const resetUserPassword = (user) => {
   })
   .then(val => {
     if (val) {
-      axios.post("/api/user/" + user["id"] + "/password-reset")
+      axios.post("/api/internal/user/" + user["id"] + "/password-reset")
       .then(response => {
         swal("Password reset successful",
             "A notification email has been sent to the user.",
@@ -65,7 +65,7 @@ const toggleUserActive = (user, active) => {
   })
   .then(val => {
     if (val) {
-      axios.post("/api/user/" + user["id"] + "/status?active=" + active)
+      axios.post("/api/internal/user/" + user["id"] + "/status?active=" + active)
       .then(response => {
         swal("User " + (!!active ? "enabled" : "disabled"),
             "Refresh the page to view the updated user information.",
@@ -103,7 +103,7 @@ const UserSettings = props => {
   }
 
   useEffect(() => {
-    axios.get("/api/user")
+    axios.get("/api/internal/user")
     .then(async response => {
       setState(prevState => ({
         ...prevState,

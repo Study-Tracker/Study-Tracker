@@ -51,7 +51,7 @@ const AssayTypeSettings = props => {
   }
 
   const toggleActive = (selected) => {
-    axios.patch("/api/assaytype/" + selected.id)
+    axios.patch("/api/internal/assaytype/" + selected.id)
     .then(response => {
       if (response.status === 200) {
         let assayTypes = state.assayTypes;
@@ -74,7 +74,7 @@ const AssayTypeSettings = props => {
   }
 
   useEffect(() => {
-    axios.get("/api/assaytype")
+    axios.get("/api/internal/assaytype")
     .then(response => {
       setState(prevState => ({
         ...prevState,
