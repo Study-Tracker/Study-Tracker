@@ -76,7 +76,7 @@ public class ProgramService {
   }
 
   @Transactional
-  public void create(Program program) {
+  public Program create(Program program) {
     LOGGER.info("Creating new program with name: " + program.getName());
 
     program.setCreatedAt(new Date());
@@ -102,7 +102,8 @@ public class ProgramService {
       program.setNotebookFolder(null);
     }
 
-    programRepository.save(program);
+    return programRepository.save(program);
+
   }
 
   @Transactional

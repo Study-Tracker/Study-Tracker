@@ -32,13 +32,15 @@ public abstract class AbstractProgramController extends AbstractApiController {
     }
 
     // Create the new program
-    this.getProgramService().create(program);
+    program = this.getProgramService().create(program);
+    Program created = this.getProgramService().findById(program.getId())
+        .orElseThrow(RecordNotFoundException::new);
 
     // Publish events
-    Activity activity = ProgramActivityUtils.fromNewProgram(program, user);
+    Activity activity = ProgramActivityUtils.fromNewProgram(created, user);
     this.logActivity(activity);
 
-    return program;
+    return created;
   }
 
   /**
@@ -110,4 +112,5 @@ public abstract class AbstractProgramController extends AbstractApiController {
   public void setProgramMapper(ProgramMapper programMapper) {
     this.programMapper = programMapper;
   }
+
 }
