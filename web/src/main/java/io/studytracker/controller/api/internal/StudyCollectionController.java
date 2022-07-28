@@ -1,6 +1,6 @@
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.controller.api.AbstractAPIController;
+import io.studytracker.controller.api.AbstractApiController;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.StudyCollectionActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/studycollection")
-public class StudyCollectionController extends AbstractAPIController {
+public class StudyCollectionController extends AbstractApiController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyCollectionController.class);
 

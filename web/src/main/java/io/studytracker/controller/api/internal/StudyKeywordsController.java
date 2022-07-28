@@ -19,7 +19,7 @@ package io.studytracker.controller.api.internal;
 import io.studytracker.controller.api.AbstractStudyController;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.mapstruct.dto.form.KeywordFormDto;
-import io.studytracker.mapstruct.dto.response.KeywordDto;
+import io.studytracker.mapstruct.dto.response.KeywordDetailsDto;
 import io.studytracker.mapstruct.mapper.KeywordMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Keyword;
@@ -52,7 +52,7 @@ public class StudyKeywordsController extends AbstractStudyController {
   @Autowired private KeywordMapper keywordMapper;
 
   @GetMapping("")
-  public List<KeywordDto> getStudyKeywords(@PathVariable("studyId") String studyId) {
+  public List<KeywordDetailsDto> getStudyKeywords(@PathVariable("studyId") String studyId) {
     Study study = getStudyFromIdentifier(studyId);
     return keywordMapper.toDtoList(studyKeywordsService.findStudyKeywords(study));
   }

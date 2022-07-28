@@ -1,6 +1,6 @@
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.controller.api.AbstractAPIController;
+import io.studytracker.controller.api.AbstractApiController;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.EntryTemplateActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/internal/notebookentrytemplate")
-public class NotebookEntryTemplateController extends AbstractAPIController {
+public class NotebookEntryTemplateController extends AbstractApiController {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(NotebookEntryTemplateController.class);

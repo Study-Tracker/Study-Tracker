@@ -19,7 +19,7 @@ package io.studytracker.controller.api.internal;
 import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.KeywordFormDto;
-import io.studytracker.mapstruct.dto.response.KeywordDto;
+import io.studytracker.mapstruct.dto.response.KeywordDetailsDto;
 import io.studytracker.mapstruct.mapper.KeywordMapper;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.KeywordCategory;
@@ -57,7 +57,7 @@ public class KeywordController {
   @Autowired private KeywordMapper keywordMapper;
 
   @GetMapping("")
-  public List<KeywordDto> findAll(
+  public List<KeywordDetailsDto> findAll(
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false, value = "q") String query) {
     List<Keyword> keywords;
@@ -74,7 +74,7 @@ public class KeywordController {
   }
 
   @GetMapping("/{id}")
-  public KeywordDto findById(@PathVariable("id") Long keywordId) throws RecordNotFoundException {
+  public KeywordDetailsDto findById(@PathVariable("id") Long keywordId) throws RecordNotFoundException {
     Optional<Keyword> optional = keywordService.findById(keywordId);
     if (optional.isPresent()) {
       return keywordMapper.toDto(optional.get());
@@ -84,7 +84,7 @@ public class KeywordController {
   }
 
   @PostMapping("")
-  public HttpEntity<KeywordDto> create(@RequestBody @Valid KeywordFormDto dto) {
+  public HttpEntity<KeywordDetailsDto> create(@RequestBody @Valid KeywordFormDto dto) {
 
     LOGGER.info("Creating keyword");
     LOGGER.info(dto.toString());
@@ -109,8 +109,8 @@ public class KeywordController {
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<KeywordDto> update(
-      @PathVariable("id") Long id, @RequestBody @Valid KeywordDto dto) {
+  public HttpEntity<KeywordDetailsDto> update(
+      @PathVariable("id") Long id, @RequestBody @Valid KeywordDetailsDto dto) {
     LOGGER.info("Updating keyword");
     LOGGER.info(dto.toString());
     Keyword updated = keywordMapper.fromDto(dto);

@@ -1,5 +1,6 @@
 package io.studytracker.mapstruct.mapper;
 
+import io.studytracker.mapstruct.dto.api.ActivityDto;
 import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
 import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
 import io.studytracker.model.Activity;
@@ -24,16 +25,15 @@ public interface ActivityMapper {
   @Mapping(source = "assay.id", target = "assayId")
   ActivitySummaryDto toActivitySummary(Activity activity);
 
-  //  @Mapping(source = "program.id", target = "programId")
-  //  @Mapping(source = "study.id", target = "studyId")
-  //  @Mapping(source = "assay.id", target = "assayId")
   List<ActivitySummaryDto> toActivitySummaryList(List<Activity> activities);
 
-  //  @Mapping(source = "program.id", target = "programId")
-  //  @Mapping(source = "study.id", target = "studyId")
-  //  @Mapping(source = "assay.id", target = "assayId")
   default Page<ActivitySummaryDto> toActivitySummaryPage(Page<Activity> page) {
     List<ActivitySummaryDto> dtos = this.toActivitySummaryList(page.getContent());
     return new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
   }
+
+  // API
+  List<ActivityDto> toActivityDtoList(List<Activity> activities);
+  ActivityDto toActivityDto(Activity activity);
+
 }

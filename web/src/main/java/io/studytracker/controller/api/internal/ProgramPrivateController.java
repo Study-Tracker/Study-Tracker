@@ -16,22 +16,21 @@
 
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.controller.api.AbstractAPIController;
+import io.studytracker.controller.api.AbstractProgramController;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.ProgramActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
-import io.studytracker.mapstruct.mapper.ProgramMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
-import io.studytracker.service.ProgramService;
 import io.studytracker.service.UserService;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
@@ -59,19 +58,15 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/internal/program")
-public class ProgramController extends AbstractAPIController {
+public class ProgramPrivateController extends AbstractProgramController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProgramController.class);
-
-  @Autowired private ProgramService programService;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProgramPrivateController.class);
 
   @Autowired private UserService userService;
 
   @Autowired private ActivityService activityService;
 
   @Autowired private EventsService eventsService;
-
-  @Autowired private ProgramMapper programMapper;
 
   @Autowired private ActivityMapper activityMapper;
 
@@ -83,95 +78,45 @@ public class ProgramController extends AbstractAPIController {
   @GetMapping("")
   public List<?> getAllPrograms(
       @RequestParam(required = false, name = "details") boolean showDetails) throws Exception {
-    List<Program> programs = programService.findAll();
+    List<Program> programs = this.getProgramService().findAll();
     if (showDetails) {
-      return programMapper.toProgramDetailsList(programs);
+      return this.getProgramMapper().toProgramDetailsList(programs);
     } else {
-      return programMapper.toProgramSummaryList(programs);
+      return this.getProgramMapper().toProgramSummaryList(programs);
     }
   }
 
   @GetMapping("/{id}")
   public ProgramDetailsDto getProgram(@PathVariable("id") Long programId) throws Exception {
-    Optional<Program> optional = programService.findById(programId);
+    Optional<Program> optional = this.getProgramService().findById(programId);
     if (optional.isPresent()) {
-      return programMapper.toProgramDetails(optional.get());
+      return this.getProgramMapper().toProgramDetails(optional.get());
     } else {
       throw new RecordNotFoundException("Could not find program: " + programId);
     }
   }
 
   @PostMapping("")
-  public HttpEntity<ProgramDetailsDto> createProgram(@RequestBody @Valid ProgramDetailsDto dto) {
-
+  public HttpEntity<ProgramDetailsDto> createProgram(@RequestBody @Valid ProgramFormDto dto) {
     LOGGER.info("Creating new program: " + dto.toString());
-    User user = this.getAuthenticatedUser();
-    if (!user.isAdmin()) {
-      throw new InsufficientPrivilegesException(
-          "You do not have permission to perform this action.");
-    }
-
-    Program program = programMapper.fromProgramDetails(dto);
-    programService.create(program);
-
-    // Publish events
-    Activity activity = ProgramActivityUtils.fromNewProgram(program, user);
-    activityService.create(activity);
-    eventsService.dispatchEvent(activity);
-
-    return new ResponseEntity<>(programMapper.toProgramDetails(program), HttpStatus.CREATED);
+    Program program = this.createNewProgram(this.getProgramMapper().fromProgramFormDto(dto));
+    return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
   public HttpEntity<ProgramDetailsDto> updateProgram(
       @PathVariable("id") Long programId,
-      @RequestBody @Valid ProgramDetailsDto dto
+      @RequestBody @Valid ProgramFormDto dto
   ) {
-
-    User user = this.getAuthenticatedUser();
-    if (!user.isAdmin()) {
-      throw new InsufficientPrivilegesException(
-          "You do not have permission to perform this action.");
-    }
-
-    if (!programService.exists(programId)) {
-      throw new RecordNotFoundException("Could not find program: " + programId);
-    }
-
-    Program program = programMapper.fromProgramDetails(dto);
-    programService.update(program);
-
-    // Publish events
-    Activity activity = ProgramActivityUtils.fromUpdatedProgram(program, user);
-    activityService.create(activity);
-    eventsService.dispatchEvent(activity);
-
-    return new ResponseEntity<>(programMapper.toProgramDetails(program), HttpStatus.OK);
+    LOGGER.info("Updating program: " + programId);
+    Program program = this.updateExistingProgram(this.getProgramMapper().fromProgramFormDto(dto));
+    return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> deleteProgram(@PathVariable("id") Long programId) {
-
-    // Get authenticated user
-    User user = this.getAuthenticatedUser();
-    if (!user.isAdmin()) {
-      throw new InsufficientPrivilegesException(
-          "You do not have permission to perform this action.");
-    }
-
-    if (!programService.exists(programId)) {
-      throw new RecordNotFoundException("Could not find program: " + programId);
-    }
-
-    //    program.setLastModifiedBy(user);
-    programService.delete(programId);
-
-    // Publish events
-    Program program = programService.findById(programId).orElseThrow(RecordNotFoundException::new);
-    Activity activity = ProgramActivityUtils.fromDeletedProgram(program, user);
-    activityService.create(activity);
-    eventsService.dispatchEvent(activity);
-
+    LOGGER.info("Deleting program: " + programId);
+    this.deleteExistingProgram(programId);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -187,15 +132,14 @@ public class ProgramController extends AbstractAPIController {
           "You do not have permission to perform this action.");
     }
 
-    Optional<Program> optional = programService.findById(programId);
+    Optional<Program> optional = this.getProgramService().findById(programId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
 
-    //    program.setLastModifiedBy(user);
     program.setActive(active);
-    programService.update(program);
+    this.getProgramService().update(program);
 
     // Publish events
     Activity activity = ProgramActivityUtils.fromUpdatedProgram(program, user);
@@ -208,7 +152,7 @@ public class ProgramController extends AbstractAPIController {
   @GetMapping("/{id}/activity")
   public HttpEntity<List<ActivityDetailsDto>> getProgramActivity(
       @PathVariable("id") Long programId) {
-    Optional<Program> optional = programService.findById(programId);
+    Optional<Program> optional = this.getProgramService().findById(programId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
@@ -225,7 +169,7 @@ public class ProgramController extends AbstractAPIController {
    */
   @GetMapping("/{id}/storage")
   public HttpEntity<StorageFolder> getProgramStorageFolder(@PathVariable("id") Long programId) {
-    Optional<Program> optional = programService.findById(programId);
+    Optional<Program> optional = this.getProgramService().findById(programId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
@@ -255,14 +199,14 @@ public class ProgramController extends AbstractAPIController {
     }
 
     // Check that the program exists
-    Optional<Program> optional = programService.findById(programId);
+    Optional<Program> optional = this.getProgramService().findById(programId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
 
     // Repair the storage folder
-    programService.repairStorageFolder(program);
+    this.getProgramService().repairStorageFolder(program);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -270,7 +214,7 @@ public class ProgramController extends AbstractAPIController {
   public NotebookFolder getProgramElnFolder(@PathVariable("id") Long programId) {
 
     // Check that the program exists
-    Optional<Program> optional = programService.findById(programId);
+    Optional<Program> optional = this.getProgramService().findById(programId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
@@ -297,14 +241,14 @@ public class ProgramController extends AbstractAPIController {
     }
 
     // Check that the program exists
-    Optional<Program> optional = programService.findById(programId);
+    Optional<Program> optional = this.getProgramService().findById(programId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
 
     // Repair the folder
-    programService.repairElnFolder(program);
+    this.getProgramService().repairElnFolder(program);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

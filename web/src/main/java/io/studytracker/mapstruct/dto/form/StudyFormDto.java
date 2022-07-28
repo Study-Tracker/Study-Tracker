@@ -5,7 +5,7 @@ import io.studytracker.mapstruct.dto.response.CommentDto;
 import io.studytracker.mapstruct.dto.response.ELNFolderDto;
 import io.studytracker.mapstruct.dto.response.ExternalLinkDto;
 import io.studytracker.mapstruct.dto.response.FileStoreFolderDto;
-import io.studytracker.mapstruct.dto.response.KeywordDto;
+import io.studytracker.mapstruct.dto.response.KeywordDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramSummaryDto;
 import io.studytracker.mapstruct.dto.response.StudyConclusionsDto;
 import io.studytracker.mapstruct.dto.response.StudyRelationshipDetailsDto;
@@ -45,7 +45,7 @@ public class StudyFormDto {
   private Date updatedAt;
   private UserSummaryDto owner;
   private Set<UserSummaryDto> users = new HashSet<>();
-  private Set<KeywordDto> keywords = new HashSet<>();
+  private Set<KeywordDetailsDto> keywords = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
   private Set<ExternalLinkDto> externalLinks = new HashSet<>();
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();

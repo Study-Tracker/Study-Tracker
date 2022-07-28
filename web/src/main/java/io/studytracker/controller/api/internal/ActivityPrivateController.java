@@ -16,12 +16,10 @@
 
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.controller.api.AbstractActivityController;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
 import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
-import io.studytracker.mapstruct.mapper.ActivityMapper;
-import io.studytracker.service.ActivityService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,16 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/internal/activity")
 @RestController
-public class ActivityController {
-
-  @Autowired private ActivityService activityService;
-
-  @Autowired private ActivityMapper activityMapper;
+public class ActivityPrivateController extends AbstractActivityController {
 
   @GetMapping("/{id}")
   public ActivityDetailsDto findById(@PathVariable Long id) {
-    return activityMapper.toActivityDetails(
-        activityService
+    return this.getActivityMapper().toActivityDetails(
+        this.getActivityService()
             .findById(id)
             .orElseThrow(
                 () -> new RecordNotFoundException("Could not find activity record: " + id)));
@@ -48,6 +42,7 @@ public class ActivityController {
 
   @GetMapping(value = "")
   public Page<ActivitySummaryDto> getActivity(Pageable pageable) {
-    return activityMapper.toActivitySummaryPage(activityService.findAll(pageable));
+    return this.getActivityMapper()
+        .toActivitySummaryPage(this.getActivityService().findAll(pageable));
   }
 }

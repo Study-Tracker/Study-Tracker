@@ -31,7 +31,7 @@ public class StudyDetailsDto {
   private Date updatedAt;
   private UserSummaryDto owner;
   private Set<UserSummaryDto> users = new HashSet<>();
-  private Set<KeywordDto> keywords = new HashSet<>();
+  private Set<KeywordDetailsDto> keywords = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
   private Set<ExternalLinkDto> externalLinks = new HashSet<>();
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();

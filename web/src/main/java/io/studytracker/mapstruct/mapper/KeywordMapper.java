@@ -1,7 +1,7 @@
 package io.studytracker.mapstruct.mapper;
 
 import io.studytracker.mapstruct.dto.form.KeywordFormDto;
-import io.studytracker.mapstruct.dto.response.KeywordDto;
+import io.studytracker.mapstruct.dto.response.KeywordDetailsDto;
 import io.studytracker.model.Keyword;
 import java.util.List;
 import java.util.Set;
@@ -9,17 +9,17 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface KeywordMapper {
-  KeywordDto toDto(Keyword keyword);
+  KeywordDetailsDto toDto(Keyword keyword);
 
-  List<KeywordDto> toDtoList(List<Keyword> keywords);
+  List<KeywordDetailsDto> toDtoList(List<Keyword> keywords);
 
-  Set<KeywordDto> toDtoSet(Set<Keyword> keywords);
+  Set<KeywordDetailsDto> toDtoSet(Set<Keyword> keywords);
 
-  Keyword fromDto(KeywordDto dto);
+  Keyword fromDto(KeywordDetailsDto dto);
 
-  List<Keyword> fromDtoList(List<KeywordDto> dtos);
+  List<Keyword> fromDtoList(List<KeywordDetailsDto> dtos);
 
-  Set<Keyword> fromDtoSet(Set<KeywordDto> dtos);
+  Set<Keyword> fromDtoSet(Set<KeywordDetailsDto> dtos);
 
   Keyword fromFormDto(KeywordFormDto dto);
 

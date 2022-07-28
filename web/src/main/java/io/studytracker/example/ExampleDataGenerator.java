@@ -80,20 +80,14 @@ import org.springframework.util.Assert;
 public class ExampleDataGenerator {
 
   public static final int PROGRAM_COUNT = 5;
-
   public static final int USER_COUNT = 3;
-
   public static final int COLLABORATOR_COUNT = 4;
-
   public static final int KEYWORD_COUNT = 7;
-
   public static final int ASSAY_TYPE_COUNT = 2;
-
   public static final int ASSAY_COUNT = 2;
-
   public static final int NOTEBOOK_ENTRY_TEMPLATE_COUNT = 5;
-
   public static final int STUDY_COUNT = 6;
+  public static final int ACTIVITY_COUNT = 13;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 

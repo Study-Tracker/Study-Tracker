@@ -1,6 +1,6 @@
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.controller.api.AbstractAPIController;
+import io.studytracker.controller.api.AbstractApiController;
 import io.studytracker.mapstruct.dto.response.SummaryStatisticsDto;
 import io.studytracker.mapstruct.dto.response.UserStatisticsDto;
 import io.studytracker.service.StatisticsService;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/internal/stats")
 @Hidden
-public class StatisticsController extends AbstractAPIController {
+public class StatisticsController extends AbstractApiController {
 
   private StatisticsService statisticsService;
 

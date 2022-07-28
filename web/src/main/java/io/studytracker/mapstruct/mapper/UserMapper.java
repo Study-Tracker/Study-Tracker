@@ -1,7 +1,8 @@
 package io.studytracker.mapstruct.mapper;
 
+import io.studytracker.mapstruct.dto.api.UserDto;
+import io.studytracker.mapstruct.dto.api.UserPayloadDto;
 import io.studytracker.mapstruct.dto.form.UserFormDto;
-import io.studytracker.mapstruct.dto.response.UserDetailsDto;
 import io.studytracker.mapstruct.dto.response.UserSlimDto;
 import io.studytracker.mapstruct.dto.response.UserSummaryDto;
 import io.studytracker.model.User;
@@ -13,6 +14,8 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
 
   User fromUserForm(UserFormDto dto);
+
+  UserFormDto toUserForm(User dto);
 
   // UserSummary
   User fromUserSummary(UserSummaryDto dto);
@@ -28,17 +31,24 @@ public interface UserMapper {
   List<UserSummaryDto> toUserSummaryList(List<User> users);
 
   // UserDetails
-  User fromUserDetails(UserDetailsDto dto);
+  User fromUserDetails(io.studytracker.mapstruct.dto.response.UserDetailsDto dto);
 
-  List<User> fromUserDetailsList(List<UserDetailsDto> dtos);
+  List<User> fromUserDetailsList(List<io.studytracker.mapstruct.dto.response.UserDetailsDto> dtos);
 
-  UserDetailsDto toUserDetails(User user);
+  io.studytracker.mapstruct.dto.response.UserDetailsDto toUserDetails(User user);
 
-  List<UserDetailsDto> toUserDetailsList(List<User> users);
+  List<io.studytracker.mapstruct.dto.response.UserDetailsDto> toUserDetailsList(List<User> users);
 
   User fromUserSlim(UserSlimDto dto);
 
   UserSlimDto toUserSlim(User user);
 
   List<UserSlimDto> toUserSlimList(List<User> users);
+
+  // API
+  UserDto toUserDetailsApi(User user);
+  List<UserDto> toUserApiDtoList(List<User> users);
+  User fromUserPayload(UserPayloadDto dto);
+
+  UserPayloadDto toUserPayload(User user);
 }
