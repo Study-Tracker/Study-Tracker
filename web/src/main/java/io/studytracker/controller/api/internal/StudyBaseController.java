@@ -17,15 +17,12 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
-import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.eln.StudyNotebookService;
-import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.StudyFormDto;
 import io.studytracker.mapstruct.dto.response.StudyDetailsDto;
 import io.studytracker.mapstruct.dto.response.StudySummaryDto;
-import io.studytracker.model.Activity;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -45,7 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -173,53 +169,31 @@ public class StudyBaseController extends AbstractStudyController {
     return this.getStudyMapper().toStudyDetails(getStudyFromIdentifier(studyId));
   }
 
-  @PostMapping("")
-  public HttpEntity<StudyDetailsDto> createStudy(@RequestBody @Valid StudyFormDto dto) {
-    LOGGER.info("Creating study");
-    LOGGER.info(dto.toString());
-    Study study = this.getStudyMapper().fromStudyForm(dto);
-
-    // Study team
+  private void mapPayloadFields(Study study, StudyFormDto dto) {
     Set<User> team = new HashSet<>();
     for (User u : study.getUsers()) {
       team.add(
-          getUserService()
-              .findById(u.getId())
+          this.getUserService().findById(u.getId())
               .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + u.getId())));
     }
     study.setUsers(team);
 
     // Owner
     study.setOwner(
-        getUserService()
+        this.getUserService()
             .findById(study.getOwner().getId())
             .orElseThrow(
                 () ->
-                    new RecordNotFoundException("Cannot find user: " + study.getOwner().getId())));
+                    new RecordNotFoundException("Cannot find user: " + dto.getOwner().getId())));
 
-    // If a notebook template was requested, find it
-    if (notebookService != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
-      Optional<NotebookTemplate> templateOptional =
-          notebookService.findEntryTemplateById(dto.getNotebookTemplateId());
-      if (templateOptional.isPresent()) {
-        getStudyService().create(study, templateOptional.get());
-      } else {
-        throw new RecordNotFoundException(
-            "Could not find notebook entry template: " + dto.getNotebookTemplateId());
-      }
-    } else {
-      getStudyService().create(study);
-    }
+  }
 
-    // Save the record
-
-    Assert.notNull(study.getId(), "Study not persisted.");
-
-    // Publish events
-    Activity activity = StudyActivityUtils.fromNewStudy(study, this.getAuthenticatedUser());
-    getActivityService().create(activity);
-    getEventsService().dispatchEvent(activity);
-
+  @PostMapping("")
+  public HttpEntity<StudyDetailsDto> createStudy(@RequestBody @Valid StudyFormDto dto) {
+    LOGGER.info("Creating study: {}", dto);
+    Study study = this.getStudyMapper().fromStudyForm(dto);
+    mapPayloadFields(study, dto);
+    study = this.createNewStudy(study, dto.getNotebookTemplateId());
     return new ResponseEntity<>(this.getStudyMapper().toStudyDetails(study), HttpStatus.CREATED);
   }
 
@@ -229,84 +203,36 @@ public class StudyBaseController extends AbstractStudyController {
       @RequestBody @Valid StudyFormDto dto
   ) {
 
-    LOGGER.info("Updating study: " + id);
-    LOGGER.info(dto.toString());
+    LOGGER.info("Updating study {}: {}", id, dto);
 
     // Make sure the study exists
     this.getStudyFromIdentifier(id);
 
     Study study = this.getStudyMapper().fromStudyForm(dto);
-
-    // Study team
-    Set<User> team = new HashSet<>();
-    for (User u : study.getUsers()) {
-      team.add(
-          getUserService()
-              .findById(u.getId())
-              .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + u.getId())));
-    }
-    study.setUsers(team);
-
-    // Owner
-    study.setOwner(
-        getUserService()
-            .findById(study.getOwner().getId())
-            .orElseThrow(
-                () ->
-                    new RecordNotFoundException("Cannot find user: " + study.getOwner().getId())));
-
-    getStudyService().update(study);
-
-    // Publish events
-    Activity activity = StudyActivityUtils.fromUpdatedStudy(study, this.getAuthenticatedUser());
-    getActivityService().create(activity);
-    getEventsService().dispatchEvent(activity);
+    mapPayloadFields(study, dto);
+    this.updateExistingStudy(study);
 
     return new ResponseEntity<>(this.getStudyMapper().toStudyDetails(study), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> deleteStudy(@PathVariable("id") String id) {
-
     LOGGER.info("Deleting study: " + id);
-
     Study study = getStudyFromIdentifier(id);
-    User user = this.getAuthenticatedUser();
-    study.setLastModifiedBy(user);
-
-    getStudyService().delete(study);
-
-    // Publish events
-    Activity activity = StudyActivityUtils.fromDeletedStudy(study, user);
-    getActivityService().create(activity);
-    getEventsService().dispatchEvent(activity);
-
+    this.deleteExistingStudy(study);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/{id}/status")
-  public void updateStudyStatus(
+  public HttpEntity<?> updateStudyStatus(
       @PathVariable("id") String id,
       @RequestBody Map<String, Object> params
   ) throws StudyTrackerException {
-
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
     }
-
     Study study = getStudyFromIdentifier(id);
-    Status oldStatus = study.getStatus();
-    User user = this.getAuthenticatedUser();
-    study.setLastModifiedBy(user);
-
-    String label = (String) params.get("status");
-    Status status = Status.valueOf(label);
-    LOGGER.info(String.format("Setting status of study %s to %s", id, label));
-    getStudyService().updateStatus(study, status);
-
-    // Publish events
-    Activity activity = StudyActivityUtils.fromStudyStatusChange(study, user, oldStatus, status);
-    getActivityService().create(activity);
-    getEventsService().dispatchEvent(activity);
+    this.updateExistingStudyStatus(study, params.get("status").toString());
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/eln")
-public class NotebookController {
+public class NotebookPrivateController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(NotebookController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NotebookPrivateController.class);
 
   @Autowired(required = false)
   private StudyNotebookService notebookService;

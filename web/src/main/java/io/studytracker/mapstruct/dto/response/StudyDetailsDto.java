@@ -21,8 +21,8 @@ public class StudyDetailsDto {
   private CollaboratorDto collaborator;
   private boolean legacy = false;
   private boolean active = true;
-  private ELNFolderDto notebookFolder;
-  private FileStoreFolderDto storageFolder;
+  private NotebookFolderDetailsDto notebookFolder;
+  private FileStoreFolderDetailsDto storageFolder;
   private UserSummaryDto createdBy;
   private UserSummaryDto lastModifiedBy;
   private Date startDate;

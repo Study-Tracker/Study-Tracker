@@ -88,6 +88,8 @@ public class ExampleDataGenerator {
   public static final int NOTEBOOK_ENTRY_TEMPLATE_COUNT = 5;
   public static final int STUDY_COUNT = 6;
   public static final int ACTIVITY_COUNT = 13;
+  public static final int STORAGE_FOLDER_COUNT = 13;
+  public static final int NOTEBOOK_FOLDER_COUNT = 3;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 

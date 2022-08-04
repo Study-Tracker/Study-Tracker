@@ -313,8 +313,50 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
             "Saving file %s to storage folder instance for study %s",
             file.getName(), study.getCode()));
     StorageFolder studyFolder = this.getStudyFolder(study);
-    Path studyPath = Paths.get(studyFolder.getPath());
-    Path newFilePath = studyPath.resolve(file.getName());
+    return this.saveFileToFolder(file, studyFolder);
+//    Path studyPath = Paths.get(studyFolder.getPath());
+//    Path newFilePath = studyPath.resolve(file.getName());
+//    File newFile = newFilePath.toFile();
+//    try {
+//      FileUtils.copyFile(file, newFile);
+//    } catch (Exception e) {
+//      throw new StudyTrackerException(e);
+//    }
+//    StorageFile studyFile = new StorageFile();
+//    studyFile.setPath(newFilePath);
+//    studyFile.setUrl(getObjectUrl(newFilePath));
+//    studyFile.setName(newFile.getName());
+//    return studyFile;
+  }
+
+  @Override
+  public StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException {
+    LOGGER.info(
+        String.format(
+            "Saving file %s to storage folder instance for assay %s",
+            file.getName(), assay.getCode()));
+    StorageFolder assayFolder = this.getAssayFolder(assay);
+    return this.saveFileToFolder(file, assayFolder);
+//    Path assayPath = Paths.get(assayFolder.getPath());
+//    Path newFilePath = assayPath.resolve(file.getName());
+//    File newFile = newFilePath.toFile();
+//    try {
+//      FileUtils.copyFile(file, newFile);
+//    } catch (Exception e) {
+//      throw new StudyTrackerException(e);
+//    }
+//    StorageFile assayFile = new StorageFile();
+//    assayFile.setPath(newFilePath);
+//    assayFile.setUrl(getObjectUrl(newFilePath));
+//    assayFile.setName(newFile.getName());
+//    return assayFile;
+  }
+
+  @Override
+  public StorageFile saveFileToFolder(File file, StorageFolder folder)
+      throws StudyStorageException {
+    Path path = Paths.get(folder.getPath());
+    Path newFilePath = path.resolve(file.getName());
     File newFile = newFilePath.toFile();
     try {
       FileUtils.copyFile(file, newFile);
@@ -326,28 +368,6 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
     studyFile.setUrl(getObjectUrl(newFilePath));
     studyFile.setName(newFile.getName());
     return studyFile;
-  }
-
-  @Override
-  public StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException {
-    LOGGER.info(
-        String.format(
-            "Saving file %s to storage folder instance for assay %s",
-            file.getName(), assay.getCode()));
-    StorageFolder assayFolder = this.getAssayFolder(assay);
-    Path assayPath = Paths.get(assayFolder.getPath());
-    Path newFilePath = assayPath.resolve(file.getName());
-    File newFile = newFilePath.toFile();
-    try {
-      FileUtils.copyFile(file, newFile);
-    } catch (Exception e) {
-      throw new StudyTrackerException(e);
-    }
-    StorageFile assayFile = new StorageFile();
-    assayFile.setPath(newFilePath);
-    assayFile.setUrl(getObjectUrl(newFilePath));
-    assayFile.setName(newFile.getName());
-    return assayFile;
   }
 
   public void setOverwriteExisting(boolean overwriteExisting) {

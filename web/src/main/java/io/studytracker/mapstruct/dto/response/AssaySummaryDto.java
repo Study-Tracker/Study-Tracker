@@ -19,8 +19,8 @@ public class AssaySummaryDto {
   private Date createdAt;
   private Date updateAt;
   private UserSlimDto owner;
-  private ELNFolderDto notebookFolder;
-  private FileStoreFolderDto storageFolder;
+  private NotebookFolderDetailsDto notebookFolder;
+  private FileStoreFolderDetailsDto storageFolder;
   private boolean active = true;
   private Set<UserSlimDto> users = new HashSet<>();
 }

@@ -14,8 +14,8 @@ public class AssayParentDto {
   private String code;
   private String description;
   private UserSlimDto owner;
-  private ELNFolderDto notebookFolder;
-  private FileStoreFolderDto storageFolder;
+  private NotebookFolderDetailsDto notebookFolder;
+  private FileStoreFolderDetailsDto storageFolder;
   private Date createdAt;
   private Date updatedAt;
   private boolean active = true;

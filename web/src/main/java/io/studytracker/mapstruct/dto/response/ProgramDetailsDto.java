@@ -17,7 +17,7 @@ public class ProgramDetailsDto {
   private Date createdAt;
   private Date updatedAt;
   private boolean active;
-  private ELNFolderDto notebookFolder;
-  private FileStoreFolderDto storageFolder;
+  private NotebookFolderDetailsDto notebookFolder;
+  private FileStoreFolderDetailsDto storageFolder;
   private Map<String, String> attributes = new HashMap<>();
 }

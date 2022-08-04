@@ -17,16 +17,12 @@ public class StudySummaryDto {
   private CollaboratorDto collaborator;
   private boolean legacy = false;
   private boolean active = true;
-  private ELNFolderDto notebookFolder;
-  private FileStoreFolderDto storageFolder;
-  //  private UserSummaryDto createdBy;
-  //  private UserSummaryDto lastModifiedBy;
+  private NotebookFolderDetailsDto notebookFolder;
+  private FileStoreFolderDetailsDto storageFolder;
   private Date startDate;
   private Date endDate;
   private Date createdAt;
   private Date updatedAt;
   private UserSummaryDto owner;
-  //  private Set<UserSummaryDto> users = new HashSet<>();
-  //  private Set<KeywordDto> keywords = new HashSet<>();
 
 }

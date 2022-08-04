@@ -16,20 +16,27 @@
 
 package io.studytracker.controller.api;
 
-import io.studytracker.events.EventsService;
+import io.studytracker.eln.NotebookTemplate;
+import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.mapstruct.mapper.AssayMapper;
 import io.studytracker.mapstruct.mapper.StudyMapper;
+import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
+import io.studytracker.model.Status;
 import io.studytracker.model.Study;
-import io.studytracker.service.ActivityService;
 import io.studytracker.service.AssayService;
+import io.studytracker.service.CollaboratorService;
+import io.studytracker.service.KeywordService;
 import io.studytracker.service.ProgramService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 public abstract class AbstractStudyController extends AbstractApiController {
 
@@ -41,15 +48,17 @@ public abstract class AbstractStudyController extends AbstractApiController {
 
   private AssayService assayService;
 
-  private ActivityService activityService;
-
-  private EventsService eventsService;
+  private StudyNotebookService notebookService;
 
   private StudyMapper studyMapper;
 
   private AssayMapper assayMapper;
 
   private ActivityMapper activityMapper;
+
+  private CollaboratorService collaboratorService;
+
+  private KeywordService keywordService;
 
   private boolean isLong(String value) {
     try {
@@ -88,6 +97,75 @@ public abstract class AbstractStudyController extends AbstractApiController {
     }
   }
 
+  /**
+   * Creates a new study with notebook and storage folders, where appropriate.
+   * @param study the study to create
+   * @param notebookTemplateId the notebook template to use, or null to use the default
+   * @return
+   */
+  protected Study createNewStudy(Study study, String notebookTemplateId) {
+
+    // If a notebook template was requested, find it
+    if (notebookService != null && StringUtils.hasText(notebookTemplateId)) {
+      Optional<NotebookTemplate> templateOptional =
+          notebookService.findEntryTemplateById(notebookTemplateId);
+      if (templateOptional.isPresent()) {
+        getStudyService().create(study, templateOptional.get());
+      } else {
+        throw new RecordNotFoundException(
+            "Could not find notebook entry template: " + notebookTemplateId);
+      }
+    } else {
+      studyService.create(study);
+    }
+
+    Assert.notNull(study.getId(), "Study not persisted.");
+
+    // Publish events
+    Activity activity = StudyActivityUtils.fromNewStudy(study, this.getAuthenticatedUser());
+    this.logActivity(activity);
+
+    return study;
+  }
+
+  /**
+   * Updates an existing study.
+   *
+   * @param study the study to update
+   * @return the updated study
+   */
+  protected Study updateExistingStudy(Study study) {
+    studyService.update(study);
+    Study updated = studyService.findById(study.getId())
+        .orElseThrow(() -> new RecordNotFoundException("Study not found: " + study.getId()));
+    Activity activity = StudyActivityUtils.fromUpdatedStudy(updated, this.getAuthenticatedUser());
+    this.logActivity(activity);
+    return updated;
+  }
+
+  /**
+   * Innactivates an existing study.
+   *
+   * @param study the study to inactivate
+   */
+  protected void deleteExistingStudy(Study study) {
+    studyService.delete(study);
+    Activity activity = StudyActivityUtils.fromDeletedStudy(study, this.getAuthenticatedUser());
+    this.logActivity(activity);
+  }
+
+  protected void updateExistingStudyStatus(Study study, Status status) {
+    Status oldStatus = study.getStatus();
+    studyService.updateStatus(study, status);
+    Activity activity = StudyActivityUtils.fromStudyStatusChange(study, this.getAuthenticatedUser(), oldStatus, status);
+    this.logActivity(activity);
+  }
+
+  protected void updateExistingStudyStatus(Study study, String statusString) {
+    Status status = Status.valueOf(statusString);
+    this.updateExistingStudyStatus(study, status);
+  }
+
   public StudyService getStudyService() {
     return studyService;
   }
@@ -124,24 +202,6 @@ public abstract class AbstractStudyController extends AbstractApiController {
     this.assayService = assayService;
   }
 
-  public ActivityService getActivityService() {
-    return activityService;
-  }
-
-  @Autowired
-  public void setActivityService(ActivityService activityService) {
-    this.activityService = activityService;
-  }
-
-  public EventsService getEventsService() {
-    return eventsService;
-  }
-
-  @Autowired
-  public void setEventsService(EventsService eventsService) {
-    this.eventsService = eventsService;
-  }
-
   public StudyMapper getStudyMapper() {
     return studyMapper;
   }
@@ -167,5 +227,32 @@ public abstract class AbstractStudyController extends AbstractApiController {
   @Autowired
   public void setActivityMapper(ActivityMapper activityMapper) {
     this.activityMapper = activityMapper;
+  }
+
+  public StudyNotebookService getNotebookService() {
+    return notebookService;
+  }
+
+  @Autowired(required = false)
+  public void setNotebookService(StudyNotebookService notebookService) {
+    this.notebookService = notebookService;
+  }
+
+  public CollaboratorService getCollaboratorService() {
+    return collaboratorService;
+  }
+
+  @Autowired
+  public void setCollaboratorService(CollaboratorService collaboratorService) {
+    this.collaboratorService = collaboratorService;
+  }
+
+  public KeywordService getKeywordService() {
+    return keywordService;
+  }
+
+  @Autowired
+  public void setKeywordService(KeywordService keywordService) {
+    this.keywordService = keywordService;
   }
 }

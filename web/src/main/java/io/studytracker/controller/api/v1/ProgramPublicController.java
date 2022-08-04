@@ -49,7 +49,10 @@ public class ProgramPublicController extends AbstractProgramController {
   public HttpEntity<ProgramDto> createProgram(@Valid @RequestBody ProgramPayloadDto dto) {
     LOGGER.info("Creating program {}", dto);
     Program program = this.createNewProgram(this.getProgramMapper().fromProgramPayloadDto(dto));
-    return new ResponseEntity<>(this.getProgramMapper().toProgramDto(program), HttpStatus.CREATED);
+    ProgramDto created = this.getProgramMapper().toProgramDto(program);
+    LOGGER.info("Storage Folder: {} {} {}", program.getStorageFolder().getId(), program.getStorageFolder().getName(), program.getStorageFolder().getPath());
+    LOGGER.info("Created program {}", created);
+    return new ResponseEntity<>(created, HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")

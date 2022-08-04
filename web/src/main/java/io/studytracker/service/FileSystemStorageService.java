@@ -23,12 +23,16 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 public final class FileSystemStorageService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemStorageService.class);
 
   private final Path tempDir;
 
@@ -44,6 +48,7 @@ public final class FileSystemStorageService {
    */
   public Path store(MultipartFile file) throws FileStorageException {
     String filename = StringUtils.cleanPath(file.getOriginalFilename());
+    LOGGER.debug("File to upload: " + filename);
     if (file.isEmpty()) {
       throw new FileStorageException("File is empty.");
     }
@@ -51,7 +56,9 @@ public final class FileSystemStorageService {
       throw new FileStorageException("Cannot store file with relative path.");
     }
     try (InputStream inputStream = file.getInputStream()) {
-      Files.copy(inputStream, tempDir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+      Path filePath = tempDir.resolve(filename);
+      LOGGER.debug("Local file path for upload: " + filePath.toString());
+      Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
       e.printStackTrace();
       throw new FileStorageException(e);

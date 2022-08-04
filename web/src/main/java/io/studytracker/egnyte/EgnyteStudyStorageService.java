@@ -310,4 +310,14 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throw new StudyStorageException(e);
     }
   }
+
+  @Override
+  public StorageFile saveFileToFolder(File file, StorageFolder folder)
+      throws StudyStorageException {
+    try {
+      return this.convertEgnyteFile(egnyteClient.uploadFile(file, folder.getPath()));
+    } catch (EgnyteException e) {
+      throw new StudyStorageException(e);
+    }
+  }
 }

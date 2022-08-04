@@ -139,4 +139,14 @@ public interface StudyStorageService {
    * @return
    */
   StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException;
+
+  /**
+   * Uploads a file to the target folder.
+   *
+   * @param file The file to upload.
+   * @param folder The folder to upload the file to.
+   * @return
+   * @throws StudyStorageException
+   */
+  StorageFile saveFileToFolder(File file, StorageFolder folder) throws StudyStorageException;
 }

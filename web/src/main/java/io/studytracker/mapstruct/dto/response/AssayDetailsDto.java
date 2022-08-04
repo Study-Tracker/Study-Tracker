@@ -23,8 +23,8 @@ public class AssayDetailsDto {
   private UserSlimDto owner;
   private Date startDate;
   private Date endDate;
-  private ELNFolderDto notebookFolder;
-  private FileStoreFolderDto storageFolder;
+  private NotebookFolderDetailsDto notebookFolder;
+  private FileStoreFolderDetailsDto storageFolder;
   private boolean active = true;
   private Date createdAt;
   private Date updatedAt;

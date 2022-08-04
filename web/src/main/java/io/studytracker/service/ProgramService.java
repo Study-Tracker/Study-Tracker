@@ -107,7 +107,7 @@ public class ProgramService {
   }
 
   @Transactional
-  public void update(Program program) {
+  public Program update(Program program) {
     LOGGER.info("Updating program with name: " + program.getName());
 
     Program p = programRepository.getById(program.getId());
@@ -124,6 +124,9 @@ public class ProgramService {
       f.setName(folder.getName());
       elnFolderRepository.save(f);
     }
+
+    return programRepository.findById(program.getId())
+        .orElseThrow(() -> new StudyTrackerException("Program not found: " + program.getId()));
   }
 
   @Transactional

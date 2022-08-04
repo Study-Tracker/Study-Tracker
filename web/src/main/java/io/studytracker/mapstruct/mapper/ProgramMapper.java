@@ -38,6 +38,8 @@ public interface ProgramMapper {
   List<ProgramDto> toProgramDtoList(List<Program> programs);
   @Mapping(source = "createdBy.id", target = "createdBy")
   @Mapping(source = "lastModifiedBy.id", target = "lastModifiedBy")
+  @Mapping(source = "storageFolder.id", target = "storageFolderId")
+  @Mapping(source = "notebookFolder.id", target = "notebookFolderId")
   ProgramDto toProgramDto(Program program);
 
   ProgramPayloadDto toProgramPayloadDto(Program program);

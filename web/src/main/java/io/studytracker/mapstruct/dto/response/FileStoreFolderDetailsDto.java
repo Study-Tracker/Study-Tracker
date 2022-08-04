@@ -3,7 +3,7 @@ package io.studytracker.mapstruct.dto.response;
 import lombok.Data;
 
 @Data
-public class ELNFolderDto {
+public class FileStoreFolderDetailsDto {
 
   private Long id;
   private String url;

@@ -31,16 +31,12 @@ public abstract class AbstractProgramController extends AbstractApiController {
           "You do not have permission to perform this action.");
     }
 
-    // Create the new program
-    program = this.getProgramService().create(program);
-    Program created = this.getProgramService().findById(program.getId())
-        .orElseThrow(RecordNotFoundException::new);
-
-    // Publish events
-    Activity activity = ProgramActivityUtils.fromNewProgram(created, user);
+    // Create the new program and publish the event
+    this.getProgramService().create(program);
+    Activity activity = ProgramActivityUtils.fromNewProgram(program, user);
     this.logActivity(activity);
 
-    return created;
+    return program;
   }
 
   /**
@@ -63,7 +59,7 @@ public abstract class AbstractProgramController extends AbstractApiController {
       throw new RecordNotFoundException("Could not find program: " + program.getId());
     }
 
-    this.getProgramService().update(program);
+    program = this.getProgramService().update(program);
     this.logActivity(ProgramActivityUtils.fromUpdatedProgram(program, user));
 
     return program;

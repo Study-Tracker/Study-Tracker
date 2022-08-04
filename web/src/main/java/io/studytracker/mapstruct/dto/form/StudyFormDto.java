@@ -2,10 +2,10 @@ package io.studytracker.mapstruct.dto.form;
 
 import io.studytracker.mapstruct.dto.response.CollaboratorDto;
 import io.studytracker.mapstruct.dto.response.CommentDto;
-import io.studytracker.mapstruct.dto.response.ELNFolderDto;
 import io.studytracker.mapstruct.dto.response.ExternalLinkDto;
-import io.studytracker.mapstruct.dto.response.FileStoreFolderDto;
+import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.KeywordDetailsDto;
+import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramSummaryDto;
 import io.studytracker.mapstruct.dto.response.StudyConclusionsDto;
 import io.studytracker.mapstruct.dto.response.StudyRelationshipDetailsDto;
@@ -35,8 +35,8 @@ public class StudyFormDto {
   private boolean legacy = false;
   private boolean active = true;
   private boolean external = false;
-  private ELNFolderDto notebookFolder;
-  private FileStoreFolderDto storageFolder;
+  private NotebookFolderDetailsDto notebookFolder;
+  private FileStoreFolderDetailsDto storageFolder;
   private UserSummaryDto createdBy;
   private UserSummaryDto lastModifiedBy;
   private @NotNull Date startDate;

@@ -7,8 +7,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -17,6 +19,7 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ProgramPayloadDto;
+import io.studytracker.mapstruct.mapper.ProgramMapper;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
@@ -47,6 +50,9 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @Autowired
+  private ProgramMapper programMapper;
 
   @Test
   public void findAllTest() throws Exception {
@@ -151,7 +157,9 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$", hasKey("createdAt")))
         .andExpect(jsonPath("$.createdAt", not(nullValue())))
         .andExpect(jsonPath("$", hasKey("updatedAt")))
-        .andExpect(jsonPath("$.updatedAt", not(nullValue())));
+        .andExpect(jsonPath("$.updatedAt", not(nullValue())))
+        .andExpect(jsonPath("$", hasKey("storageFolderId")))
+        .andExpect(jsonPath("$.storageFolderId", not(nullValue())));
 
     Program program = programRepository.findByName("Program X")
         .orElseThrow(RecordNotFoundException::new);
@@ -160,6 +168,56 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
     System.out.println(program.getStorageFolder().getName());
     System.out.println(program.getStorageFolder().getId());
 
+  }
+
+  @Test
+  public void updateTest() throws Exception {
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+
+    mockMvc
+        .perform(get("/api/v1/program/" + program.getId())
+            .header("Authorization", "Bearer " + this.getToken()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("active")))
+        .andExpect(jsonPath("$.active", is(true)));
+
+    program.setActive(false);
+
+    mockMvc
+        .perform(
+            put("/api/v1/program/" + program.getId())
+                .header("Authorization", "Bearer " + this.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(programMapper.toProgramPayloadDto(program))))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void deactivateProgramTest() throws Exception {
+    Program program =
+        programRepository
+            .findByName("Clinical Program A")
+            .orElseThrow(RecordNotFoundException::new);
+    Assert.assertTrue(program.isActive());
+
+    program.setActive(false);
+
+    mockMvc
+        .perform(
+            delete("/api/v1/program/" + program.getId())
+                .header("Authorization", "Bearer " + this.getToken())
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+
+    mockMvc
+        .perform(get("/api/v1/program/" + program.getId())
+            .header("Authorization", "Bearer " + this.getToken()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("active")))
+        .andExpect(jsonPath("$.active", is(false)));
   }
 
 }
