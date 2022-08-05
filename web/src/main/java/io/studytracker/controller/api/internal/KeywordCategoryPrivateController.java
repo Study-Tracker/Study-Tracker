@@ -16,19 +16,16 @@
 
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.exception.DuplicateRecordException;
+import io.studytracker.controller.api.AbstractKeywordCategoryController;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.KeywordCategoryFormDto;
-import io.studytracker.mapstruct.dto.response.KeywordCategoryDto;
-import io.studytracker.mapstruct.mapper.KeywordCategoryMapper;
+import io.studytracker.mapstruct.dto.response.KeywordCategoryDetailsDto;
 import io.studytracker.model.KeywordCategory;
-import io.studytracker.service.KeywordCategoryService;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,68 +40,49 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/keyword-category")
-public class KeywordCategoryController {
+public class KeywordCategoryPrivateController extends AbstractKeywordCategoryController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(KeywordCategoryController.class);
-
-  @Autowired private KeywordCategoryService categoryService;
-
-  @Autowired private KeywordCategoryMapper categoryMapper;
+  private static final Logger LOGGER = LoggerFactory.getLogger(KeywordCategoryPrivateController.class);
 
   @GetMapping("")
-  public List<KeywordCategoryDto> findAll() {
-    return categoryMapper.toKeywordCategoryDtoList(categoryService.findAll());
+  public List<KeywordCategoryDetailsDto> findAll() {
+    return this.getKeywordCategoryMapper().toKeywordCategoryDtoList(this.getKeywordCategoryService().findAll());
   }
 
   @GetMapping("/{id}")
-  public KeywordCategoryDto findById(@PathVariable("id") Long id) throws RecordNotFoundException {
-    Optional<KeywordCategory> optional = categoryService.findById(id);
+  public KeywordCategoryDetailsDto findById(@PathVariable("id") Long id) throws RecordNotFoundException {
+    Optional<KeywordCategory> optional = this.getKeywordCategoryService().findById(id);
     if (optional.isPresent()) {
-      return categoryMapper.toKeywordCategoryDto(optional.get());
+      return this.getKeywordCategoryMapper().toKeywordCategoryDto(optional.get());
     } else {
       throw new RecordNotFoundException();
     }
   }
 
   @PostMapping("")
-  public HttpEntity<KeywordCategoryDto> create(@RequestBody @Valid KeywordCategoryFormDto dto) {
+  public HttpEntity<KeywordCategoryDetailsDto> create(@RequestBody @Valid KeywordCategoryFormDto dto) {
     LOGGER.info("Creating keyword category: {}", dto);
-    KeywordCategory category = categoryMapper.fromKeywordCategoryFormDto(dto);
-    Optional<KeywordCategory> optional = categoryService.findByName(category.getName());
-    if (optional.isPresent()) {
-      throw new DuplicateRecordException(
-          String.format(
-              "Keyword category already exists: %s", category.getName()));
-    }
-    categoryService.create(category);
-    return new ResponseEntity<>(categoryMapper.toKeywordCategoryDto(category), HttpStatus.CREATED);
+    KeywordCategory category = this.createNewKeywordCategory(this.getKeywordCategoryMapper().fromKeywordCategoryFormDto(dto));
+    return new ResponseEntity<>(this.getKeywordCategoryMapper().toKeywordCategoryDto(category), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<KeywordCategoryDto> update(
+  public HttpEntity<KeywordCategoryDetailsDto> update(
       @PathVariable("id") Long id, @RequestBody @Valid KeywordCategoryFormDto dto) {
     LOGGER.info("Updating keyword category: {}", dto);
-    KeywordCategory updated = categoryMapper.fromKeywordCategoryFormDto(dto);
-    Optional<KeywordCategory> optional = categoryService.findByName(updated.getName());
-    if (optional.isPresent()) {
-      KeywordCategory keywordCategory = optional.get();
-      if (!keywordCategory.getId().equals(id)) {
-        throw new DuplicateRecordException(
-            String.format("Keyword category already exists: %s", keywordCategory.getName()));
-      }
-    }
-    categoryService.update(updated);
-    return new ResponseEntity<>(categoryMapper.toKeywordCategoryDto(updated), HttpStatus.OK);
+    KeywordCategory updated =
+        this.updateExistingKeywordCategory(this.getKeywordCategoryMapper().fromKeywordCategoryFormDto(dto), id);
+    return new ResponseEntity<>(this.getKeywordCategoryMapper().toKeywordCategoryDto(updated), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> delete(@PathVariable("id") Long id) {
     LOGGER.info("Deleting keyword category: {}", id);
     KeywordCategory keywordCategory =
-        categoryService
+        this.getKeywordCategoryService()
             .findById(id)
             .orElseThrow(() -> new RecordNotFoundException("Cannot find keyword category with ID: " + id));
-    categoryService.delete(keywordCategory);
+    this.getKeywordCategoryService().delete(keywordCategory);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

@@ -82,6 +82,7 @@ public class ExampleDataGenerator {
   public static final int PROGRAM_COUNT = 5;
   public static final int USER_COUNT = 3;
   public static final int COLLABORATOR_COUNT = 4;
+  public static final int KEYWORD_CATEGORY_COUNT = 2;
   public static final int KEYWORD_COUNT = 7;
   public static final int ASSAY_TYPE_COUNT = 2;
   public static final int ASSAY_COUNT = 2;
@@ -90,6 +91,7 @@ public class ExampleDataGenerator {
   public static final int ACTIVITY_COUNT = 13;
   public static final int STORAGE_FOLDER_COUNT = 13;
   public static final int NOTEBOOK_FOLDER_COUNT = 3;
+  public static final int COMMENT_COUNT = 1;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 

@@ -62,7 +62,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @ActiveProfiles({"web-test", "example"})
-public class StudyBaseControllerTests {
+public class StudyBasePrivateControllerTests {
 
   @Autowired private MockMvc mockMvc;
 

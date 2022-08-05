@@ -36,5 +36,5 @@ public class StudyDetailsDto {
   private Set<ExternalLinkDto> externalLinks = new HashSet<>();
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();
   private StudyConclusionsDto conclusions;
-  private Set<CommentDto> comments = new HashSet<>();
+  private Set<CommentDetailsDto> comments = new HashSet<>();
 }

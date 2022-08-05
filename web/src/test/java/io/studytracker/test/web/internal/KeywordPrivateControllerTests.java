@@ -52,7 +52,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @ActiveProfiles({"web-test", "example"})
-public class KeywordControllerTests {
+public class KeywordPrivateControllerTests {
 
   private static final int KEYWORD_COUNT = 7;
 

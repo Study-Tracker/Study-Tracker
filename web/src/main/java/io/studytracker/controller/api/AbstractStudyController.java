@@ -22,6 +22,7 @@ import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.mapstruct.mapper.AssayMapper;
+import io.studytracker.mapstruct.mapper.CommentMapper;
 import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
@@ -31,6 +32,7 @@ import io.studytracker.service.AssayService;
 import io.studytracker.service.CollaboratorService;
 import io.studytracker.service.KeywordService;
 import io.studytracker.service.ProgramService;
+import io.studytracker.service.StudyCommentService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
 import java.util.Optional;
@@ -59,6 +61,10 @@ public abstract class AbstractStudyController extends AbstractApiController {
   private CollaboratorService collaboratorService;
 
   private KeywordService keywordService;
+
+  private StudyCommentService studyCommentService;
+
+  private CommentMapper commentMapper;
 
   private boolean isLong(String value) {
     try {
@@ -254,5 +260,23 @@ public abstract class AbstractStudyController extends AbstractApiController {
   @Autowired
   public void setKeywordService(KeywordService keywordService) {
     this.keywordService = keywordService;
+  }
+
+  public StudyCommentService getStudyCommentService() {
+    return studyCommentService;
+  }
+
+  @Autowired
+  public void setStudyCommentService(StudyCommentService studyCommentService) {
+    this.studyCommentService = studyCommentService;
+  }
+
+  public CommentMapper getCommentMapper() {
+    return commentMapper;
+  }
+
+  @Autowired
+  public void setCommentMapper(CommentMapper commentMapper) {
+    this.commentMapper = commentMapper;
   }
 }

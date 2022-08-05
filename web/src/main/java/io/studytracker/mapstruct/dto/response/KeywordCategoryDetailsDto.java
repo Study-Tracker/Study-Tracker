@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class KeywordCategoryDto {
+public class KeywordCategoryDetailsDto {
 
   private Long id;
   @NotNull private String name;

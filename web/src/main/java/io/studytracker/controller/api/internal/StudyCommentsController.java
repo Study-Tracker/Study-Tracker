@@ -20,19 +20,16 @@ import io.studytracker.controller.api.AbstractStudyController;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.CommentFormDto;
-import io.studytracker.mapstruct.dto.response.CommentDto;
-import io.studytracker.mapstruct.mapper.CommentMapper;
+import io.studytracker.mapstruct.dto.response.CommentDetailsDto;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Comment;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
-import io.studytracker.service.StudyCommentService;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,39 +48,35 @@ public class StudyCommentsController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyCommentsController.class);
 
-  @Autowired private StudyCommentService studyCommentService;
-
-  @Autowired private CommentMapper commentMapper;
-
   @GetMapping("")
-  public List<CommentDto> getStudyComments(@PathVariable("studyId") String studyId) {
+  public List<CommentDetailsDto> getStudyComments(@PathVariable("studyId") String studyId) {
     Study study = getStudyFromIdentifier(studyId);
-    return commentMapper.toDtoList(studyCommentService.findStudyComments(study));
+    return this.getCommentMapper().toDetailsDtoList(this.getStudyCommentService().findStudyComments(study));
   }
 
   @PostMapping("")
-  public HttpEntity<CommentDto> addStudyComment(
+  public HttpEntity<CommentDetailsDto> addStudyComment(
       @PathVariable("studyId") String studyId,
       @RequestBody @Valid CommentFormDto dto
   ) {
 
     LOGGER.info(String.format("Creating new comment for study %s: %s", studyId, dto.toString()));
 
-    Comment comment = commentMapper.fromFormDto(dto);
+    Comment comment = this.getCommentMapper().fromFormDto(dto);
 
     Study study = getStudyFromIdentifier(studyId);
-    studyCommentService.addStudyComment(study, comment);
+    this.getStudyCommentService().addStudyComment(study, comment);
 
     // Publish events
     Activity activity = StudyActivityUtils.fromNewComment(study, this.getAuthenticatedUser(), comment);
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(commentMapper.toDto(comment), HttpStatus.CREATED);
+    return new ResponseEntity<>(this.getCommentMapper().toDetailsDto(comment), HttpStatus.CREATED);
   }
 
   @PutMapping("/{commentId}")
-  public HttpEntity<CommentDto> editedStudyComment(
+  public HttpEntity<CommentDetailsDto> editedStudyComment(
       @PathVariable("studyId") String studyId,
       @PathVariable("commentId") Long commentId,
       @RequestBody @Valid CommentFormDto dto
@@ -93,10 +86,10 @@ public class StudyCommentsController extends AbstractStudyController {
 
     User user = this.getAuthenticatedUser();
     Study study = getStudyFromIdentifier(studyId);
-    Comment comment = commentMapper.fromFormDto(dto);
+    Comment comment = this.getCommentMapper().fromFormDto(dto);
     comment.setId(commentId);
 
-    Comment updated = studyCommentService.updateStudyComment(comment);
+    Comment updated = this.getStudyCommentService().updateStudyComment(comment);
     this.getStudyService().markAsUpdated(study, user);
 
     // Publish events
@@ -104,7 +97,7 @@ public class StudyCommentsController extends AbstractStudyController {
     getActivityService().create(activity);
     getEventsService().dispatchEvent(activity);
 
-    return new ResponseEntity<>(commentMapper.toDto(updated), HttpStatus.OK);
+    return new ResponseEntity<>(this.getCommentMapper().toDetailsDto(updated), HttpStatus.OK);
   }
 
   @DeleteMapping("/{commentId}")
@@ -117,13 +110,13 @@ public class StudyCommentsController extends AbstractStudyController {
 
     Study study = getStudyFromIdentifier(studyId);
 
-    Optional<Comment> optional = studyCommentService.findStudyCommentById(commentId);
+    Optional<Comment> optional = this.getStudyCommentService().findStudyCommentById(commentId);
     if (!optional.isPresent()) {
       throw new RecordNotFoundException(
           String.format("No comment with ID %s found for study %s", commentId, study.getCode()));
     }
 
-    studyCommentService.deleteStudyComment(study, optional.get());
+    this.getStudyCommentService().deleteStudyComment(study, optional.get());
 
     // Publish events
     Activity activity = StudyActivityUtils.fromDeletedComment(study, this.getAuthenticatedUser());

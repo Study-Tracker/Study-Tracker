@@ -56,9 +56,9 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/internal/study")
-public class StudyBaseController extends AbstractStudyController {
+public class StudyBasePrivateController extends AbstractStudyController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StudyBaseController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyBasePrivateController.class);
 
   @Autowired(required = false)
   private StudyNotebookService notebookService;

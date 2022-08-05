@@ -7,5 +7,5 @@ public class KeywordDetailsDto {
 
   private Long id;
   private String keyword;
-  private KeywordCategoryDto category;
+  private KeywordCategoryDetailsDto category;
 }

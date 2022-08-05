@@ -54,7 +54,7 @@ public class StudyKeywordsController extends AbstractStudyController {
   @GetMapping("")
   public List<KeywordDetailsDto> getStudyKeywords(@PathVariable("studyId") String studyId) {
     Study study = getStudyFromIdentifier(studyId);
-    return keywordMapper.toDtoList(studyKeywordsService.findStudyKeywords(study));
+    return keywordMapper.toDetailsDtoList(studyKeywordsService.findStudyKeywords(study));
   }
 
   @PutMapping("")
