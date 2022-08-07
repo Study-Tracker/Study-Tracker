@@ -2,7 +2,7 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import java.util.Optional;
@@ -25,7 +25,7 @@ public class AssayNotebookController extends AbstractAssayController {
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayNotebookController.class);
 
   @Autowired(required = false)
-  private StudyNotebookService studyNotebookService;
+  private NotebookFolderService notebookFolderService;
 
   @GetMapping("")
   public NotebookFolder getNotebookFolder(@PathVariable("assayId") String assayId)
@@ -34,7 +34,7 @@ public class AssayNotebookController extends AbstractAssayController {
     Assay assay = getAssayFromIdentifier(assayId);
 
     Optional<NotebookFolder> notebookFolder =
-        Optional.ofNullable(studyNotebookService)
+        Optional.ofNullable(notebookFolderService)
             .flatMap(service -> service.findAssayFolder(assay));
     return notebookFolder.orElseThrow(
         () -> new RecordNotFoundException("Could not load assay folder"));

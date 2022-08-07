@@ -32,10 +32,10 @@ const StudyFormView = props => {
     programsLoaded: false,
     collaboratorsLoaded: false,
     keywordCategoriesLoaded: false,
-    notebookTemplatesLoaded: false,
     isError: false,
   });
   const user = useSelector(s => s.user.value);
+  const features = useSelector(s => s.features.value);
 
   useEffect(() => {
 
@@ -95,26 +95,6 @@ const StudyFormView = props => {
       }));
     });
 
-    // Entry Templates
-    axios.get("/api/internal/notebookentrytemplate?category=STUDY&active=true")
-    .then(response => {
-      const defaultNotebookTemplate = response.data.find(o => o.default === true);
-      setState(prevState => ({
-        ...prevState,
-        notebookTemplates: response.data,
-        defaultNotebookTemplate: defaultNotebookTemplate,
-        notebookTemplatesLoaded: true
-      }));
-    })
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
-
     // Selected study
     if (!!state.studyCode) {
       axios.get("/api/internal/study/" + state.studyCode)
@@ -151,16 +131,14 @@ const StudyFormView = props => {
       && state.programsLoaded
       && state.collaboratorsLoaded
       && state.keywordCategoriesLoaded
-      && state.notebookTemplatesLoaded
   ) {
     content = <StudyForm
         study={state.study}
         programs={state.programs}
         externalContacts={state.collaborators}
         keywordCategories={state.keywordCategories}
-        notebookTemplates={state.notebookTemplates}
-        defaultNotebookTemplate={state.defaultNotebookTemplate}
         user={user}
+        features={features}
     />;
   }
   return (

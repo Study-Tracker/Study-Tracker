@@ -29,19 +29,20 @@ import CollaboratorInputs from "../../common/forms/CollaboratorInputs";
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../../common/loading";
 import {Breadcrumbs} from "../../common/common";
-import {
-  NotebookEntryTemplatesDropdown
-} from "../../common/forms/notebookEntryTemplates";
+import NotebookEntryTemplatesDropdown
+  from "../../common/forms/NotebookEntryTemplateDropdown";
 import {useNavigate} from "react-router-dom";
 import {Form as FormikForm, Formik} from "formik";
 import FormikFormErrorNotification
   from "../../common/forms/FormikFormErrorNotification";
 import * as yup from "yup";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 const StudyForm = props => {
 
   const navigate = useNavigate();
+  console.log(props);
 
   const defaultStudyValues = {
     name: '',
@@ -314,17 +315,15 @@ const StudyForm = props => {
                           />
 
                           {
-                            !props.study
+                            !values.id
                             && props.features
                             && props.features.notebook
                             && props.features.notebook.isEnabled ? (
                                 <NotebookEntryTemplatesDropdown
-                                    notebookTemplates={props.notebookTemplates}
-                                    defaultTemplate={props.defaultNotebookTemplate}
                                     onChange={selectedItem =>
                                         setFieldValue(
                                             "notebookTemplateId",
-                                            selectedItem ? selectedItem.value : ''
+                                            selectedItem || ''
                                         )
                                     }
                                 />
@@ -593,6 +592,15 @@ const StudyForm = props => {
 
   );
 
+}
+
+StudyForm.propTypes = {
+  study: PropTypes.object.isRequired,
+  programs: PropTypes.array.isRequired,
+  keywordCategories: PropTypes.array.isRequired,
+  externalContacts: PropTypes.array.isRequired,
+  user: PropTypes.object,
+  features: PropTypes.object,
 }
 
 export default StudyForm;

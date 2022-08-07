@@ -18,7 +18,7 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractProgramController;
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.ProgramActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -73,7 +73,7 @@ public class ProgramPrivateController extends AbstractProgramController {
   @Autowired private StudyStorageService storageService;
 
   @Autowired(required = false)
-  private StudyNotebookService notebookService;
+  private NotebookFolderService notebookFolderService;
 
   @GetMapping("")
   public List<?> getAllPrograms(
@@ -222,7 +222,7 @@ public class ProgramPrivateController extends AbstractProgramController {
 
     // Check that the folder exists
     Optional<NotebookFolder> folderOptional =
-        Optional.ofNullable(notebookService).flatMap(service -> service.findProgramFolder(program));
+        Optional.ofNullable(notebookFolderService).flatMap(service -> service.findProgramFolder(program));
     if (!folderOptional.isPresent()) {
       throw new RecordNotFoundException("Cannot find notebook folder for program: " + programId);
     }

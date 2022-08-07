@@ -70,16 +70,18 @@ const ProgramForm = props => {
       .required("Code is required.")
       .matches("[A-Za-z0-9]+", "Code must be alphanumeric."),
     active: yup.boolean(),
-    notebookFolder: yup.object()
-      .when("id", {
-        is: id => id !== null && props.features && props.features.notebook.isEnabled,
-        then: yup.object().shape({
-          referenceId: yup.string()
-            .required("Notebook folder reference ID is required."),
-          name: yup.string(),
-          url: yup.string().url()
-        })
-      }),
+    notebookFolder: yup.object().shape({
+      referenceId: yup.string()
+      .test(
+          "not empty",
+          "Notebook folder ID is required.",
+          value => props.features && props.features.notebook
+              && props.features.notebook.isEnabled && !!value
+              && value.trim() !== ""
+      ),
+      name: yup.string(),
+      url: yup.string().url()
+    }),
     attributes: yup.object()
     .test(
         "not empty",
@@ -94,7 +96,11 @@ const ProgramForm = props => {
     description: '',
     active: true,
     attributes: {},
-    notebookFolder: {},
+    notebookFolder: {
+      referenceId: '',
+      name: '',
+      url: ''
+    },
   };
 
   const submitForm = (values, {setSubmitting}) => {
@@ -358,7 +364,7 @@ const ProgramForm = props => {
                                     <Form.Control
                                         type="text"
                                         name={"notebookFolder.referenceId"}
-                                        isValid={touched.notebookFolder.referenceId && !errors.notebookFolder.referenceId}
+                                        isInvalid={!!errors.notebookFolder && !!errors.notebookFolder.referenceId}
                                         value={values.notebookFolder.referenceId}
                                         onChange={handleChange}
                                     />

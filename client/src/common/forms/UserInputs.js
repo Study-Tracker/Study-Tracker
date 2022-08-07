@@ -34,15 +34,15 @@ const UserInputs = ({
     axios.get("/api/internal/autocomplete/user?q=" + input)
     .then(response => {
       const options = response.data
-      .filter(user => !users.find(u => u.id === user.id))
-      .map(user => {
-        return {label: user.displayName, value: user.id, obj: user}
-      })
-      .sort((a, b) => {
-        if (a.label < b.label) return -1;
-        else if (a.label > b.label) return 1;
-        else return 0;
-      });
+        .filter(user => !users.find(u => u.id === user.id))
+        .map(user => {
+          return {label: user.displayName, value: user.id, obj: user}
+        })
+        .sort((a, b) => {
+          if (a.label < b.label) return -1;
+          else if (a.label > b.label) return 1;
+          else return 0;
+        });
       callback(options);
     }).catch(e => {
       console.error(e);

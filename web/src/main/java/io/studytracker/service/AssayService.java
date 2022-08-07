@@ -16,9 +16,10 @@
 
 package io.studytracker.service;
 
+import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -66,7 +67,10 @@ public class AssayService {
   @Autowired private StudyStorageService storageService;
 
   @Autowired(required = false)
-  private StudyNotebookService notebookService;
+  private NotebookFolderService notebookFolderService;
+
+  @Autowired(required = false)
+  private NotebookEntryService notebookEntryService;
 
   @Autowired private NamingService namingService;
 
@@ -201,18 +205,18 @@ public class AssayService {
     }
 
     // Create the ELN folder
-    if (notebookService != null) {
+    if (notebookFolderService != null) {
       if (study.getNotebookFolder() != null) {
         try {
 
           LOGGER.info(String.format("Creating ELN entry for assay: %s", assay.getCode()));
 
           // Create the notebook folder
-          NotebookFolder notebookFolder = notebookService.createAssayFolder(assay);
+          NotebookFolder notebookFolder = notebookFolderService.createAssayFolder(assay);
           assay.setNotebookFolder(ELNFolder.from(notebookFolder));
 
           // Create the notebook entry
-          notebookService.createAssayNotebookEntry(assay, template);
+          notebookEntryService.createAssayNotebookEntry(assay, template);
 
         } catch (Exception e) {
           e.printStackTrace();
@@ -357,11 +361,11 @@ public class AssayService {
 
     // Check to see if the folder exists and create a new one if necessary
     NotebookFolder folder;
-    Optional<NotebookFolder> optional = notebookService.findAssayFolder(assay);
+    Optional<NotebookFolder> optional = notebookFolderService.findAssayFolder(assay);
     if (optional.isPresent()) {
       folder = optional.get();
     } else {
-      folder = notebookService.createAssayFolder(assay);
+      folder = notebookFolderService.createAssayFolder(assay);
     }
 
     // Update the record

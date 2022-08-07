@@ -37,7 +37,7 @@ const AssayNotebookTabContent = props => {
     })
     .catch(e => {
       console.error(e);
-      setError(e);
+      setError(e.message);
     });
   }
 
@@ -49,7 +49,7 @@ const AssayNotebookTabContent = props => {
                 folder={folder}
                 isLoaded={!!folder}
                 isError={!!error}
-                errorMessage={error.message}
+                errorMessage={error}
                 folderFileKey={'entries'}
             />
           </Col>

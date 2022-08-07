@@ -2,8 +2,13 @@ package io.studytracker.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.benchling.api.BenchlingElnRestClient;
-import io.studytracker.benchling.api.BenchlingNotebookService;
+import io.studytracker.benchling.api.BenchlingNotebookEntryService;
+import io.studytracker.benchling.api.BenchlingNotebookFolderService;
+import io.studytracker.benchling.api.BenchlingNotebookUserService;
 import io.studytracker.benchling.exception.BenchlingExceptionHandler;
+import io.studytracker.eln.NotebookEntryService;
+import io.studytracker.eln.NotebookFolderService;
+import io.studytracker.eln.NotebookUserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -46,8 +51,19 @@ public class ELNServiceConfiguration {
     }
 
     @Bean
-    public BenchlingNotebookService benchlingNotebookService() {
-      return new BenchlingNotebookService();
+    public NotebookFolderService benchlingNotebookService() {
+      return new BenchlingNotebookFolderService();
     }
+
+    @Bean
+    public NotebookEntryService benchlingNotebookEntryService() {
+      return new BenchlingNotebookEntryService();
+    }
+
+    @Bean
+    public NotebookUserService benchlingNotebookUserService() {
+      return new BenchlingNotebookUserService();
+    }
+
   }
 }

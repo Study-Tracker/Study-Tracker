@@ -1,7 +1,7 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookUserService;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
@@ -35,7 +35,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
 
   private ActivityService activityService;
 
-  private StudyNotebookService studyNotebookService;
+  private NotebookUserService studyNotebookService;
 
   private boolean isLong(String value) {
     try {
@@ -259,12 +259,12 @@ public abstract class AbstractAssayController extends AbstractApiController {
     this.activityService = activityService;
   }
 
-  public StudyNotebookService getStudyNotebookService() {
+  public NotebookUserService getStudyNotebookService() {
     return studyNotebookService;
   }
 
   @Autowired(required = false)
-  public void setStudyNotebookService(StudyNotebookService studyNotebookService) {
+  public void setStudyNotebookService(NotebookUserService studyNotebookService) {
     this.studyNotebookService = studyNotebookService;
   }
 }

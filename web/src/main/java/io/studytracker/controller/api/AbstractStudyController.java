@@ -16,8 +16,8 @@
 
 package io.studytracker.controller.api;
 
+import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
@@ -50,7 +50,7 @@ public abstract class AbstractStudyController extends AbstractApiController {
 
   private AssayService assayService;
 
-  private StudyNotebookService notebookService;
+  private NotebookEntryService notebookEntryService;
 
   private StudyMapper studyMapper;
 
@@ -112,9 +112,9 @@ public abstract class AbstractStudyController extends AbstractApiController {
   protected Study createNewStudy(Study study, String notebookTemplateId) {
 
     // If a notebook template was requested, find it
-    if (notebookService != null && StringUtils.hasText(notebookTemplateId)) {
+    if (notebookEntryService != null && StringUtils.hasText(notebookTemplateId)) {
       Optional<NotebookTemplate> templateOptional =
-          notebookService.findEntryTemplateById(notebookTemplateId);
+          notebookEntryService.findEntryTemplateById(notebookTemplateId);
       if (templateOptional.isPresent()) {
         getStudyService().create(study, templateOptional.get());
       } else {
@@ -235,13 +235,13 @@ public abstract class AbstractStudyController extends AbstractApiController {
     this.activityMapper = activityMapper;
   }
 
-  public StudyNotebookService getNotebookService() {
-    return notebookService;
+  public NotebookEntryService getNotebookEntryService() {
+    return notebookEntryService;
   }
 
   @Autowired(required = false)
-  public void setNotebookService(StudyNotebookService notebookService) {
-    this.notebookService = notebookService;
+  public void setNotebookEntryService(NotebookEntryService notebookEntryService) {
+    this.notebookEntryService = notebookEntryService;
   }
 
   public CollaboratorService getCollaboratorService() {

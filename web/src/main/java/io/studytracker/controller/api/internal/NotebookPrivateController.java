@@ -1,7 +1,7 @@
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.StudyNotebookService;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -22,21 +22,21 @@ public class NotebookPrivateController {
   private static final Logger LOGGER = LoggerFactory.getLogger(NotebookPrivateController.class);
 
   @Autowired(required = false)
-  private StudyNotebookService notebookService;
+  private NotebookEntryService notebookEntryService;
 
   @GetMapping("/entrytemplate")
   public HttpEntity<List<NotebookTemplate>> findNotebookEntryTemplates() {
-    if (notebookService == null) {
+    if (notebookEntryService == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    List<NotebookTemplate> templates = notebookService.findEntryTemplates();
+    List<NotebookTemplate> templates = notebookEntryService.findEntryTemplates();
     LOGGER.info(templates.toString());
     return new ResponseEntity<>(templates, HttpStatus.OK);
   }
 
   @GetMapping("/entrytemplate/{id}")
   public HttpEntity<NotebookTemplate> findNotebookEntryTemplateById(@PathVariable String id) {
-    Optional<NotebookTemplate> optional = notebookService.findEntryTemplateById(id);
+    Optional<NotebookTemplate> optional = notebookEntryService.findEntryTemplateById(id);
     if (optional.isPresent()) {
       return new ResponseEntity<>(optional.get(), HttpStatus.OK);
     } else {

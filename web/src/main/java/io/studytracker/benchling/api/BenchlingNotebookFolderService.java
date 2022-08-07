@@ -16,117 +16,50 @@
 
 package io.studytracker.benchling.api;
 
-import io.studytracker.benchling.api.entities.BenchlingAuthenticationToken;
 import io.studytracker.benchling.api.entities.BenchlingEntry;
 import io.studytracker.benchling.api.entities.BenchlingEntryList;
-import io.studytracker.benchling.api.entities.BenchlingEntryRequest;
-import io.studytracker.benchling.api.entities.BenchlingEntryRequest.CustomField;
-import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
-import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
 import io.studytracker.benchling.api.entities.BenchlingFolder;
 import io.studytracker.benchling.api.entities.BenchlingFolderList;
 import io.studytracker.benchling.api.entities.BenchlingProject;
-import io.studytracker.benchling.api.entities.BenchlingUser;
-import io.studytracker.benchling.api.entities.BenchlingUserList;
 import io.studytracker.benchling.exception.EntityNotFoundException;
-import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.NotebookUser;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.MalformedEntityException;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
-import io.studytracker.model.User;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.service.NamingService;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import javax.annotation.PostConstruct;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
-public final class BenchlingNotebookService implements StudyNotebookService {
+public final class BenchlingNotebookFolderService 
+    extends AbstractBenchlingApiService
+    implements NotebookFolderService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingNotebookService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingNotebookFolderService.class);
 
-  @Autowired private BenchlingElnRestClient client;
+  @Autowired 
+  private NamingService namingService;
 
-  @Autowired private NamingService namingService;
-
-  @Autowired private ELNFolderRepository elnFolderRepository;
-
-  @Value("${benchling.tenant-name}")
-  private String tenantName;
-
-  @Value("${benchling.api.username:}")
-  private String username;
-
-  @Value("${benchling.api.password:}")
-  private String password;
-
-  @Value("${benchling.api.client-id:}")
-  private String clientId;
-
-  @Value("${benchling.api.client-secret:}")
-  private String clientSecret;
-
-  @Value("${benchling.api.token:}")
-  private String token;
-
-  private URL rootUrl;
-
-  private URL rootFolderUrl;
-
-  @PostConstruct
-  public void init() throws MalformedURLException {
-    rootUrl = new URL("https://" + tenantName + ".benchling.com");
-    rootFolderUrl = new URL(rootUrl, "/" + tenantName + "/f_");
-  }
+  @Autowired 
+  private ELNFolderRepository elnFolderRepository;
 
   /**
-   * Generates an Authorization header to be used in REST API requests. The header will acquired
-   * based on the provided configuration. If an application client is provided, a Bearer token will
-   * be generated. Otherwise, a HTTP Basic auth header will be used.
-   *
-   * @return token
-   */
-  private String generateAuthorizationHeader() {
-    if (StringUtils.hasText(token)) {
-      return "Basic " + token;
-    } else if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-      String auth = username + ":" + password;
-      byte[] bytes = Base64.encodeBase64(auth.getBytes(StandardCharsets.US_ASCII));
-      return "Basic " + new String(bytes);
-    } else {
-      BenchlingAuthenticationToken benchlingAuthenticationToken =
-          client.acquireApplicationAuthenticationToken(clientId, clientSecret);
-      String token = benchlingAuthenticationToken.getAccessToken();
-      return "Bearer " + token;
-    }
-  }
-
-  /**
-   * Generate the web client URL for the folder with the given ID.
+   * Generate the web this.getClient() URL for the folder with the given ID.
    *
    * @param folder
    * @return
    */
   private String createFolderUrl(BenchlingFolder folder) {
-    return rootFolderUrl
+    return this.getRootFolderUrl()
         + "/"
         + folder.getId().replace("lib_", "")
         + "-"
@@ -137,21 +70,6 @@ public final class BenchlingNotebookService implements StudyNotebookService {
             .replaceAll("[^A-Za-z0-9-_\\s()]+", "")
             .replaceAll("[\\()]", "")
             .trim();
-  }
-
-  /**
-   * Converts a {@link BenchlingEntry} object into a {@link NotebookEntry} object.
-   *
-   * @param benchlingEntry
-   * @return
-   */
-  private NotebookEntry convertBenchlingEntry(BenchlingEntry benchlingEntry) {
-    NotebookEntry notebookEntry = new NotebookEntry();
-    notebookEntry.setName(benchlingEntry.getName());
-    notebookEntry.setReferenceId(benchlingEntry.getId());
-    notebookEntry.setUrl(benchlingEntry.getWebURL());
-    notebookEntry.getAttributes().put("folderId", benchlingEntry.getFolderId());
-    return notebookEntry;
   }
 
   /**
@@ -198,39 +116,6 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     return notebookFolder;
   }
 
-  private NotebookTemplate convertNotebookEntryTemplate(BenchlingEntryTemplate benchlingTemplate) {
-    NotebookTemplate template = new NotebookTemplate();
-    template.setName(benchlingTemplate.getName());
-    template.setReferenceId(benchlingTemplate.getId());
-    return template;
-  }
-
-  private List<NotebookTemplate> convertNotebookEntryTemplates(
-      List<BenchlingEntryTemplate> benchlingEntryTemplates) {
-    List<NotebookTemplate> templates = new ArrayList<>();
-    for (BenchlingEntryTemplate benchlingEntryTemplate : benchlingEntryTemplates) {
-      templates.add(this.convertNotebookEntryTemplate(benchlingEntryTemplate));
-    }
-    return templates;
-  }
-
-  private NotebookUser convertUser(BenchlingUser benchlingUser) {
-    NotebookUser notebookUser = new NotebookUser();
-    notebookUser.setName(benchlingUser.getName());
-    notebookUser.setUsername(benchlingUser.getHandle());
-    notebookUser.setEmail(benchlingUser.getEmail());
-    notebookUser.setReferenceId(benchlingUser.getId());
-    return notebookUser;
-  }
-
-  private List<NotebookUser> convertUsers(List<BenchlingUser> benchlingUsers) {
-    List<NotebookUser> notebookUsers = new ArrayList<>();
-    for (BenchlingUser benchlingUser : benchlingUsers) {
-      notebookUsers.add(this.convertUser(benchlingUser));
-    }
-    return notebookUsers;
-  }
-
   /**
    * Loads the contents of {@link BenchlingFolder} folders and appends them to the referenced {@link
    * NotebookFolder} object.
@@ -252,7 +137,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     String nextToken = null;
     while (hasNext) {
       BenchlingFolderList folderList =
-          client.findFolderChildren(benchlingFolder.getId(), authHeader, nextToken);
+          this.getClient().findFolderChildren(benchlingFolder.getId(), authHeader, nextToken);
       childrenFolders.addAll(folderList.getFolders());
       nextToken = folderList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
@@ -268,10 +153,10 @@ public final class BenchlingNotebookService implements StudyNotebookService {
    * @return
    */
   private String getProjectPath(NotebookFolder folder, String authHeader) {
-    return client
+    return this.getClient()
         .findFolderById(folder.getReferenceId(), authHeader)
         .flatMap(
-            benchlingFolder -> client.findProjectById(benchlingFolder.getProjectId(), authHeader))
+            benchlingFolder -> this.getClient().findProjectById(benchlingFolder.getProjectId(), authHeader))
         .map(BenchlingProject::getName)
         .map(name -> name + "/")
         .orElse("");
@@ -322,7 +207,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     boolean hasNext = true;
     while (hasNext) {
       BenchlingEntryList entryList =
-          client.findProjectEntries(benchlingFolder.getProjectId(), authHeader, nextToken);
+          this.getClient().findProjectEntries(benchlingFolder.getProjectId(), authHeader, nextToken);
       entries.addAll(entryList.getEntries());
       nextToken = entryList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
@@ -352,7 +237,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     boolean hasNext = true;
     while (hasNext) {
       BenchlingEntryList entryList =
-          client.findProjectEntries(benchlingFolder.getProjectId(), authHeader, nextToken);
+          this.getClient().findProjectEntries(benchlingFolder.getProjectId(), authHeader, nextToken);
       entries.addAll(entryList.getEntries());
       nextToken = entryList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
@@ -374,7 +259,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     if (elnFolderOptional.isPresent()) {
       String authHeader = generateAuthorizationHeader();
       Optional<BenchlingFolder> optional =
-          client.findFolderById(elnFolderOptional.get().getReferenceId(), authHeader);
+          this.getClient().findFolderById(elnFolderOptional.get().getReferenceId(), authHeader);
       return Optional.of(convertFolder(optional.get(), authHeader));
     } else {
       LOGGER.warn(
@@ -398,7 +283,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
       String authHeader = generateAuthorizationHeader();
       NotebookFolder studyFolder = NotebookFolder.from(elnFolderOptional.get());
       Optional<BenchlingFolder> optional =
-          client.findFolderById(studyFolder.getReferenceId(), authHeader);
+          this.getClient().findFolderById(studyFolder.getReferenceId(), authHeader);
       return optional.flatMap(
           folder -> {
             if (includeContents) {
@@ -423,7 +308,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
       String authHeader = generateAuthorizationHeader();
       NotebookFolder assayFolder = NotebookFolder.from(elnFolderOptional.get());
       Optional<BenchlingFolder> optional =
-          client.findFolderById(assayFolder.getReferenceId(), authHeader);
+          this.getClient().findFolderById(assayFolder.getReferenceId(), authHeader);
       return optional.flatMap(
           folder -> Optional.of(getContentFullNotebookFolder(folder, assay, authHeader)));
     } else {
@@ -442,7 +327,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
       String authHeader = generateAuthorizationHeader();
       try {
         BenchlingFolder folder =
-            client.findFolderById(program.getNotebookFolder().getReferenceId(), authHeader).get();
+            this.getClient().findFolderById(program.getNotebookFolder().getReferenceId(), authHeader).get();
         return this.convertFolder(folder, authHeader);
       } catch (Exception e) {
         LOGGER.error("Failed to register new program: " + program.getName());
@@ -469,7 +354,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
     String authHeader = generateAuthorizationHeader();
     BenchlingFolder benchlingFolder =
-        client.createFolder(
+        this.getClient().createFolder(
             namingService.getStudyNotebookFolderName(study),
             programFolder.getReferenceId(),
             authHeader);
@@ -491,7 +376,7 @@ public final class BenchlingNotebookService implements StudyNotebookService {
 
     String authHeader = generateAuthorizationHeader();
     BenchlingFolder benchlingFolder =
-        client.createFolder(
+        this.getClient().createFolder(
             namingService.getAssayNotebookFolderName(assay),
             studyFolder.getReferenceId(),
             authHeader);
@@ -501,179 +386,4 @@ public final class BenchlingNotebookService implements StudyNotebookService {
     return assayFolder;
   }
 
-  @Override
-  public List<NotebookTemplate> findEntryTemplates() {
-    LOGGER.info("Fetching Benchling notebook entry templates.");
-    String authHeader = generateAuthorizationHeader();
-    List<BenchlingEntryTemplate> templates = new ArrayList<>();
-    String nextToken = null;
-    boolean hasNext = true;
-    while (hasNext) {
-      BenchlingEntryTemplateList templateList = client.findEntryTemplates(authHeader, nextToken);
-      templates.addAll(templateList.getEntryTemplates());
-      nextToken = templateList.getNextToken();
-      hasNext = StringUtils.hasText(nextToken);
-    }
-    return this.convertNotebookEntryTemplates(templates);
-  }
-
-  @Override
-  public Optional<NotebookTemplate> findEntryTemplateById(String id) {
-    LOGGER.info("Fetching Benchling notebook entry template: " + id);
-    String authHeader = generateAuthorizationHeader();
-    BenchlingEntryTemplate template = client.findEntryTemplateById(id, authHeader);
-    return Optional.of(this.convertNotebookEntryTemplate(template));
-  }
-
-  @Override
-  public NotebookEntry createStudyNotebookEntry(Study study) throws NotebookException {
-    return this.createStudyNotebookEntry(study, null);
-  }
-
-  @Override
-  public NotebookEntry createStudyNotebookEntry(Study study, NotebookTemplate template)
-      throws NotebookException {
-
-    BenchlingEntryRequest request = new BenchlingEntryRequest();
-    request.setName(study.getCode() + " Study Summary: " + study.getName());
-    request.setFolderId(study.getNotebookFolder().getReferenceId());
-
-    // Users
-    List<String> userIds = new ArrayList<>();
-    for (User user : study.getUsers()) {
-      Optional<NotebookUser> userOptional = this.findNotebookUser(user);
-      if (userOptional.isPresent()) {
-        userIds.add(userOptional.get().getReferenceId());
-      } else {
-        LOGGER.warn("Could not find user registered in Benchling: " + user);
-      }
-    }
-    request.setAuthorIds(userIds);
-
-    // Entry template
-    if (template != null) {
-      request.setEntryTemplateId(template.getReferenceId());
-    }
-
-    // Custom fields
-    Map<String, CustomField> customFields = new LinkedHashMap<>();
-    customFields.put("Name", new CustomField(study.getName()));
-    customFields.put("Code", new CustomField(study.getCode()));
-    customFields.put(
-        "Description", new CustomField(study.getDescription().replaceAll("<.+?>", "")));
-    customFields.put("Program", new CustomField(study.getProgram().getName()));
-    if (study.getExternalCode() != null) {
-      customFields.put("External Code", new CustomField(study.getExternalCode()));
-    }
-    request.setCustomFields(customFields);
-
-    String authHeader = generateAuthorizationHeader();
-    return this.convertBenchlingEntry(client.createEntry(request, authHeader));
-  }
-
-  @Override
-  public NotebookEntry createAssayNotebookEntry(Assay assay) throws NotebookException {
-    return this.createAssayNotebookEntry(assay, null);
-  }
-
-  @Override
-  public NotebookEntry createAssayNotebookEntry(Assay assay, NotebookTemplate template)
-      throws NotebookException {
-
-    BenchlingEntryRequest request = new BenchlingEntryRequest();
-    request.setName(assay.getCode() + " Assay Summary: " + assay.getName());
-    request.setFolderId(assay.getNotebookFolder().getReferenceId());
-
-    // Users
-    List<String> userIds = new ArrayList<>();
-    for (User user : assay.getUsers()) {
-      Optional<NotebookUser> userOptional = this.findNotebookUser(user);
-      if (userOptional.isPresent()) {
-        userIds.add(userOptional.get().getReferenceId());
-      } else {
-        LOGGER.warn("Could not find user registered in Benchling: " + user);
-      }
-    }
-    request.setAuthorIds(userIds);
-
-    // Entry template
-    if (template != null) {
-      request.setEntryTemplateId(template.getReferenceId());
-    }
-
-    // Custom fields
-    Map<String, CustomField> customFields = new LinkedHashMap<>();
-    customFields.put("Name", new CustomField(assay.getName()));
-    customFields.put("Code", new CustomField(assay.getCode()));
-    customFields.put(
-        "Description", new CustomField(assay.getDescription().replaceAll("<.+?>", "")));
-    customFields.put("Assay Type", new CustomField(assay.getAssayType().getName()));
-    customFields.put("Study", new CustomField(assay.getStudy().getCode()));
-    request.setCustomFields(customFields);
-
-    String authHeader = generateAuthorizationHeader();
-    return this.convertBenchlingEntry(client.createEntry(request, authHeader));
-  }
-
-  @Override
-  public List<NotebookUser> findNotebookUsers() {
-    LOGGER.info("Fetching Benchling user list.");
-    String authHeader = generateAuthorizationHeader();
-    List<BenchlingUser> users = new ArrayList<>();
-    String nextToken = null;
-    boolean hasNext = true;
-    while (hasNext) {
-      BenchlingUserList userList = client.findUsers(authHeader, nextToken);
-      users.addAll(userList.getUsers());
-      nextToken = userList.getNextToken();
-      hasNext = StringUtils.hasText(nextToken);
-    }
-    return this.convertUsers(users);
-  }
-
-  @Override
-  public Optional<NotebookUser> findNotebookUser(User user) {
-    LOGGER.info("Looking up Benchling user: " + user.getDisplayName());
-    String authHeader = generateAuthorizationHeader();
-
-    // Look up user by username first
-    List<BenchlingUser> users = new ArrayList<>();
-    String nextToken = null;
-    boolean hasNext = true;
-    while (hasNext) {
-      BenchlingUserList userList =
-          client.findUsersByUsername(user.getEmail(), authHeader, nextToken);
-      users.addAll(userList.getUsers());
-      nextToken = userList.getNextToken();
-      hasNext = StringUtils.hasText(nextToken);
-    }
-    if (!users.isEmpty()) {
-      for (BenchlingUser benchlingUser : users) {
-        if (benchlingUser.getEmail().equals(user.getEmail())) {
-          return Optional.of(this.convertUser(benchlingUser));
-        }
-      }
-    }
-
-    // Otherwise, check all the users
-    else {
-      nextToken = null;
-      hasNext = true;
-      while (hasNext) {
-        BenchlingUserList userList = client.findUsers(authHeader, nextToken);
-        users.addAll(userList.getUsers());
-        nextToken = userList.getNextToken();
-        hasNext = StringUtils.hasText(nextToken);
-      }
-      if (!users.isEmpty()) {
-        for (BenchlingUser benchlingUser : users) {
-          if (benchlingUser.getEmail().equals(user.getEmail())) {
-            return Optional.of(this.convertUser(benchlingUser));
-          }
-        }
-      }
-    }
-
-    return Optional.empty();
-  }
 }

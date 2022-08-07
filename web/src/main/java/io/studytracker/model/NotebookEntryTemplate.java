@@ -22,6 +22,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+@Deprecated
 @Entity
 @Table(name = "notebook_entry_templates")
 @EntityListeners(AuditingEntityListener.class)

@@ -75,27 +75,11 @@ const AssayFormView = props => {
       }));
     });
 
-    const notebookTemplates = await axios.get(
-        "/api/internal/notebookentrytemplate?category=ASSAY&active=true")
-    .then(async response => await response.data)
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
-    const defaultNotebookTemplate = notebookTemplates.find(
-        o => o.default === true);
-
     setState(prevState => ({
       ...prevState,
       study: study,
       assay: assay,
       assayTypes: assayTypes,
-      notebookTemplates: notebookTemplates,
-      defaultNotebookTemplate,
       isLoaded: true
     }));
 
@@ -111,8 +95,6 @@ const AssayFormView = props => {
         assay={state.assay}
         user={user}
         assayTypes={state.assayTypes}
-        notebookTemplates={state.notebookTemplates}
-        defaultNotebookTemplate={state.defaultNotebookTemplate}
         features={features}
     />;
   }

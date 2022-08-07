@@ -73,6 +73,9 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
 
   @Override
   public EgnyteFolder createFolder(String folderPath) throws EgnyteException {
+    if (folderPath == null) {
+      throw new IllegalArgumentException("folderPath cannot be null");
+    }
     LOGGER.info("Making request to Egnyte API to create directory: " + folderPath);
     doBefore();
     URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/" + folderPath);
@@ -86,7 +89,7 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
       ResponseEntity<EgnyteFolder> response =
           restTemplate.exchange(url.toString(), HttpMethod.POST, request, EgnyteFolder.class);
       EgnyteFolder egnyteFolder = response.getBody();
-      LOGGER.debug(egnyteFolder.toString());
+      LOGGER.debug("New Egnyte folder: " + egnyteFolder.toString());
       return egnyteFolder;
     } catch (HttpStatusCodeException e) {
       String responseBody = e.getResponseBodyAsString();
@@ -118,7 +121,9 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
 
   @Override
   public EgnyteObject findObjectByPath(String path, int depth) throws EgnyteException {
-
+    if (path == null) {
+      throw new IllegalArgumentException("Path cannot be null.");
+    }
     LOGGER.info("Making request to Egnyte API for object at path: " + path);
 
     doBefore();
@@ -172,6 +177,9 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
 
   @Override
   public EgnyteFolder findFolderById(String folderId) throws EgnyteException {
+    if (folderId == null) {
+      throw new IllegalArgumentException("folderId cannot be null");
+    }
     LOGGER.info("Making request to Egnyte API for folder with ID: " + folderId);
     doBefore();
     URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/ids/folder/" + folderId);

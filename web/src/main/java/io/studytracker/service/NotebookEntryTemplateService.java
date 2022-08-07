@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Deprecated
 @Service
 public class NotebookEntryTemplateService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NotebookEntryTemplateService.class);
 
-  @Autowired private NotebookEntryTemplateRepository notebookEntryTemplateRepository;
+  @Autowired
+  private NotebookEntryTemplateRepository notebookEntryTemplateRepository;
 
   public Optional<NotebookEntryTemplate> findById(Long id) {
     return notebookEntryTemplateRepository.findById(id);

@@ -2,7 +2,7 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Study;
 import java.util.Optional;
@@ -25,7 +25,7 @@ public class StudyNotebookController extends AbstractStudyController {
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyNotebookController.class);
 
   @Autowired(required = false)
-  private StudyNotebookService studyNotebookService;
+  private NotebookFolderService notebookFolderService;
 
   @GetMapping("")
   public NotebookFolder getStudyNotebookFolder(@PathVariable("studyId") String studyId)
@@ -34,7 +34,7 @@ public class StudyNotebookController extends AbstractStudyController {
     Study study = getStudyFromIdentifier(studyId);
 
     Optional<NotebookFolder> notebookFolder =
-        Optional.ofNullable(studyNotebookService)
+        Optional.ofNullable(notebookFolderService)
             .flatMap(service -> service.findStudyFolder(study));
     return notebookFolder.orElseThrow(
         () -> new RecordNotFoundException("Could not load notebook folder"));

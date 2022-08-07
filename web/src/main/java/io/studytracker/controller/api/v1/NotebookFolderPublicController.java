@@ -1,7 +1,7 @@
 package io.studytracker.controller.api.v1;
 
 import io.studytracker.controller.api.AbstractApiController;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookUserService;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.NotebookFolderDto;
 import io.studytracker.mapstruct.mapper.NotebookFolderMapper;
@@ -25,7 +25,7 @@ public class NotebookFolderPublicController extends AbstractApiController {
   private static final Logger LOGGER = LoggerFactory.getLogger(NotebookFolderPublicController.class);
 
   @Autowired(required = false)
-  private StudyNotebookService studyNotebookService;
+  private NotebookUserService studyNotebookService;
 
   @Autowired
   private NotebookFolderMapper notebookFolderMapper;

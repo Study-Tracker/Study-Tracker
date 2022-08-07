@@ -17,9 +17,10 @@
 package io.studytracker.service;
 
 import io.studytracker.eln.NotebookEntry;
+import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
@@ -64,7 +65,9 @@ public class StudyService {
 
   private StudyStorageService studyStorageService;
 
-  private StudyNotebookService notebookService;
+  private NotebookEntryService notebookEntryService;
+
+  private NotebookFolderService notebookFolderService;
 
   private NamingService namingService;
 
@@ -188,7 +191,7 @@ public class StudyService {
         try {
 
           // Create the notebook folder
-          NotebookFolder notebookFolder = notebookService.createStudyFolder(study);
+          NotebookFolder notebookFolder = notebookFolderService.createStudyFolder(study);
           elnFolder = ELNFolder.from(notebookFolder);
 
         } catch (Exception e) {
@@ -253,11 +256,11 @@ public class StudyService {
 
     // Create the ELN folder
     NotebookEntry studySummaryEntry = null;
-    if (notebookService != null) {
+    if (notebookEntryService != null) {
       ELNFolder elnFolder = this.createStudyElnFolder(study, program);
       study.setNotebookFolder(elnFolder);
       if (!study.isLegacy()) {
-        studySummaryEntry = notebookService.createStudyNotebookEntry(study, template);
+        studySummaryEntry = notebookEntryService.createStudyNotebookEntry(study, template);
       }
     } else {
       study.setNotebookFolder(null);
@@ -477,11 +480,11 @@ public class StudyService {
 
     // Check to see if the folder exists and create a new one if necessary
     NotebookFolder folder;
-    Optional<NotebookFolder> optional = notebookService.findStudyFolder(study);
+    Optional<NotebookFolder> optional = notebookFolderService.findStudyFolder(study);
     if (optional.isPresent()) {
       folder = optional.get();
     } else {
-      folder = notebookService.createStudyFolder(study);
+      folder = notebookFolderService.createStudyFolder(study);
     }
 
     // Update the record
@@ -522,8 +525,8 @@ public class StudyService {
   }
 
   @Autowired(required = false)
-  public void setNotebookService(StudyNotebookService notebookService) {
-    this.notebookService = notebookService;
+  public void setNotebookEntryService(NotebookEntryService notebookEntryService) {
+    this.notebookEntryService = notebookEntryService;
   }
 
   @Autowired
@@ -539,5 +542,10 @@ public class StudyService {
   @Autowired
   public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {
     this.elnFolderRepository = elnFolderRepository;
+  }
+
+  @Autowired
+  public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
+    this.notebookFolderService = notebookFolderService;
   }
 }

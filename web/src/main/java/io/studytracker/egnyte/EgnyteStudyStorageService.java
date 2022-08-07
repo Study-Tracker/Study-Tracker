@@ -53,6 +53,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   public String getProgramFolderPath(Program program) {
+    LOGGER.debug("getProgramFolderPath({})", program.getName());
     String path;
     if (program.getStorageFolder() != null && program.getStorageFolder().getPath() != null) {
       path = program.getStorageFolder().getPath();
@@ -63,10 +64,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       String root = options.getRootPath();
       path = root + egnyteFolderNamingService.getProgramStorageFolderName(program) + "/";
     }
+    LOGGER.debug("Program folder path: " + path);
     return path;
   }
 
   public String getStudyFolderPath(Study study) {
+    LOGGER.debug("getStudyFolderPath({})", study.getName());
     String path;
     if (study.getStorageFolder() != null && study.getStorageFolder().getPath() != null) {
       path = study.getStorageFolder().getPath();
@@ -79,10 +82,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
               + egnyteFolderNamingService.getStudyStorageFolderName(study)
               + "/";
     }
+    LOGGER.debug("Study folder path: " + path);
     return path;
   }
 
   public String getAssayFolderPath(Assay assay) {
+    LOGGER.debug("getAssayFolderPath({})", assay.getName());
     String path;
     if (assay.getStorageFolder() != null && assay.getStorageFolder().getPath() != null) {
       path = assay.getStorageFolder().getPath();
@@ -94,6 +99,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       String studyPath = this.getStudyFolderPath(study);
       path = studyPath + egnyteFolderNamingService.getAssayStorageFolderName(assay) + "/";
     }
+    LOGGER.debug("Assay folder path: " + path);
     return path;
   }
 
@@ -145,10 +151,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       storageFolder.getSubFolders().add(convertFolder(subFolder));
     }
     EgnyteFolder parentFolder = null;
-    try {
-      parentFolder = egnyteClient.findFolderById(egnyteFolder.getParentId());
-    } catch (Exception e) {
-      LOGGER.warn("No Egnyte folder found with ID: " + egnyteFolder.getParentId());
+    if (egnyteFolder.getParentId() != null) {
+      try {
+        parentFolder = egnyteClient.findFolderById(egnyteFolder.getParentId());
+      } catch (Exception e) {
+        LOGGER.warn("No Egnyte folder found with ID: " + egnyteFolder.getParentId());
+      }
     }
     if (parentFolder != null) {
       storageFolder.setParentFolder(convertEgnyteFolder(parentFolder));
@@ -164,7 +172,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFolder getProgramFolder(Program program, boolean includeContents)
       throws StudyStorageNotFoundException {
+    LOGGER.debug("getProgramFolder({}, {})", program.getName(), includeContents);
     String path = getProgramFolderPath(program);
+    StorageFolder storageFolder;
     try {
       EgnyteObject obj;
       if (includeContents) {
@@ -175,10 +185,13 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       if (!obj.isFolder()) {
         throw new StudyTrackerException("Found resource is not a folder");
       }
-      return convertFolder((EgnyteFolder) obj);
+      LOGGER.debug("Egnyte folder: " + ((EgnyteFolder) obj));
+      storageFolder = convertFolder((EgnyteFolder) obj);
     } catch (EgnyteException e) {
       throw new StudyStorageNotFoundException(e);
     }
+    LOGGER.debug("Program folder: " + storageFolder);
+    return storageFolder;
   }
 
   @Override
@@ -189,7 +202,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFolder getStudyFolder(Study study, boolean includeContents)
       throws StudyStorageNotFoundException {
+    LOGGER.debug("getStudyFolder({}, {})", study.getName(), includeContents);
     String path = getStudyFolderPath(study);
+    StorageFolder storageFolder;
     try {
       EgnyteObject obj;
       if (includeContents) {
@@ -200,10 +215,13 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       if (!obj.isFolder()) {
         throw new StudyTrackerException("Found resource is not a folder");
       }
-      return this.convertFolder((EgnyteFolder) obj);
+      LOGGER.debug("Egnyte folder: " + ((EgnyteFolder) obj));
+      storageFolder = this.convertFolder((EgnyteFolder) obj);
     } catch (EgnyteException e) {
       throw new StudyStorageNotFoundException(e);
     }
+    LOGGER.debug("Study folder: " + storageFolder);
+    return storageFolder;
   }
 
   @Override
@@ -214,7 +232,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFolder getAssayFolder(Assay assay, boolean includeContents)
       throws StudyStorageNotFoundException {
+    LOGGER.debug("getAssayFolder({}, {})", assay.getName(), includeContents);
     String path = getAssayFolderPath(assay);
+    StorageFolder storageFolder;
     try {
       EgnyteObject obj;
       if (includeContents) {
@@ -225,49 +245,60 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       if (!obj.isFolder()) {
         throw new StudyTrackerException("Found resource is not a folder");
       }
-      return this.convertFolder((EgnyteFolder) obj);
+      LOGGER.debug("Egnyte folder: " + ((EgnyteFolder) obj));
+      storageFolder = this.convertFolder((EgnyteFolder) obj);
     } catch (EgnyteException e) {
       throw new StudyStorageNotFoundException(e);
     }
+    LOGGER.debug("Assay folder: " + storageFolder);
+    return storageFolder;
   }
 
   @Override
   public StorageFolder createProgramFolder(Program program) throws StudyStorageException {
     LOGGER.info(String.format("Creating folder for program %s", program.getName()));
     String path = getProgramFolderPath(program);
+    StorageFolder storageFolder;
     try {
-      return this.convertFolder(egnyteClient.createFolder(path));
+      storageFolder = this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
       LOGGER.warn("Duplicate folder found: " + path);
       if (options.isUseExisting()) {
         LOGGER.warn("Existing folder will be used.");
-        return this.getProgramFolder(program, false);
+        storageFolder = this.getProgramFolder(program, false);
+      } else {
+        throw new StudyStorageDuplicateException(e);
       }
-      throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
+    LOGGER.debug("Program folder: " + storageFolder);
+    return storageFolder;
   }
 
   @Override
   public StorageFolder createStudyFolder(Study study) throws StudyStorageException {
     Program program = study.getProgram();
     String path = getStudyFolderPath(study);
+    StorageFolder storageFolder;
     LOGGER.info(
         String.format(
             "Creating folder for study %s in program folder %s with path: %s",
             study.getCode(), program.getName(), path));
     try {
-      return this.convertFolder(egnyteClient.createFolder(path));
+      storageFolder = this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
       if (options.isUseExisting()) {
         LOGGER.warn("Existing folder will be used.");
-        return this.getStudyFolder(study, false);
+        storageFolder = this.getStudyFolder(study, false);
+      } else {
+        throw new StudyStorageDuplicateException(e);
       }
-      throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
+    LOGGER.debug("Study folder: " + storageFolder);
+    return storageFolder;
   }
 
   @Override
@@ -278,37 +309,49 @@ public class EgnyteStudyStorageService implements StudyStorageService {
             "Creating folder for assay %s in study folder %s",
             assay.getCode(), study.getName() + " (" + study.getCode() + ")"));
     String path = getAssayFolderPath(assay);
+    StorageFolder storageFolder;
     try {
-      return this.convertFolder(egnyteClient.createFolder(path));
+      storageFolder = this.convertFolder(egnyteClient.createFolder(path));
     } catch (DuplicateFolderException e) {
       if (options.isUseExisting()) {
         LOGGER.warn("Existing folder will be used.");
-        return this.getAssayFolder(assay, false);
+        storageFolder = this.getAssayFolder(assay, false);
+      } else {
+        throw new StudyStorageDuplicateException(e);
       }
-      throw new StudyStorageDuplicateException(e);
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
+    LOGGER.debug("Assay folder: " + storageFolder);
+    return storageFolder;
   }
 
   @Override
   public StorageFile saveStudyFile(File file, Study study) throws StudyStorageException {
+    LOGGER.debug("saveStudyFile({}, {})", file.getName(), study.getName());
     String path = getStudyFolderPath(study);
+    StorageFile storageFile;
     try {
-      return this.convertEgnyteFile(egnyteClient.uploadFile(file, path));
+      storageFile = this.convertEgnyteFile(egnyteClient.uploadFile(file, path));
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
+    LOGGER.debug("Study file: " + storageFile);
+    return storageFile;
   }
 
   @Override
   public StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException {
+    LOGGER.debug("saveAssayFile({}, {})", file.getName(), assay.getName());
     String path = getAssayFolderPath(assay);
+    StorageFile storageFile;
     try {
-      return this.convertEgnyteFile(egnyteClient.uploadFile(file, path));
+      storageFile = this.convertEgnyteFile(egnyteClient.uploadFile(file, path));
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
+    LOGGER.debug("Assay file: " + storageFile);
+    return storageFile;
   }
 
   @Override

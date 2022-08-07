@@ -17,7 +17,7 @@
 package io.studytracker.service;
 
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.FileStoreFolder;
@@ -49,7 +49,7 @@ public class ProgramService {
 
   private StudyStorageService studyStorageService;
 
-  private StudyNotebookService studyNotebookService;
+  private NotebookFolderService notebookFolderService;
 
   private FileStoreFolderRepository fileStoreFolderRepository;
 
@@ -84,16 +84,19 @@ public class ProgramService {
 
     // Create the storage folder
     try {
-      StorageFolder storageFolder = studyStorageService.createProgramFolder(program);
+      studyStorageService.createProgramFolder(program);
+      StorageFolder storageFolder = studyStorageService.getProgramFolder(program);
+      LOGGER.debug("Created storage folder: " + storageFolder.getPath());
       program.setStorageFolder(FileStoreFolder.from(storageFolder));
     } catch (StudyStorageException e) {
       throw new StudyTrackerException(e);
     }
 
     // Create the notebook folder
-    if (studyNotebookService != null) {
+    if (notebookFolderService != null) {
       try {
-        NotebookFolder notebookFolder = studyNotebookService.createProgramFolder(program);
+        NotebookFolder notebookFolder = notebookFolderService.createProgramFolder(program);
+        LOGGER.debug("Created notebook folder: " + notebookFolder);
         program.setNotebookFolder(ELNFolder.from(notebookFolder));
       } catch (Exception e) {
         throw new StudyTrackerException(e);
@@ -190,11 +193,11 @@ public class ProgramService {
 
     // Check to see if the folder exists and create a new one if necessary
     NotebookFolder folder;
-    Optional<NotebookFolder> optional = studyNotebookService.findProgramFolder(program);
+    Optional<NotebookFolder> optional = notebookFolderService.findProgramFolder(program);
     if (optional.isPresent()) {
       folder = optional.get();
     } else {
-      folder = studyNotebookService.createProgramFolder(program);
+      folder = notebookFolderService.createProgramFolder(program);
     }
 
     // Update the record
@@ -217,8 +220,8 @@ public class ProgramService {
   }
 
   @Autowired(required = false)
-  public void setStudyNotebookService(StudyNotebookService studyNotebookService) {
-    this.studyNotebookService = studyNotebookService;
+  public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
+    this.notebookFolderService = notebookFolderService;
   }
 
   @Autowired

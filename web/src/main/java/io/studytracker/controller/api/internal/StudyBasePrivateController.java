@@ -17,7 +17,7 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
-import io.studytracker.eln.StudyNotebookService;
+import io.studytracker.eln.NotebookUserService;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.StudyFormDto;
@@ -61,7 +61,7 @@ public class StudyBasePrivateController extends AbstractStudyController {
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyBasePrivateController.class);
 
   @Autowired(required = false)
-  private StudyNotebookService notebookService;
+  private NotebookUserService notebookService;
 
   @GetMapping("")
   public List<StudySummaryDto> getAllStudies(

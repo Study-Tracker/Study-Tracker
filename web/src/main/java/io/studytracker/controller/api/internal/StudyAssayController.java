@@ -17,8 +17,8 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
+import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.StudyNotebookService;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -59,7 +59,7 @@ public class StudyAssayController extends AbstractAssayController {
   @Autowired private AssayMapper assayMapper;
 
   @Autowired(required = false)
-  private StudyNotebookService notebookService;
+  private NotebookEntryService notebookEntryService;
 
   @GetMapping("")
   public List<AssaySummaryDto> findStudyAssays(@PathVariable("studyId") String studyId) {
@@ -88,9 +88,9 @@ public class StudyAssayController extends AbstractAssayController {
     Assay created;
 
     // If a notebook template was requested, find it
-    if (notebookService != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
+    if (notebookEntryService != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
       Optional<NotebookTemplate> templateOptional =
-          notebookService.findEntryTemplateById(dto.getNotebookTemplateId());
+          notebookEntryService.findEntryTemplateById(dto.getNotebookTemplateId());
       if (templateOptional.isPresent()) {
         created = this.createAssay(assay, study, user, templateOptional.get());
       } else {

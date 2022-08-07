@@ -23,9 +23,8 @@ import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
 import swal from 'sweetalert';
 import {AssayTypeDropdown} from "../../common/forms/assayTypes";
-import {
-  NotebookEntryTemplatesDropdown
-} from '../../common/forms/notebookEntryTemplates';
+import NotebookEntryTemplatesDropdown
+  from '../../common/forms/NotebookEntryTemplateDropdown';
 import {
   AssayTypeFieldCaptureInputList
 } from "../../common/forms/assayTypeFieldCapture";
@@ -49,9 +48,7 @@ const AssayForm = props => {
     study,
     assay,
     user,
-    defaultNotebookTemplate,
     assayTypes,
-    notebookTemplates,
     features
   } = props;
   const navigate = useNavigate();
@@ -68,8 +65,7 @@ const AssayForm = props => {
     tasks: [],
     attributes: {},
     notebookFolder: {},
-    notebookTemplateId: !!defaultNotebookTemplate
-        ? defaultNotebookTemplate.templateId : null
+    notebookTemplateId: null
   };
 
   const assaySchema = yup.object().shape({
@@ -288,11 +284,12 @@ const AssayForm = props => {
                             && features.notebook.isEnabled
                             && !values.id ? (
                               <NotebookEntryTemplatesDropdown
-                                  notebookTemplates={notebookTemplates}
-                                  defaultTemplate={defaultNotebookTemplate}
-                                  onChange={(selectedItem) => {
-                                    setFieldValue("notebookTemplateId", selectedItem ? selectedItem.value : '')
-                                  }}
+                                  onChange={selectedItem =>
+                                      setFieldValue(
+                                          "notebookTemplateId",
+                                          selectedItem || ''
+                                      )
+                                  }
                               />
                             ): ""
                           }
@@ -572,8 +569,6 @@ AssayForm.propTypes = {
   user: PropTypes.object.isRequired,
   assay: PropTypes.object,
   assayTypes: PropTypes.array.isRequired,
-  notebookTemplates: PropTypes.array.isRequired,
-  defaultNotebookTemplate: PropTypes.object,
 }
 
 export default AssayForm;
