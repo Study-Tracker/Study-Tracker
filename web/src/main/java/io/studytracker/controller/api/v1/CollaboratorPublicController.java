@@ -1,9 +1,15 @@
 package io.studytracker.controller.api.v1;
 
+import io.studytracker.controller.api.AbstractCollaboratorController;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.api.CollaboratorDto;
+import io.studytracker.mapstruct.dto.api.CollaboratorPayloadDto;
+import io.studytracker.model.Collaborator;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -19,33 +25,49 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/collaborator")
-public class CollaboratorPublicController {
+public class CollaboratorPublicController extends AbstractCollaboratorController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollaboratorPublicController.class);
 
   @GetMapping("")
-  public Page<?> findAll(Pageable pageable) {
-    return null;
+  public Page<CollaboratorDto> findAll(Pageable pageable) {
+    LOGGER.debug("Find all collaborators");
+    Page<Collaborator> page = this.getCollaboratorService().findAll(pageable);
+    return new PageImpl<>(this.getCollaboratorMapper().toDtoList(page.getContent()), pageable, page.getTotalElements());
   }
 
   @GetMapping("/{id}")
-  public Object findById(Long id) {
-    return null;
+  public CollaboratorDto findById(Long id) {
+    LOGGER.debug("Find collaborator with id {}", id);
+    Collaborator collaborator = this.getCollaboratorService().findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Collaborator not found: " + id));
+    return this.getCollaboratorMapper().toDto(collaborator);
   }
 
   @PostMapping("")
-  public HttpEntity<?> create(@Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<CollaboratorDto> create(@Valid @RequestBody CollaboratorPayloadDto dto) {
+    LOGGER.info("Creating collaborator: {}", dto);
+    Collaborator collaborator = this.createNewCollaborator(this.getCollaboratorMapper().fromPayloadDto(dto));
+    return new ResponseEntity<>(this.getCollaboratorMapper().toDto(collaborator), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<?> update(@PathVariable Long id, @Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<CollaboratorDto> update(
+      @PathVariable Long id,
+      @Valid @RequestBody CollaboratorPayloadDto dto
+  ) {
+    LOGGER.info("Updating existing collaborator: {}", dto);
+    Collaborator collaborator = this.getCollaboratorMapper().fromPayloadDto(dto);
+    collaborator.setId(id);
+    collaborator = this.updateExistingCollaborator(collaborator, id);
+    return new ResponseEntity<>(this.getCollaboratorMapper().toDto(collaborator), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> delete(@PathVariable Long id) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    LOGGER.info("Deleting collaborator: {}", id);
+    this.deleteCollaborator(id);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 }

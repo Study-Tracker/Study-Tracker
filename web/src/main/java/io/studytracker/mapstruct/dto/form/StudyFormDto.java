@@ -1,6 +1,6 @@
 package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.mapstruct.dto.response.CollaboratorDto;
+import io.studytracker.mapstruct.dto.response.CollaboratorDetailsDto;
 import io.studytracker.mapstruct.dto.response.CommentDetailsDto;
 import io.studytracker.mapstruct.dto.response.ExternalLinkDto;
 import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
@@ -31,7 +31,7 @@ public class StudyFormDto {
   private ProgramSummaryDto program;
   private @NotBlank String description;
   private String notebookTemplateId;
-  private CollaboratorDto collaborator;
+  private CollaboratorDetailsDto collaborator;
   private boolean legacy = false;
   private boolean active = true;
   private boolean external = false;

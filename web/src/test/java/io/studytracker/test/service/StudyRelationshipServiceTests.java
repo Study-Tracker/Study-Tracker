@@ -52,7 +52,7 @@ public class StudyRelationshipServiceTests {
   }
 
   @Test
-  public void studyRelationshipTests() {
+  public void addStudyRelationshipTest() {
 
     Study sourceStudy =
         studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
@@ -106,7 +106,7 @@ public class StudyRelationshipServiceTests {
 
   @Test
   public void removeStudyRelationshipTest() {
-    this.studyRelationshipTests();
+    this.addStudyRelationshipTest();
 
     Study sourceStudy =
         studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);

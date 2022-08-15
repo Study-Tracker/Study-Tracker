@@ -544,7 +544,7 @@ public class StudyService {
     this.elnFolderRepository = elnFolderRepository;
   }
 
-  @Autowired
+  @Autowired(required = false)
   public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
     this.notebookFolderService = notebookFolderService;
   }

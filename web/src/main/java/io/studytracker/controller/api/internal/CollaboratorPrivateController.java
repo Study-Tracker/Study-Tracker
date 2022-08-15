@@ -16,11 +16,11 @@
 
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.controller.api.AbstractCollaboratorController;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.response.CollaboratorDto;
-import io.studytracker.mapstruct.mapper.CollaboratorMapper;
+import io.studytracker.mapstruct.dto.form.CollaboratorFormDto;
+import io.studytracker.mapstruct.dto.response.CollaboratorDetailsDto;
 import io.studytracker.model.Collaborator;
-import io.studytracker.service.CollaboratorService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +28,6 @@ import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,75 +44,63 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/internal/collaborator")
-public class CollaboratorController {
+public class CollaboratorPrivateController extends AbstractCollaboratorController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CollaboratorController.class);
-
-  @Autowired private CollaboratorService collaboratorService;
-
-  @Autowired private CollaboratorMapper collaboratorMapper;
+  private static final Logger LOGGER = LoggerFactory.getLogger(CollaboratorPrivateController.class);
 
   @GetMapping("")
-  public List<CollaboratorDto> getAllExternalContacts(
+  public List<CollaboratorDetailsDto> getAllExternalContacts(
       @RequestParam(value = "label", required = false) String label,
       @RequestParam(value = "organizationName", required = false) String name,
       @RequestParam(value = "organizationCode", required = false) String code) {
     List<Collaborator> collaborators;
     if (label != null) {
-      Optional<Collaborator> optional = collaboratorService.findByLabel(label);
+      Optional<Collaborator> optional = this.getCollaboratorService().findByLabel(label);
       collaborators =
           optional.isPresent() ? Collections.singletonList(optional.get()) : new ArrayList<>();
     } else if (name != null) {
-      collaborators = collaboratorService.findByOrganizationName(name);
+      collaborators = this.getCollaboratorService().findByOrganizationName(name);
     } else if (code != null) {
-      collaborators = collaboratorService.findByCode(code);
+      collaborators = this.getCollaboratorService().findByCode(code);
     } else {
-      collaborators = collaboratorService.findAll();
+      collaborators = this.getCollaboratorService().findAll();
     }
-    return collaboratorMapper.toDtoList(collaborators);
+    return this.getCollaboratorMapper().toDetailsDtoList(collaborators);
   }
 
   @GetMapping("/{id}")
-  public CollaboratorDto getExternalContact(@PathVariable("id") Long id) throws Exception {
-    Optional<Collaborator> optional = collaboratorService.findById(id);
+  public CollaboratorDetailsDto getExternalContact(@PathVariable("id") Long id) throws Exception {
+    Optional<Collaborator> optional = this.getCollaboratorService().findById(id);
     if (optional.isPresent()) {
-      return collaboratorMapper.toDto(optional.get());
+      return this.getCollaboratorMapper().toDetailsDto(optional.get());
     } else {
       throw new RecordNotFoundException();
     }
   }
 
   @PostMapping("")
-  public HttpEntity<CollaboratorDto> createNewCollaborator(
-      @Valid @RequestBody CollaboratorDto dto) {
+  public HttpEntity<CollaboratorDetailsDto> createCollaborator(
+      @Valid @RequestBody CollaboratorFormDto dto) {
     LOGGER.info("Creating new collaborator record: " + dto.toString());
-    Collaborator collaborator = collaboratorMapper.fromDto(dto);
-    collaboratorService.create(collaborator);
+    Collaborator collaborator = this.createNewCollaborator(this.getCollaboratorMapper().fromFormDto(dto));
     LOGGER.info(collaborator.toString());
-    return new ResponseEntity<>(collaboratorMapper.toDto(collaborator), HttpStatus.CREATED);
+    return new ResponseEntity<>(this.getCollaboratorMapper().toDetailsDto(collaborator), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<CollaboratorDto> updateCollaborator(
-      @PathVariable("id") Long id, @Valid @RequestBody CollaboratorDto dto) {
+  public HttpEntity<CollaboratorDetailsDto> updateCollaborator(
+      @PathVariable("id") Long id, @Valid @RequestBody CollaboratorFormDto dto) {
     LOGGER.info("Updating collaborator record: " + dto.toString());
-    if (!collaboratorService.exists(id)) {
-      throw new RecordNotFoundException("Collaborator does not exist: " + id);
-    }
-    Collaborator collaborator = collaboratorMapper.fromDto(dto);
+    Collaborator collaborator = this.getCollaboratorMapper().fromFormDto(dto);
     collaborator.setId(id);
-    collaboratorService.update(collaborator);
-    LOGGER.info(collaborator.toString());
-    return new ResponseEntity<>(collaboratorMapper.toDto(collaborator), HttpStatus.OK);
+    collaborator = this.updateExistingCollaborator(collaborator, id);
+    return new ResponseEntity<>(this.getCollaboratorMapper().toDetailsDto(collaborator), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> removeCollaborator(@PathVariable("id") Long id) {
     LOGGER.info("Removing collaborator record: " + id);
-    if (!collaboratorService.exists(id)) {
-      throw new RecordNotFoundException("Collaborator does not exist: " + id);
-    }
-    collaboratorService.delete(id);
+    this.deleteCollaborator(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

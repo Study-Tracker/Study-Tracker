@@ -21,12 +21,18 @@ import io.studytracker.repository.CollaboratorRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CollaboratorService {
 
   @Autowired private CollaboratorRepository collaboratorRepository;
+
+  public Page<Collaborator> findAll(Pageable pageable) {
+    return collaboratorRepository.findAll(pageable);
+  }
 
   public List<Collaborator> findAll() {
     return collaboratorRepository.findAll();
@@ -48,11 +54,11 @@ public class CollaboratorService {
     return collaboratorRepository.findByCode(code);
   }
 
-  public void create(Collaborator collaborator) {
-    collaboratorRepository.save(collaborator);
+  public Collaborator create(Collaborator collaborator) {
+    return collaboratorRepository.save(collaborator);
   }
 
-  public void update(Collaborator collaborator) {
+  public Collaborator update(Collaborator collaborator) {
     Collaborator c = collaboratorRepository.getById(collaborator.getId());
     c.setActive(collaborator.isActive());
     c.setCode(collaborator.getCode());
@@ -61,7 +67,7 @@ public class CollaboratorService {
     c.setContactPersonName(collaborator.getContactPersonName());
     c.setOrganizationName(collaborator.getOrganizationName());
     c.setOrganizationLocation(collaborator.getOrganizationLocation());
-    collaboratorRepository.save(c);
+    return collaboratorRepository.save(c);
   }
 
   public void delete(Collaborator collaborator) {

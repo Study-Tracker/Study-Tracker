@@ -3,6 +3,7 @@ package io.studytracker.events.util;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayType;
+import io.studytracker.model.Collaborator;
 import io.studytracker.model.Comment;
 import io.studytracker.model.ExternalLink;
 import io.studytracker.model.Keyword;
@@ -185,4 +186,17 @@ public class EntityViewUtils {
     view.put("updatedAt", collection.getUpdatedAt());
     return view;
   }
+
+  public static Map<String, Object> createCollaboratorView(Collaborator collaborator) {
+    Map<String, Object> view = new HashMap<>();
+    view.put("id", collaborator.getId());
+    view.put("label", collaborator.getLabel());
+    view.put("code", collaborator.getCode());
+    view.put("organizationName", collaborator.getOrganizationName());
+    view.put("organizationLocation", collaborator.getOrganizationLocation());
+    view.put("contactPersonName", collaborator.getContactPersonName());
+    view.put("contactEmail", collaborator.getContactEmail());
+    return view;
+  }
+
 }

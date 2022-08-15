@@ -92,6 +92,7 @@ public class ExampleDataGenerator {
   public static final int STORAGE_FOLDER_COUNT = 13;
   public static final int NOTEBOOK_FOLDER_COUNT = 3;
   public static final int COMMENT_COUNT = 1;
+  public static final int STUDY_RELATIONSHIPS_COUNT = 0;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 

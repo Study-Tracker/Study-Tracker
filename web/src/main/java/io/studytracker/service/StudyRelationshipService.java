@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class StudyRelationshipService {
 
   @Autowired private StudyRelationshipRepository studyRelationshipRepository;
+
+  public Page<StudyRelationship> findAll(Pageable pageable) {
+    return studyRelationshipRepository.findAll(pageable);
+  }
 
   public Optional<StudyRelationship> findById(Long id) {
     return studyRelationshipRepository.findById(id);
@@ -48,9 +54,20 @@ public class StudyRelationshipService {
     return relationships;
   }
 
+  /**
+   * Creates both standard and inverse relationships from a pair of studies and a relationship type.
+   *
+   * @param sourceStudy the source study
+   * @param targetStudy the target study
+   * @param type the relationship type
+   * @return the created relationship
+   */
   @Transactional
   public StudyRelationship addStudyRelationship(
-      Study sourceStudy, Study targetStudy, RelationshipType type) {
+      Study sourceStudy,
+      Study targetStudy,
+      RelationshipType type
+  ) {
 
     StudyRelationship sourceRelationship;
     StudyRelationship targetRelationship;

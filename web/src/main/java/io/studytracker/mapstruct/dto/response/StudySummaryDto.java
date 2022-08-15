@@ -14,7 +14,7 @@ public class StudySummaryDto {
   private String name;
   private ProgramSummaryDto program;
   private String description;
-  private CollaboratorDto collaborator;
+  private CollaboratorDetailsDto collaborator;
   private boolean legacy = false;
   private boolean active = true;
   private NotebookFolderDetailsDto notebookFolder;
