@@ -2,15 +2,13 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
 import io.studytracker.events.util.AssayActivityUtils;
-import io.studytracker.mapstruct.dto.response.AssayTaskDto;
-import io.studytracker.mapstruct.mapper.AssayTaskMapper;
+import io.studytracker.mapstruct.dto.form.AssayTaskFormDto;
+import io.studytracker.mapstruct.dto.response.AssayTaskDetailsDto;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.User;
-import io.studytracker.service.AssayTaskService;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,63 +25,43 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping({"/api/internal/assay/{assayId}/tasks", "/api/internal/study/{studyId}/assays/{assayId}/tasks"})
 public class AssayTasksController extends AbstractAssayController {
 
-  @Autowired private AssayTaskService assayTaskService;
-
-  @Autowired private AssayTaskMapper mapper;
-
   @GetMapping("")
-  public List<AssayTaskDto> fetchTasks(@PathVariable("assayId") String assayId) {
+  public List<AssayTaskDetailsDto> fetchTasks(@PathVariable("assayId") String assayId) {
     Assay assay = this.getAssayFromIdentifier(assayId);
-    return mapper.toDtoList(assayTaskService.findAssayTasks(assay));
+    return this.getAssayTaskMapper().toDetailsDtoList(this.getAssayTaskService().findAssayTasks(assay));
   }
 
   @PostMapping("")
-  public HttpEntity<AssayTaskDto> addTask(
+  public HttpEntity<AssayTaskDetailsDto> addTask(
       @PathVariable("assayId") String assayId,
-      @RequestBody AssayTaskDto dto
+      @RequestBody AssayTaskFormDto dto
   ) {
-
     Assay assay = this.getAssayFromIdentifier(assayId);
-    AssayTask task = mapper.fromDto(dto);
-    assayTaskService.addAssayTask(task, assay);
-
-    Activity activity = AssayActivityUtils.fromTaskAdded(assay, this.getAuthenticatedUser(), task);
-    this.getActivityService().create(activity);
-    this.getEventsService().dispatchEvent(activity);
-
-    return new ResponseEntity<>(mapper.toDto(task), HttpStatus.OK);
+    AssayTask task = this.addNewAssayTask(this.getAssayTaskMapper().fromFormDto(dto), assay);
+    return new ResponseEntity<>(this.getAssayTaskMapper().toDetailsDto(task), HttpStatus.CREATED);
   }
 
   @PutMapping("")
-  public HttpEntity<AssayTaskDto> updateTask(
+  public HttpEntity<AssayTaskDetailsDto> updateTask(
       @PathVariable("assayId") String assayId,
-      @RequestBody AssayTaskDto dto
+      @RequestBody AssayTaskDetailsDto dto
   ) {
-
-    User user = this.getAuthenticatedUser();
     Assay assay = this.getAssayFromIdentifier(assayId);
-    assay.setLastModifiedBy(user);
-    AssayTask task = mapper.fromDto(dto);
-    assayTaskService.updateAssayTask(task, assay);
-
-    Activity activity = AssayActivityUtils.fromAssayTaskUpdate(assay, user, task);
-    this.getActivityService().create(activity);
-    this.getEventsService().dispatchEvent(activity);
-
-    return new ResponseEntity<>(mapper.toDto(task), HttpStatus.OK);
+    AssayTask task = this.updateExistingAssayTask(this.getAssayTaskMapper().fromDetailsDto(dto), assay);
+    return new ResponseEntity<>(this.getAssayTaskMapper().toDetailsDto(task), HttpStatus.OK);
   }
 
   @DeleteMapping("")
   public HttpEntity<?> removeTask(
       @PathVariable("assayId") String assayId,
-      @RequestBody AssayTaskDto dto
+      @RequestBody AssayTaskDetailsDto dto
   ) {
 
     User user = this.getAuthenticatedUser();
     Assay assay = this.getAssayFromIdentifier(assayId);
     assay.setLastModifiedBy(user);
-    AssayTask task = mapper.fromDto(dto);
-    assayTaskService.deleteAssayTask(task, assay);
+    AssayTask task = this.getAssayTaskMapper().fromDetailsDto(dto);
+    this.getAssayTaskService().deleteAssayTask(task, assay);
 
     Activity activity = AssayActivityUtils.fromTaskDeleted(assay, user, task);
     this.getActivityService().create(activity);

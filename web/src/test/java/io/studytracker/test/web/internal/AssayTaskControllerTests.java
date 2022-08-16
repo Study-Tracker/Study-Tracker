@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.form.AssayTaskFormDto;
 import io.studytracker.mapstruct.mapper.AssayTaskMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
@@ -101,7 +102,7 @@ public class AssayTaskControllerTests {
         assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
-    AssayTask task = new AssayTask();
+    AssayTaskFormDto task = new AssayTaskFormDto();
     task.setLabel("New task");
     task.setStatus(TaskStatus.TODO);
 
@@ -110,7 +111,7 @@ public class AssayTaskControllerTests {
             post("/api/internal/assay/xxxxxxx/tasks")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(task)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
@@ -119,7 +120,7 @@ public class AssayTaskControllerTests {
             post("/api/internal/assay/" + assay.getCode() + "/tasks")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(task)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().is3xxRedirection());
 
@@ -128,12 +129,13 @@ public class AssayTaskControllerTests {
             post("/api/internal/assay/" + assay.getCode() + "/tasks")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(task)))
         .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk());
+        .andExpect(status().isCreated());
 
     mockMvc
-        .perform(get("/api/internal/assay/" + assay.getCode() + "/tasks").with(user(username)).with(csrf()))
+        .perform(get("/api/internal/assay/" + assay.getCode() + "/tasks")
+            .with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
@@ -145,14 +147,18 @@ public class AssayTaskControllerTests {
     User user = assay.getOwner();
 
     AssayTask task = assay.getTasks().stream().findFirst().get();
-    task.setStatus(TaskStatus.COMPLETE);
+    AssayTaskFormDto dto = new AssayTaskFormDto();
+    dto.setId(task.getId());
+    dto.setLabel(task.getLabel());
+    dto.setOrder(task.getOrder());
+    dto.setStatus(TaskStatus.COMPLETE);
 
     mockMvc
         .perform(
             put("/api/internal/assay/xxxxxxx/tasks")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(dto)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
@@ -161,7 +167,7 @@ public class AssayTaskControllerTests {
             put("/api/internal/assay/" + assay.getCode() + "/tasks")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(dto)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().is3xxRedirection());
 
@@ -170,7 +176,7 @@ public class AssayTaskControllerTests {
             put("/api/internal/assay/" + assay.getCode() + "/tasks")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(dto)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
@@ -195,7 +201,7 @@ public class AssayTaskControllerTests {
             delete("/api/internal/assay/xxxxxxx/tasks")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(mapper.toDetailsDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
@@ -204,7 +210,7 @@ public class AssayTaskControllerTests {
             delete("/api/internal/assay/" + assay.getCode() + "/tasks")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(mapper.toDetailsDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().is3xxRedirection());
 
@@ -213,7 +219,7 @@ public class AssayTaskControllerTests {
             delete("/api/internal/assay/" + assay.getCode() + "/tasks")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toDto(task))))
+                .content(objectMapper.writeValueAsBytes(mapper.toDetailsDto(task))))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 

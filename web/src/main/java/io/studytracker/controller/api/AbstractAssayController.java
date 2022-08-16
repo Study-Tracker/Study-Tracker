@@ -1,17 +1,19 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.NotebookUserService;
-import io.studytracker.events.EventsService;
 import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.mapper.AssayMapper;
+import io.studytracker.mapstruct.mapper.AssayTaskMapper;
+import io.studytracker.mapstruct.mapper.AssayTypeMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayTask;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
-import io.studytracker.service.ActivityService;
 import io.studytracker.service.AssayService;
+import io.studytracker.service.AssayTaskService;
 import io.studytracker.service.AssayTypeService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
@@ -29,13 +31,15 @@ public abstract class AbstractAssayController extends AbstractApiController {
 
   private AssayTypeService assayTypeService;
 
+  private AssayTaskService assayTaskService;
+
   private UserService userService;
 
-  private EventsService eventsService;
+  private AssayMapper assayMapper;
 
-  private ActivityService activityService;
+  private AssayTypeMapper assayTypeMapper;
 
-  private NotebookUserService studyNotebookService;
+  private AssayTaskMapper assayTaskMapper;
 
   private boolean isLong(String value) {
     try {
@@ -123,8 +127,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
 
     // Add activity record and dispatch event
     Activity activity = AssayActivityUtils.fromNewAssay(assay, user);
-    activityService.create(activity);
-    eventsService.dispatchEvent(activity);
+    this.logActivity(activity);
 
     return assay;
   }
@@ -161,8 +164,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
     assayService.update(assay);
 
     Activity activity = AssayActivityUtils.fromUpdatedAssay(assay, user);
-    activityService.create(activity);
-    eventsService.dispatchEvent(activity);
+    this.logActivity(activity);
 
     return assay;
   }
@@ -179,8 +181,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
     assayService.delete(assay);
 
     Activity activity = AssayActivityUtils.fromDeletedAssay(assay, user);
-    activityService.create(activity);
-    eventsService.dispatchEvent(activity);
+    this.logActivity(activity);
   }
 
   /**
@@ -199,8 +200,45 @@ public abstract class AbstractAssayController extends AbstractApiController {
     assayService.updateStatus(assay, status);
 
     Activity activity = AssayActivityUtils.fromChangedAssayStatus(assay, user, oldStatus, status);
-    activityService.create(activity);
-    eventsService.dispatchEvent(activity);
+    this.logActivity(activity);
+  }
+
+  /**
+   * Create a new assay task associated with the given assay
+   *
+   * @param assayTask
+   * @param assay
+   * @return
+   */
+  protected AssayTask addNewAssayTask(AssayTask assayTask, Assay assay) {
+    AssayTask created = this.getAssayTaskService().addAssayTask(assayTask, assay);
+    Activity activity = AssayActivityUtils.fromTaskAdded(assay, this.getAuthenticatedUser(), created);
+    this.logActivity(activity);
+    return created;
+  }
+
+  /**
+   * Updates an existing assay task.
+   *
+   * @param assayTask
+   * @param assay
+   * @return
+   */
+  protected AssayTask updateExistingAssayTask(AssayTask assayTask, Assay assay) {
+    User user = this.getAuthenticatedUser();
+    assay.setLastModifiedBy(user);
+    AssayTask updated = this.getAssayTaskService().updateAssayTask(assayTask, assay);
+    Activity activity = AssayActivityUtils.fromAssayTaskUpdate(assay, user, updated);
+    this.logActivity(activity);
+    return updated;
+  }
+
+  protected void deleteAssayTask(AssayTask assayTask, Assay assay) {
+    User user = this.getAuthenticatedUser();
+    assay.setLastModifiedBy(user);
+    this.getAssayTaskService().deleteAssayTask(assayTask, assay);
+    Activity activity = AssayActivityUtils.fromTaskDeleted(assay, user, assayTask);
+    this.logActivity(activity);
   }
 
   /* Getters and Setters */
@@ -241,30 +279,39 @@ public abstract class AbstractAssayController extends AbstractApiController {
     this.userService = userService;
   }
 
-  public EventsService getEventsService() {
-    return eventsService;
+  public AssayTaskService getAssayTaskService() {
+    return assayTaskService;
   }
 
   @Autowired
-  public void setEventsService(EventsService eventsService) {
-    this.eventsService = eventsService;
+  public void setAssayTaskService(AssayTaskService assayTaskService) {
+    this.assayTaskService = assayTaskService;
   }
 
-  public ActivityService getActivityService() {
-    return activityService;
+  public AssayMapper getAssayMapper() {
+    return assayMapper;
   }
 
   @Autowired
-  public void setActivityService(ActivityService activityService) {
-    this.activityService = activityService;
+  public void setAssayMapper(AssayMapper assayMapper) {
+    this.assayMapper = assayMapper;
   }
 
-  public NotebookUserService getStudyNotebookService() {
-    return studyNotebookService;
+  public AssayTypeMapper getAssayTypeMapper() {
+    return assayTypeMapper;
   }
 
-  @Autowired(required = false)
-  public void setStudyNotebookService(NotebookUserService studyNotebookService) {
-    this.studyNotebookService = studyNotebookService;
+  @Autowired
+  public void setAssayTypeMapper(AssayTypeMapper assayTypeMapper) {
+    this.assayTypeMapper = assayTypeMapper;
+  }
+
+  public AssayTaskMapper getAssayTaskMapper() {
+    return assayTaskMapper;
+  }
+
+  @Autowired
+  public void setAssayTaskMapper(AssayTaskMapper assayTaskMapper) {
+    this.assayTaskMapper = assayTaskMapper;
   }
 }

@@ -31,5 +31,5 @@ public class AssayDetailsDto {
   private Set<UserSlimDto> users = new HashSet<>();
   private Map<String, Object> fields = new LinkedHashMap<>();
   private Map<String, String> attributes = new HashMap<>();
-  private Set<AssayTaskDto> tasks = new HashSet<>();
+  private Set<AssayTaskDetailsDto> tasks = new HashSet<>();
 }

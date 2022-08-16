@@ -1,9 +1,16 @@
 package io.studytracker.controller.api.v1;
 
+import io.studytracker.controller.api.AbstractAssayController;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.api.AssayTaskDto;
+import io.studytracker.mapstruct.dto.api.AssayTaskPayloadDto;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayTask;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -15,37 +22,65 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/assay-task")
-public class AssayTaskPublicController {
+public class AssayTaskPublicController extends AbstractAssayController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AssayTaskPublicController.class);
 
   @GetMapping("")
-  public Page<?> findAll(Pageable pageable) {
-    return null;
+  public Page<AssayTaskDto> findAll(
+      @RequestParam(required = false) Long assayId,
+      Pageable pageable
+  ) {
+    LOGGER.debug("Find all assay tasks");
+    Page<AssayTask> page;
+    if (assayId != null) {
+      page = this.getAssayTaskService().findAssayTasks(assayId, pageable);
+    } else {
+      page = this.getAssayTaskService().findAll(pageable);
+    }
+    return new PageImpl<>(this.getAssayTaskMapper().toDtoList(page.getContent()), pageable, page.getTotalElements());
   }
 
   @GetMapping("/{id}")
-  public Object findById(Long id) {
-    return null;
+  public HttpEntity<AssayTaskDto> findById(@PathVariable Long id) {
+    LOGGER.debug("Find assay task by id: {}", id);
+    AssayTask task = this.getAssayTaskService().findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("No task found with id " + id));
+    return new ResponseEntity<>(this.getAssayTaskMapper().toDto(task), HttpStatus.OK);
   }
 
   @PostMapping("")
-  public HttpEntity<?> create(@Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<AssayTaskDto> create(@Valid @RequestBody AssayTaskPayloadDto dto) {
+    LOGGER.info("Create assay task: {}", dto);
+    Assay assay = this.getAssayService().findById(dto.getAssayId())
+        .orElseThrow(() -> new RecordNotFoundException("No assay found with id " + dto.getAssayId()));
+    AssayTask assayTask = this.addNewAssayTask(this.getAssayTaskMapper().fromPayload(dto), assay);
+    return new ResponseEntity<>(this.getAssayTaskMapper().toDto(assayTask), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<?> update(@PathVariable Long id, @Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<AssayTaskDto> update(
+      @PathVariable Long id, @Valid @RequestBody AssayTaskPayloadDto dto) {
+    LOGGER.info("Update assay task: {}", dto);
+    Assay assay = this.getAssayService().findById(dto.getAssayId())
+        .orElseThrow(() -> new RecordNotFoundException("No assay found with id " + dto.getAssayId()));
+    AssayTask assayTask = this.updateExistingAssayTask(this.getAssayTaskMapper().fromPayload(dto), assay);
+    return new ResponseEntity<>(this.getAssayTaskMapper().toDto(assayTask), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> delete(@PathVariable Long id) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    LOGGER.info("Delete assay task: {}", id);
+    AssayTask assayTask = this.getAssayTaskService().findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("No task found with id " + id));
+    Assay assay = assayTask.getAssay();
+    this.deleteAssayTask(assayTask, assay);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 }
