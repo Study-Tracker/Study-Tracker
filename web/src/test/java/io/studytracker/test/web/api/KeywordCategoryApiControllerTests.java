@@ -12,12 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.okta.commons.lang.Assert;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.mapstruct.dto.api.KeywordCategoryPayloadDto;
 import io.studytracker.model.KeywordCategory;
 import io.studytracker.repository.KeywordCategoryRepository;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,7 @@ public class KeywordCategoryApiControllerTests extends AbstractApiControllerTest
   @Test
   public void findByIdTest() throws Exception {
     KeywordCategory category = keywordCategoryRepository.findAll().get(0);
-    Assert.notNull(category);
+    Assert.assertNotNull(category);
     mockMvc.perform(get("/api/v1/keyword-category/" + category.getId())
         .header("Authorization", "Bearer " + this.getToken()))
         .andDo(MockMvcResultHandlers.print())
@@ -102,7 +102,7 @@ public class KeywordCategoryApiControllerTests extends AbstractApiControllerTest
   @Test
   public void updateCategoryTest() throws Exception {
     KeywordCategory category = keywordCategoryRepository.findAll().get(0);
-    Assert.notNull(category);
+    Assert.assertNotNull(category);
     KeywordCategoryPayloadDto dto = new KeywordCategoryPayloadDto();
     dto.setId(category.getId());
     dto.setName("Test Category");

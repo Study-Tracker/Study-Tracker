@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useLocation} from "react-router-dom";
 import NoNavWrapper from "../../common/structure/NoNavWrapper";
 import SignInForm from "./SignInForm";
@@ -29,11 +29,11 @@ const SignInView = props => {
       {ignoreQueryPrefix: true});
   const isError = params.hasOwnProperty("error");
   const message = params.message || null;
-  let ssoOptions = {};
+  const [ssoOptions, setSsoOptions] = useState({});
 
   useEffect(() => {
     axios.get("/auth/options")
-    .then(response => ssoOptions = response.data);
+    .then(response => setSsoOptions(response.data));
   }, []);
 
   return (

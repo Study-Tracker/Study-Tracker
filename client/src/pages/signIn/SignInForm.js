@@ -12,6 +12,8 @@ const SignInForm = ({ssoOptions, isError, message}) => {
     });
   }
 
+  console.debug("SSO Options: ", ssoOptions);
+
   return (
       <Container fluid className="animated fadeIn">
         <Row className="justify-content-center">
@@ -107,13 +109,11 @@ const SignInForm = ({ssoOptions, isError, message}) => {
                     </div>
 
                     {
-                      ssoOptions.isSuccess
-                      && ssoOptions.data.sso
-                      && ssoOptions.data.sso.okta
+                      !!ssoOptions && !!ssoOptions.sso && !!ssoOptions.sso.okta
                           ? (
                               <div className="text-center mt-3">
                                 <Button
-                                    href={ssoOptions.data.sso.okta}
+                                    href={ssoOptions.sso.okta}
                                     size={"lg"}
                                     variant="outline-primary"
                                 >

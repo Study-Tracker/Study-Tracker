@@ -16,6 +16,16 @@
 	<name>Study Tracker: Web Services</name>
 	<description>Study Tracker web server and API</description>
 
+	<repositories>
+
+		<repository>
+			<id>Shibboleth</id>
+			<name>Shibboleth</name>
+			<url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
+		</repository>
+
+	</repositories>
+
 	<dependencies>
 
 		<dependency>
@@ -43,10 +53,16 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+<!--		<dependency>-->
+<!--			<groupId>com.okta.spring</groupId>-->
+<!--			<artifactId>okta-spring-boot-starter</artifactId>-->
+<!--			<version>2.1.5</version>-->
+<!--		</dependency>-->
+
 		<dependency>
-			<groupId>com.okta.spring</groupId>
-			<artifactId>okta-spring-boot-starter</artifactId>
-			<version>2.1.5</version>
+			<groupId>org.springframework.security.extensions</groupId>
+			<artifactId>spring-security-saml2-core</artifactId>
+			<version>1.0.10.RELEASE</version>
 		</dependency>
 
 		<dependency>
