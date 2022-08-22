@@ -1,7 +1,7 @@
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.search.GenericSearchHits;
 import io.studytracker.search.SearchService;
-import io.studytracker.search.StudySearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -17,20 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class SearchController {
 
   @Autowired(required = false)
-  private SearchService<?, ?> searchService;
+  private SearchService searchService;
 
   @GetMapping("")
-  public HttpEntity<StudySearchHits<?>> search(
+  public HttpEntity<GenericSearchHits<?>> search(
       @RequestParam("keyword") String keyword,
       @RequestParam(value = "field", required = false) String field) {
     if (searchService != null) {
-      StudySearchHits<?> searchHits;
+      GenericSearchHits<?> genericSearchHits;
       if (StringUtils.hasText(field)) {
-        searchHits = searchService.search(keyword, field);
+        genericSearchHits = searchService.search(keyword, field);
       } else {
-        searchHits = searchService.search(keyword);
+        genericSearchHits = searchService.search(keyword);
       }
-      return new ResponseEntity<>(searchHits, HttpStatus.OK);
+      return new ResponseEntity<>(genericSearchHits, HttpStatus.OK);
     } else {
       return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }

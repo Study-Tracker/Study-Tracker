@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "eln_folders")
-public class ELNFolder {
+public class ELNFolder implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

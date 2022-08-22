@@ -82,10 +82,10 @@ study.code-counter-start=10001
 # Study Tracker can integrate with Elasticsearch to provide advanced study search functionality.
 # To enable, set search.mode to 'elasticsearch'. The host value should be the full host name
 # (without protocol) and the port number. So if my host is https://myelasticdb.com, then the
-# value for elasticsearch.host would be 'myelasticdb.com:443'.
+# value for elasticsearch.host would be 'myelasticdb.com' and the port would be set to 443.
 search.mode=
 elasticsearch.host=
-elasticsearch.index=
+elasticsearch.port=
 elasticsearch.use-ssl=
 elasticsearch.username=
 elasticsearch.password=

@@ -39,7 +39,7 @@ import javax.persistence.Table;
       name = "keyword-details",
       attributeNodes = {@NamedAttributeNode("category")})
 })
-public class Keyword {
+public class Keyword implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

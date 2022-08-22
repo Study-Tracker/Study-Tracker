@@ -33,6 +33,9 @@ public class SearchServiceConfiguration {
     @Value("${elasticsearch.host}")
     private String host;
 
+    @Value("${elasticsearch.port}")
+    private Integer port;
+
     @Value("${elasticsearch.use-ssl:#{false}}")
     private Boolean useSsl;
 
@@ -45,7 +48,10 @@ public class SearchServiceConfiguration {
     @Bean
     public RestHighLevelClient client() {
       ClientConfigurationBuilderWithRequiredEndpoint builder = ClientConfiguration.builder();
-      MaybeSecureClientConfigurationBuilder sBuilder = builder.connectedTo(host);
+      if (port == null && useSsl) {
+        port = 443;
+      }
+      MaybeSecureClientConfigurationBuilder sBuilder = builder.connectedTo(host + ":" + port);
       ClientConfiguration configuration;
       if (useSsl != null && useSsl && username != null && password != null) {
         configuration = sBuilder.usingSsl().withBasicAuth(username, password).build();
@@ -74,7 +80,7 @@ public class SearchServiceConfiguration {
 
     @Autowired private StudyRepository studyRepository;
 
-    @Autowired private SearchService<?, ?> searchService;
+    @Autowired private SearchService searchService;
 
     /**
      * Indexes all studies that have been updated within the past two hours. Runs on a schedule

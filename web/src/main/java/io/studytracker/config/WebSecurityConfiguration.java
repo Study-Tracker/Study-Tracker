@@ -173,7 +173,7 @@ public class WebSecurityConfiguration {
           .httpBasic().disable()
           .cors()
           .and()
-          .authorizeHttpRequests()
+          .authorizeRequests()
           .anyRequest().authenticated()
           .and()
           .userDetailsService(appUserDetailsService)

@@ -19,7 +19,7 @@ public class ApplicationStartupStudyIndexer implements ApplicationRunner {
   @Autowired private StudyRepository studyRepository;
 
   @Autowired(required = false)
-  private SearchService<?, ?> searchService;
+  private SearchService searchService;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {

@@ -99,7 +99,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     }
   )
 })
-public class Study {
+public class Study implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

@@ -25,7 +25,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "keyword_categories")
-public class KeywordCategory {
+public class KeywordCategory implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

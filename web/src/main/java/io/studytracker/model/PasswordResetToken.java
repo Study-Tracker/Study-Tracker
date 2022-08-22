@@ -15,7 +15,7 @@ import javax.persistence.TemporalType;
 
 @Table(name = "password_reset_token")
 @Entity
-public class PasswordResetToken {
+public class PasswordResetToken implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

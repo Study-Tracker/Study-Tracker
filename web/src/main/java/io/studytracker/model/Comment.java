@@ -45,7 +45,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       name = "comment-details",
       attributeNodes = {@NamedAttributeNode("createdBy")})
 })
-public class Comment {
+public class Comment implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

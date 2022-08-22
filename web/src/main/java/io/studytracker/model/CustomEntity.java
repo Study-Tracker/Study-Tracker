@@ -9,7 +9,7 @@ import lombok.Data;
 
 @MappedSuperclass
 @Data
-public abstract class CustomEntity {
+public abstract class CustomEntity implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

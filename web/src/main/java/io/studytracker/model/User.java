@@ -45,7 +45,7 @@ import org.springframework.security.core.GrantedAuthority;
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
-public class User {
+public class User implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

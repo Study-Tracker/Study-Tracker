@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "file_store_folders")
-public class FileStoreFolder {
+public class FileStoreFolder implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

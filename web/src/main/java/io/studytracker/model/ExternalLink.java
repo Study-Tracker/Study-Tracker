@@ -39,7 +39,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       name = "link-only",
       attributeNodes = {})
 })
-public class ExternalLink {
+public class ExternalLink implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

@@ -77,7 +77,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode(value = "tasks", subgraph = "assay-task-details"),
-        @NamedAttributeNode("users")
+        @NamedAttributeNode("users"),
+        @NamedAttributeNode("study")
       },
       subgraphs = {
         @NamedSubgraph(
@@ -106,7 +107,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
             attributeNodes = {@NamedAttributeNode("program"), @NamedAttributeNode("collaborator")})
       })
 })
-public class Assay {
+public class Assay implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

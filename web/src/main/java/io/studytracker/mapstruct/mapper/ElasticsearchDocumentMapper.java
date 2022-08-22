@@ -1,5 +1,8 @@
 package io.studytracker.mapstruct.mapper;
 
+import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayDocument;
+import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayTaskDocument;
+import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayTypeDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchCollaboratorDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchCommentDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchConclusionsDocument;
@@ -8,7 +11,11 @@ import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchKeywordDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchLinkDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchProgramDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudyDocument;
+import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudySummaryDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchUserDocument;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayTask;
+import io.studytracker.model.AssayType;
 import io.studytracker.model.Collaborator;
 import io.studytracker.model.Comment;
 import io.studytracker.model.Conclusions;
@@ -80,6 +87,16 @@ public interface ElasticsearchDocumentMapper {
   List<ElasticsearchUserDocument> fromUserList(List<User> users);
 
   Set<ElasticsearchUserDocument> fromUserSet(Set<User> users);
+
+  ElasticsearchAssayDocument fromAssay(Assay assay);
+  List<ElasticsearchAssayDocument> fromAssayList(List<Assay> assays);
+
+  ElasticsearchAssayTypeDocument fromAssayType(AssayType assayType);
+
+  ElasticsearchAssayTaskDocument fromAssayTask(AssayTask task);
+  Set<ElasticsearchAssayTaskDocument> fromAssayTaskSet(Set<AssayTask> tasks);
+
+  ElasticsearchStudySummaryDocument fromStudySummary(Study study);
 
   /** For mapping the {@link ExternalLink#getUrl()} field to a String * */
   default String map(URL url) {

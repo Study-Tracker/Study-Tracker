@@ -61,7 +61,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           @NamedAttributeNode("notebookFolder"),
           @NamedAttributeNode("storageFolder")
         }))
-public class Program {
+public class Program implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

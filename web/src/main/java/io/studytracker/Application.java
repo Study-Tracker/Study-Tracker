@@ -21,7 +21,7 @@ public class Application {
 
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(Application.class)
-				.allowCircularReferences(true)
+//				.allowCircularReferences(true)
 				.run(args);
 	}
 

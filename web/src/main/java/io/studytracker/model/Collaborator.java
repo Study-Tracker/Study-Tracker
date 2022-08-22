@@ -28,7 +28,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "collaborators")
 @EntityListeners(AuditingEntityListener.class)
-public class Collaborator {
+public class Collaborator implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
