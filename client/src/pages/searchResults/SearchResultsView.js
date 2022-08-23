@@ -20,7 +20,7 @@ import ErrorMessage from "../../common/structure/ErrorMessage";
 import SideBar from "../../common/structure/SideBar";
 import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
-import {SearchHits} from "../../common/search";
+import SearchHits from "./SearchHits";
 import {useSearchParams} from "react-router-dom";
 import axios from "axios";
 

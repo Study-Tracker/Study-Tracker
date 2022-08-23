@@ -30,6 +30,10 @@ public interface AssayRepository extends JpaRepository<Assay, Long> {
   @EntityGraph("assay-with-parents")
   List<Assay> findAll();
 
+  @EntityGraph("assay-with-attributes")
+  @Query("select a from Assay a")
+  List<Assay> findAllWithDetails();
+
   @Override
   @EntityGraph("assay-with-attributes")
   Optional<Assay> findById(Long id);
@@ -42,6 +46,9 @@ public interface AssayRepository extends JpaRepository<Assay, Long> {
 
   @Query("select a from Assay a where lower(a.code) like lower(concat(?1, '%'))")
   List<Assay> findByCodePrefix(String prefix);
+
+  @EntityGraph("assay-with-attributes")
+  List<Assay> findByUpdatedAtAfter(Date date);
 
   @Query("select count(a) from Assay a where lower(a.code) like lower(concat(?1, '%'))")
   long countByCodePrefix(String prefix);

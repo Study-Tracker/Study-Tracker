@@ -1,6 +1,8 @@
 package io.studytracker.config;
 
+import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
+import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.search.SearchService;
 import io.studytracker.search.elasticsearch.ElasticsearchSearchService;
@@ -80,6 +82,8 @@ public class SearchServiceConfiguration {
 
     @Autowired private StudyRepository studyRepository;
 
+    @Autowired private AssayRepository assayRepository;
+
     @Autowired private SearchService searchService;
 
     /**
@@ -87,16 +91,28 @@ public class SearchServiceConfiguration {
      * every other hour.
      */
     @Scheduled(cron = "0 0 */2 * * *")
-    public void scheduledStudyIndex() {
+    public void scheduledDocumentIndex() {
       LOGGER.info("Running scheduled study search indexing...");
-      int count = 0;
+
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.MINUTE, -130);
+
+      // Index studies
+      int studyCount = 0;
       for (Study study : studyRepository.findByUpdatedAtAfter(calendar.getTime())) {
         searchService.indexStudy(study);
-        count = count + 1;
+        studyCount = studyCount + 1;
       }
-      LOGGER.info("Study indexing complete. Indexed {} studies", count);
+
+      // Index assays
+      int assayCount = 0;
+      for (Assay assay : assayRepository.findByUpdatedAtAfter(calendar.getTime())) {
+        searchService.indexAssay(assay);
+        assayCount = assayCount + 1;
+      }
+
+      LOGGER.info("Document indexing complete. Indexed {} studies and {} assays",
+          studyCount, assayCount);
     }
   }
 }

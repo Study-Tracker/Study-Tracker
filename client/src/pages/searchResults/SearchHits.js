@@ -1,7 +1,9 @@
 import React, {useState} from "react";
 import {Card, Col, Container, Row} from "react-bootstrap";
+import PropTypes from "prop-types";
+import SearchHitHighlights from "./SearchHitHighlights";
 
-export const SearchHits = ({hits}) => {
+const SearchHits = ({hits}) => {
 
   let content = (
       <Row>
@@ -22,7 +24,7 @@ export const SearchHits = ({hits}) => {
   if (hits.hits.length > 0) {
 
     const list = hits.hits
-    .filter(h => !!h.document.active)
+    .filter(h => !!h.document.data.active)
     .sort((a, b) => {
       if (a.score < b.score) {
         return 1;
@@ -32,7 +34,14 @@ export const SearchHits = ({hits}) => {
       }
       return 0;
     })
-    .map((hit, i) => <SearchHit key={"search-hit-" + i} hit={hit}/>);
+    .map((hit, i) => {
+      if (hit.document.type === "STUDY") {
+        return <StudySearchHit key={"search-hit-" + i} hit={hit}/>
+      } else {
+        return <AssaySearchHit key={"search-hit-" + i} hit={hit}/>
+      }
+
+    });
 
     content = (
         <Row>
@@ -60,54 +69,25 @@ export const SearchHits = ({hits}) => {
 
 }
 
-const SearchHitHighlight = ({field, text}) => {
-  return (
-      <Col lg={12} className={"search-hit-highlight"}>
-        <h6>{field}</h6>
-        <blockquote>
-          <div className="bg-light p-2 font-italic"
-               dangerouslySetInnerHTML={createMarkup(text)}/>
-        </blockquote>
-      </Col>
-  )
-}
-
-const SearchHitHighlights = ({hit}) => {
-  let list = [];
-  for (const [field, highlight] of Object.entries(hit.highlightFields)) {
-    highlight.forEach((h, i) => {
-      const text = h.replace("<em>", "<mark>").replace("</em>", "</mark>");
-      list.push(
-          <SearchHitHighlight
-              key={"search-highlight-" + hit.document.id + "-" + field + "-"
-                  + i}
-              field={field}
-              text={text}
-          />
-      );
-    });
-  }
-  return (
-      <Col sm={12}>
-        <h6>Matched Fields</h6>
-        <Row>
-          {list}
-        </Row>
-      </Col>
-  );
+SearchHits.propTypes = {
+  hits: PropTypes.array.isRequired
 }
 
 const createMarkup = (content) => {
   return {__html: content};
 };
 
-const SearchHit = ({hit}) => {
+const StudySearchHit = ({hit}) => {
   const [toggle, setToggle] = useState(false);
-  const study = hit.document;
+  const study = hit.document.data;
   return (
       <Card>
         <Card.Body>
           <Row>
+
+            <Col xs={12}>
+              <p className="text-muted">Study</p>
+            </Col>
 
             <Col sm={8} md={10}>
               <h4>
@@ -161,3 +141,79 @@ const SearchHit = ({hit}) => {
       </Card>
   )
 }
+
+StudySearchHit.propTypes = {
+  hit: PropTypes.object.isRequired
+}
+
+const AssaySearchHit = ({hit}) => {
+  const [toggle, setToggle] = useState(false);
+  const assay = hit.document.data;
+  return (
+      <Card>
+        <Card.Body>
+          <Row>
+
+            <Col xs={12}>
+              <p className="text-muted">Assay</p>
+            </Col>
+
+            <Col sm={8} md={10}>
+              <h4>
+                <a href={"/study/" + assay.study.code + "/assay/" + assay.code}>{assay.code}: {assay.name}</a>
+              </h4>
+            </Col>
+
+            <Col sm={4} md={2}>
+              <p className="text-muted">
+                <span className="float-end">{assay.assayType.name}</span>
+              </p>
+            </Col>
+
+            <Col sm={12}>
+              <p dangerouslySetInnerHTML={createMarkup(assay.description)}/>
+            </Col>
+
+            <Col xs={12}>
+              <a href={"/study/" + assay.study.code + "/assay/" + assay.code}
+                 className="btn btn-sm btn-outline-primary">
+                View Assay
+              </a>
+              &nbsp;&nbsp;
+              <a className="btn btn-sm btn-outline-secondary"
+                 onClick={() => setToggle(!toggle)}>
+                {!!toggle ? "Hide" : "Show"} Hit Details
+              </a>
+            </Col>
+
+            <div hidden={!toggle} style={{width: "100%"}}>
+
+              <Col xs={12}>
+                <hr/>
+              </Col>
+
+              <Col xs={12}>
+                <h6>Search Score</h6>
+                <p>{hit.score}</p>
+              </Col>
+
+              {
+                !!hit.highlightFields
+                    ? <SearchHitHighlights hit={hit}/>
+                    : ''
+              }
+
+            </div>
+
+          </Row>
+        </Card.Body>
+      </Card>
+  )
+}
+
+AssaySearchHit.propTypes = {
+  hit: PropTypes.object.isRequired
+}
+
+export default SearchHits;
+

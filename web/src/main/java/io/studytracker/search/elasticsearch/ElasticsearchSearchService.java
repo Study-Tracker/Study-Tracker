@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,8 @@ public class ElasticsearchSearchService implements SearchService {
   private ElasticsearchOperations elasticsearchOperations;
 
   private GenericSearchHits<ElasticsearchPowerSearchDocument> searchAllIndexes(Query query) {
+
+    LOGGER.debug("Searching all indexes for query: {}", query);
 
     // Run the search
     SearchHits<AllDocuments> searchHits = elasticsearchOperations
@@ -91,22 +94,28 @@ public class ElasticsearchSearchService implements SearchService {
     genericSearchHits.setMaxScore(searchHits.getMaxScore());
     genericSearchHits.setHits(genericHits);
 
+    LOGGER.debug("Found {} hits: {}", genericSearchHits.getNumHits(), genericSearchHits);
+
     return genericSearchHits;
 
   }
 
   @Override
   public GenericSearchHits<ElasticsearchPowerSearchDocument> search(String keyword) {
+    LOGGER.debug("Searching for keyword: {}", keyword);
     Query query = new NativeSearchQueryBuilder()
         .withQuery(QueryBuilders.multiMatchQuery(keyword))
+        .withHighlightFields(new HighlightBuilder.Field("*"))
         .build();
     return searchAllIndexes(query);
   }
 
   @Override
   public GenericSearchHits<ElasticsearchPowerSearchDocument> search(String keyword, String field) {
+    LOGGER.debug("Searching for keyword: {}, field: {}", keyword, field);
     Query query = new NativeSearchQueryBuilder()
         .withQuery(QueryBuilders.multiMatchQuery(keyword))
+        .withHighlightFields(new HighlightBuilder.Field("*"))
         .withFields(field)
         .build();
     return searchAllIndexes(query);

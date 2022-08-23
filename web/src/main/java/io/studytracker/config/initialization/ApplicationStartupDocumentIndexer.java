@@ -1,6 +1,8 @@
 package io.studytracker.config.initialization;
 
+import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
+import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.search.SearchService;
 import org.slf4j.Logger;
@@ -11,12 +13,14 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApplicationStartupStudyIndexer implements ApplicationRunner {
+public class ApplicationStartupDocumentIndexer implements ApplicationRunner {
 
   private static final Logger LOGGER =
-      LoggerFactory.getLogger(ApplicationStartupStudyIndexer.class);
+      LoggerFactory.getLogger(ApplicationStartupDocumentIndexer.class);
 
   @Autowired private StudyRepository studyRepository;
+
+  @Autowired private AssayRepository assayRepository;
 
   @Autowired(required = false)
   private SearchService searchService;
@@ -24,13 +28,24 @@ public class ApplicationStartupStudyIndexer implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) throws Exception {
     if (searchService != null) {
-      LOGGER.info("Running startup full study search indexing...");
-      int count = 0;
+      LOGGER.info("Running startup search document indexing...");
+
+      // Index studies
+      int studyCount = 0;
       for (Study study : studyRepository.findAllWithDetails()) {
         searchService.indexStudy(study);
-        count = count + 1;
+        studyCount = studyCount + 1;
       }
-      LOGGER.info("Study indexing complete. Indexed {} studies", count);
+
+      // Index assays
+      int assayCount = 0;
+      for (Assay assay : assayRepository.findAllWithDetails()) {
+        searchService.indexAssay(assay);
+        assayCount = assayCount + 1;
+      }
+
+      LOGGER.info("Document indexing complete. Indexed {} studies and {} assays",
+          studyCount, assayCount);
     } else {
       LOGGER.warn("StudySearchService is not defined. No study search indexing will occur.");
     }
