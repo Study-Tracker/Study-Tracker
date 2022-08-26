@@ -24,7 +24,6 @@ import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
 import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssayParentDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
-import io.studytracker.mapstruct.mapper.AssayMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Status;
 import io.studytracker.model.User;
@@ -49,17 +48,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/assay")
-public class AssayController extends AbstractAssayController {
+public class AssayPrivateController extends AbstractAssayController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AssayController.class);
-
-  @Autowired private AssayMapper assayMapper;
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssayPrivateController.class);
 
   @Autowired private ActivityMapper activityMapper;
 
   @GetMapping("")
   public List<AssayParentDto> findAll() {
-    return assayMapper.toAssayParentList(
+    return this.getAssayMapper().toAssayParentList(
         getAssayService().findAll().stream()
             .filter(Assay::isActive)
             .filter(a -> a.getStudy().isActive())
@@ -69,7 +66,7 @@ public class AssayController extends AbstractAssayController {
   @GetMapping("/{id}")
   public AssayDetailsDto findById(@PathVariable("id") String assayId)
       throws RecordNotFoundException {
-    return assayMapper.toAssayDetails(getAssayFromIdentifier(assayId));
+    return this.getAssayMapper().toAssayDetails(getAssayFromIdentifier(assayId));
   }
 
   @PutMapping("/{id}")
@@ -80,9 +77,9 @@ public class AssayController extends AbstractAssayController {
     LOGGER.info("Updating assay with id: " + id);
     LOGGER.info(dto.toString());
     User user = this.getAuthenticatedUser();
-    Assay assay = assayMapper.fromAssayForm(dto);
+    Assay assay = this.getAssayMapper().fromAssayForm(dto);
     Assay updated = updateAssay(assay, user);
-    return new ResponseEntity<>(assayMapper.toAssayDetails(updated), HttpStatus.CREATED);
+    return new ResponseEntity<>(this.getAssayMapper().toAssayDetails(updated), HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")

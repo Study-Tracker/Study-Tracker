@@ -43,7 +43,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @ActiveProfiles({"web-test", "example"})
-public class AssayControllerTests {
+public class AssayPrivateControllerTests {
 
   private static final int NUM_ASSAYS = ExampleDataGenerator.ASSAY_COUNT;
 

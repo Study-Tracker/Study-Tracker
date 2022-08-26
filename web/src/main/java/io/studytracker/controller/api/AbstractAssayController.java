@@ -1,5 +1,6 @@
 package io.studytracker.controller.api;
 
+import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
@@ -40,6 +41,8 @@ public abstract class AbstractAssayController extends AbstractApiController {
   private AssayTypeMapper assayTypeMapper;
 
   private AssayTaskMapper assayTaskMapper;
+
+  private NotebookEntryService notebookEntryService;
 
   private boolean isLong(String value) {
     try {
@@ -161,12 +164,12 @@ public abstract class AbstractAssayController extends AbstractApiController {
             .findById(assay.getOwner().getId())
             .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
 
-    assayService.update(assay);
+    Assay updated = assayService.update(assay);
 
-    Activity activity = AssayActivityUtils.fromUpdatedAssay(assay, user);
+    Activity activity = AssayActivityUtils.fromUpdatedAssay(updated, user);
     this.logActivity(activity);
 
-    return assay;
+    return updated;
   }
 
   /**
@@ -313,5 +316,14 @@ public abstract class AbstractAssayController extends AbstractApiController {
   @Autowired
   public void setAssayTaskMapper(AssayTaskMapper assayTaskMapper) {
     this.assayTaskMapper = assayTaskMapper;
+  }
+
+  public NotebookEntryService getNotebookEntryService() {
+    return notebookEntryService;
+  }
+
+  @Autowired(required = false)
+  public void setNotebookEntryService(NotebookEntryService notebookEntryService) {
+    this.notebookEntryService = notebookEntryService;
   }
 }

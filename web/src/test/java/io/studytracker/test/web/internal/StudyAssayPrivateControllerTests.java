@@ -33,6 +33,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.form.AssayFormDto;
+import io.studytracker.mapstruct.dto.response.UserSlimDto;
 import io.studytracker.mapstruct.mapper.AssayMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
@@ -45,6 +47,7 @@ import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.Assert;
@@ -65,7 +68,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @ActiveProfiles({"web-test", "example"})
-public class StudyAssayControllerTests {
+public class StudyAssayPrivateControllerTests {
 
   private static final int NUM_ASSAYS = ExampleDataGenerator.ASSAY_COUNT;
 
@@ -213,11 +216,27 @@ public class StudyAssayControllerTests {
         assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     assay.setStatus(Status.COMPLETE);
 
+    UserSlimDto userDto = new UserSlimDto();
+    userDto.setId(assay.getOwner().getId());
+
+    AssayFormDto dto = new AssayFormDto();
+    dto.setId(assay.getId());
+    dto.setName(assay.getName());
+    dto.setCode(assay.getCode());
+    dto.setDescription(assay.getDescription());
+    dto.setStatus(Status.COMPLETE);
+    dto.setOwner(userDto);
+    dto.setStartDate(assay.getStartDate());
+    dto.setEndDate(assay.getEndDate());
+    dto.setUsers(new HashSet<>(Collections.singletonList(userDto)));
+    dto.setFields(assay.getFields());
+    dto.setAttributes(assay.getAttributes());
+
     mockMvc
         .perform(
             put("/api/internal/study/PPB-10001/assays/PPB-10001-001")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(assay))
+                .content(objectMapper.writeValueAsBytes(dto))
                 .with(user(assay.getOwner().getEmail())).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("status")))

@@ -1,14 +1,20 @@
 package io.studytracker.mapstruct.mapper;
 
+import io.studytracker.mapstruct.dto.api.AssayDto;
+import io.studytracker.mapstruct.dto.api.AssayPayloadDto;
 import io.studytracker.mapstruct.dto.form.AssayFormDto;
 import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssayParentDto;
 import io.studytracker.mapstruct.dto.response.AssaySlimDto;
 import io.studytracker.mapstruct.dto.response.AssaySummaryDto;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayTask;
+import io.studytracker.model.User;
 import java.util.List;
 import java.util.Set;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface AssayMapper {
@@ -62,4 +68,28 @@ public interface AssayMapper {
   Set<AssayParentDto> toAssayParentSet(Set<Assay> assays);
 
   List<AssayParentDto> toAssayParentList(List<Assay> assays);
+
+  @Mapping(target = "owner", source = "owner.id")
+  @Mapping(target = "createdBy", source = "createdBy.id")
+  @Mapping(target = "lastModifiedBy", source = "lastModifiedBy.id")
+  @Mapping(target = "studyId", source = "study.id")
+  @Mapping(target = "assayTypeId", source = "assayType.id")
+  @Mapping(target = "notebookFolderId", source = "notebookFolder.id")
+  @Mapping(target = "storageFolderId", source = "storageFolder.id")
+  @Mapping(target = "users", source = "users", qualifiedByName = "userToId")
+  @Mapping(target = "tasks", source = "tasks", qualifiedByName = "assayTaskToId")
+  AssayDto toAssayDto(Assay assay);
+
+  List<AssayDto> toAssayDtoList(List<Assay> assays);
+
+  @Mapping(target = "owner", ignore = true)
+  @Mapping(target = "users", ignore = true)
+  Assay fromPayload(AssayPayloadDto dto);
+
+  @Named("userToId")
+  public static Long userToId(User user) { return user.getId();}
+
+  @Named("assayTaskToId")
+  public static Long assayTaskToId(AssayTask assayTask) { return assayTask.getId();}
+
 }

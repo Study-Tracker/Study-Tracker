@@ -17,7 +17,6 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
-import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.exception.RecordNotFoundException;
@@ -25,7 +24,6 @@ import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.AssayFormDto;
 import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssaySummaryDto;
-import io.studytracker.mapstruct.mapper.AssayMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -36,7 +34,6 @@ import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,25 +49,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/internal/study/{studyId}/assays")
 @RestController
-public class StudyAssayController extends AbstractAssayController {
+public class StudyAssayPrivateController extends AbstractAssayController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StudyAssayController.class);
-
-  @Autowired private AssayMapper assayMapper;
-
-  @Autowired(required = false)
-  private NotebookEntryService notebookEntryService;
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyAssayPrivateController.class);
 
   @GetMapping("")
   public List<AssaySummaryDto> findStudyAssays(@PathVariable("studyId") String studyId) {
     Study study = getStudyFromIdentifier(studyId);
-    return assayMapper.toAssaySummaryList(this.getAssayService().findByStudyId(study.getId()));
+    return this.getAssayMapper().toAssaySummaryList(this.getAssayService().findByStudyId(study.getId()));
   }
 
   @GetMapping("/{assayId}")
   public AssayDetailsDto findById(@PathVariable("assayId") String assayId)
       throws RecordNotFoundException {
-    return assayMapper.toAssayDetails(getAssayFromIdentifier(assayId));
+    return this.getAssayMapper().toAssayDetails(getAssayFromIdentifier(assayId));
   }
 
   @PostMapping("")
@@ -83,14 +75,14 @@ public class StudyAssayController extends AbstractAssayController {
     LOGGER.info(dto.toString());
 
     Study study = this.getStudyFromIdentifier(studyId);
-    Assay assay = assayMapper.fromAssayForm(dto);
+    Assay assay = this.getAssayMapper().fromAssayForm(dto);
     User user = this.getAuthenticatedUser();
     Assay created;
 
     // If a notebook template was requested, find it
-    if (notebookEntryService != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
+    if (this.getNotebookEntryService() != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
       Optional<NotebookTemplate> templateOptional =
-          notebookEntryService.findEntryTemplateById(dto.getNotebookTemplateId());
+          this.getNotebookEntryService().findEntryTemplateById(dto.getNotebookTemplateId());
       if (templateOptional.isPresent()) {
         created = this.createAssay(assay, study, user, templateOptional.get());
       } else {
@@ -101,7 +93,7 @@ public class StudyAssayController extends AbstractAssayController {
       created = this.createAssay(assay, study, user);
     }
 
-    return new ResponseEntity<>(assayMapper.toAssayDetails(created), HttpStatus.CREATED);
+    return new ResponseEntity<>(this.getAssayMapper().toAssayDetails(created), HttpStatus.CREATED);
   }
 
   @PutMapping("/{assayId}")
@@ -111,9 +103,9 @@ public class StudyAssayController extends AbstractAssayController {
   ) {
     LOGGER.info("Updating assay");
     LOGGER.info(dto.toString());
-    Assay assay = assayMapper.fromAssayForm(dto);
+    Assay assay = this.getAssayMapper().fromAssayForm(dto);
     this.updateAssay(assay, this.getAuthenticatedUser());
-    return new ResponseEntity<>(assayMapper.toAssayDetails(assay), HttpStatus.OK);
+    return new ResponseEntity<>(this.getAssayMapper().toAssayDetails(assay), HttpStatus.OK);
   }
 
   @DeleteMapping("/{assayId}")

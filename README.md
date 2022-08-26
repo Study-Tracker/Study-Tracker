@@ -14,7 +14,7 @@ integrated REST API and event dispatcher service for sharing of data.
 - JDK 17+
 - Maven 3+
 - PostgreSQL 12+
-- Elasticsearch 7.10+ (optional)
+- Elasticsearch 7.10 (optional)
 
 NodeJS and NPM are *not* required for building and running the project, as the
 `frontend-maven-plugin` installs them at build time, in order to properly compile the front-end of
