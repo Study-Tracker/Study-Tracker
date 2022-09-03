@@ -215,10 +215,6 @@ public class Study implements Model {
       orphanRemoval = true)
   private Set<StudyRelationship> studyRelationships = new HashSet<>();
 
-  //  @OneToMany(mappedBy = "targetStudy", fetch = FetchType.LAZY, cascade = CascadeType.ALL,
-  // orphanRemoval = true)
-  //  private Set<StudyRelationship> studyRelationships = new HashSet<>();
-
   @OneToOne(
       mappedBy = "study",
       cascade = CascadeType.ALL,

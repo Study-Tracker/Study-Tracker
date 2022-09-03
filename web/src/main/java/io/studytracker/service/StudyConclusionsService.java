@@ -23,6 +23,8 @@ import io.studytracker.repository.StudyRepository;
 import java.util.Date;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,15 +35,24 @@ public class StudyConclusionsService {
 
   @Autowired private StudyRepository studyRepository;
 
+  public Page<StudyConclusions> findAll(Pageable pageable) {
+    return studyConclusionsRepository.findAll(pageable);
+  }
+
+  public Optional<StudyConclusions> findById(Long id) {
+    return studyConclusionsRepository.findById(id);
+  }
+
   public Optional<StudyConclusions> findStudyConclusions(Study study) {
     return studyConclusionsRepository.findByStudyId(study.getId());
   }
 
   @Transactional
-  public void addStudyConclusions(Study study, StudyConclusions conclusions) {
+  public StudyConclusions addStudyConclusions(Study study, StudyConclusions conclusions) {
     conclusions.setStudy(study);
     studyConclusionsRepository.save(conclusions);
     studyRepository.save(study);
+    return conclusions;
   }
 
   @Transactional

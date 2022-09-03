@@ -17,11 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.api.CommentPayloadDto;
-import io.studytracker.mapstruct.mapper.CommentMapper;
-import io.studytracker.model.Comment;
+import io.studytracker.mapstruct.dto.api.StudyConclusionsPayloadDto;
+import io.studytracker.mapstruct.mapper.StudyConclusionsMapper;
 import io.studytracker.model.Study;
-import io.studytracker.repository.CommentRepository;
+import io.studytracker.model.StudyConclusions;
+import io.studytracker.repository.StudyConclusionsRepository;
 import io.studytracker.repository.StudyRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,7 +40,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @ActiveProfiles({"web-test", "example"})
-public class CommentApiControllerTests extends AbstractApiControllerTests {
+public class ConclusionsApiControllerTests extends AbstractApiControllerTests {
 
   @Autowired
   private MockMvc mockMvc;
@@ -49,23 +49,23 @@ public class CommentApiControllerTests extends AbstractApiControllerTests {
   private StudyRepository studyRepository;
 
   @Autowired
-  private CommentRepository commentRepository;
+  private StudyConclusionsRepository studyConclusionsRepository;
 
   @Autowired
   private ObjectMapper objectMapper;
 
   @Autowired
-  private CommentMapper commentMapper;
+  private StudyConclusionsMapper studyConclusionsMapper;
 
   @Test
   public void findAllTest() throws Exception {
-    mockMvc.perform(get("/api/v1/comment")
+    mockMvc.perform(get("/api/v1/conclusions")
             .header("Authorization", "Bearer " + this.getToken()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", not(empty())))
-        .andExpect(jsonPath("$.content", hasSize(ExampleDataGenerator.COMMENT_COUNT)))
+        .andExpect(jsonPath("$.content", hasSize(ExampleDataGenerator.CONCLUSIONS_COUNT)))
         .andExpect(jsonPath("$", hasKey("last")))
         .andExpect(jsonPath("$.last", is(true)))
         .andExpect(jsonPath("$", hasKey("pageable")))
@@ -73,7 +73,7 @@ public class CommentApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$", hasKey("totalPages")))
         .andExpect(jsonPath("$.totalPages", is(1)))
         .andExpect(jsonPath("$", hasKey("totalElements")))
-        .andExpect(jsonPath("$.totalElements", is(ExampleDataGenerator.COMMENT_COUNT)))
+        .andExpect(jsonPath("$.totalElements", is(ExampleDataGenerator.CONCLUSIONS_COUNT)))
         .andExpect(jsonPath("$", hasKey("first")))
         .andExpect(jsonPath("$.first", is(true)))
         .andExpect(jsonPath("$", hasKey("size")))
@@ -81,62 +81,43 @@ public class CommentApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$", hasKey("number")))
         .andExpect(jsonPath("$.number", is(0)))
         .andExpect(jsonPath("$", hasKey("numberOfElements")))
-        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataGenerator.COMMENT_COUNT)))
+        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataGenerator.CONCLUSIONS_COUNT)))
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
     ;
-
-    Study study1 = studyRepository.findByCode("PPB-10001")
-        .orElseThrow(RecordNotFoundException::new);
-    Study study2 = studyRepository.findAll().stream()
-            .filter(study -> !study.getCode().equals("PPB-10001"))
-            .findFirst()
-            .orElseThrow(RecordNotFoundException::new);
-
-    mockMvc.perform(get("/api/v1/comment?studyId=" + study2.getId())
-            .header("Authorization", "Bearer " + this.getToken()))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", empty()));
-
-    mockMvc.perform(get("/api/v1/comment?studyId=" + study1.getId())
-            .header("Authorization", "Bearer " + this.getToken()))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", not(empty())))
-        .andExpect(jsonPath("$.content", hasSize(1)));
 
   }
 
   @Test
   public void findByIdTest() throws Exception {
 
-    Comment comment = commentRepository.findAll().get(0);
+    StudyConclusions conclusions = studyConclusionsRepository.findAll().get(0);
+    Study study = studyRepository.findByCode("PPB-10001")
+            .orElseThrow(RecordNotFoundException::new);
 
-    mockMvc.perform(get("/api/v1/comment/" + comment.getId())
+    mockMvc.perform(get("/api/v1/conclusions/" + conclusions.getId())
             .header("Authorization", "Bearer " + this.getToken()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("text")))
-        .andExpect(jsonPath("$.text", is(comment.getText())))
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", is(conclusions.getContent())))
         .andExpect(jsonPath("$", hasKey("studyId")))
-        .andExpect(jsonPath("$.studyId", is(comment.getStudy().getId().intValue())));
+        .andExpect(jsonPath("$.studyId", is(conclusions.getStudy().getId().intValue())));
 
   }
 
   @Test
-  public void createCommentTest() throws Exception {
-    Study study = studyRepository.findByCode("PPB-10001")
+  public void createTest() throws Exception {
+    Study study = studyRepository.findByCode("CPA-10001")
         .orElseThrow(RecordNotFoundException::new);
+    Assert.assertNull(study.getConclusions());
 
-    CommentPayloadDto comment = new CommentPayloadDto();
-    comment.setText("Test comment");
+    StudyConclusionsPayloadDto comment = new StudyConclusionsPayloadDto();
+    comment.setContent("Test comment");
     comment.setStudyId(study.getId());
 
-    mockMvc.perform(post("/api/v1/comment")
+    mockMvc.perform(post("/api/v1/conclusions")
             .header("Authorization", "Bearer " + this.getToken())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(comment)))
@@ -144,21 +125,29 @@ public class CommentApiControllerTests extends AbstractApiControllerTests {
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", not(nullValue())))
-        .andExpect(jsonPath("$", hasKey("text")))
-        .andExpect(jsonPath("$.text", is("Test comment")))
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", is("Test comment")))
         .andExpect(jsonPath("$", hasKey("studyId")))
         .andExpect(jsonPath("$.studyId", is(study.getId().intValue())));
+
+    study = studyRepository.findByCode("CPA-10001")
+        .orElseThrow(RecordNotFoundException::new);
+    StudyConclusions conclusions = study.getConclusions();
+    Assert.assertNotNull(conclusions);
+    Assert.assertNotNull(conclusions.getId());
+    Assert.assertEquals(conclusions.getContent(), "Test comment");
+
   }
 
   @Test
   public void updateCommentTest() throws Exception {
-    Comment comment = commentRepository.findAll().get(0);
-    CommentPayloadDto dto = new CommentPayloadDto();
-    dto.setId(comment.getId());
-    dto.setText("Something different");
-    dto.setStudyId(comment.getStudy().getId());
+    StudyConclusions conclusions = studyConclusionsRepository.findAll().get(0);
+    StudyConclusionsPayloadDto dto = new StudyConclusionsPayloadDto();
+    dto.setId(conclusions.getId());
+    dto.setContent("Something different");
+    dto.setStudyId(conclusions.getStudy().getId());
 
-    mockMvc.perform(put("/api/v1/comment/" + comment.getId())
+    mockMvc.perform(put("/api/v1/conclusions/" + conclusions.getId())
             .header("Authorization", "Bearer " + this.getToken())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(dto)))
@@ -166,22 +155,30 @@ public class CommentApiControllerTests extends AbstractApiControllerTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", not(nullValue())))
-        .andExpect(jsonPath("$", hasKey("text")))
-        .andExpect(jsonPath("$.text", is(dto.getText())))
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", is(dto.getContent())))
         .andExpect(jsonPath("$", hasKey("studyId")))
-        .andExpect(jsonPath("$.studyId", is(comment.getStudy().getId().intValue())));
+        .andExpect(jsonPath("$.studyId", is(conclusions.getStudy().getId().intValue())));
+
+    Study study = studyRepository.findById(conclusions.getStudy().getId())
+        .orElseThrow(RecordNotFoundException::new);
+    conclusions = study.getConclusions();
+    Assert.assertNotNull(conclusions);
+    Assert.assertNotNull(conclusions.getId());
+    Assert.assertEquals(conclusions.getContent(), "Something different");
+
   }
 
   @Test
   public void deleteCommentTest() throws Exception {
-    Comment comment = commentRepository.findAll().get(0);
+    StudyConclusions conclusions = studyConclusionsRepository.findAll().get(0);
 
-    mockMvc.perform(delete("/api/v1/comment/" + comment.getId())
+    mockMvc.perform(delete("/api/v1/conclusions/" + conclusions.getId())
             .header("Authorization", "Bearer " + this.getToken()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
-    Assert.assertEquals(0, commentRepository.findAll().size());
+    Assert.assertEquals(0, studyConclusionsRepository.findAll().size());
   }
 
 }

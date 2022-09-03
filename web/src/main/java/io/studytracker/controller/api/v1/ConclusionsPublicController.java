@@ -1,9 +1,16 @@
 package io.studytracker.controller.api.v1;
 
+import io.studytracker.controller.api.AbstractStudyConclusionsController;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.api.StudyConclusionsDto;
+import io.studytracker.mapstruct.dto.api.StudyConclusionsPayloadDto;
+import io.studytracker.model.Study;
+import io.studytracker.model.StudyConclusions;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -19,33 +26,53 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/conclusions")
-public class ConclusionsPublicController {
+public class ConclusionsPublicController extends AbstractStudyConclusionsController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ConclusionsPublicController.class);
 
   @GetMapping("")
-  public Page<?> findAll(Pageable pageable) {
-    return null;
+  public Page<StudyConclusionsDto> findAll(Pageable pageable) {
+    LOGGER.debug("Finding all study conclusions");
+    Page<StudyConclusions> page = this.getStudyConclusionsService().findAll(pageable);
+    return new PageImpl<>(this.getConclusionsMapper().toDtoList(page.getContent()), pageable,
+        page.getTotalElements());
   }
 
   @GetMapping("/{id}")
-  public Object findById(Long id) {
-    return null;
+  public StudyConclusionsDto findById(@PathVariable Long id) {
+    LOGGER.debug("Finding study conclusions by id: {}", id);
+    StudyConclusions conclusions = this.getStudyConclusionsService().findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Study conclusions not found: " + id));
+    return this.getConclusionsMapper().toDto(conclusions);
   }
 
   @PostMapping("")
-  public HttpEntity<?> create(@Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<StudyConclusionsDto> create(@Valid @RequestBody StudyConclusionsPayloadDto dto) {
+    LOGGER.info("Creating study conclusions: {}", dto);
+    Study study = this.getStudyService().findById(dto.getStudyId())
+        .orElseThrow(() -> new RecordNotFoundException("Study not found: " + dto.getStudyId()));
+    StudyConclusions conclusions =
+        this.createNewConclusions(study, this.getConclusionsMapper().fromPayload(dto));
+    return new ResponseEntity<>(this.getConclusionsMapper().toDto(conclusions), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<?> update(@PathVariable Long id, @Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<?> update(@PathVariable Long id, @Valid @RequestBody StudyConclusionsPayloadDto dto) {
+    LOGGER.info("Updating study conclusions: {}", dto);
+    Study study = this.getStudyService().findById(dto.getStudyId())
+        .orElseThrow(() -> new RecordNotFoundException("Study not found: " + dto.getStudyId()));
+    StudyConclusions updated =
+        this.updateExistingConclusions(study, this.getConclusionsMapper().fromPayload(dto));
+    return new ResponseEntity<>(this.getConclusionsMapper().toDto(updated), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> delete(@PathVariable Long id) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    LOGGER.info("Deleting study conclusions: {}", id);
+    StudyConclusions conclusions = this.getStudyConclusionsService().findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Study conclusions not found: " + id));
+    this.deleteStudyConclusions(conclusions.getStudy());
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 }

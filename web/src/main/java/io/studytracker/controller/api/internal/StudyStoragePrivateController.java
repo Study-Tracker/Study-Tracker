@@ -42,9 +42,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/api/internal/study/{studyId}/storage")
 @RestController
-public class StudyStorageController extends AbstractStudyController {
+public class StudyStoragePrivateController extends AbstractStudyController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StudyStorageController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyStoragePrivateController.class);
 
   @Autowired private FileSystemStorageService fileStorageService;
 

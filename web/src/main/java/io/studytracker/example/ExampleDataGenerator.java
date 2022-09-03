@@ -94,6 +94,8 @@ public class ExampleDataGenerator {
   public static final int COMMENT_COUNT = 1;
   public static final int STUDY_RELATIONSHIPS_COUNT = 0;
   public static final int ASSAY_TASK_COUNT = 2;
+  public static final int CONCLUSIONS_COUNT = 1;
+  public static final int EXTERNAL_LINK_COUNT = 1;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 

@@ -43,9 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/internal/study/{studyId}/keywords")
 @RestController
-public class StudyKeywordsController extends AbstractStudyController {
+public class StudyKeywordsPrivateController extends AbstractStudyController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StudyKeywordsController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyKeywordsPrivateController.class);
 
   @Autowired private StudyKeywordsService studyKeywordsService;
 

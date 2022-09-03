@@ -5,6 +5,7 @@ import io.studytracker.benchling.api.entities.BenchlingUserList;
 import io.studytracker.eln.NotebookUser;
 import io.studytracker.eln.NotebookUserService;
 import io.studytracker.model.User;
+import io.studytracker.model.UserConfigurations;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,16 @@ public final class BenchlingNotebookUserService
     LOGGER.info("Looking up Benchling user: " + user.getDisplayName());
     String authHeader = generateAuthorizationHeader();
 
-    // Look up user by username first
+    // Lookup user by ID
+    if (user.getConfiguration().containsKey(UserConfigurations.BENCHLING_USER_ID)) {
+      String benchlingUserId = user.getConfiguration().get(UserConfigurations.BENCHLING_USER_ID);
+      Optional<BenchlingUser> optional = this.getClient().findUserById(benchlingUserId, authHeader);
+      if (optional.isPresent()) {
+        return Optional.of(this.convertUser(optional.get()));
+      }
+    }
+
+    // Look up user by username
     List<BenchlingUser> users = new ArrayList<>();
     String nextToken = null;
     boolean hasNext = true;

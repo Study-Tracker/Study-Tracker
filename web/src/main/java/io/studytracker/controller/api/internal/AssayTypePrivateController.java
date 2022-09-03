@@ -42,9 +42,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/assaytype")
-public class AssayTypeController {
+public class AssayTypePrivateController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AssayTypeController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssayTypePrivateController.class);
 
   @Autowired private AssayTypeService assayTypeService;
 

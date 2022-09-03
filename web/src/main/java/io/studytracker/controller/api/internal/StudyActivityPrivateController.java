@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/internal/study/{studyId}/activity")
 @RestController
-public class StudyActivityController extends AbstractStudyController {
+public class StudyActivityPrivateController extends AbstractStudyController {
 
   @Autowired private ActivityService activityService;
 

@@ -1,9 +1,16 @@
 package io.studytracker.controller.api.v1;
 
+import io.studytracker.controller.api.AbstractExternalLinksController;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.api.ExternalLinkDto;
+import io.studytracker.mapstruct.dto.api.ExternalLinkPayloadDto;
+import io.studytracker.model.ExternalLink;
+import io.studytracker.model.Study;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -15,37 +22,59 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/external-link")
-public class ExternalLinkPublicController {
+public class ExternalLinkPublicController extends AbstractExternalLinksController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExternalLinkPublicController.class);
 
   @GetMapping("")
-  public Page<?> findAll(Pageable pageable) {
-    return null;
+  public Page<ExternalLinkDto> findAll(
+      @RequestParam(required = false) Long studyId, Pageable pageable) {
+    Page<ExternalLink> page;
+    if (studyId != null) {
+      page = this.getStudyExternalLinkService().findByStudyId(studyId, pageable);
+    } else {
+      page = this.getStudyExternalLinkService().findAll(pageable);
+    }
+    return new PageImpl<>(this.getExternalLinkMapper().toDtoList(page.getContent()),
+        pageable, page.getTotalElements());
   }
 
   @GetMapping("/{id}")
-  public Object findById(Long id) {
-    return null;
+  public ExternalLinkDto findById(@PathVariable Long id) {
+    ExternalLink externalLink = this.getStudyExternalLinkService().findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("External link not found: " + id));
+    return this.getExternalLinkMapper().toDto(externalLink);
   }
 
   @PostMapping("")
-  public HttpEntity<?> create(@Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<ExternalLinkDto> create(@Valid @RequestBody ExternalLinkPayloadDto dto) {
+    Study study = this.getStudyService().findById(dto.getStudyId())
+        .orElseThrow(() -> new RecordNotFoundException("Study not found: " + dto.getStudyId()));
+    ExternalLink externalLink =
+        this.createNewExternalLink(study, this.getExternalLinkMapper().fromPayloadDto(dto));
+    return new ResponseEntity<>(this.getExternalLinkMapper().toDto(externalLink), HttpStatus.CREATED);
+
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<?> update(@PathVariable Long id, @Valid @RequestBody Object dto) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public HttpEntity<ExternalLinkDto> update(
+      @PathVariable Long id, @Valid @RequestBody ExternalLinkPayloadDto dto) {
+    Study study = this.getStudyService().findById(dto.getStudyId())
+        .orElseThrow(() -> new RecordNotFoundException("Study not found: " + dto.getStudyId()));
+    ExternalLink externalLink =
+        this.updateExistingExternalLink(study, this.getExternalLinkMapper().fromPayloadDto(dto));
+    return new ResponseEntity<>(this.getExternalLinkMapper().toDto(externalLink), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> delete(@PathVariable Long id) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    this.deleteExternalLink(id);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 }

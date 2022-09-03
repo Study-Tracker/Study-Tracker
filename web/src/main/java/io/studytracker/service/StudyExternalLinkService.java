@@ -25,6 +25,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,14 @@ public class StudyExternalLinkService {
 
   @Autowired private ExternalLinkRepository externalLinkRepository;
 
+  public Page<ExternalLink> findAll(Pageable pageable) {
+    return externalLinkRepository.findAll(pageable);
+  }
+
+  public Page<ExternalLink> findByStudyId(Long studyId, Pageable pageable) {
+    return externalLinkRepository.findByStudyId(studyId, pageable);
+  }
+
   public List<ExternalLink> findAllStudyExternalLinks(Study study) {
     return externalLinkRepository.findByStudyId(study.getId());
   }
@@ -46,19 +56,24 @@ public class StudyExternalLinkService {
   }
 
   @Transactional
-  public void addStudyExternalLink(Study study, ExternalLink externalLink) {
+  public ExternalLink addStudyExternalLink(Study study, ExternalLink externalLink) {
     LOGGER.info(
         String.format("Adding new external link for study %s: %s", study.getCode(), externalLink));
-    study.addExternalLink(externalLink);
-    studyRepository.save(study);
+    externalLink.setStudy(study);
+    return externalLinkRepository.save(externalLink);
+//    study.addExternalLink(externalLink);
+//    studyRepository.save(study);
+//    return externalLink;
   }
 
   @Transactional
-  public void updateStudyExternalLink(Study study, ExternalLink externalLink) {
+  public ExternalLink updateStudyExternalLink(Study study, ExternalLink externalLink) {
     ExternalLink l = externalLinkRepository.getById(externalLink.getId());
     l.setUrl(externalLink.getUrl());
     l.setLabel(externalLink.getLabel());
     externalLinkRepository.save(l);
+    return externalLinkRepository.findById(externalLink.getId())
+        .orElseThrow(() -> new IllegalStateException("External link not found"));
   }
 
   @Transactional

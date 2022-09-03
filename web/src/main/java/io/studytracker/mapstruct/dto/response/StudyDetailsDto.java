@@ -33,8 +33,8 @@ public class StudyDetailsDto {
   private Set<UserSummaryDto> users = new HashSet<>();
   private Set<KeywordDetailsDto> keywords = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
-  private Set<ExternalLinkDto> externalLinks = new HashSet<>();
+  private Set<ExternalLinkDetailsDto> externalLinks = new HashSet<>();
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();
-  private StudyConclusionsDto conclusions;
+  private StudyConclusionsDetailsDto conclusions;
   private Set<CommentDetailsDto> comments = new HashSet<>();
 }

@@ -2,12 +2,12 @@ package io.studytracker.mapstruct.dto.form;
 
 import io.studytracker.mapstruct.dto.response.CollaboratorDetailsDto;
 import io.studytracker.mapstruct.dto.response.CommentDetailsDto;
-import io.studytracker.mapstruct.dto.response.ExternalLinkDto;
+import io.studytracker.mapstruct.dto.response.ExternalLinkDetailsDto;
 import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.KeywordDetailsDto;
 import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramSummaryDto;
-import io.studytracker.mapstruct.dto.response.StudyConclusionsDto;
+import io.studytracker.mapstruct.dto.response.StudyConclusionsDetailsDto;
 import io.studytracker.mapstruct.dto.response.StudyRelationshipDetailsDto;
 import io.studytracker.mapstruct.dto.response.UserSummaryDto;
 import io.studytracker.model.Status;
@@ -47,8 +47,8 @@ public class StudyFormDto {
   private Set<UserSummaryDto> users = new HashSet<>();
   private Set<KeywordDetailsDto> keywords = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
-  private Set<ExternalLinkDto> externalLinks = new HashSet<>();
+  private Set<ExternalLinkDetailsDto> externalLinks = new HashSet<>();
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();
-  private StudyConclusionsDto conclusions;
+  private StudyConclusionsDetailsDto conclusions;
   private Set<CommentDetailsDto> comments = new HashSet<>();
 }

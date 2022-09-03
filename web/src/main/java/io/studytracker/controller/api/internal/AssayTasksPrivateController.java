@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping({"/api/internal/assay/{assayId}/tasks", "/api/internal/study/{studyId}/assays/{assayId}/tasks"})
-public class AssayTasksController extends AbstractAssayController {
+public class AssayTasksPrivateController extends AbstractAssayController {
 
   @GetMapping("")
   public List<AssayTaskDetailsDto> fetchTasks(@PathVariable("assayId") String assayId) {

@@ -1,13 +1,12 @@
 package io.studytracker.mapstruct.dto.response;
 
 import java.util.Date;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class StudyConclusionsDto {
+public class StudyConclusionsDetailsDto {
   private Long id;
-  @NotNull private String content;
+  private String content;
   private UserSlimDto createdBy;
   private UserSlimDto lastModifiedBy;
   private Date createdAt;

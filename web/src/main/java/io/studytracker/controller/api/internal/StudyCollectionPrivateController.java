@@ -39,9 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/studycollection")
-public class StudyCollectionController extends AbstractApiController {
+public class StudyCollectionPrivateController extends AbstractApiController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StudyCollectionController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyCollectionPrivateController.class);
 
   @Autowired private StudyCollectionService studyCollectionService;
 
