@@ -26,13 +26,24 @@ const Sidebar = props => {
   const sidebarIsOpen = useSelector(state => state.sidebar.sidebarIsOpen);
 
   const isActive = (paths) => {
+    let val = "";
     for (let i = 0; i < paths.length; i++) {
-      if (location.pathname.indexOf(paths[i]) > 0
-          || location.pathname === ("/" + paths[i])) {
-        return "active";
+      let bit = paths[i];
+      let inverse = false;
+      if (bit.startsWith("!")) {
+        inverse = true;
+        bit = bit.substring(1);
+      }
+      if (location.pathname.indexOf(bit) > 0
+          || location.pathname === ("/" + bit)) {
+        if (inverse) {
+          return ""
+        } else {
+          val = "active";
+        }
       }
     }
-    return "";
+    return val;
   }
 
   return (
@@ -59,7 +70,7 @@ const Sidebar = props => {
 
               <li className={"sidebar-item"}>
                 <a className={"sidebar-link " + isActive(
-                    ["studies", "study"])} href={"/studies"}>
+                    ["studies", "study", "!assay", "!assays"])} href={"/studies"}>
                   <Clipboard size={18} className="align-middle me-3"/>
                   <span className="align-middle">Studies</span>
                 </a>
