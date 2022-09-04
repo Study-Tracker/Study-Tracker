@@ -1,4 +1,4 @@
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.mapstruct.dto.api;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -6,15 +6,15 @@ import java.util.Set;
 import lombok.Data;
 
 @Data
-public class StudyCollectionSummaryDto {
+public class StudyCollectionDto {
 
   private Long id;
   private String name;
   private String description;
   private boolean shared;
-  private UserSlimDto createdBy;
-  private UserSlimDto lastModifiedBy;
+  private Long createdBy;
+  private Long lastModifiedBy;
   private Date createdAt;
   private Date updatedAt;
-  private Set<StudySlimDto> studies = new HashSet<>();
+  private Set<Long> studies = new HashSet<>();
 }

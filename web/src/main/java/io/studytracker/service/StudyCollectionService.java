@@ -7,6 +7,8 @@ import io.studytracker.repository.StudyCollectionRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +20,10 @@ public class StudyCollectionService {
     return studyCollectionRepository.findById(id);
   }
 
+  public Page<StudyCollection> findAll(Pageable pageable) {
+    return studyCollectionRepository.findAll(pageable);
+  }
+
   public List<StudyCollection> findAll() {
     return studyCollectionRepository.findAll();
   }
@@ -26,8 +32,16 @@ public class StudyCollectionService {
     return studyCollectionRepository.findByCreatedById(user.getId());
   }
 
+  public Page<StudyCollection> findByUser(User user, Pageable pageable) {
+    return studyCollectionRepository.findByCreatedById(user.getId(), pageable);
+  }
+
   public List<StudyCollection> findByStudy(Study study) {
     return studyCollectionRepository.findByStudiesId(study.getId());
+  }
+
+  public Page<StudyCollection> findByStudy(Study study, Pageable pageable) {
+    return studyCollectionRepository.findByStudiesId(study.getId(), pageable);
   }
 
   public StudyCollection create(StudyCollection collection) {

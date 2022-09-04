@@ -38,6 +38,7 @@ import io.studytracker.model.NotebookEntryTemplate.Category;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyCollection;
 import io.studytracker.model.StudyConclusions;
 import io.studytracker.model.TaskStatus;
 import io.studytracker.model.User;
@@ -55,6 +56,7 @@ import io.studytracker.repository.KeywordRepository;
 import io.studytracker.repository.NotebookEntryTemplateRepository;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.StudyCollectionRepository;
 import io.studytracker.repository.StudyConclusionsRepository;
 import io.studytracker.repository.StudyRelationshipRepository;
 import io.studytracker.repository.StudyRepository;
@@ -96,6 +98,7 @@ public class ExampleDataGenerator {
   public static final int ASSAY_TASK_COUNT = 2;
   public static final int CONCLUSIONS_COUNT = 1;
   public static final int EXTERNAL_LINK_COUNT = 1;
+  public static final int STUDY_COLLECTION_COUNT = 2;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 
@@ -136,6 +139,8 @@ public class ExampleDataGenerator {
   @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
   @Autowired private KeywordCategoryRepository keywordCategoryRepository;
+
+  @Autowired private StudyCollectionRepository studyCollectionRepository;
 
   public List<NotebookEntryTemplate> generateExampleEntryTemplates() {
     User user = userRepository.findAll().get(0);
@@ -813,8 +818,44 @@ public class ExampleDataGenerator {
     }
   }
 
+  public List<StudyCollection> generateStudyCollections(List<Study> studies) {
+    List<StudyCollection> collections = new ArrayList<>();
+    User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
+
+    StudyCollection collection = new StudyCollection();
+    collection.setName("Example public collection");
+    collection.setDescription("This is a test");
+    collection.setShared(true);
+    collection.setCreatedBy(user);
+    collection.setLastModifiedBy(user);
+    collection.setCreatedAt(new Date());
+    collection.setUpdatedAt(new Date());
+    Set<Study> studySet = new HashSet<>();
+    studySet.add(studies.stream().filter(s -> s.getCode().equals("CPA-10001")).findFirst().get());
+    studySet.add(studies.stream().filter(s -> s.getCode().equals("PPB-10001")).findFirst().get());
+    collection.setStudies(studySet);
+    collections.add(collection);
+
+    collection = new StudyCollection();
+    collection.setName("Example private collection");
+    collection.setDescription("This is also a test");
+    collection.setShared(false);
+    collection.setCreatedBy(user);
+    collection.setLastModifiedBy(user);
+    collection.setCreatedAt(new Date());
+    collection.setUpdatedAt(new Date());
+    studySet = new HashSet<>();
+    studySet.add(studies.stream().filter(s -> s.getCode().equals("CPA-10002")).findFirst().get());
+    collection.setStudies(studySet);
+    collections.add(collection);
+
+    return collections;
+
+  }
+
   public void clearDatabase() {
     LOGGER.info("Wiping collections...");
+    studyCollectionRepository.deleteAll();
     passwordResetTokenRepository.deleteAll();
     externalLinkRepository.deleteAll();
     commentRepository.deleteAll();
@@ -853,6 +894,7 @@ public class ExampleDataGenerator {
       notebookEntryTemplateRepository.saveAll(generateExampleEntryTemplates());
       generateExampleStudies();
       generateExampleAssays(studyRepository.findAll());
+      studyCollectionRepository.saveAll(generateStudyCollections(studyRepository.findAll()));
       LOGGER.info("Done.");
 
     } catch (Exception e) {
