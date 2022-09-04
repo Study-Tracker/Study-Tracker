@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class AssayTypeTaskDto {
+public class AssayTypeTaskDetailsDto {
 
   private Long id;
   @NotNull private TaskStatus status;

@@ -1,11 +1,10 @@
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.mapstruct.dto.api;
 
 import io.studytracker.model.CustomEntityFieldType;
 import lombok.Data;
 
 @Data
 public class AssayTypeFieldDto {
-
   private Long id;
   private String displayName;
   private String fieldName;

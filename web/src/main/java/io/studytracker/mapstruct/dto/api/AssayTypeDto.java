@@ -1,4 +1,4 @@
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.mapstruct.dto.api;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,13 +7,12 @@ import java.util.Set;
 import lombok.Data;
 
 @Data
-public class AssayTypeDetailsDto {
-
+public class AssayTypeDto {
   private Long id;
   private String name;
   private String description;
   private boolean active = true;
-  private Set<AssayTypeFieldDetailsDto> fields = new HashSet<>();
-  private Set<AssayTypeTaskDetailsDto> tasks = new HashSet<>();
+  private Set<AssayTypeFieldDto> fields = new HashSet<>();
+  private Set<AssayTypeTaskDto> tasks = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
 }

@@ -1,17 +1,20 @@
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.mapstruct.dto.form;
 
+import io.studytracker.mapstruct.dto.response.AssayTypeFieldDetailsDto;
+import io.studytracker.mapstruct.dto.response.AssayTypeTaskDetailsDto;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class AssayTypeDetailsDto {
+public class AssayTypeFormDto {
 
   private Long id;
-  private String name;
-  private String description;
+  @NotNull private String name;
+  @NotNull private String description;
   private boolean active = true;
   private Set<AssayTypeFieldDetailsDto> fields = new HashSet<>();
   private Set<AssayTypeTaskDetailsDto> tasks = new HashSet<>();
