@@ -37,12 +37,11 @@ const ProgramListView = props => {
   const [state, setState] = useState({
     isLoaded: false,
     isError: false,
-    title: props.title,
     data: {}
   });
 
   const indexPrograms = (programs) => {
-    console.log(programs);
+    console.debug("Programs", programs);
     const data = {};
     data.cf = crossfilter(programs);
     data.dimensions = {};
@@ -74,11 +73,6 @@ const ProgramListView = props => {
   }
 
   useEffect(() => {
-    let title = searchParams.has("title") ? searchParams.get("title") : state.title;
-    setState(prevState => ({
-      ...prevState,
-      title: title
-    }));
 
     axios.get("/api/internal/program")
     .then(async response => {
@@ -92,7 +86,7 @@ const ProgramListView = props => {
         error: error
       }));
     });
-  }, []);
+  }, [user]);
 
   let content = <LoadingMessage/>;
 
@@ -111,7 +105,6 @@ const ProgramListView = props => {
       content =
           <ProgramList
               programs={state.data.dimensions.allData.top(Infinity)}
-              title={state.title}
               filters={filters}
               user={user}
           />;

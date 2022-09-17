@@ -35,7 +35,6 @@ const UserListView = props => {
   const [state, setState] = useState({
     isLoaded: false,
     isError: false,
-    title: props.title,
     data: {}
   });
 
@@ -71,11 +70,6 @@ const UserListView = props => {
   }
 
   useEffect(() => {
-    let title = searchParams.has("title") ? searchParams.get("title") : state.title;
-    setState(prevState => ({
-      ...prevState,
-      title: title
-    }));
 
     axios.get("/api/internal/user")
     .then(async response => {
@@ -89,7 +83,7 @@ const UserListView = props => {
         error: error
       }));
     });
-  }, []);
+  }, [user]);
   
   let content = <LoadingMessage/>;
 
@@ -108,9 +102,6 @@ const UserListView = props => {
       content =
           <UserList
               users={state.data.dimensions.allData.top(Infinity)}
-              title={state.title}
-              filters={filters}
-              user={user}
           />;
 
     }

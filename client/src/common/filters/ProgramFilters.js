@@ -1,41 +1,45 @@
 import React, {useEffect, useState} from "react";
-import {FormGroup} from '../forms/common';
 import {Form} from 'react-bootstrap';
-import {FilterLabel, FilterSidebar} from "./filters";
+import {FormGroup} from '../forms/common';
 import {setFilters} from "../../redux/filterSlice";
-import {useDispatch} from "react-redux";
+import {
+  convertSearchParams,
+  filterNullSearchParams,
+  FilterSidebar
+} from "./filters";
+import {useDispatch, useSelector} from "react-redux";
 import {useSearchParams} from "react-router-dom";
-
-const qs = require('qs');
 
 export const labels = {
   ACTIVE: "active",
   INACTIVE: "inactive",
-  ADMIN: "admin"
+  MY_PROGRAM: "myProgram"
 };
 
 const defaults = {
   [labels.ACTIVE]: null,
   [labels.INACTIVE]: null,
-  [labels.ADMIN]: null
+  [labels.MY_PROGRAM]: null
 };
 
-const UserFilters = props => {
+const ProgramFilters = props => {
 
-  const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState({
     defaults: defaults,
     filters: defaults
   });
+  const user = useSelector(s => s.user.value);
 
   useEffect(() => {
 
     dispatch(setFilters(defaults));
-
+    const params = convertSearchParams(searchParams);
+    
     const filters = {
       ...state.defaults,
-      ...searchParams
+      ...params
     };
     console.debug(filters);
 
@@ -58,46 +62,50 @@ const UserFilters = props => {
       ...prevState,
       filters
     }));
-    setSearchParams(filters);
-  }
+    setSearchParams(filterNullSearchParams(filters));
+  };
 
   const resetFilters = () => {
     updateFilters(state.defaults);
-  };
+  }
 
   return (
       <FilterSidebar resetFilters={resetFilters}>
 
         <div className="settings-section">
 
-          <FilterLabel text={"Quick Views"}/>
+          {
+            !!user ? (
+                <React.Fragment>
 
-          <FormGroup>
-            <Form.Check
-                id="admin-check"
-                type="checkbox"
-                label="Admin users"
-                checked={!!state.filters[labels.ADMIN]}
-                onChange={(e) => updateFilters({
-                  [labels.ADMIN]: e.target.checked ? true
-                      : null
-                })}
-            />
-          </FormGroup>
+                  <small className="d-block font-weight-bold text-muted mb-2">
+                    Quick Views
+                  </small>
 
-        </div>
+                  <FormGroup>
+                    <Form.Check
+                        id="my-programs-check"
+                        type="checkbox"
+                        label="My Programs"
+                        checked={!!state.filters[labels.MY_PROGRAM]}
+                        onChange={(e) => updateFilters({
+                          [labels.MY_PROGRAM]: e.target.checked ? true : null
+                        })}
+                    />
+                  </FormGroup>
 
-        <hr/>
+                </React.Fragment>
+            ) : ''
+          }
 
-        <div className="settings-section">
-
-          <FilterLabel text={"User Status"}/>
+          <small className="d-block font-weight-bold text-muted mb-2">
+            Program Status
+          </small>
 
           <FormGroup className="mb-2 ms-4">
             <Form.Check
-                label={"Show all users"}
                 type="radio"
-                name="user-status"
+                name="program-status"
                 checked={
                     !state.filters[labels.ACTIVE]
                     && !state.filters[labels.INACTIVE]
@@ -108,14 +116,16 @@ const UserFilters = props => {
                     [labels.INACTIVE]: null
                   })
                 }}
+                label={"Show all programs"}
             />
           </FormGroup>
 
           <FormGroup className="mb-2 ms-4">
+
             <Form.Check
-                label={"Active users only"}
+                label={"Active programs only"}
                 type="radio"
-                name="user-status"
+                name="program-status"
                 checked={!!state.filters[labels.ACTIVE]}
                 onChange={() => {
                   updateFilters({
@@ -128,9 +138,9 @@ const UserFilters = props => {
 
           <FormGroup className="mb-2 ms-4">
             <Form.Check
-                label={"Inactive users only"}
+                label={"Inactive programs only"}
                 type="radio"
-                name="user-status"
+                name="program-status"
                 checked={!!state.filters[labels.INACTIVE]}
                 onChange={() => {
                   updateFilters({
@@ -148,4 +158,4 @@ const UserFilters = props => {
 
 }
 
-export default UserFilters;
+export default ProgramFilters;

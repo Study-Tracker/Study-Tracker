@@ -1,82 +1,50 @@
 import React, {useEffect, useState} from "react";
-import {FormGroup} from '../forms/common';
 import {Form} from 'react-bootstrap';
+import {FormGroup} from '../forms/common';
 import {statuses} from "../../config/statusConstants";
-import {FilterLabel, FilterSidebar} from "./filters";
-import {setPrograms} from "../../redux/programSlice";
-import {setFilters} from "../../redux/filterSlice";
-import {setAssayTypes} from "../../redux/assayTypeSlice";
-import {useDispatch} from "react-redux";
+import {
+  convertSearchParams,
+  FilterLabel,
+  filterNullSearchParams,
+  FilterSidebar
+} from "./filters";
+import {useDispatch, useSelector} from "react-redux";
 import {useSearchParams} from "react-router-dom";
+import {setFilters} from "../../redux/filterSlice";
+import {setPrograms} from "../../redux/programSlice";
 import axios from "axios";
 
 export const labels = {
   LEGACY: "legacy",
-  MY_ASSAY: "myAssay",
+  MY_STUDY: "myStudy",
   PROGRAM: "program",
   EXTERNAL: "external",
   STATUS: "status",
-  ACTIVE: "active",
-  ASSAY_TYPE: "assayType"
+  ACTIVE: "active"
 };
 
 const defaults = {
   [labels.LEGACY]: null,
-  [labels.MY_ASSAY]: null,
+  [labels.MY_STUDY]: null,
   [labels.EXTERNAL]: null,
   [labels.ACTIVE]: null,
   [labels.STATUS]: Object.values(statuses).map(status => status.value),
-  [labels.PROGRAM]: [],
-  [labels.ASSAY_TYPE]: []
+  [labels.PROGRAM]: []
 };
 
-const AssayFilters = props => {
+const StudyFilters = props => {
 
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState({
     defaults: defaults,
     filters: defaults,
-    programs: [],
-    assayTypes: []
+    programs: []
   });
-
-  const toggleAllStatusFilters = () => {
-    let filter = state.filters[labels.STATUS];
-    if (!!filter && filter.length > 0) {
-      filter = [];
-    } else {
-      filter = Object.values(statuses).map(status => status.value);
-    }
-    updateFilters({[labels.STATUS]: filter})
-  }
-
-  const toggleAllProgramFilters = () => {
-    let filter = state.filters[labels.PROGRAM];
-    if (!!filter && filter.length > 0) {
-      filter = [];
-    } else {
-      filter = Object.values(state.programs)
-      .map(program => program.id);
-    }
-    updateFilters({[labels.PROGRAM]: filter})
-  }
-
-  const toggleAllAssayTypeFilters = () => {
-    let filter = state.filters[labels.ASSAY_TYPE];
-    if (!!filter && filter.length > 0) {
-      filter = [];
-    } else {
-      filter = Object.values(state.assayTypes)
-      .map(type => type.id);
-    }
-    updateFilters({[labels.ASSAY_TYPE]: filter})
-  }
+  const user = useSelector(s => s.user.value);
 
   useEffect(() => {
-
     dispatch(setFilters(defaults));
-
     axios.get("/api/internal/program")
     .then(response => {
 
@@ -90,60 +58,33 @@ const AssayFilters = props => {
         }
       });
 
-      axios.get("/api/internal/assaytype")
-      .then(response => {
+      const params = convertSearchParams(searchParams);
+      console.debug("Params", params);
+      if (params.hasOwnProperty(labels.PROGRAM)) {
+        const p = params[labels.PROGRAM]
+        .map(p => parseInt(p));
+        params[labels.PROGRAM] = [...p];
+      }
 
-        const assayTypes = response.data.sort((a, b) => {
-          if (a.name < b.name) {
-            return -1;
-          } else if (a.name > b.name) {
-            return 1;
-          } else {
-            return 0;
-          }
-        });
+      const updatedDefaults = {
+        ...state.defaults,
+        [labels.PROGRAM]: programs.map(p => p.id)
+      };
 
-        if (searchParams.has(labels.PROGRAM)) {
-          const p = String(searchParams.get([labels.PROGRAM]))
-          .split(",")
-          .map(p => parseInt(p));
-          searchParams.set([labels.PROGRAM], [...p]);
-        }
-        if (searchParams.has(labels.ASSAY_TYPE)) {
-          const t = String(searchParams.get([labels.ASSAY_TYPE]))
-          .split(",")
-          .map(p => parseInt(p));
-          searchParams.set([labels.ASSAY_TYPE], [...t]);
-        }
-        if (searchParams.has(labels.STATUS)) {
-          searchParams.set([labels.STATUS], [...searchParams.get([labels.STATUS]).split(",")]);
-        }
+      const filters = {
+        ...updatedDefaults,
+        ...params
+      };
 
-        const updatedDefaults = {
-          ...state.defaults,
-          [labels.PROGRAM]: programs.map(p => p.id),
-          [labels.ASSAY_TYPE]: assayTypes.map(t => t.id)
-        };
-
-        const filters = {
-          ...updatedDefaults,
-          ...searchParams
-        };
-        console.debug(filters);
-
-        setState(prevState => ({
+      setState(prevState => ({
           ...prevState,
           programs: programs,
-          assayTypes: assayTypes,
           defaults: updatedDefaults,
           filters: filters
-        }));
+      }));
 
-        dispatch(setPrograms(programs));
-        dispatch(setAssayTypes(assayTypes));
-        dispatch(setFilters(filters))
-
-      })
+      dispatch(setPrograms(programs));
+      dispatch(setFilters(filters))
 
     }).catch(e => {
       console.error(e);
@@ -151,21 +92,44 @@ const AssayFilters = props => {
   }, []);
 
   const updateFilters = (filter) => {
+    console.debug("New filter", filter);
     const filters = {
       ...state.filters,
       ...filter
     };
+    console.debug("Update filters", filters);
     dispatch(setFilters(filters));
     setState(prevState => ({
       ...prevState,
       filters
     }));
-    setSearchParams(filters);
+    setSearchParams(filterNullSearchParams(filters));
+  }
+
+  const toggleAllStatusFilters = () => {
+    let filter = state.filters[labels.STATUS];
+    if (!!filter && filter.length > 0) {
+      filter = [];
+    } else {
+      filter = Object.values(statuses).map(status => status.value);
+    }
+    updateFilters({[labels.STATUS]: filter})
   };
+
+  const toggleAllProgramFilters = () => {
+    let filter = state.filters[labels.PROGRAM];
+    if (!!filter && filter.length > 0) {
+      filter = [];
+    } else {
+      filter = Object.values(state.programs)
+      .map(program => program.id);
+    }
+    updateFilters({[labels.PROGRAM]: filter})
+  }
 
   const resetFilters = () => {
     updateFilters(state.defaults);
-  };
+  }
 
   return (
       <FilterSidebar resetFilters={resetFilters}>
@@ -175,15 +139,15 @@ const AssayFilters = props => {
           <FilterLabel text={"Quick Views"}/>
 
           {
-            !!props.user ? (
+            !!user ? (
                 <FormGroup>
                   <Form.Check
-                      id="my-assays-check"
+                      id="my-studies-check"
                       type="checkbox"
-                      label="My Assays"
-                      checked={!!state.filters[labels.MY_ASSAY]}
+                      label="My Studies"
+                      checked={!!state.filters[labels.MY_STUDY]}
                       onChange={(e) => updateFilters({
-                        [labels.MY_ASSAY]: e.target.checked ? true
+                        [labels.MY_STUDY]: e.target.checked ? true
                             : null
                       })}
                   />
@@ -237,8 +201,7 @@ const AssayFilters = props => {
                           onChange={(e) => {
                             let values = [...state.filters[labels.STATUS]];
                             if (e.target.checked) {
-                              values.push(
-                                  status.value);
+                              values.push(status.value);
                             } else {
                               values = values.filter(
                                   v => v !== status.value);
@@ -293,44 +256,6 @@ const AssayFilters = props => {
             ) : ''
           }
 
-          {
-            !!state.assayTypes ? (
-                <FormGroup>
-                  <FilterLabel text={"Assay Types"}
-                               toggle={toggleAllAssayTypeFilters}/>
-                  <div>
-                    {
-                      state.assayTypes.map(assayType => {
-                        return (
-                            <Form.Check
-                                key={"assay-type-checkbox-" + assayType.id}
-                                id={"assay-type-checkbox-" + assayType.id}
-                                type={"checkbox"}
-                                label={assayType.name}
-                                checked={state.filters[labels.ASSAY_TYPE].indexOf(
-                                    assayType.id) > -1}
-                                onChange={(e) => {
-                                  let values = [...state.filters[labels.ASSAY_TYPE]];
-                                  if (e.target.checked) {
-                                    values.push(assayType.id);
-                                  } else {
-                                    values = values.filter(
-                                        v => v !== assayType.id);
-                                  }
-                                  updateFilters({
-                                    [labels.ASSAY_TYPE]: values
-                                  })
-                                }}
-                            />
-                        )
-                      })
-                    }
-
-                  </div>
-                </FormGroup>
-            ) : ''
-          }
-
         </div>
 
       </FilterSidebar>
@@ -338,4 +263,4 @@ const AssayFilters = props => {
 
 }
 
-export default AssayFilters;
+export default StudyFilters;

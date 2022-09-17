@@ -24,33 +24,24 @@ import SideBar from "../../common/structure/SideBar";
 import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
 import {useSelector} from "react-redux";
-import {useSearchParams} from "react-router-dom";
 import axios from "axios";
 
 const StudyListView = props => {
 
   const user = useSelector(state => state.user.value);
   const filters = useSelector(state => state.filters.value);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState({
     isLoaded: false,
     isError: false,
-    title: props.title,
     data: {}
   });
 
   useEffect(() => {
-    let title = searchParams.has("title") ? searchParams.get("title") : state.title;
-    let query = '';
-    if (searchParams.has("search")) {
-      query = "?search=" + searchParams.get("search");
-      title = 'Search Results';
-    }
 
-    axios.get("/api/internal/study" + query)
+    axios.get("/api/internal/study")
     .then(response => {
 
-      console.debug(response.data);
+      console.debug("Studies", response.data);
 
       const data = {};
       data.cf = crossfilter(response.data);
@@ -60,15 +51,23 @@ const StudyListView = props => {
       data.dimensions[filter.LEGACY] = data.cf.dimension(d => d.legacy);
       data.dimensions[filter.EXTERNAL] = data.cf.dimension(
           d => !!d.collaborator);
-      data.dimensions[filter.MY_STUDY] = data.cf.dimension(
-          d => user && d.owner.id === user.id);
+      data.dimensions[filter.MY_STUDY] = data.cf.dimension(d => {
+        if (!!user) {
+          if (d.owner.id === user.id) return true;
+          else {
+            for (const u of d.users) {
+              if (u.id === user.id) return true;
+            }
+          }
+        }
+        return false;
+      });
       data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
 
       setState(prevState => ({
         ...prevState,
         data: data,
-        isLoaded: true,
-        title: title
+        isLoaded: true
       }));
 
     })
@@ -80,7 +79,7 @@ const StudyListView = props => {
         error: error
       }));
     });
-  }, []);
+  }, [user]);
 
 
   let content = <LoadingMessage/>;
@@ -94,13 +93,12 @@ const StudyListView = props => {
     } else if (state.isLoaded) {
 
       // Apply filters
-      console.debug("Filters: ");
-      console.debug(filters);
+      console.debug("Active filters", filters);
 
       for (let key of Object.keys(state.data.dimensions)) {
         state.data.dimensions[key].filterAll();
-        if (filters.hasOwnProperty(key) && filters[key]
-            != null) {
+        if (filters.hasOwnProperty(key) && filters[key] != null) {
+          console.debug("Applying filter", key, filters[key]);
           if (Array.isArray(filters[key])) {
             state.data.dimensions[key].filter(
                 d => filters[key].indexOf(d) > -1);
@@ -113,7 +111,6 @@ const StudyListView = props => {
       content =
           <StudyList
               studies={state.data.dimensions.allData.top(Infinity)}
-              title={state.title}
               filters={filters}
               user={user}
           />;
@@ -137,7 +134,7 @@ const StudyListView = props => {
             <Footer/>
           </div>
         </div>
-        <StudyFilters/>
+        <StudyFilters />
       </React.Fragment>
   );
 

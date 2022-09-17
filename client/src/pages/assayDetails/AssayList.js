@@ -230,7 +230,7 @@ const ExportToCsv = (props) => {
   );
 };
 
-const AssayList = ({assays, title, filters, user}) => {
+const AssayList = ({assays, filters, user}) => {
 
   return (
       <Container fluid className="animated fadeIn">

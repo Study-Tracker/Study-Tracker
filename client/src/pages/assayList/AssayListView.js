@@ -26,33 +26,24 @@ import AssayFilters, {
 } from "../../common/filters/assayFilters";
 import AssayList from "../assayDetails/AssayList";
 import {useSelector} from "react-redux";
-import {useSearchParams} from "react-router-dom";
 import axios from "axios";
 
 const AssayListView = props => {
 
   const user = useSelector(state => state.user.value);
   const filters = useSelector(state => state.filters.value);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState({
     isLoaded: false,
     isError: false,
-    title: props.title,
     data: {}
   });
 
   useEffect(() => {
-    let title = searchParams.has("title") ? searchParams.get("title") : state.title;
-    let query = '';
-    if (searchParams.has("search")) {
-      query = "?search=" + searchParams.get("search");
-      title = 'Search Results';
-    }
 
-    axios.get("/api/internal/assay" + query)
+    axios.get("/api/internal/assay")
     .then(response => {
 
-      console.log(response.data);
+      console.log("Assays", response.data);
 
       const data = {};
       data.cf = crossfilter(response.data);
@@ -63,8 +54,17 @@ const AssayListView = props => {
       data.dimensions[filter.LEGACY] = data.cf.dimension(d => d.study.legacy);
       data.dimensions[filter.EXTERNAL] = data.cf.dimension(
           d => !!d.study.collaborator);
-      data.dimensions[filter.MY_ASSAY] = data.cf.dimension(
-          d => props.user && d.owner.id === props.user.id);
+      data.dimensions[filter.MY_ASSAY] = data.cf.dimension(d => {
+          if (!!user) {
+            if (d.owner.id === user.id) return true;
+            else {
+              for (const u of d.users) {
+                if (u.id === user.id) return true;
+              }
+            }
+          }
+          return false;
+        });
       data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
       data.dimensions[filter.ASSAY_TYPE] = data.cf.dimension(
           d => d.assayType.id);
@@ -72,8 +72,7 @@ const AssayListView = props => {
       setState(prevState => ({
         ...prevState,
         data: data,
-        isLoaded: true,
-        title: title
+        isLoaded: true
       }));
 
     })
@@ -85,7 +84,7 @@ const AssayListView = props => {
         error: error
       }));
     });
-  }, []);
+  }, [user]);
 
   let content = <LoadingMessage/>;
 
@@ -98,13 +97,12 @@ const AssayListView = props => {
     } else if (state.isLoaded) {
 
       // Apply filters
-      console.log("Filters: ");
-      console.log(filters);
+      console.debug("Active filters", filters);
 
       for (let key of Object.keys(state.data.dimensions)) {
         state.data.dimensions[key].filterAll();
-        if (filters.hasOwnProperty(key) && filters[key]
-            != null) {
+        if (filters.hasOwnProperty(key) && filters[key] != null) {
+          console.debug("Applying filter", key, filters[key]);
           if (Array.isArray(filters[key])) {
             state.data.dimensions[key].filter(
                 d => filters[key].indexOf(d) > -1);
@@ -117,7 +115,6 @@ const AssayListView = props => {
       content =
           <AssayList
               assays={state.data.dimensions.allData.top(Infinity)}
-              title={state.title}
               filters={filters}
               user={user}
           />;

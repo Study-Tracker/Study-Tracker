@@ -140,7 +140,7 @@ export const UserTable = ({users}) => {
   )
 }
 
-const UserList = ({title, user, users}) => {
+const UserList = ({users}) => {
 
   return (
       <Container fluid className="animated fadeIn">

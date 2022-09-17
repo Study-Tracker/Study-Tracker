@@ -78,15 +78,34 @@ export const FilterSidebar = (props) => {
 
 }
 
-export const cleanQueryParams = (params) => {
-  const keys = Object.keys(params);
-  for (const k of keys) {
-    if (params[k] === 'true') {
-      params[k] = true;
-    } else if (params[k] === 'false') {
-      params[k] = false;
-    } else if (!isNaN(params[k])) {
-      params[k] = parseInt(params[k]);
+export const filterNullSearchParams = filters => {
+  const result = {};
+  for (const key in filters) {
+    if (filters[key] !== null) {
+      result[key] = filters[key];
+    }
+  }
+  return result;
+}
+
+export const convertSearchParams = searchParams => {
+  let params = {};
+  for (const [key, value] of searchParams.entries()) {
+    if (value === 'true') {
+      params[key] = true;
+    } else if (value === 'false') {
+      params[key] = false;
+    } else {
+      let val = [];
+      if (params.hasOwnProperty(key)) {
+        val = params[key];
+      }
+      if (!isNaN(value)) {
+        val.push(parseInt(value));
+      } else {
+        val.push(value);
+      }
+      params[key] = val;
     }
   }
   return params;
