@@ -24,7 +24,7 @@ import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
 import ProgramFilters, {
   labels as filter
-} from "../../common/filters/programFilters";
+} from "../../common/filters/ProgramFilters";
 import {useSearchParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";

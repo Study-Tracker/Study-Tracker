@@ -19,7 +19,7 @@ import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import StudyList from "./StudyList";
 import crossfilter from "crossfilter2";
-import StudyFilters, {labels as filter} from '../../common/filters/studyFilters'
+import StudyFilters, {labels as filter} from '../../common/filters/StudyFilters'
 import SideBar from "../../common/structure/SideBar";
 import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";

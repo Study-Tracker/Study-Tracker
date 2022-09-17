@@ -22,7 +22,7 @@ import SideBar from "../../common/structure/SideBar";
 import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
 import UserList from "./UserList";
-import UserFilters, {labels as filter} from "../../common/filters/userFilters";
+import UserFilters, {labels as filter} from "../../common/filters/UserFilters";
 import {useSearchParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";

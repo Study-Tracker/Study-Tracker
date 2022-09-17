@@ -23,7 +23,7 @@ import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
 import AssayFilters, {
   labels as filter
-} from "../../common/filters/assayFilters";
+} from "../../common/filters/AssayFilters";
 import AssayList from "../assayDetails/AssayList";
 import {useSelector} from "react-redux";
 import axios from "axios";
