@@ -16,6 +16,7 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.mapstruct.mapper.FileStoreFolderMapper;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.repository.FileStoreFolderRepository;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -98,15 +100,22 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
   }
 
   @Test
-  public void uploadFiletest() throws Exception {
+  public void uploadFileTest() throws Exception {
     Resource resource = new ClassPathResource("test.txt");
     FileStoreFolder folder = repository.findAll().stream()
         .findFirst()
         .orElseThrow();
-    MockMultipartFile mockFile = new MockMultipartFile(resource.getFilename(), resource.getInputStream());
+    Assert.assertEquals(resource.getFilename(), "test.txt");
+    MockMultipartFile mockFile = new MockMultipartFile(
+        "file",
+        resource.getFilename(),
+        MediaType.TEXT_PLAIN_VALUE,
+        resource.getInputStream()
+    );
     mockMvc.perform(multipart("/api/v1/storage-folder/" + folder.getId() + "/upload")
-            .file("file", mockFile.getBytes())
+            .file(mockFile)
         .header("Authorization", "Bearer " + this.getToken()))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk());
 
   }

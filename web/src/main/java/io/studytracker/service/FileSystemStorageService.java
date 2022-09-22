@@ -47,8 +47,12 @@ public final class FileSystemStorageService {
    * @return
    */
   public Path store(MultipartFile file) throws FileStorageException {
+    LOGGER.debug("Storing file: {}", file.getName());
     String filename = StringUtils.cleanPath(file.getOriginalFilename());
     LOGGER.debug("File to upload: " + filename);
+    if (!StringUtils.hasText(filename)) {
+      throw new FileStorageException("File name is empty");
+    }
     if (file.isEmpty()) {
       throw new FileStorageException("File is empty.");
     }
