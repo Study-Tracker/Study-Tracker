@@ -12,5 +12,5 @@ if [ ! -f "${CONF_FILE}" ]; then
 fi
 
 echo "Migrating database..."
-mvn flyway:migrate -Dflyway.configFiles=${CONF_FILE}
+mvn flyway:migrate -Dflyway.configFiles="${CONF_FILE}"
 echo "Done."

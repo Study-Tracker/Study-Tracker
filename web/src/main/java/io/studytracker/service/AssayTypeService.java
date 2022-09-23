@@ -1,0 +1,136 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.studytracker.service;
+
+import io.studytracker.exception.InvalidConstraintException;
+import io.studytracker.model.AssayType;
+import io.studytracker.model.AssayTypeField;
+import io.studytracker.model.AssayTypeTask;
+import io.studytracker.repository.AssayTypeRepository;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+@Service
+public class AssayTypeService {
+
+  @Autowired private AssayTypeRepository assayTypeRepository;
+
+  public Optional<AssayType> findById(Long id) {
+    return assayTypeRepository.findById(id);
+  }
+
+  public Optional<AssayType> findByName(String name) {
+    return assayTypeRepository.findByName(name);
+  }
+
+  public Page<AssayType> findAll(Pageable pageable) {
+    return assayTypeRepository.findAll(pageable);
+  }
+
+  public List<AssayType> findAll() {
+    return assayTypeRepository.findAll();
+  }
+
+  private void validateFields(AssayType assayType) {
+    Set<String> fieldNames = new HashSet<>();
+    Set<String> displayNames = new HashSet<>();
+    for (AssayTypeField field : assayType.getFields()) {
+
+      // Check for required input
+      if (StringUtils.isEmpty(field.getFieldName())
+          || StringUtils.isEmpty(field.getDisplayName())
+          || field.getType() == null) {
+        throw new InvalidConstraintException(
+            "Assay type "
+                + assayType.getName()
+                + " field is missing required attributes: "
+                + assayType);
+      }
+
+      // Check that a field with the name doesn't exist
+      if (fieldNames.contains(field.getFieldName())) {
+        throw new InvalidConstraintException(
+            "Assay type "
+                + assayType.getName()
+                + " already contains a field with name: "
+                + field.getFieldName());
+      }
+      fieldNames.add(field.getFieldName());
+
+      // Check that a field with the display name doesn't exist
+      if (displayNames.contains(field.getDisplayName())) {
+        throw new InvalidConstraintException(
+            "Assay type "
+                + assayType.getName()
+                + " already contains a field with display name: "
+                + field.getDisplayName());
+      }
+      displayNames.add(field.getDisplayName());
+    }
+  }
+
+  @Transactional
+  public AssayType create(AssayType assayType) {
+    validateFields(assayType);
+    for (AssayTypeField field : assayType.getFields()) {
+      field.setAssayType(assayType);
+    }
+    for (AssayTypeTask task : assayType.getTasks()) {
+      task.setAssayType(assayType);
+    }
+    assayTypeRepository.save(assayType);
+    return assayType;
+  }
+
+  @Transactional
+  public AssayType update(AssayType assayType) {
+
+    validateFields(assayType);
+    for (AssayTypeField field : assayType.getFields()) {
+      field.setAssayType(assayType);
+    }
+    for (AssayTypeTask task : assayType.getTasks()) {
+      task.setAssayType(assayType);
+    }
+    assayTypeRepository.save(assayType);
+    return assayType;
+  }
+
+  @Transactional
+  public void toggleActive(AssayType assayType) {
+    assayType.setActive(!assayType.isActive());
+    assayTypeRepository.save(assayType);
+  }
+
+  @Transactional
+  public void delete(AssayType assayType) {
+    assayType.setActive(false);
+    assayTypeRepository.save(assayType);
+  }
+
+  public long count() {
+    return assayTypeRepository.count();
+  }
+}

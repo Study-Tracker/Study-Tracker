@@ -1,0 +1,178 @@
+####################################################################################################
+# Study Tracker .properties file example
+#
+# Use this file as a template for your own .properties file, which is required for configuring and
+# running Study Tracker. Study Tracker requires that an application.properties file be present in
+# either the same directory as the Study Tracker jar file at run-time, or in the directory
+# web/src/main/resources/ at compile-time.
+####################################################################################################
+
+### General properties ###
+
+# Required
+# Host name of your application (should not include protocol or port). This is used for generating
+# links to your application in emails and other notifications.
+# Eg. localhost or mywebsite.com
+
+application.host-name=
+
+
+### Admin User ###
+
+# Required
+# The first time Study Tracker starts, an admin user will be created. You must specify an email and
+# default password for the admin account. The password can be changed after initial startup.
+
+admin.email=
+admin.password=
+
+
+### Data Source ###
+
+# Required
+# Provide the connection information for the primary Study Tracker database. The user and schema
+# need to be configured ahead of time.
+
+db.username=
+db.password=
+db.host=
+db.port=
+db.name=
+
+
+### AWS ###
+
+# Optional
+# If the instance running Study Tracker has an IAM role that assigns it access to EventBridge and
+# S3, then these properties can be left blank. Otherwise, provide the region, access key and secret
+# key for the account you are running Study Tracker in.
+
+aws.region=
+aws.access-key-id=
+aws.secret-access-key=
+
+
+### Events ###
+
+# Determines where to dispatch events. Can be 'eventbridge' or 'local'. Default mode: 'local'
+events.mode=
+
+$ If events.mode is set to 'eventbridge', then you must provide the name of the event bus to use.
+aws.eventbridge.bus-name=
+
+
+### Email ###
+
+# Required
+# Provide SMTP connection details for outgoing emails.
+spring.mail.host=
+spring.mail.port=
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+email.outgoing-email-address=${spring.mail.username}
+
+
+### Notebook ###
+
+# Connect Study Tracker with your ELN
+# Options: 'none', 'benchling'. Default: 'none'
+notebook.mode=
+
+# If notebook.mode is set to 'benchling', then you must provide the Benchling API key and the
+benchling.tenant-name=
+benchling.api.client-id=
+benchling.api.client-secret=
+
+# Deprecated parameters.
+#benchling.api.token=
+#benchling.api.username=
+#benchling.api.password=
+#benchling.api.root-url=
+#benchling.api.root-entity=
+#benchling.api.root-folder-url=
+
+
+### File Storage ###
+
+# Options: local, egnyte. Defaults to local
+storage.mode=
+
+# If storage.use-existing is set to 'true', Study Tracker will use existing folders with the same
+# name when trying to create new ones. If set to 'false', Study Tracker throw an error when trying
+# to create a folder that already exists. Defaults to 'true'.
+storage.use-existing=true
+
+# Sets the maximum recursive read depth for the local file storage. The higher the number, the
+# longer it will take to load folder contents and the larger the folder tree that will be returned.
+storage.max-folder-read-depth=3
+
+# Local file storage
+# Sets the directory used for uploading files.
+storage.temp-dir=
+# Sets the folder in which the root program/study/assay storage folder hierarchy will be created.
+# Required if storage.mode is set to 'local'.
+storage.local-dir=
+
+
+### Egnyte ###
+
+# Required if storage.mode is set to 'egnyte'.
+egnyte.tenant-name=
+egnyte.root-url=https://${egnyte.tenant-name}.egnyte.com
+egnyte.api-token=
+
+# Sets the folder in which the root program/study/assay storage folder hierarchy will be created.
+egnyte.root-path=
+# Sets the maximum number of API requests that will be made to egnyte every second.
+egnyte.qps=3
+
+
+### Studies ###
+
+# You can change default study code creation behavior here.
+study.code-counter-start=10001
+
+
+### Search ###
+
+# Study Tracker can integrate with Elasticsearch to provide advanced study search functionality.
+# To enable, set search.mode to 'elasticsearch'. The host value should be the full host name
+# (without protocol) and the port number. So if my host is https://myelasticdb.com, then the
+# value for elasticsearch.host would be 'myelasticdb.com' and the port would be set to 443.
+search.mode=
+elasticsearch.host=
+elasticsearch.port=
+elasticsearch.use-ssl=
+elasticsearch.username=
+elasticsearch.password=
+
+
+### SSL ###
+
+# Optional
+# If SSL is enabled, set the port to 8443 or 443
+#server.port=8443
+#server.ssl.enabled=true
+#server.ssl.key-store-type=PKCS12
+server.ssl.key-alias=
+server.ssl.key-store=
+server.ssl.key-store-password=
+
+
+### Single Sign-On ###
+
+# Optional
+# If using Okta for SSO, set option to 'okta-saml'
+security.sso=
+
+# Okta
+sso.okta.url=
+saml.audience=
+saml.idp=
+saml.metadata-url=
+saml.metadata-base-url=
+saml.keystore.location=
+saml.keystore.alias=
+saml.keystore.password=

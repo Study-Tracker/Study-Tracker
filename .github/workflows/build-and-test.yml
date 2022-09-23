@@ -6,7 +6,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-#    container: adoptopenjdk/maven-openjdk11
 
     services:
       postgres:
@@ -29,17 +28,18 @@ jobs:
       - uses: actions/checkout@v2
 
       # Install JDK
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@main
         with:
-          java-version: 1.11
+          java-version: 17
+          distribution: 'adopt'
 
       # Get the test properties
       - name: Test properties
-        run: 'echo "$TEST_PROPERTIES" > application.properties'
         shell: bash
         env:
           TEST_PROPERTIES: ${{secrets.TEST_PROPERTIES}}
+        run: 'echo "$TEST_PROPERTIES" > ./web/src/main/resources/application.properties'
 
       # Build the application
       - name: Maven Package
@@ -47,13 +47,13 @@ jobs:
 
       # Run tests
       - name: Repository tests
+        working-directory: ./web
         run: mvn -Dtest="io.studytracker.test.repository.**" test
 
       - name: Service tests
+        working-directory: ./web
         run: mvn -Dtest="io.studytracker.test.service.**" test
 
       - name: Web tests
+        working-directory: ./web
         run: mvn -Dtest="io.studytracker.test.web.**" test
-
-      #- name: Maven Verify
-      #  run: mvn -B clean verify
