@@ -35,7 +35,6 @@ import io.studytracker.mapstruct.dto.api.KeywordPayloadDto;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.KeywordCategory;
 import io.studytracker.repository.KeywordCategoryRepository;
-import io.studytracker.repository.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +56,6 @@ public class KeywordApiControllerTests extends AbstractApiControllerTests {
   @Autowired private MockMvc mockMvc;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private UserRepository userRepository;
 
   @Autowired private KeywordCategoryRepository keywordCategoryRepository;
 

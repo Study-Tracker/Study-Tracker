@@ -26,10 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
-import io.studytracker.mapstruct.mapper.FileStoreFolderMapper;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.repository.FileStoreFolderRepository;
 import org.junit.Assert;
@@ -56,12 +54,6 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
 
   @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private ObjectMapper objectMapper;
-
-  @Autowired
-  private FileStoreFolderMapper mapper;
 
   @Autowired
   private FileStoreFolderRepository repository;
@@ -94,7 +86,6 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
-    ;
   }
 
   @Test

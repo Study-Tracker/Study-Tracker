@@ -50,6 +50,7 @@ public class ExternalLinkPublicController extends AbstractExternalLinksControlle
   @GetMapping("")
   public Page<ExternalLinkDto> findAll(
       @RequestParam(required = false) Long studyId, Pageable pageable) {
+    LOGGER.debug("Find all external links");
     Page<ExternalLink> page;
     if (studyId != null) {
       page = this.getStudyExternalLinkService().findByStudyId(studyId, pageable);
@@ -62,6 +63,7 @@ public class ExternalLinkPublicController extends AbstractExternalLinksControlle
 
   @GetMapping("/{id}")
   public ExternalLinkDto findById(@PathVariable Long id) {
+    LOGGER.debug("Find external link by id: {}", id);
     ExternalLink externalLink = this.getStudyExternalLinkService().findById(id)
         .orElseThrow(() -> new RecordNotFoundException("External link not found: " + id));
     return this.getExternalLinkMapper().toDto(externalLink);
@@ -69,6 +71,7 @@ public class ExternalLinkPublicController extends AbstractExternalLinksControlle
 
   @PostMapping("")
   public HttpEntity<ExternalLinkDto> create(@Valid @RequestBody ExternalLinkPayloadDto dto) {
+    LOGGER.info("Create external link: {}", dto);
     Study study = this.getStudyService().findById(dto.getStudyId())
         .orElseThrow(() -> new RecordNotFoundException("Study not found: " + dto.getStudyId()));
     ExternalLink externalLink =
@@ -80,6 +83,7 @@ public class ExternalLinkPublicController extends AbstractExternalLinksControlle
   @PutMapping("/{id}")
   public HttpEntity<ExternalLinkDto> update(
       @PathVariable Long id, @Valid @RequestBody ExternalLinkPayloadDto dto) {
+    LOGGER.info("Update external link: {}", dto);
     Study study = this.getStudyService().findById(dto.getStudyId())
         .orElseThrow(() -> new RecordNotFoundException("Study not found: " + dto.getStudyId()));
     ExternalLink externalLink =
@@ -89,6 +93,7 @@ public class ExternalLinkPublicController extends AbstractExternalLinksControlle
 
   @DeleteMapping("/{id}")
   public HttpEntity<?> delete(@PathVariable Long id) {
+    LOGGER.info("Delete external link: {}", id);
     this.deleteExternalLink(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

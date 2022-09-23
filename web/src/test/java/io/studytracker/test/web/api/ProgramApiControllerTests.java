@@ -98,7 +98,6 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
-    ;
   }
 
   @Test

@@ -34,7 +34,6 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.CommentPayloadDto;
-import io.studytracker.mapstruct.mapper.CommentMapper;
 import io.studytracker.model.Comment;
 import io.studytracker.model.Study;
 import io.studytracker.repository.CommentRepository;
@@ -70,9 +69,6 @@ public class CommentApiControllerTests extends AbstractApiControllerTests {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private CommentMapper commentMapper;
-
   @Test
   public void findAllTest() throws Exception {
     mockMvc.perform(get("/api/v1/comment")
@@ -101,7 +97,6 @@ public class CommentApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
-    ;
 
     Study study1 = studyRepository.findByCode("PPB-10001")
         .orElseThrow(RecordNotFoundException::new);

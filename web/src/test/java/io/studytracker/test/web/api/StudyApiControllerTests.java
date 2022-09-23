@@ -36,7 +36,6 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.StudyPayloadDto;
-import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -83,9 +82,6 @@ public class StudyApiControllerTests extends AbstractApiControllerTests {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private StudyMapper studyMapper;
-
   @Test
   public void findAllTest() throws Exception {
     mockMvc.perform(get("/api/v1/study")
@@ -114,7 +110,6 @@ public class StudyApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
-    ;
   }
 
   @Test

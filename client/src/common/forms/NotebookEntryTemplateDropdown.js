@@ -58,17 +58,8 @@ const NotebookEntryTemplatesDropdown = ({onChange}) => {
             console.debug("Selected template: ", selected);
             onChange(selected.value)
           }}
-          // controlShouldRenderValue={false}
           defaultOptions={true}
         />
-        {/*<Select*/}
-        {/*    className="react-select-container"*/}
-        {/*    classNamePrefix="react-select"*/}
-        {/*    defaultValue={selectedValue}*/}
-        {/*    options={options}*/}
-        {/*    onChange={onChange}*/}
-        {/*    isClearable={true}*/}
-        {/*/>*/}
         <Form.Control.Feedback>
           Select a template for notebook entry.
         </Form.Control.Feedback>

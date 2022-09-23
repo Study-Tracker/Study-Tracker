@@ -34,7 +34,6 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.StudyConclusionsPayloadDto;
-import io.studytracker.mapstruct.mapper.StudyConclusionsMapper;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyConclusions;
 import io.studytracker.repository.StudyConclusionsRepository;
@@ -70,9 +69,6 @@ public class ConclusionsApiControllerTests extends AbstractApiControllerTests {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private StudyConclusionsMapper studyConclusionsMapper;
-
   @Test
   public void findAllTest() throws Exception {
     mockMvc.perform(get("/api/v1/conclusions")
@@ -101,7 +97,6 @@ public class ConclusionsApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
-    ;
 
   }
 
@@ -109,8 +104,6 @@ public class ConclusionsApiControllerTests extends AbstractApiControllerTests {
   public void findByIdTest() throws Exception {
 
     StudyConclusions conclusions = studyConclusionsRepository.findAll().get(0);
-    Study study = studyRepository.findByCode("PPB-10001")
-            .orElseThrow(RecordNotFoundException::new);
 
     mockMvc.perform(get("/api/v1/conclusions/" + conclusions.getId())
             .header("Authorization", "Bearer " + this.getToken()))

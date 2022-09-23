@@ -75,10 +75,10 @@ public abstract class AbstractProgramController extends AbstractApiController {
       throw new RecordNotFoundException("Could not find program: " + program.getId());
     }
 
-    program = this.getProgramService().update(program);
-    this.logActivity(ProgramActivityUtils.fromUpdatedProgram(program, user));
+    Program updated = this.getProgramService().update(program);
+    this.logActivity(ProgramActivityUtils.fromUpdatedProgram(updated, user));
 
-    return program;
+    return updated;
   }
 
   /**

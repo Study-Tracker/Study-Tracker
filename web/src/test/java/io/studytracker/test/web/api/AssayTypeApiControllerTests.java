@@ -36,7 +36,6 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.AssayTypeFieldPayloadDto;
 import io.studytracker.mapstruct.dto.api.AssayTypePayloadDto;
 import io.studytracker.mapstruct.dto.api.AssayTypeTaskPayloadDto;
-import io.studytracker.mapstruct.mapper.AssayTypeMapper;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.TaskStatus;
@@ -70,9 +69,6 @@ public class AssayTypeApiControllerTests extends AbstractApiControllerTests {
 
   @Autowired
   private ObjectMapper objectMapper;
-
-  @Autowired
-  private AssayTypeMapper assayTypeMapper;
 
   @Test
   public void findAllTest() throws Exception {

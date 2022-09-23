@@ -24,7 +24,6 @@ import io.studytracker.model.User;
 import io.studytracker.service.StudyCollectionService;
 import io.studytracker.service.UserService;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,14 +41,6 @@ public class UserStudyCollectionPrivateController {
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private StudyCollectionMapper mapper;
-
-  private User getUserFromIdentifier(Long id) {
-    Optional<User> optional = userService.findById(id);
-    if (optional.isEmpty()) {
-      throw new RecordNotFoundException("User not found: " + id);
-    }
-    return optional.get();
-  }
 
   @GetMapping("")
   public List<StudyCollectionSummaryDto> getUserStudyCollections(

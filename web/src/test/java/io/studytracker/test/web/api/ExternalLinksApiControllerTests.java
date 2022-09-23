@@ -34,7 +34,6 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ExternalLinkPayloadDto;
-import io.studytracker.mapstruct.mapper.ExternalLinkMapper;
 import io.studytracker.model.ExternalLink;
 import io.studytracker.model.Study;
 import io.studytracker.repository.ExternalLinkRepository;
@@ -71,9 +70,6 @@ public class ExternalLinksApiControllerTests extends AbstractApiControllerTests 
 
   @Autowired
   private ObjectMapper objectMapper;
-
-  @Autowired
-  private ExternalLinkMapper externalLinkMapper;
 
   @Test
   public void findAllTest() throws Exception {

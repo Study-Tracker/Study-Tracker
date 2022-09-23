@@ -38,7 +38,6 @@ import io.studytracker.model.Study;
 import io.studytracker.model.StudyCollection;
 import io.studytracker.repository.StudyCollectionRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.repository.UserRepository;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Assert;
@@ -72,9 +71,6 @@ public class StudyCollectionApiControllerTests extends AbstractApiControllerTest
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private UserRepository userRepository;
-
   @Test
   public void findAllTest() throws Exception {
     mockMvc.perform(get("/api/v1/study-collection")
@@ -103,7 +99,6 @@ public class StudyCollectionApiControllerTests extends AbstractApiControllerTest
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
-    ;
 
   }
 

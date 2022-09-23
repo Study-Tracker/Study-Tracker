@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import {useFormikContext} from 'formik'
-import {useEffect} from 'react'
+import {useFormikContext} from 'formik';
+import {useEffect} from 'react';
 import swal from "sweetalert";
 
 const FormikFormErrorNotification = () => {
-    const { isValid, isValidating, isSubmitting, errors, submitCount, values } = useFormikContext()
+    const { isSubmitting, errors, submitCount, values } = useFormikContext()
 
     useEffect(() => {
         if (submitCount > 0 && !isSubmitting && Object.keys(errors).length > 0) {
