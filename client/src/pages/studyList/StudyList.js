@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,7 @@ const columns = [
     text: "Code",
     sort: true,
     headerStyle: {width: '10%'},
-    formatter: (cell, d, index, x) => {
+    formatter: (cell, d) => {
       return (
           <a href={"/study/" + d.code}>
             {d.code}
@@ -62,7 +62,7 @@ const columns = [
       }
       return 0;
     },
-    formatter: (c, d, i, x) => <StatusBadge status={d.status}/>
+    formatter: (c, d) => <StatusBadge status={d.status}/>
   },
   {
     dataField: "updatedAt",
@@ -71,8 +71,8 @@ const columns = [
     sort: true,
     searchable: false,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString(),
-    csvFormatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString()
+    formatter: (c, d) => new Date(d.updatedAt).toLocaleDateString(),
+    csvFormatter: (c, d) => new Date(d.updatedAt).toLocaleDateString()
   },
   {
     dataField: "program",
@@ -88,23 +88,23 @@ const columns = [
       }
       return 0;
     },
-    formatter: (cell, d, i, x) => d.program.name,
-    csvFormatter: (cell, d, i, x) => d.program.name
+    formatter: (cell, d) => d.program.name,
+    csvFormatter: (cell, d) => d.program.name
   },
   {
     dataField: "name",
     text: "Name",
     sort: true,
     headerStyle: {width: '25%'},
-    formatter: (c, d, i, x) => d.name
+    formatter: (c, d) => d.name
   },
   {
     dataField: "owner",
     text: "Owner",
     sort: true,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => d.owner.displayName,
-    csvFormatter: (c, d, i, x) => d.owner.displayName
+    formatter: (c, d) => d.owner.displayName,
+    csvFormatter: (c, d) => d.owner.displayName
   },
   {
     dataField: "cro",
@@ -124,9 +124,9 @@ const columns = [
       }
       return 0;
     },
-    csvFormatter: (c, d, i, x) => !!d.collaborator
+    csvFormatter: (c, d) => !!d.collaborator
         ? d.collaborator.organizationName : "",
-    formatter: (c, d, i, x) => !!d.collaborator
+    formatter: (c, d) => !!d.collaborator
         ? (
             <div>
               <p style={{fontWeight: 'bold', marginBottom: '0.2rem'}}>
@@ -146,7 +146,7 @@ const columns = [
     searchable: false,
     headerStyle: {width: '10%'},
     csvExport: false,
-    formatter: (c, d, i, x) => {
+    formatter: (c, d) => {
       let links = [];
       if (!!d.storageFolder) {
         links.push(
@@ -177,8 +177,8 @@ const columns = [
     isDummyField: true,
     hidden: true,
     csvExport: false,
-    formatter: (c, d, i, x) => '',
-    filterValue: (c, d, i, x) => {
+    formatter: () => '',
+    filterValue: (c, d) => {
       const CRO = !!d.collaborator
           ? d.collaborator.organizationName +
           ' ' +

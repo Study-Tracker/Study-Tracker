@@ -16,6 +16,6 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     echo "Cleaning database..."
-    mvn flyway:clean flyway:migrate -Dflyway.configFiles=${CONF_FILE}
+    mvn flyway:clean flyway:migrate -Dflyway.configFiles="${CONF_FILE}"
     echo "Done."
 fi

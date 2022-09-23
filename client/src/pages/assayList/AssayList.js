@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {File} from "react-feather";
+import PropTypes from "prop-types";
 
 const columns = [
   {
@@ -28,7 +29,7 @@ const columns = [
     text: "Code",
     sort: true,
     headerStyle: {width: '15%'},
-    formatter: (cell, d, index, x) => {
+    formatter: (cell, d) => {
       return (
           <a href={"/study/" + d.study.code + "/assay/" + d.code}>
             {d.code}
@@ -50,8 +51,8 @@ const columns = [
     text: "Assay Type",
     sort: true,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => d.assayType.name,
-    csvFormatter: (c, d, i, x) => d.assayType.name
+    formatter: (c, d) => d.assayType.name,
+    csvFormatter: (c, d) => d.assayType.name
   },
   {
     dataField: "status",
@@ -67,7 +68,7 @@ const columns = [
       }
       return 0;
     },
-    formatter: (c, d, i, x) => <StatusBadge status={d.status}/>
+    formatter: (c, d) => <StatusBadge status={d.status}/>
   },
   {
     dataField: "updatedAt",
@@ -76,8 +77,8 @@ const columns = [
     sort: true,
     searchable: false,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString(),
-    csvFormatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString()
+    formatter: (c, d) => new Date(d.updatedAt).toLocaleDateString(),
+    csvFormatter: (c, d) => new Date(d.updatedAt).toLocaleDateString()
   },
   {
     dataField: "program",
@@ -93,23 +94,23 @@ const columns = [
       }
       return 0;
     },
-    formatter: (cell, d, i, x) => d.study.program.name,
-    csvFormatter: (cell, d, i, x) => d.study.program.name
+    formatter: (cell, d) => d.study.program.name,
+    csvFormatter: (cell, d) => d.study.program.name
   },
   {
     dataField: "name",
     text: "Name",
     sort: true,
     headerStyle: {width: '20%'},
-    formatter: (c, d, i, x) => d.name
+    formatter: (c, d) => d.name
   },
   {
     dataField: "owner",
     text: "Owner",
     sort: true,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => d.owner.displayName,
-    csvFormatter: (c, d, i, x) => d.owner.displayName
+    formatter: (c, d) => d.owner.displayName,
+    csvFormatter: (c, d) => d.owner.displayName
   },
   {
     dataField: "cro",
@@ -131,9 +132,9 @@ const columns = [
       }
       return 0;
     },
-    csvFormatter: (c, d, i, x) => !!d.study.collaborator
+    csvFormatter: (c, d) => !!d.study.collaborator
         ? d.study.collaborator.organizationName : "",
-    formatter: (c, d, i, x) => !!d.study.collaborator
+    formatter: (c, d) => !!d.study.collaborator
         ? (
             <div>
               <p style={{fontWeight: 'bold', marginBottom: '0.2rem'}}>
@@ -153,7 +154,7 @@ const columns = [
     searchable: false,
     headerStyle: {width: '10%'},
     csvExport: false,
-    formatter: (c, d, i, x) => {
+    formatter: (c, d) => {
       let links = [];
       if (!!d.storageFolder) {
         links.push(
@@ -184,15 +185,14 @@ const columns = [
     isDummyField: true,
     hidden: true,
     csvExport: false,
-    formatter: (c, d, i, x) => '',
-    filterValue: (c, d, i, x) => {
+    formatter: () => '',
+    filterValue: (c, d) => {
       const CRO = !!d.study.collaborator
           ? d.study.collaborator.organizationName +
           ' ' +
           d.study.collaborator.contactName
           : '';
-      let text =
-          d.name +
+      return d.name +
           ' ' +
           d.assayType.name +
           ' ' +
@@ -209,7 +209,6 @@ const columns = [
           d.owner.displayName +
           ' ' +
           (d.study.externalCode || '');
-      return text;
     }
   }
 ];
@@ -230,7 +229,7 @@ const ExportToCsv = (props) => {
   );
 };
 
-const AssayList = ({assays, filters, user}) => {
+const AssayList = ({assays}) => {
 
   return (
       <Container fluid className="animated fadeIn">
@@ -288,5 +287,9 @@ const AssayList = ({assays, filters, user}) => {
   );
 
 };
+
+AssayList.propTypes = {
+  assays: PropTypes.array.isRequired
+}
 
 export default AssayList;

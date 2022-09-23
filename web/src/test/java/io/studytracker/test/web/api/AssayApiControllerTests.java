@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,6 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.AssayPayloadDto;
-import io.studytracker.mapstruct.mapper.AssayMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.Status;
@@ -44,7 +43,6 @@ import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.service.UserService;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -71,10 +69,6 @@ public class AssayApiControllerTests extends AbstractApiControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
-
-  @Autowired private UserService userService;
-
   @Autowired private AssayRepository assayRepository;
 
   @Autowired private AssayTypeRepository assayTypeRepository;
@@ -82,8 +76,6 @@ public class AssayApiControllerTests extends AbstractApiControllerTests {
   @Autowired private StudyRepository studyRepository;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private AssayMapper assayMapper;
 
   // Study methods
 

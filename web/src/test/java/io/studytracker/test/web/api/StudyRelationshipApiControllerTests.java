@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,6 @@ import io.studytracker.model.RelationshipType;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyRelationship;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.repository.UserRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,8 +60,6 @@ public class StudyRelationshipApiControllerTests extends AbstractApiControllerTe
   @Autowired private StudyRepository studyRepository;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private UserRepository userRepository;
 
   @Test
   public void createStudyRelationshipTest() throws Exception {

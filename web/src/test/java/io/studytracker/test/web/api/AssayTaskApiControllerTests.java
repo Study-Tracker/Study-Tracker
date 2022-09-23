@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,13 +34,11 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.AssayTaskPayloadDto;
-import io.studytracker.mapstruct.mapper.AssayTaskMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.TaskStatus;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.service.AssayTaskService;
-import io.studytracker.service.UserService;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -68,10 +66,6 @@ public class AssayTaskApiControllerTests extends AbstractApiControllerTests {
   @Autowired private AssayTaskService assayTaskService;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private UserService userService;
-
-  @Autowired private AssayTaskMapper mapper;
 
   @Test
   public void findAssayTasksTest() throws Exception {

@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {File} from "react-feather";
+import PropTypes from "prop-types";
 
 const columns = [
   {
@@ -27,7 +28,7 @@ const columns = [
     text: "Name",
     sort: true,
     headerStyle: {width: '50%%'},
-    formatter: (c, d, i, x) => {
+    formatter: (c, d) => {
       return (
           <a href={"/program/" + d.id}>{d.name}</a>
       )
@@ -47,14 +48,14 @@ const columns = [
     text: "Code",
     sort: true,
     headerStyle: {width: '20%'},
-    formatter: (cell, d, index, x) => d.code
+    formatter: (cell, d) => d.code
   },
   {
     dataField: "active",
     text: "Active",
     sort: true,
     headerStyle: {width: '20%'},
-    formatter: (c, d, i, x) => {
+    formatter: (c, d) => {
       if (d.active) {
         return (
             <Badge bg="success">
@@ -72,9 +73,9 @@ const columns = [
   }
 ];
 
-const ExportToCsv = (props) => {
+const ExportToCsv = ({onExport}) => {
   const handleClick = () => {
-    props.onExport();
+    onExport();
   };
   return (
       <span>
@@ -86,6 +87,9 @@ const ExportToCsv = (props) => {
       </span>
   );
 };
+ExportToCsv.propTypes = {
+  onExport: PropTypes.func.isRequired
+}
 
 const ProgramList = ({programs}) => {
 
@@ -144,6 +148,10 @@ const ProgramList = ({programs}) => {
       </Container>
   );
 
+}
+
+ProgramList.propTypes = {
+  programs: PropTypes.array.isRequired
 }
 
 export default ProgramList;

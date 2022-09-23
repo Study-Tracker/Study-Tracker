@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React from "react";
 import {Button, Card, Col, Row} from "react-bootstrap";
 import {
@@ -10,8 +26,9 @@ import {
 } from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
+import PropTypes from "prop-types";
 
-export const WelcomeBack = ({}) => {
+export const WelcomeBack = () => {
   return (
       <Card className="illustration flex-fill">
         <Card.Body className="p-0 d-flex flex-fill">
@@ -76,6 +93,10 @@ export const MyActiveStudies = ({count}) => {
 
 }
 
+MyActiveStudies.propTypes = {
+  count: PropTypes.number.isRequired
+}
+
 export const MyCompleteStudies = ({count}) => {
 
   return (
@@ -111,6 +132,10 @@ export const MyCompleteStudies = ({count}) => {
 
 }
 
+MyCompleteStudies.propTypes = {
+  count: PropTypes.number.isRequired
+}
+
 const IllustrationWidget = ({header, text, image}) => {
   return (
       <Card className="flex-fill illustration">
@@ -139,6 +164,12 @@ const IllustrationWidget = ({header, text, image}) => {
         </Card.Body>
       </Card>
   )
+}
+
+IllustrationWidget.propTypes = {
+  header: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  image: PropTypes.string.isRequired
 }
 
 const StatWidget = ({label, value, icon: Icon, color, url}) => {
@@ -177,6 +208,14 @@ const StatWidget = ({label, value, icon: Icon, color, url}) => {
   )
 }
 
+StatWidget.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+  color: PropTypes.string.isRequired,
+  url: PropTypes.string
+}
+
 export const ActiveStudies = ({count}) => {
   return <StatWidget
       label={"My active studies"}
@@ -187,13 +226,25 @@ export const ActiveStudies = ({count}) => {
   />
 }
 
+ActiveStudies.propTypes = {
+  count: PropTypes.number.isRequired
+}
+
 export const StudyUpdates = ({count}) => {
   return <StatWidget label={"Updates this week"} icon={Activity} value={count}
                      color={"warning"}/>
 }
 
+StudyUpdates.propTypes = {
+  count: PropTypes.number.isRequired
+}
+
 export const ActiveUsers = ({count}) => {
   return <StatWidget label="Active Users" value={count} icon={Users}/>
+}
+
+ActiveUsers.propTypes = {
+  count: PropTypes.number.isRequired
 }
 
 export const NewStudies = ({count}) => {
@@ -201,11 +252,23 @@ export const NewStudies = ({count}) => {
                      color={"warning"}/>
 }
 
+NewStudies.propTypes = {
+  count: PropTypes.number.isRequired
+}
+
 export const CompletedStudies = ({count}) => {
   return <StatWidget label={"Completed studies this month"} icon={ThumbsUp}
                      value={count} color={"success"}/>
 }
 
+CompletedStudies.propTypes = {
+  count: PropTypes.number.isRequired
+}
+
 export const TotalStudies = ({count}) => {
   return <StatWidget label={"Total studies"} icon={Clipboard} value={count}/>
+}
+
+TotalStudies.propTypes = {
+  count: PropTypes.number.isRequired
 }

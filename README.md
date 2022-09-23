@@ -9,6 +9,8 @@ connecting with other required platforms, such as electronic laboratory notebook
 storage systems, and team messaging services. Integrate Study Tracker with other platforms via an
 integrated REST API and event dispatcher service for sharing of data.
 
+![Study Tracker front page](media/front-page.png)
+
 ## Requirements
 
 - JDK 17+

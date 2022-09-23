@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -102,7 +102,7 @@ const AssayForm = props => {
       const tasks = document.getElementById("task-input-container").children;
       if (tasks.length > 0) {
         for (let i = 0; i < tasks.length; i++) {
-          let idx = parseInt(tasks[i].dataset.index);
+          let idx = parseInt(tasks[i].dataset.index, 10);
           values.tasks[idx].order = i;
         }
       }

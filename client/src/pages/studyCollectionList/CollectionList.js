@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React from "react";
 import {Button, Card, Col, Container, Row} from "react-bootstrap";
 import {File} from "react-feather";
@@ -6,13 +22,14 @@ import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
+import PropTypes from "prop-types";
 
 const myCollectionColumns = [
   {
     dataField: "name",
     text: "Name",
     sort: true,
-    formatter: (cell, d, index, x) => {
+    formatter: (cell, d) => {
       return (
           <a href={"/collection/" + d.id}>
             {d.name}
@@ -33,13 +50,13 @@ const myCollectionColumns = [
     dataField: "description",
     text: "Description",
     sort: false,
-    formatter: (cell, d, index, x) => d.description
+    formatter: (cell, d) => d.description
   },
   {
     dataField: "shared",
     text: "Visibility",
     sort: true,
-    formatter: (cell, d, index, x) => {
+    formatter: (cell, d) => {
       if (!!d.shared) {
         return <div className="badge badge-success">Public</div>
       } else {
@@ -53,13 +70,13 @@ const myCollectionColumns = [
     sort: true,
     searchable: false,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString()
+    formatter: (c, d) => new Date(d.updatedAt).toLocaleDateString()
   },
   {
     dataField: "studies",
     text: "No. Studies",
     sort: true,
-    formatter: (cell, d, index, x) => d.studies.length
+    formatter: (cell, d) => d.studies.length
   }
 ];
 
@@ -68,7 +85,7 @@ const publicCollectionColumns = [
     dataField: "name",
     text: "Name",
     sort: true,
-    formatter: (cell, d, index, x) => {
+    formatter: (cell, d) => {
       return (
           <a href={"/collection/" + d.id}>
             {d.name}
@@ -89,13 +106,13 @@ const publicCollectionColumns = [
     dataField: "description",
     text: "Description",
     sort: false,
-    formatter: (cell, d, index, x) => d.description
+    formatter: (cell, d) => d.description
   },
   {
     dataField: "createdBy",
     text: "Created By",
     sort: true,
-    formatter: (cell, d, index, x) => d.createdBy.displayName
+    formatter: (cell, d) => d.createdBy.displayName
   },
   {
     dataField: "updatedAt",
@@ -103,19 +120,19 @@ const publicCollectionColumns = [
     sort: true,
     searchable: false,
     headerStyle: {width: '10%'},
-    formatter: (c, d, i, x) => new Date(d.updatedAt).toLocaleDateString()
+    formatter: (c, d) => new Date(d.updatedAt).toLocaleDateString()
   },
   {
     dataField: "studies",
     text: "No. Studies",
     sort: true,
-    formatter: (cell, d, index, x) => d.studies.length
+    formatter: (cell, d) => d.studies.length
   }
 ];
 
-const ExportToCsv = (props) => {
+const ExportToCsv = ({onExport}) => {
   const handleClick = () => {
-    props.onExport();
+    onExport();
   };
   return (
       <span>
@@ -127,6 +144,10 @@ const ExportToCsv = (props) => {
       </span>
   );
 };
+
+ExportToCsv.propTypes = {
+  onExport: PropTypes.func.isRequired
+}
 
 export const MyCollectionTable = ({collections}) => {
   return (
@@ -165,6 +186,10 @@ export const MyCollectionTable = ({collections}) => {
         )}
       </ToolkitProvider>
   )
+}
+
+MyCollectionTable.propTypes = {
+  collections: PropTypes.array.isRequired
 }
 
 export const PublicCollectionsTable = ({collections}) => {
@@ -206,11 +231,14 @@ export const PublicCollectionsTable = ({collections}) => {
   )
 }
 
+PublicCollectionsTable.propTypes = {
+  collections: PropTypes.array.isRequired
+}
+
 export const CollectionList = ({collections, user}) => {
 
-  const myCollections = collections.filter(c => c.createdBy.id === user.id);
-  const publicCollections = collections.filter(
-      c => c.createdBy.id !== user.id && !!c.shared);
+  const myCollections = collections.filter(c => c.createdBy.id === user.id && !c.shared);
+  const publicCollections = collections.filter(c => !!c.shared);
 
   return (
       <Container fluid className="animated fadeIn">
@@ -232,7 +260,7 @@ export const CollectionList = ({collections, user}) => {
             <Card className="details-card">
               <Card.Header>
                 <Card.Title>
-                  My Collections
+                  My Private Collections
                 </Card.Title>
               </Card.Header>
               <Card.Body>
@@ -259,4 +287,9 @@ export const CollectionList = ({collections, user}) => {
 
       </Container>
   )
+}
+
+CollectionList.propTypes = {
+  collections: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired
 }

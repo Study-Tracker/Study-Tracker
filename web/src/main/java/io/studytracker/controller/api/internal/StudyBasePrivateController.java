@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 the original author or authors
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
-import io.studytracker.eln.NotebookUserService;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.StudyFormDto;
@@ -38,7 +37,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,9 +57,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudyBasePrivateController extends AbstractStudyController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyBasePrivateController.class);
-
-  @Autowired(required = false)
-  private NotebookUserService notebookService;
 
   @GetMapping("")
   public List<StudySummaryDto> getAllStudies(
