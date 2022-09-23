@@ -57,6 +57,3 @@ jobs:
       - name: Web tests
         working-directory: ./web
         run: mvn -Dtest="io.studytracker.test.web.**" test
-
-      #- name: Maven Verify
-      #  run: mvn -B clean verify
