@@ -17,7 +17,6 @@ Study Tracker version 0.7.0 is the first of several transitional updates that wi
 - Assays are now indexed by Elasticsearch, allowing for a more effective power search tool.
 
 ### Changed
-- Study Tracker now requires Java 17 to run, in order to support upcoming dependency changes.
 - Study Tracker now uses the `frontend-maven-plugin` to download NPM & NodeJS and build the front-end web application. This allows for a more streamlined build process and removes the requirement for NodeJS & NPM installation from the user.
 - Updated the front-end to use React 17.0.2. Rewrote a lot of the front-end code to use modern techniques, such as React Hooks and Formik, which will make future development easier.
 - The old API has been hidden from the Swagger documentation. It is still available, but is not intended for use by external applications and users.

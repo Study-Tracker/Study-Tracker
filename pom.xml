@@ -56,7 +56,7 @@
 
   <properties>
     <study-tracker.version>0.7.0</study-tracker.version>
-    <java.version>17</java.version>
+    <java.version>11</java.version>
     <node.version>v16.5.0</node.version>
     <npm.version>8.11.0</npm.version>
   </properties>
@@ -72,55 +72,6 @@
           <artifactId>flatten-maven-plugin</artifactId>
           <version>1.1.0</version>
         </plugin>
-
-        <!--				<plugin>-->
-        <!--					<groupId>io.spring.javaformat</groupId>-->
-        <!--					<artifactId>spring-javaformat-maven-plugin</artifactId>-->
-        <!--					<version>${spring-javaformat.version}</version>-->
-        <!--					<executions>-->
-        <!--						<execution>-->
-        <!--							<phase>validate</phase>-->
-        <!--							<configuration>-->
-        <!--								<skip>${disable.checks}</skip>-->
-        <!--							</configuration>-->
-        <!--							<goals>-->
-        <!--								<goal>validate</goal>-->
-        <!--							</goals>-->
-        <!--						</execution>-->
-        <!--					</executions>-->
-        <!--				</plugin>-->
-
-        <!--				<plugin>-->
-        <!--					<groupId>org.apache.maven.plugins</groupId>-->
-        <!--					<artifactId>maven-checkstyle-plugin</artifactId>-->
-        <!--					<version>3.1.2</version>-->
-        <!--					<executions>-->
-        <!--						<execution>-->
-        <!--							<id>checkstyle-validation</id>-->
-        <!--							<phase>validate</phase>-->
-        <!--							<configuration>-->
-        <!--								<skip>${disable.checks}</skip>-->
-        <!--								<configLocation>io/spring/javaformat/checkstyle/checkstyle.xml</configLocation>-->
-        <!--								<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
-        <!--							</configuration>-->
-        <!--							<goals>-->
-        <!--								<goal>check</goal>-->
-        <!--							</goals>-->
-        <!--						</execution>-->
-        <!--					</executions>-->
-        <!--					<dependencies>-->
-        <!--						<dependency>-->
-        <!--							<groupId>com.puppycrawl.tools</groupId>-->
-        <!--							<artifactId>checkstyle</artifactId>-->
-        <!--							<version>8.45.1</version>-->
-        <!--						</dependency>-->
-        <!--						<dependency>-->
-        <!--							<groupId>io.spring.javaformat</groupId>-->
-        <!--							<artifactId>spring-javaformat-checkstyle</artifactId>-->
-        <!--							<version>${spring-javaformat.version}</version>-->
-        <!--						</dependency>-->
-        <!--					</dependencies>-->
-        <!--				</plugin>-->
 
         <plugin>
           <groupId>com.github.eirslett</groupId>
