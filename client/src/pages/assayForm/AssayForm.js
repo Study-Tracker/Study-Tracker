@@ -352,7 +352,7 @@ const AssayForm = props => {
                       {/* Legacy study assay */}
 
                       {
-                        !!study.legacy
+                        study.legacy
                             ? (
                                 <React.Fragment>
                                   <Row>
@@ -402,7 +402,7 @@ const AssayForm = props => {
                       {/* Assay type fields */}
 
                       {
-                        !!values.assayType
+                        values.assayType
                         && values.assayType.fields.length > 0
                             ? (
                                 <React.Fragment>

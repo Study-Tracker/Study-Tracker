@@ -38,6 +38,7 @@ import {
   ModelDetailsAttributeList
 } from "../../common/ModelDetailsAttributeList";
 import PropTypes from "prop-types";
+import {useNavigate} from "react-router-dom";
 
 const ProgramDetailHeader = ({program, user}) => {
   return (
@@ -47,7 +48,7 @@ const ProgramDetailHeader = ({program, user}) => {
         </Col>
         <Col className="col-auto">
           {
-            !!user && !!user.admin
+            user && user.admin
                 ? <SelectableProgramStatusButton active={program.active}
                                                  programId={program.id}/>
                 : <ProgramStatusButton active={program.active}/>
@@ -62,6 +63,7 @@ const ProgramDetailHeader = ({program, user}) => {
 const ProgramDetails = props => {
 
   const {program, studies, user} = props;
+  const navigate = useNavigate();
   const createMarkup = (content) => {
     return {__html: content};
   };
@@ -88,17 +90,18 @@ const ProgramDetails = props => {
             <Card className="details-card">
 
               <Card.Header>
+
                 <div className="card-actions float-end">
                   <Dropdown align="end">
-                    <Dropdown.Toggle tag="a" bsPrefix="-">
+                    <Dropdown.Toggle as="a" bsPrefix="-">
                       <Menu/>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
 
                       {
-                        !!user && !!user.admin ? (
-                            <Dropdown.Item
-                                href={"/program/" + program.id + "/edit"}>
+                        user && user.admin ? (
+                            <Dropdown.Item onclick={() =>
+                                navigate("/program/" + program.id + "/edit")}>
                               <FontAwesomeIcon icon={faEdit}/>
                               &nbsp;
                               Edit
@@ -109,9 +112,11 @@ const ProgramDetails = props => {
                     </Dropdown.Menu>
                   </Dropdown>
                 </div>
+
                 <Card.Title tag="h5" className="mb-0 text-muted">
                   Summary
                 </Card.Title>
+
               </Card.Header>
 
               <Card.Body>
