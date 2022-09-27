@@ -73,7 +73,9 @@ const AssayForm = props => {
       .required("Name is required")
       .max(255, "Name cannot be larger than 255 characters"),
     status: yup.string().required("Status is required"),
-    description: yup.string().required("Description is required"),
+    description: yup.string()
+      .required("Description is required")
+      .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
     users: yup.array().of(yup.object()).min(1, "At least one user is required"),
     owner: yup.object().required("Owner is required"),
     startDate: yup.number()

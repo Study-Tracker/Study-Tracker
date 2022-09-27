@@ -56,7 +56,9 @@ const AssayTypeForm = props => {
           "Name must be unique",
           value => !assayTypes.find(d => !!value && d.name.toLowerCase() === value.toLowerCase())
       ),
-    description: yup.string().required("Description is required"),
+    description: yup.string()
+      .required("Description is required")
+      .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
     active: yup.boolean(),
     fields: yup.array().of(yup.object())
       .test(

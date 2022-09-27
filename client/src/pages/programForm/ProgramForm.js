@@ -65,7 +65,8 @@ const ProgramForm = props => {
         value => !props.programs.find(p => !!value && p.name.toLowerCase() === value.toLowerCase())
       ),
     description: yup.string()
-      .required("Description is required."),
+      .required("Description is required.")
+      .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
     code: yup.string()
       .required("Code is required.")
       .matches("[A-Za-z0-9]+", "Code must be alphanumeric."),
