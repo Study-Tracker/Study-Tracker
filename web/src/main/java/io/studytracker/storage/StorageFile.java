@@ -18,6 +18,7 @@ package io.studytracker.storage;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Date;
 
 public class StorageFile implements StorageObject {
 
@@ -26,6 +27,12 @@ public class StorageFile implements StorageObject {
   private String path;
 
   private String name;
+
+  private Date lastModified;
+
+  private Long size;
+
+  private String fileId;
 
   @Override
   public String getUrl() {
@@ -67,18 +74,39 @@ public class StorageFile implements StorageObject {
     this.name = name;
   }
 
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  public Long getSize() {
+    return size;
+  }
+
+  public void setSize(Long size) {
+    this.size = size;
+  }
+
+  public String getFileId() {
+    return fileId;
+  }
+
+  public void setFileId(String fileId) {
+    this.fileId = fileId;
+  }
+
   @Override
   public String toString() {
-    return "StorageFile{"
-        + "url='"
-        + url
-        + '\''
-        + ", path='"
-        + path
-        + '\''
-        + ", name='"
-        + name
-        + '\''
-        + '}';
+    return "StorageFile{" +
+        "url='" + url + '\'' +
+        ", path='" + path + '\'' +
+        ", name='" + name + '\'' +
+        ", lastModified=" + lastModified +
+        ", size=" + size +
+        ", fileId='" + fileId + '\'' +
+        '}';
   }
 }

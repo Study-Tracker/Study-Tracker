@@ -9,7 +9,7 @@
     "npm": ">=8.0.0"
   },
   "scripts": {
-    "build:less": "less-watch-compiler --run-once --main-file=app.less src/less/ build/static/css/",
+    "build:less": "less-watch-compiler --run-once src/less/ build/static/css/ app.less",
     "build:js": "react-app-rewired build",
     "lint": "eslint src --ext .js,.jsx --fix",
     "build": "CI=false && npm-run-all build:js build:less",

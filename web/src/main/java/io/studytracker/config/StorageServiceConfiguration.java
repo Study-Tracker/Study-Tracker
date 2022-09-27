@@ -18,6 +18,7 @@ package io.studytracker.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
 import io.studytracker.egnyte.EgnyteClientOperations;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
 import io.studytracker.egnyte.EgnyteOptions;
@@ -143,7 +144,7 @@ public class StorageServiceConfiguration {
     }
 
     @Bean
-    public EgnyteClientOperations egnyteClient(EgnyteOptions egnyteOptions, Environment env)
+    public EgnyteRestApiClient egnyteClient(EgnyteOptions egnyteOptions, Environment env)
         throws Exception {
       return new EgnyteRestApiClient(egnyteRestTemplate(env), egnyteOptions);
     }
@@ -152,6 +153,12 @@ public class StorageServiceConfiguration {
     public EgnyteStudyStorageService egnyteStorageService(
         EgnyteClientOperations egnyteClient, EgnyteOptions options) {
       return new EgnyteStudyStorageService(egnyteClient, options);
+    }
+
+    @Bean
+    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService(
+        EgnyteRestApiClient egnyteClient, EgnyteOptions egnyteOptions) {
+      return new EgnyteApiDataFileStorageService(egnyteClient, egnyteOptions);
     }
   }
 }

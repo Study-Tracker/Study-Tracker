@@ -44,6 +44,7 @@ import StudyCollectionListView
 import PasswordResetRequestView
   from "./pages/passwordResetRequest/PasswordResetRequestView";
 import SearchResultsView from "./pages/searchResults/SearchResultsView";
+import FileManagerView from "./pages/fileManager/FileManagerView";
 
 const App = props => {
 
@@ -178,6 +179,10 @@ const App = props => {
 
             <Route path={"/search"}
                    element={<SearchResultsView />}/>
+
+            {/* File Manager */}
+            <Route path={"/file-manager"}
+                   element={<FileManagerView />}/>
 
             {/* Error */}
             <Route path={"/error"}

@@ -14,33 +14,29 @@
  * limitations under the License.
  */
 
-package io.studytracker.controller;
+import React from 'react';
+import SideBar from "../../common/structure/SideBar";
+import NavBar from "../../common/structure/NavBar";
+import Footer from "../../common/structure/Footer";
+import FileManager from "../../common/fileManager/FileManager";
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+const FileManagerView = props => {
 
-@Controller
-public class DefaultController {
-
-  @GetMapping({
-      "/",
-      "/login",
-      "/study/**",
-      "/studies/**",
-      "/assay/**",
-      "/assays/**",
-      "/programs/**",
-      "/program/**",
-      "/user/**",
-      "/users/**",
-      "/collection/**",
-      "/collections/**",
-      "/admin/**",
-      "/search/**",
-      "/file-manager/**",
-  })
-  public String home() {
-    return "index";
-  }
+  return (
+      <>
+        <div className="wrapper">
+          <SideBar/>
+          <div className="main">
+            <NavBar />
+            <div className="content">
+              <FileManager />
+            </div>
+            <Footer/>
+          </div>
+        </div>
+      </>
+  )
 
 }
+
+export default FileManagerView;

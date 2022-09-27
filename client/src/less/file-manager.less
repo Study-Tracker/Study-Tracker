@@ -14,33 +14,34 @@
  * limitations under the License.
  */
 
-package io.studytracker.controller;
+.card {
+  .card-header {
+    .card-toolbar {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0;
+      flex-wrap: wrap;
+    }
+  }
+}
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+.file-manager-menu {
+  width: 240px;
+  float: left;
+  padding: 0 20px 20px 10px;
+  position: relative;
+  border-right: 5px solid #fafbfe;
 
-@Controller
-public class DefaultController {
-
-  @GetMapping({
-      "/",
-      "/login",
-      "/study/**",
-      "/studies/**",
-      "/assay/**",
-      "/assays/**",
-      "/programs/**",
-      "/program/**",
-      "/user/**",
-      "/users/**",
-      "/collection/**",
-      "/collections/**",
-      "/admin/**",
-      "/search/**",
-      "/file-manager/**",
-  })
-  public String home() {
-    return "index";
+  .menu-links {
+    color: #6c757d;
+    padding: 12px 5px;
+    display: block;
+    font-size: 15px;
   }
 
+}
+
+.file-manager-content {
+  margin: -1.5rem 0 -1.5rem 250px;
+  padding: 1.5rem 0 1.5rem 25px;
 }
