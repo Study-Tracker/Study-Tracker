@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import React, {useState} from 'react';
-import {Download, File, Folder, Image, Link} from "react-feather";
+import {Download, File, Folder, Link} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -40,7 +40,7 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       formatter: (cell, d) => {
         return (
             <a onClick={() => handleItemClick(d)}>
-              {d.type === "folder" ? <Folder/> : <File/>} {d.name}
+              {d.type === "folder" ? <Folder size={18}/> : <File size={18}/>} {d.name}
             </a>
         )
       }
@@ -80,7 +80,7 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       formatter: (cell, d) => {
         return (
             <>
-              <Download className="align-middle me-1" size={18} />
+              { d.type === "file" ? <Download className="align-middle me-1" size={18} />: "" }
               <Link className="align-middle" size={18} />
             </>
         );
@@ -88,23 +88,23 @@ const FileManagerTable = ({folder, handlePathChange}) => {
     }
   ];
 
-  const getIcon = (file) => {
-    if (file.type === "folder") {
-      return <Folder />;
-    } else if (file.type === "image") {
-      return <Image />;
-    } else {
-      return <File />;
-    }
-  }
-
-  const getFileSize = (file) => {
-    if (file.type === "folder") {
-      return "";
-    } else {
-      return file.size + " bytes";
-    }
-  }
+  // const getIcon = (file) => {
+  //   if (file.type === "folder") {
+  //     return <Folder />;
+  //   } else if (file.type === "image") {
+  //     return <Image />;
+  //   } else {
+  //     return <File />;
+  //   }
+  // }
+  //
+  // const getFileSize = (file) => {
+  //   if (file.type === "folder") {
+  //     return "";
+  //   } else {
+  //     return file.size + " bytes";
+  //   }
+  // }
 
   const data = [
       ...folder.subFolders.map(f => ({...f, type: "folder"})),

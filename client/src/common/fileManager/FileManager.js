@@ -108,13 +108,13 @@ const FileManager = ({path}) => {
 
         <Row>
 
-          <Col xs="4" md="3" xl="2">
+          <Col xs="4" md="3">
 
             <Card>
 
               <Card.Header>
-                <Card.Title tag="h5" className="mb-0">
-                  My Data
+                <Card.Title tag="h5" className="mb-0 text-muted">
+                  Data Sources
                 </Card.Title>
               </Card.Header>
 
@@ -171,7 +171,7 @@ const FileManager = ({path}) => {
 
           </Col>
 
-          <Col xs="8" md="9" xl="10">
+          <Col xs="8" md="9">
             <Card>
 
               <Card.Header>
