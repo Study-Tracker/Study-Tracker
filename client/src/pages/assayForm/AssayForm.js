@@ -87,7 +87,7 @@ const AssayForm = props => {
       .test(
           "not empty",
           "Attribute names must not be empty",
-          value => !Object.keys(value).find(d => d.trim() === '')
+          value => Object.keys(value).every(d => d && d.trim() !== '')
       ),
     fields: yup.object()
       .test(
@@ -532,6 +532,7 @@ const AssayForm = props => {
                       <AttributeInputs
                           attributes={values.attributes}
                           handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
+                          error={errors.attributes}
                       />
 
                       <Row>

@@ -84,11 +84,11 @@ const ProgramForm = props => {
       url: yup.string().url()
     }),
     attributes: yup.object()
-    .test(
-        "not empty",
-        "Attribute names must not be empty",
-        value => !Object.keys(value).find(d => d.trim() === '')
-    )
+      .test(
+          "not empty",
+          "Attribute names must not be empty",
+          value => Object.keys(value).every(d => d && d.trim() !== '')
+      ),
   });
 
   const defaultProgramValues = {
@@ -446,6 +446,7 @@ const ProgramForm = props => {
                         <AttributeInputs
                             attributes={values.attributes}
                             handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
+                            error={errors.attributes}
                         />
 
                         <Row>

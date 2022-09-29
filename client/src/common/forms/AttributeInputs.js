@@ -98,7 +98,7 @@ const AttributeInputs = props => {
                 title={"Remove attribute"}
                 onClick={() => handleRemoveAttributeClick(i)}
             >
-              <Trash className="align-middle mt-3" size={18}/>
+              <Trash className="align-middle mt-4" size={18}/>
             </a>
           </Col>
         </Row>

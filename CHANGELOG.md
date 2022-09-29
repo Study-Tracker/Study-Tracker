@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed validation of Quill input fields to prevent empty inputs.
 - Fixed validation of required custom assay type fields.
+- Fixed validation of key-value attribute fields.
 - Fixed a number of small UI bugs.
 
 ## [0.7.0] - 2022-09-26

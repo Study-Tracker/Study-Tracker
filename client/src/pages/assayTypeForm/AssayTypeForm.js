@@ -76,8 +76,8 @@ const AssayTypeForm = props => {
       .test(
           "not empty",
           "Attribute names must not be empty",
-          value => !Object.keys(value).find(d => d.trim() === '')
-      )
+          value => Object.keys(value).every(d => d && d.trim() !== '')
+      ),
   });
 
   const handleFormSubmit = (values, {setSubmitting}) => {
