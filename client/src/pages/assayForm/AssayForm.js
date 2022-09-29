@@ -94,7 +94,7 @@ const AssayForm = props => {
           "required fields",
           "Required assay type fields are missing",
           (value, context) => {
-            const requiredFields = context.parent.assayType.fields.filter(f => f.required);
+            const requiredFields = context.parent.assayType ? context.parent.assayType.fields.filter(f => f.required) : [];
             return requiredFields.every(f => value[f.fieldName] !== undefined && value[f.fieldName] !== null && value[f.fieldName] !== "");
           }
       ),
