@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 import React, {useState} from 'react';
-import {Table} from 'react-bootstrap';
 import {Download, File, Folder, Image, Link} from "react-feather";
+import BootstrapTable from "react-bootstrap-table-next";
+import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
+import paginationFactory from "react-bootstrap-table2-paginator";
 
 const FileManagerTable = ({folder, handlePathChange}) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -24,7 +26,67 @@ const FileManagerTable = ({folder, handlePathChange}) => {
   const handleItemClick = (item, index) => {
     setSelectedItem(item);
     setSelectedItemIndex(index);
+    if (item.type === 'folder') {
+      handlePathChange(item.path);
+    }
   };
+
+  const columns = [
+    {
+      dataField: "name",
+      text: "Name",
+      sort: true,
+      headerStyle: {width: "40%"},
+      formatter: (cell, d) => {
+        return (
+            <a onClick={() => handleItemClick(d)}>
+              {d.type === "folder" ? <Folder/> : <File/>} {d.name}
+            </a>
+        )
+      }
+    },
+    {
+      dataField: "size",
+      text: "Size",
+      sort: true,
+      headerStyle: {width: "20%"},
+      formatter: (cell, d) => {
+        if (d.type === "folder") {
+          return d.totalSize || "-";
+        } else {
+          return d.size + " bytes";
+        }
+      },
+      sortFunc: (a, b) => {
+        return a - b;
+      }
+    },
+    {
+      dataField: "lastModified",
+      text: "Last Modified",
+      sort: true,
+      formatter: (cell, d) => {
+        return new Date(d.lastModified).toLocaleDateString();
+      },
+      sortFunc: (a, b) => {
+        return a - b;
+      }
+    },
+    {
+      dataField: "actions",
+      text: "Actions",
+      sort: false,
+      searchable: false,
+      formatter: (cell, d) => {
+        return (
+            <>
+              <Download className="align-middle me-1" size={18} />
+              <Link className="align-middle" size={18} />
+            </>
+        );
+      }
+    }
+  ];
 
   const getIcon = (file) => {
     if (file.type === "folder") {
@@ -44,61 +106,43 @@ const FileManagerTable = ({folder, handlePathChange}) => {
     }
   }
 
-  const renderTableRows = () => {
-    const folderRows = folder.subFolders
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((f, index) => {
-      return (
-          <tr
-              key={index}
-              onClick={() => handleItemClick(f, index)}
-              className={selectedItemIndex === index ? 'selected' : ''}
-          >
-            <td><Folder /> {f.name}</td>
-            <td>{f.totalSize || '-'}</td>
-            <td>{f.lastModified}</td>
-            <td className="table-action">
-              <Download className="align-middle me-1" size={18} />
-              <Link className="align-middle" size={18} />
-            </td>
-          </tr>
-      );
-    });
-    const fileRows = folder.files
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((f, index) => {
-      index += folderRows.length;
-      return (
-        <tr
-          key={index}
-          onClick={() => handleItemClick(f, index)}
-          className={selectedItemIndex === index ? 'selected' : ''}
-        >
-          <td><File /> {f.name}</td>
-          <td>{f.size}</td>
-          <td>{new Date(f.lastModified).toLocaleDateString()}</td>
-          <td className="table-action">
-            <Download className="align-middle me-1" size={18} />
-            <Link className="align-middle" size={18} />
-          </td>
-        </tr>
-      );
-    });
-    return [...folderRows, ...fileRows];
-  };
+  const data = [
+      ...folder.subFolders.map(f => ({...f, type: "folder"})),
+      ...folder.files.map(f => ({...f, type: "file"}))
+  ]
 
   return (
-    <Table hover>
-      <thead>
-        <tr>
-          <th style={{width: "40%"}}>Name</th>
-          <th style={{width: "20%"}}>Size</th>
-          <th>Last Modified Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>{renderTableRows()}</tbody>
-    </Table>
+    <ToolkitProvider
+      keyField={"name"}
+      data={data}
+      columns={columns}
+      search
+    >
+      {props => (
+          <div className="mt-3">
+            <div className="d-flex justify-content-end">
+              <Search.SearchBar
+                  {...props.searchProps}
+              />
+            </div>
+            <BootstrapTable
+                bootstrap4
+                keyField="name"
+                bordered={false}
+                pagination={paginationFactory({
+                  sizePerPage: 20,
+                  sizePerPageList: [10, 20, 40, 80]
+                })}
+                defaultSorted={[{
+                  dataField: "name",
+                  order: "asc"
+                }]}
+                {...props.baseProps}
+            >
+            </BootstrapTable>
+          </div>
+      )}
+    </ToolkitProvider>
   );
 }
 

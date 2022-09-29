@@ -34,9 +34,10 @@ import {
   faGoogleDrive
 } from "@fortawesome/free-brands-svg-icons";
 import {faFolder, faFolderPlus} from "@fortawesome/free-solid-svg-icons";
-import {FolderPlus, Upload} from "react-feather";
+import {ArrowLeft, CornerLeftUp, FolderPlus, Upload} from "react-feather";
 import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
+import {useSearchParams} from "react-router-dom";
 
 const FolderSizeBadge = ({folder}) => {
   let count = 0;
@@ -55,18 +56,26 @@ const FolderPathBreadcrumbs = ({folder}) => {
   return <Badge bg="info" style={{fontSize: "100%"}}>{folder ? folder.path : ''}</Badge>
 }
 
-const FileManager = props => {
+const FileManager = ({path}) => {
 
   const [folder, setFolder] = useState(null);
-  const [currentPath, setCurrentPath] = useState(null);
+  const [currentPath, setCurrentPath] = useState(path);
+  const [previousPath, setPreviousPath] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handlePathUpdate = (path) => {
+    console.debug("handlePathUpdate -- new path: " + path + ", current path: " + currentPath);
+    setPreviousPath(currentPath);
     setCurrentPath(path);
+    searchParams.set("path", path);
+    setSearchParams(searchParams);
   }
 
   useEffect(() => {
+    setIsLoading(true);
+    setError(null);
     axios.get("/api/internal/data-files", {params: {path: currentPath}})
     .then(response => {
       setFolder(response.data);
@@ -83,7 +92,9 @@ const FileManager = props => {
   if (!isLoading && error) {
     content = <ErrorMessage />;
   } else if (!isLoading && folder) {
-    content = <FileManagerTable folder={folder} />;
+    content = <FileManagerTable
+        folder={folder}
+        handlePathChange={handlePathUpdate} />;
   }
 
   return (
@@ -164,22 +175,53 @@ const FileManager = props => {
             <Card>
 
               <Card.Header>
-                <div className="d-flex justify-content-end">
+
+                <div className="d-flex justify-content-between">
+
                   <div className="card-toolbar">
-                    <div className="d-flex justify-content-end">
-                      <Button variant="outline-primary" className="me-2">
-                        <FolderPlus />
-                        &nbsp;&nbsp;
-                        New Folder
-                      </Button>
-                      <Button variant="primary">
-                        <Upload />
-                        &nbsp;&nbsp;
-                        Upload
-                      </Button>
-                    </div>
+
+                    <Button
+                        variant="outline-primary"
+                        className="me-2"
+                        disabled={!previousPath}
+                        onClick={() => handlePathUpdate(previousPath)}
+                    >
+                      <ArrowLeft />
+                      &nbsp;&nbsp;
+                      Back
+                    </Button>
+
+                    <Button
+                        variant="outline-primary"
+                        className="me-2"
+                        disabled={!folder || !folder.parentFolder}
+                        onClick={() => handlePathUpdate(folder.parentFolder.path)}
+                    >
+                      <CornerLeftUp />
+                      &nbsp;&nbsp;
+                      Up
+                    </Button>
+
                   </div>
+
+                  <div className="card-toolbar">
+
+                    <Button variant="outline-primary" className="me-2">
+                      <FolderPlus />
+                      &nbsp;&nbsp;
+                      New Folder
+                    </Button>
+
+                    <Button variant="primary">
+                      <Upload />
+                      &nbsp;&nbsp;
+                      Upload
+                    </Button>
+
+                  </div>
+
                 </div>
+
               </Card.Header>
 
               <Card.Body>
@@ -188,8 +230,12 @@ const FileManager = props => {
 
                   <Col xs={12}>
                     <div className="d-flex justify-content-between align-items-center">
-                      <FolderPathBreadcrumbs folder={folder} />
-                      <FolderSizeBadge folder={folder} />
+                      <div>
+                        <FolderPathBreadcrumbs folder={folder} />
+                      </div>
+                      <div>
+                        <FolderSizeBadge folder={folder} />
+                      </div>
                     </div>
                   </Col>
 

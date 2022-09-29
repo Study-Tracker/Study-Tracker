@@ -49,7 +49,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
       EgnyteObject egnyteObject = client.findObjectByPath(path, -1);
       if (egnyteObject.isFolder()) {
         EgnyteFolder folder = (EgnyteFolder) egnyteObject;
-        return EgnyteUtils.convertEgnyteFolderWithContents(folder);
+        return EgnyteUtils.convertEgnyteFolderWithContents(folder, egnyteOptions.getRootPath());
       } else {
         throw new EgnyteException("Object is not a folder: " + path);
       }
@@ -64,7 +64,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
     LOGGER.debug("Finding folder by id: {}", id);
     try {
       EgnyteFolder folder = client.findFolderById(id);
-      return EgnyteUtils.convertEgnyteFolderWithContents(folder);
+      return EgnyteUtils.convertEgnyteFolderWithContents(folder, egnyteOptions.getRootPath());
     } catch (EgnyteException e) {
       LOGGER.error("Error while finding folder by id", e);
       throw new StudyStorageNotFoundException("Error while finding folder by id", e);
