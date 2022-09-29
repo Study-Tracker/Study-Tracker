@@ -62,7 +62,7 @@ const StudyDetailHeader = ({study, user}) => {
         </Col>
         <Col className="col-auto">
           {
-            !!study.collaborator
+            study.collaborator
                 ? (
                     <React.Fragment>
                       <Button
@@ -99,7 +99,7 @@ const StudyDetailHeader = ({study, user}) => {
                 : ''
           }
           {
-            !!user
+            user
                 ? <SelectableStatusButton status={study.status}
                                           studyId={study.id}/>
                 : <StatusButton status={study.status}/>
@@ -170,6 +170,7 @@ const StudyDetails = props => {
             <Card className="details-card">
 
               <Card.Header>
+
                 <div className="card-actions float-end">
                   <Dropdown align="end">
                     <Dropdown.Toggle as="a" bsPrefix="-">

@@ -73,7 +73,9 @@ const AssayForm = props => {
       .required("Name is required")
       .max(255, "Name cannot be larger than 255 characters"),
     status: yup.string().required("Status is required"),
-    description: yup.string().required("Description is required"),
+    description: yup.string()
+      .required("Description is required")
+      .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
     users: yup.array().of(yup.object()).min(1, "At least one user is required"),
     owner: yup.object().required("Owner is required"),
     startDate: yup.number()
@@ -82,11 +84,21 @@ const AssayForm = props => {
     endDate: yup.number(),
     assayType: yup.object().required("Assay type is required"),
     attributes: yup.object()
-    .test(
-        "not empty",
-        "Attribute names must not be empty",
-        value => !Object.keys(value).find(d => d.trim() === '')
-    )
+      .test(
+          "not empty",
+          "Attribute names must not be empty",
+          value => Object.keys(value).every(d => d && d.trim() !== '')
+      ),
+    fields: yup.object()
+      .test(
+          "required fields",
+          "Required assay type fields are missing",
+          (value, context) => {
+            const requiredFields = context.parent.assayType ? context.parent.assayType.fields.filter(f => f.required) : [];
+            return requiredFields.every(f => value[f.fieldName] !== undefined && value[f.fieldName] !== null && value[f.fieldName] !== "");
+          }
+      ),
+
   });
 
   const handleFormSubmit = (values, {setSubmitting}) => {
@@ -352,7 +364,7 @@ const AssayForm = props => {
                       {/* Legacy study assay */}
 
                       {
-                        !!study.legacy
+                        study.legacy
                             ? (
                                 <React.Fragment>
                                   <Row>
@@ -402,7 +414,7 @@ const AssayForm = props => {
                       {/* Assay type fields */}
 
                       {
-                        !!values.assayType
+                        values.assayType
                         && values.assayType.fields.length > 0
                             ? (
                                 <React.Fragment>
@@ -430,6 +442,7 @@ const AssayForm = props => {
                                           ...data
                                         });
                                       }}
+                                      errors={errors}
                                   />
 
                                   <Row>
@@ -519,6 +532,7 @@ const AssayForm = props => {
                       <AttributeInputs
                           attributes={values.attributes}
                           handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
+                          error={errors.attributes}
                       />
 
                       <Row>

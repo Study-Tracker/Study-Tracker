@@ -84,7 +84,9 @@ const StudyForm = props => {
       .matches("[A-Za-z0-9_-]+", "External code must contain only alphanumeric, hyphen, and underscore characters."),
     status: yup.string().required("Status is required"),
     program: yup.object().required("Program is required"),
-    description: yup.string().required("Description is required"),
+    description: yup.string()
+      .required("Description is required")
+      .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
     legacy: yup.bool(),
     external: yup.bool(),
     startDate: yup.number()

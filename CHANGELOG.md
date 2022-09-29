@@ -8,7 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new feature to allow creation of permanent API tokens for use by integrations. This will allow admin users to create a token that can be used to authenticate to the API without having to use their username and password. This will be useful for integrations that need to access the API, but do not have a way to store a username and password.
 - Study Tracker will eventually deprecate support of Elasticsearch 7.10 in favor of newer versions. 
 
-## [0.7.0] - 2022-XX-XX
+## [0.7.1] - 2022-XX-XX
+
+### Added
+
+### Changed
+
+### Fixed
+- Fixed validation of Quill input fields to prevent empty inputs.
+- Fixed validation of required custom assay type fields.
+- Fixed validation of key-value attribute fields.
+- Fixed a number of small UI bugs.
+
+## [0.7.0] - 2022-09-26
 
 Study Tracker version 0.7.0 is the first of several transitional updates that will modernize the front and back ends of the application. These updates are primarily designed to utilize newer versions of dependencies, remove deprecated dependencies, and mitigate security vulnerabilities. A significant number of new features will be added, as well, in order to take the application in a direction that will broaden its utility.
 
