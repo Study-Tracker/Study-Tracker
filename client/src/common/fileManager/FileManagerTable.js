@@ -63,9 +63,9 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       headerStyle: {width: "20%"},
       formatter: (cell, d) => {
         if (d.type === "folder") {
-          return d.totalSize || "-";
+          return d.totalSize ? formatFileSize(d.totalSize) : "-";
         } else {
-          return d.size + " bytes";
+          return formatFileSize(d.size);
         }
       },
       sortFunc: (a, b) => {
@@ -139,6 +139,18 @@ const FileManagerTable = ({folder, handlePathChange}) => {
   //   }
   // }
 
+  const formatFileSize = (size) => {
+    if (size >= 1000000000) {
+      return (size / 1000000000).toFixed(2) + " gb";
+    } else if (size >= 1000000) {
+      return (size / 1000000).toFixed(2) + " mb";
+    } else if (size >= 1000) {
+      return (size / 1000).toFixed(2) + " kb";
+    } else {
+      return size + " bytes";
+    }
+  };
+
   const data = [
       ...folder.subFolders.map(f => ({...f, type: "folder"})),
       ...folder.files.map(f => ({...f, type: "file"}))
@@ -163,7 +175,7 @@ const FileManagerTable = ({folder, handlePathChange}) => {
                 keyField="name"
                 bordered={false}
                 pagination={paginationFactory({
-                  sizePerPage: 20,
+                  sizePerPage: 10,
                   sizePerPageList: [10, 20, 40, 80]
                 })}
                 defaultSorted={[{

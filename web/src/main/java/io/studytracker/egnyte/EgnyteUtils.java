@@ -94,7 +94,6 @@ public class EgnyteUtils {
     if (!path2.endsWith("/")) path2 += "/";
     String slug1 = String.join("/", (Arrays.asList(path1.toLowerCase().split("/"))));
     String slug2 = String.join("/", (Arrays.asList(path2.toLowerCase().split("/"))));
-    System.out.println("Comparing " + slug1 + " to " + slug2);
     return slug1.equals(slug2);
   }
 

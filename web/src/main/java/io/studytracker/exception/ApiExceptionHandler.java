@@ -89,6 +89,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler(FileStorageException.class)
+  public final ResponseEntity<ApiError> fileStorageError(
+      FileStorageException ex, WebRequest request) {
+    ex.printStackTrace();
+    ApiError apiError = new ApiError(ex.getMessage(), request.getDescription(false));
+    return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
   @ExceptionHandler(Exception.class)
   public final ResponseEntity<ApiError> genericException(Exception ex, WebRequest request) {
     ex.printStackTrace();
