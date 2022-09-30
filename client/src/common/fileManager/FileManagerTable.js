@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 import React, {useState} from 'react';
-import {Download, File, Folder, Link} from "react-feather";
+import {
+  Download,
+  File,
+  Folder,
+  Info,
+  Link,
+  MoreHorizontal
+} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
+import {Dropdown} from "react-bootstrap";
 
 const FileManagerTable = ({folder, handlePathChange}) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -39,8 +47,11 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       headerStyle: {width: "40%"},
       formatter: (cell, d) => {
         return (
-            <a onClick={() => handleItemClick(d)}>
-              {d.type === "folder" ? <Folder size={18}/> : <File size={18}/>} {d.name}
+            <a className="d-flex justify-content-start file-link" onClick={() => handleItemClick(d)}>
+              <div className="align-self-center">
+                {d.type === "folder" ? <Folder size={24}/> : <File size={24}/>}
+              </div>
+              <div className="align-self-center">{d.name}</div>
             </a>
         )
       }
@@ -79,11 +90,33 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       searchable: false,
       formatter: (cell, d) => {
         return (
-            <>
-              { d.type === "file" ? <Download className="align-middle me-1" size={18} />: "" }
-              <Link className="align-middle" size={18} />
-            </>
-        );
+            <Dropdown className="actions-button">
+              <Dropdown.Toggle variant="light">
+                <MoreHorizontal size={18}/>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {
+                  d.type === "file" ? (
+                    <Dropdown.Item onClick={() => console.log("Click!")}>
+                      <Download className="align-middle me-2" /> Download
+                    </Dropdown.Item>
+                    ) : ""
+                }
+                <Dropdown.Item onClick={() => console.log("Click!")}>
+                  <Link className="align-middle me-2" size={18} /> Copy Link
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => console.log("Click!")}>
+                  <Info className="align-middle me-2" size={18} /> Details
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+        )
+        // return (
+        //     <>
+        //       { d.type === "file" ? <Download className="align-middle me-1" size={18} />: "" }
+        //       <Link className="align-middle" size={18} />
+        //     </>
+        // );
       }
     }
   ];
@@ -119,7 +152,7 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       search
     >
       {props => (
-          <div className="mt-3">
+          <div className="mt-3 file-manager-table">
             <div className="d-flex justify-content-end">
               <Search.SearchBar
                   {...props.searchProps}

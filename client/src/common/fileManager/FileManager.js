@@ -106,7 +106,7 @@ const FileManager = ({path}) => {
           </Col>
         </Row>
 
-        <Row>
+        <Row className="file-manager">
 
           <Col xs="4" md="3">
 
@@ -183,10 +183,11 @@ const FileManager = ({path}) => {
                     <Button
                         variant="outline-primary"
                         className="me-2"
+                        style={{width: "90px"}}
                         disabled={!previousPath}
                         onClick={() => handlePathUpdate(previousPath)}
                     >
-                      <ArrowLeft />
+                      <ArrowLeft size={18} />
                       &nbsp;&nbsp;
                       Back
                     </Button>
@@ -194,10 +195,11 @@ const FileManager = ({path}) => {
                     <Button
                         variant="outline-primary"
                         className="me-2"
+                        style={{width: "90px"}}
                         disabled={!folder || !folder.parentFolder}
                         onClick={() => handlePathUpdate(folder.parentFolder.path)}
                     >
-                      <CornerLeftUp />
+                      <CornerLeftUp size={18} />
                       &nbsp;&nbsp;
                       Up
                     </Button>
@@ -207,13 +209,13 @@ const FileManager = ({path}) => {
                   <div className="card-toolbar">
 
                     <Button variant="outline-primary" className="me-2">
-                      <FolderPlus />
+                      <FolderPlus size={18} />
                       &nbsp;&nbsp;
                       New Folder
                     </Button>
 
                     <Button variant="primary">
-                      <Upload />
+                      <Upload size={18} />
                       &nbsp;&nbsp;
                       Upload
                     </Button>

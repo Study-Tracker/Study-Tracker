@@ -25,18 +25,36 @@
   }
 }
 
-.file-manager-menu {
-  width: 240px;
-  float: left;
-  padding: 0 20px 20px 10px;
-  position: relative;
-  border-right: 5px solid #fafbfe;
+.file-manager {
 
-  .menu-links {
-    color: #6c757d;
-    padding: 12px 5px;
-    display: block;
-    font-size: 15px;
+  .file-manager-table {
+
+    .file-link {
+      cursor: pointer;
+
+      svg {
+        margin-right: 0.5rem;
+      }
+
+      span {
+        vertical-align: middle !important;
+      }
+    }
+
+    .actions-button {
+      button {
+        width: calc(1.5em + 1.1rem + 2px);
+        height: calc(1.5em + 1.0rem);
+
+        svg {
+          margin-left: -0.2rem;
+        }
+      }
+      .dropdown-toggle::after {
+        display: none;
+      }
+    }
+
   }
 
 }
