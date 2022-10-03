@@ -26,10 +26,13 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -49,24 +52,26 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   @Override
   public StorageFolder findFolderByPath(String path) throws StudyStorageNotFoundException {
     LOGGER.debug("Looking up folder by path: {}", path);
-    if (!path.endsWith("/")) {
+    if (!path.trim().equals("") && !path.endsWith("/")) {
       path += "/";
     }
-    try {
-      ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucketName)
-          .prefix(path)
-          .delimiter("/")
-          .build();
-      ListObjectsV2Response response = client.listObjectsV2(request);
-      return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents());
-    } catch (Exception e) {
-      throw new StudyStorageNotFoundException("Failed to lookup folder by path: " + path, e);
+    if (!exists(path)) {
+      throw new StudyStorageNotFoundException("Folder not found: " + path);
     }
+    ListObjectsV2Request request = ListObjectsV2Request.builder()
+        .bucket(bucketName)
+        .prefix(path)
+        .delimiter("/")
+        .build();
+    ListObjectsV2Response response = client.listObjectsV2(request);
+    return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents());
   }
 
   @Override
   public StorageFile findFileByPath(String path) throws StudyStorageNotFoundException {
+    if (!exists(path)) {
+      throw new StudyStorageNotFoundException("File not found: " + path);
+    }
     ListObjectsV2Request request = ListObjectsV2Request.builder()
         .bucket(bucketName)
         .prefix(path)
@@ -98,6 +103,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
 
   @Override
   public StorageFile uploadFile(String path, File file) throws StudyStorageException {
+    if (!exists(path)) {
+      throw new StudyStorageException("Folder not found: " + path);
+    }
     String fullPath = StorageUtils.joinPath(path, file.getName());
     try {
       PutObjectRequest request = PutObjectRequest.builder()
@@ -110,4 +118,31 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     }
     return findFileByPath(fullPath);
   }
+
+  @Override
+  public InputStreamResource downloadFile(String path) throws StudyStorageException {
+    if (!exists(path)) {
+      throw new StudyStorageException("File not found: " + path);
+    }
+    try {
+      return new InputStreamResource(
+          client.getObjectAsBytes(b -> b.bucket(bucketName).key(path)).asInputStream());
+    } catch (Exception e) {
+      throw new StudyStorageException("Failed to download file: " + path, e);
+    }
+  }
+
+  private boolean exists(String path) {
+    HeadObjectRequest request = HeadObjectRequest.builder()
+        .bucket(bucketName)
+        .key(path)
+        .build();
+    try {
+      client.headObject(request);
+      return true;
+    } catch (NoSuchKeyException e) {
+      return false;
+    }
+  }
+
 }

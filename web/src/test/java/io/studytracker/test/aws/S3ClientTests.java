@@ -68,6 +68,17 @@ public class S3ClientTests {
       System.out.println(object.toString());
     });
 
+    request = ListObjectsV2Request.builder()
+        .bucket(bucketName)
+        .prefix("")
+        .delimiter("/")
+        .build();
+    response = s3Client.listObjectsV2(request);
+    Assert.assertTrue(response.contents().size() > 0);
+    response.contents().forEach(object -> {
+      System.out.println(object.toString());
+    });
+
      // Check if file exists
     request = ListObjectsV2Request.builder()
         .bucket(bucketName)
@@ -91,6 +102,14 @@ public class S3ClientTests {
         .key("test/test1.txt")
         .build();
     HeadObjectResponse headObjectResponse = s3Client.headObject(headObjectRequest);
+    Assert.assertTrue(headObjectResponse.contentLength() > 0);
+    System.out.println(headObjectResponse.toString());
+
+    headObjectRequest = HeadObjectRequest.builder()
+        .bucket(bucketName)
+        .key("/")
+        .build();
+    headObjectResponse = s3Client.headObject(headObjectRequest);
     Assert.assertTrue(headObjectResponse.contentLength() > 0);
     System.out.println(headObjectResponse.toString());
 

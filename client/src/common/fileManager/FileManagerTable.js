@@ -46,14 +46,33 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       sort: true,
       headerStyle: {width: "40%"},
       formatter: (cell, d) => {
-        return (
-            <a className="d-flex justify-content-start file-link" onClick={() => handleItemClick(d)}>
-              <div className="align-self-center">
-                {d.type === "folder" ? <Folder size={24}/> : <File size={24}/>}
-              </div>
-              <div className="align-self-center">{d.name}</div>
-            </a>
-        )
+        if (d.type === 'folder') {
+          return (
+              <a
+                  className="d-flex justify-content-start file-link"
+                  onClick={() => handleItemClick(d)}
+              >
+                <div className="align-self-center">
+                  <Folder size={24}/>
+                </div>
+                <div className="align-self-center">{d.name}</div>
+              </a>
+          )
+        } else {
+          return (
+              <a
+                  className="d-flex justify-content-start file-link"
+                  href={d.url || ''} target="_blank"
+                  rel="noopener noreferrer"
+              >
+                <div className="align-self-center">
+                  <File size={24}/>
+                </div>
+                <div className="align-self-center">{d.name}</div>
+              </a>
+          )
+        }
+
       }
     },
     {

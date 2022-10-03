@@ -28,8 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +63,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   ) {
     LOGGER.debug("Getting data storage folder");
     String rootPath = environment.getRequiredProperty("egnyte.root-path");
+//    String rootPath = "";
     if (path == null) path = rootPath;
     try {
       StorageFolder folder = dataFileStorageService.findFolderByPath(path);
@@ -102,6 +106,18 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     StorageFolder storageFolder = dataFileStorageService.createFolder(path, folderName);
     LOGGER.debug("Created folder: " + storageFolder.toString());
     return new ResponseEntity<>(storageFolder, HttpStatus.OK);
+  }
+
+  @GetMapping("/download")
+  private HttpEntity<Resource> downloadFile(
+      @RequestParam(name = "path") String path
+  ) throws Exception {
+    LOGGER.info("Downloading file from data storage folder {}", path);
+    InputStreamResource resource = dataFileStorageService.downloadFile(path);
+    return ResponseEntity.ok()
+        .contentLength(resource.contentLength())
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .body(resource);
   }
 
 

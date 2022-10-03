@@ -30,6 +30,7 @@ import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 
 public class EgnyteApiDataFileStorageService implements DataFileStorageService {
 
@@ -99,5 +100,11 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
       LOGGER.error("Error while uploading file", e);
       throw new StudyStorageException("Error while uploading file", e);
     }
+  }
+
+  @Override
+  public InputStreamResource downloadFile(String path) throws StudyStorageException {
+    LOGGER.info("Downloading file: {}", path);
+    return null;
   }
 }
