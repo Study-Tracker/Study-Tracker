@@ -24,6 +24,7 @@ import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
@@ -60,30 +61,6 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   }
 
   @Override
-  public StorageFolder findFolderById(String id) throws StudyStorageNotFoundException {
-    LOGGER.debug("Finding folder by id: {}", id);
-    try {
-      EgnyteFolder folder = client.findFolderById(id);
-      return EgnyteUtils.convertEgnyteFolderWithContents(folder, egnyteOptions.getRootPath());
-    } catch (EgnyteException e) {
-      LOGGER.error("Error while finding folder by id", e);
-      throw new StudyStorageNotFoundException("Error while finding folder by id", e);
-    }
-  }
-
-  @Override
-  public StorageFile findFileById(String id) throws StudyStorageNotFoundException {
-    LOGGER.debug("Finding file by id: {}", id);
-    try {
-      EgnyteFile file = client.findFileById(id);
-      return EgnyteUtils.convertEgnyteFile(file);
-    } catch (EgnyteException e) {
-      LOGGER.error("Error while finding file by id", e);
-      throw new StudyStorageNotFoundException("Error while finding file by id", e);
-    }
-  }
-
-  @Override
   public StorageFile findFileByPath(String path) throws StudyStorageNotFoundException {
     LOGGER.debug("Finding file by path: {}", path);
     try {
@@ -104,7 +81,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   public StorageFolder createFolder(String path, String name) throws StudyStorageException {
     LOGGER.info("Creating folder: {} in {}", name, path);
     try {
-      EgnyteFolder folder = client.createFolder(EgnyteUtils.joinPath(path, name));
+      EgnyteFolder folder = client.createFolder(StorageUtils.joinPath(path, name));
       return EgnyteUtils.convertEgnyteFolder(folder);
     } catch (EgnyteException e) {
       LOGGER.error("Error while creating folder", e);

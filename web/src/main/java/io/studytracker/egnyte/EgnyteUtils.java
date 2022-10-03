@@ -20,6 +20,7 @@ import io.studytracker.egnyte.entity.EgnyteFile;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +61,7 @@ public class EgnyteUtils {
   public static StorageFolder convertEgnyteFolderWithContents(EgnyteFolder egnyteFolder,
       String rootFolderPath) {
     StorageFolder storageFolder = convertEgnyteFolderWithContents(egnyteFolder);
-    if (comparePaths(rootFolderPath, storageFolder.getPath())) {
+    if (StorageUtils.comparePaths(rootFolderPath, storageFolder.getPath())) {
       storageFolder.setParentFolder(null);
     }
     return storageFolder;
@@ -78,23 +79,6 @@ public class EgnyteUtils {
     }
     parentFolder.setFolderId(egnyteFolder.getParentId());
     return parentFolder;
-  }
-
-  public static String joinPath(String path, String name) {
-    if (!path.endsWith("/")) {
-      path += "/";
-    }
-    return path + name;
-  }
-
-  public static boolean comparePaths(String path1, String path2) {
-    if (!path1.startsWith("/")) path1 = "/" + path1;
-    if (!path1.endsWith("/")) path1 += "/";
-    if (!path2.startsWith("/")) path2 = "/" + path2;
-    if (!path2.endsWith("/")) path2 += "/";
-    String slug1 = String.join("/", (Arrays.asList(path1.toLowerCase().split("/"))));
-    String slug2 = String.join("/", (Arrays.asList(path2.toLowerCase().split("/"))));
-    return slug1.equals(slug2);
   }
 
 }

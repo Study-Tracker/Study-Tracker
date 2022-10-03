@@ -18,6 +18,7 @@ package io.studytracker.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import io.studytracker.aws.S3DataFileStorageService;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
 import io.studytracker.egnyte.EgnyteClientOperations;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
@@ -32,6 +33,8 @@ import io.studytracker.storage.StudyStorageService;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -41,6 +44,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
 
 @Configuration
 public class StorageServiceConfiguration {
@@ -161,4 +168,45 @@ public class StorageServiceConfiguration {
       return new EgnyteApiDataFileStorageService(egnyteClient, egnyteOptions);
     }
   }
+
+  @Configuration
+  @ConditionalOnProperty(name = "aws.region", havingValue = "")
+  public static class S3StorageServiceConfiguration {
+
+    @Autowired
+    private Environment env;
+
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired(required = false)
+    private AwsCredentialsProvider credentialsProvider;
+
+    @Value("${aws.region}")
+    private Region region;
+
+    @Bean
+    public S3Client s3Client() {
+      S3ClientBuilder builder = S3Client.builder().region(region);
+      if (credentialsProvider != null) {
+        builder.credentialsProvider(credentialsProvider);
+      }
+      return builder.build();
+    }
+
+    @Bean
+    public S3DataFileStorageService s3DataFileStorageService() {
+      return new S3DataFileStorageService(s3Client());
+//        if (env.containsProperty("storage.overwrite-existing")) {
+//          service.setOverwriteExisting(
+//              env.getRequiredProperty("storage.overwrite-existing", Boolean.class));
+//        }
+//        if (env.containsProperty("storage.use-existing")) {
+//          service.setUseExisting(env.getRequiredProperty("storage.use-existing", Boolean.class));
+//        }
+//        if (env.containsProperty("storage.max-folder-read-depth")) {
+//          service.setMaxDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
+//        }
+//      return service;
+    }
+  }
+
 }

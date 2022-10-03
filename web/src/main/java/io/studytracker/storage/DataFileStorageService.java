@@ -31,23 +31,6 @@ public interface DataFileStorageService {
    */
   StorageFolder findFolderByPath(String path) throws StudyStorageNotFoundException;
 
-  /**
-   * Looks up a folder by its file system identifier.
-   *
-   * @param id the file system identifier
-   * @return the folder
-   * @throws StudyStorageNotFoundException if the folder is not found
-   */
-  StorageFolder findFolderById(String id) throws StudyStorageNotFoundException;
-
-  /**
-   * Looks up a file by its file system identifier.
-   *
-   * @param id the file system identifier
-   * @return the file
-   * @throws StudyStorageNotFoundException if the file is not found
-   */
-  StorageFile findFileById(String id) throws StudyStorageNotFoundException;
 
   /**
    * Finds a file by its path in the file system.
