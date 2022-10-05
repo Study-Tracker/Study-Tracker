@@ -18,7 +18,11 @@ package io.studytracker.aws;
 
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import software.amazon.awssdk.services.s3.model.CommonPrefix;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class S3Utils {
@@ -43,20 +47,46 @@ public class S3Utils {
     return storageFolder;
   }
 
+  public static StorageFolder convertCommonPrefixToStorageFolder(CommonPrefix commonPrefix) {
+    String folderName = commonPrefix.prefix().split("/")[commonPrefix.prefix().split("/").length - 1];
+    StorageFolder storageFolder = new StorageFolder();
+    storageFolder.setPath(commonPrefix.prefix());
+    storageFolder.setName(folderName);
+    return storageFolder;
+  }
+
   public static StorageFolder convertS3ObjectsToStorageFolderWithContents(String path,
-      Iterable<S3Object> s3Objects) {
+      Iterable<S3Object> s3Objects, List<CommonPrefix> commonPrefixes) {
     StorageFolder storageFolder = new StorageFolder();
     storageFolder.setPath(path);
-    String folderName = path.split("/")[path.split("/").length - 2];
+    String folderName = path.split("/")[path.split("/").length - 1];
     storageFolder.setName(folderName);
+    storageFolder.setParentFolder(deriveParentFolder(path));
     for (S3Object s3Object: s3Objects) {
-      if (s3Object.key().endsWith("/")) {
-        storageFolder.addSubfolder(convertS3ObjectToStorageFolder(s3Object));
-      } else {
+      if (!s3Object.key().endsWith("/")) {
         storageFolder.addFile(convertS3ObjectToStorageFile(s3Object));
       }
     }
+    for (CommonPrefix commonPrefix: commonPrefixes) {
+      storageFolder.addSubfolder(convertCommonPrefixToStorageFolder(commonPrefix));
+    }
     return storageFolder;
+  }
+
+  public static StorageFolder deriveParentFolder(String path) {
+    if (path.trim().equals("")) return null;
+    StorageFolder parentFolder = new StorageFolder();
+    List<String> bits = new ArrayList<>(Arrays.asList(path.split("/")));
+    String parentPath = "";
+    String parentName = "";
+    if (bits.size() > 1) {
+      bits.remove(bits.size() - 1);
+      parentPath = String.join("/", bits) + "/";
+      parentName = bits.get(bits.size() - 1);
+    }
+    parentFolder.setPath(parentPath);
+    parentFolder.setName(parentName);
+    return parentFolder;
   }
 
 }

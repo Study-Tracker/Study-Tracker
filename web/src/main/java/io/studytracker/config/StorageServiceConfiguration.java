@@ -164,8 +164,8 @@ public class StorageServiceConfiguration {
 
     @Bean
     public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService(
-        EgnyteRestApiClient egnyteClient, EgnyteOptions egnyteOptions) {
-      return new EgnyteApiDataFileStorageService(egnyteClient, egnyteOptions);
+        EgnyteRestApiClient egnyteClient) {
+      return new EgnyteApiDataFileStorageService(egnyteClient);
     }
   }
 

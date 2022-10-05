@@ -21,6 +21,7 @@ import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import org.junit.Assert;
@@ -61,7 +62,9 @@ public class EgnyteDataFileManagementTests {
   @Test
   public void getFolderContentsTest() throws Exception {
     String rootPath = env.getRequiredProperty("egnyte.root-path");
-    StorageFolder folder = storageService.findFolderByPath(rootPath);
+    FileStorageLocation location = new FileStorageLocation();
+    location.setRootFolderPath(rootPath);
+    StorageFolder folder = storageService.findFolderByPath(location, rootPath);
     Assert.assertNotNull(folder);
     for (StorageFolder subFolder : folder.getSubFolders()) {
       System.out.println(subFolder.toString());

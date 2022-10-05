@@ -16,6 +16,7 @@
 
 package io.studytracker.storage;
 
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
@@ -26,49 +27,54 @@ public interface DataFileStorageService {
   /**
    * Looks up a folder and its contents by path.
    *
+   * @param location the storage location
    * @param path the path to the folder
    * @return the folder
    * @throws StudyStorageNotFoundException if the folder is not found
    */
-  StorageFolder findFolderByPath(String path) throws StudyStorageNotFoundException;
+  StorageFolder findFolderByPath(FileStorageLocation location, String path) throws StudyStorageNotFoundException;
 
 
   /**
    * Finds a file by its path in the file system.
    *
+   * @param location the storage location
    * @param path the path to the file
    * @return the file
    * @throws StudyStorageNotFoundException if the file is not found
    */
-  StorageFile findFileByPath(String path) throws StudyStorageNotFoundException;
+  StorageFile findFileByPath(FileStorageLocation location, String path) throws StudyStorageNotFoundException;
 
   /**
    * Creates a new folder at the given path.
    *
+   * @param location the storage location
    * @param path the path to the folder to create the new folder within
    * @param name the name of the new folder
    * @return the new folder
    * @throws StudyStorageException if the folder cannot be created
    */
-  StorageFolder createFolder(String path, String name) throws StudyStorageException;
+  StorageFolder createFolder(FileStorageLocation location, String path, String name) throws StudyStorageException;
 
   /**
    * Uploads the given file to the provided path.
    *
+   * @param location the storage location
    * @param path the path to the folder to upload the file to
    * @param file the file to upload
    * @return the uploaded file object
    * @throws StudyStorageException if the file cannot be uploaded
    */
-  StorageFile uploadFile(String path, File file) throws StudyStorageException;
+  StorageFile uploadFile(FileStorageLocation location, String path, File file) throws StudyStorageException;
 
   /**
    * Downloads the file at the provided path.
    *
+   * @param location the storage location
    * @param path the path to the object to download
    * @return the downloaded file byte stream
    * @throws StudyStorageException if the file cannot be downloaded
    */
-  InputStreamResource downloadFile(String path) throws StudyStorageException;
+  InputStreamResource downloadFile(FileStorageLocation location, String path) throws StudyStorageException;
 
 }

@@ -16,20 +16,23 @@
 
 package io.studytracker.aws;
 
+import io.studytracker.exception.InsufficientPrivilegesException;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StoragePermissions;
 import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -40,9 +43,6 @@ public class S3DataFileStorageService  implements DataFileStorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(S3DataFileStorageService.class);
 
-  @Value("${aws.example-s3-bucket}")
-  private String bucketName;
-
   private final S3Client client;
 
   public S3DataFileStorageService(S3Client client) {
@@ -50,26 +50,43 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   }
 
   @Override
-  public StorageFolder findFolderByPath(String path) throws StudyStorageNotFoundException {
+  public StorageFolder findFolderByPath(FileStorageLocation location, String path)
+      throws StudyStorageNotFoundException {
     LOGGER.debug("Looking up folder by path: {}", path);
+
+    // Get the bucket
+    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
+        .orElseThrow(() -> new StudyStorageNotFoundException("Missing bucket configuration for location: " + location.getId()));
+    LOGGER.debug("Using bucket: {}", bucketName);
+
+    // CLean the path input
     if (!path.trim().equals("") && !path.endsWith("/")) {
       path += "/";
     }
-    if (!exists(path)) {
+    if (!exists(bucketName, path)) {
       throw new StudyStorageNotFoundException("Folder not found: " + path);
     }
+    LOGGER.debug("Folder '{}' exists in bucket: {}", path, bucketName);
+
     ListObjectsV2Request request = ListObjectsV2Request.builder()
         .bucket(bucketName)
         .prefix(path)
         .delimiter("/")
         .build();
     ListObjectsV2Response response = client.listObjectsV2(request);
-    return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents());
+    LOGGER.debug("Found {} objects in path {}", response.contents().size(), path);
+    return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents(), response.commonPrefixes());
   }
 
   @Override
-  public StorageFile findFileByPath(String path) throws StudyStorageNotFoundException {
-    if (!exists(path)) {
+  public StorageFile findFileByPath(FileStorageLocation location, String path)
+      throws StudyStorageNotFoundException {
+
+    // Get the bucket
+    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
+        .orElseThrow(() -> new StudyStorageNotFoundException("Missing bucket configuration for location: " + location.getId()));
+
+    if (!exists(bucketName, path)) {
       throw new StudyStorageNotFoundException("File not found: " + path);
     }
     ListObjectsV2Request request = ListObjectsV2Request.builder()
@@ -87,23 +104,44 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(String path, String name) throws StudyStorageException {
+  public StorageFolder createFolder(FileStorageLocation location, String path, String name)
+      throws StudyStorageException {
     String fullPath = StorageUtils.joinPath(path, name) + "/";
     try {
+
+      // Get the bucket
+      String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
+          .orElseThrow(() -> new StudyStorageException("Missing bucket configuration for location: " + location.getId()));
+
+      if (!StoragePermissions.canWrite(location.getPermissions())) {
+        throw new InsufficientPrivilegesException("Insufficient privileges to create folder: " + fullPath);
+      }
+
       PutObjectRequest request = PutObjectRequest.builder()
           .bucket(bucketName)
           .key(fullPath)
           .build();
        client.putObject(request, RequestBody.empty());
+
      } catch (Exception e) {
       throw new StudyStorageException("Failed to create folder: " + path, e);
     }
-    return findFolderByPath(fullPath);
+    return findFolderByPath(location, fullPath);
   }
 
   @Override
-  public StorageFile uploadFile(String path, File file) throws StudyStorageException {
-    if (!exists(path)) {
+  public StorageFile uploadFile(FileStorageLocation location, String path, File file)
+      throws StudyStorageException {
+
+    // Get the bucket
+    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
+        .orElseThrow(() -> new StudyStorageException("Missing bucket configuration for location: " + location.getId()));
+
+    if (!StoragePermissions.canWrite(location.getPermissions())) {
+      throw new InsufficientPrivilegesException("Insufficient privileges to upload files");
+    }
+
+    if (!exists(bucketName, path)) {
       throw new StudyStorageException("Folder not found: " + path);
     }
     String fullPath = StorageUtils.joinPath(path, file.getName());
@@ -116,14 +154,20 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     } catch (Exception e) {
       throw new StudyStorageException("Failed to upload file: " + path, e);
     }
-    return findFileByPath(fullPath);
+    return findFileByPath(location, fullPath);
   }
 
   @Override
-  public InputStreamResource downloadFile(String path) throws StudyStorageException {
-    if (!exists(path)) {
+  public InputStreamResource downloadFile(FileStorageLocation location, String path) throws StudyStorageException {
+
+    // Get the bucket
+    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
+        .orElseThrow(() -> new StudyStorageException("Missing bucket configuration for location: " + location.getId()));
+
+    if (!exists(bucketName, path)) {
       throw new StudyStorageException("File not found: " + path);
     }
+
     try {
       return new InputStreamResource(
           client.getObjectAsBytes(b -> b.bucket(bucketName).key(path)).asInputStream());
@@ -132,13 +176,18 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     }
   }
 
-  private boolean exists(String path) {
+  private boolean exists(String bucketName, String path) {
+    LOGGER.debug("Checking if path '{}' exists in bucket: {}", path, bucketName);
+    if (path.trim().equals("")) {
+      return true;
+    }
     HeadObjectRequest request = HeadObjectRequest.builder()
         .bucket(bucketName)
         .key(path)
         .build();
     try {
-      client.headObject(request);
+      HeadObjectResponse response = client.headObject(request);
+      LOGGER.debug("Found object: {}", response);
       return true;
     } catch (NoSuchKeyException e) {
       return false;
