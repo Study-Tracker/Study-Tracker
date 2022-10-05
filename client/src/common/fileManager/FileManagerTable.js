@@ -26,8 +26,9 @@ import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {Dropdown} from "react-bootstrap";
+import PropTypes from "prop-types";
 
-const FileManagerTable = ({folder, handlePathChange}) => {
+const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
@@ -59,18 +60,30 @@ const FileManagerTable = ({folder, handlePathChange}) => {
               </a>
           )
         } else {
-          return (
-              <a
-                  className="d-flex justify-content-start file-link"
-                  href={d.url || ''} target="_blank"
-                  rel="noopener noreferrer"
-              >
-                <div className="align-self-center">
-                  <File size={24}/>
+          if (d.url) {
+            return (
+                <a
+                    className="d-flex justify-content-start file-link"
+                    href={d.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                  <div className="align-self-center">
+                    <File size={24}/>
+                  </div>
+                  <div className="align-self-center">{d.name}</div>
+                </a>
+            )
+          } else {
+            return (
+                <div className="d-flex justify-content-start file-link">
+                  <div className="align-self-center">
+                    <File size={24}/>
+                  </div>
+                  <div className="align-self-center">{d.name}</div>
                 </div>
-                <div className="align-self-center">{d.name}</div>
-              </a>
-          )
+            )
+          }
         }
 
       }
@@ -96,7 +109,7 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       text: "Last Modified",
       sort: true,
       formatter: (cell, d) => {
-        return new Date(d.lastModified).toLocaleDateString();
+        return d.lastModified ? new Date(d.lastModified).toLocaleString() : "-";
       },
       sortFunc: (a, b) => {
         return a - b;
@@ -114,49 +127,29 @@ const FileManagerTable = ({folder, handlePathChange}) => {
                 <MoreHorizontal size={18}/>
               </Dropdown.Toggle>
               <Dropdown.Menu>
+
                 {
-                  d.type === "file" ? (
-                    <Dropdown.Item onClick={() => console.log("Click!")}>
+                  d.type === "file" && d.downloadable ? (
+                    <Dropdown.Item onClick={() => window.open("/api/internal/data-files/download?locationId=" + dataSource.id + "&path=" + d.path)}>
                       <Download className="align-middle me-2" /> Download
                     </Dropdown.Item>
                     ) : ""
                 }
+
                 <Dropdown.Item onClick={() => console.log("Click!")}>
                   <Link className="align-middle me-2" size={18} /> Copy Link
                 </Dropdown.Item>
+
                 <Dropdown.Item onClick={() => console.log("Click!")}>
                   <Info className="align-middle me-2" size={18} /> Details
                 </Dropdown.Item>
+
               </Dropdown.Menu>
             </Dropdown>
         )
-        // return (
-        //     <>
-        //       { d.type === "file" ? <Download className="align-middle me-1" size={18} />: "" }
-        //       <Link className="align-middle" size={18} />
-        //     </>
-        // );
       }
     }
   ];
-
-  // const getIcon = (file) => {
-  //   if (file.type === "folder") {
-  //     return <Folder />;
-  //   } else if (file.type === "image") {
-  //     return <Image />;
-  //   } else {
-  //     return <File />;
-  //   }
-  // }
-  //
-  // const getFileSize = (file) => {
-  //   if (file.type === "folder") {
-  //     return "";
-  //   } else {
-  //     return file.size + " bytes";
-  //   }
-  // }
 
   const formatFileSize = (size) => {
     if (!size) {
@@ -210,6 +203,12 @@ const FileManagerTable = ({folder, handlePathChange}) => {
       )}
     </ToolkitProvider>
   );
+}
+
+FileManagerTable.propTypes = {
+  folder: PropTypes.object.isRequired,
+  handlePathChange: PropTypes.func.isRequired,
+  dataSource: PropTypes.object.isRequired
 }
 
 export default FileManagerTable;

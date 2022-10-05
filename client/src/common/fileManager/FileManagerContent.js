@@ -31,6 +31,7 @@ import FileManagerTable from "./FileManagerTable";
 import {useSearchParams} from "react-router-dom";
 import NotyfContext from "../../context/NotyfContext";
 import {LoadingMessageCard} from "../loading";
+import PropTypes from "prop-types";
 
 const FolderSizeBadge = ({folder}) => {
   let count = 0;
@@ -80,13 +81,14 @@ const FileManagerContent = ({dataSource, path}) => {
     })
     .then(response => {
       setFolder(response.data);
-      setIsLoading(false);
     })
     .catch(error => {
       console.error(error);
       setError(error);
-      setIsLoading(false);
       notyf.open({message: "Error loading folder.", type: "error"});
+    })
+    .finally(() => {
+      setIsLoading(false);
     });
   }, [currentPath, refreshCount]);
 
@@ -178,7 +180,9 @@ const FileManagerContent = ({dataSource, path}) => {
   } else if (!isLoading && folder) {
     content = <FileManagerTable
         folder={folder}
-        handlePathChange={handlePathUpdate} />;
+        handlePathChange={handlePathUpdate}
+        dataSource={dataSource}
+    />;
   }
 
   return (
@@ -296,6 +300,11 @@ const FileManagerContent = ({dataSource, path}) => {
       </Card>
   )
 
+}
+
+FileManagerContent.propTypes = {
+  dataSource: PropTypes.object.isRequired,
+  path: PropTypes.string.isRequired,
 }
 
 export default FileManagerContent;
