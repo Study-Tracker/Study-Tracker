@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Badge, Button, Card, Col, Row} from "react-bootstrap";
+import {Badge, Breadcrumb, Button, Card, Col, Row} from "react-bootstrap";
 import {
   ArrowLeft,
   CornerLeftUp,
@@ -46,8 +46,16 @@ const FolderSizeBadge = ({folder}) => {
   );
 }
 
+const pathIsWithinRoot = (path, root) => {
+  if (!path.startsWith("/")) path = "/" + path;
+  if (!root.startsWith("/")) root = "/" + root;
+  if (!path.endsWith("/")) path = path + "/";
+  if (!root.endsWith("/")) root = root + "/";
+  return path.indexOf(root) === -1;
+}
+
 const FolderPathBreadcrumbs = ({dataSource, folder}) => {
-  return <Badge bg="info" style={{fontSize: "100%"}}>{dataSource.name}: {folder ? folder.path : ''}</Badge>
+  return <Badge bg="light" style={{fontSize: "100%", color: "darkslategrey"}}>{dataSource.name}: {folder ? folder.path : ''}</Badge>
 }
 
 const FileManagerContent = ({dataSource, path}) => {
@@ -151,8 +159,9 @@ const FileManagerContent = ({dataSource, path}) => {
    * Creates a new folder in the current folder.
    * @param values the form values
    * @param setSubmitting the form setSubmitting function
+   * @param resetForm the form resetForm function
    */
-  const handleCreateFolder = (values, {setSubmitting}) => {
+  const handleCreateFolder = (values, {setSubmitting, resetForm}) => {
     const data = new FormData();
     data.append("locationId", dataSource.id);
     data.append("path", currentPath);
@@ -170,6 +179,7 @@ const FileManagerContent = ({dataSource, path}) => {
     })
     .finally(() => {
       setSubmitting(false);
+      resetForm();
       setNewFolderModalIsOpen(false);
     });
   }
@@ -281,7 +291,39 @@ const FileManagerContent = ({dataSource, path}) => {
             <Col xs={12}>
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <FolderPathBreadcrumbs dataSource={dataSource} folder={folder} />
+                  <Breadcrumb>
+                    <Breadcrumb.Item
+                        onClick={() => handlePathUpdate(dataSource.rootFolderPath)}
+                    >
+                      {dataSource.name}
+                    </Breadcrumb.Item>
+                    {
+                      folder ? folder.path.split("/").map((path, index) => {
+                        if (index === 0 && path === "") return null;
+                        if (index === folder.path.split("/").length - 1 && path === "") return null;
+                        const label = path === "" ? "root" : path;
+                        const pathSlice = folder.path.split("/").slice(0, index + 1).join("/");
+                        if (pathIsWithinRoot(pathSlice, dataSource.rootFolderPath)) {
+                          return (
+                              <Breadcrumb.Item key={index} active={true}>
+                                {label}
+                              </Breadcrumb.Item>
+                          );
+                        } else {
+                          return (
+                              <Breadcrumb.Item
+                                  key={index}
+                                  onClick={() => handlePathUpdate(pathSlice)}
+                                  active={index === folder.path.split("/").length - 1}
+                              >
+                                {label}
+                              </Breadcrumb.Item>
+                          );
+                        }
+                      }) : ""
+                    }
+                  </Breadcrumb>
+                  {/*<FolderPathBreadcrumbs dataSource={dataSource} folder={folder} />*/}
                 </div>
                 <div>
                   <FolderSizeBadge folder={folder} />
