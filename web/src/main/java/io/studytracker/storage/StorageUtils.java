@@ -20,6 +20,13 @@ import java.util.Arrays;
 
 public class StorageUtils {
 
+  /**
+   * Joins two paths into a single path.
+   *
+   * @param path the first path
+   * @param name the second path or file name to join
+   * @return the joined path
+   */
   public static String joinPath(String path, String name) {
     if (!path.endsWith("/")) {
       path += "/";
@@ -27,6 +34,13 @@ public class StorageUtils {
     return path + name;
   }
 
+  /**
+   * Determines whether the given paths are equivalent.
+   *
+   * @param path1 the first path
+   * @param path2 the second path
+   * @return true if the paths are equivalent, false otherwise
+   */
   public static boolean comparePaths(String path1, String path2) {
     if (!path1.startsWith("/")) path1 = "/" + path1;
     if (!path1.endsWith("/")) path1 += "/";
@@ -35,6 +49,19 @@ public class StorageUtils {
     String slug1 = String.join("/", (Arrays.asList(path1.toLowerCase().split("/"))));
     String slug2 = String.join("/", (Arrays.asList(path2.toLowerCase().split("/"))));
     return slug1.equals(slug2);
+  }
+
+  /**
+   * Gets the name of the file or folder at the end of the path.
+   *
+   * @param path the path
+   * @return the name of the file or folder
+   */
+  public static String getFileName(String path) {
+    if (path.endsWith("/")) {
+      path = path.substring(0, path.length() - 1);
+    }
+    return path.substring(path.lastIndexOf("/") + 1);
   }
 
 }

@@ -33,7 +33,7 @@ import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 
 public class EgnyteApiDataFileStorageService implements DataFileStorageService {
 
@@ -118,7 +118,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   }
 
   @Override
-  public InputStreamResource downloadFile(FileStorageLocation location, String path)
+  public Resource downloadFile(FileStorageLocation location, String path)
       throws StudyStorageException {
     LOGGER.info("Downloading file: {}", path);
     throw new StudyStorageException("Not implemented");

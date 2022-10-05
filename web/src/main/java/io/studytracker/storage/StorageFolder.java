@@ -39,6 +39,8 @@ public class StorageFolder implements StorageObject {
 
   private String folderId;
 
+  private boolean downloadable = false;
+
   @Transient private List<StorageFolder> subFolders = new ArrayList<>();
 
   @Transient private List<StorageFile> files = new ArrayList<>();
@@ -137,6 +139,14 @@ public class StorageFolder implements StorageObject {
 
   public void addSubfolder(StorageFolder folder) {
     subFolders.add(folder);
+  }
+
+  public boolean isDownloadable() {
+    return downloadable;
+  }
+
+  public void setDownloadable(boolean downloadable) {
+    this.downloadable = downloadable;
   }
 
   @Override

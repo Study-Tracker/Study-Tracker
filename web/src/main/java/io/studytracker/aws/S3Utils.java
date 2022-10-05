@@ -34,6 +34,7 @@ public class S3Utils {
     storageFile.setPath(s3Object.key());
     storageFile.setLastModified(new Date(s3Object.lastModified().toEpochMilli()));
     storageFile.setName(fileName);
+    storageFile.setDownloadable(true);
     return storageFile;
   }
 
@@ -68,7 +69,9 @@ public class S3Utils {
       }
     }
     for (CommonPrefix commonPrefix: commonPrefixes) {
-      storageFolder.addSubfolder(convertCommonPrefixToStorageFolder(commonPrefix));
+      if (!commonPrefix.prefix().trim().equals("/")) {
+        storageFolder.addSubfolder(convertCommonPrefixToStorageFolder(commonPrefix));
+      }
     }
     return storageFolder;
   }

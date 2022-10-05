@@ -30,6 +30,7 @@ import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageLocationType;
 import io.studytracker.storage.StoragePermissions;
+import io.studytracker.storage.StorageUtils;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,9 +40,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -220,8 +223,13 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     LOGGER.info("Downloading file from data storage folder {}", path);
     FileStorageLocation location = lookupFileStorageLocation(locationId);
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
-    InputStreamResource resource = storageService.downloadFile(location, path);
+    ByteArrayResource resource = (ByteArrayResource) storageService.downloadFile(location, path);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentDisposition(ContentDisposition.builder("attachment")
+        .filename(StorageUtils.getFileName(path))
+        .build());
     return ResponseEntity.ok()
+        .headers(headers)
         .contentLength(resource.contentLength())
         .contentType(MediaType.APPLICATION_OCTET_STREAM)
         .body(resource);

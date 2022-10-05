@@ -28,7 +28,8 @@ import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -74,13 +75,16 @@ public class S3DataFileStorageService  implements DataFileStorageService {
         .delimiter("/")
         .build();
     ListObjectsV2Response response = client.listObjectsV2(request);
-    LOGGER.debug("Found {} objects in path {}", response.contents().size(), path);
+    LOGGER.debug("Found {} files and {} folders in path {}", response.contents().size(), response.commonPrefixes().size(), path);
+    LOGGER.debug(response.toString());
     return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents(), response.commonPrefixes());
   }
 
   @Override
   public StorageFile findFileByPath(FileStorageLocation location, String path)
       throws StudyStorageNotFoundException {
+
+    LOGGER.debug("Looking up file by path: {}", path);
 
     // Get the bucket
     String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
@@ -106,6 +110,8 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   @Override
   public StorageFolder createFolder(FileStorageLocation location, String path, String name)
       throws StudyStorageException {
+    LOGGER.info("Creating folder: {} in path: {}", name, path);
+
     String fullPath = StorageUtils.joinPath(path, name) + "/";
     try {
 
@@ -133,18 +139,29 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   public StorageFile uploadFile(FileStorageLocation location, String path, File file)
       throws StudyStorageException {
 
+    LOGGER.info("Uploading file: {} to path: {} in bucket: {}", file.getName(), path, location.getName());
+
     // Get the bucket
     String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
         .orElseThrow(() -> new StudyStorageException("Missing bucket configuration for location: " + location.getId()));
 
+    // Check permissions
     if (!StoragePermissions.canWrite(location.getPermissions())) {
       throw new InsufficientPrivilegesException("Insufficient privileges to upload files");
     }
 
+    // Make sure the target folder exists
     if (!exists(bucketName, path)) {
       throw new StudyStorageException("Folder not found: " + path);
     }
+
+    // Cleanup the path
     String fullPath = StorageUtils.joinPath(path, file.getName());
+    if (fullPath.startsWith("/")) {
+      fullPath = fullPath.substring(1);
+    }
+
+    // Upload the file to S3
     try {
       PutObjectRequest request = PutObjectRequest.builder()
           .bucket(bucketName)
@@ -152,13 +169,14 @@ public class S3DataFileStorageService  implements DataFileStorageService {
           .build();
       client.putObject(request, RequestBody.fromFile(file));
     } catch (Exception e) {
+      e.printStackTrace();
       throw new StudyStorageException("Failed to upload file: " + path, e);
     }
     return findFileByPath(location, fullPath);
   }
 
   @Override
-  public InputStreamResource downloadFile(FileStorageLocation location, String path) throws StudyStorageException {
+  public Resource downloadFile(FileStorageLocation location, String path) throws StudyStorageException {
 
     // Get the bucket
     String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
@@ -169,8 +187,8 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     }
 
     try {
-      return new InputStreamResource(
-          client.getObjectAsBytes(b -> b.bucket(bucketName).key(path)).asInputStream());
+      return new ByteArrayResource(
+          client.getObjectAsBytes(b -> b.bucket(bucketName).key(path)).asByteArray());
     } catch (Exception e) {
       throw new StudyStorageException("Failed to download file: " + path, e);
     }

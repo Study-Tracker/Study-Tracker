@@ -20,7 +20,7 @@ import io.studytracker.model.FileStorageLocation;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 
 public interface DataFileStorageService {
 
@@ -75,6 +75,6 @@ public interface DataFileStorageService {
    * @return the downloaded file byte stream
    * @throws StudyStorageException if the file cannot be downloaded
    */
-  InputStreamResource downloadFile(FileStorageLocation location, String path) throws StudyStorageException;
+  Resource downloadFile(FileStorageLocation location, String path) throws StudyStorageException;
 
 }

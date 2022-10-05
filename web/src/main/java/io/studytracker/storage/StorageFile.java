@@ -34,6 +34,8 @@ public class StorageFile implements StorageObject {
 
   private String fileId;
 
+  private boolean downloadable = false;
+
   @Override
   public String getUrl() {
     return url;
@@ -96,6 +98,14 @@ public class StorageFile implements StorageObject {
 
   public void setFileId(String fileId) {
     this.fileId = fileId;
+  }
+
+  public boolean isDownloadable() {
+    return downloadable;
+  }
+
+  public void setDownloadable(boolean canDownload) {
+    this.downloadable = canDownload;
   }
 
   @Override
