@@ -16,21 +16,27 @@
 
 import {Card, ListGroup} from "react-bootstrap";
 import React from "react";
-import {Cloud, Folder, Server} from "react-feather";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faFolder, faServer} from "@fortawesome/free-solid-svg-icons";
+import {faAws} from "@fortawesome/free-brands-svg-icons";
 
 const FileManagerMenu = ({
   dataSources,
-  handleDataSourceSelect
+  handleDataSourceSelect,
+  selectedDataSource
 }) => {
 
   const getDataSourceIcon = (type) => {
     switch (type) {
       case "EGNYTE_API":
-        return <Server size={18} className={"me-2"} />; // faServer;
+        return <FontAwesomeIcon icon={faServer} className={"me-2"} />
+        // return <Server size={18} className={"me-2"} />; // faServer;
       case "AWS_S3":
-        return <Cloud size={18} className={"me-2"} />;  //faCloud;
+        return <FontAwesomeIcon icon={faAws} className={"me-2"} />
+        // return <Cloud size={18} className={"me-2"} />;  //faCloud;
       default:
-        return <Folder size={18} className={"me-2"} />; //faFolder;
+        return <FontAwesomeIcon icon={faFolder} className={"me-2"} />
+        // return <Folder size={18} className={"me-2"} />; //faFolder;
     }
   }
 
@@ -39,14 +45,12 @@ const FileManagerMenu = ({
       return (
           <ListGroup.Item
               action
-              href={"#" + ds.id}
+              key={ds.id}
+              active={selectedDataSource ? selectedDataSource.id === ds.id : false}
               onClick={() => handleDataSourceSelect(ds)}
           >
             {getDataSourceIcon(ds.type)}
-            {/*<FontAwesomeIcon*/}
-            {/*    className={"me-2"}*/}
-            {/*    icon={getDataSourceIcon(ds.type)} />*/}
-            {ds.label}
+            {ds.displayName}
           </ListGroup.Item>
       )
     });

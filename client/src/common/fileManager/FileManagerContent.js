@@ -26,12 +26,11 @@ import FileManagerUploadModal from "./FileManagerUploadModal";
 import FileManagerNewFolderModal from "./FileManagerNewFolderModal";
 import React, {useContext, useEffect, useState} from "react";
 import axios from "axios";
-import swal from "sweetalert";
-import LoadingMessage from "../structure/LoadingMessage";
 import ErrorMessage from "../structure/ErrorMessage";
 import FileManagerTable from "./FileManagerTable";
 import {useSearchParams} from "react-router-dom";
 import NotyfContext from "../../context/NotyfContext";
+import {LoadingMessageCard} from "../loading";
 
 const FolderSizeBadge = ({folder}) => {
   let count = 0;
@@ -46,18 +45,19 @@ const FolderSizeBadge = ({folder}) => {
   );
 }
 
-const FolderPathBreadcrumbs = ({folder}) => {
-  return <Badge bg="info" style={{fontSize: "100%"}}>{folder ? folder.path : ''}</Badge>
+const FolderPathBreadcrumbs = ({dataSource, folder}) => {
+  return <Badge bg="info" style={{fontSize: "100%"}}>{dataSource.name}: {folder ? folder.path : ''}</Badge>
 }
 
-const FileManagerContent = ({dataSource}) => {
+const FileManagerContent = ({dataSource, path}) => {
 
   console.debug("Selected data source: ", dataSource);
+  console.debug("Selected path: ", path);
 
   const notyf = useContext(NotyfContext);
 
   const [folder, setFolder] = useState(null);
-  const [currentPath, setCurrentPath] = useState(dataSource.rootFolderPath);
+  const [currentPath, setCurrentPath] = useState(path || dataSource.rootFolderPath);
   const [previousPath, setPreviousPath] = useState(null);
   const [refreshCount, setRefreshCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,7 +92,7 @@ const FileManagerContent = ({dataSource}) => {
 
   // Reset the component on data source change
   useEffect(() => {
-    setCurrentPath(dataSource.rootFolderPath);
+    setCurrentPath(path || dataSource.rootFolderPath);
     setPreviousPath(null);
   }, [dataSource]);
 
@@ -151,21 +151,22 @@ const FileManagerContent = ({dataSource}) => {
     data.append("folderName", values.folderName);
     axios.post("/api/internal/data-files/create-folder", data)
     .then(() => {
-      setSubmitting(false);
-      setNewFolderModalIsOpen(false);
       setRefreshCount(refreshCount + 1);
-      notyf.open({message: "Folder created successfully", type: "success"});
+      notyf.open({message: "Folder created successfully.", type: "success"});
     })
     .catch(e => {
-      setSubmitting(false);
       console.error(e);
       console.error("Failed to create folder");
       setNewFolderError(e.message);
-      swal("Failed to create folder", e.message, "error");
+      notyf.open({message: "Failed to create folder. Please try again.", type: "error"});
+    })
+    .finally(() => {
+      setSubmitting(false);
+      setNewFolderModalIsOpen(false);
     });
   }
 
-  let content = <LoadingMessage />;
+  let content = <LoadingMessageCard />;
   if (!isLoading && error) {
     content = <ErrorMessage />;
   } else if (!isLoading && folder) {
@@ -267,7 +268,7 @@ const FileManagerContent = ({dataSource}) => {
             <Col xs={12}>
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <FolderPathBreadcrumbs folder={folder} />
+                  <FolderPathBreadcrumbs dataSource={dataSource} folder={folder} />
                 </div>
                 <div>
                   <FolderSizeBadge folder={folder} />

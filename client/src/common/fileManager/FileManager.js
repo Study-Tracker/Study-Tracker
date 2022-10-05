@@ -22,17 +22,27 @@ import FileManagerContent from "./FileManagerContent";
 import FileManagerContentPlaceholder from "./FileManagerContentPlaceholder";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
+import {useSearchParams} from "react-router-dom";
 
-const FileManager = () => {
+const FileManager = ({path, locationId}) => {
 
   const notyf = useContext(NotyfContext);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [dataSources, setDataSources] = useState([]);
   const [selectedDataSource, setSelectedDataSource] = useState(null);
+
+  const handleDataSourceSelect = (dataSource) => {
+    setSelectedDataSource(dataSource);
+    setSearchParams({locationId: dataSource.id});
+  }
 
   useEffect(() => {
     axios.get("/api/internal/data-files/locations")
     .then(response => {
       setDataSources(response.data);
+      if (locationId) {
+        setSelectedDataSource(response.data.find(dataSource => dataSource.id === parseInt(locationId)));
+      }
     })
     .catch(error => {
       console.error(error);
@@ -55,7 +65,8 @@ const FileManager = () => {
 
             <FileManagerMenu
                 dataSources={dataSources}
-                handleDataSourceSelect={setSelectedDataSource}
+                handleDataSourceSelect={handleDataSourceSelect}
+                selectedDataSource={selectedDataSource}
             />
 
           </Col>
@@ -63,7 +74,7 @@ const FileManager = () => {
           <Col xs="8" md="9">
             {
               selectedDataSource
-                  ? <FileManagerContent dataSource={selectedDataSource} />
+                  ? <FileManagerContent dataSource={selectedDataSource} path={path} />
                   : <FileManagerContentPlaceholder />
             }
 

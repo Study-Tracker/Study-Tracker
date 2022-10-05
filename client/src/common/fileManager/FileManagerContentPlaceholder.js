@@ -23,7 +23,7 @@ const FileManagerContentPlaceholder = () => {
           <Row>
             <Col sm={6} className={"d-flex"}>
               <div className={"align-self-center"}>
-                <h1 className="display-5 illustration-text text-center mb-4">No Data Source Selected</h1>
+                <h1 className="display-5 illustration-text text-center mb-4">Time to explore...</h1>
                 <p className="text-lg">Select a data source from the menu on the left to view its contents.</p>
               </div>
             </Col>

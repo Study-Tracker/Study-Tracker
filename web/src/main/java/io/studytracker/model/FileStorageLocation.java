@@ -31,7 +31,9 @@ public class FileStorageLocation implements Model {
 
   private StorageLocationType type;
 
-  private String label;
+  private String displayName;
+
+  private String name;
 
   private String rootFolderPath;
 

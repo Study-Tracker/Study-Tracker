@@ -21,10 +21,11 @@ import Footer from "../../common/structure/Footer";
 import FileManager from "../../common/fileManager/FileManager";
 import {useSearchParams} from "react-router-dom";
 
-const FileManagerView = props => {
+const FileManagerView = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const path = searchParams.has("path") ? searchParams.get('path') : null;
+  const locationId = searchParams.has("locationId") ? searchParams.get('locationId') : null;
 
   return (
       <>
@@ -33,7 +34,7 @@ const FileManagerView = props => {
           <div className="main">
             <NavBar />
             <div className="content">
-              <FileManager path={path} />
+              <FileManager path={path} locationId={locationId} />
             </div>
             <Footer/>
           </div>

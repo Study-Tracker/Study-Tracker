@@ -83,7 +83,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       IntegrationInstance egnyteInstance = new IntegrationInstance();
       egnyteInstance.setId(1L);
       egnyteInstance.setSupportedIntegration(egnyteIntegration);
-      egnyteInstance.setLabel("Vesalius Egnyte");
+      egnyteInstance.setDisplayName("Vesalius Egnyte");
+      egnyteInstance.setName("fl60inc.egnyte.com");
       egnyteInstance.setActive(true);
 
       FileStorageLocation egnyteStorageLocation = new FileStorageLocation();
@@ -91,7 +92,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       egnyteStorageLocation.setIntegrationInstance(egnyteInstance);
       egnyteStorageLocation.setType(StorageLocationType.EGNYTE_API);
       egnyteStorageLocation.setRootFolderPath(environment.getRequiredProperty("egnyte.root-path"));
-      egnyteStorageLocation.setLabel("Vesalius Egnyte");
+      egnyteStorageLocation.setDisplayName("Vesalius Egnyte");
+      egnyteStorageLocation.setName("StudyTrackerDemo");
       egnyteStorageLocation.setPermissions(StoragePermissions.READ_WRITE);
       egnyteStorageLocation.setStudyDefault(true);
       egnyteStorageLocation.setDataDefault(false);
@@ -110,7 +112,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       IntegrationInstance awsInstance = new IntegrationInstance();
       awsInstance.setId(2L);
       awsInstance.setSupportedIntegration(awsIntegration);
-      awsInstance.setLabel("FL60 AWS");
+      awsInstance.setDisplayName("Vesalius AWS");
+      awsInstance.setName("vesaliustx-fl60");
       awsInstance.setActive(true);
       awsInstance.setConfiguration(Collections.singletonMap("bucket", environment.getRequiredProperty("aws.example-s3-bucket")));
 
@@ -119,7 +122,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       s3StorageLocation.setType(StorageLocationType.AWS_S3);
       s3StorageLocation.setIntegrationInstance(awsInstance);
       s3StorageLocation.setRootFolderPath("");
-      s3StorageLocation.setLabel("Example Bucket");
+      s3StorageLocation.setDisplayName("Example Bucket");
+      s3StorageLocation.setName(environment.getRequiredProperty("aws.example-s3-bucket"));
       s3StorageLocation.setPermissions(StoragePermissions.READ_WRITE);
       s3StorageLocation.setStudyDefault(false);
       s3StorageLocation.setDataDefault(true);

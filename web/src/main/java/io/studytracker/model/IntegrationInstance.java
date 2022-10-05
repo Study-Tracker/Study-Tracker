@@ -30,7 +30,9 @@ public class IntegrationInstance implements Model {
 
   private SupportedIntegration supportedIntegration;
 
-  private String label;
+  private String displayName;
+
+  private String name;
 
   private boolean active = true;
 
