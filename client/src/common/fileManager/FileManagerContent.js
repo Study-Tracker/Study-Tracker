@@ -58,7 +58,7 @@ const FileManagerContent = ({dataSource, path}) => {
 
   const [folder, setFolder] = useState(null);
   const [currentPath, setCurrentPath] = useState(path || dataSource.rootFolderPath);
-  const [previousPath, setPreviousPath] = useState(null);
+  const [history, setHistory] = useState([]);
   const [refreshCount, setRefreshCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -93,16 +93,22 @@ const FileManagerContent = ({dataSource, path}) => {
   // Reset the component on data source change
   useEffect(() => {
     setCurrentPath(path || dataSource.rootFolderPath);
-    setPreviousPath(null);
+    setHistory([]);
   }, [dataSource]);
 
   /**
    * Loads the folder from the selected path and refreshes the UI.
    * @param path the path to load
+   * @param newHistory if present, this will be used to replace the current history
    */
-  const handlePathUpdate = (path) => {
+  const handlePathUpdate = (path, newHistory) => {
     console.debug("handlePathUpdate -- new path: " + path + ", current path: " + currentPath);
-    setPreviousPath(currentPath);
+    if (newHistory) {
+      setHistory(newHistory);
+    } else {
+      setHistory(prevHistory => [...prevHistory, currentPath]);
+    }
+    console.debug("New history: ", history);
     setCurrentPath(path);
     searchParams.set("path", path);
     setSearchParams(searchParams);
@@ -188,8 +194,11 @@ const FileManagerContent = ({dataSource, path}) => {
                   variant="outline-primary"
                   className="me-2"
                   style={{width: "90px"}}
-                  disabled={!previousPath}
-                  onClick={() => handlePathUpdate(previousPath)}
+                  disabled={history.length === 0}
+                  onClick={() => {
+                    const p = history.pop();
+                    handlePathUpdate(p, history);
+                  }}
               >
                 <ArrowLeft size={18} />
                 &nbsp;&nbsp;
