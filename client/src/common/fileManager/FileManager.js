@@ -28,20 +28,20 @@ const FileManager = ({path, locationId}) => {
 
   const notyf = useContext(NotyfContext);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [dataSources, setDataSources] = useState([]);
-  const [selectedDataSource, setSelectedDataSource] = useState(null);
+  const [locations, setLocations] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
-  const handleDataSourceSelect = (dataSource) => {
-    setSelectedDataSource(dataSource);
-    setSearchParams({locationId: dataSource.id});
+  const handleLocationSelect = (location) => {
+    setSelectedLocation(location);
+    setSearchParams({locationId: location.id});
   }
 
   useEffect(() => {
     axios.get("/api/internal/data-files/locations")
     .then(response => {
-      setDataSources(response.data);
+      setLocations(response.data);
       if (locationId) {
-        setSelectedDataSource(response.data.find(dataSource => dataSource.id === parseInt(locationId)));
+        setSelectedLocation(response.data.find(dataSource => dataSource.id === parseInt(locationId)));
       }
     })
     .catch(error => {
@@ -64,17 +64,17 @@ const FileManager = ({path, locationId}) => {
           <Col xs="4" md="3">
 
             <FileManagerMenu
-                dataSources={dataSources}
-                handleDataSourceSelect={handleDataSourceSelect}
-                selectedDataSource={selectedDataSource}
+                locations={locations}
+                handleLocationSelect={handleLocationSelect}
+                selectedLocation={selectedLocation}
             />
 
           </Col>
 
           <Col xs="8" md="9">
             {
-              selectedDataSource
-                  ? <FileManagerContent dataSource={selectedDataSource} path={path} />
+              selectedLocation
+                  ? <FileManagerContent location={selectedLocation} path={path} />
                   : <FileManagerContentPlaceholder />
             }
 

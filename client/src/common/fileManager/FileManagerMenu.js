@@ -21,9 +21,9 @@ import {faFolder, faServer} from "@fortawesome/free-solid-svg-icons";
 import {faAws} from "@fortawesome/free-brands-svg-icons";
 
 const FileManagerMenu = ({
-  dataSources,
-  handleDataSourceSelect,
-  selectedDataSource
+  locations,
+  handleLocationSelect,
+  selectedLocation
 }) => {
 
   const getDataSourceIcon = (type) => {
@@ -41,13 +41,13 @@ const FileManagerMenu = ({
   }
 
   const renderDataSourceMenu = () => {
-    return dataSources.map(ds => {
+    return locations.map(ds => {
       return (
           <ListGroup.Item
               action
               key={ds.id}
-              active={selectedDataSource ? selectedDataSource.id === ds.id : false}
-              onClick={() => handleDataSourceSelect(ds)}
+              active={selectedLocation ? selectedLocation.id === ds.id : false}
+              onClick={() => handleLocationSelect(ds)}
           >
             {getDataSourceIcon(ds.type)}
             {ds.displayName}

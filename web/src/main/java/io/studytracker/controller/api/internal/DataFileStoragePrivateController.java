@@ -76,27 +76,35 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   @PostConstruct
   public void init() {
 
+    long integrationCount = 0L;
+    long instanceCount = 0L;
+    long locationCount = 0L;
+
     if (environment.containsProperty("egnyte.root-path")) {
+
+      integrationCount++;
       SupportedIntegration egnyteIntegration = new SupportedIntegration();
       egnyteIntegration.setName("Egnyte");
-      egnyteIntegration.setId(1L);
+      egnyteIntegration.setId(integrationCount);
       egnyteIntegration.setActive(true);
       egnyteIntegration.setVersion(1);
 
+      instanceCount++;
       IntegrationInstance egnyteInstance = new IntegrationInstance();
-      egnyteInstance.setId(1L);
+      egnyteInstance.setId(instanceCount);
       egnyteInstance.setSupportedIntegration(egnyteIntegration);
-      egnyteInstance.setDisplayName("Vesalius Egnyte");
-      egnyteInstance.setName("fl60inc.egnyte.com");
+      egnyteInstance.setDisplayName("Egnyte");
+      egnyteInstance.setName(environment.getRequiredProperty("egnyte.root-url"));
       egnyteInstance.setActive(true);
 
+      locationCount++;
       FileStorageLocation egnyteStorageLocation = new FileStorageLocation();
-      egnyteStorageLocation.setId(1L);
+      egnyteStorageLocation.setId(locationCount);
       egnyteStorageLocation.setIntegrationInstance(egnyteInstance);
       egnyteStorageLocation.setType(StorageLocationType.EGNYTE_API);
       egnyteStorageLocation.setRootFolderPath(environment.getRequiredProperty("egnyte.root-path"));
-      egnyteStorageLocation.setDisplayName("Vesalius Egnyte");
-      egnyteStorageLocation.setName("StudyTrackerDemo");
+      egnyteStorageLocation.setDisplayName("Egnyte");
+      egnyteStorageLocation.setName(environment.getRequiredProperty("egnyte.root-path"));
       egnyteStorageLocation.setPermissions(StoragePermissions.READ_WRITE);
       egnyteStorageLocation.setStudyDefault(true);
       egnyteStorageLocation.setDataDefault(false);
@@ -104,34 +112,41 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       fileStorageLocations.add(egnyteStorageLocation);
     }
 
-    if (environment.containsProperty("aws.example-s3-bucket")) {
+    if (environment.containsProperty("aws.s3-buckets")) {
 
+      integrationCount++;
       SupportedIntegration awsIntegration = new SupportedIntegration();
-      awsIntegration.setName("AWS S3");
-      awsIntegration.setId(2L);
+      awsIntegration.setName("Amazon Web Services");
+      awsIntegration.setId(integrationCount);
       awsIntegration.setActive(true);
       awsIntegration.setVersion(1);
 
+      instanceCount++;
       IntegrationInstance awsInstance = new IntegrationInstance();
-      awsInstance.setId(2L);
+      awsInstance.setId(instanceCount);
       awsInstance.setSupportedIntegration(awsIntegration);
-      awsInstance.setDisplayName("Vesalius AWS");
-      awsInstance.setName("vesaliustx-fl60");
+      awsInstance.setDisplayName("AWS S3");
+      awsInstance.setName("AWS S3");
       awsInstance.setActive(true);
-      awsInstance.setConfiguration(Collections.singletonMap("bucket", environment.getRequiredProperty("aws.example-s3-bucket")));
+      awsInstance.setConfiguration(Collections.singletonMap("buckets", environment.getRequiredProperty("aws.s3-buckets")));
 
-      FileStorageLocation s3StorageLocation = new FileStorageLocation();
-      s3StorageLocation.setId(2L);
-      s3StorageLocation.setType(StorageLocationType.AWS_S3);
-      s3StorageLocation.setIntegrationInstance(awsInstance);
-      s3StorageLocation.setRootFolderPath("");
-      s3StorageLocation.setDisplayName("Example Bucket");
-      s3StorageLocation.setName(environment.getRequiredProperty("aws.example-s3-bucket"));
-      s3StorageLocation.setPermissions(StoragePermissions.READ_WRITE);
-      s3StorageLocation.setStudyDefault(false);
-      s3StorageLocation.setDataDefault(true);
+      for (String bucket: environment.getRequiredProperty("aws.s3-buckets").split(",")) {
+        locationCount++;
+        bucket = bucket.trim();
+        FileStorageLocation s3StorageLocation = new FileStorageLocation();
+        s3StorageLocation.setId(locationCount);
+        s3StorageLocation.setType(StorageLocationType.AWS_S3);
+        s3StorageLocation.setIntegrationInstance(awsInstance);
+        s3StorageLocation.setRootFolderPath("");
+        s3StorageLocation.setDisplayName(bucket);
+        s3StorageLocation.setName(bucket);
+        s3StorageLocation.setPermissions(StoragePermissions.READ_WRITE);
+        s3StorageLocation.setStudyDefault(false);
+        s3StorageLocation.setDataDefault(true);
 
-      fileStorageLocations.add(s3StorageLocation);
+        fileStorageLocations.add(s3StorageLocation);
+      }
+
     }
 
   }

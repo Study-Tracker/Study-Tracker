@@ -56,8 +56,7 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     LOGGER.debug("Looking up folder by path: {}", path);
 
     // Get the bucket
-    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
-        .orElseThrow(() -> new StudyStorageNotFoundException("Missing bucket configuration for location: " + location.getId()));
+    String bucketName = location.getName();
     LOGGER.debug("Using bucket: {}", bucketName);
 
     // CLean the path input
@@ -87,8 +86,7 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     LOGGER.debug("Looking up file by path: {}", path);
 
     // Get the bucket
-    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
-        .orElseThrow(() -> new StudyStorageNotFoundException("Missing bucket configuration for location: " + location.getId()));
+    String bucketName = location.getName();
 
     if (!exists(bucketName, path)) {
       throw new StudyStorageNotFoundException("File not found: " + path);
@@ -116,8 +114,7 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     try {
 
       // Get the bucket
-      String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
-          .orElseThrow(() -> new StudyStorageException("Missing bucket configuration for location: " + location.getId()));
+      String bucketName = location.getName();
 
       if (!StoragePermissions.canWrite(location.getPermissions())) {
         throw new InsufficientPrivilegesException("Insufficient privileges to create folder: " + fullPath);
@@ -142,8 +139,7 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     LOGGER.info("Uploading file: {} to path: {} in bucket: {}", file.getName(), path, location.getName());
 
     // Get the bucket
-    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
-        .orElseThrow(() -> new StudyStorageException("Missing bucket configuration for location: " + location.getId()));
+    String bucketName = location.getName();
 
     // Check permissions
     if (!StoragePermissions.canWrite(location.getPermissions())) {
@@ -179,8 +175,7 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   public Resource downloadFile(FileStorageLocation location, String path) throws StudyStorageException {
 
     // Get the bucket
-    String bucketName = (String) location.getIntegrationInstance().findConfigurationValue("bucket")
-        .orElseThrow(() -> new StudyStorageException("Missing bucket configuration for location: " + location.getId()));
+    String bucketName = location.getName();
 
     if (!exists(bucketName, path)) {
       throw new StudyStorageException("File not found: " + path);

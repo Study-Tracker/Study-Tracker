@@ -58,15 +58,15 @@ const FolderPathBreadcrumbs = ({dataSource, folder}) => {
   return <Badge bg="light" style={{fontSize: "100%", color: "darkslategrey"}}>{dataSource.name}: {folder ? folder.path : ''}</Badge>
 }
 
-const FileManagerContent = ({dataSource, path}) => {
+const FileManagerContent = ({location, path}) => {
 
-  console.debug("Selected data source: ", dataSource);
+  console.debug("Selected data source: ", location);
   console.debug("Selected path: ", path);
 
   const notyf = useContext(NotyfContext);
 
   const [folder, setFolder] = useState(null);
-  const [currentPath, setCurrentPath] = useState(path || dataSource.rootFolderPath);
+  const [currentPath, setCurrentPath] = useState(path || location.rootFolderPath);
   const [history, setHistory] = useState([]);
   const [refreshCount, setRefreshCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,7 +84,7 @@ const FileManagerContent = ({dataSource, path}) => {
     axios.get("/api/internal/data-files", {
       params: {
         path: currentPath,
-        locationId: dataSource.id
+        locationId: location.id
       }
     })
     .then(response => {
@@ -102,9 +102,10 @@ const FileManagerContent = ({dataSource, path}) => {
 
   // Reset the component on data source change
   useEffect(() => {
-    setCurrentPath(path || dataSource.rootFolderPath);
+    setCurrentPath(path || location.rootFolderPath);
     setHistory([]);
-  }, [dataSource]);
+    setRefreshCount(refreshCount + 1);
+  }, [location]);
 
   /**
    * Loads the folder from the selected path and refreshes the UI.
@@ -134,7 +135,7 @@ const FileManagerContent = ({dataSource, path}) => {
     const requests = files.map(file => {
       const data = new FormData();
       data.append("file", file);
-      data.append("locationId", dataSource.id);
+      data.append("locationId", location.id);
       data.append("path", currentPath);
       return axios.post('/api/internal/data-files/upload', data);
     });
@@ -163,7 +164,7 @@ const FileManagerContent = ({dataSource, path}) => {
    */
   const handleCreateFolder = (values, {setSubmitting, resetForm}) => {
     const data = new FormData();
-    data.append("locationId", dataSource.id);
+    data.append("locationId", location.id);
     data.append("path", currentPath);
     data.append("folderName", values.folderName);
     axios.post("/api/internal/data-files/create-folder", data)
@@ -191,7 +192,7 @@ const FileManagerContent = ({dataSource, path}) => {
     content = <FileManagerTable
         folder={folder}
         handlePathChange={handlePathUpdate}
-        dataSource={dataSource}
+        dataSource={location}
     />;
   }
 
@@ -293,9 +294,9 @@ const FileManagerContent = ({dataSource, path}) => {
                 <div>
                   <Breadcrumb>
                     <Breadcrumb.Item
-                        onClick={() => handlePathUpdate(dataSource.rootFolderPath)}
+                        onClick={() => handlePathUpdate(location.rootFolderPath)}
                     >
-                      {dataSource.name}
+                      {location.name}
                     </Breadcrumb.Item>
                     {
                       folder ? folder.path.split("/").map((path, index) => {
@@ -303,7 +304,7 @@ const FileManagerContent = ({dataSource, path}) => {
                         if (index === folder.path.split("/").length - 1 && path === "") return null;
                         const label = path === "" ? "root" : path;
                         const pathSlice = folder.path.split("/").slice(0, index + 1).join("/");
-                        if (pathIsWithinRoot(pathSlice, dataSource.rootFolderPath)) {
+                        if (pathIsWithinRoot(pathSlice, location.rootFolderPath)) {
                           return (
                               <Breadcrumb.Item key={index} active={true}>
                                 {label}
@@ -345,7 +346,7 @@ const FileManagerContent = ({dataSource, path}) => {
 }
 
 FileManagerContent.propTypes = {
-  dataSource: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
   path: PropTypes.string.isRequired,
 }
 
