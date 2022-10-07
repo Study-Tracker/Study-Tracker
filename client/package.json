@@ -92,7 +92,7 @@
     "postcss-cli": "9.1.0",
     "prettier": "2.6.2",
     "react-app-rewired": "^2.2.1",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.1",
     "sass": "1.51.0"
   }
 }
