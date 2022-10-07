@@ -56,7 +56,9 @@ const AssayTypeForm = props => {
           "Name must be unique",
           value => !assayTypes.find(d => !!value && d.name.toLowerCase() === value.toLowerCase())
       ),
-    description: yup.string().required("Description is required"),
+    description: yup.string()
+      .required("Description is required")
+      .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
     active: yup.boolean(),
     fields: yup.array().of(yup.object())
       .test(
@@ -74,8 +76,8 @@ const AssayTypeForm = props => {
       .test(
           "not empty",
           "Attribute names must not be empty",
-          value => !Object.keys(value).find(d => d.trim() === '')
-      )
+          value => Object.keys(value).every(d => d && d.trim() !== '')
+      ),
   });
 
   const handleFormSubmit = (values, {setSubmitting}) => {

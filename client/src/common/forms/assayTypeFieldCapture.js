@@ -23,7 +23,7 @@ export const AssayTypeFieldCaptureInputList = ({
   assayType,
   assayFields,
   handleUpdate,
-  fieldValidation
+  errors
 }) => {
 
   let inputs = assayType.fields
@@ -51,7 +51,7 @@ export const AssayTypeFieldCaptureInputList = ({
             field={f}
             value={value}
             handleUpdate={handleUpdate}
-            isValid={true}
+            isInvalid={errors.fields && f.required && !value}
         />;
         break;
 
@@ -60,7 +60,7 @@ export const AssayTypeFieldCaptureInputList = ({
             field={f}
             value={value}
             handleUpdate={handleUpdate}
-            isValid={true}
+            isInvalid={errors.fields && f.required && !value}
         />;
         break;
 
@@ -69,7 +69,7 @@ export const AssayTypeFieldCaptureInputList = ({
             field={f}
             value={value}
             handleUpdate={handleUpdate}
-            isValid={true}
+            isInvalid={errors.fields && f.required && !value}
         />;
         break;
 
@@ -78,7 +78,7 @@ export const AssayTypeFieldCaptureInputList = ({
             field={f}
             value={value}
             handleUpdate={handleUpdate}
-            isValid={true}
+            isInvalid={errors.fields && f.required && !value}
         />;
         break;
 
@@ -87,7 +87,7 @@ export const AssayTypeFieldCaptureInputList = ({
             field={f}
             value={value}
             handleUpdate={handleUpdate}
-            isValid={true}
+            isInvalid={errors.fields && f.required && !value}
         />;
         break;
 
@@ -98,6 +98,15 @@ export const AssayTypeFieldCaptureInputList = ({
             handleUpdate={handleUpdate}
         />;
         break;
+
+      default:
+        input = <StringFieldInput
+            field={f}
+            value={value}
+            handleUpdate={handleUpdate}
+            isInvalid={errors.fields && f.required && !value}
+        />;
+
     }
 
     return (
@@ -117,7 +126,7 @@ export const AssayTypeFieldCaptureInputList = ({
 
 // Field type inputs
 
-const StringFieldInput = ({field, value, handleUpdate, isValid, error}) => {
+const StringFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
   return (
       <FormGroup>
         <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
@@ -129,15 +138,15 @@ const StringFieldInput = ({field, value, handleUpdate, isValid, error}) => {
                   [field.fieldName]: e.target.value
                 }
             )}
-            isValid={!isValid}
+            isInvalid={isInvalid}
         />
         <Form.Text>{field.description}</Form.Text>
-        <Form.Control.Feedback type={"invalid"}>{error}</Form.Control.Feedback>
+        <Form.Control.Feedback type={"invalid"}>{error || field.displayName + " is required"}</Form.Control.Feedback>
       </FormGroup>
   )
 };
 
-const TextFieldInput = ({field, value, handleUpdate, isValid, error}) => {
+const TextFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
   return (
       <FormGroup>
         <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
@@ -150,15 +159,17 @@ const TextFieldInput = ({field, value, handleUpdate, isValid, error}) => {
                   [field.fieldName]: e.target.value
                 }
             )}
-            isValid={!isValid}
+            isInvalid={isInvalid}
         />
         <Form.Text>{field.description}</Form.Text>
-        <Form.Control.Feedback>{error}</Form.Control.Feedback>
+        <Form.Control.Feedback type={"invalid"}>
+          {error || field.displayName + " is required"}
+        </Form.Control.Feedback>
       </FormGroup>
   )
 };
 
-const NumberFieldInput = ({field, value, handleUpdate, isValid, error}) => {
+const NumberFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
   return (
       <FormGroup>
         <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
@@ -174,10 +185,12 @@ const NumberFieldInput = ({field, value, handleUpdate, isValid, error}) => {
               }
               handleUpdate({[field.fieldName]: value})
             }}
-            isValid={!isValid}
+            isInvalid={isInvalid}
         />
         <Form.Text>{field.description}</Form.Text>
-        <Form.Control.Feedback type={"invalid"}>{error}</Form.Control.Feedback>
+        <Form.Control.Feedback type={"invalid"}>
+          {error || field.displayName + " is required"}
+        </Form.Control.Feedback>
       </FormGroup>
   )
 };
@@ -201,14 +214,14 @@ const BooleanFieldInput = ({field, value, handleUpdate}) => {
   )
 };
 
-const DateFieldInput = ({field, value, handleUpdate, isValid, error}) => {
+const DateFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
   return (
       <FormGroup>
         <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
         <DatePicker
             maxlength="2"
             className="form-control"
-            invalid={!isValid}
+            invalid={isInvalid}
             wrapperClassName="form-control"
             // selected={!!value ? new Date(value) : null}
             selected={value}
@@ -221,7 +234,9 @@ const DateFieldInput = ({field, value, handleUpdate, isValid, error}) => {
             dateFormat=" MM / dd / yyyy"
             placeholderText="MM / DD / YYYY"
         />
-        <Form.Control.Feedback type={"invalid"}>{error}</Form.Control.Feedback>
+        <Form.Control.Feedback type={"invalid"}>
+          {error || field.displayName + " is required"}
+        </Form.Control.Feedback>
         <Form.Text>{field.description}</Form.Text>
       </FormGroup>
   )

@@ -44,7 +44,9 @@ const StudyCollectionForm = props => {
     name: yup.string()
       .required("Name is required")
       .max(255, "Name must be less than 255 characters"),
-    description: yup.string().required("Description is required"),
+    description: yup.string()
+      .required("Description is required")
+      .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
     shared: yup.boolean(),
     studies: yup.array(),
   });

@@ -60,11 +60,11 @@ const UserForm = props => {
     title: yup.string(),
     department: yup.string(),
     attributes: yup.object()
-    .test(
-        "not empty",
-        "Attribute names must not be empty",
-        value => !Object.keys(value).find(d => d.trim() === '')
-    )
+      .test(
+          "not empty",
+          "Attribute names must not be empty",
+          value => Object.keys(value).every(d => d && d.trim() !== '')
+      ),
   });
 
   const handleFormSubmit = (values, {setSubmitting}) => {
@@ -305,7 +305,7 @@ const UserForm = props => {
                         <AttributeInputs
                             attributes={values.attributes}
                             handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
-                            errors={errors.attributes}
+                            error={errors.attributes}
                         />
 
                         <Row>
