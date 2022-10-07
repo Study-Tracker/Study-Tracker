@@ -14,33 +14,26 @@
  * limitations under the License.
  */
 
-package io.studytracker.controller;
+package io.studytracker.model;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 
-@Controller
-public class DefaultController {
+import java.util.LinkedHashMap;
+import java.util.Map;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
 
-  @GetMapping({
-      "/",
-      "/login",
-      "/study/**",
-      "/studies/**",
-      "/assay/**",
-      "/assays/**",
-      "/programs/**",
-      "/program/**",
-      "/user/**",
-      "/users/**",
-      "/collection/**",
-      "/collections/**",
-      "/admin/**",
-      "/search/**",
-      "/file-manager/**",
-  })
-  public String home() {
-    return "index";
-  }
+@Data
+public class SupportedIntegration implements Model {
+
+  @Id
+  private Long id;
+
+  private String name;
+
+  private boolean active = true;
+
+  private Integer version;
+
+  private Map<String, Object> configurationSchema = new LinkedHashMap<>();
 
 }

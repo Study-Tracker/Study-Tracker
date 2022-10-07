@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Col, Row, Spinner} from 'react-bootstrap';
+import {Card, Col, Row, Spinner} from 'react-bootstrap';
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -28,6 +28,25 @@ export const CardLoadingMessage = () => {
           </h4>
         </Col>
       </Row>
+  )
+};
+
+export const LoadingMessageCard = () => {
+  return (
+      <Card className="illustration-light flex-fill mt-3">
+        <Card.Body>
+          <Row>
+            <Col className={"d-flex justify-content-center"}>
+              <div className={"align-self-center"}>
+                <h1 className={"pt-5 pb-5"}>
+                  <Spinner animation="border" variant={'primary'} className="me-2"/>
+                  <span className={"display-5"}>Loading...</span>
+                </h1>
+              </div>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   )
 };
 

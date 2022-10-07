@@ -19,6 +19,7 @@ package io.studytracker.storage;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.springframework.data.annotation.Transient;
 
@@ -31,6 +32,14 @@ public class StorageFolder implements StorageObject {
   private String path;
 
   private String name;
+
+  private Date lastModified;
+
+  private Long totalSize;
+
+  private String folderId;
+
+  private boolean downloadable = false;
 
   @Transient private List<StorageFolder> subFolders = new ArrayList<>();
 
@@ -100,6 +109,46 @@ public class StorageFolder implements StorageObject {
     this.files = files;
   }
 
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  public Long getTotalSize() {
+    return totalSize;
+  }
+
+  public void setTotalSize(Long totalSize) {
+    this.totalSize = totalSize;
+  }
+
+  public String getFolderId() {
+    return folderId;
+  }
+
+  public void setFolderId(String folderId) {
+    this.folderId = folderId;
+  }
+
+  public void addFile(StorageFile file) {
+    files.add(file);
+  }
+
+  public void addSubfolder(StorageFolder folder) {
+    subFolders.add(folder);
+  }
+
+  public boolean isDownloadable() {
+    return downloadable;
+  }
+
+  public void setDownloadable(boolean downloadable) {
+    this.downloadable = downloadable;
+  }
+
   @Override
   public String toString() {
     return "StorageFolder{" +
@@ -109,6 +158,9 @@ public class StorageFolder implements StorageObject {
         ", name='" + name + '\'' +
         ", subFolders=" + subFolders +
         ", files=" + files +
+        ", lastModified=" + lastModified +
+        ", totalSize=" + totalSize +
+        ", folderId='" + folderId + '\'' +
         '}';
   }
 }

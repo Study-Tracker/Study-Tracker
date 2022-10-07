@@ -14,33 +14,10 @@
  * limitations under the License.
  */
 
-package io.studytracker.controller;
+package io.studytracker.storage;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-
-@Controller
-public class DefaultController {
-
-  @GetMapping({
-      "/",
-      "/login",
-      "/study/**",
-      "/studies/**",
-      "/assay/**",
-      "/assays/**",
-      "/programs/**",
-      "/program/**",
-      "/user/**",
-      "/users/**",
-      "/collection/**",
-      "/collections/**",
-      "/admin/**",
-      "/search/**",
-      "/file-manager/**",
-  })
-  public String home() {
-    return "index";
-  }
-
+public enum StorageLocationType {
+  LOCAL_FILE_SYSTEM,
+  EGNYTE_API,
+  AWS_S3
 }

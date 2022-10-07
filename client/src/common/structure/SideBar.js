@@ -16,7 +16,15 @@
 
 import React from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {Activity, Clipboard, Layers, List, Target, Users} from "react-feather";
+import {
+  Activity,
+  Clipboard,
+  Folder,
+  Layers,
+  List,
+  Target,
+  Users
+} from "react-feather";
 import {useLocation} from "react-router-dom";
 import {useSelector} from "react-redux";
 
@@ -105,6 +113,16 @@ const Sidebar = props => {
                     ["collections", "collection"])} href={"/collections"}>
                   <List size={18} className="align-middle me-3"/>
                   <span className="align-middle">Collections</span>
+                </a>
+              </li>
+
+              <li className="sidebar-header">Data Management</li>
+
+              <li className={"sidebar-item"}>
+                <a className={"sidebar-link " + isActive(
+                    ["file-manager"])} href={"/file-manager"}>
+                  <Folder size={18} className="align-middle me-3"/>
+                  <span className="align-middle">File Manager</span>
                 </a>
               </li>
 

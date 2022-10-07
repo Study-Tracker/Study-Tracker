@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package io.studytracker.controller;
+package io.studytracker.model;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import io.studytracker.storage.StorageLocationType;
+import io.studytracker.storage.StoragePermissions;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
 
-@Controller
-public class DefaultController {
+@Data
+public class FileStorageLocation implements Model {
 
-  @GetMapping({
-      "/",
-      "/login",
-      "/study/**",
-      "/studies/**",
-      "/assay/**",
-      "/assays/**",
-      "/programs/**",
-      "/program/**",
-      "/user/**",
-      "/users/**",
-      "/collection/**",
-      "/collections/**",
-      "/admin/**",
-      "/search/**",
-      "/file-manager/**",
-  })
-  public String home() {
-    return "index";
-  }
+  @Id
+  private Long id;
+
+  private IntegrationInstance integrationInstance;
+
+  private StorageLocationType type;
+
+  private String displayName;
+
+  private String name;
+
+  private String rootFolderPath;
+
+  private boolean studyDefault = false;
+
+  private boolean dataDefault = false;
+
+  private StoragePermissions permissions;
 
 }

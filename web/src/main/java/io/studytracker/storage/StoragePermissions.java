@@ -14,33 +14,21 @@
  * limitations under the License.
  */
 
-package io.studytracker.controller;
+package io.studytracker.storage;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+public enum StoragePermissions {
+  READ_ONLY,
+  READ_WRITE,
+  READ_WRITE_DELETE,
+  FULL_CONTROL
+  ;
 
-@Controller
-public class DefaultController {
+  public static boolean canWrite(StoragePermissions permissions) {
+    return permissions == READ_WRITE || permissions == READ_WRITE_DELETE || permissions == FULL_CONTROL;
+  }
 
-  @GetMapping({
-      "/",
-      "/login",
-      "/study/**",
-      "/studies/**",
-      "/assay/**",
-      "/assays/**",
-      "/programs/**",
-      "/program/**",
-      "/user/**",
-      "/users/**",
-      "/collection/**",
-      "/collections/**",
-      "/admin/**",
-      "/search/**",
-      "/file-manager/**",
-  })
-  public String home() {
-    return "index";
+  public static boolean canDelete(StoragePermissions permissions) {
+    return permissions == READ_WRITE_DELETE || permissions == FULL_CONTROL;
   }
 
 }
