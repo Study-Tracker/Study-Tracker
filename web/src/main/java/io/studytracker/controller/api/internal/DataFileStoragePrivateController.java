@@ -70,7 +70,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   @Autowired
   private Environment environment;
 
-  private List<FileStorageLocation> fileStorageLocations = new ArrayList<>();
+  private final List<FileStorageLocation> fileStorageLocations = new ArrayList<>();
 
   // TODO: remove
   @PostConstruct
@@ -164,7 +164,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   }
 
   @GetMapping("")
-  private StorageFolder getDataStorageFolder(
+  public StorageFolder getDataStorageFolder(
       @RequestParam(name = "path") String path,
       @RequestParam(name = "locationId") Long locationId
   ) {
@@ -181,7 +181,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   }
 
   @PostMapping("/upload")
-  private HttpEntity<StorageFile> uploadFilesToFolder(
+  public HttpEntity<StorageFile> uploadFilesToFolder(
       @RequestParam(name = "path") String path,
       @RequestParam(name = "locationId") Long locationId,
       @RequestParam("file") MultipartFile file
@@ -214,7 +214,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   }
 
   @PostMapping("/create-folder")
-  private HttpEntity<StorageFolder> createNewFolder(
+  public HttpEntity<StorageFolder> createNewFolder(
       @RequestParam(name = "path") String path,
       @RequestParam(name = "locationId") Long locationId,
       @RequestParam(name = "folderName") String folderName
@@ -231,7 +231,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   }
 
   @GetMapping("/download")
-  private HttpEntity<Resource> downloadFile(
+  public HttpEntity<Resource> downloadFile(
       @RequestParam(name = "path") String path,
       @RequestParam(name = "locationId") Long locationId
   ) throws Exception {

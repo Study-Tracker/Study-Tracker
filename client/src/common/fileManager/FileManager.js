@@ -41,7 +41,7 @@ const FileManager = ({path, locationId}) => {
     .then(response => {
       setLocations(response.data);
       if (locationId) {
-        setSelectedLocation(response.data.find(dataSource => dataSource.id === parseInt(locationId)));
+        setSelectedLocation(response.data.find(dataSource => dataSource.id === parseInt(locationId, 10)));
       }
     })
     .catch(error => {

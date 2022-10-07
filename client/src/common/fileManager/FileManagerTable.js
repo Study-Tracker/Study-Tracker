@@ -154,8 +154,8 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
   const formatFileSize = (size) => {
     if (!size) {
       return "-"
-    } else if (size >= 1000000000) {
-      return (size / 1000000000).toFixed(2) + " gb";
+    } else if (size >= 1e9) {
+      return (size / 1e9).toFixed(2) + " gb";
     } else if (size >= 1000000) {
       return (size / 1000000).toFixed(2) + " mb";
     } else if (size >= 1000) {
