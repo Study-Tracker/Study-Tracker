@@ -28,6 +28,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findByEmail(String email);
 
+  Optional<User> findByUsername(String username);
+
   List<User> findByType(UserType type);
 
   @Query("select u from User u where lower(u.displayName) like lower(concat('%', ?1, '%'))")

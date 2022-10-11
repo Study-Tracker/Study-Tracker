@@ -108,17 +108,17 @@ const UserSettingsTable = ({users, showModal}) => {
       },
     },
     {
-      dataField: "email",
-      text: "Email",
+      dataField: "username",
+      text: "Username",
       sort: true,
       headerStyle: {width: '30%'},
       formatter: (c, d) => <Button variant={"link"}
-                                         onClick={() => showModal(d)}>{d.email}</Button>,
+                                         onClick={() => showModal(d)}>{d.username}</Button>,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
-        if (rowA.email > rowB.email) {
+        if (rowA.username > rowB.username) {
           return order === "desc" ? -1 : 1;
         }
-        if (rowB.email > rowA.email) {
+        if (rowB.username > rowA.username) {
           return order === "desc" ? 1 : -1;
         }
         return 0;

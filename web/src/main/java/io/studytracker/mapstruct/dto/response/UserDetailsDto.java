@@ -29,6 +29,7 @@ public class UserDetailsDto {
   private String department;
   private String title;
   private String displayName;
+  private String username;
   private String email;
   private UserType type;
   private boolean admin = false;

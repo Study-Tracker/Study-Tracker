@@ -56,6 +56,9 @@ public class User implements Model {
   @Column(name = "display_name", nullable = false)
   private String displayName;
 
+  @Column(name = "username", nullable = false, unique = true)
+  private String username;
+
   @Column(name = "email", unique = true, nullable = false)
   private String email;
 
@@ -122,6 +125,14 @@ public class User implements Model {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public UserType getType() {

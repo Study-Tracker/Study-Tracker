@@ -22,5 +22,6 @@ import lombok.Data;
 public class ElasticsearchUserDocument {
 
   private String displayName;
+  private String username;
   private String email;
 }

@@ -22,6 +22,7 @@ import io.studytracker.exception.UnauthorizedException;
 import io.studytracker.exception.UnknownUserException;
 import io.studytracker.model.PasswordResetToken;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.security.AppUserDetails;
 import io.studytracker.security.AuthCredentials;
 import io.studytracker.security.TokenUtils;
@@ -117,14 +118,15 @@ public class AuthenticationController {
       Object principal = authentication.getPrincipal();
       if (principal instanceof User) {
         user = (User) principal;
-        LOGGER.debug("Loaded user from principal: {}", user.getEmail());
+        LOGGER.debug("Loaded user from principal: {}", user.getUsername());
       } else if (principal instanceof AppUserDetails) {
         AppUserDetails userDetails = (AppUserDetails) principal;
         user = userDetails.getUser();
         LOGGER.debug("Loaded user from userDetails: {}", userDetails.getUsername());
       } else {
         String username = principal.toString();
-        user = userService.findByEmail(username).orElseThrow(UnknownUserException::new);
+        user = userService.findByUsername(username)
+            .orElseThrow(() -> new UnknownUserException(username));
         LOGGER.debug("Loaded user from username: {}", username);
       }
     } else {
@@ -167,6 +169,9 @@ public class AuthenticationController {
       throw new RecordNotFoundException("Cannot find user with email: " + email);
     }
     User user = optional.get();
+    if (user.getType() != UserType.STANDARD_USER) {
+      throw new UnauthorizedException("Cannot reset password for non-standard user");
+    }
     PasswordResetToken token = userService.createPasswordResetToken(user);
     emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
     return "redirect:/login?message=Password reset request successfully sent.";
@@ -198,6 +203,9 @@ public class AuthenticationController {
       throw new InvalidConstraintException("Passwords do not match.");
     }
     User user = optional.get();
+    if (user.getType() != UserType.STANDARD_USER) {
+      throw new UnauthorizedException("Cannot reset password for non-standard user");
+    }
     boolean valid = userService.validatePasswordResetToken(email, token);
     if (valid) {
       userService.updatePassword(user, passwordEncoder.encode(password));

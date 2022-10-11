@@ -27,7 +27,8 @@ public class UserFormDto {
 
   private Long id;
   private @NotBlank String displayName;
-  private @NotBlank String email;
+  private String email;
+  private @NotBlank String username;
   private String department;
   private String title;
   private String type;

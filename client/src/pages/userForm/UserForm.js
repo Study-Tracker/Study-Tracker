@@ -36,7 +36,9 @@ const UserForm = props => {
   const navigate = useNavigate();
   const userDefaults = {
     displayName: "",
+    username: "",
     email: "",
+    type: "STANDARD_USER",
     title: "",
     department: "",
     admin: false,
@@ -46,6 +48,16 @@ const UserForm = props => {
   const userSchema = yup.object().shape({
     displayName: yup.string().required("Name is required"),
     admin: yup.boolean(),
+    username: yup.string()
+      .required("Username is required")
+      .when("type", {
+        is: "STANDARD_USER",
+        then: yup.string().test(
+            "username matches email",
+            "Standard users must have matching usernames and emails.",
+            (value, context) => value === context.parent.email
+        )
+      }),
     email: yup.string()
       .email("Invalid email address")
       .required("Email is required")
@@ -57,6 +69,9 @@ const UserForm = props => {
             value => !props.users.find(u => !!value && u.email.toLowerCase() === value.toLowerCase())
         )
       }),
+    type: yup.string()
+      .required("Type is required")
+      .oneOf(["STANDARD_USER", "SYSTEM_USER", "API_USER"]),
     title: yup.string(),
     department: yup.string(),
     attributes: yup.object()
@@ -206,22 +221,6 @@ const UserForm = props => {
 
                           <Col md={6}>
                             <FormGroup>
-                              <Form.Label>Email *</Form.Label>
-                              <Form.Control
-                                  type="text"
-                                  name={"email"}
-                                  isInvalid={!!errors.email}
-                                  value={values.email}
-                                  onChange={handleChange}
-                              />
-                              <Form.Control.Feedback type={"invalid"}>
-                                {errors.email}
-                              </Form.Control.Feedback>
-                            </FormGroup>
-                          </Col>
-
-                          <Col md={6}>
-                            <FormGroup>
                               <Form.Label>Role</Form.Label>
                               <Select
                                   className="react-select-container"
@@ -248,6 +247,38 @@ const UserForm = props => {
                                   }
                                   onChange={(selected) => setFieldValue("admin", selected.value)}
                               />
+                            </FormGroup>
+                          </Col>
+
+                          <Col md={6}>
+                            <FormGroup>
+                              <Form.Label>Email *</Form.Label>
+                              <Form.Control
+                                  type="text"
+                                  name={"email"}
+                                  isInvalid={!!errors.email}
+                                  value={values.email}
+                                  onChange={handleChange}
+                              />
+                              <Form.Control.Feedback type={"invalid"}>
+                                {errors.email}
+                              </Form.Control.Feedback>
+                            </FormGroup>
+                          </Col>
+
+                          <Col md={6}>
+                            <FormGroup>
+                              <Form.Label>Username *</Form.Label>
+                              <Form.Control
+                                  type="text"
+                                  name={"username"}
+                                  isInvalid={!!errors.username}
+                                  value={values.username}
+                                  onChange={handleChange}
+                              />
+                              <Form.Control.Feedback type={"invalid"}>
+                                {errors.username}
+                              </Form.Control.Feedback>
                             </FormGroup>
                           </Col>
 

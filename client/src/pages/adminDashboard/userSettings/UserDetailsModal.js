@@ -42,7 +42,7 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
       >
         <Modal.Header closeButton>
           User:&nbsp;
-          <strong>{user.displayName}</strong>&nbsp;(<code>{user.email}</code>)
+          <strong>{user.displayName}</strong>&nbsp;(<code>{user.username}</code>)
         </Modal.Header>
         <Modal.Body>
           <Row>
@@ -50,6 +50,10 @@ const UserDetailsModal = ({user, isOpen, showModal}) => {
             <Col md={6}>
               <h4>Name</h4>
               <p>{user.displayName}</p>
+            </Col>
+            <Col md={6}>
+              <h4>Username</h4>
+              <p>{user.username}</p>
             </Col>
             <Col md={6}>
               <h4>Email</h4>
