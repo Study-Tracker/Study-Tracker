@@ -24,39 +24,50 @@ import {
   ListGroup,
   Row
 } from "react-bootstrap";
-import UserSettings from "./UserSettings";
+import UserSettings from "./userSettings/UserSettings";
 import AssayTypeSettings from "./AssayTypeSettings";
 import KeywordSettings from "./KeywordSettings";
 import ProgramSettings from "./ProgramSettings";
+import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
 
 const settings = {
   "users": {
     id: "users",
+    category: "site-settings",
     label: "Users",
     tag: UserSettings
   },
   "assay-types": {
     id: "assay-types",
+    category: "site-settings",
     label: "Assay Types",
     tag: AssayTypeSettings
   },
   "keywords": {
     id: "keywords",
+    category: "site-settings",
     label: "Keywords",
     tag: KeywordSettings
   },
   "programs": {
     id: "programs",
+    category: "site-settings",
     label: "Programs",
     tag: ProgramSettings
+  },
+  "api-documentation": {
+    id: "api-documentation",
+    category: "developer",
+    label: "API Documentation",
+    onClick: () => window.open("/swagger-ui.html", "_blank")
   }
 };
 
-function useQuery() {
+const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 }
 
-export const AdminDashboard = props => {
+const AdminDashboard = props => {
 
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(null);
@@ -64,11 +75,10 @@ export const AdminDashboard = props => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (Object.keys(settings).includes(activeTabQuery) && activeTab
-        !== activeTabQuery) {
+    if (activeTabQuery
+        && Object.keys(settings).includes(activeTabQuery)
+        && activeTab !== activeTabQuery) {
       setActiveTab(activeTabQuery);
-    } else {
-      setActiveTab(Object.keys(settings).sort()[0]);
     }
   }, [location]);
 
@@ -77,7 +87,7 @@ export const AdminDashboard = props => {
       const Tag = settings[activeTab].tag;
       return <Tag/>;
     } else {
-      return '';
+      return <AdminDashboardPlaceholder />;
     }
   }
 
@@ -85,28 +95,31 @@ export const AdminDashboard = props => {
     navigate('/admin?active=' + tabName);
   }
 
-  const controls = Object.values(settings)
-  .sort((a, b) => {
-    if (a.label > b.label) {
-      return 1;
-    } else if (a.label < b.label) {
-      return -1;
-    } else {
-      return 0;
-    }
-  })
-  .map(s => {
-    return (
-        <ListGroup.Item
-            key={'setting-tab-' + s.id}
-            action
-            active={activeTab === s.id}
-            onClick={() => onSetActiveTab(s.id)}
-        >
-          {s.label}
-        </ListGroup.Item>
-    )
-  })
+  const renderMenu = (category) => {
+    return Object.values(settings)
+    .filter((setting) => setting.category === category)
+    .sort((a, b) => {
+      if (a.label > b.label) {
+        return 1;
+      } else if (a.label < b.label) {
+        return -1;
+      } else {
+        return 0;
+      }
+    })
+    .map(s => {
+      return (
+          <ListGroup.Item
+              key={'setting-tab-' + s.id}
+              action
+              active={activeTab === s.id}
+              onClick={s.onClick || (() => onSetActiveTab(s.id))}
+          >
+            {s.label}
+          </ListGroup.Item>
+      )
+    })
+  }
 
   return (
       <Container fluid>
@@ -135,7 +148,7 @@ export const AdminDashboard = props => {
                 </Card.Title>
               </Card.Header>
               <ListGroup variant={"flush"}>
-                {controls}
+                {renderMenu('site-settings')}
               </ListGroup>
             </Card>
 
@@ -146,12 +159,7 @@ export const AdminDashboard = props => {
                 </Card.Title>
               </Card.Header>
               <ListGroup variant={"flush"}>
-                <ListGroup.Item
-                    action
-                    href={"/swagger-ui.html"}
-                >
-                  API Documentation
-                </ListGroup.Item>
+                {renderMenu('developer')}
               </ListGroup>
             </Card>
 

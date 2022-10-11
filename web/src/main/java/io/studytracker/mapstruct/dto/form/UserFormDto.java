@@ -30,6 +30,7 @@ public class UserFormDto {
   private @NotBlank String email;
   private String department;
   private String title;
+  private String type;
   private boolean admin = false;
   private Date createdAt;
   private Date updatedAt;

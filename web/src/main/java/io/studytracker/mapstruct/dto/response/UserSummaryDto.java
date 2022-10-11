@@ -16,6 +16,7 @@
 
 package io.studytracker.mapstruct.dto.response;
 
+import io.studytracker.model.UserType;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class UserSummaryDto {
   private String title;
   private String displayName;
   private String email;
+  private UserType type;
   private boolean admin = false;
   private boolean active = true;
   private boolean locked = false;

@@ -1,0 +1,10 @@
+ALTER TABLE users
+    ADD type VARCHAR(255);
+
+UPDATE users SET type = 'STANDARD_USER' WHERE type IS NULL;
+
+ALTER TABLE users
+    ALTER COLUMN type SET NOT NULL;
+
+ALTER TABLE study_collections
+    ALTER COLUMN shared SET NOT NULL;

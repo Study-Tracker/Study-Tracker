@@ -19,6 +19,7 @@ package io.studytracker.service;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.PasswordResetToken;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.UserRepository;
 import java.util.Calendar;
@@ -59,6 +60,10 @@ public class UserService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Optional<User> findByEmail(String email) {
     return userRepository.findByEmail(email);
+  }
+
+  public List<User> findByType(UserType type) {
+    return userRepository.findByType(type);
   }
 
   public List<User> search(String keyword) {
