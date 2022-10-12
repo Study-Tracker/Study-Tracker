@@ -35,6 +35,7 @@ import io.studytracker.service.NamingService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -386,4 +387,19 @@ public final class BenchlingNotebookFolderService
     return assayFolder;
   }
 
+  @Override
+  public List<NotebookFolder> listNotebookProjectFolders() {
+    LOGGER.debug("Listing all notebook projects");
+    String authHeader = generateAuthorizationHeader();
+    List<BenchlingFolder> folders = new ArrayList<>();
+    String nextToken = null;
+    boolean hasNext = true;
+    while (hasNext) {
+      BenchlingFolderList folderList = this.getClient().findRootFolders(authHeader, nextToken);
+      nextToken = folderList.getNextToken();
+      folders.addAll(folderList.getFolders());
+      hasNext = StringUtils.hasText(nextToken);
+    }
+    return folders.stream().map(this::convertBenchlingFolder).collect(Collectors.toList());
+  }
 }
