@@ -20,6 +20,7 @@ import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
+import java.util.List;
 import java.util.Optional;
 
 public interface NotebookFolderService {
@@ -67,13 +68,20 @@ public interface NotebookFolderService {
   NotebookFolder createStudyFolder(Study study) throws NotebookException;
 
   /**
-   * Creates a folder for a assay in the ELN and returns a {@link NotebookFolder}.
+   * Creates a folder for an assay in the ELN and returns a {@link NotebookFolder}.
    *
    * @param assay
    * @return
    * @throws NotebookException
    */
   NotebookFolder createAssayFolder(Assay assay) throws NotebookException;
+
+  /**
+   * Lists all project folders within the ELN.
+   *
+   * @return
+   */
+  List<NotebookFolder> listNotebookProjectFolders();
 
 
 }
