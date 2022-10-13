@@ -39,7 +39,13 @@ import FormikFormErrorNotification
 import axios from "axios";
 import * as yup from "yup";
 
-const ProgramForm = props => {
+const ProgramForm = ({
+    program,
+    programs,
+    elnProjects,
+    features,
+    user
+}) => {
 
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
   const navigate = useNavigate();
@@ -62,7 +68,7 @@ const ProgramForm = props => {
       .test(
         "unique",
         "Name must be unique",
-        value => !props.programs.find(p => !!value && p.name.toLowerCase() === value.toLowerCase())
+        value => !programs.find(p => !!value && p.name.toLowerCase() === value.toLowerCase())
       ),
     description: yup.string()
       .required("Description is required.")
@@ -76,8 +82,8 @@ const ProgramForm = props => {
       .test(
           "not empty",
           "Notebook folder ID is required.",
-          value => props.features && props.features.notebook
-              && props.features.notebook.isEnabled && !!value
+          value => features && features.notebook
+              && features.notebook.isEnabled && !!value
               && value.trim() !== ""
       ),
       name: yup.string(),
@@ -171,12 +177,12 @@ const ProgramForm = props => {
         <Row>
           <Col>
             {
-              !!props.program
+              program
                   ? (
                       <Breadcrumb>
                         <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
                         <Breadcrumb.Item
-                            href={"/program/" + props.program.id}>
+                            href={"/program/" + program.id}>
                           Program Detail
                         </Breadcrumb.Item>
                         <Breadcrumb.Item active>Edit Program</Breadcrumb.Item>
@@ -196,8 +202,7 @@ const ProgramForm = props => {
 
         <Row className="justify-content-end align-items-center">
           <Col>
-            <h3>{!!props.program ? "Edit Program"
-                : "New Program"}</h3>
+            <h3>{program ? "Edit Program" : "New Program"}</h3>
           </Col>
         </Row>
 
@@ -218,7 +223,7 @@ const ProgramForm = props => {
 
               <Card.Body>
                 <Formik
-                    initialValues={props.program || defaultProgramValues}
+                    initialValues={program || defaultProgramValues}
                     validationSchema={programSchema}
                     onSubmit={submitForm}
                     validateOnBlur={false}
@@ -327,9 +332,9 @@ const ProgramForm = props => {
                         </Row>
 
                         {
-                          props.features
-                          && props.features.notebook
-                          && props.features.notebook.isEnabled ? (
+                          features
+                          && features.notebook
+                          && features.notebook.isEnabled ? (
 
                             <React.Fragment>
 
@@ -351,13 +356,50 @@ const ProgramForm = props => {
                                     entries will be created. You will have to create the
                                     program in the ELN software before Study Tracker can
                                     register the study and hook into the ELN platform.
-                                    Provide the unique ID for the ELN program (aka.
-                                    Program Folder ID), the name of the program as it
-                                    appears in the ELN, and the URL for creating a link to
-                                    the program page in the ELN.
+                                    Select the program you wish to map your new program
+                                    to from the dropdown below. If your project is not
+                                    listed, check with your ELN administrator to ensure
+                                    the project has been created.
                                   </h6>
                                   <br/>
                                 </Col>
+
+                              </Row>
+
+                              {
+                                elnProjects ? (
+                                    <Row>
+                                      <Col md={6} className={"mb-3"}>
+                                        <FormGroup>
+                                          <Form.Label>ELN Project</Form.Label>
+                                          <Select
+                                              className="react-select-container"
+                                              classNamePrefix="react-select"
+                                              options={
+                                                elnProjects
+                                                .sort((a, b) => a.name.localeCompare(b.name))
+                                                .map(p => ({
+                                                  label: p.name,
+                                                  value: p
+                                                }))
+                                              }
+                                              name="elnProject"
+                                              onChange={(selected) => {
+                                                setFieldValue("notebookFolder.name", selected.value.name);
+                                                setFieldValue("notebookFolder.url", selected.value.url);
+                                                setFieldValue("notebookFolder.referenceId", selected.value.folderId);
+                                              }}
+                                          />
+                                          <Form.Text>
+                                            Select an existing project from your ELN to assign your program to.
+                                          </Form.Text>
+                                        </FormGroup>
+                                      </Col>
+                                    </Row>
+                                ) : ""
+                              }
+
+                              <Row>
 
                                 <Col md={6} className={"mb-3"}>
                                   <FormGroup>
@@ -368,14 +410,17 @@ const ProgramForm = props => {
                                         isInvalid={!!errors.notebookFolder && !!errors.notebookFolder.referenceId}
                                         value={values.notebookFolder.referenceId}
                                         onChange={handleChange}
+                                        disabled={!!elnProjects && elnProjects.length > 0}
                                     />
                                     <Form.Control.Feedback type={"invalid"}>
                                       Program Folder ID must not be empty.
                                     </Form.Control.Feedback>
-                                    <Form.Text>This is the ID assigned to the program
+                                    <Form.Text>
+                                      This is the ID assigned to the program
                                       folder in the ELN. For example, in Benchling the ID
                                       will take the form of an alphanumeric code with a
-                                      prefix of <code>lib_</code>.</Form.Text>
+                                      prefix of <code>lib_</code>.
+                                    </Form.Text>
                                   </FormGroup>
                                 </Col>
 
@@ -387,6 +432,7 @@ const ProgramForm = props => {
                                         name={"notebookFolder.name"}
                                         value={values.notebookFolder.name}
                                         onChange={handleChange}
+                                        disabled={!!elnProjects && elnProjects.length > 0}
                                     />
                                     <Form.Control.Feedback type={"invalid"}>
                                       Folder Name must not be empty.
@@ -404,6 +450,7 @@ const ProgramForm = props => {
                                         name={"notebookFolder.url"}
                                         value={values.notebookFolder.url}
                                         onChange={handleChange}
+                                        disabled={!!elnProjects && elnProjects.length > 0}
                                     />
                                     <Form.Control.Feedback type={"invalid"}>
                                       URL must not be empty.
@@ -497,6 +544,7 @@ ProgramForm.propTypes = {
   programs: PropTypes.array.isRequired,
   user: PropTypes.object,
   features: PropTypes.object,
+  elnProjects: PropTypes.array,
 }
 
 export default ProgramForm;

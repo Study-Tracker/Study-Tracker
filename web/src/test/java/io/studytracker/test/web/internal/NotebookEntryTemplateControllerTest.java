@@ -57,6 +57,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @ActiveProfiles({"web-test", "example"})
+@Deprecated
 public class NotebookEntryTemplateControllerTest {
 
   private static final int ENTRY_TEMPLATE_COUNT =
