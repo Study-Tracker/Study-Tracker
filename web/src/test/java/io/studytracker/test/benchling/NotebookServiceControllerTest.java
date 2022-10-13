@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.studytracker.test.web.internal;
+package io.studytracker.test.benchling;
 
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
