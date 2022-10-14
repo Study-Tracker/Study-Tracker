@@ -33,6 +33,7 @@ import io.studytracker.Application;
 import io.studytracker.mapstruct.dto.api.UserPayloadDto;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.service.UserService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -139,6 +140,8 @@ public class UserApiControllerTests extends AbstractApiControllerTests {
 
     User user = new User();
     user.setEmail("newperson@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setDisplayName("New Person");
     user.setDepartment("IT");
     user.setTitle("IT Admin");
@@ -163,6 +166,8 @@ public class UserApiControllerTests extends AbstractApiControllerTests {
 
     UserPayloadDto dto = new UserPayloadDto();
     dto.setEmail("newperson@email.com");
+    dto.setUsername(dto.getEmail());
+    dto.setType(UserType.STANDARD_USER);
     dto.setDepartment("IT");
     dto.setTitle("IT Admin");
     dto.setAdmin(true);
@@ -194,6 +199,8 @@ public class UserApiControllerTests extends AbstractApiControllerTests {
 
     User user = new User();
     user.setEmail("newperson@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setDisplayName("New Person");
     user.setDepartment("IT");
     user.setTitle("IT Admin");

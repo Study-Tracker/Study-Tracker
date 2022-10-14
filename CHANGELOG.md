@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for creating API users, which can be used exclusively for API access. This allows for easier management of integrations and removes the need to use a user's credentials for API access.
 
 ### Changed
+- Changed the signature of the JWT created and returned to authenticated users to include creation and expiration times.
 
 ### Fixed
 - Fixed validation of Quill input fields to prevent empty inputs.

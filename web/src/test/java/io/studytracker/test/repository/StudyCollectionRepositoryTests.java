@@ -24,6 +24,7 @@ import io.studytracker.model.Status;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyCollection;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
@@ -71,6 +72,8 @@ public class StudyCollectionRepositoryTests {
     User user = new User();
     user.setAdmin(false);
     user.setEmail("test@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setDisplayName("Joe Person");
     user.setActive(true);
     user.setPassword("password");

@@ -35,6 +35,7 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.mapstruct.dto.form.UserFormDto;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.service.UserService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -102,6 +103,8 @@ public class UserInternalControllerTests {
 
     User user = new User();
     user.setEmail("newperson@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setDisplayName("New Person");
     user.setDepartment("IT");
     user.setTitle("IT Admin");
@@ -126,6 +129,8 @@ public class UserInternalControllerTests {
 
     UserFormDto dto = new UserFormDto();
     dto.setEmail("newperson@email.com");
+    dto.setUsername(dto.getEmail());
+    dto.setType(UserType.STANDARD_USER.toString());
     dto.setDepartment("IT");
     dto.setTitle("IT Admin");
     dto.setAdmin(true);
@@ -159,6 +164,8 @@ public class UserInternalControllerTests {
 
     User user = new User();
     user.setEmail("newperson@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setDisplayName("New Person");
     user.setDepartment("IT");
     user.setTitle("IT Admin");

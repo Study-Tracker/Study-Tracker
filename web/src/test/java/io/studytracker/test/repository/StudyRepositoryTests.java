@@ -26,6 +26,7 @@ import io.studytracker.model.Status;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyConclusions;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.CommentRepository;
 import io.studytracker.repository.ELNFolderRepository;
@@ -91,7 +92,9 @@ public class StudyRepositoryTests {
   private void createUser() {
     User user = new User();
     user.setAdmin(false);
+    user.setType(UserType.STANDARD_USER);
     user.setEmail("test@email.com");
+    user.setUsername("test@email.com");
     user.setDisplayName("Joe Person");
     user.setActive(true);
     user.setPassword("password");
@@ -304,6 +307,8 @@ public class StudyRepositoryTests {
       User user = new User();
       user.setAdmin(false);
       user.setEmail("jperson@email.com");
+      user.setUsername(user.getEmail());
+      user.setType(UserType.STANDARD_USER);
       user.setDisplayName("Joe Person");
       user.setActive(true);
       user.setPassword("password");
