@@ -17,6 +17,7 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.eln.NotebookEntryService;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,10 @@ public class NotebookPrivateController {
   @Autowired(required = false)
   private NotebookEntryService notebookEntryService;
 
+  @Autowired(required = false)
+  private NotebookFolderService notebookFolderService;
+
+  @Deprecated
   @GetMapping("/entrytemplate")
   public HttpEntity<List<NotebookTemplate>> findNotebookEntryTemplates() {
     if (notebookEntryService == null) {
@@ -50,6 +55,7 @@ public class NotebookPrivateController {
     return new ResponseEntity<>(templates, HttpStatus.OK);
   }
 
+  @Deprecated
   @GetMapping("/entrytemplate/{id}")
   public HttpEntity<NotebookTemplate> findNotebookEntryTemplateById(@PathVariable String id) {
     Optional<NotebookTemplate> optional = notebookEntryService.findEntryTemplateById(id);
@@ -59,5 +65,13 @@ public class NotebookPrivateController {
       LOGGER.warn("Could not find notebook entry template with id: " + id);
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+  }
+
+  @GetMapping("/project-folders")
+  public HttpEntity<?> findNotebookProjects() {
+    if (notebookFolderService == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(notebookFolderService.listNotebookProjectFolders(), HttpStatus.OK);
   }
 }
