@@ -148,7 +148,7 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .perform(
             post("/api/v1/program/")
                 .header("Authorization",
-                    "Bearer " + this.getTokenUtils().generateToken(user.getEmail()))
+                    "Bearer " + this.getTokenUtils().generateToken(user.getEmail()).getToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(dto)))
         .andExpect(status().isForbidden());

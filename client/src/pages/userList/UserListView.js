@@ -71,7 +71,7 @@ const UserListView = props => {
 
   useEffect(() => {
 
-    axios.get("/api/internal/user")
+    axios.get("/api/internal/user?type=STANDARD_USER")
     .then(async response => {
       indexUsers(response.data);
     })

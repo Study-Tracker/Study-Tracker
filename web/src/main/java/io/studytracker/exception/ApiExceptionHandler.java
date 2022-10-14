@@ -42,7 +42,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(UnauthorizedException.class)
-  public final ResponseEntity<ApiError> unauthroizedError(
+  public final ResponseEntity<ApiError> unauthorizedError(
       UnauthorizedException ex, WebRequest webRequest) {
     ex.printStackTrace();
     ApiError apiError = new ApiError(ex.getMessage(), webRequest.getDescription(false));
@@ -83,6 +83,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(DuplicateRecordException.class)
   public final ResponseEntity<ApiError> duplicateRecord(
+      DuplicateRecordException ex, WebRequest request) {
+    ex.printStackTrace();
+    ApiError apiError = new ApiError(ex.getMessage(), request.getDescription(false));
+    return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(InvalidRequestException.class)
+  public final ResponseEntity<ApiError> invalidRequest(
       DuplicateRecordException ex, WebRequest request) {
     ex.printStackTrace();
     ApiError apiError = new ApiError(ex.getMessage(), request.getDescription(false));

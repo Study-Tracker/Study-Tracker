@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.model;
 
-import lombok.Data;
-
-@Data
-public class ElasticsearchUserDocument {
-
-  private String displayName;
-  private String username;
-  private String email;
+public enum UserType {
+  STANDARD_USER,
+  API_USER,
+  SYSTEM_USER
 }

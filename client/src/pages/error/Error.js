@@ -80,7 +80,7 @@ const PageNotFound = () => {
           The requested resource could not be found or has been removed.
         </p>
         <a className="btn btn-lg btn-primary"
-           style={{paddingLeft: "50", paddingRight: "50"}} href="/Users/woemler/Code/Projects/Study-Tracker/client/src/pages">Home</a>
+           style={{paddingLeft: "50", paddingRight: "50"}} href="/">Home</a>
       </div>
   );
 };
@@ -94,7 +94,7 @@ const Unauthorized = () => {
           You do not have permission to access this page.
         </p>
         <a className="btn btn-lg btn-primary"
-           style={{paddingLeft: "50", paddingRight: "50"}} href="/Users/woemler/Code/Projects/Study-Tracker/client/src/pages">Home</a>
+           style={{paddingLeft: "50", paddingRight: "50"}} href="/">Home</a>
       </div>
   );
 };
@@ -111,7 +111,7 @@ const ServerError = () => {
           help desk.
         </p>
         <a className="btn btn-lg btn-primary"
-           style={{paddingLeft: "50", paddingRight: "50"}} href="/Users/woemler/Code/Projects/Study-Tracker/client/src/pages">Home</a>
+           style={{paddingLeft: "50", paddingRight: "50"}} href="/">Home</a>
       </div>
   );
 };

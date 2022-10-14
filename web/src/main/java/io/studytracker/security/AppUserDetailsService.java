@@ -38,7 +38,7 @@ public class AppUserDetailsService implements UserDetailsService, SAMLUserDetail
 
   @Override
   public AppUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userService.findByEmail(username).orElse(null);
+    User user = userService.findByUsername(username).orElse(null);
     if (user != null) {
       LOGGER.info("Loaded user details for username: {}", username);
       return new AppUserDetails(user, AuthMethod.DATABASE);
@@ -50,15 +50,15 @@ public class AppUserDetailsService implements UserDetailsService, SAMLUserDetail
 
   @Override
   public Object loadUserBySAML(SAMLCredential samlCredential) throws UsernameNotFoundException {
-    String email = samlCredential.getNameID().getValue();
-    Optional<User> optional = userService.findByEmail(email);
+    String username = samlCredential.getNameID().getValue();
+    Optional<User> optional = userService.findByUsername(username);
     if (optional.isPresent()) {
       User user = optional.get();
-      LOGGER.info("Loading user by SAMLCredentials: {}", email);
+      LOGGER.info("Loading user by SAMLCredentials: {}", username);
       return new AppUserDetails(user, AuthMethod.SAML);
     } else {
-      LOGGER.warn("Could not load user details for identifier: {}", email);
-      throw new UsernameNotFoundException(email);
+      LOGGER.warn("Could not load user details for identifier: {}", username);
+      throw new UsernameNotFoundException(username);
     }
   }
 

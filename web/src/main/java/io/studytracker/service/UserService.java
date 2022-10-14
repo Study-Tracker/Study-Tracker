@@ -19,8 +19,10 @@ package io.studytracker.service;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.PasswordResetToken;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.security.UserPasswordGenerator;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +47,10 @@ public class UserService {
 
   @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
+  @Autowired private PasswordEncoder passwordEncoder;
+
+  @Autowired private UserPasswordGenerator userPasswordGenerator;
+
   public Optional<User> findById(Long id) {
     return userRepository.findById(id);
   }
@@ -56,9 +63,17 @@ public class UserService {
     return userRepository.findAll(pageable);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Optional<User> findByEmail(String email) {
     return userRepository.findByEmail(email);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Optional<User> findByUsername(String username) {
+    return userRepository.findByUsername(username);
+  }
+
+  public List<User> findByType(UserType type) {
+    return userRepository.findByType(type);
   }
 
   public List<User> search(String keyword) {
@@ -173,4 +188,16 @@ public class UserService {
                 () -> new RecordNotFoundException("Cannot find password reset token: " + token));
     passwordResetTokenRepository.deleteById(passwordResetToken.getId());
   }
+
+  @Transactional
+  public String createUserPassword(User user) {
+    LOGGER.info("Creating new password for user: " + user.getUsername());
+    User u = userRepository.getById(user.getId());
+    String password = userPasswordGenerator.generatePassword(12);
+    u.setPassword(passwordEncoder.encode(password));
+    u.setCredentialsExpired(false);
+    userRepository.save(u);
+    return password;
+  }
+
 }

@@ -18,8 +18,11 @@ package io.studytracker.controller.api.internal.autocomplete;
 
 import io.studytracker.mapstruct.dto.response.UserSlimDto;
 import io.studytracker.mapstruct.mapper.UserMapper;
+import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.service.UserService;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +39,10 @@ public class UserAutocompleteController {
 
   @GetMapping("")
   public List<UserSlimDto> userSearch(@RequestParam("q") String keyword) {
-    return userMapper.toUserSlimList(userService.search(keyword));
+    List<User> users = userService.search(keyword).stream()
+        .filter(user -> user.getType().equals(UserType.STANDARD_USER))
+        .collect(Collectors.toList());
+    return userMapper.toUserSlimList(users);
   }
 
   @Autowired

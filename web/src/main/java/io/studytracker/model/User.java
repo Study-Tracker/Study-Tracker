@@ -27,6 +27,8 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,11 +56,18 @@ public class User implements Model {
   @Column(name = "display_name", nullable = false)
   private String displayName;
 
-  @Column(name = "email", unique = true, nullable = false)
+  @Column(name = "username", nullable = false, unique = true)
+  private String username;
+
+  @Column(name = "email", unique = true)
   private String email;
 
   @Column(name = "password")
   private String password;
+
+  @Column(name = "type", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private UserType type;
 
   @Column(name = "department")
   private String department;
@@ -116,6 +125,22 @@ public class User implements Model {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public UserType getType() {
+    return type;
+  }
+
+  public void setType(UserType type) {
+    this.type = type;
   }
 
   public String getDepartment() {

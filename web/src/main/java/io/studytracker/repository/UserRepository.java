@@ -17,6 +17,7 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,10 @@ import org.springframework.data.jpa.repository.Query;
 public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findByEmail(String email);
+
+  Optional<User> findByUsername(String username);
+
+  List<User> findByType(UserType type);
 
   @Query("select u from User u where lower(u.displayName) like lower(concat('%', ?1, '%'))")
   List<User> findByDisplayNameLike(String keyword);

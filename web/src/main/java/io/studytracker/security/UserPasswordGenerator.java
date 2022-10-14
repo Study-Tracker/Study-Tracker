@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserPasswordGenerator {
 
+  private static final int PASSWORD_LENGTH = 8;
+
   private final PasswordGenerator passwordGenerator = new PasswordGenerator();
 
   private CharacterRule[] getCharacterRules() {
@@ -52,6 +54,10 @@ public class UserPasswordGenerator {
   }
 
   public String generatePassword() {
-    return passwordGenerator.generatePassword(8, getCharacterRules());
+    return this.generatePassword(PASSWORD_LENGTH);
+  }
+
+  public String generatePassword(int length) {
+    return passwordGenerator.generatePassword(length, getCharacterRules());
   }
 }

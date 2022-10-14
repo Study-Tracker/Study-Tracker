@@ -18,6 +18,7 @@ package io.studytracker.test.repository;
 
 import io.studytracker.Application;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.UserRepository;
 import java.util.Collections;
@@ -57,6 +58,8 @@ public class UserRepositoryTests {
     User user = new User();
     user.setAdmin(false);
     user.setEmail("test@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setDisplayName("Joe Person");
     user.setActive(true);
     user.setPassword("password");

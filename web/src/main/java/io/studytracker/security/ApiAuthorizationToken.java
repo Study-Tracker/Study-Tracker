@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.security;
 
 import lombok.Data;
 
 @Data
-public class ElasticsearchUserDocument {
+public class ApiAuthorizationToken {
 
-  private String displayName;
-  private String username;
-  private String email;
+  private String token;
+  private Long createdAt;
+  private Long expiresAt;
+
 }
