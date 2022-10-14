@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added File Manager tool to the Study Tracker UI. This tool allows the browsing of storage locations registered within Study Tracker. Users can navigate & create folders, and upload & download files.
 - Added support for Amazon Web Services S3 storage locations. This allows users to store files in S3 buckets.
 - Added support for creating API users, which can be used exclusively for API access. This allows for easier management of integrations and removes the need to use a user's credentials for API access.
+- Admin users can now select existing Benchling projects to map new programs to.
 
 ### Changed
 

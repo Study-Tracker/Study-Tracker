@@ -19,67 +19,74 @@ import NoSidebarPageWrapper from "../../common/structure/NoSidebarPageWrapper";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import ProgramForm from "./ProgramForm";
-import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import {useParams} from "react-router-dom";
 
-const ProgramFormView = props => {
+const ProgramFormView = () => {
 
   const params = useParams();
+  const programId = params.programId || null;
   const user = useSelector(s => s.user.value);
   const features = useSelector(s => s.features.value);
-  const [state, setState] = useState({
-    programId: params.programId || null,
-    isLoaded: false,
-    isError: false,
-  });
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [programs, setPrograms] = useState(null);
+  const [error, setError] = useState(null);
+  const [elnProjects, setElnProjects] = useState(null);
   
   useEffect(() => {
 
     // Programs
     axios.get("/api/internal/program")
     .then(async response => {
+
       const programs = response.data;
-      if (!!state.programId) {
+      console.debug("Existing programs", programs);
+      setPrograms(programs);
 
-        const program = await axios.get("/api/internal/program/" + state.programId)
-        .then(response => response.data);
-        console.log(program);
-
-        setState(prevState => ({
-          ...prevState,
-          program: program,
-          programs: programs,
-          isLoaded: true
-        }));
-
-      } else {
-        setState(prevState => ({
-          ...prevState,
-          programs: programs,
-          isLoaded: true
-        }));
+      // Get the full record for the requested program
+      if (programId) {
+        const program = await axios.get("/api/internal/program/" + programId)
+          .then(response => response.data);
+        console.debug("Selected Program", program);
+        setSelectedProgram(program);
       }
+
+      if (features && features.notebook && features.notebook.isEnabled) {
+        const projects = await axios.get("/api/internal/eln/project-folders")
+          .then(response => {
+            return response.data.map(p => {
+              return {
+                name: p.name,
+                url: p.url,
+                folderId: p.referenceId
+              }
+            })
+          })
+          .catch(error => {
+            console.error("Error getting ELN programs", error);
+            setError(error);
+          });
+        setElnProjects(projects);
+      }
+
     }).catch(error => {
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
+      console.error("Error loading programs", error);
+      setError(error);
     });
 
-  }, []);
+  }, [programId, features]);
 
   let content = <LoadingMessage/>;
-  if (state.isError) {
+  if (error) {
     content = <ErrorMessage/>;
-  } else if (!!user && state.isLoaded) {
+  } else if (!!user && programs && (!programId || selectedProgram)) {
     content = <ProgramForm
-        program={state.program}
-        programs={state.programs}
+        program={selectedProgram}
+        programs={programs}
         user={user}
         features={features}
+        elnProjects={elnProjects}
     />;
   }
   return (
@@ -88,10 +95,6 @@ const ProgramFormView = props => {
       </NoSidebarPageWrapper>
   );
 
-}
-
-ProgramFormView.propTypes = {
-  features: PropTypes.object,
 }
 
 export default ProgramFormView;
