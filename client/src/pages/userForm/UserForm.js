@@ -66,7 +66,7 @@ const UserForm = props => {
         then: yup.string().test(
             "unique",
             "A user with this email is already registered.",
-            value => !props.users.find(u => !!value && u.email.toLowerCase() === value.toLowerCase())
+            value => !props.users.find(u => !!value && u.email && u.email.toLowerCase() === value.toLowerCase())
         )
       }),
     type: yup.string()

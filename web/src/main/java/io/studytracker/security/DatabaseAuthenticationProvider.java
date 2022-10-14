@@ -16,6 +16,7 @@
 
 package io.studytracker.security;
 
+import io.studytracker.egnyte.exception.UnauthorizedException;
 import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +48,27 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+
     String username = authentication.getPrincipal().toString();
     LOGGER.info("Attempting to authenticate user: " + username);
     AppUserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+    // Check user status
+    if (!userDetails.getUser().isActive() || !userDetails.isEnabled()) {
+      LOGGER.warn("User is not active: " + username);
+      throw new UnauthorizedException("User is not active: " + username);
+    } else if (!userDetails.isCredentialsNonExpired()) {
+      LOGGER.warn("User credentials have expired: " + username);
+      throw new UnauthorizedException("User credentials have expired: " + username);
+    } else if (!userDetails.isAccountNonLocked()) {
+      LOGGER.warn("User account is locked: " + username);
+      throw new UnauthorizedException("User account is locked: " + username);
+    } else if (!userDetails.isAccountNonExpired()) {
+      LOGGER.warn("User account has expired: " + username);
+      throw new UnauthorizedException("User account has expired: " + username);
+    }
+
+    // Check credentials
     String pw =
         authentication.getCredentials() == null ? null : authentication.getCredentials().toString();
     if (passwordEncoder.matches(pw, userDetails.getPassword())) {
@@ -60,6 +79,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
       LOGGER.warn("User failed to log in: {}", authentication.getPrincipal().toString());
       throw new BadCredentialsException("Bad password");
     }
+
   }
 
   @Override

@@ -18,6 +18,7 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractUserController;
 import io.studytracker.exception.InsufficientPrivilegesException;
+import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.UserFormDto;
 import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
@@ -26,8 +27,10 @@ import io.studytracker.mapstruct.dto.response.UserSummaryDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.model.PasswordResetToken;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.service.ActivityService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -58,8 +61,15 @@ public class UserPrivateController extends AbstractUserController {
 
 
   @GetMapping("")
-  public List<UserSummaryDto> getAllUsers() throws Exception {
-    return this.getUserMapper().toUserSummaryList(this.getUserService().findAll());
+  public List<UserSummaryDto> getAllUsers(
+      @RequestParam(name = "type", required = false) UserType userType
+  ) throws Exception {
+    if (userType != null) {
+      return this.getUserMapper().toUserSummaryList(this.getUserService().findByType(userType));
+    } else {
+      return this.getUserMapper().toUserSummaryList(this.getUserService().findAll());
+    }
+
   }
 
   @GetMapping("/{id}")
@@ -110,6 +120,28 @@ public class UserPrivateController extends AbstractUserController {
     PasswordResetToken token = this.getUserService().createPasswordResetToken(user);
     this.getEmailService().sendPasswordResetEmail(user.getEmail(), token.getToken());
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @PostMapping("/{id}/secret-reset")
+  public HttpEntity<Map<String, String>> resetApiUserSecret(@PathVariable("id") Long userId) {
+    User authenticatedUser = this.getAuthenticatedUser();
+    if (!authenticatedUser.isAdmin()) {
+      throw new InsufficientPrivilegesException(
+          "You do not have permission to perform this action.");
+    }
+
+    Optional<User> optional = this.getUserService().findById(userId);
+    if (!optional.isPresent()) {
+      throw new RecordNotFoundException("User not found: " + userId);
+    }
+    User user = optional.get();
+    if (!user.getType().equals(UserType.API_USER)) {
+      throw new InvalidRequestException("User is not an API user.");
+    }
+
+    LOGGER.info("Generating new secret token for user: " + user.getEmail());
+    String secret = this.getUserService().createUserPassword(user);
+    return ResponseEntity.ok().body(Map.of("secret", secret));
   }
 
   @GetMapping("/{id}/activity")

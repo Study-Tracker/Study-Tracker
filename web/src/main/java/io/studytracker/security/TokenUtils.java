@@ -36,20 +36,25 @@ public class TokenUtils {
   @Value("${jwt.expiration:1440}")
   private String tokenExpiration;
 
-  public String generateToken(String username) {
+  public ApiAuthorizationToken generateToken(String username) {
     Date now = new Date();
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(new Date());
     calendar.add(Calendar.MINUTE, Integer.parseInt(tokenExpiration));
     Date expiresAt = calendar.getTime();
 
-    return JWT.create()
+    String token = JWT.create()
         .withIssuer(ISSUER)
         .withSubject(SUBJECT)
         .withClaim("username", username)
         .withIssuedAt(now)
         .withExpiresAt(expiresAt)
         .sign(Algorithm.HMAC256(tokenSecret));
+    ApiAuthorizationToken authToken = new ApiAuthorizationToken();
+    authToken.setToken(token);
+    authToken.setCreatedAt(now.getTime());
+    authToken.setExpiresAt(expiresAt.getTime());
+    return authToken;
   }
 
   public String validateToken(String token) throws JWTVerificationException {

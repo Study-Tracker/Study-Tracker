@@ -42,7 +42,7 @@ public abstract class AbstractApiControllerTests {
           .findFirst()
           .get()
           .getEmail();
-      token = tokenUtils.generateToken(email);
+      token = tokenUtils.generateToken(email).getToken();
     }
   }
 

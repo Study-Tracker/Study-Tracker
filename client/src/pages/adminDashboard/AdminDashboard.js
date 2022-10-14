@@ -29,6 +29,7 @@ import AssayTypeSettings from "./AssayTypeSettings";
 import KeywordSettings from "./KeywordSettings";
 import ProgramSettings from "./ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
+import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
 
 const settings = {
   "users": {
@@ -60,6 +61,12 @@ const settings = {
     category: "developer",
     label: "API Documentation",
     onClick: () => window.open("/swagger-ui.html", "_blank")
+  },
+  "api-users": {
+    id: "api-users",
+    category: "developer",
+    label: "API Users",
+    tag: ApiUserSettings
   }
 };
 
@@ -67,7 +74,7 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 }
 
-const AdminDashboard = props => {
+const AdminDashboard = () => {
 
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(null);

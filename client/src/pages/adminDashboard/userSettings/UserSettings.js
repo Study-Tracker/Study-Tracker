@@ -15,7 +15,7 @@
  */
 
 import React, {useEffect} from "react";
-import {Button, Card} from 'react-bootstrap';
+import {Button, Card, Col, Row} from 'react-bootstrap';
 import {UserPlus} from 'react-feather';
 import {SettingsErrorMessage} from "../../../common/errors";
 import {SettingsLoadingMessage} from "../../../common/loading";
@@ -94,7 +94,11 @@ const UserSettings = () => {
           </Card.Header>
           <Card.Body>
 
-            {content}
+            <Row>
+              <Col>
+                {content}
+              </Col>
+            </Row>
 
             <UserDetailsModal
                 showModal={showModal}

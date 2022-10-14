@@ -40,7 +40,6 @@ Study Tracker version 0.7.0 is the first of several transitional updates that wi
 
 ### Removed
 - Removed the admin dashboard functionality for registering notebook entry templates.
-- Removed the `username` field from the user model. This field was not required and created some redundancy with email, which was the primary identifier for user accounts.
 
 ### Deprecated
 - The `NotebookEntryTemplate` model and associated classes have been deprecated and are no longer in active use. They will be removed in a future release, which will include a database migration script.

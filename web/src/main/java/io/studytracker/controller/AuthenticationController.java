@@ -23,6 +23,7 @@ import io.studytracker.exception.UnknownUserException;
 import io.studytracker.model.PasswordResetToken;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
+import io.studytracker.security.ApiAuthorizationToken;
 import io.studytracker.security.AppUserDetails;
 import io.studytracker.security.AuthCredentials;
 import io.studytracker.security.TokenUtils;
@@ -87,7 +88,7 @@ public class AuthenticationController {
   }
 
   @PostMapping("/auth/token")
-  public HttpEntity<?> generateAuthToken(@RequestBody AuthCredentials credentials) {
+  public HttpEntity<ApiAuthorizationToken> generateAuthToken(@RequestBody AuthCredentials credentials) {
     LOGGER.info("Processing token generation request for user: {}", credentials.getUsername());
     try {
       Authentication authentication =
@@ -99,13 +100,11 @@ public class AuthenticationController {
       } else {
         throw new UnauthorizedException("Unauthenticated");
       }
-      String token = tokenUtils.generateToken(credentials.getUsername());
-      Map<String, Object> payload = new LinkedHashMap<>();
-      payload.put("token", token);
-      return new ResponseEntity<>(payload, HttpStatus.OK);
+      ApiAuthorizationToken token = tokenUtils.generateToken(credentials.getUsername());
+      return new ResponseEntity<>(token, HttpStatus.OK);
     } catch (Exception e) {
       e.printStackTrace();
-      throw new UnauthorizedException("Invalid username or password");
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
   }
 
