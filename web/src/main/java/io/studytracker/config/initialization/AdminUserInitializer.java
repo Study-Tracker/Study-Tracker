@@ -17,6 +17,7 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.security.UserPasswordGenerator;
 import io.studytracker.service.UserService;
 import javax.annotation.PostConstruct;
@@ -64,8 +65,10 @@ public class AdminUserInitializer {
     user.setActive(true);
     user.setDisplayName("Study Tracker Admin");
     user.setEmail(email);
+    user.setUsername(email);
     user.setAdmin(true);
     user.setPassword(passwordEncoder.encode(password));
+    user.setType(UserType.STANDARD_USER);
     userService.create(user);
     LOGGER.info(
         String.format(

@@ -42,6 +42,7 @@ import io.studytracker.model.StudyCollection;
 import io.studytracker.model.StudyConclusions;
 import io.studytracker.model.TaskStatus;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTaskRepository;
@@ -305,6 +306,8 @@ public class ExampleDataGenerator {
     user.setPassword(encoder.encode("password"));
     user.setDisplayName("Joe Smith");
     user.setEmail("jsmith@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setTitle("Director");
     user.setAdmin(false);
     user.setDepartment("Biology");
@@ -314,6 +317,8 @@ public class ExampleDataGenerator {
     user.setPassword(encoder.encode("password"));
     user.setDisplayName("Ann Johnson");
     user.setEmail("ajohnson@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setTitle("Sr. Scientist");
     user.setAdmin(false);
     user.setDepartment("Biology");
@@ -323,6 +328,8 @@ public class ExampleDataGenerator {
     user.setPassword(encoder.encode("password"));
     user.setDisplayName("Rob Black");
     user.setEmail("rblack@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setTitle("IT Admin");
     user.setAdmin(true);
     user.setDepartment("IT");

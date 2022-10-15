@@ -14,14 +14,27 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.exception;
 
-import lombok.Data;
+public class InvalidRequestException extends StudyTrackerException{
 
-@Data
-public class ElasticsearchUserDocument {
+  public InvalidRequestException() {
+  }
 
-  private String displayName;
-  private String username;
-  private String email;
+  public InvalidRequestException(String message) {
+    super(message);
+  }
+
+  public InvalidRequestException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public InvalidRequestException(Throwable cause) {
+    super(cause);
+  }
+
+  public InvalidRequestException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 }

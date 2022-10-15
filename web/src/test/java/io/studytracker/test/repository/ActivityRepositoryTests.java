@@ -27,6 +27,7 @@ import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
@@ -79,6 +80,8 @@ public class ActivityRepositoryTests {
     user.setEmail("test@email.com");
     user.setDisplayName("Joe Person");
     user.setActive(true);
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setPassword("password");
     user.setAttributes(Collections.singletonMap("key", "value"));
     user.setTitle("Director");

@@ -70,11 +70,10 @@ const NavBar = props => {
               ) : (
                   <Navbar.Brand href={"/"}>
                     <img
-                        width="40"
                         height="30"
                         className="d-inline-block align-top"
                         alt="Study Tracker"
-                        src={"/static/images/logo-icon.png"}
+                        src={"/static/images/logo-wide.png"}
                     />
                   </Navbar.Brand>
               )

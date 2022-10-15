@@ -16,6 +16,7 @@
 
 package io.studytracker.mapstruct.dto.api;
 
+import io.studytracker.model.UserType;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +28,11 @@ public class UserPayloadDto {
 
   private Long id;
   private @NotBlank String displayName;
-  private @NotBlank String email;
+  private String email;
+  private @NotBlank String username;
   private String department;
   private String title;
+  private UserType type;
   private boolean admin = false;
   private Date createdAt;
   private Date updatedAt;

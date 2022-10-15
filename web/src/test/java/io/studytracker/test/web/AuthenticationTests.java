@@ -29,6 +29,7 @@ import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.UserRepository;
@@ -104,6 +105,8 @@ public class AuthenticationTests {
       user.setDisplayName(email);
       user.setActive(true);
       user.setEmail(email);
+      user.setUsername(email);
+      user.setType(UserType.STANDARD_USER);
       userRepository.save(user);
     }
   }

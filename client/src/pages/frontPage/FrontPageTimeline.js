@@ -25,6 +25,7 @@ import {
   WelcomeBack
 } from './timelineWidgets';
 import {ArrowLeft, ArrowRight} from "react-feather";
+import FrontPagePlaceholder from "./FrontPagePlaceholder";
 
 const FrontPageTimeline = ({
   activity,
@@ -87,48 +88,53 @@ const FrontPageTimeline = ({
           </Col>
 
           <Col lg={8}>
-            <Card>
-              <Card.Body>
-                <Row>
+            {
+              activity.length > 0 ? (
+                  <Card>
+                    <Card.Body>
+                      <Row>
 
-                  <Col xs={12}>
-                    <Timeline activity={activity}/>
-                  </Col>
+                        <Col xs={12}>
+                          <Timeline activity={activity}/>
+                        </Col>
 
-                  <Col xs={12}>
-                    <hr/>
-                  </Col>
+                        <Col xs={12}>
+                          <hr/>
+                        </Col>
 
-                  <Col xs="auto" className="d-none d-sm-block">
-                    {
-                      !!hasPreviousPage
-                          ? <a
-                              href={"/?size=" + pageSize + "&page=" + (pageNumber
-                                  - 1)} className="btn btn-primary">
-                            <ArrowLeft
-                                className="feather align-middle me-2"/> Previous
-                            Page
-                          </a>
-                          : ''
-                    }
-                  </Col>
+                        <Col xs="auto" className="d-none d-sm-block">
+                          {
+                            !!hasPreviousPage
+                                ? <a
+                                    href={"/?size=" + pageSize + "&page=" + (pageNumber
+                                        - 1)} className="btn btn-primary">
+                                  <ArrowLeft
+                                      className="feather align-middle me-2"/> Previous
+                                  Page
+                                </a>
+                                : ''
+                          }
+                        </Col>
 
-                  <Col xs="auto" className="ms-auto text-end mt-n1">
-                    {
-                      !!hasNextPage
-                          ? <a
-                              href={"/?size=" + pageSize + "&page=" + (pageNumber
-                                  + 1)} className="btn btn-primary float-end">
-                            Next Page <ArrowRight
-                              className="feather align-middle me-2"/>
-                          </a>
-                          : ''
-                    }
-                  </Col>
+                        <Col xs="auto" className="ms-auto text-end mt-n1">
+                          {
+                            !!hasNextPage
+                                ? <a
+                                    href={"/?size=" + pageSize + "&page=" + (pageNumber
+                                        + 1)} className="btn btn-primary float-end">
+                                  Next Page <ArrowRight
+                                    className="feather align-middle me-2"/>
+                                </a>
+                                : ''
+                          }
+                        </Col>
 
-                </Row>
-              </Card.Body>
-            </Card>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+              ) : <FrontPagePlaceholder isAdmin={user.admin}/>
+            }
+
           </Col>
 
         </Row>

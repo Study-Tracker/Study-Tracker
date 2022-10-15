@@ -21,6 +21,7 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.PasswordResetToken;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.service.UserService;
@@ -81,6 +82,8 @@ public class UserServiceTests {
     user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Person");
     user.setEmail("jperson@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setTitle("Director");
     user.setAdmin(false);
     user.setDepartment("Chemistry");
@@ -115,6 +118,8 @@ public class UserServiceTests {
     user.setPassword(new BCryptPasswordEncoder().encode("test"));
     user.setDisplayName("Joe Smith");
     user.setEmail("jsmith@email.com");
+    user.setUsername(user.getEmail());
+    user.setType(UserType.STANDARD_USER);
     user.setTitle("Director");
     user.setAdmin(false);
     user.setDepartment("Biology");

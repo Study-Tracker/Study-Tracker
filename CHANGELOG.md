@@ -13,9 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added File Manager tool to the Study Tracker UI. This tool allows the browsing of storage locations registered within Study Tracker. Users can navigate & create folders, and upload & download files.
 - Added support for Amazon Web Services S3 storage locations. This allows users to store files in S3 buckets.
+- Added support for creating API users, which can be used exclusively for API access. This allows for easier management of integrations and removes the need to use a user's credentials for API access.
 - Admin users can now select existing Benchling projects to map new programs to.
 
 ### Changed
+- Changed the signature of the JWT created and returned to authenticated users to include creation and expiration times.
 
 ### Fixed
 - Fixed validation of Quill input fields to prevent empty inputs.
@@ -40,7 +42,6 @@ Study Tracker version 0.7.0 is the first of several transitional updates that wi
 
 ### Removed
 - Removed the admin dashboard functionality for registering notebook entry templates.
-- Removed the `username` field from the user model. This field was not required and created some redundancy with email, which was the primary identifier for user accounts.
 
 ### Deprecated
 - The `NotebookEntryTemplate` model and associated classes have been deprecated and are no longer in active use. They will be removed in a future release, which will include a database migration script.
