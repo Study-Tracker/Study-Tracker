@@ -15,7 +15,7 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Alert, Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import {FormGroup} from "./common";
 import Select from "react-select";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -141,227 +141,228 @@ const CollaboratorInputs = ({
   }
 
   return (
-      <Row>
-
-        <Col sm={12}>
-          <h5 className="card-title">
-            CRO/External Collaborator
-          </h5>
+      <Card>
+        <Card.Header>
+          <Card.Title>CRO/External Collaborator</Card.Title>
           <h6 className="card-subtitle text-muted">Studies being performed
             externally should be assigned a collaborator and external study
             code. Select from a list of registered collaborators or add a new
             one. If no external study code is provided, one will be
             automatically generated using the 'organization code' as a prefix.
           </h6>
-          <br/>
-        </Col>
-
-        <Col sm={12}>
-          <FormGroup>
-            <Form.Check
-                id="cro-check"
-                type="checkbox"
-                label="Is this study being performed externally?"
-                onChange={() => handleShowInputs()}
-                defaultChecked={isExternalStudy}
-            />
-          </FormGroup>
-        </Col>
-
-        <Col sm={12} id="cro-input-container"
-             style={{
-               display: isExternalStudy ? "block" : "none",
-               zIndex: 1000
-             }}
-             className={isExternalStudy ? "animated fadein" : ""}
-        >
-
+        </Card.Header>
+        <Card.Body>
           <Row>
 
-            <Col sm={6}>
+            <Col sm={12}>
               <FormGroup>
-                <Form.Label>External Study Code</Form.Label>
-                <Form.Control
-                    type="text"
-                    defaultValue={code}
-                    onChange={handleExternalCodeChange}
-                    placeholder={"eg. EX-01234"}
+                <Form.Check
+                    id="cro-check"
+                    type="switch"
+                    label="Is this study being performed externally?"
+                    onChange={() => handleShowInputs()}
+                    defaultChecked={isExternalStudy}
                 />
-                <Form.Text>If the CRO provided their own study code, enter it
-                  here.</Form.Text>
               </FormGroup>
             </Col>
 
-          </Row>
+            <Col sm={12} id="cro-input-container"
+                 style={{
+                   display: isExternalStudy ? "block" : "none",
+                   zIndex: 1000
+                 }}
+                 className={isExternalStudy ? "animated fadein" : ""}
+            >
 
-          <Row>
+              <Row>
 
-            <Col sm={6}>
+                <Col sm={6}>
+                  <FormGroup>
+                    <Form.Label>External Study Code</Form.Label>
+                    <Form.Control
+                        type="text"
+                        defaultValue={code}
+                        onChange={handleExternalCodeChange}
+                        placeholder={"eg. EX-01234"}
+                    />
+                    <Form.Text>If the CRO provided their own study code, enter it
+                      here.</Form.Text>
+                  </FormGroup>
+                </Col>
 
-              <FormGroup>
-                <Form.Label>Registered Organizations</Form.Label>
-                <Select
-                    className="react-select-container"
-                    classNamePrefix="react-select"
-                    options={collaborators}
-                    onChange={handleCollaboratorSelect}
-                    defaultValue={selectedCollaborator}
-                />
-              </FormGroup>
+              </Row>
+
+              <Row>
+
+                <Col sm={6}>
+
+                  <FormGroup>
+                    <Form.Label>Registered Organizations</Form.Label>
+                    <Select
+                        className="react-select-container"
+                        classNamePrefix="react-select"
+                        options={collaborators}
+                        onChange={handleCollaboratorSelect}
+                        defaultValue={selectedCollaborator}
+                    />
+                  </FormGroup>
+
+                </Col>
+
+                <Col sm={6}>
+
+                  <div style={{marginTop: "2em"}}>
+                    <Button variant={"primary"}
+                            onClick={() => showModal(true)}>
+                      <FontAwesomeIcon icon={faPlusCircle}/> Add New Organization
+                    </Button>
+                  </div>
+
+                </Col>
+
+              </Row>
 
             </Col>
 
-            <Col sm={6}>
+            <Modal
+                show={modalState.isOpen}
+                onHide={() => showModal(false)}
+                size={"lg"}
+            >
 
-              <div style={{marginTop: "2em"}}>
-                <Button variant={"primary"}
-                        onClick={() => showModal(true)}>
-                  <FontAwesomeIcon icon={faPlusCircle}/> Add New Organization
+              <Modal.Header closeButton>
+                Add New Organization
+              </Modal.Header>
+
+              <Modal.Body className="m-3">
+
+                <Row>
+
+                  <Col sm={12}>
+                    <p>
+                      Please provide a unique label to identify the organization
+                      in the study form. The 'organization code' should be a short
+                      alphanumeric prefix, used for generating external study
+                      codes.
+                      For example, Wuxi could have a code of 'WX', which would
+                      produce studies with codes like 'WX-01234'. Multiple
+                      organizations can share the same organization code.
+                    </p>
+                  </Col>
+
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Form.Label>Label *</Form.Label>
+                      <Form.Control
+                          type="text"
+                          defaultValue={newCollaborator.label}
+                          onChange={(e) => handleNewCollaboratorChange({
+                            label: e.target.value
+                          })}
+                      />
+                    </FormGroup>
+                  </Col>
+
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Form.Label>Organization Code *</Form.Label>
+                      <Form.Control
+                          type="text"
+                          defaultValue={newCollaborator.code}
+                          onChange={(e) => handleNewCollaboratorChange({
+                            code: e.target.value
+                          })}
+                      />
+                    </FormGroup>
+                  </Col>
+
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Form.Label>Organization Name *</Form.Label>
+                      <Form.Control
+                          type="text"
+                          defaultValue={newCollaborator.organizationName}
+                          onChange={(e) => handleNewCollaboratorChange({
+                            organizationName: e.target.value
+                          })}
+                      />
+                    </FormGroup>
+                  </Col>
+
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Form.Label>Organization Location</Form.Label>
+                      <Form.Control
+                          type="text"
+                          defaultValue={newCollaborator.organizationLocation}
+                          onChange={(e) => handleNewCollaboratorChange({
+                            organizationLocation: e.target.value
+                          })}
+                      />
+                    </FormGroup>
+                  </Col>
+
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Form.Label>Contact Person</Form.Label>
+                      <Form.Control
+                          type="text"
+                          defaultValue={newCollaborator.contactPersonName}
+                          onChange={(e) => handleNewCollaboratorChange({
+                            contactPersonName: e.target.value
+                          })}
+                      />
+                    </FormGroup>
+                  </Col>
+
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Form.Label>Contact Email</Form.Label>
+                      <Form.Control
+                          type="text"
+                          defaultValue={newCollaborator.contactEmail}
+                          onChange={(e) => handleNewCollaboratorChange({
+                            contactEmail: e.target.value
+                          })}
+                      />
+                    </FormGroup>
+                  </Col>
+
+                </Row>
+                {
+                  !!modalState.error
+                      ? (
+                          <Row>
+                            <Col sm={12}>
+                              <Alert variant={"warning"}>
+                                <div className="alert-message">
+                                  {modalState.error}
+                                </div>
+                              </Alert>
+                            </Col>
+                          </Row>
+                      ) : ''
+                }
+
+              </Modal.Body>
+
+              <Modal.Footer>
+                <Button variant={"secondary"}
+                        onClick={() => showModal(false)}>
+                  Cancel
                 </Button>
-              </div>
+                <Button variant={"primary"}
+                        onClick={handleNewCollaboratorSubmit}>
+                  Save
+                </Button>
+              </Modal.Footer>
 
-            </Col>
+            </Modal>
 
           </Row>
+        </Card.Body>
+      </Card>
 
-        </Col>
-
-        <Modal
-            show={modalState.isOpen}
-            onHide={() => showModal(false)}
-            size={"lg"}
-        >
-
-          <Modal.Header closeButton>
-            Add New Organization
-          </Modal.Header>
-
-          <Modal.Body className="m-3">
-
-            <Row>
-
-              <Col sm={12}>
-                <p>
-                  Please provide a unique label to identify the organization
-                  in the study form. The 'organization code' should be a short
-                  alphanumeric prefix, used for generating external study
-                  codes.
-                  For example, Wuxi could have a code of 'WX', which would
-                  produce studies with codes like 'WX-01234'. Multiple
-                  organizations can share the same organization code.
-                </p>
-              </Col>
-
-              <Col sm={6}>
-                <FormGroup>
-                  <Form.Label>Label *</Form.Label>
-                  <Form.Control
-                      type="text"
-                      defaultValue={newCollaborator.label}
-                      onChange={(e) => handleNewCollaboratorChange({
-                        label: e.target.value
-                      })}
-                  />
-                </FormGroup>
-              </Col>
-
-              <Col sm={6}>
-                <FormGroup>
-                  <Form.Label>Organization Code *</Form.Label>
-                  <Form.Control
-                      type="text"
-                      defaultValue={newCollaborator.code}
-                      onChange={(e) => handleNewCollaboratorChange({
-                        code: e.target.value
-                      })}
-                  />
-                </FormGroup>
-              </Col>
-
-              <Col sm={6}>
-                <FormGroup>
-                  <Form.Label>Organization Name *</Form.Label>
-                  <Form.Control
-                      type="text"
-                      defaultValue={newCollaborator.organizationName}
-                      onChange={(e) => handleNewCollaboratorChange({
-                        organizationName: e.target.value
-                      })}
-                  />
-                </FormGroup>
-              </Col>
-
-              <Col sm={6}>
-                <FormGroup>
-                  <Form.Label>Organization Location</Form.Label>
-                  <Form.Control
-                      type="text"
-                      defaultValue={newCollaborator.organizationLocation}
-                      onChange={(e) => handleNewCollaboratorChange({
-                        organizationLocation: e.target.value
-                      })}
-                  />
-                </FormGroup>
-              </Col>
-
-              <Col sm={6}>
-                <FormGroup>
-                  <Form.Label>Contact Person</Form.Label>
-                  <Form.Control
-                      type="text"
-                      defaultValue={newCollaborator.contactPersonName}
-                      onChange={(e) => handleNewCollaboratorChange({
-                        contactPersonName: e.target.value
-                      })}
-                  />
-                </FormGroup>
-              </Col>
-
-              <Col sm={6}>
-                <FormGroup>
-                  <Form.Label>Contact Email</Form.Label>
-                  <Form.Control
-                      type="text"
-                      defaultValue={newCollaborator.contactEmail}
-                      onChange={(e) => handleNewCollaboratorChange({
-                        contactEmail: e.target.value
-                      })}
-                  />
-                </FormGroup>
-              </Col>
-
-            </Row>
-            {
-              !!modalState.error
-                  ? (
-                      <Row>
-                        <Col sm={12}>
-                          <Alert variant={"warning"}>
-                            <div className="alert-message">
-                              {modalState.error}
-                            </div>
-                          </Alert>
-                        </Col>
-                      </Row>
-                  ) : ''
-            }
-
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button variant={"secondary"}
-                    onClick={() => showModal(false)}>
-              Cancel
-            </Button>
-            <Button variant={"primary"}
-                    onClick={handleNewCollaboratorSubmit}>
-              Save
-            </Button>
-          </Modal.Footer>
-
-        </Modal>
-
-      </Row>
   );
 
 }
