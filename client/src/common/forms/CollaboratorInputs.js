@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Alert, Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import {FormGroup} from "./common";
 import Select from "react-select";
@@ -22,6 +22,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import PropTypes from "prop-types";
+import {CSSTransition} from "react-transition-group";
 
 const CollaboratorInputs = ({
   isExternalStudy,
@@ -30,9 +31,9 @@ const CollaboratorInputs = ({
   onChange
 }) => {
 
+  const externalStudyNodeRef = useRef(null);
   const [collaborators, setCollaborators] = useState([]);
   const [modalState, setModalState] = useState({isOpen:false});
-  // const [isVisible, setIsVisible] = useState(isExternalStudy);
   const [code, setCode] = useState(externalCode);
   const [selectedCollaborator, setSelectedCollaborator] = useState(collaborator);
   const newCollaboratorDefaults = {
@@ -66,7 +67,6 @@ const CollaboratorInputs = ({
 
   const handleShowInputs = () => {
     const visible = !isExternalStudy;
-    // setIsVisible(visible);
     if (!selectedCollaborator) {
       onChange("collaborator", !!visible ? -1 : null);
     }
@@ -141,20 +141,21 @@ const CollaboratorInputs = ({
   }
 
   return (
-      <Card>
-        <Card.Header>
-          <Card.Title>CRO/External Collaborator</Card.Title>
-          <h6 className="card-subtitle text-muted">Studies being performed
-            externally should be assigned a collaborator and external study
-            code. Select from a list of registered collaborators or add a new
-            one. If no external study code is provided, one will be
-            automatically generated using the 'organization code' as a prefix.
-          </h6>
-        </Card.Header>
+      <Card className={"form-card " + (isExternalStudy ? "" : "illustration")}>
         <Card.Body>
           <Row>
 
             <Col sm={12}>
+              <h5 className={"card-title"}>CRO/External Collaborator</h5>
+              <h6 className="card-subtitle text-muted">Studies being performed
+                externally should be assigned a collaborator and external study
+                code. Select from a list of registered collaborators or add a new
+                one. If no external study code is provided, one will be
+                automatically generated using the 'organization code' as a prefix.
+              </h6>
+            </Col>
+
+            <Col sm={12} className={"feature-toggle"}>
               <FormGroup>
                 <Form.Check
                     id="cro-check"
@@ -166,63 +167,70 @@ const CollaboratorInputs = ({
               </FormGroup>
             </Col>
 
-            <Col sm={12} id="cro-input-container"
-                 style={{
-                   display: isExternalStudy ? "block" : "none",
-                   zIndex: 1000
-                 }}
-                 className={isExternalStudy ? "animated fadein" : ""}
+            <CSSTransition
+              nodeRef={externalStudyNodeRef}
+              in={isExternalStudy}
+              timeout={300}
+              classNames={"slide-in-down"}
             >
 
-              <Row>
+              <Col
+                  sm={12}
+                  className={"slide-in-down-enter"}
+                  ref={externalStudyNodeRef}
+              >
 
-                <Col sm={6}>
-                  <FormGroup>
-                    <Form.Label>External Study Code</Form.Label>
-                    <Form.Control
-                        type="text"
-                        defaultValue={code}
-                        onChange={handleExternalCodeChange}
-                        placeholder={"eg. EX-01234"}
-                    />
-                    <Form.Text>If the CRO provided their own study code, enter it
-                      here.</Form.Text>
-                  </FormGroup>
-                </Col>
+                <Row>
 
-              </Row>
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Form.Label>External Study Code</Form.Label>
+                      <Form.Control
+                          type="text"
+                          defaultValue={code}
+                          onChange={handleExternalCodeChange}
+                          placeholder={"eg. EX-01234"}
+                      />
+                      <Form.Text>If the CRO provided their own study code, enter it
+                        here.</Form.Text>
+                    </FormGroup>
+                  </Col>
 
-              <Row>
+                </Row>
 
-                <Col sm={6}>
+                <Row>
 
-                  <FormGroup>
-                    <Form.Label>Registered Organizations</Form.Label>
-                    <Select
-                        className="react-select-container"
-                        classNamePrefix="react-select"
-                        options={collaborators}
-                        onChange={handleCollaboratorSelect}
-                        defaultValue={selectedCollaborator}
-                    />
-                  </FormGroup>
+                  <Col sm={6}>
 
-                </Col>
+                    <FormGroup>
+                      <Form.Label>Registered Organizations</Form.Label>
+                      <Select
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          options={collaborators}
+                          onChange={handleCollaboratorSelect}
+                          defaultValue={selectedCollaborator}
+                      />
+                    </FormGroup>
 
-                <Col sm={6}>
+                  </Col>
 
-                  <div style={{marginTop: "2em"}}>
-                    <Button variant={"primary"}
-                            onClick={() => showModal(true)}>
-                      <FontAwesomeIcon icon={faPlusCircle}/> Add New Organization
-                    </Button>
-                  </div>
+                  <Col sm={6}>
 
-                </Col>
+                    <div style={{marginTop: "2em"}}>
+                      <Button variant={"primary"}
+                              onClick={() => showModal(true)}>
+                        <FontAwesomeIcon icon={faPlusCircle}/> Add New Organization
+                      </Button>
+                    </div>
 
-              </Row>
+                  </Col>
 
-            </Col>
+                </Row>
+
+              </Col>
+
+            </CSSTransition>
 
             <Modal
                 show={modalState.isOpen}

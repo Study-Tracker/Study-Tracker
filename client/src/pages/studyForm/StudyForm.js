@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useRef} from "react";
+import React, {useRef, useState} from "react";
 import {ProgramDropdown} from "../../common/forms/programs";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -23,14 +23,12 @@ import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {StatusDropdown} from "../../common/forms/status";
 import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
-import swal from 'sweetalert';
+import Swal from "sweetalert2";
 import KeywordInputs from "../../common/forms/KeywordInputs";
 import CollaboratorInputs from "../../common/forms/CollaboratorInputs";
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../../common/loading";
 import {Breadcrumbs} from "../../common/common";
-import NotebookEntryTemplatesDropdown
-  from "../../common/forms/NotebookEntryTemplateDropdown";
 import {useNavigate} from "react-router-dom";
 import {Form as FormikForm, Formik} from "formik";
 import FormikFormErrorNotification
@@ -39,14 +37,22 @@ import * as yup from "yup";
 import axios from "axios";
 import PropTypes from "prop-types";
 import {CSSTransition} from "react-transition-group";
+import NotebookInputs from "../../common/forms/NotebookInputs";
+import GitInputs from "../../common/forms/GitInputs";
 
-const StudyForm = props => {
+const StudyForm = ({
+    study,
+    user,
+    programs,
+    keywordCategories,
+    features
+}) => {
 
   const navigate = useNavigate();
-  console.debug("Props", props);
-
   const legacyNodeRef = useRef(null);
-  const [showLegacyControls, setShowLegacyControls] = React.useState(props.study ? props.study.legacy : false);
+  const [showLegacyControls, setShowLegacyControls] = useState(study ? study.legacy : false);
+  const [showExternalStudyControls, setShowExternalStudyControls] = useState(study ? study.external : false);
+  const [showNotebookControls, setShowNotebookControls] = useState(!study);
 
   const defaultStudyValues = {
     name: '',
@@ -59,13 +65,14 @@ const StudyForm = props => {
     endDate: null,
     collaborator: null,
     users: [{
-      ...props.user,
+      ...user,
       owner: true
     }],
-    owner: props.user,
+    owner: user,
     notebookFolder: {},
-    notebookTemplateId: !!props.defaultNotebookTemplate
-        ? props.defaultNotebookTemplate.templateId : null
+    notebookTemplateId: null,
+    useNotebook: true,
+    useGit: false
   };
 
   const studySchema = yup.object().shape({
@@ -108,22 +115,6 @@ const StudyForm = props => {
       }),
   });
 
-  /**
-   * Handles toggling display of legacy study container when checkbox is checked.
-   */
-  // const handleLegacyToggle = (e) => {
-  //   const container = document.getElementById("legacy-input-container");
-  //   if (e.target.checked) {
-  //     container.style.display = "block";
-  //     container.classList.add("animated");
-  //     container.classList.add("fadeIn");
-  //   } else {
-  //     container.classList.remove("fadeIn");
-  //     container.classList.remove("animated");
-  //     container.style.display = "none";
-  //   }
-  // }
-
   const submitForm = (values, {setSubmitting}) => {
 
     const isUpdate = !!values.id;
@@ -148,7 +139,7 @@ const StudyForm = props => {
         navigate("/study/" + json.code);
       } else {
         setSubmitting(false);
-        swal("Something went wrong",
+        Swal.fire("Something went wrong",
             !!json.message
                 ? "Error: " + json.message :
                 "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
@@ -158,7 +149,7 @@ const StudyForm = props => {
 
     }).catch(e => {
       setSubmitting(false);
-      swal(
+      Swal.fire(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
       );
@@ -168,14 +159,14 @@ const StudyForm = props => {
   }
 
   const handleCancel = () => {
-    swal({
+    Swal.fire({
       title: "Are you sure you want to leave the page?",
       text: "Any unsaved work will be lost.",
       icon: "warning",
-      buttons: true
+      showCancelButton: true
     })
-    .then(val => {
-      if (val) {
+    .then(result => {
+      if (result.isConfirmed) {
         navigate("/");
       }
     });
@@ -184,10 +175,10 @@ const StudyForm = props => {
   return (
 
     <Formik
-        initialValues={props.study
+        initialValues={study
             ? {
-                ...props.study,
-                lastModifiedBy: props.user
+                ...study,
+                lastModifiedBy: user
             } : defaultStudyValues
         }
         onSubmit={submitForm}
@@ -217,13 +208,13 @@ const StudyForm = props => {
               <Row>
                 <Col>
                   {
-                    !!props.study
+                    !!study
                         ? (
                             <Breadcrumbs crumbs={[
                               {label: "Home", url: "/"},
                               {
                                 label: "Study Detail",
-                                url: "/study/" + props.study.code
+                                url: "/study/" + study.code
                               },
                               {label: "Edit Study"}
                             ]}/>
@@ -240,7 +231,7 @@ const StudyForm = props => {
 
               <Row className="justify-content-end align-items-center">
                 <Col>
-                  <h3>{!!props.study ? "Edit Study" : "New Study"}</h3>
+                  <h3>{!!study ? "Edit Study" : "New Study"}</h3>
                 </Col>
               </Row>
 
@@ -275,7 +266,7 @@ const StudyForm = props => {
                                   isInvalid={!!errors.name}
                                   value={values.name}
                                   onChange={handleChange}
-                                  disabled={!!props.study}
+                                  disabled={!!study}
                               />
                               <Form.Control.Feedback type={"invalid"}>
                                 {errors.name}
@@ -286,12 +277,12 @@ const StudyForm = props => {
 
                           <Col md={5}>
                             <ProgramDropdown
-                                programs={props.programs}
+                                programs={programs}
                                 selectedProgram={!!values.program
                                     ? values.program.id : -1}
                                 onChange={(value) => setFieldValue("program", value)}
                                 isInvalid={!!errors.program}
-                                disabled={!!props.study}
+                                disabled={!!study}
                                 isLegacyStudy={values.legacy}
                             />
                           </Col>
@@ -323,21 +314,21 @@ const StudyForm = props => {
                                 onChange={(value) => setFieldValue("status", value)}
                             />
 
-                            {
-                              !values.id
-                              && props.features
-                              && props.features.notebook
-                              && props.features.notebook.isEnabled ? (
-                                  <NotebookEntryTemplatesDropdown
-                                      onChange={selectedItem =>
-                                          setFieldValue(
-                                              "notebookTemplateId",
-                                              selectedItem || ''
-                                          )
-                                      }
-                                  />
-                              ) : ''
-                            }
+                            {/*{*/}
+                            {/*  !values.id*/}
+                            {/*  && features*/}
+                            {/*  && features.notebook*/}
+                            {/*  && features.notebook.isEnabled ? (*/}
+                            {/*      <NotebookEntryTemplatesDropdown*/}
+                            {/*          onChange={selectedItem =>*/}
+                            {/*              setFieldValue(*/}
+                            {/*                  "notebookTemplateId",*/}
+                            {/*                  selectedItem || ''*/}
+                            {/*              )*/}
+                            {/*          }*/}
+                            {/*      />*/}
+                            {/*  ) : ''*/}
+                            {/*}*/}
 
                             <FormGroup>
                               <Form.Label>Start Date *</Form.Label>
@@ -392,7 +383,7 @@ const StudyForm = props => {
                     !!values.id && !values.legacy
                         ? ""
                         : (
-                            <Card className={values.legacy ? "" : "illustration"}>
+                            <Card className={"form-card " + (values.legacy ? "" : "illustration")}>
 
                               <Card.Body>
                               <Row>
@@ -407,21 +398,23 @@ const StudyForm = props => {
                                     specify certain attributes that would otherwise be
                                     automatically generated.
                                   </h6>
-                                  <br/>
+
+                                </Col>
+
+                                <Col md={12} className={"feature-toggle"}>
 
                                   <FormGroup>
                                     <Form.Check
                                         id="legacy-check"
                                         type="switch"
                                         label="Is this a legacy study?"
-                                        style={{fontSize: "larger"}}
                                         onChange={e => {
                                           const bool = e.target.checked;
                                           setShowLegacyControls(bool);
                                           setFieldValue("legacy", bool);
                                         }}
-                                        disabled={!!props.study}
-                                        defaultChecked={!!props.study
+                                        disabled={!!study}
+                                        defaultChecked={!!study
                                             && !!values.legacy}
                                     />
                                   </FormGroup>
@@ -434,14 +427,10 @@ const StudyForm = props => {
                                     classNames={"slide-in-down"}
                                 >
 
-                                    <Col md={12} ref={legacyNodeRef} className={"slide-in-down-enter"}
-                                         // id="legacy-input-container"
-                                         // style={{
-                                         //   display: !!props.study
-                                         //    && !!values.legacy
-                                         //       ? "block"
-                                         //       : "none"
-                                         // }}
+                                    <Col
+                                        md={12}
+                                        ref={legacyNodeRef}
+                                        className={"slide-in-down-enter"}
                                     >
 
                                       <Row>
@@ -452,7 +441,7 @@ const StudyForm = props => {
                                             <Form.Control
                                                 type="text"
                                                 isInvalid={!!errors.code}
-                                                disabled={!!props.study}
+                                                disabled={!!study}
                                                 name={"code"}
                                                 value={values.code}
                                                 onChange={handleChange}
@@ -473,7 +462,7 @@ const StudyForm = props => {
                                             <Form.Control
                                                 type="text"
                                                 name={"notebookFolder.url"}
-                                                disabled={!!props.study}
+                                                disabled={!!study}
                                                 value={values.notebookFolder.url}
                                                 onChange={handleChange}
                                             />
@@ -497,7 +486,6 @@ const StudyForm = props => {
                         )
                   }
 
-
                   {/*CRO*/}
                   <CollaboratorInputs
                       isExternalStudy={values.external}
@@ -505,6 +493,32 @@ const StudyForm = props => {
                       externalCode={values.externalCode}
                       onChange={(key, value) => setFieldValue(key, value)}
                   />
+
+                  {/*Notebook*/}
+                  {
+                    !values.id
+                    && features
+                    && features.notebook
+                    && features.notebook.isEnabled ? (
+                        <NotebookInputs
+                          isActive={values.useNotebook}
+                          selectedProgram={values.program}
+                          onChange={(key, value) => setFieldValue(key, value)}
+                        />
+                    ) : ''
+                  }
+
+                  {/*Git*/}
+                  {
+                    !values.id ? (
+                        <GitInputs
+                            onChange={(key, value) => setFieldValue(key, value)}
+                            isActive={values.useGit}
+                            selectedProgram={values.program}
+                        />
+                    ) : ''
+
+                  }
 
                   {/*Study Team*/}
                   <Card>
@@ -549,7 +563,7 @@ const StudyForm = props => {
                         <Col md={12}>
                           <KeywordInputs
                               keywords={values.keywords || []}
-                              keywordCategories={props.keywordCategories}
+                              keywordCategories={keywordCategories}
                               onChange={(value) => setFieldValue("keywords", value)}
                           />
                         </Col>
@@ -603,7 +617,6 @@ StudyForm.propTypes = {
   study: PropTypes.object.isRequired,
   programs: PropTypes.array.isRequired,
   keywordCategories: PropTypes.array.isRequired,
-  externalContacts: PropTypes.array.isRequired,
   user: PropTypes.object,
   features: PropTypes.object,
 }

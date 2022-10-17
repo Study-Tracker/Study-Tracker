@@ -23,14 +23,13 @@ import {useSelector} from "react-redux";
 import axios from "axios";
 import {useParams} from "react-router-dom";
 
-const StudyFormView = props => {
+const StudyFormView = () => {
 
   const params = useParams();
   const [state, setState] = useState({
     studyCode: params.studyCode || null,
     studyLoaded: false,
     programsLoaded: false,
-    collaboratorsLoaded: false,
     keywordCategoriesLoaded: false,
     isError: false,
   });
@@ -46,22 +45,6 @@ const StudyFormView = props => {
         ...prevState,
         programs: response.data,
         programsLoaded: true
-      }));
-    }).catch(error => {
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
-
-    // Contacts
-    axios.get("/api/internal/collaborator")
-    .then(response => {
-      setState(prevState => ({
-        ...prevState,
-        collaborators: response.data,
-        collaboratorsLoaded: true
       }));
     }).catch(error => {
       setState(prevState => ({
@@ -129,13 +112,11 @@ const StudyFormView = props => {
       !!user
       && state.studyLoaded
       && state.programsLoaded
-      && state.collaboratorsLoaded
       && state.keywordCategoriesLoaded
   ) {
     content = <StudyForm
         study={state.study}
         programs={state.programs}
-        externalContacts={state.collaborators}
         keywordCategories={state.keywordCategories}
         user={user}
         features={features}

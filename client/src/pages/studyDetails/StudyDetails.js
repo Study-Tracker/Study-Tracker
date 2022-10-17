@@ -60,7 +60,7 @@ const StudyDetailHeader = ({study, user}) => {
           <h3>{study.name}</h3>
           <h5 className="text-muted">{study.code}</h5>
         </Col>
-        <Col className="col-auto">
+        <Col className="col-auto d-flex">
           {
             study.collaborator
                 ? (
