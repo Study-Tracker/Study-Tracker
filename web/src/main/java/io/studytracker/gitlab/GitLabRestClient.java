@@ -1,8 +1,26 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.studytracker.gitlab;
 
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.gitlab.entities.GitLabAuthenticationToken;
+import io.studytracker.gitlab.entities.GitLabGroup;
 import io.studytracker.gitlab.entities.GitLabNamespace;
+import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabUser;
@@ -176,6 +194,82 @@ public final class GitLabRestClient {
    */
   public List<GitLabNamespace> findNamespaces(@NotNull String token) {
     return findNamespaces(token, null);
+  }
+
+  /**
+   * Returns a list of public groups. The list can be filtered using a search string.
+   *
+   * @param token the access token
+   * @param query the search string
+   * @return the list of groups
+   */
+  public List<GitLabGroup> findGroups(@NotNull String token, String query) {
+    LOGGER.debug("Finding groups with query: {}", query);
+    URL url = joinUrls(options.getRootUrl(),
+        "/api/v4/groups" + (query != null ? "?search=" + query : ""));
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.set("Accept", "application/json");
+    HttpEntity<?> request = new HttpEntity<>(headers);
+    ResponseEntity<List<GitLabGroup>> response = restTemplate.exchange(
+        url.toString(), HttpMethod.GET, request,
+        new ParameterizedTypeReference<List<GitLabGroup>>() {});
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      return response.getBody();
+    } else {
+      throw new StudyTrackerException("Failed to find groups in GitLab");
+    }
+  }
+
+  /**
+   * Returns a list of all public groups.
+   *
+   * @param token the access token
+   * @return the list of groups
+   */
+  public List<GitLabGroup> findGroups(@NotNull String token) {
+    return findGroups(token, null);
+  }
+
+  /**
+   * Looks up a group by its ID.
+   *
+   * @param token the access token
+   * @param groupId the group ID
+   * @return the group or an empty optional if not found
+   */
+  public Optional<GitLabGroup> findGroupById(@NotNull String token, @NotNull Long groupId) {
+    LOGGER.debug("Finding group with id: {}", groupId);
+    URL url = joinUrls(options.getRootUrl(),
+        "/api/v4/groups/" + groupId.toString());
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.set("Accept", "application/json");
+    HttpEntity<?> request = new HttpEntity<>(headers);
+    ResponseEntity<GitLabGroup> response = restTemplate.exchange(
+        url.toString(), HttpMethod.GET, request, GitLabGroup.class);
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      return Optional.ofNullable(response.getBody());
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  public GitLabGroup createNewGroup(@NotNull String token, @NotNull GitLabNewGroupRequest newGroupRequest) {
+    LOGGER.debug("Creating new group with name: {}", newGroupRequest.getName());
+    URL url = joinUrls(options.getRootUrl(), "/api/v4/groups");
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.set("Accept", "application/json");
+    headers.set("Content-Type", "application/json");
+    HttpEntity<GitLabNewGroupRequest> request = new HttpEntity<>(newGroupRequest, headers);
+    ResponseEntity<GitLabGroup> response = restTemplate.exchange(
+        url.toString(), HttpMethod.POST, request, GitLabGroup.class);
+    if (response.getStatusCode().equals(HttpStatus.CREATED)) {
+      return response.getBody();
+    } else {
+      throw new StudyTrackerException("Failed to create new group in GitLab");
+    }
   }
 
   /**

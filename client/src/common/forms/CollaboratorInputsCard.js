@@ -24,7 +24,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import {CSSTransition} from "react-transition-group";
 
-const CollaboratorInputs = ({
+const CollaboratorInputsCard = ({
   isExternalStudy,
   collaborator,
   externalCode,
@@ -375,10 +375,10 @@ const CollaboratorInputs = ({
 
 }
 
-CollaboratorInputs.propTypes = {
+CollaboratorInputsCard.propTypes = {
   externalCode: PropTypes.string,
   collaborator: PropTypes.object,
   onChange: PropTypes.func,
 }
 
-export default CollaboratorInputs;
+export default CollaboratorInputsCard;

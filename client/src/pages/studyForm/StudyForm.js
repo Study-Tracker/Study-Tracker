@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useRef, useState} from "react";
+import React, {useRef} from "react";
 import {ProgramDropdown} from "../../common/forms/programs";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -25,7 +25,7 @@ import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
 import Swal from "sweetalert2";
 import KeywordInputs from "../../common/forms/KeywordInputs";
-import CollaboratorInputs from "../../common/forms/CollaboratorInputs";
+import CollaboratorInputsCard from "../../common/forms/CollaboratorInputsCard";
 import ReactQuill from "react-quill";
 import {LoadingOverlay} from "../../common/loading";
 import {Breadcrumbs} from "../../common/common";
@@ -36,9 +36,9 @@ import FormikFormErrorNotification
 import * as yup from "yup";
 import axios from "axios";
 import PropTypes from "prop-types";
-import {CSSTransition} from "react-transition-group";
-import NotebookInputs from "../../common/forms/NotebookInputs";
-import GitInputs from "../../common/forms/GitInputs";
+import NotebookInputsCard from "../../common/forms/NotebookInputsCard";
+import GitInputsCard from "../../common/forms/GitInputsCard";
+import LegacyStudyControlsCard from "./LegacyStudyControlsCard";
 
 const StudyForm = ({
     study,
@@ -50,9 +50,6 @@ const StudyForm = ({
 
   const navigate = useNavigate();
   const legacyNodeRef = useRef(null);
-  const [showLegacyControls, setShowLegacyControls] = useState(study ? study.legacy : false);
-  const [showExternalStudyControls, setShowExternalStudyControls] = useState(study ? study.external : false);
-  const [showNotebookControls, setShowNotebookControls] = useState(!study);
 
   const defaultStudyValues = {
     name: '',
@@ -377,149 +374,6 @@ const StudyForm = ({
                     </Card.Body>
                   </Card>
 
-
-                  {/*Legacy studies*/}
-                  {
-                    !!values.id && !values.legacy
-                        ? ""
-                        : (
-                            <Card className={"form-card " + (values.legacy ? "" : "illustration")}>
-
-                              <Card.Body>
-                              <Row>
-
-                                <Col md={12}>
-
-                                  <h5 className="card-title">Legacy Study</h5>
-
-                                  <h6 className="card-subtitle text-muted">
-                                    Studies created prior to the introduction of Study Tracker are
-                                    considered legacy. Enabling this option allows you to
-                                    specify certain attributes that would otherwise be
-                                    automatically generated.
-                                  </h6>
-
-                                </Col>
-
-                                <Col md={12} className={"feature-toggle"}>
-
-                                  <FormGroup>
-                                    <Form.Check
-                                        id="legacy-check"
-                                        type="switch"
-                                        label="Is this a legacy study?"
-                                        onChange={e => {
-                                          const bool = e.target.checked;
-                                          setShowLegacyControls(bool);
-                                          setFieldValue("legacy", bool);
-                                        }}
-                                        disabled={!!study}
-                                        defaultChecked={!!study
-                                            && !!values.legacy}
-                                    />
-                                  </FormGroup>
-                                </Col>
-
-                                <CSSTransition
-                                    nodeRef={legacyNodeRef}
-                                    in={showLegacyControls}
-                                    timeout={300}
-                                    classNames={"slide-in-down"}
-                                >
-
-                                    <Col
-                                        md={12}
-                                        ref={legacyNodeRef}
-                                        className={"slide-in-down-enter"}
-                                    >
-
-                                      <Row>
-
-                                        <Col md={6}>
-                                          <FormGroup>
-                                            <Form.Label>Study Code *</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                isInvalid={!!errors.code}
-                                                disabled={!!study}
-                                                name={"code"}
-                                                value={values.code}
-                                                onChange={handleChange}
-                                            />
-                                            <Form.Control.Feedback type={"invalid"}>
-                                              {errors.code}
-                                            </Form.Control.Feedback>
-                                            <Form.Text>
-                                              Provide the existing code or ID
-                                              for the study.
-                                            </Form.Text>
-                                          </FormGroup>
-                                        </Col>
-
-                                        <Col md={6}>
-                                          <FormGroup>
-                                            <Form.Label>Notebook URL</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                name={"notebookFolder.url"}
-                                                disabled={!!study}
-                                                value={values.notebookFolder.url}
-                                                onChange={handleChange}
-                                            />
-                                            <Form.Text>
-                                              If the study already has an ELN
-                                              entry, provide the URL here.
-                                            </Form.Text>
-                                          </FormGroup>
-                                        </Col>
-
-                                      </Row>
-
-                                    </Col>
-
-                                </CSSTransition>
-
-                              </Row>
-                              </Card.Body>
-                            </Card>
-
-                        )
-                  }
-
-                  {/*CRO*/}
-                  <CollaboratorInputs
-                      isExternalStudy={values.external}
-                      collaborator={values.collaborator}
-                      externalCode={values.externalCode}
-                      onChange={(key, value) => setFieldValue(key, value)}
-                  />
-
-                  {/*Notebook*/}
-                  {
-                    !values.id
-                    && features
-                    && features.notebook
-                    && features.notebook.isEnabled ? (
-                        <NotebookInputs
-                          isActive={values.useNotebook}
-                          selectedProgram={values.program}
-                          onChange={(key, value) => setFieldValue(key, value)}
-                        />
-                    ) : ''
-                  }
-
-                  {/*Git*/}
-                  {
-                    !values.id ? (
-                        <GitInputs
-                            onChange={(key, value) => setFieldValue(key, value)}
-                            isActive={values.useGit}
-                            selectedProgram={values.program}
-                        />
-                    ) : ''
-
-                  }
-
                   {/*Study Team*/}
                   <Card>
                     <Card.Header>
@@ -546,6 +400,52 @@ const StudyForm = ({
 
                     </Card.Body>
                   </Card>
+
+                  {/*Legacy studies*/}
+                  {
+                    !!values.id && !values.legacy ? "" : (
+                        <LegacyStudyControlsCard
+                            study={study}
+                            onChange={(key, value) => setFieldValue(key, value)}
+                            values={values}
+                            errors={errors}
+                        />
+                    )
+                  }
+
+                  {/*CRO*/}
+                  <CollaboratorInputsCard
+                      isExternalStudy={values.external}
+                      collaborator={values.collaborator}
+                      externalCode={values.externalCode}
+                      onChange={(key, value) => setFieldValue(key, value)}
+                  />
+
+                  {/*Notebook*/}
+                  {
+                    !values.id
+                    && features
+                    && features.notebook
+                    && features.notebook.isEnabled ? (
+                        <NotebookInputsCard
+                          isActive={values.useNotebook}
+                          selectedProgram={values.program}
+                          onChange={(key, value) => setFieldValue(key, value)}
+                        />
+                    ) : ''
+                  }
+
+                  {/*Git*/}
+                  {
+                    !values.id ? (
+                        <GitInputsCard
+                            onChange={(key, value) => setFieldValue(key, value)}
+                            isActive={values.useGit}
+                            selectedProgram={values.program}
+                        />
+                    ) : ''
+
+                  }
 
                   <Card>
                     <Card.Header>
