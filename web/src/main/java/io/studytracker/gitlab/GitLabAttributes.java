@@ -32,4 +32,8 @@ public class GitLabAttributes {
   public static final String REPOSITORY_HTTP_URL = "_gitlab.repository_http_url";
   public static final String REPOSITORY_WEB_URL = "_gitlab.repository_web_url";
 
+  public static final String USER_ID = "_gitlab.user_id";
+  public static final String USER_USERNAME = "_gitlab.user_username";
+  public static final String USER_EMAIL = "_gitlab.user_email";
+
 }

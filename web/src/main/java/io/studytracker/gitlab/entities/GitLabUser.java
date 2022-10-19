@@ -8,7 +8,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GitLabUser {
 
-  private Long id;
+  private Integer id;
   private String username;
   private String name;
   private String state;
@@ -25,7 +25,7 @@ public class GitLabUser {
   private String commitEmail;
   private boolean external;
   private boolean isAdmin;
-  private Long namespaceId;
+  private Integer namespaceId;
   private String bio;
   private String location;
   private boolean isAuditor;

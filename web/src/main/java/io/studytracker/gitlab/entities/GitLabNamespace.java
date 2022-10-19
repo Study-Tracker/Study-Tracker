@@ -8,12 +8,12 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GitLabNamespace {
 
-  private Long id;
+  private Integer id;
   private String name;
   private String path;
   private String kind;
   @JsonProperty("full_path") private String fullPath;
-  @JsonProperty("parent_id") private Long parentId;
+  @JsonProperty("parent_id") private Integer parentId;
   @JsonProperty("avatar_url") private String avatarUrl;
   @JsonProperty("web_url") private String webUrl;
 

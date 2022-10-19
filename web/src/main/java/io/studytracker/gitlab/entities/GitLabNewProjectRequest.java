@@ -12,7 +12,7 @@ public class GitLabNewProjectRequest {
 
   private @NotEmpty String name;
   private @NotEmpty String description;
-  @JsonProperty("namespace_id") private @NotNull Long namespaceId;
+  @JsonProperty("namespace_id") private @NotNull Integer namespaceId;
   @JsonProperty("auto_devops_enabled") private boolean autoDevopsEnabled = false;
   @JsonProperty("initialize_with_readme") private boolean initializeWithReadme = true;
 

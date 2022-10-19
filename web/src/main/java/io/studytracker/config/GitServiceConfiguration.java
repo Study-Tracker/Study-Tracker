@@ -40,13 +40,19 @@ public class GitServiceConfiguration {
     public GitLabOptions gitLabOptions() {
       GitLabOptions options = new GitLabOptions();
       options.setRootUrl(environment.getRequiredProperty("gitlab.url", URL.class));
-      options.setUsername(environment.getRequiredProperty("gitlab.username"));
-      options.setPassword(environment.getRequiredProperty("gitlab.password"));
-      if (environment.containsProperty("gitlab.client-id")) {
+      options.setRootGroupId(environment.getRequiredProperty("gitlab.root-group-id", Integer.class));
+      if (environment.containsProperty("gitlab.access-token")) {
+        options.setAccessToken(environment.getRequiredProperty("gitlab.access-token"));
+      } else if (environment.containsProperty("gitlab.username")
+          && environment.containsProperty("gitlab.password")
+          && environment.containsProperty("gitlab.client-id")
+          && environment.containsProperty("gitlab.client-secret")) {
+        options.setUsername(environment.getRequiredProperty("gitlab.username"));
+        options.setPassword(environment.getRequiredProperty("gitlab.password"));
         options.setClientId(environment.getRequiredProperty("gitlab.client-id"));
-      }
-      if (environment.containsProperty("gitlab.client-secret")) {
         options.setClientSecret(environment.getRequiredProperty("gitlab.client-secret"));
+      } else {
+        throw new IllegalStateException("GitLab configuration failed. Either gitlab.access-token or gitlab.username and gitlab.password must be set");
       }
       return options;
     }
@@ -58,7 +64,7 @@ public class GitServiceConfiguration {
 
     @Bean
     public GitLabService gitLabService() {
-      return new GitLabService(gitLabRestClient());
+      return new GitLabService();
     }
 
   }

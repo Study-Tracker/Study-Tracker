@@ -25,7 +25,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GitLabGroup {
 
-  private Long id;
+  private Integer id;
   @JsonProperty("web_url") private String webUrl;
   private String name;
   private String path;
@@ -33,7 +33,7 @@ public class GitLabGroup {
   @JsonProperty("full_name") private String fullName;
   @JsonProperty("full_path") private String fullPath;
   @JsonProperty("created_at") private Date createdAt;
-  @JsonProperty("parent_id") private Long parentId;
+  @JsonProperty("parent_id") private Integer parentId;
   private String visibility;
   @JsonProperty("share_with_group_lock") private Boolean shareWithGroupLock;
   @JsonProperty("require_two_factor_authentication") private Boolean requireTwoFactorAuthentication;

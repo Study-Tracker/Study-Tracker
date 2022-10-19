@@ -120,7 +120,7 @@ public final class GitLabRestClient {
    * @param userId the user ID
    * @return the user or an empty optional if not found
    */
-  public Optional<GitLabUser> findUserById(@NotNull String token, @NotNull Long userId) {
+  public Optional<GitLabUser> findUserById(@NotNull String token, @NotNull Integer userId) {
     LOGGER.debug("Finding user with id: {}", userId);
     URL url = joinUrls(options.getRootUrl(),
         "/api/v4/users/" + userId.toString());
@@ -169,7 +169,7 @@ public final class GitLabRestClient {
    * @param namespaceId the namespace ID
    * @return the namespace or an empty optional if not found
    */
-  public Optional<GitLabNamespace> findNamespaceById(@NotNull String token, @NotNull Long namespaceId) {
+  public Optional<GitLabNamespace> findNamespaceById(@NotNull String token, @NotNull Integer namespaceId) {
     LOGGER.debug("Finding namespace with id: {}", namespaceId);
     URL url = joinUrls(options.getRootUrl(),
         "/api/v4/namespaces/" + namespaceId.toString());
@@ -238,7 +238,7 @@ public final class GitLabRestClient {
    * @param groupId the group ID
    * @return the group or an empty optional if not found
    */
-  public Optional<GitLabGroup> findGroupById(@NotNull String token, @NotNull Long groupId) {
+  public Optional<GitLabGroup> findGroupById(@NotNull String token, @NotNull Integer groupId) {
     LOGGER.debug("Finding group with id: {}", groupId);
     URL url = joinUrls(options.getRootUrl(),
         "/api/v4/groups/" + groupId.toString());
@@ -358,4 +358,11 @@ public final class GitLabRestClient {
     }
   }
 
+  public RestTemplate getRestTemplate() {
+    return restTemplate;
+  }
+
+  public GitLabOptions getOptions() {
+    return options;
+  }
 }

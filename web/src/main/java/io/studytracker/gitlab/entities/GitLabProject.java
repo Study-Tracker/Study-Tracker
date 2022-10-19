@@ -10,7 +10,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GitLabProject {
 
-  private Long id;
+  private Integer id;
   private String name;
   private String description;
   @JsonProperty("name_with_namespace") private String nameWithNamespace;
