@@ -28,6 +28,7 @@ public class GitLabNewGroupRequest {
   private @NotEmpty String name;
   private @NotEmpty String path;
   @JsonProperty("parent_id") private Integer parentId;
+  private String visibility = "public";
   @JsonProperty("auto_devops_enabled") private boolean autoDevOpsEnabled = false;
   private @NotEmpty String description;
 

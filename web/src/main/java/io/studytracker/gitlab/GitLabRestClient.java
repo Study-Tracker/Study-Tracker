@@ -307,6 +307,30 @@ public final class GitLabRestClient {
   }
 
   /**
+   * Returns reference to a project, identified by its ID.
+   *
+   * @param token the access token
+   * @param projectId the project ID
+   * @return the project or an empty optional if not found
+   */
+  public Optional<GitLabProject> findProjectById(@NotNull String token, @NotNull Integer projectId) {
+    LOGGER.debug("Finding project with id: {}", projectId);
+    URL url = joinUrls(options.getRootUrl(),
+        "/api/v4/projects/" + projectId.toString());
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + token);
+    headers.set("Accept", "application/json");
+    HttpEntity<?> request = new HttpEntity<>(headers);
+    ResponseEntity<GitLabProject> response = restTemplate.exchange(
+        url.toString(), HttpMethod.GET, request, GitLabProject.class);
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      return Optional.ofNullable(response.getBody());
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  /**
    * Creates a new GitLab project (aka. Git repository) for the given user.
    *
    * @param token the access token

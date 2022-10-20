@@ -6,13 +6,31 @@ import io.studytracker.git.GitUser;
 import io.studytracker.gitlab.entities.GitLabGroup;
 import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabUser;
+import io.studytracker.model.Assay;
+import io.studytracker.model.Study;
 
 public class GitLabUtils {
 
   public static String getPathFromName(String name) {
     return name.toLowerCase()
         .replaceAll("[\\s_]+", "-")
-        .replaceAll("[^a-z0-9]", "");
+        .replaceAll("[^a-z0-9-]", "");
+  }
+
+  public static String getStudyProjectName(Study study) {
+    return study.getCode() + " - " + study.getName().replaceAll("[^\\w\\d\\s_+.]", "");
+  }
+
+  public static String getStudyProjectPath(Study study) {
+    return getPathFromName(study.getCode());
+  }
+
+  public static String getAssayProjectName(Assay assay) {
+    return assay.getCode() + " - " + assay.getName().replaceAll("[^\\w\\d\\s_+.]", "");
+  }
+
+  public static String getAssayProjectPath(Assay assay) {
+    return getPathFromName(assay.getCode());
   }
 
   public static GitGroup toGitGroup(GitLabGroup group) {
@@ -31,7 +49,7 @@ public class GitLabUtils {
     GitRepository gitRepository = new GitRepository();
     gitRepository.setRepositoryId(project.getId().toString());
     gitRepository.setGroupId(project.getNamespace().getId().toString());
-    gitRepository.setOwnerId(project.getOwner().getId().toString());
+    gitRepository.setOwnerId(project.getOwner() != null ? project.getOwner().getId().toString() : null);
     gitRepository.setName(project.getName());
     gitRepository.setDescription(project.getDescription());
     gitRepository.setPath(project.getPath());

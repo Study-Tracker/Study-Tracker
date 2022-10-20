@@ -38,7 +38,7 @@ const FrontPagePlaceholder = ({isAdmin}) => {
                      <p className="text-lg">
                        As an administrator, you can also access the <a href="/admin">Admin Dashboard</a> to
                        configure your tenant. Before someone can log-in, you will need to
-                       &nbsp;<a href="/admin/users">register them as a new user</a>. You will also need to
+                       &nbsp;<a href="/users/new">register them as a new user</a>. You will also need to
                        &nbsp;<a href="/programs/new">create a program</a> before users can create new studies.
                      </p>
                   )
