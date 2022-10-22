@@ -25,6 +25,7 @@ import io.studytracker.mapstruct.dto.response.StudySummaryDto;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.model.User;
 import java.util.Arrays;
 import java.util.Collections;
@@ -187,8 +188,9 @@ public class StudyBasePrivateController extends AbstractStudyController {
   public HttpEntity<StudyDetailsDto> createStudy(@RequestBody @Valid StudyFormDto dto) {
     LOGGER.info("Creating study: {}", dto);
     Study study = this.getStudyMapper().fromStudyForm(dto);
+    StudyOptions options = this.getStudyMapper().optionsFromStudyForm(dto);
     mapPayloadFields(study, dto);
-    study = this.createNewStudy(study, dto.getNotebookTemplateId());
+    study = this.createNewStudy(study, options);
     return new ResponseEntity<>(this.getStudyMapper().toStudyDetails(study), HttpStatus.CREATED);
   }
 

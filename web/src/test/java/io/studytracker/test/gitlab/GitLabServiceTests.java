@@ -1,11 +1,27 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.studytracker.test.gitlab;
 
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.git.GitAttributes;
 import io.studytracker.git.GitGroup;
 import io.studytracker.git.GitRepository;
-import io.studytracker.gitlab.GitLabAttributes;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.gitlab.GitLabUtils;
 import io.studytracker.model.Assay;
@@ -53,24 +69,24 @@ public class GitLabServiceTests {
   public void createProgramGroupTest() throws Exception {
     Program program = programRepository.findByName(EXAMPLE_PROGRAM)
         .orElseThrow(RecordNotFoundException::new);
-    Assert.assertFalse(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_ID));
-    Assert.assertFalse(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_NAME));
-    Assert.assertFalse(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PATH));
-    Assert.assertFalse(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PARENT_ID));
-    Assert.assertFalse(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PARENT_NAME));
-    Assert.assertFalse(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PARENT_PATH));
+    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_ID));
+    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_NAME));
+    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PATH));
+    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_ID));
+    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_NAME));
+    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_PATH));
     GitGroup group = gitLabService.createProgramGroup(program);
     Assert.assertNotNull(group);
     Assert.assertEquals(group.getName(), program.getName());
     Assert.assertEquals(group.getPath(), GitLabUtils.getPathFromName(program.getName()));
     program = programRepository.findByName(EXAMPLE_PROGRAM)
         .orElseThrow(RecordNotFoundException::new);
-    Assert.assertTrue(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_ID));
-    Assert.assertTrue(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_NAME));
-    Assert.assertTrue(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PATH));
-    Assert.assertTrue(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PARENT_ID));
-    Assert.assertTrue(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PARENT_NAME));
-    Assert.assertTrue(program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_PARENT_PATH));
+    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_ID));
+    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_NAME));
+    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PATH));
+    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_ID));
+    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_NAME));
+    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_PATH));
 
     GitGroup group2 = gitLabService.findProgramGroup(program).orElseThrow(RecordNotFoundException::new);
     Assert.assertNotNull(group2);

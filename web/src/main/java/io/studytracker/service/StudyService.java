@@ -25,12 +25,16 @@ import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
+import io.studytracker.git.GitRepository;
+import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptionAttributes;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.model.User;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
@@ -75,6 +79,8 @@ public class StudyService {
 
   private ELNFolderRepository elnFolderRepository;
 
+  private GitService gitService;
+
   /**
    * Finds a single study, identified by its primary key ID
    *
@@ -97,8 +103,8 @@ public class StudyService {
   /**
    * Returns a {@link Page} of studies
    *
-   * @param pageable
-   * @return
+   * @param pageable page request
+   * @return page of studies
    */
   public Page<Study> findAll(Pageable pageable) {
     return studyRepository.findAll(pageable);
@@ -139,20 +145,10 @@ public class StudyService {
   }
 
   /**
-   * Finds a study by its optional, unique internal code.
-   *
-   * @param code internal code
-   * @return optional study
-   */
-  public Optional<Study> findByExternalCode(String code) {
-    return studyRepository.findByExternalCode(code);
-  }
-
-  /**
    * Creates a storage folder for the study and returns a {@link StorageFolder} record.
    *
-   * @param study
-   * @return
+   * @param study study object
+   * @return storage folder record
    */
   private StorageFolder createStudyStorageFolder(Study study) {
     StorageFolder folder = null;
@@ -170,9 +166,9 @@ public class StudyService {
    * Creates a folder in the ELN, if necessary, and then saves a {@link ELNFolder} record
    *   associated with the provided {@code study}. If the study is legacy, no new folder is created.
    *
-   * @param study
-   * @param program
-   * @return
+   * @param study study object
+   * @param program program object
+   * @return ELNFolder record
    */
   private ELNFolder createStudyElnFolder(Study study, Program program) {
     ELNFolder elnFolder = null;
@@ -207,7 +203,7 @@ public class StudyService {
   }
 
   public void create(Study study) {
-    this.create(study, null);
+    this.create(study, new StudyOptions());
   }
 
   /**
@@ -217,9 +213,11 @@ public class StudyService {
    * @param study new study
    */
   @Transactional
-  public void create(Study study, NotebookTemplate template) {
+  public void create(Study study, StudyOptions options) {
 
-    LOGGER.info("Attempting to create new study with name: " + study.getName());
+    LOGGER.info("Attempting to create new study with name: {}  and options: {}" + study.getName(), options);
+
+    StudyOptionAttributes.setStudyOptionAttributes(study, options);
 
     // Check for existing studies
     if (study.getCode() != null) {
@@ -239,7 +237,7 @@ public class StudyService {
     study.setActive(true);
 
     // External study
-    if (study.getCollaborator() != null && StringUtils.isEmpty(study.getExternalCode())) {
+    if (study.getCollaborator() != null && !StringUtils.hasText(study.getExternalCode())) {
       study.setExternalCode(namingService.generateExternalStudyCode(study));
     }
 
@@ -256,9 +254,25 @@ public class StudyService {
 
     // Create the ELN folder
     NotebookEntry studySummaryEntry = null;
-    if (notebookEntryService != null) {
+    if (notebookEntryService != null && options.isUseNotebook()) {
+
+      LOGGER.debug("Creating ELN folder for study: " + study.getName());
+
       ELNFolder elnFolder = this.createStudyElnFolder(study, program);
       study.setNotebookFolder(elnFolder);
+
+      // Get the template
+      NotebookTemplate template = null;
+      if (StringUtils.hasText(options.getNotebookTemplateId())) {
+        Optional<NotebookTemplate> templateOptional =
+            notebookEntryService.findEntryTemplateById(options.getNotebookTemplateId());
+        if (templateOptional.isPresent()) {
+          template = templateOptional.get();
+        } else {
+          LOGGER.warn("Could not find notebook template with ID: " + options.getNotebookTemplateId());
+        }
+      }
+
       if (!study.isLegacy()) {
         studySummaryEntry = notebookEntryService.createStudyNotebookEntry(study, template);
       }
@@ -276,10 +290,18 @@ public class StudyService {
     } catch (ConstraintViolationException e) {
       throw new InvalidConstraintException(e);
     } catch (Exception e) {
+      e.printStackTrace();
       throw e;
     }
 
-    // Add a link to the study summary entry
+    // Git repository
+    GitRepository gitRepository = null;
+    if (gitService != null && options.isUseGit()) {
+      LOGGER.debug("Creating Git repository for study: " + study.getName());
+      gitRepository = gitService.createStudyRepository(study);
+    }
+
+    // Add a links to extra resources
     if (studySummaryEntry != null) {
       try {
         ExternalLink entryLink = new ExternalLink();
@@ -293,6 +315,21 @@ public class StudyService {
         LOGGER.warn("Failed to create link to ELN entry.");
       }
     }
+
+    if (gitRepository != null) {
+      try {
+        ExternalLink entryLink = new ExternalLink();
+        entryLink.setStudy(study);
+        entryLink.setLabel("Git Repository");
+        entryLink.setUrl(new URL(gitRepository.getWebUrl()));
+        study.addExternalLink(entryLink);
+        studyRepository.save(study);
+      } catch (Exception e) {
+        e.printStackTrace();
+        LOGGER.warn("Failed to create link to Git repository.");
+      }
+    }
+
   }
 
   /**
@@ -318,7 +355,7 @@ public class StudyService {
     // Collaborator changes
     if (study.getCollaborator() == null && updated.getCollaborator() != null) {
       study.setCollaborator(updated.getCollaborator());
-      if (StringUtils.isEmpty(updated.getExternalCode())) {
+      if (!StringUtils.hasText(updated.getExternalCode())) {
         study.setExternalCode(namingService.generateExternalStudyCode(study));
       } else {
         study.setExternalCode(updated.getExternalCode());
@@ -363,8 +400,8 @@ public class StudyService {
    * Searches the study repository using the provided keyword and returns matching {@link Study}
    * records.
    *
-   * @param keyword
-   * @return
+   * @param keyword keyword to search for
+   * @return list of matching studies
    */
   @Transactional
   public List<Study> search(String keyword) {
@@ -374,8 +411,8 @@ public class StudyService {
   /**
    * Checks to see whether the study with the provided ID exists.
    *
-   * @param studyId
-   * @return
+   * @param studyId study ID
+   * @return true if the study exists
    */
   public boolean exists(Long studyId) {
     return studyRepository.existsById(studyId);
@@ -384,8 +421,8 @@ public class StudyService {
   /**
    * Manually updates a study's {@code updatedAt} and {@code lastModifiedBy} fields.
    *
-   * @param study
-   * @param user
+   * @param study study
+   * @param user user
    */
   @Transactional
   public void markAsUpdated(Study study, User user) {
@@ -479,13 +516,8 @@ public class StudyService {
   public void repairElnFolder(Study study) {
 
     // Check to see if the folder exists and create a new one if necessary
-    NotebookFolder folder;
     Optional<NotebookFolder> optional = notebookFolderService.findStudyFolder(study);
-    if (optional.isPresent()) {
-      folder = optional.get();
-    } else {
-      folder = notebookFolderService.createStudyFolder(study);
-    }
+    NotebookFolder folder = optional.orElseGet(() -> notebookFolderService.createStudyFolder(study));
 
     // Update the record
     ELNFolder f;
@@ -547,5 +579,10 @@ public class StudyService {
   @Autowired(required = false)
   public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
     this.notebookFolderService = notebookFolderService;
+  }
+
+  @Autowired(required = false)
+  public void setGitService(GitService gitService) {
+    this.gitService = gitService;
   }
 }

@@ -39,8 +39,10 @@ const GitInputsCard = ({
       >
 
         <Row>
-          <Col md={6}>
-            Things will go here.
+          <Col md={12}>
+            <p>
+              A Git repository will be created in the selected program's group on your Git server and linked on the study details page.
+            </p>
           </Col>
         </Row>
 

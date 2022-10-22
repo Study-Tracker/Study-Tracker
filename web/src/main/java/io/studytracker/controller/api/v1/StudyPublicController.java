@@ -24,6 +24,7 @@ import io.studytracker.mapstruct.dto.api.StudyDto;
 import io.studytracker.mapstruct.dto.api.StudyPayloadDto;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.model.User;
 import java.util.HashSet;
 import java.util.Set;
@@ -117,8 +118,9 @@ public class StudyPublicController extends AbstractStudyController {
   public HttpEntity<StudyDto> create(@Valid @RequestBody StudyPayloadDto dto) {
     LOGGER.info("Creating new study: {}", dto);
     Study study = this.getStudyMapper().fromPayload(dto);
+    StudyOptions options = this.getStudyMapper().optionsFromStudyPayload(dto);
     mapPayloadFields(study, dto);
-    study = this.createNewStudy(study, dto.getNotebookTemplateId());
+    study = this.createNewStudy(study, options);
     return new ResponseEntity<>(this.getStudyMapper().toDto(study), HttpStatus.CREATED);
   }
 

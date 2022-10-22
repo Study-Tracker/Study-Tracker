@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-package io.studytracker.gitlab;
+package io.studytracker.mapstruct.dto.features;
 
-public class GitLabAttributes {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-  public static final String GIT_SERVICE_VALUE = "gitlab";
+@Data
+public class GitFeaturesDto {
+
+  private String mode = "none";
+
+  private String gitServerUrl;
+
+  @JsonProperty("isEnabled")
+  public boolean isEnabled() {
+    return mode != null && !mode.equals("none");
+  }
 
 }

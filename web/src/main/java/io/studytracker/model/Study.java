@@ -537,4 +537,17 @@ public class Study implements Model {
     }
     this.comments = comments;
   }
+
+  public void setAttribute(String key, String value) {
+    this.attributes.put(key, value);
+  }
+
+  public boolean hasAttribute(String key) {
+    return this.attributes.containsKey(key);
+  }
+
+  public String getAttribute(String key) {
+    return this.attributes.get(key);
+  }
+
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useRef} from "react";
+import React from "react";
 import {ProgramDropdown} from "../../common/forms/programs";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -49,7 +49,6 @@ const StudyForm = ({
 }) => {
 
   const navigate = useNavigate();
-  const legacyNodeRef = useRef(null);
 
   const defaultStudyValues = {
     name: '',
@@ -69,7 +68,8 @@ const StudyForm = ({
     notebookFolder: {},
     notebookTemplateId: null,
     useNotebook: true,
-    useGit: false
+    useGit: false,
+    useStorage: true,
   };
 
   const studySchema = yup.object().shape({
@@ -437,7 +437,10 @@ const StudyForm = ({
 
                   {/*Git*/}
                   {
-                    !values.id ? (
+                    !values.id
+                    && features
+                    && features.git
+                    && features.git.isEnabled ? (
                         <GitInputsCard
                             onChange={(key, value) => setFieldValue(key, value)}
                             isActive={values.useGit}

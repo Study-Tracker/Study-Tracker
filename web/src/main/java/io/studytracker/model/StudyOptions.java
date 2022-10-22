@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package io.studytracker.gitlab;
+package io.studytracker.model;
 
-public class GitLabAttributes {
+import lombok.Data;
 
-  public static final String GIT_SERVICE_VALUE = "gitlab";
+@Data
+public class StudyOptions {
+
+  private boolean useNotebook = true;
+  private String notebookTemplateId;
+  private boolean useGit = false;
+  private boolean useStorage = true;
 
 }

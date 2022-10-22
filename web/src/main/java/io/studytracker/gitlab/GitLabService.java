@@ -17,6 +17,7 @@
 package io.studytracker.gitlab;
 
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.git.GitAttributes;
 import io.studytracker.git.GitGroup;
 import io.studytracker.git.GitRepository;
 import io.studytracker.git.GitService;
@@ -72,45 +73,49 @@ public class GitLabService implements GitService {
   @Transactional
   void updateProgramGroupAttributes(Program program, GitLabGroup group, GitLabGroup parentGroup) {
     Program p = programRepository.findById(program.getId()).orElseThrow();
-    p.getAttributes().put(GitLabAttributes.NAMESPACE_ID, group.getId().toString());
-    p.getAttributes().put(GitLabAttributes.NAMESPACE_NAME, group.getName());
-    p.getAttributes().put(GitLabAttributes.NAMESPACE_PATH, group.getPath());
-    p.getAttributes().put(GitLabAttributes.NAMESPACE_PARENT_ID, parentGroup.getId().toString());
-    p.getAttributes().put(GitLabAttributes.NAMESPACE_PARENT_NAME, parentGroup.getName());
-    p.getAttributes().put(GitLabAttributes.NAMESPACE_PARENT_PATH, parentGroup.getPath());
+    p.getAttributes().put(GitAttributes.GIT_SERVICE, GitLabAttributes.GIT_SERVICE_VALUE);
+    p.getAttributes().put(GitAttributes.GROUP_ID, group.getId().toString());
+    p.getAttributes().put(GitAttributes.GROUP_NAME, group.getName());
+    p.getAttributes().put(GitAttributes.GROUP_PATH, group.getPath());
+    p.getAttributes().put(GitAttributes.GROUP_PARENT_ID, parentGroup.getId().toString());
+    p.getAttributes().put(GitAttributes.GROUP_PARENT_NAME, parentGroup.getName());
+    p.getAttributes().put(GitAttributes.GROUP_PARENT_PATH, parentGroup.getPath());
     programRepository.save(p);
   }
 
   @Transactional
   void updateUserAttributes(User user, GitLabUser gitLabUser) {
     User u = userRepository.findById(user.getId()).orElseThrow();
-    u.getAttributes().put(GitLabAttributes.USER_ID, gitLabUser.getId().toString());
-    u.getAttributes().put(GitLabAttributes.USER_USERNAME, gitLabUser.getUsername());
-    u.getAttributes().put(GitLabAttributes.USER_EMAIL, gitLabUser.getEmail());
+    u.getAttributes().put(GitAttributes.GIT_SERVICE, GitLabAttributes.GIT_SERVICE_VALUE);
+    u.getAttributes().put(GitAttributes.USER_ID, gitLabUser.getId().toString());
+    u.getAttributes().put(GitAttributes.USER_USERNAME, gitLabUser.getUsername());
+    u.getAttributes().put(GitAttributes.USER_EMAIL, gitLabUser.getEmail());
     userRepository.save(u);
   }
 
   @Transactional
   void updateStudyRepositoryAttributes(Study study, GitLabProject project) {
     Study s = studyRepository.findById(study.getId()).orElseThrow();
-    s.getAttributes().put(GitLabAttributes.REPOSITORY_ID, project.getId().toString());
-    s.getAttributes().put(GitLabAttributes.REPOSITORY_NAME, project.getName());
-    s.getAttributes().put(GitLabAttributes.REPOSITORY_PATH, project.getPath());
-    s.getAttributes().put(GitLabAttributes.REPOSITORY_SSH_URL, project.getSshUrlToRepo());
-    s.getAttributes().put(GitLabAttributes.REPOSITORY_HTTP_URL, project.getHttpUrlToRepo());
-    s.getAttributes().put(GitLabAttributes.REPOSITORY_WEB_URL, project.getWebUrl());
+    s.getAttributes().put(GitAttributes.GIT_SERVICE, GitLabAttributes.GIT_SERVICE_VALUE);
+    s.getAttributes().put(GitAttributes.REPOSITORY_ID, project.getId().toString());
+    s.getAttributes().put(GitAttributes.REPOSITORY_NAME, project.getName());
+    s.getAttributes().put(GitAttributes.REPOSITORY_PATH, project.getPath());
+    s.getAttributes().put(GitAttributes.REPOSITORY_SSH_URL, project.getSshUrlToRepo());
+    s.getAttributes().put(GitAttributes.REPOSITORY_HTTP_URL, project.getHttpUrlToRepo());
+    s.getAttributes().put(GitAttributes.REPOSITORY_WEB_URL, project.getWebUrl());
     studyRepository.save(s);
   }
 
   @Transactional
   void updateAssayRepositoryAttributes(Assay assay, GitLabProject project) {
     Assay a = assayRepository.findById(assay.getId()).orElseThrow();
-    a.getAttributes().put(GitLabAttributes.REPOSITORY_ID, project.getId().toString());
-    a.getAttributes().put(GitLabAttributes.REPOSITORY_NAME, project.getName());
-    a.getAttributes().put(GitLabAttributes.REPOSITORY_PATH, project.getPath());
-    a.getAttributes().put(GitLabAttributes.REPOSITORY_SSH_URL, project.getSshUrlToRepo());
-    a.getAttributes().put(GitLabAttributes.REPOSITORY_HTTP_URL, project.getHttpUrlToRepo());
-    a.getAttributes().put(GitLabAttributes.REPOSITORY_WEB_URL, project.getWebUrl());
+    a.getAttributes().put(GitAttributes.GIT_SERVICE, GitLabAttributes.GIT_SERVICE_VALUE);
+    a.getAttributes().put(GitAttributes.REPOSITORY_ID, project.getId().toString());
+    a.getAttributes().put(GitAttributes.REPOSITORY_NAME, project.getName());
+    a.getAttributes().put(GitAttributes.REPOSITORY_PATH, project.getPath());
+    a.getAttributes().put(GitAttributes.REPOSITORY_SSH_URL, project.getSshUrlToRepo());
+    a.getAttributes().put(GitAttributes.REPOSITORY_HTTP_URL, project.getHttpUrlToRepo());
+    a.getAttributes().put(GitAttributes.REPOSITORY_WEB_URL, project.getWebUrl());
     assayRepository.save(a);
   }
 
@@ -158,6 +163,7 @@ public class GitLabService implements GitService {
         ? program.getDescription().replaceAll("<[^>]*>", "")
         : "Program " + program.getName() + " study group");
     request.setParentId(parentGroup.getId());
+    request.setVisibility(parentGroup.getVisibility());
     GitLabGroup group = client.createNewGroup(token, request);
     LOGGER.info("Created group {} for program {}", group.getPath(), program.getName());
 
@@ -174,9 +180,9 @@ public class GitLabService implements GitService {
     String token = getAccessToken();
 
     // Lookup by saved group ID
-    if (program.getAttributes().containsKey(GitLabAttributes.NAMESPACE_ID)
-        && StringUtils.hasText(program.getAttributes().get(GitLabAttributes.NAMESPACE_ID))) {
-      Integer groupId = Integer.parseInt(program.getAttributes().get(GitLabAttributes.NAMESPACE_ID));
+    if (program.getAttributes().containsKey(GitAttributes.GROUP_ID)
+        && StringUtils.hasText(program.getAttributes().get(GitAttributes.GROUP_ID))) {
+      Integer groupId = Integer.parseInt(program.getAttributes().get(GitAttributes.GROUP_ID));
       Optional<GitLabGroup> optional = client.findGroupById(token, groupId);
       if (optional.isPresent()) {
         return Optional.of(GitLabUtils.toGitGroup(optional.get()));
@@ -214,6 +220,8 @@ public class GitLabService implements GitService {
         .orElseThrow(RecordNotFoundException::new);
     Optional<GitGroup> optional = this.findProgramGroup(program);
     GitGroup group = optional.orElseGet(() -> createProgramGroup(program));
+    GitLabGroup gitLabGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
+        .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
     GitLabNewProjectRequest request = new GitLabNewProjectRequest();
@@ -223,6 +231,7 @@ public class GitLabService implements GitService {
     request.setDescription(study.getDescription().replaceAll("<[^>]*>", ""));
     request.setAutoDevopsEnabled(false);
     request.setInitializeWithReadme(false);
+    request.setVisibility(gitLabGroup.getVisibility());
 
     // Create the repository
     GitLabProject project = client.createProject(getAccessToken(), request);
@@ -238,8 +247,8 @@ public class GitLabService implements GitService {
     LOGGER.info("Getting repository for study {}", study.getName());
 
     // Lookup by saved study attribute
-    if (study.getAttributes().containsKey(GitLabAttributes.REPOSITORY_ID)) {
-      Integer projectId = Integer.parseInt(study.getAttributes().get(GitLabAttributes.REPOSITORY_ID));
+    if (study.getAttributes().containsKey(GitAttributes.REPOSITORY_ID)) {
+      Integer projectId = Integer.parseInt(study.getAttributes().get(GitAttributes.REPOSITORY_ID));
       Optional<GitLabProject> optional = client.findProjectById(getAccessToken(), projectId);
       if (optional.isPresent()) {
         return Optional.of(GitLabUtils.toGitRepository(optional.get()));
@@ -270,6 +279,8 @@ public class GitLabService implements GitService {
         .orElseThrow(RecordNotFoundException::new);
     Optional<GitGroup> optional = this.findProgramGroup(program);
     GitGroup group = optional.orElseGet(() -> createProgramGroup(program));
+    GitLabGroup gitLabGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
+        .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
     GitLabNewProjectRequest request = new GitLabNewProjectRequest();
@@ -279,6 +290,7 @@ public class GitLabService implements GitService {
     request.setDescription(assay.getDescription().replaceAll("<[^>]*>", ""));
     request.setAutoDevopsEnabled(false);
     request.setInitializeWithReadme(false);
+    request.setVisibility(gitLabGroup.getVisibility());
 
     // Create the repository
     GitLabProject project = client.createProject(getAccessToken(), request);
@@ -292,8 +304,8 @@ public class GitLabService implements GitService {
   public Optional<GitRepository> findAssayRepository(Assay assay) {
     LOGGER.info("Getting repository for assay {}", assay.getName());
     // Lookup by saved study attribute
-    if (assay.getAttributes().containsKey(GitLabAttributes.REPOSITORY_ID)) {
-      Integer projectId = Integer.parseInt(assay.getAttributes().get(GitLabAttributes.REPOSITORY_ID));
+    if (assay.getAttributes().containsKey(GitAttributes.REPOSITORY_ID)) {
+      Integer projectId = Integer.parseInt(assay.getAttributes().get(GitAttributes.REPOSITORY_ID));
       Optional<GitLabProject> optional = client.findProjectById(getAccessToken(), projectId);
       if (optional.isPresent()) {
         return Optional.of(GitLabUtils.toGitRepository(optional.get()));
@@ -327,8 +339,8 @@ public class GitLabService implements GitService {
     LOGGER.debug("Getting GitLab user for {}", user.getUsername());
 
     // Lookup by saved user ID
-    if (user.getAttributes().containsKey(GitLabAttributes.USER_ID)) {
-      Integer userId = Integer.parseInt(user.getAttributes().get(GitLabAttributes.USER_ID));
+    if (user.getAttributes().containsKey(GitAttributes.USER_ID)) {
+      Integer userId = Integer.parseInt(user.getAttributes().get(GitAttributes.USER_ID));
       Optional<GitLabUser> optional = client.findUserById(getAccessToken(), userId);
       if (optional.isPresent()) {
         return Optional.of(GitLabUtils.toGitUser(optional.get()));

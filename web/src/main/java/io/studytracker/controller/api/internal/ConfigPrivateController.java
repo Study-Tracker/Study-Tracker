@@ -18,6 +18,7 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.mapstruct.dto.features.AuthFeaturesDto;
 import io.studytracker.mapstruct.dto.features.FeaturesSummaryDto;
+import io.studytracker.mapstruct.dto.features.GitFeaturesDto;
 import io.studytracker.mapstruct.dto.features.NotebookFeaturesDto;
 import io.studytracker.mapstruct.dto.features.SearchFeaturesDto;
 import io.studytracker.mapstruct.dto.features.StorageFeaturesDto;
@@ -68,6 +69,15 @@ public class ConfigPrivateController {
       authFeaturesDto.getSso().setSsoUrl(env.getRequiredProperty("sso.okta.url"));
     }
     features.setAuth(authFeaturesDto);
+
+    // Git
+    GitFeaturesDto gitFeaturesDto = new GitFeaturesDto();
+    String gitMode = env.getProperty("git.mode", "none");
+    gitFeaturesDto.setMode(gitMode);
+    if (gitMode.equals("gitlab")) {
+      gitFeaturesDto.setGitServerUrl(env.getRequiredProperty("gitlab.url"));
+    }
+    features.setGit(gitFeaturesDto);
 
     return features;
 
