@@ -311,22 +311,6 @@ const StudyForm = ({
                                 onChange={(value) => setFieldValue("status", value)}
                             />
 
-                            {/*{*/}
-                            {/*  !values.id*/}
-                            {/*  && features*/}
-                            {/*  && features.notebook*/}
-                            {/*  && features.notebook.isEnabled ? (*/}
-                            {/*      <NotebookEntryTemplatesDropdown*/}
-                            {/*          onChange={selectedItem =>*/}
-                            {/*              setFieldValue(*/}
-                            {/*                  "notebookTemplateId",*/}
-                            {/*                  selectedItem || ''*/}
-                            {/*              )*/}
-                            {/*          }*/}
-                            {/*      />*/}
-                            {/*  ) : ''*/}
-                            {/*}*/}
-
                             <FormGroup>
                               <Form.Label>Start Date *</Form.Label>
                               <DatePicker

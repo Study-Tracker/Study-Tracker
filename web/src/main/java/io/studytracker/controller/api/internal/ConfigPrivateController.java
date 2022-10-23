@@ -48,12 +48,20 @@ public class ConfigPrivateController {
 
     // Storage
     StorageFeaturesDto storageFeaturesDto = new StorageFeaturesDto();
-    storageFeaturesDto.setMode(env.getProperty("storage.mode", "local"));
+    String storageMode = env.getProperty("storage.mode", "local");
+    storageFeaturesDto.setMode(storageMode);
+    if (storageMode.equals("egnyte")) {
+      storageFeaturesDto.setStorageServiceUrl(env.getProperty("egnyte.root-url"));
+    }
     features.setStorage(storageFeaturesDto);
 
     // ELN
     NotebookFeaturesDto notebookFeaturesDto = new NotebookFeaturesDto();
-    notebookFeaturesDto.setMode(env.getProperty("notebook.mode", "none"));
+    String elnMode = env.getProperty("notebook.mode", "none");
+    notebookFeaturesDto.setMode(elnMode);
+    if (elnMode.equals("benchling")) {
+      notebookFeaturesDto.setElnUrl(env.getProperty("benchling.root-url"));
+    }
     features.setNotebook(notebookFeaturesDto);
 
     // Search

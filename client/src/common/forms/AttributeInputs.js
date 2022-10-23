@@ -67,7 +67,9 @@ const AttributeInputs = props => {
     props.handleUpdate(arrayToAttributeMap(updated));
   }
 
-  let inputs = attributes.map((a, i) => {
+  let inputs = attributes
+  .filter(attribute => !attribute.key.startsWith("_"))
+  .map((a, i) => {
     return (
         <Row key={'attributes-inputs-' + i}>
           <Col xs={5}>

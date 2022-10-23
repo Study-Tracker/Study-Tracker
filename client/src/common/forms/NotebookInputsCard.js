@@ -25,33 +25,44 @@ import axios from "axios";
 const NotebookInputsCard = ({
     isActive,
     onChange,
-    selectedProgram
+    selectedProgram,
+    selectedStudy
 }) => {
 
   console.debug("Program: ", selectedProgram);
-  const [programFolder, setProgramFolder] = useState(null);
+  const [parentFolder, setParentFolder] = useState(null);
 
   useEffect(() => {
     if (selectedProgram) {
       axios.get("/api/internal/program/" + selectedProgram.id + "/notebook")
       .then(response => {
-        setProgramFolder(response.data.path || response.data.name);
+        setParentFolder(response.data.path || response.data.name);
       })
       .catch(error => {
         console.error("Error loading program notebook folder: ", error);
       });
+    } else if (selectedStudy) {
+      axios.get("/api/internal/study/" + selectedStudy.id + "/notebook")
+      .then(response => {
+        setParentFolder(response.data.path || response.data.name);
+      })
+      .catch(error => {
+        console.error("Error loading study notebook folder: ", error);
+      });
     }
-  }, [selectedProgram]);
+  }, [selectedProgram, selectedStudy]);
 
   return (
       <FeatureToggleCard
         isActive={isActive}
         title={"Electronic Laboratory Notebook (ELN)"}
-        description={"Studies that require an electronic notebook will have a folder created within the "
-            + "appropriate program folder of the integrated ELN system. Studies will "
-            + "also have a summary notebook entry created for them, either from the "
-            + "selected template, or as a blank entry."}
-        switchLabel={"Does this study need an electronic notebook?"}
+        description={(selectedProgram ? "Studies" : "Assays") + " that require "
+            + "an electronic notebook will have a folder created within the "
+            + "appropriate " + (selectedProgram ? "program" : "study") + " folder "
+            + "of the integrated ELN system. " + (selectedProgram ? "Studies" : "Assays")
+            + " will also have a summary notebook entry created for them, either "
+            + "from the selected template, or as a blank entry."}
+        switchLabel={"Does this " + (selectedProgram ? "study" : "assay") + " need an electronic notebook?"}
         handleToggle={() => onChange("useNotebook", !isActive)}
       >
         <Row>
@@ -68,14 +79,14 @@ const NotebookInputsCard = ({
               <Form.Control
                   type="text"
                   name="notebookFolderPath"
-                  value={programFolder}
+                  value={parentFolder}
                   disabled={true}
-                  isInvalid={!programFolder}
+                  isInvalid={!parentFolder}
               />
               <Form.Control.Feedback type={"invalid"}>
                 You must select a program to associate the study with.
               </Form.Control.Feedback>
-              <Form.Text>The study notebook folder will be created at this location in the ELN.</Form.Text>
+              <Form.Text>The notebook folder will be created at this location in the ELN.</Form.Text>
             </FormGroup>
           </Col>
 
@@ -83,66 +94,13 @@ const NotebookInputsCard = ({
       </FeatureToggleCard>
   )
 
-  // return (
-  //   <Card className={"form-card " + (isActive ? "" : "illustration")}>
-  //     <Card.Body>
-  //
-  //       <Row>
-  //
-  //         <Col sm={12}>
-  //           <h5 className={"card-title"}>Electronic Laboratory Notebook (ELN)</h5>
-  //           <h6 className={"card-subtitle text-muted"}>
-  //             Studies that require an electronic notebook will have a folder created within the
-  //             appropriate program folder of the integrated ELN system. Studies will
-  //             also have a summary notebook entry created for them, either from the
-  //             selected template, or as a blank entry.
-  //           </h6>
-  //         </Col>
-  //
-  //         <Col sm={12} className={"feature-toggle"}>
-  //           <FormGroup>
-  //             <Form.Check
-  //               type={"switch"}
-  //               label={"Does this study need an electronic notebook?"}
-  //               onChange={() => onChange("useNotebook", !isActive)}
-  //               defaultChecked={isActive}
-  //             />
-  //           </FormGroup>
-  //         </Col>
-  //
-  //         <CSSTransition
-  //           nodeRef={notebookNodeRef}
-  //           in={isActive}
-  //           timeout={300}
-  //           classNames={"slide-in-down"}
-  //         >
-  //           <Col sm={12}
-  //                ref={notebookNodeRef}
-  //                className={cardClass}
-  //           >
-  //             <Row>
-  //               <Col md={6}>
-  //                   <NotebookEntryTemplatesDropdown
-  //                       onChange={selected =>
-  //                           onChange("notebookTemplateId", selected || "")
-  //                       }
-  //                   />
-  //               </Col>
-  //             </Row>
-  //           </Col>
-  //         </CSSTransition>
-  //
-  //       </Row>
-  //
-  //     </Card.Body>
-  //   </Card>
-  // );
 }
 
 NotebookInputsCard.propTypes = {
   isActive: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
-  selectedProgram: PropTypes.string
+  selectedProgram: PropTypes.string,
+  selectedStudy: PropTypes.string
 }
 
 export default NotebookInputsCard;

@@ -47,4 +47,7 @@ public class AssayPayloadDto {
   private Set<Long> users = new HashSet<>();
   private Map<String, Object> fields = new LinkedHashMap<>();
   private Map<String, String> attributes = new HashMap<>();
+  private boolean useNotebook = true;
+  private boolean useGit = false;
+  private boolean useStorage = true;
 }
