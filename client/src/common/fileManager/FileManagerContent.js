@@ -54,10 +54,6 @@ const pathIsWithinRoot = (path, root) => {
   return path.indexOf(root) === -1;
 }
 
-const FolderPathBreadcrumbs = ({dataSource, folder}) => {
-  return <Badge bg="light" style={{fontSize: "100%", color: "darkslategrey"}}>{dataSource.name}: {folder ? folder.path : ''}</Badge>
-}
-
 const FileManagerContent = ({location, path}) => {
 
   console.debug("Selected data source: ", location);
@@ -296,7 +292,7 @@ const FileManagerContent = ({location, path}) => {
                     <Breadcrumb.Item
                         onClick={() => handlePathUpdate(location.rootFolderPath)}
                     >
-                      {location.name}
+                      Home
                     </Breadcrumb.Item>
                     {
                       folder ? folder.path.split("/").map((path, index) => {
