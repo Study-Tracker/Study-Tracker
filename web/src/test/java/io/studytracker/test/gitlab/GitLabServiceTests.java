@@ -37,7 +37,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -46,7 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"gitlab-test", "example"})
 public class GitLabServiceTests {
 
-  @Autowired private Environment env;
+  private static final String EXAMPLE_PROGRAM = "Preclinical Project B";
 
   @Autowired private GitLabService gitLabService;
 
@@ -62,8 +61,6 @@ public class GitLabServiceTests {
   public void doBefore() {
     exampleDataGenerator.populateDatabase();
   }
-
-  private static final String EXAMPLE_PROGRAM = "Preclinical Project B";
 
   @Test
   public void createProgramGroupTest() throws Exception {

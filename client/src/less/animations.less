@@ -16,7 +16,7 @@
 
 .hidden {
   height: 0;
-  -webkit-transition:height, 0.5s linear;
+  -webkit-transition: height, 0.5s linear;
   -moz-transition: height, 0.5s linear;
   -ms-transition: height, 0.5s linear;
   -o-transition: height, 0.5s linear;
@@ -25,7 +25,7 @@
 
 .hidden.show {
   height: 100%;
-  -webkit-transition:height, 0.5s linear;
+  -webkit-transition: height, 0.5s linear;
   -moz-transition: height, 0.5s linear;
   -ms-transition: height, 0.5s linear;
   -o-transition: height, 0.5s linear;
@@ -64,8 +64,6 @@
   transform: translate3d(0, 10px, 0);
 }
 
-// Slide-in down
-
 .slide-in-down-enter {
   opacity: 0;
   height: 0;
@@ -73,33 +71,33 @@
 }
 
 .slide-in-down-enter-active {
-    opacity: 1;
-    height: auto;
-    transform: translate3d(0, 0, 0);
-    transition: opacity 300ms, transform 300ms, height 300ms;
+  opacity: 1;
+  height: auto;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 300ms, transform 300ms, height 300ms;
 }
 
 .slide-in-down-enter-done {
-    opacity: 1;
-    height: auto;
-    transform: translate3d(0, 0, 0);
+  opacity: 1;
+  height: auto;
+  transform: translate3d(0, 0, 0);
 }
 
 .slide-in-down-exit {
-    opacity: 1;
-    height: auto;
-    transform: translate3d(0, 0, 0);
+  opacity: 1;
+  height: auto;
+  transform: translate3d(0, 0, 0);
 }
 
 .slide-in-down-exit-active {
-    opacity: 0;
-    height: 0;
-    transform: translate3d(0, -10px, 0);
-    transition: opacity 300ms, transform 300ms, height 300ms;
+  opacity: 0;
+  height: 0;
+  transform: translate3d(0, -10px, 0);
+  transition: opacity 300ms, transform 300ms, height 300ms;
 }
 
 .slide-in-down-exit-done {
-    opacity: 0;
-    height: 0;
-    transform: translate3d(0, -10px, 0);
+  opacity: 0;
+  height: 0;
+  transform: translate3d(0, -10px, 0);
 }

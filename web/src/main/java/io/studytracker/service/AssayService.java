@@ -82,7 +82,7 @@ public class AssayService {
 
   @Autowired private ELNFolderRepository elnFolderRepository;
 
-  @Autowired private GitService gitService;
+  @Autowired(required = false) private GitService gitService;
 
   public Page<Assay> findAll(Pageable pageable) {
     return assayRepository.findAll(pageable);

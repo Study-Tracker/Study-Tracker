@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.studytracker.test.gitlab;
 
 import io.studytracker.Application;
@@ -17,7 +33,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -28,21 +43,11 @@ public class GitLabRestClientTests {
 
   private static final String EXAMPLE_GROUP = "API Client Test Group";
 
-  @Autowired private Environment env;
-
   @Autowired
   private GitLabRestClient client;
 
   @Autowired
   private GitLabOptions options;
-
-//  @Test
-//  public void authenticationTest() throws Exception {
-//    GitLabAuthenticationToken token = client.authenticate();
-//    System.out.println(token.toString());
-//    Assert.assertNotNull(token);
-//    Assert.assertTrue(token.getAccessToken().length() > 0);
-//  }
 
   @Test
   public void findUsersTest() throws Exception {
@@ -94,6 +99,7 @@ public class GitLabRestClientTests {
     request.setDescription("Test group created by API client");
     request.setAutoDevOpsEnabled(false);
     request.setParentId(options.getRootGroupId());
+    request.setVisibility("private");
     GitLabGroup group = client.createNewGroup(token, request);
     Assert.assertNotNull(group);
     Assert.assertEquals(group.getName(), EXAMPLE_GROUP);
