@@ -19,9 +19,11 @@ package io.studytracker.service;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.StudyTrackerException;
+import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramOptions;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
@@ -32,6 +34,7 @@ import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +58,8 @@ public class ProgramService {
 
   private ELNFolderRepository elnFolderRepository;
 
+  private GitService gitService;
+
   public Optional<Program> findById(Long id) {
     return programRepository.findById(id);
   }
@@ -76,7 +81,7 @@ public class ProgramService {
   }
 
   @Transactional
-  public Program create(Program program) {
+  public Program create(@NotNull Program program, @NotNull ProgramOptions options) {
     LOGGER.info("Creating new program with name: " + program.getName());
 
     program.setCreatedAt(new Date());
@@ -93,7 +98,7 @@ public class ProgramService {
     }
 
     // Create the notebook folder
-    if (notebookFolderService != null) {
+    if (options.isUseNotebook() && notebookFolderService != null) {
       try {
         NotebookFolder notebookFolder = notebookFolderService.createProgramFolder(program);
         LOGGER.debug("Created notebook folder: " + notebookFolder);
@@ -105,8 +110,23 @@ public class ProgramService {
       program.setNotebookFolder(null);
     }
 
-    return programRepository.save(program);
+    Program created = programRepository.save(program);
 
+    // Create the program Git group
+    if (options.isUseGit() && gitService != null) {
+      try {
+        gitService.createProgramGroup(created);
+      } catch (Exception e) {
+        throw new StudyTrackerException(e);
+      }
+    }
+
+    return created;
+
+  }
+
+  public Program create(Program program) {
+    return create(program, new ProgramOptions());
   }
 
   @Transactional
@@ -232,5 +252,10 @@ public class ProgramService {
   @Autowired
   public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {
     this.elnFolderRepository = elnFolderRepository;
+  }
+
+  @Autowired(required = false)
+  public void setGitService(GitService gitService) {
+    this.gitService = gitService;
   }
 }

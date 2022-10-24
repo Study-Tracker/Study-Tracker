@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-import React from "react";
+package io.studytracker.model;
 
-export const ModelDetailsAttributeList = ({attributes}) => {
+import lombok.Data;
 
-  return Object.keys(attributes)
-  .filter(key => !key.startsWith("_"))
-  .map((key) => {
-    return (
-        <React.Fragment key={'attribute-' + key}>
-          <h6 className="details-label">{key}</h6>
-          <p>{attributes[key]}</p>
-        </React.Fragment>
-    )
-  });
+@Data
+public class ProgramOptions {
+
+  private boolean useNotebook = true;
+  private boolean useGit = true;
+  private boolean useStorage = true;
 
 }

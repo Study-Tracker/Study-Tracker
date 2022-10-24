@@ -23,7 +23,9 @@ import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
+import io.studytracker.git.GitService;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayTypeField;
 import io.studytracker.model.CustomEntityFieldType;
@@ -79,6 +81,8 @@ public class AssayService {
   @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
 
   @Autowired private ELNFolderRepository elnFolderRepository;
+
+  @Autowired private GitService gitService;
 
   public Page<Assay> findAll(Pageable pageable) {
     return assayRepository.findAll(pageable);
@@ -175,11 +179,11 @@ public class AssayService {
   }
 
   public void create(Assay assay) {
-    this.create(assay, null);
+    this.create(assay, new AssayOptions());
   }
 
   @Transactional
-  public void create(Assay assay, NotebookTemplate template) {
+  public Assay create(Assay assay, AssayOptions options) {
 
     LOGGER.info("Creating new assay record with name: " + assay.getName());
 
@@ -201,17 +205,19 @@ public class AssayService {
                     new RecordNotFoundException("Cannot find study: " + assay.getStudy().getId()));
 
     // Create the storage folder
-    try {
-      storageService.createAssayFolder(assay);
-      StorageFolder folder = storageService.getAssayFolder(assay);
-      assay.setStorageFolder(FileStoreFolder.from(folder));
-    } catch (Exception e) {
-      e.printStackTrace();
-      LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode());
+    if (options.isUseStorage()) {
+      try {
+        storageService.createAssayFolder(assay);
+        StorageFolder folder = storageService.getAssayFolder(assay);
+        assay.setStorageFolder(FileStoreFolder.from(folder));
+      } catch (Exception e) {
+        e.printStackTrace();
+        LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode());
+      }
     }
 
     // Create the ELN folder
-    if (notebookFolderService != null) {
+    if (options.isUseNotebook() && notebookFolderService != null) {
       if (study.getNotebookFolder() != null) {
         try {
 
@@ -222,6 +228,16 @@ public class AssayService {
           assay.setNotebookFolder(ELNFolder.from(notebookFolder));
 
           // Create the notebook entry
+          NotebookTemplate template = null;
+          if (options.getNotebookTemplateId() != null) {
+            Optional<NotebookTemplate> templateOptional =
+                notebookEntryService.findEntryTemplateById(options.getNotebookTemplateId());
+            if (templateOptional.isPresent()) {
+              template = templateOptional.get();
+            } else {
+              LOGGER.warn("Cannot find notebook template with id: " + options.getNotebookTemplateId());
+            }
+          }
           notebookEntryService.createAssayNotebookEntry(assay, template);
 
         } catch (Exception e) {
@@ -235,8 +251,9 @@ public class AssayService {
       assay.setNotebookFolder(null);
     }
 
+    Assay created;
     try {
-      assayRepository.save(assay);
+      created = assayRepository.save(assay);
       LOGGER.info(
           String.format(
               "Successfully created new assay with code %s and ID %s",
@@ -246,6 +263,19 @@ public class AssayService {
     } catch (Exception e) {
       throw e;
     }
+
+    // Git repository
+    if (options.isUseGit()) {
+      try {
+        gitService.createAssayRepository(created);
+      } catch (Exception e) {
+        e.printStackTrace();
+        LOGGER.warn("Failed to create git repository for assay: " + created.getCode());
+      }
+    }
+
+    return created;
+
   }
 
   @Transactional

@@ -24,6 +24,7 @@ import io.studytracker.mapstruct.dto.response.AssayParentDto;
 import io.studytracker.mapstruct.dto.response.AssaySlimDto;
 import io.studytracker.mapstruct.dto.response.AssaySummaryDto;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.User;
 import java.util.List;
@@ -107,5 +108,9 @@ public interface AssayMapper {
 
   @Named("assayTaskToId")
   public static Long assayTaskToId(AssayTask assayTask) { return assayTask.getId();}
+
+  public AssayOptions optionsFromAssayPayload(AssayPayloadDto dto);
+
+  public AssayOptions optionsFromAssayForm(AssayFormDto dto);
 
 }

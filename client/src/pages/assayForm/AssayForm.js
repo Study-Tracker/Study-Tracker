@@ -65,7 +65,7 @@ const AssayForm = props => {
     attributes: {},
     notebookFolder: {},
     notebookTemplateId: null,
-    useNotebook: true,
+    useNotebook: !!study.notebookFolder,
     useGit: false,
     useStorage: true,
   };
@@ -375,6 +375,7 @@ const AssayForm = props => {
                   {/*ELN*/}
                   {
                     !values.id
+                    && study.notebookFolder
                     && features
                     && features.notebook
                     && features.notebook.isEnabled ? (
