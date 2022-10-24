@@ -24,6 +24,8 @@ public class StorageFeaturesDto {
 
   private String mode;
 
+  private String storageServiceUrl;
+
   @JsonProperty("label")
   public String getLabel() {
     switch (mode) {
@@ -31,6 +33,8 @@ public class StorageFeaturesDto {
         return "Egnyte";
       case "local":
         return "File System";
+      case "s3":
+        return "Amazon S3";
       default:
         return mode;
     }

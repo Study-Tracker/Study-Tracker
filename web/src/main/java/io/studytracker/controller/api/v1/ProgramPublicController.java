@@ -21,6 +21,7 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ProgramDto;
 import io.studytracker.mapstruct.dto.api.ProgramPayloadDto;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramOptions;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,9 @@ public class ProgramPublicController extends AbstractProgramController {
   @PostMapping("")
   public HttpEntity<ProgramDto> createProgram(@Valid @RequestBody ProgramPayloadDto dto) {
     LOGGER.info("Creating program {}", dto);
-    Program program = this.createNewProgram(this.getProgramMapper().fromProgramPayloadDto(dto));
+    Program newProgram = this.getProgramMapper().fromProgramPayloadDto(dto);
+    ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
+    Program program = this.createNewProgram(newProgram, options);
     ProgramDto created = this.getProgramMapper().toProgramDto(program);
     LOGGER.info("Storage Folder: {} {} {}", program.getStorageFolder().getId(), program.getStorageFolder().getName(), program.getStorageFolder().getPath());
     LOGGER.info("Created program {}", created);

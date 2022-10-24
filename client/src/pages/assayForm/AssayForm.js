@@ -23,8 +23,6 @@ import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
 import swal from 'sweetalert';
 import {AssayTypeDropdown} from "../../common/forms/assayTypes";
-import NotebookEntryTemplatesDropdown
-  from '../../common/forms/NotebookEntryTemplateDropdown';
 import {
   AssayTypeFieldCaptureInputList
 } from "../../common/forms/assayTypeFieldCapture";
@@ -41,6 +39,7 @@ import * as yup from "yup";
 import axios from "axios";
 import FormikFormErrorNotification
   from "../../common/forms/FormikFormErrorNotification";
+import NotebookInputsCard from "../../common/forms/NotebookInputsCard";
 
 const AssayForm = props => {
 
@@ -65,7 +64,10 @@ const AssayForm = props => {
     tasks: [],
     attributes: {},
     notebookFolder: {},
-    notebookTemplateId: null
+    notebookTemplateId: null,
+    useNotebook: !!study.notebookFolder,
+    useGit: false,
+    useStorage: true,
   };
 
   const assaySchema = yup.object().shape({
@@ -193,45 +195,47 @@ const AssayForm = props => {
 
             <FormikFormErrorNotification />
 
-            <Row>
-              <Col>
-                <Breadcrumbs crumbs={[
-                  {label: "Home", url: "/"},
-                  {
-                    label: "Study " + study.code,
-                    url: "/study/" + study.code
-                  },
-                  {label: !!values.id ? "Edit Assay" : "New Assay"}
-                ]}/>
-              </Col>
-            </Row>
+            <FormikForm autoComplete={"off"}>
 
-            <Row className="justify-content-end align-items-center">
-              <Col>
-                <h3>{!!values.id ? "Edit Assay" : "New Assay"}</h3>
-              </Col>
-            </Row>
+              <Row>
+                <Col>
+                  <Breadcrumbs crumbs={[
+                    {label: "Home", url: "/"},
+                    {
+                      label: "Study " + study.code,
+                      url: "/study/" + study.code
+                    },
+                    {label: !!values.id ? "Edit Assay" : "New Assay"}
+                  ]}/>
+                </Col>
+              </Row>
 
-            <Row>
-              <Col xs={12}>
-                <Card>
+              <Row className="justify-content-end align-items-center">
+                <Col>
+                  <h3>{!!values.id ? "Edit Assay" : "New Assay"}</h3>
+                </Col>
+              </Row>
 
-                  <Card.Header>
-                    <Card.Title tag="h5">Assay Overview</Card.Title>
-                    <h6 className="card-subtitle text-muted">Select the assay type
-                      that best reflects the experiment being done. If an accurate
-                      option does not exist, or if this is a new assay type,
-                      select 'Generic'. If Assay names should be descriptive, but
-                      do not need to be unique. Describe the
-                      objective of your assay in one or two sentences. Select the
-                      status that best reflects the current state of your assay.
-                      Choose the date your assay is expected to start. If the
-                      assay has already completed, you may select an end
-                      date.</h6>
-                  </Card.Header>
+              <Row>
+                <Col xs={12}>
+                  <Card>
 
-                  <Card.Body>
-                    <FormikForm autoComplete={"off"}>
+                    <Card.Header>
+                      <Card.Title tag="h5">Assay Overview</Card.Title>
+                      <h6 className="card-subtitle text-muted">Select the assay type
+                        that best reflects the experiment being done. If an accurate
+                        option does not exist, or if this is a new assay type,
+                        select 'Generic'. If Assay names should be descriptive, but
+                        do not need to be unique. Describe the
+                        objective of your assay in one or two sentences. Select the
+                        status that best reflects the current state of your assay.
+                        Choose the date your assay is expected to start. If the
+                        assay has already completed, you may select an end
+                        date.</h6>
+                    </Card.Header>
+
+                    <Card.Body>
+
 
                       {/*Overview*/}
                       <Row>
@@ -289,22 +293,8 @@ const AssayForm = props => {
                             </Form.Text>
                           </FormGroup>
                         </Col>
+
                         <Col sm={5}>
-                          {
-                            features
-                            && features.notebook
-                            && features.notebook.isEnabled
-                            && !values.id ? (
-                              <NotebookEntryTemplatesDropdown
-                                  onChange={selectedItem =>
-                                      setFieldValue(
-                                          "notebookTemplateId",
-                                          selectedItem || ''
-                                      )
-                                  }
-                              />
-                            ): ""
-                          }
 
                           <StatusDropdown
                               selected={values.status}
@@ -354,144 +344,21 @@ const AssayForm = props => {
 
                         </Col>
                       </Row>
+                    </Card.Body>
+                  </Card>
 
+                  {/* Assay Team */}
+                  <Card>
+                    <Card.Header>
+                      <Card.Title>Assay Team</Card.Title>
+                      <h6 className="card-subtitle text-muted">Who will be
+                        working on this assay? One user must be assigned as
+                        the assay owner. This person will be the primary
+                        contact person for the experiment.</h6>
+                      <br/>
+                    </Card.Header>
+                    <Card.Body>
                       <Row>
-                        <Col>
-                          <hr/>
-                        </Col>
-                      </Row>
-
-                      {/* Legacy study assay */}
-
-                      {
-                        study.legacy
-                            ? (
-                                <React.Fragment>
-                                  <Row>
-
-                                    <Col md={12}>
-                                      <h5 className="card-title">Legacy Study</h5>
-                                      <h6 className="card-subtitle text-muted">Studies
-                                        created
-                                        prior to the introduction of Study Tracker are
-                                        considered legacy. Enabling this option allows
-                                        you to
-                                        specify certain attributes that would
-                                        otherwise be
-                                        automatically generated.</h6>
-                                      <br/>
-                                    </Col>
-
-                                    <Col md={12}>
-
-                                      <FormGroup>
-                                        <Form.Label>Notebook URL</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name={"notebookFolder.url"}
-                                            value={values.notebookFolder.url}
-                                            onChange={handleChange}
-                                        />
-                                        <Form.Text>
-                                          If the study already has an ELN
-                                          entry, provide the URL here.
-                                        </Form.Text>
-                                      </FormGroup>
-                                    </Col>
-
-                                  </Row>
-
-                                  <Row>
-                                    <Col>
-                                      <hr/>
-                                    </Col>
-                                  </Row>
-
-                                </React.Fragment>
-                            ) : ''
-                      }
-
-                      {/* Assay type fields */}
-
-                      {
-                        values.assayType
-                        && values.assayType.fields.length > 0
-                            ? (
-                                <React.Fragment>
-
-                                  <Row>
-
-                                    <Col md={12}>
-                                      <h5 className="card-title">
-                                        {values.assayType.name} Fields
-                                      </h5>
-                                      <h6 className="card-subtitle text-muted">
-                                        {values.assayType.description}
-                                      </h6>
-                                      <br/>
-                                    </Col>
-
-                                  </Row>
-
-                                  <AssayTypeFieldCaptureInputList
-                                      assayType={values.assayType}
-                                      assayFields={values.fields}
-                                      handleUpdate={data => {
-                                        setFieldValue("fields", {
-                                          ...values.fields,
-                                          ...data
-                                        });
-                                      }}
-                                      errors={errors}
-                                  />
-
-                                  <Row>
-                                    <Col>
-                                      <hr/>
-                                    </Col>
-                                  </Row>
-
-                                </React.Fragment>
-                            )
-                            : ''
-                      }
-
-                      {/* Tasks */}
-
-                      <Row>
-                        <Col sm={12}>
-                          <h5 className="card-title">Tasks</h5>
-                          <h6 className="card-subtitle text-muted">
-                            You can define an ordered list of tasks that must be
-                            completed for your assay here. Task status changes are
-                            captured with user-associated timestamps.
-                          </h6>
-                          <br/>
-                        </Col>
-                      </Row>
-
-                      <TaskInputs
-                          tasks={values.tasks}
-                          handleUpdate={(tasks) => setFieldValue("tasks", tasks)}
-                      />
-
-                      <Row>
-                        <Col>
-                          <hr/>
-                        </Col>
-                      </Row>
-
-                      {/* Assay Team */}
-                      <Row>
-                        <Col sm={12}>
-                          <h5 className="card-title">Assay Team</h5>
-                          <h6 className="card-subtitle text-muted">Who will be
-                            working on this assay? One user must be assigned as
-                            the assay owner. This person will be the primary
-                            contact person for the experiment.</h6>
-                          <br/>
-                        </Col>
-
                         <Col sm={12}>
                           <UserInputs
                               users={values.users}
@@ -502,73 +369,165 @@ const AssayForm = props => {
                         </Col>
 
                       </Row>
+                    </Card.Body>
+                  </Card>
 
-                      <Row>
-                        <Col>
-                          <hr/>
-                        </Col>
-                      </Row>
+                  {/*ELN*/}
+                  {
+                    !values.id
+                    && study.notebookFolder
+                    && features
+                    && features.notebook
+                    && features.notebook.isEnabled ? (
+                        <NotebookInputsCard
+                            isActive={values.useNotebook}
+                            selectedStudy={study}
+                            onChange={(key, value) => setFieldValue(key, value)}
+                        />
+                    ) : ''
+                  }
 
-                      {/* Attributes */}
+                  {/* Legacy study assay */}
+                  {
+                    study.legacy
+                        ? (
+                            <Card>
+                              <Card.Header>
+                                <Card.Title>Legacy Study</Card.Title>
+                                <h6 className="card-subtitle text-muted">Studies
+                                  created
+                                  prior to the introduction of Study Tracker are
+                                  considered legacy. Enabling this option allows
+                                  you to
+                                  specify certain attributes that would
+                                  otherwise be
+                                  automatically generated.</h6>
+                              </Card.Header>
+                              <Card.Body>
+                                <Row>
 
-                      <Row>
 
-                        <Col md={12}>
-                          <h5 className="card-title">Assay Attributes</h5>
-                          <h6 className="card-subtitle text-muted">
-                            Key-value attributes for adding additional information
-                            about the assay, or for adding application-aware
-                            attributes for external integrations (for example, ELN
-                            identifiers). You can add as many or as few attributes
-                            as you'd like. Attribute values should not be left
-                            empty. All values are saved as simple character
-                            strings.
-                          </h6>
-                          <br/>
-                        </Col>
+                                  <Col md={12}>
 
-                      </Row>
+                                    <FormGroup>
+                                      <Form.Label>Notebook URL</Form.Label>
+                                      <Form.Control
+                                          type="text"
+                                          name={"notebookFolder.url"}
+                                          value={values.notebookFolder.url}
+                                          onChange={handleChange}
+                                      />
+                                      <Form.Text>
+                                        If the study already has an ELN
+                                        entry, provide the URL here.
+                                      </Form.Text>
+                                    </FormGroup>
+                                  </Col>
 
+                                </Row>
+                              </Card.Body>
+                            </Card>
+                        ) : ''
+                  }
+
+                  {/* Assay type fields */}
+                  {
+                    values.assayType
+                    && values.assayType.fields.length > 0
+                        ? (
+                            <Card>
+                              <Card.Header>
+                                <Card.Title>{values.assayType.name} Fields</Card.Title>
+                                <h6 className="card-subtitle text-muted">
+                                  {values.assayType.description}
+                                </h6>
+                              </Card.Header>
+                              <Card.Body>
+                                <AssayTypeFieldCaptureInputList
+                                    assayType={values.assayType}
+                                    assayFields={values.fields}
+                                    handleUpdate={data => {
+                                      setFieldValue("fields", {
+                                        ...values.fields,
+                                        ...data
+                                      });
+                                    }}
+                                    errors={errors}
+                                />
+                              </Card.Body>
+                            </Card>
+                        )
+                        : ''
+                  }
+
+                  {/* Tasks */}
+                  <Card>
+                    <Card.Header>
+                      <Card.Title>Tasks</Card.Title>
+                      <h6 className="card-subtitle text-muted">
+                        You can define an ordered list of tasks that must be
+                        completed for your assay here. Task status changes are
+                        captured with user-associated timestamps.
+                      </h6>
+                    </Card.Header>
+                    <Card.Body>
+                      <TaskInputs
+                          tasks={values.tasks}
+                          handleUpdate={(tasks) => setFieldValue("tasks", tasks)}
+                      />
+                    </Card.Body>
+                  </Card>
+
+                  {/* Attributes */}
+                  <Card>
+                    <Card.Header>
+                      <Card.Title>Assay Attributes</Card.Title>
+                      <h6 className="card-subtitle text-muted">
+                        Key-value attributes for adding additional information
+                        about the assay, or for adding application-aware
+                        attributes for external integrations (for example, ELN
+                        identifiers). You can add as many or as few attributes
+                        as you'd like. Attribute values should not be left
+                        empty. All values are saved as simple character
+                        strings.
+                      </h6>
+                    </Card.Header>
+                    <Card.Body>
                       <AttributeInputs
                           attributes={values.attributes}
                           handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
                           error={errors.attributes}
                       />
+                    </Card.Body>
+                  </Card>
 
-                      <Row>
-                        <Col>
-                          <hr/>
-                        </Col>
-                      </Row>
+                  {/*Buttons*/}
+                  <Row>
+                    <Col className="text-center">
+                      <FormGroup>
+                        <Button
+                            size="lg"
+                            variant="primary"
+                            type="submit"
+                            className={"me-2"}
+                        >
+                          Submit
+                        </Button>
+                        <Button
+                            size="lg"
+                            variant="secondary"
+                            onClick={handleCancel}
+                        >
+                          Cancel
+                        </Button>
+                      </FormGroup>
+                    </Col>
+                  </Row>
 
-                      {/*Buttons*/}
-                      <Row>
-                        <Col className="text-center">
-                          <FormGroup>
-                            <Button
-                                size="lg"
-                                variant="primary"
-                                type="submit"
-                            >
-                              Submit
-                            </Button>
-                            &nbsp;&nbsp;
-                            <Button
-                                size="lg"
-                                variant="secondary"
-                                onClick={handleCancel}
-                            >
-                              Cancel
-                            </Button>
-                          </FormGroup>
-                        </Col>
-                      </Row>
+                </Col>
+              </Row>
 
-                    </FormikForm>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
+            </FormikForm>
 
           </Container>
         )}

@@ -56,4 +56,7 @@ public class AssayFormDto {
   private Map<String, Object> fields = new LinkedHashMap<>();
   private Map<String, String> attributes = new HashMap<>();
   private Set<AssayTaskDetailsDto> tasks = new HashSet<>();
+  private Boolean useGit;
+  private Boolean useNotebook;
+  private Boolean useStorage;
 }

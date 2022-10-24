@@ -22,6 +22,7 @@ import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramSummaryDto;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramOptions;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -60,4 +61,8 @@ public interface ProgramMapper {
 
   ProgramPayloadDto toProgramPayloadDto(Program program);
   Program fromProgramPayloadDto(ProgramPayloadDto dto);
+
+  ProgramOptions optionsFromPayloadDto(ProgramPayloadDto dto);
+
+  ProgramOptions optionsFromFormDto(ProgramFormDto dto);
 }

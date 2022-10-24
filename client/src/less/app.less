@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+@import "forms";
 @import "file-manager";
+@import "animations";
 
 .content {
   padding: 1rem;
@@ -327,24 +329,6 @@ table td .dropdown {
   max-width: 1200px;
 }
 
-/* Study Form */
-.study-form {
-
-  .quill {
-    height: 100%;
-  }
-
-  .ql-editor {
-    height: 15rem;
-  }
-
-}
-
-/* Form validation */
-.react-select-container.is-invalid .react-select__control {
-  border-color: #d9534f;
-}
-
 /* Settings sidebar */
 
 .settings-toggle {
@@ -355,14 +339,7 @@ table td .dropdown {
 
 }
 
-/* Quill */
-
-.ql-container {
-  height: 70%
-}
-
-/* Forms */
-
-.form-label {
-  font-weight: 500;
+/* Sweetalert */
+.swal2-styled.swal2-confirm {
+  background-color: #3f80ea !important;
 }

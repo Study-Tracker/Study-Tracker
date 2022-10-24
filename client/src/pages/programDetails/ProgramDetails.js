@@ -46,7 +46,7 @@ const ProgramDetailHeader = ({program, user}) => {
         <Col>
           <h3>Program {program.name} ({program.code})</h3>
         </Col>
-        <Col className="col-auto">
+        <Col className="col-auto d-flex">
           {
             user && user.admin
                 ? <SelectableProgramStatusButton active={program.active}

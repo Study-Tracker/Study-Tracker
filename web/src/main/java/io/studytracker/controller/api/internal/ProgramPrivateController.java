@@ -29,6 +29,7 @@ import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
 import io.studytracker.storage.StorageFolder;
@@ -96,7 +97,9 @@ public class ProgramPrivateController extends AbstractProgramController {
   @PostMapping("")
   public HttpEntity<ProgramDetailsDto> createProgram(@RequestBody @Valid ProgramFormDto dto) {
     LOGGER.info("Creating new program: " + dto.toString());
-    Program program = this.createNewProgram(this.getProgramMapper().fromProgramFormDto(dto));
+    Program newProgram = this.getProgramMapper().fromProgramFormDto(dto);
+    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
+    Program program = this.createNewProgram(newProgram, options);
     return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.CREATED);
   }
 

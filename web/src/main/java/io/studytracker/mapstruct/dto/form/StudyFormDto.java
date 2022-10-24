@@ -67,4 +67,7 @@ public class StudyFormDto {
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();
   private StudyConclusionsDetailsDto conclusions;
   private Set<CommentDetailsDto> comments = new HashSet<>();
+  private Boolean useGit;
+  private Boolean useNotebook;
+  private Boolean useStorage;
 }

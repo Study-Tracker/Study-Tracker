@@ -22,6 +22,7 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.User;
 import io.studytracker.service.ProgramService;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public abstract class AbstractProgramController extends AbstractApiController {
    * @param program the program to create
    * @return the created program
    */
-  public Program createNewProgram(Program program) {
+  public Program createNewProgram(Program program, ProgramOptions options) {
 
     // Make sure the user has the necessary privileges to create a new program
     User user = this.getAuthenticatedUser();
@@ -48,7 +49,7 @@ public abstract class AbstractProgramController extends AbstractApiController {
     }
 
     // Create the new program and publish the event
-    this.getProgramService().create(program);
+    this.getProgramService().create(program, options);
     Activity activity = ProgramActivityUtils.fromNewProgram(program, user);
     this.logActivity(activity);
 

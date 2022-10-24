@@ -25,5 +25,6 @@ public class FeaturesSummaryDto {
   private NotebookFeaturesDto notebook;
   private SearchFeaturesDto search;
   private AuthFeaturesDto auth;
+  private GitFeaturesDto git;
 
 }

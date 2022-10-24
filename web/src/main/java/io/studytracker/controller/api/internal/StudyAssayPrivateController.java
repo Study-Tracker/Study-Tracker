@@ -17,7 +17,6 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
-import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -25,19 +24,18 @@ import io.studytracker.mapstruct.dto.form.AssayFormDto;
 import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssaySummaryDto;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,23 +74,9 @@ public class StudyAssayPrivateController extends AbstractAssayController {
 
     Study study = this.getStudyFromIdentifier(studyId);
     Assay assay = this.getAssayMapper().fromAssayForm(dto);
+    AssayOptions options = this.getAssayMapper().optionsFromAssayForm(dto);
     User user = this.getAuthenticatedUser();
-    Assay created;
-
-    // If a notebook template was requested, find it
-    if (this.getNotebookEntryService() != null && StringUtils.hasText(dto.getNotebookTemplateId())) {
-      Optional<NotebookTemplate> templateOptional =
-          this.getNotebookEntryService().findEntryTemplateById(dto.getNotebookTemplateId());
-      if (templateOptional.isPresent()) {
-        created = this.createAssay(assay, study, user, templateOptional.get());
-      } else {
-        throw new RecordNotFoundException(
-            "Could not find notebook entry template: " + dto.getNotebookTemplateId());
-      }
-    } else {
-      created = this.createAssay(assay, study, user);
-    }
-
+    Assay created = this.createAssay(assay, study, user, options);
     return new ResponseEntity<>(this.getAssayMapper().toAssayDetails(created), HttpStatus.CREATED);
   }
 

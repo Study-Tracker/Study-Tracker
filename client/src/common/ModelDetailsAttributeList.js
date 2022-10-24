@@ -18,16 +18,15 @@ import React from "react";
 
 export const ModelDetailsAttributeList = ({attributes}) => {
 
-  let list = [];
-  for (let key of Object.keys(attributes)) {
-    list.push(
+  return Object.keys(attributes)
+  .filter(key => !key.startsWith("_"))
+  .map((key) => {
+    return (
         <React.Fragment key={'attribute-' + key}>
           <h6 className="details-label">{key}</h6>
           <p>{attributes[key]}</p>
         </React.Fragment>
     )
-  }
-
-  return list;
+  });
 
 }

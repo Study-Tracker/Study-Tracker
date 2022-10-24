@@ -35,7 +35,6 @@ public class StudyPayloadDto {
   private @NotBlank String name;
   private Long programId;
   private @NotBlank String description;
-  private String notebookTemplateId;
   private Long collaboratorId;
   private boolean legacy = false;
   private boolean active = true;
@@ -48,4 +47,8 @@ public class StudyPayloadDto {
   private Set<Long> users = new HashSet<>();
   private Set<Long> keywords = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
+  private String notebookTemplateId;
+  private boolean useNotebook = true;
+  private boolean useGit = false;
+  private boolean useStorage = true;
 }

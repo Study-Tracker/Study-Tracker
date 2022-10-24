@@ -5,8 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Working on a new feature to allow creation of permanent API tokens for use by integrations. This will allow admin users to create a token that can be used to authenticate to the API without having to use their username and password. This will be useful for integrations that need to access the API, but do not have a way to store a username and password.
-- Study Tracker will eventually deprecate support of Elasticsearch 7.10 in favor of newer versions. 
+- Study Tracker will eventually deprecate support of Elasticsearch 7.10 in favor of newer versions.
+- Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
+- Updates to the UI of the various 'Details' pages and the main page are in progress.
 
 ## [0.7.1] - 2022-XX-XX
 
@@ -15,9 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for Amazon Web Services S3 storage locations. This allows users to store files in S3 buckets.
 - Added support for creating API users, which can be used exclusively for API access. This allows for easier management of integrations and removes the need to use a user's credentials for API access.
 - Admin users can now select existing Benchling projects to map new programs to.
+- Added generic Git service integration with GitLab implementation. Users can now opt to create Git repositories for new studies and assays.
 
 ### Changed
 - Changed the signature of the JWT created and returned to authenticated users to include creation and expiration times.
+- Updated program, study, and assay forms to make some features optional. Users can choose whether they want notebook and git resources created for them, rather than assuming they are required.
 
 ### Fixed
 - Fixed validation of Quill input fields to prevent empty inputs.

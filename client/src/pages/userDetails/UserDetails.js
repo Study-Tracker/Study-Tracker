@@ -39,7 +39,7 @@ const UserDetailHeader = ({targetUser, user}) => {
         <Col>
           <h3>{targetUser.displayName} ({targetUser.username})</h3>
         </Col>
-        <Col xs="auto">
+        <Col xs="auto" className={"d-flex"}>
           {
             !!user && !!user.admin
                 ? <SelectableUserStatusButton active={targetUser.active}

@@ -80,7 +80,7 @@ public class ElasticsearchSearchControllerTests {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("numHits")))
-        .andExpect(jsonPath("$.numHits", Matchers.is(3)))
+        .andExpect(jsonPath("$.numHits", Matchers.is(2)))
         .andExpect(jsonPath("$", hasKey("maxScore")))
         .andExpect(jsonPath("$.maxScore", greaterThan(0.0)))
         .andExpect(jsonPath("$", hasKey("hits")))

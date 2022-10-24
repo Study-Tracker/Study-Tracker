@@ -30,6 +30,9 @@ import KeywordSettings from "./KeywordSettings";
 import ProgramSettings from "./ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
 import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
+import BenchlingIntegrationSettings from "./BenchlingIntegrationSettings";
+import EgnyteIntegrationSettings from "./EgnyteIntegrationSettings";
+import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
 
 const settings = {
   "users": {
@@ -56,6 +59,28 @@ const settings = {
     label: "Programs",
     tag: ProgramSettings
   },
+
+  // Integrations
+  "benchling": {
+    id: "benchling",
+    category: "integrations",
+    label: "Benchling",
+    tag: BenchlingIntegrationSettings
+  },
+  "egnyte": {
+    id: "egnyte",
+    category: "integrations",
+    label: "Egnyte",
+    tag: EgnyteIntegrationSettings
+  },
+  "gitlab": {
+    id: "gitlab",
+    category: "integrations",
+    label: "GitLab",
+    tag: GitlabIntegrationSettings
+  },
+
+  // Developer Settings
   "api-documentation": {
     id: "api-documentation",
     category: "developer",
@@ -156,6 +181,17 @@ const AdminDashboard = () => {
               </Card.Header>
               <ListGroup variant={"flush"}>
                 {renderMenu('site-settings')}
+              </ListGroup>
+            </Card>
+
+            <Card>
+              <Card.Header>
+                <Card.Title tag="h5" className="mb-0">
+                  Integrations
+                </Card.Title>
+              </Card.Header>
+              <ListGroup variant={"flush"}>
+                {renderMenu('integrations')}
               </ListGroup>
             </Card>
 

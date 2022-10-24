@@ -26,6 +26,7 @@ import io.studytracker.model.Comment;
 import io.studytracker.model.ExternalLink;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.model.StudyRelationship;
 import io.studytracker.model.User;
 import java.util.List;
@@ -110,5 +111,8 @@ public interface StudyMapper {
 
   @Named("studyRelationshipToId")
   public static Long studyRelationshipToId(StudyRelationship relationship) { return relationship.getId();}
+
+  StudyOptions optionsFromStudyPayload(StudyPayloadDto dto);
+  StudyOptions optionsFromStudyForm(StudyFormDto dto);
 
 }

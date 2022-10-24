@@ -24,9 +24,21 @@ public class NotebookFeaturesDto {
 
   private String mode = "none";
 
+  private String elnUrl;
+
   @JsonProperty("isEnabled")
   public boolean isEnabled() {
     return mode != null && !mode.equals("none");
+  }
+
+  @JsonProperty("label")
+  public String getLabel() {
+    switch (mode) {
+      case "benchling":
+        return "Benchling";
+      default:
+        return "None";
+    }
   }
 
 }

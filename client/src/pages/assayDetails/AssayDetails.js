@@ -56,7 +56,7 @@ const AssayDetailHeader = ({assay, user}) => {
           <h4>{assay.code}</h4>
         </Col>
 
-        <Col xs={"auto"}>
+        <Col xs={"auto"} className={"d-flex"}>
 
           {
             !assay.active

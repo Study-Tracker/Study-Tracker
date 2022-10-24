@@ -17,7 +17,6 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.eln.NotebookEntryService;
-import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
@@ -28,6 +27,7 @@ import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.service.AssayService;
 import io.studytracker.service.CollaboratorService;
 import io.studytracker.service.KeywordService;
@@ -38,7 +38,6 @@ import io.studytracker.service.UserService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 public abstract class AbstractStudyController extends AbstractApiController {
 
@@ -106,31 +105,14 @@ public abstract class AbstractStudyController extends AbstractApiController {
   /**
    * Creates a new study with notebook and storage folders, where appropriate.
    * @param study the study to create
-   * @param notebookTemplateId the notebook template to use, or null to use the default
+   * @param options study creation options
    * @return
    */
-  protected Study createNewStudy(Study study, String notebookTemplateId) {
-
-    // If a notebook template was requested, find it
-    if (notebookEntryService != null && StringUtils.hasText(notebookTemplateId)) {
-      Optional<NotebookTemplate> templateOptional =
-          notebookEntryService.findEntryTemplateById(notebookTemplateId);
-      if (templateOptional.isPresent()) {
-        getStudyService().create(study, templateOptional.get());
-      } else {
-        throw new RecordNotFoundException(
-            "Could not find notebook entry template: " + notebookTemplateId);
-      }
-    } else {
-      studyService.create(study);
-    }
-
+  protected Study createNewStudy(Study study, StudyOptions options) {
+    studyService.create(study, options);
     Assert.notNull(study.getId(), "Study not persisted.");
-
-    // Publish events
     Activity activity = StudyActivityUtils.fromNewStudy(study, this.getAuthenticatedUser());
     this.logActivity(activity);
-
     return study;
   }
 

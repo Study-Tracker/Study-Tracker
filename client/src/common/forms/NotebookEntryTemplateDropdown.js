@@ -59,6 +59,7 @@ const NotebookEntryTemplatesDropdown = ({onChange}) => {
             onChange(selected.value)
           }}
           defaultOptions={true}
+          menuPortalTarget={document.body}
         />
         <Form.Control.Feedback>
           Select a template for notebook entry.

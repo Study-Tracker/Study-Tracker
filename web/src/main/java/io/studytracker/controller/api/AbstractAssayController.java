@@ -17,7 +17,6 @@
 package io.studytracker.controller.api;
 
 import io.studytracker.eln.NotebookEntryService;
-import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.AssayMapper;
@@ -25,6 +24,7 @@ import io.studytracker.mapstruct.mapper.AssayTaskMapper;
 import io.studytracker.mapstruct.mapper.AssayTypeMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -117,7 +117,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
    * @param user
    * @return
    */
-  protected Assay createAssay(Assay assay, Study study, User user, NotebookTemplate template) {
+  protected Assay createAssay(Assay assay, Study study, User user, AssayOptions options) {
 
     assay.setStudy(study);
 
@@ -138,7 +138,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
             .orElseThrow(() -> new RecordNotFoundException("Cannot find user: " + user.getId())));
 
     // Create the record
-    assayService.create(assay, template);
+    assayService.create(assay, options);
     Assert.notNull(assay.getId(), "Assay not persisted.");
 
     // Update the study
@@ -149,10 +149,6 @@ public abstract class AbstractAssayController extends AbstractApiController {
     this.logActivity(activity);
 
     return assay;
-  }
-
-  protected Assay createAssay(Assay assay, Study study, User user) {
-    return this.createAssay(assay, study, user, null);
   }
 
   /**

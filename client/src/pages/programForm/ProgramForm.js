@@ -108,6 +108,9 @@ const ProgramForm = ({
       name: '',
       url: ''
     },
+    useGit: false,
+    useNotebook: true,
+    useStorage: true
   };
 
   const submitForm = (values, {setSubmitting}) => {
@@ -167,81 +170,82 @@ const ProgramForm = ({
   };
 
   return (
-      <Container fluid className="animated fadeIn max-width-1200">
+      <Formik
+          initialValues={program || defaultProgramValues}
+          validationSchema={programSchema}
+          onSubmit={submitForm}
+          validateOnBlur={false}
+          validateOnChange={false}
+      >
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isSubmitting,
+          setFieldValue,
+        }) => (
+            <Container fluid className="animated fadeIn max-width-1200">
 
-        <LoadingOverlay
-            isVisible={showLoadingOverlay}
-            message={"Saving program..."}
-        />
+              <LoadingOverlay
+                  isVisible={showLoadingOverlay}
+                  message={"Saving program..."}
+              />
 
-        <Row>
-          <Col>
-            {
-              program
-                  ? (
-                      <Breadcrumb>
-                        <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
-                        <Breadcrumb.Item
-                            href={"/program/" + program.id}>
-                          Program Detail
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item active>Edit Program</Breadcrumb.Item>
-                      </Breadcrumb>
-                  )
-                  : (
-                      <Breadcrumb>
-                        <Breadcrumb.Item href={"/programs"}>
-                          Programs
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item active>New Program</Breadcrumb.Item>
-                      </Breadcrumb>
-                  )
-            }
-          </Col>
-        </Row>
+              <FormikFormErrorNotification />
 
-        <Row className="justify-content-end align-items-center">
-          <Col>
-            <h3>{program ? "Edit Program" : "New Program"}</h3>
-          </Col>
-        </Row>
+              <FormikForm className="program-form" autoComplete={"off"}>
 
-        <Row>
-          <Col xs={12}>
-            <Card>
+                <Row>
+                  <Col>
+                    {
+                      program
+                          ? (
+                              <Breadcrumb>
+                                <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
+                                <Breadcrumb.Item
+                                    href={"/program/" + program.id}>
+                                  Program Detail
+                                </Breadcrumb.Item>
+                                <Breadcrumb.Item active>Edit Program</Breadcrumb.Item>
+                              </Breadcrumb>
+                          )
+                          : (
+                              <Breadcrumb>
+                                <Breadcrumb.Item href={"/programs"}>
+                                  Programs
+                                </Breadcrumb.Item>
+                                <Breadcrumb.Item active>New Program</Breadcrumb.Item>
+                              </Breadcrumb>
+                          )
+                    }
+                  </Col>
+                </Row>
 
-              <Card.Header>
-                <Card.Title tag="h5">Program Overview</Card.Title>
-                <h6 className="card-subtitle text-muted">
-                  Provide a unique name and a brief overview for your program.
-                  If this program is no longer active, set the status to
-                  'inactive'. Inactive programs will remain in the system,
-                  along with their studies, but no new non-legacy studies
-                  will be allowed to be created for it.
-                </h6>
-              </Card.Header>
+                <Row className="justify-content-end align-items-center">
+                  <Col>
+                    <h3>{program ? "Edit Program" : "New Program"}</h3>
+                  </Col>
+                </Row>
 
-              <Card.Body>
-                <Formik
-                    initialValues={program || defaultProgramValues}
-                    validationSchema={programSchema}
-                    onSubmit={submitForm}
-                    validateOnBlur={false}
-                    validateOnChange={false}
-                >
-                  {({
-                    values,
-                    errors,
-                    touched,
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    isSubmitting,
-                    setFieldValue,
-                  }) => (
-                      <FormikForm className="program-form" autoComplete={"off"}>
+                <Row>
+                  <Col xs={12}>
+                    <Card>
 
-                        <FormikFormErrorNotification />
+                      <Card.Header>
+                        <Card.Title tag="h5">Program Overview</Card.Title>
+                        <h6 className="card-subtitle text-muted">
+                          Provide a unique name and a brief overview for your program.
+                          If this program is no longer active, set the status to
+                          'inactive'. Inactive programs will remain in the system,
+                          along with their studies, but no new non-legacy studies
+                          will be allowed to be created for it.
+                        </h6>
+                      </Card.Header>
+
+                      <Card.Body>
 
                         {/*Overview*/}
                         <Row>
@@ -331,209 +335,186 @@ const ProgramForm = ({
 
                         </Row>
 
-                        {
-                          features
-                          && features.notebook
-                          && features.notebook.isEnabled ? (
+                      </Card.Body>
+                    </Card>
 
-                            <React.Fragment>
+                    {
+                      features
+                      && features.notebook
+                      && features.notebook.isEnabled ? (
 
-                              <Row>
-                                <Col>
-                                  <hr/>
-                                </Col>
-                              </Row>
-
-                              <Row>
-
-                                <Col md={12} className={"mb-3"}>
-                                  <h5 className="card-title">
-                                    Electronic Laboratory Notebook Folder
-                                  </h5>
-                                  <h6 className="card-subtitle text-muted">
-                                    When using an electronic laboratory notebook, all
-                                    programs require a folder in which all studies and
-                                    entries will be created. You will have to create the
-                                    program in the ELN software before Study Tracker can
-                                    register the study and hook into the ELN platform.
-                                    Select the program you wish to map your new program
-                                    to from the dropdown below. If your project is not
-                                    listed, check with your ELN administrator to ensure
-                                    the project has been created.
-                                  </h6>
-                                  <br/>
-                                </Col>
-
-                              </Row>
-
-                              {
-                                elnProjects ? (
-                                    <Row>
-                                      <Col md={6} className={"mb-3"}>
-                                        <FormGroup>
-                                          <Form.Label>ELN Project</Form.Label>
-                                          <Select
-                                              className="react-select-container"
-                                              classNamePrefix="react-select"
-                                              options={
-                                                elnProjects
-                                                .sort((a, b) => a.name.localeCompare(b.name))
-                                                .map(p => ({
-                                                  label: p.name,
-                                                  value: p
-                                                }))
-                                              }
-                                              name="elnProject"
-                                              onChange={(selected) => {
-                                                setFieldValue("notebookFolder.name", selected.value.name);
-                                                setFieldValue("notebookFolder.url", selected.value.url);
-                                                setFieldValue("notebookFolder.referenceId", selected.value.folderId);
-                                              }}
-                                          />
-                                          <Form.Text>
-                                            Select an existing project from your ELN to assign your program to.
-                                          </Form.Text>
-                                        </FormGroup>
-                                      </Col>
-                                    </Row>
-                                ) : ""
-                              }
-
-                              <Row>
-
-                                <Col md={6} className={"mb-3"}>
-                                  <FormGroup>
-                                    <Form.Label>Program Folder ID *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name={"notebookFolder.referenceId"}
-                                        isInvalid={!!errors.notebookFolder && !!errors.notebookFolder.referenceId}
-                                        value={values.notebookFolder.referenceId}
-                                        onChange={handleChange}
-                                        disabled={!!elnProjects && elnProjects.length > 0}
-                                    />
-                                    <Form.Control.Feedback type={"invalid"}>
-                                      Program Folder ID must not be empty.
-                                    </Form.Control.Feedback>
-                                    <Form.Text>
-                                      This is the ID assigned to the program
-                                      folder in the ELN. For example, in Benchling the ID
-                                      will take the form of an alphanumeric code with a
-                                      prefix of <code>lib_</code>.
-                                    </Form.Text>
-                                  </FormGroup>
-                                </Col>
-
-                                <Col md={6} className={"mb-3"}>
-                                  <FormGroup>
-                                    <Form.Label>Folder Name</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name={"notebookFolder.name"}
-                                        value={values.notebookFolder.name}
-                                        onChange={handleChange}
-                                        disabled={!!elnProjects && elnProjects.length > 0}
-                                    />
-                                    <Form.Control.Feedback type={"invalid"}>
-                                      Folder Name must not be empty.
-                                    </Form.Control.Feedback>
-                                    <Form.Text>If different from the program
-                                      name.</Form.Text>
-                                  </FormGroup>
-                                </Col>
-
-                                <Col md={6} className={"mb-3"}>
-                                  <FormGroup>
-                                    <Form.Label>URL</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name={"notebookFolder.url"}
-                                        value={values.notebookFolder.url}
-                                        onChange={handleChange}
-                                        disabled={!!elnProjects && elnProjects.length > 0}
-                                    />
-                                    <Form.Control.Feedback type={"invalid"}>
-                                      URL must not be empty.
-                                    </Form.Control.Feedback>
-                                    <Form.Text>URL for the program in the ELN.</Form.Text>
-                                  </FormGroup>
-                                </Col>
-
-                              </Row>
-
-                            </React.Fragment>
-
-                          ) : ""
-                        }
-
-                        <Row>
-                          <Col>
-                            <hr/>
-                          </Col>
-                        </Row>
-
-                        <Row>
-
-                          <Col md={12} className={"mb-3"}>
-                            <h5 className="card-title">Program Attributes</h5>
+                        <Card>
+                          <Card.Header>
+                            <Card.Title>Electronic Laboratory Notebook Folder</Card.Title>
                             <h6 className="card-subtitle text-muted">
-                              Key-value attributes for adding additional information
-                              about the program, or for adding application-aware
-                              attributes for external integrations (for example, ELN
-                              identifiers). You can add as many or as few attributes
-                              as you'd like. Attribute values should not be left
-                              empty. All values are saved as simple character
-                              strings.
+                              When using an electronic laboratory notebook, all
+                              programs require a folder in which all studies and
+                              entries will be created. You will have to create the
+                              program in the ELN software before Study Tracker can
+                              register the study and hook into the ELN platform.
+                              Select the program you wish to map your new program
+                              to from the dropdown below. If your project is not
+                              listed, check with your ELN administrator to ensure
+                              the project has been created.
                             </h6>
-                            <br/>
-                          </Col>
+                          </Card.Header>
+                          <Card.Body>
+                            {
+                              elnProjects ? (
+                                  <Row>
+                                    <Col md={6} className={"mb-3"}>
+                                      <FormGroup>
+                                        <Form.Label>ELN Project</Form.Label>
+                                        <Select
+                                            className="react-select-container"
+                                            classNamePrefix="react-select"
+                                            options={
+                                              elnProjects
+                                              .sort((a, b) => a.name.localeCompare(b.name))
+                                              .map(p => ({
+                                                label: p.name,
+                                                value: p
+                                              }))
+                                            }
+                                            name="elnProject"
+                                            onChange={(selected) => {
+                                              setFieldValue("notebookFolder.name", selected.value.name);
+                                              setFieldValue("notebookFolder.url", selected.value.url);
+                                              setFieldValue("notebookFolder.referenceId", selected.value.folderId);
+                                            }}
+                                        />
+                                        <Form.Text>
+                                          Select an existing project from your ELN to assign your program to.
+                                        </Form.Text>
+                                      </FormGroup>
+                                    </Col>
+                                  </Row>
+                              ) : ""
+                            }
 
-                        </Row>
+                            <Row>
 
+                              <Col md={6} className={"mb-3"}>
+                                <FormGroup>
+                                  <Form.Label>Program Folder ID *</Form.Label>
+                                  <Form.Control
+                                      type="text"
+                                      name={"notebookFolder.referenceId"}
+                                      isInvalid={!!errors.notebookFolder && !!errors.notebookFolder.referenceId}
+                                      value={values.notebookFolder.referenceId}
+                                      onChange={handleChange}
+                                      disabled={!!elnProjects && elnProjects.length > 0}
+                                  />
+                                  <Form.Control.Feedback type={"invalid"}>
+                                    Program Folder ID must not be empty.
+                                  </Form.Control.Feedback>
+                                  <Form.Text>
+                                    This is the ID assigned to the program
+                                    folder in the ELN. For example, in Benchling the ID
+                                    will take the form of an alphanumeric code with a
+                                    prefix of <code>lib_</code>.
+                                  </Form.Text>
+                                </FormGroup>
+                              </Col>
+
+                              <Col md={6} className={"mb-3"}>
+                                <FormGroup>
+                                  <Form.Label>Folder Name</Form.Label>
+                                  <Form.Control
+                                      type="text"
+                                      name={"notebookFolder.name"}
+                                      value={values.notebookFolder.name}
+                                      onChange={handleChange}
+                                      disabled={!!elnProjects && elnProjects.length > 0}
+                                  />
+                                  <Form.Control.Feedback type={"invalid"}>
+                                    Folder Name must not be empty.
+                                  </Form.Control.Feedback>
+                                  <Form.Text>If different from the program
+                                    name.</Form.Text>
+                                </FormGroup>
+                              </Col>
+
+                              <Col md={6} className={"mb-3"}>
+                                <FormGroup>
+                                  <Form.Label>URL</Form.Label>
+                                  <Form.Control
+                                      type="text"
+                                      name={"notebookFolder.url"}
+                                      value={values.notebookFolder.url}
+                                      onChange={handleChange}
+                                      disabled={!!elnProjects && elnProjects.length > 0}
+                                  />
+                                  <Form.Control.Feedback type={"invalid"}>
+                                    URL must not be empty.
+                                  </Form.Control.Feedback>
+                                  <Form.Text>URL for the program in the ELN.</Form.Text>
+                                </FormGroup>
+                              </Col>
+
+                            </Row>
+                          </Card.Body>
+                        </Card>
+
+                      ) : ""
+                    }
+
+                    <Card>
+                      <Card.Header>
+                        <Card.Title>Program Attributes</Card.Title>
+                        <h6 className="card-subtitle text-muted">
+                          Key-value attributes for adding additional information
+                          about the program, or for adding application-aware
+                          attributes for external integrations (for example, ELN
+                          identifiers). You can add as many or as few attributes
+                          as you'd like. Attribute values should not be left
+                          empty. All values are saved as simple character
+                          strings.
+                        </h6>
+                      </Card.Header>
+                      <Card.Body>
                         <AttributeInputs
                             attributes={values.attributes}
                             handleUpdate={(attributes) => setFieldValue("attributes", attributes)}
                             error={errors.attributes}
                         />
+                      </Card.Body>
+                    </Card>
 
-                        <Row>
-                          <Col>
-                            <hr/>
-                          </Col>
-                        </Row>
+                    {/*Buttons*/}
+                    <Row>
+                      <Col className="text-center">
+                        <FormGroup>
+                          <Button
+                              size="lg"
+                              variant="primary"
+                              type={"submit"}
+                              className={"me-4"}
+                          >
+                            Submit
+                          </Button>
 
-                        {/*Buttons*/}
-                        <Row>
-                          <Col className="text-center">
-                            <FormGroup>
-                              <Button
-                                  size="lg"
-                                  variant="primary"
-                                  type={"submit"}
-                              >
-                                Submit
-                              </Button>
-                              &nbsp;&nbsp;
-                              <Button
-                                  size="lg"
-                                  variant="secondary"
-                                  onClick={handleCancel}
-                              >
-                                Cancel
-                              </Button>
-                            </FormGroup>
-                          </Col>
-                        </Row>
+                          <Button
+                              size="lg"
+                              variant="secondary"
+                              onClick={handleCancel}
+                          >
+                            Cancel
+                          </Button>
+                        </FormGroup>
+                      </Col>
+                    </Row>
 
-                      </FormikForm>
-                    )}
-                </Formik>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+                  </Col>
+                </Row>
 
-      </Container>
+              </FormikForm>
+
+            </Container>
+
+        )}
+
+      </Formik>
   );
 
 
