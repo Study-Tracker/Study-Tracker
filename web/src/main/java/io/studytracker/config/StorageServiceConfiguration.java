@@ -19,6 +19,7 @@ package io.studytracker.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.studytracker.aws.S3DataFileStorageService;
+import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
 import io.studytracker.egnyte.EgnyteClientOperations;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
@@ -195,17 +196,12 @@ public class StorageServiceConfiguration {
     @Bean
     public S3DataFileStorageService s3DataFileStorageService() {
       return new S3DataFileStorageService(s3Client());
-//        if (env.containsProperty("storage.overwrite-existing")) {
-//          service.setOverwriteExisting(
-//              env.getRequiredProperty("storage.overwrite-existing", Boolean.class));
-//        }
-//        if (env.containsProperty("storage.use-existing")) {
-//          service.setUseExisting(env.getRequiredProperty("storage.use-existing", Boolean.class));
-//        }
-//        if (env.containsProperty("storage.max-folder-read-depth")) {
-//          service.setMaxDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
-//        }
-//      return service;
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "aws.s3.default-study-location", havingValue = "")
+    public S3StudyFileStorageService s3StudyFileStorageService() {
+      return new S3StudyFileStorageService();
     }
   }
 
