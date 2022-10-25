@@ -17,6 +17,7 @@
 package io.studytracker.test.aws;
 
 import io.studytracker.Application;
+import io.studytracker.aws.S3Utils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +48,17 @@ public class S3ClientTests {
 
   @Autowired(required = false)
   private S3Client s3Client;
+
+  @Test
+  public void pathBuilderTest() throws Exception {
+    System.out.println(S3Utils.joinS3Path("path/to/thing", "file.txt"));
+    System.out.println(S3Utils.joinS3Path("path/to/thing/", "file.txt"));
+    System.out.println(S3Utils.joinS3Path("/path/to/thing/", "file.txt"));
+    System.out.println(S3Utils.joinS3Path("/path/to/thing/", "/file.txt"));
+    System.out.println(S3Utils.joinS3Path("path/to/thing", "new_folder"));
+    System.out.println(S3Utils.joinS3Path("", "file.txt"));
+    System.out.println(S3Utils.joinS3Path("", "new_folder/"));
+  }
 
   @Test
   public void configTest() throws Exception {

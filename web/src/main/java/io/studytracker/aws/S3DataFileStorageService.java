@@ -22,7 +22,6 @@ import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StoragePermissions;
-import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
@@ -108,9 +107,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   @Override
   public StorageFolder createFolder(FileStorageLocation location, String path, String name)
       throws StudyStorageException {
-    LOGGER.info("Creating folder: {} in path: {}", name, path);
+    LOGGER.info("Creating folder: '{}' in path: '{}' in bucket '{}'", name, path, location.getName());
 
-    String fullPath = StorageUtils.joinPath(path, name) + "/";
+    String fullPath = S3Utils.joinS3Path(path, name) + "/";
     try {
 
       // Get the bucket
@@ -152,10 +151,7 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     }
 
     // Cleanup the path
-    String fullPath = StorageUtils.joinPath(path, file.getName());
-    if (fullPath.startsWith("/")) {
-      fullPath = fullPath.substring(1);
-    }
+    String fullPath = S3Utils.joinS3Path(path, file.getName());
 
     // Upload the file to S3
     try {

@@ -219,7 +219,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       @RequestParam(name = "locationId") Long locationId,
       @RequestParam(name = "folderName") String folderName
   ) throws Exception {
-    LOGGER.info("Creating new folder {} in data storage folder {}", folderName, path);
+    LOGGER.info("Creating new folder '{}' in data storage folder '{}'", folderName, path);
     FileStorageLocation location = lookupFileStorageLocation(locationId);
     if (!StoragePermissions.canWrite(location.getPermissions())) {
       throw new InsufficientPrivilegesException("Insufficient privileges to create folder");

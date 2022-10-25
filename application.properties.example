@@ -16,6 +16,11 @@
 
 application.host-name=
 
+# Required
+# Character sequence used for seeding encryption keys. This should ideally be a long, random string
+# of characters. It is important that you do not change this value after setting it.
+application.secret=
+
 
 ### Admin User ###
 
@@ -40,6 +45,12 @@ db.port=
 db.name=
 
 
+### Events ###
+
+# Determines where to dispatch events. Can be 'eventbridge' or 'local'. Default mode: 'local'
+events.mode=
+
+
 ### AWS ###
 
 # Optional
@@ -51,13 +62,7 @@ aws.region=
 aws.access-key-id=
 aws.secret-access-key=
 
-
-### Events ###
-
-# Determines where to dispatch events. Can be 'eventbridge' or 'local'. Default mode: 'local'
-events.mode=
-
-$ If events.mode is set to 'eventbridge', then you must provide the name of the event bus to use.
+# If events.mode is set to 'eventbridge', then you must provide the name of the event bus to use.
 aws.eventbridge.bus-name=
 
 
@@ -176,3 +181,20 @@ saml.metadata-base-url=
 saml.keystore.location=
 saml.keystore.alias=
 saml.keystore.password=
+
+
+### Git ###
+
+# Optional
+# If you wish to integrate Study Tracker with a Git server, you can enable that here. Currently, only
+# GitLab is supported. Options: 'none', 'gitlab'. Default: 'none'
+git.mode=
+
+## GitLab
+# Required if git.mode is set to 'gitlab'. The URL should be the full URL to the GitLab instance. The
+# root-group-id value should be the identifier of the group you would like study repositories
+# created within. You should create an access key to grant permission to Study Tracker to create
+# and read repositories within this group, that key should be provided here.
+gitlab.url=
+gitlab.access_key=
+gitlab.root-group-id=

@@ -30,7 +30,7 @@ public class TokenUtils {
   private static final String ISSUER = "Study Tracker";
   private static final String SUBJECT = "User Details";
 
-  @Value("${jwt.secret}")
+  @Value("${application.secret}")
   private String tokenSecret;
 
   @Value("${jwt.expiration:1440}")

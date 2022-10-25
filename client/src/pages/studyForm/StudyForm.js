@@ -70,6 +70,7 @@ const StudyForm = ({
     useNotebook: true,
     useGit: false,
     useStorage: true,
+    useS3: false,
   };
 
   const studySchema = yup.object().shape({

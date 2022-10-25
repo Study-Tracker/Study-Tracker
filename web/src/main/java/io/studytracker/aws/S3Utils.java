@@ -92,4 +92,21 @@ public class S3Utils {
     return parentFolder;
   }
 
+  public static String joinS3Path(String... parts) {
+    StringBuilder builder = new StringBuilder();
+    for (String part: parts) {
+      if (builder.length() > 0) {
+        builder.append("/");
+      }
+      if (part.startsWith("/")) {
+        part = part.substring(1);
+      }
+      if (part.endsWith("/")) {
+        part = part.substring(0, part.length() - 1);
+      }
+      builder.append(part);
+    }
+    return builder.toString();
+  }
+
 }
