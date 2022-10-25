@@ -25,5 +25,6 @@ public class StudyOptions {
   private String notebookTemplateId;
   private boolean useGit = false;
   private boolean useStorage = true;
+  private boolean useS3 = false;
 
 }

@@ -16,6 +16,7 @@
 
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.mapstruct.dto.features.AWSFeaturesDto;
 import io.studytracker.mapstruct.dto.features.AuthFeaturesDto;
 import io.studytracker.mapstruct.dto.features.FeaturesSummaryDto;
 import io.studytracker.mapstruct.dto.features.GitFeaturesDto;
@@ -86,6 +87,23 @@ public class ConfigPrivateController {
       gitFeaturesDto.setGitServerUrl(env.getRequiredProperty("gitlab.url"));
     }
     features.setGit(gitFeaturesDto);
+
+    // AWS
+    AWSFeaturesDto awsFeaturesDto = new AWSFeaturesDto();
+    if (env.containsProperty("aws.region")) {
+      awsFeaturesDto.setRegion(env.getRequiredProperty("aws.region"));
+    }
+    if (env.containsProperty("aws.access-key-id")) {
+      awsFeaturesDto.setAccessKey(env.getRequiredProperty("aws.access-key-id"));
+    }
+    if (env.containsProperty("aws.s3.default-study-location")) {
+      awsFeaturesDto.setDefaultS3StudyLocation(
+          env.getRequiredProperty("aws.s3.default-study-location"));
+    }
+    if (env.containsProperty("aws.eventbridge.bus-name")) {
+      awsFeaturesDto.setEventBridgeBus(env.getRequiredProperty("aws.eventbridge.bus-name"));
+    }
+    features.setAws(awsFeaturesDto);
 
     return features;
 

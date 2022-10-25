@@ -39,6 +39,7 @@ import PropTypes from "prop-types";
 import NotebookInputsCard from "../../common/forms/NotebookInputsCard";
 import GitInputsCard from "../../common/forms/GitInputsCard";
 import LegacyStudyControlsCard from "./LegacyStudyControlsCard";
+import S3InputsCard from "../../common/forms/S3InputsCard";
 
 const StudyForm = ({
     study,
@@ -430,6 +431,22 @@ const StudyForm = ({
                             onChange={(key, value) => setFieldValue(key, value)}
                             isActive={values.useGit}
                             selectedProgram={values.program}
+                        />
+                    ) : ''
+
+                  }
+
+                  {/*S3*/}
+                  {
+                    !values.id
+                    && features
+                    && features.aws
+                    && features.aws.isEnabled ? (
+                        <S3InputsCard
+                            onChange={(key, value) => setFieldValue(key, value)}
+                            isActive={values.useS3}
+                            selectedProgram={values.program}
+                            selectedBucket={features.aws.defaultS3StudyLocation || 'n/a'}
                         />
                     ) : ''
 
