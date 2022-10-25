@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,18 +101,21 @@ public class StudyAssayPrivateControllerTests {
   public void findStudyAssaysTest() throws Exception {
     mockMvc
         .perform(get("/api/internal/study/PPB-10001/assays").with(user(username)).with(csrf()))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("code")))
-        .andExpect(jsonPath("$[0].code", is("PPB-10001-001")));
+        .andExpect(jsonPath("$[0].code", Matchers.oneOf("PPB-10001-001", "PPB-10001-00002")));
 
     mockMvc
         .perform(get("/api/internal/study/CPA-10001/assays").with(user(username)).with(csrf()))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(0)));
 
     mockMvc
         .perform(get("/api/internal/study/PPB-XXXX/assays").with(user(username)).with(csrf()))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
   }
 

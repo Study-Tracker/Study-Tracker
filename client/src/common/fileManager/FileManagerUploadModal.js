@@ -14,78 +14,164 @@
  * limitations under the License.
  */
 
+import React, {useContext, useEffect, useState} from 'react';
 import {useDropzone} from "react-dropzone";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFile} from "@fortawesome/free-solid-svg-icons";
-import React, {useMemo} from "react";
-import {Button, Col, Modal, Row} from "react-bootstrap";
+import {faCircleCheck, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
+import {Button, Modal} from "react-bootstrap";
 import PropTypes from "prop-types";
 import {DismissableAlert} from "../errors";
+import {FormGroup} from "../forms/common";
+import NotyfContext from "../../context/NotyfContext";
+import axios from "axios";
+import {LoadingOverlay} from "../loading";
 
-const baseStyle = {
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: '20px',
-  borderWidth: 2,
-  borderRadius: 2,
-  borderColor: '#eeeeee',
-  borderStyle: 'dashed',
-  backgroundColor: '#fafafa',
-  color: '#bdbdbd',
-  outline: 'none',
-  transition: 'border .24s ease-in-out'
-};
+const QueuedFile = ({file, handleRemove, handleSubmit}) => {
+  return (
+      <div className={"dropzone-item d-flex justify-content-between bg-light p-3 mt-2"} key={"file-" + file.name}>
+        <div className={"dropzone-file"}>
+          <div className={"dropzone-filename text-dark"}>
+            {file.name}&nbsp;({file.size} bytes)
+          </div>
+          <div className={"dropzone-error mt-0"}></div>
+        </div>
+        <div className={"dropzone-progress"}></div>
+        <div className={"dropzone-toolbar"}>
+          {/*<Button variant={"outline-info"} className={"me-2"}>*/}
+          {/*  <FontAwesomeIcon icon={faPlay} />*/}
+          {/*</Button>*/}
+          <Button variant={"outline-danger"} onClick={() => handleRemove(file)}>
+            <FontAwesomeIcon icon={faTrashAlt} />
+          </Button>
+        </div>
+      </div>
+  )
+}
 
-const activeStyle = {
-  borderColor: '#2196f3'
-};
-
-const acceptStyle = {
-  borderColor: '#00e676'
-};
-
-const rejectStyle = {
-  borderColor: '#ff1744'
-};
+const SuccessFile = ({path}) => {
+  return (
+      <div className={"dropzone-item d-flex justify-content-between dropzone-success p-3 mt-2"} key={"file-" + path}>
+        <div className={"dropzone-file"}>
+          <div className={"dropzone-filename"}>
+            {path}
+          </div>
+          <div className={"dropzone-error mt-0"}></div>
+        </div>
+        <div className={"dropzone-toolbar"}>
+          <FontAwesomeIcon size={"xl"} icon={faCircleCheck} className={"text-success"}/>
+        </div>
+      </div>
+  )
+}
 
 const FileManagerUploadModal = ({
   isOpen,
   setModalIsOpen,
-  handleSubmit,
-  error
+  path,
+  error,
+  handleSuccess,
+  locationId
 }) => {
 
+  const notyf = useContext(NotyfContext);
+  const [queuedFiles, setQueuedFiles] = useState([]);
+  const [successFiles, setSuccessFiles] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
-    acceptedFiles,
     getRootProps,
     getInputProps,
-    isDragAccept,
-    isDragActive,
-    isDragReject
-  } = useDropzone();
+    open,
+    acceptedFiles,
+    fileRejections
+  } = useDropzone({
+    maxSize: 1024 * 1024 * 20,
+    onDropRejected: (rejectedFiles) => notyf.open({
+      type: 'error',
+      message: `File ${rejectedFiles[0].file.name} is too large. The limit is 20 MB`
+    })
+  })
 
-  const files = acceptedFiles.map(file => (
-      <li key={file.path}>
-        <FontAwesomeIcon icon={faFile}/> {file.path}
-      </li>
-  ));
+  const handleCloseModal = () => {
+    setQueuedFiles([]);
+    setSuccessFiles([]);
+    setModalIsOpen(false);
+  }
 
-  const style = useMemo(() => ({
-    ...baseStyle,
-    ...(isDragActive ? activeStyle : {}),
-    ...(isDragAccept ? acceptStyle : {}),
-    ...(isDragReject ? rejectStyle : {})
-  }), [
-    isDragActive, isDragReject
-  ]);
+  const updateQueuedFiles = (files) => {
+    const existing = queuedFiles.map(f => f.name + "--" + f.size);
+    const toAdd = files.filter(f => !existing.includes(f.name + "--" + f.size));
+    setQueuedFiles([...queuedFiles, ...toAdd]);
+  }
+
+  useEffect(() => {
+    console.debug('acceptedFiles', acceptedFiles);
+    updateQueuedFiles(acceptedFiles);
+  }, [acceptedFiles]);
+
+
+  const handleUploadFiles = () => {
+    console.debug("Files", queuedFiles);
+    setIsSubmitting(true);
+    const requests = queuedFiles.map(file => {
+      const data = new FormData();
+      data.append("file", file);
+      data.append("locationId", locationId);
+      data.append("path", path);
+      return axios.post('/api/internal/data-files/upload', data)
+      .then(() => {
+        return {
+          ...file,
+          success: true
+        }
+      })
+      .catch(err => {
+        return {
+          ...file,
+          success: false,
+          error: err
+        }
+      });
+    });
+    Promise.allSettled(requests)
+    .then((results) => {
+      console.debug("Result", results);
+      const success = [];
+      let failed = false;
+      for (const r of results) {
+        if (r.status === "fulfilled" && !r.value.error) {
+          setQueuedFiles(queuedFiles.filter(f => f.path !== r.value.path));
+          success.push(r.value.path);
+        } else {
+          failed = true;
+        }
+      }
+      if (!failed) {
+        setQueuedFiles([]);
+        notyf.open({message: "Files uploaded successfully", type: "success"});
+        handleSuccess();
+      } else {
+        setSuccessFiles(success);
+        notyf.open({message: "One or more uploads failed. Please try again.", type: "error"});
+      }
+    })
+    .finally(() => {
+      setIsSubmitting(false);
+    });
+  }
+
+  const handleRemoveFile = (file) => {
+    const updated = queuedFiles.filter(f => f !== file);
+    setQueuedFiles(updated);
+  }
 
   return (
       <Modal
           show={isOpen}
-          onHide={() => setModalIsOpen(false)}
+          onHide={handleCloseModal}
       >
+
+        <LoadingOverlay isVisible={isSubmitting} message={"Uploading files..."} />
 
         <Modal.Header closeButton>
           Upload Files
@@ -93,51 +179,77 @@ const FileManagerUploadModal = ({
 
         <Modal.Body className="m-3">
 
-          <Row>
+          <FormGroup>
+            <div className={"dropzone dropzone-queue mb-2"}>
 
-            <Col sm={12}>
-              <p>
-                Uploaded files will be stored with your other study documents
-                and
-                will be accessible directly in the file system or through the
-                Files
-                tab.
-              </p>
-            </Col>
+              <div {...getRootProps()} className={"dropzone-panel d-flex"}>
 
-            <Col sm={12}>
-              <div {...getRootProps({style})}>
                 <input {...getInputProps()} />
+
                 <p>
-                  Drag-and-drop files to upload them, or click here to select
-                  the files you would like to upload individually.
+                  Drag-and-drop files here to queue them for upload.
                 </p>
+
+                <Button
+                    variant={"outline-primary"}
+                    onClick={open}
+                    className={"me-2"}
+                >
+                  Select Files
+                </Button>
+
               </div>
-            </Col>
 
-            <Col sm={12}></Col>
+              <div className={"dropzone-items"}>
+                {
+                  queuedFiles.map((f, i) => (
+                      <QueuedFile file={f} handleRemove={handleRemoveFile} />
+                  ))
+                }
+              </div>
 
-            <Col sm={12}>
-              {files.length > 0 ? <h4 className="mt-3">To be uploaded:</h4> : ""}
-              <ul>
-                {files}
-              </ul>
-              {error && <DismissableAlert variant="danger" message={error}/>}
-            </Col>
+              <div className={"dropzone-items"}>
+                {
+                  successFiles.map((f, i) => (
+                      <SuccessFile path={f} />
+                  ))
+                }
+              </div>
 
-          </Row>
+
+              <div className={"dropzone-default dropzone-message"}>
+                {error && <DismissableAlert variant="danger" message={error}/>}
+              </div>
+
+              <div className={"dropzone-controls d-flex justify-content-end mt-2"}>
+                {
+                    queuedFiles.length > 0 && (
+                        <>
+                          <Button
+                              variant={"outline-warning"}
+                              onClick={() => setQueuedFiles([])}
+                              className={"me-2"}
+                          >
+                            Remove All
+                          </Button>
+
+                          <Button
+                              variant={"primary"}
+                              onClick={handleUploadFiles}
+                          >
+                            Upload All
+                          </Button>
+                        </>
+                    )
+                }
+              </div>
+
+            </div>
+
+            <span className={"text-muted"}>Max file size: 20MB</span>
+          </FormGroup>
 
         </Modal.Body>
-
-        <Modal.Footer>
-          <Button variant={"secondary"} onClick={() => setModalIsOpen(false)}>
-            Cancel
-          </Button>
-          <Button variant={"primary"}
-                  onClick={() => handleSubmit(acceptedFiles)}>
-            Upload
-          </Button>
-        </Modal.Footer>
 
       </Modal>
   )
@@ -146,7 +258,10 @@ const FileManagerUploadModal = ({
 FileManagerUploadModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setModalIsOpen: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired
+  handleSubmit: PropTypes.func.isRequired,
+  path: PropTypes.string.isRequired,
+  error: PropTypes.string,
+  handleSuccess: PropTypes.func.isRequired,
 };
 
 export default FileManagerUploadModal;

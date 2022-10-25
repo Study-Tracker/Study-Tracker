@@ -54,10 +54,6 @@ const pathIsWithinRoot = (path, root) => {
   return path.indexOf(root) === -1;
 }
 
-const FolderPathBreadcrumbs = ({dataSource, folder}) => {
-  return <Badge bg="light" style={{fontSize: "100%", color: "darkslategrey"}}>{dataSource.name}: {folder ? folder.path : ''}</Badge>
-}
-
 const FileManagerContent = ({location, path}) => {
 
   console.debug("Selected data source: ", location);
@@ -125,36 +121,49 @@ const FileManagerContent = ({location, path}) => {
     setSearchParams(searchParams);
   }
 
-  /**
-   * Uploads the provided files to the current folder.
-   * @param files
-   */
-  const handleUploadFiles = (files) => {
-    console.debug("Files", files);
+  const handleUploadSuccess = () => {
     setUploadError(null);
-    const requests = files.map(file => {
-      const data = new FormData();
-      data.append("file", file);
-      data.append("locationId", location.id);
-      data.append("path", currentPath);
-      return axios.post('/api/internal/data-files/upload', data);
-    });
-    Promise.all(requests)
-    .then(() => {
-      setUploadModalIsOpen(false);
-      setRefreshCount(refreshCount + 1);
-      notyf.open({message: "Files uploaded successfully", type: "success"});
-    })
-    .catch(e => {
-      console.error(e);
-      console.error("Failed to upload files");
-      let errorMessage = e.message;
-      if (uploadError) {
-        errorMessage = errorMessage + " - " + uploadError;
-      }
-      setUploadError(errorMessage);
-    });
+    setUploadModalIsOpen(false);
+    setRefreshCount(refreshCount + 1);
   }
+
+  // /**
+  //  * Uploads the provided files to the current folder.
+  //  * @param files
+  //  */
+  // const handleUploadFiles = (files) => {
+  //   console.debug("Files", files);
+  //   setUploadError(null);
+  //   const requests = files.map(file => {
+  //     const data = new FormData();
+  //     data.append("file", file);
+  //     data.append("locationId", location.id);
+  //     data.append("path", currentPath);
+  //     return axios.post('/api/internal/data-files/upload', data)
+  //       .then(response => {
+  //         return {
+  //           ...file,
+  //           success: response.status === 200,
+  //         }
+  //       });
+  //   });
+  //   Promise.all(requests)
+  //   .then((result) => {
+  //     console.debug("Upload result: ", result);
+  //     setUploadModalIsOpen(false);
+  //     setRefreshCount(refreshCount + 1);
+  //     notyf.open({message: "Files uploaded successfully", type: "success"});
+  //   })
+  //   .catch(e => {
+  //     console.error(e);
+  //     console.error("Failed to upload files");
+  //     let errorMessage = e.message;
+  //     if (uploadError) {
+  //       errorMessage = errorMessage + " - " + uploadError;
+  //     }
+  //     setUploadError(errorMessage);
+  //   });
+  // }
 
   /**
    * Creates a new folder in the current folder.
@@ -272,8 +281,9 @@ const FileManagerContent = ({location, path}) => {
           <FileManagerUploadModal
               isOpen={uploadModalIsOpen}
               setModalIsOpen={setUploadModalIsOpen}
-              handleSubmit={handleUploadFiles}
-              error={uploadError}
+              handleSuccess={handleUploadSuccess}
+              path={currentPath}
+              locationId={location.id}
           />
 
           <FileManagerNewFolderModal
@@ -296,7 +306,7 @@ const FileManagerContent = ({location, path}) => {
                     <Breadcrumb.Item
                         onClick={() => handlePathUpdate(location.rootFolderPath)}
                     >
-                      {location.name}
+                      Home
                     </Breadcrumb.Item>
                     {
                       folder ? folder.path.split("/").map((path, index) => {
