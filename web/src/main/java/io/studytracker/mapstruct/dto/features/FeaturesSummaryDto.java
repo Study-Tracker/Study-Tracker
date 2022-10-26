@@ -26,5 +26,6 @@ public class FeaturesSummaryDto {
   private SearchFeaturesDto search;
   private AuthFeaturesDto auth;
   private GitFeaturesDto git;
+  private AWSFeaturesDto aws;
 
 }

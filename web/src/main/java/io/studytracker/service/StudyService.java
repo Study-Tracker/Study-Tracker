@@ -16,6 +16,7 @@
 
 package io.studytracker.service;
 
+import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
@@ -42,6 +43,7 @@ import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.net.URL;
 import java.util.Date;
@@ -80,6 +82,8 @@ public class StudyService {
   private ELNFolderRepository elnFolderRepository;
 
   private GitService gitService;
+
+  private S3StudyFileStorageService s3StudyFileStorageService;
 
   /**
    * Finds a single study, identified by its primary key ID
@@ -299,6 +303,17 @@ public class StudyService {
     if (gitService != null && options.isUseGit()) {
       LOGGER.debug("Creating Git repository for study: " + study.getName());
       gitRepository = gitService.createStudyRepository(study);
+    }
+
+    // S3 folder
+    if (options.isUseS3() && s3StudyFileStorageService != null) {
+      LOGGER.debug("Creating S3 folder for study: " + study.getCode());
+      try {
+        s3StudyFileStorageService.createStorageFolder(study);
+      } catch (StudyStorageException e) {
+        e.printStackTrace();
+        LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
+      }
     }
 
     // Add a links to extra resources
@@ -584,5 +599,11 @@ public class StudyService {
   @Autowired(required = false)
   public void setGitService(GitService gitService) {
     this.gitService = gitService;
+  }
+
+  @Autowired(required = false)
+  public void setS3StudyFileStorageService(
+      S3StudyFileStorageService s3StudyFileStorageService) {
+    this.s3StudyFileStorageService = s3StudyFileStorageService;
   }
 }

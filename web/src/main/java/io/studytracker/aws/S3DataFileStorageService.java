@@ -22,7 +22,6 @@ import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StoragePermissions;
-import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
@@ -63,10 +62,10 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     if (!path.trim().equals("") && !path.endsWith("/")) {
       path += "/";
     }
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageNotFoundException("Folder not found: " + path);
-    }
-    LOGGER.debug("Folder '{}' exists in bucket: {}", path, bucketName);
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageNotFoundException("Folder not found: " + path);
+//    }
+//    LOGGER.debug("Folder '{}' exists in bucket: {}", path, bucketName);
 
     ListObjectsV2Request request = ListObjectsV2Request.builder()
         .bucket(bucketName)
@@ -88,9 +87,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     // Get the bucket
     String bucketName = location.getName();
 
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageNotFoundException("File not found: " + path);
-    }
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageNotFoundException("File not found: " + path);
+//    }
     ListObjectsV2Request request = ListObjectsV2Request.builder()
         .bucket(bucketName)
         .prefix(path)
@@ -108,9 +107,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   @Override
   public StorageFolder createFolder(FileStorageLocation location, String path, String name)
       throws StudyStorageException {
-    LOGGER.info("Creating folder: {} in path: {}", name, path);
+    LOGGER.info("Creating folder: '{}' in path: '{}' in bucket '{}'", name, path, location.getName());
 
-    String fullPath = StorageUtils.joinPath(path, name) + "/";
+    String fullPath = S3Utils.joinS3Path(path, name) + "/";
     try {
 
       // Get the bucket
@@ -147,15 +146,12 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     }
 
     // Make sure the target folder exists
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageException("Folder not found: " + path);
-    }
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageException("Folder not found: " + path);
+//    }
 
     // Cleanup the path
-    String fullPath = StorageUtils.joinPath(path, file.getName());
-    if (fullPath.startsWith("/")) {
-      fullPath = fullPath.substring(1);
-    }
+    String fullPath = S3Utils.joinS3Path(path, file.getName());
 
     // Upload the file to S3
     try {
@@ -177,9 +173,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     // Get the bucket
     String bucketName = location.getName();
 
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageException("File not found: " + path);
-    }
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageException("File not found: " + path);
+//    }
 
     try {
       return new ByteArrayResource(

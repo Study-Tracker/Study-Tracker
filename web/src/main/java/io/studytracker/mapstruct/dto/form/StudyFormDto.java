@@ -70,4 +70,5 @@ public class StudyFormDto {
   private Boolean useGit;
   private Boolean useNotebook;
   private Boolean useStorage;
+  private Boolean useS3;
 }
