@@ -62,10 +62,10 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     if (!path.trim().equals("") && !path.endsWith("/")) {
       path += "/";
     }
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageNotFoundException("Folder not found: " + path);
-    }
-    LOGGER.debug("Folder '{}' exists in bucket: {}", path, bucketName);
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageNotFoundException("Folder not found: " + path);
+//    }
+//    LOGGER.debug("Folder '{}' exists in bucket: {}", path, bucketName);
 
     ListObjectsV2Request request = ListObjectsV2Request.builder()
         .bucket(bucketName)
@@ -87,9 +87,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     // Get the bucket
     String bucketName = location.getName();
 
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageNotFoundException("File not found: " + path);
-    }
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageNotFoundException("File not found: " + path);
+//    }
     ListObjectsV2Request request = ListObjectsV2Request.builder()
         .bucket(bucketName)
         .prefix(path)
@@ -146,9 +146,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     }
 
     // Make sure the target folder exists
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageException("Folder not found: " + path);
-    }
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageException("Folder not found: " + path);
+//    }
 
     // Cleanup the path
     String fullPath = S3Utils.joinS3Path(path, file.getName());
@@ -173,9 +173,9 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     // Get the bucket
     String bucketName = location.getName();
 
-    if (!exists(bucketName, path)) {
-      throw new StudyStorageException("File not found: " + path);
-    }
+//    if (!exists(bucketName, path)) {
+//      throw new StudyStorageException("File not found: " + path);
+//    }
 
     try {
       return new ByteArrayResource(
