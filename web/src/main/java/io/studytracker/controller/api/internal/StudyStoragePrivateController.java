@@ -56,7 +56,7 @@ public class StudyStoragePrivateController extends AbstractStudyController {
       throws Exception {
     LOGGER.info("Fetching storage folder for study: " + studyId);
     Study study = getStudyFromIdentifier(studyId);
-    return studyStorageService.getStudyFolder(study);
+    return studyStorageService.findFolder(study);
   }
 
   @PostMapping("")
@@ -74,7 +74,7 @@ public class StudyStoragePrivateController extends AbstractStudyController {
       e.printStackTrace();
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    StorageFile storageFile = studyStorageService.saveStudyFile(path.toFile(), study);
+    StorageFile storageFile = studyStorageService.saveFile(path.toFile(), study);
 
     // Publish events
     Activity activity =

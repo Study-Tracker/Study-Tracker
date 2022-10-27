@@ -147,7 +147,7 @@ public class EgnyteStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createStudyFolder(study);
+      folder = storageService.createFolder(study);
     } catch (Exception e) {
       exception = e;
     }
@@ -157,7 +157,7 @@ public class EgnyteStudyStorageServiceTests {
       Assert.assertTrue(exception.getCause() instanceof DuplicateFolderException);
     } else {
       Assert.assertNotNull(folder);
-      StorageFolder studyFolder = storageService.getStudyFolder(study);
+      StorageFolder studyFolder = storageService.findFolder(study);
       Assert.assertNotNull(studyFolder);
       Assert.assertEquals(folder.getPath(), studyFolder.getPath());
     }
@@ -165,7 +165,7 @@ public class EgnyteStudyStorageServiceTests {
     exception = null;
     StorageFile file = null;
     try {
-      file = storageService.saveStudyFile(TEST_FILE.getFile(), study);
+      file = storageService.saveFile(TEST_FILE.getFile(), study);
     } catch (Exception e) {
       exception = e;
     }
@@ -193,7 +193,7 @@ public class EgnyteStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.getStudyFolder(study);
+      folder = storageService.findFolder(study);
     } catch (Exception e) {
       exception = e;
     }
@@ -247,7 +247,7 @@ public class EgnyteStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createAssayFolder(assay);
+      folder = storageService.createFolder(assay);
     } catch (Exception e) {
       exception = e;
     }
@@ -257,7 +257,7 @@ public class EgnyteStudyStorageServiceTests {
       Assert.assertTrue(exception.getCause() instanceof DuplicateFolderException);
     } else {
       Assert.assertNotNull(folder);
-      StorageFolder assayFolder = storageService.getAssayFolder(assay);
+      StorageFolder assayFolder = storageService.findFolder(assay);
       Assert.assertNotNull(assayFolder);
       Assert.assertEquals(folder.getPath(), assayFolder.getPath());
     }
@@ -265,7 +265,7 @@ public class EgnyteStudyStorageServiceTests {
     exception = null;
     StorageFile file = null;
     try {
-      file = storageService.saveAssayFile(TEST_FILE.getFile(), assay);
+      file = storageService.saveFile(TEST_FILE.getFile(), assay);
     } catch (Exception e) {
       exception = e;
     }
@@ -289,7 +289,7 @@ public class EgnyteStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.getAssayFolder(assay);
+      folder = storageService.findFolder(assay);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -304,7 +304,7 @@ public class EgnyteStudyStorageServiceTests {
 
     System.out.println("Read depth: " + egnyteOptions.getMaxReadDepth());
     Study study = studyRepository.findByCode("PPB-10001").orElseThrow(RecordNotFoundException::new);
-    StorageFolder studyFolder = storageService.getStudyFolder(study, true);
+    StorageFolder studyFolder = storageService.findFolder(study, true);
     System.out.println(studyFolder.toString());
     Assert.assertNotNull(studyFolder);
     Assert.assertFalse(studyFolder.getFiles().isEmpty());

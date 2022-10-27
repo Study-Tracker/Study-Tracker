@@ -101,7 +101,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   }
 
   @Override
-  public StorageFile uploadFile(FileStorageLocation location, String path, File file)
+  public StorageFile saveFile(FileStorageLocation location, String path, File file)
       throws StudyStorageException {
     LOGGER.info("Uploading file: {} to {}", file.getName(), path);
     try {
@@ -118,7 +118,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   }
 
   @Override
-  public Resource downloadFile(FileStorageLocation location, String path)
+  public Resource fetchFile(FileStorageLocation location, String path)
       throws StudyStorageException {
     LOGGER.info("Downloading file: {}", path);
     throw new StudyStorageException("Not implemented");

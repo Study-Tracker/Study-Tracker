@@ -106,8 +106,6 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       egnyteStorageLocation.setDisplayName("Egnyte");
       egnyteStorageLocation.setName(environment.getRequiredProperty("egnyte.root-path"));
       egnyteStorageLocation.setPermissions(StoragePermissions.READ_WRITE);
-      egnyteStorageLocation.setStudyDefault(true);
-      egnyteStorageLocation.setDataDefault(false);
 
       fileStorageLocations.add(egnyteStorageLocation);
     }
@@ -141,8 +139,6 @@ public class DataFileStoragePrivateController extends AbstractApiController {
         s3StorageLocation.setDisplayName(bucket);
         s3StorageLocation.setName(bucket);
         s3StorageLocation.setPermissions(StoragePermissions.READ_WRITE);
-        s3StorageLocation.setStudyDefault(false);
-        s3StorageLocation.setDataDefault(true);
 
         fileStorageLocations.add(s3StorageLocation);
       }
@@ -207,7 +203,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
 
     // Upload to the cloud service
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
-    StorageFile storageFile = storageService.uploadFile(location, path, localPath.toFile());
+    StorageFile storageFile = storageService.saveFile(location, path, localPath.toFile());
     LOGGER.debug("Uploaded file: " + storageFile.toString());
     return new ResponseEntity<>(storageFile, HttpStatus.OK);
 
@@ -238,7 +234,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     LOGGER.info("Downloading file from data storage folder {}", path);
     FileStorageLocation location = lookupFileStorageLocation(locationId);
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
-    ByteArrayResource resource = (ByteArrayResource) storageService.downloadFile(location, path);
+    ByteArrayResource resource = (ByteArrayResource) storageService.fetchFile(location, path);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentDisposition(ContentDisposition.builder("attachment")
         .filename(StorageUtils.getFileName(path))

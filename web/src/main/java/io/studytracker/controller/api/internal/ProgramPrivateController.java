@@ -175,7 +175,7 @@ public class ProgramPrivateController extends AbstractProgramController {
     }
     Program program = optional.get();
     try {
-      return new ResponseEntity<>(storageService.getProgramFolder(program), HttpStatus.OK);
+      return new ResponseEntity<>(storageService.findFolder(program), HttpStatus.OK);
     } catch (StudyStorageNotFoundException e) {
       throw new RecordNotFoundException("Program folder not found:" + programId);
     }

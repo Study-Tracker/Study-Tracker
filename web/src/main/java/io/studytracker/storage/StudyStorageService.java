@@ -24,7 +24,12 @@ import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
 
-/** Base interface for a service that reads and writes study files to a connected file system. */
+/**
+ * Base interface for a service that reads and writes study files to a connected file system.
+ *
+ * @author Will Oemler
+ * @since < 0.6.0
+ */
 public interface StudyStorageService {
 
   /**
@@ -34,7 +39,7 @@ public interface StudyStorageService {
    * @param program
    * @return
    */
-  StorageFolder getProgramFolder(Program program) throws StudyStorageNotFoundException;
+  StorageFolder findFolder(Program program) throws StudyStorageNotFoundException;
 
   /**
    * Returns reference to a {@link Program} instance's storage folder, optionally including its
@@ -45,7 +50,7 @@ public interface StudyStorageService {
    * @return
    * @throws StudyStorageNotFoundException
    */
-  StorageFolder getProgramFolder(Program program, boolean includeContents)
+  StorageFolder findFolder(Program program, boolean includeContents)
       throws StudyStorageNotFoundException;
 
   /**
@@ -55,7 +60,7 @@ public interface StudyStorageService {
    * @param study
    * @return
    */
-  StorageFolder getStudyFolder(Study study) throws StudyStorageNotFoundException;
+  StorageFolder findFolder(Study study) throws StudyStorageNotFoundException;
 
   /**
    * Returns reference to a {@link Study} instance's storage folder, optionally including its
@@ -64,7 +69,7 @@ public interface StudyStorageService {
    * @param study
    * @return
    */
-  StorageFolder getStudyFolder(Study study, boolean includeContents)
+  StorageFolder findFolder(Study study, boolean includeContents)
       throws StudyStorageNotFoundException;
 
   /**
@@ -74,7 +79,7 @@ public interface StudyStorageService {
    * @param assay
    * @return
    */
-  StorageFolder getAssayFolder(Assay assay) throws StudyStorageNotFoundException;
+  StorageFolder findFolder(Assay assay) throws StudyStorageNotFoundException;
 
   /**
    * Returns reference to a {@link Assay} instance's storage folder, optionally including its
@@ -83,7 +88,7 @@ public interface StudyStorageService {
    * @param assay
    * @return
    */
-  StorageFolder getAssayFolder(Assay assay, boolean includeContents)
+  StorageFolder findFolder(Assay assay, boolean includeContents)
       throws StudyStorageNotFoundException;
 
   /**
@@ -94,7 +99,7 @@ public interface StudyStorageService {
    * @param program
    * @return
    */
-  StorageFolder createProgramFolder(Program program) throws StudyStorageException;
+  StorageFolder createFolder(Program program) throws StudyStorageException;
 
   /**
    * Creates a new directory in the storage file system for the target {@link Study}. Throws a
@@ -104,7 +109,7 @@ public interface StudyStorageService {
    * @param study
    * @return
    */
-  StorageFolder createStudyFolder(Study study) throws StudyStorageException;
+  StorageFolder createFolder(Study study) throws StudyStorageException;
 
   /**
    * Creates a new directory in the storage file system for the target {@link Assay}. Throws a
@@ -114,7 +119,7 @@ public interface StudyStorageService {
    * @param assay
    * @return
    */
-  StorageFolder createAssayFolder(Assay assay) throws StudyStorageException;
+  StorageFolder createFolder(Assay assay) throws StudyStorageException;
 
   /**
    * Uploads the target file to the appropriate directory for the target {@link Study}. Throws a
@@ -126,7 +131,7 @@ public interface StudyStorageService {
    * @param study
    * @return
    */
-  StorageFile saveStudyFile(File file, Study study) throws StudyStorageException;
+  StorageFile saveFile(File file, Study study) throws StudyStorageException;
 
   /**
    * Uploads the target file to the appropriate directory for the target {@link Assay}. Throws a *
@@ -138,15 +143,6 @@ public interface StudyStorageService {
    * @param assay
    * @return
    */
-  StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException;
+  StorageFile saveFile(File file, Assay assay) throws StudyStorageException;
 
-  /**
-   * Uploads a file to the target folder.
-   *
-   * @param file The file to upload.
-   * @param folder The folder to upload the file to.
-   * @return
-   * @throws StudyStorageException
-   */
-  StorageFile saveFileToFolder(File file, StorageFolder folder) throws StudyStorageException;
 }

@@ -271,9 +271,9 @@ public class ExampleDataGenerator {
     try {
       StorageFolder folder;
       try {
-        folder = studyStorageService.getProgramFolder(program);
+        folder = studyStorageService.findFolder(program);
       } catch (Exception e) {
-        folder = studyStorageService.createProgramFolder(program);
+        folder = studyStorageService.createFolder(program);
       }
       Assert.notNull(folder, "Program folder must not be null");
       return FileStoreFolder.from(folder);
@@ -286,9 +286,9 @@ public class ExampleDataGenerator {
     try {
       for (Program program : programRepository.findAll()) {
         try {
-          studyStorageService.getProgramFolder(program);
+          studyStorageService.findFolder(program);
         } catch (StudyStorageNotFoundException ex) {
-          studyStorageService.createProgramFolder(program);
+          studyStorageService.createFolder(program);
         }
       }
     } catch (Exception e) {
@@ -659,9 +659,9 @@ public class ExampleDataGenerator {
     try {
       StorageFolder folder;
       try {
-        folder = studyStorageService.getStudyFolder(study);
+        folder = studyStorageService.findFolder(study);
       } catch (Exception e) {
-        folder = studyStorageService.createStudyFolder(study);
+        folder = studyStorageService.createFolder(study);
       }
       Assert.notNull(folder, "Study folder must not be null");
       return FileStoreFolder.from(folder);
@@ -814,9 +814,9 @@ public class ExampleDataGenerator {
     try {
       StorageFolder folder;
       try {
-        folder = studyStorageService.getAssayFolder(assay);
+        folder = studyStorageService.findFolder(assay);
       } catch (Exception e) {
-        folder = studyStorageService.createAssayFolder(assay);
+        folder = studyStorageService.createFolder(assay);
       }
       Assert.notNull(folder, "Assay folder must not be null");
       return FileStoreFolder.from(folder);

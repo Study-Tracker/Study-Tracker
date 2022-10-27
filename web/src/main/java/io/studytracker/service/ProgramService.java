@@ -89,8 +89,8 @@ public class ProgramService {
 
     // Create the storage folder
     try {
-      studyStorageService.createProgramFolder(program);
-      StorageFolder storageFolder = studyStorageService.getProgramFolder(program);
+      studyStorageService.createFolder(program);
+      StorageFolder storageFolder = studyStorageService.findFolder(program);
       LOGGER.debug("Created storage folder: " + storageFolder.getPath());
       program.setStorageFolder(FileStoreFolder.from(storageFolder));
     } catch (StudyStorageException e) {
@@ -191,10 +191,10 @@ public class ProgramService {
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = studyStorageService.getProgramFolder(program, false);
+      folder = studyStorageService.findFolder(program, false);
     } catch (StudyStorageNotFoundException e) {
       try {
-        folder = studyStorageService.createProgramFolder(program);
+        folder = studyStorageService.createFolder(program);
       } catch (Exception ex) {
         throw new StudyTrackerException(ex);
       }

@@ -207,8 +207,8 @@ public class AssayService {
     // Create the storage folder
     if (options.isUseStorage()) {
       try {
-        storageService.createAssayFolder(assay);
-        StorageFolder folder = storageService.getAssayFolder(assay);
+        storageService.createFolder(assay);
+        StorageFolder folder = storageService.findFolder(assay);
         assay.setStorageFolder(FileStoreFolder.from(folder));
       } catch (Exception e) {
         e.printStackTrace();
@@ -350,11 +350,11 @@ public class AssayService {
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = storageService.getAssayFolder(assay, false);
+      folder = storageService.findFolder(assay, false);
     } catch (StudyStorageNotFoundException e) {
       LOGGER.warn("Storage folder not found for assay: " + assay.getCode());
       try {
-        folder = storageService.createAssayFolder(assay);
+        folder = storageService.createFolder(assay);
       } catch (Exception ex) {
         throw new StudyTrackerException(ex);
       }

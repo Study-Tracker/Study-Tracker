@@ -108,7 +108,7 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createStudyFolder(study);
+      folder = storageService.createFolder(study);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -119,7 +119,7 @@ public class LocalStorageStudyStorageServiceTests {
       Assert.assertTrue(exception instanceof StudyStorageDuplicateException);
     } else {
       Assert.assertNotNull(folder);
-      StorageFolder studyFolder = storageService.getStudyFolder(study);
+      StorageFolder studyFolder = storageService.findFolder(study);
       Assert.assertNotNull(studyFolder);
       Assert.assertEquals(folder.getPath(), studyFolder.getPath());
     }
@@ -127,7 +127,7 @@ public class LocalStorageStudyStorageServiceTests {
     exception = null;
     StorageFile file = null;
     try {
-      file = storageService.saveStudyFile(TEST_FILE.getFile(), study);
+      file = storageService.saveFile(TEST_FILE.getFile(), study);
     } catch (Exception e) {
       exception = e;
     }
@@ -152,7 +152,7 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.getStudyFolder(study);
+      folder = storageService.findFolder(study);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -190,7 +190,7 @@ public class LocalStorageStudyStorageServiceTests {
     studyRepository.save(study);
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
-    storageService.createStudyFolder(study);
+    storageService.createFolder(study);
 
     Assay assay = new Assay();
     assay.setName("Test assay");
@@ -209,7 +209,7 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createAssayFolder(assay);
+      folder = storageService.createFolder(assay);
     } catch (Exception e) {
       e.printStackTrace();
       exception = e;
@@ -220,7 +220,7 @@ public class LocalStorageStudyStorageServiceTests {
       Assert.assertTrue(exception instanceof StudyStorageDuplicateException);
     } else {
       Assert.assertNotNull(folder);
-      StorageFolder assayFolder = storageService.getAssayFolder(assay);
+      StorageFolder assayFolder = storageService.findFolder(assay);
       Assert.assertNotNull(assayFolder);
       Assert.assertEquals(folder.getPath(), assayFolder.getPath());
     }
@@ -228,7 +228,7 @@ public class LocalStorageStudyStorageServiceTests {
     exception = null;
     StorageFile file = null;
     try {
-      file = storageService.saveAssayFile(TEST_FILE.getFile(), assay);
+      file = storageService.saveFile(TEST_FILE.getFile(), assay);
     } catch (Exception e) {
       exception = e;
     }
@@ -252,7 +252,7 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.getAssayFolder(assay);
+      folder = storageService.findFolder(assay);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();

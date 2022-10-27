@@ -55,7 +55,7 @@ public class AssayStoragePrivateController extends AbstractAssayController {
   public StorageFolder getStorageFolder(@PathVariable("assayId") String assayId) throws Exception {
     LOGGER.info("Fetching storage folder for assay: " + assayId);
     Assay assay = getAssayFromIdentifier(assayId);
-    return studyStorageService.getAssayFolder(assay);
+    return studyStorageService.findFolder(assay);
   }
 
   @PostMapping("")
@@ -73,7 +73,7 @@ public class AssayStoragePrivateController extends AbstractAssayController {
       e.printStackTrace();
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    StorageFile storageFile = studyStorageService.saveAssayFile(path.toFile(), assay);
+    StorageFile storageFile = studyStorageService.saveFile(path.toFile(), assay);
 
     // Publish events
     Activity activity =

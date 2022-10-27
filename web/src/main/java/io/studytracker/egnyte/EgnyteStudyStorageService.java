@@ -165,12 +165,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder getProgramFolder(Program program) throws StudyStorageNotFoundException {
-    return this.getProgramFolder(program, true);
+  public StorageFolder findFolder(Program program) throws StudyStorageNotFoundException {
+    return this.findFolder(program, true);
   }
 
   @Override
-  public StorageFolder getProgramFolder(Program program, boolean includeContents)
+  public StorageFolder findFolder(Program program, boolean includeContents)
       throws StudyStorageNotFoundException {
     LOGGER.debug("getProgramFolder({}, {})", program.getName(), includeContents);
     String path = getProgramFolderPath(program);
@@ -195,12 +195,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder getStudyFolder(Study study) throws StudyStorageNotFoundException {
-    return this.getStudyFolder(study, true);
+  public StorageFolder findFolder(Study study) throws StudyStorageNotFoundException {
+    return this.findFolder(study, true);
   }
 
   @Override
-  public StorageFolder getStudyFolder(Study study, boolean includeContents)
+  public StorageFolder findFolder(Study study, boolean includeContents)
       throws StudyStorageNotFoundException {
     LOGGER.debug("getStudyFolder({}, {})", study.getName(), includeContents);
     String path = getStudyFolderPath(study);
@@ -225,12 +225,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder getAssayFolder(Assay assay) throws StudyStorageNotFoundException {
-    return this.getAssayFolder(assay, true);
+  public StorageFolder findFolder(Assay assay) throws StudyStorageNotFoundException {
+    return this.findFolder(assay, true);
   }
 
   @Override
-  public StorageFolder getAssayFolder(Assay assay, boolean includeContents)
+  public StorageFolder findFolder(Assay assay, boolean includeContents)
       throws StudyStorageNotFoundException {
     LOGGER.debug("getAssayFolder({}, {})", assay.getName(), includeContents);
     String path = getAssayFolderPath(assay);
@@ -255,7 +255,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createProgramFolder(Program program) throws StudyStorageException {
+  public StorageFolder createFolder(Program program) throws StudyStorageException {
     LOGGER.info(String.format("Creating folder for program %s", program.getName()));
     String path = getProgramFolderPath(program);
     StorageFolder storageFolder;
@@ -265,7 +265,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       LOGGER.warn("Duplicate folder found: " + path);
       if (options.isUseExisting()) {
         LOGGER.warn("Existing folder will be used.");
-        storageFolder = this.getProgramFolder(program, false);
+        storageFolder = this.findFolder(program, false);
       } else {
         throw new StudyStorageDuplicateException(e);
       }
@@ -277,7 +277,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createStudyFolder(Study study) throws StudyStorageException {
+  public StorageFolder createFolder(Study study) throws StudyStorageException {
     Program program = study.getProgram();
     String path = getStudyFolderPath(study);
     StorageFolder storageFolder;
@@ -290,7 +290,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     } catch (DuplicateFolderException e) {
       if (options.isUseExisting()) {
         LOGGER.warn("Existing folder will be used.");
-        storageFolder = this.getStudyFolder(study, false);
+        storageFolder = this.findFolder(study, false);
       } else {
         throw new StudyStorageDuplicateException(e);
       }
@@ -302,7 +302,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createAssayFolder(Assay assay) throws StudyStorageException {
+  public StorageFolder createFolder(Assay assay) throws StudyStorageException {
     Study study = assay.getStudy();
     LOGGER.info(
         String.format(
@@ -315,7 +315,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     } catch (DuplicateFolderException e) {
       if (options.isUseExisting()) {
         LOGGER.warn("Existing folder will be used.");
-        storageFolder = this.getAssayFolder(assay, false);
+        storageFolder = this.findFolder(assay, false);
       } else {
         throw new StudyStorageDuplicateException(e);
       }
@@ -327,7 +327,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFile saveStudyFile(File file, Study study) throws StudyStorageException {
+  public StorageFile saveFile(File file, Study study) throws StudyStorageException {
     LOGGER.debug("saveStudyFile({}, {})", file.getName(), study.getName());
     String path = getStudyFolderPath(study);
     StorageFile storageFile;
@@ -341,7 +341,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException {
+  public StorageFile saveFile(File file, Assay assay) throws StudyStorageException {
     LOGGER.debug("saveAssayFile({}, {})", file.getName(), assay.getName());
     String path = getAssayFolderPath(assay);
     StorageFile storageFile;
@@ -354,13 +354,4 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     return storageFile;
   }
 
-  @Override
-  public StorageFile saveFileToFolder(File file, StorageFolder folder)
-      throws StudyStorageException {
-    try {
-      return this.convertEgnyteFile(egnyteClient.uploadFile(file, folder.getPath()));
-    } catch (EgnyteException e) {
-      throw new StudyStorageException(e);
-    }
-  }
 }

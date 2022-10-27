@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -58,24 +59,27 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     String bucketName = location.getName();
     LOGGER.debug("Using bucket: {}", bucketName);
 
-    // CLean the path input
+    // Clean the path input
     if (!path.trim().equals("") && !path.endsWith("/")) {
       path += "/";
     }
-//    if (!exists(bucketName, path)) {
-//      throw new StudyStorageNotFoundException("Folder not found: " + path);
-//    }
-//    LOGGER.debug("Folder '{}' exists in bucket: {}", path, bucketName);
 
-    ListObjectsV2Request request = ListObjectsV2Request.builder()
-        .bucket(bucketName)
-        .prefix(path)
-        .delimiter("/")
-        .build();
-    ListObjectsV2Response response = client.listObjectsV2(request);
-    LOGGER.debug("Found {} files and {} folders in path {}", response.contents().size(), response.commonPrefixes().size(), path);
-    LOGGER.debug(response.toString());
-    return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents(), response.commonPrefixes());
+    try {
+      ListObjectsV2Request request = ListObjectsV2Request.builder()
+          .bucket(bucketName)
+          .prefix(path)
+          .delimiter("/")
+          .build();
+      ListObjectsV2Response response = client.listObjectsV2(request);
+      LOGGER.debug("Found {} files and {} folders in path {}", response.contents().size(),
+          response.commonPrefixes().size(), path);
+      LOGGER.debug(response.toString());
+      return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents(),
+          response.commonPrefixes());
+    } catch (AwsServiceException e) {
+      e.printStackTrace();
+      throw new StudyStorageNotFoundException("Cannot access folder at path: " + path);
+    }
   }
 
   @Override
@@ -87,21 +91,24 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     // Get the bucket
     String bucketName = location.getName();
 
-//    if (!exists(bucketName, path)) {
-//      throw new StudyStorageNotFoundException("File not found: " + path);
-//    }
-    ListObjectsV2Request request = ListObjectsV2Request.builder()
-        .bucket(bucketName)
-        .prefix(path)
-        .delimiter("/")
-        .build();
-    ListObjectsV2Response response = client.listObjectsV2(request);
-    S3Object s3Object = response.contents().stream().findFirst()
-        .orElseThrow(() -> new StudyStorageNotFoundException("Failed to lookup file by path: " + path));
-    if (s3Object.key().endsWith("/")) {
-      throw new StudyStorageNotFoundException("Object at path is a folder: " + path);
+    try {
+      ListObjectsV2Request request = ListObjectsV2Request.builder()
+          .bucket(bucketName)
+          .prefix(path)
+          .delimiter("/")
+          .build();
+      ListObjectsV2Response response = client.listObjectsV2(request);
+      S3Object s3Object = response.contents().stream().findFirst()
+          .orElseThrow(
+              () -> new StudyStorageNotFoundException("Failed to lookup file by path: " + path));
+      if (s3Object.key().endsWith("/")) {
+        throw new StudyStorageNotFoundException("Object at path is a folder: " + path);
+      }
+      return S3Utils.convertS3ObjectToStorageFile(s3Object);
+    } catch (AwsServiceException e) {
+      e.printStackTrace();
+      throw new StudyStorageNotFoundException("Cannot access file at path: " + path);
     }
-    return S3Utils.convertS3ObjectToStorageFile(s3Object);
   }
 
   @Override
@@ -132,7 +139,7 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   }
 
   @Override
-  public StorageFile uploadFile(FileStorageLocation location, String path, File file)
+  public StorageFile saveFile(FileStorageLocation location, String path, File file)
       throws StudyStorageException {
 
     LOGGER.info("Uploading file: {} to path: {} in bucket: {}", file.getName(), path, location.getName());
@@ -144,11 +151,6 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     if (!StoragePermissions.canWrite(location.getPermissions())) {
       throw new InsufficientPrivilegesException("Insufficient privileges to upload files");
     }
-
-    // Make sure the target folder exists
-//    if (!exists(bucketName, path)) {
-//      throw new StudyStorageException("Folder not found: " + path);
-//    }
 
     // Cleanup the path
     String fullPath = S3Utils.joinS3Path(path, file.getName());
@@ -168,14 +170,10 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   }
 
   @Override
-  public Resource downloadFile(FileStorageLocation location, String path) throws StudyStorageException {
+  public Resource fetchFile(FileStorageLocation location, String path) throws StudyStorageException {
 
     // Get the bucket
     String bucketName = location.getName();
-
-//    if (!exists(bucketName, path)) {
-//      throw new StudyStorageException("File not found: " + path);
-//    }
 
     try {
       return new ByteArrayResource(

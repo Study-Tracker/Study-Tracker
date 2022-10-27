@@ -157,8 +157,8 @@ public class StudyService {
   private StorageFolder createStudyStorageFolder(Study study) {
     StorageFolder folder = null;
     try {
-      studyStorageService.createStudyFolder(study);
-      folder = studyStorageService.getStudyFolder(study);
+      studyStorageService.createFolder(study);
+      folder = studyStorageService.findFolder(study);
     } catch (Exception e) {
       e.printStackTrace();
       LOGGER.warn("Failed to create storage folder for study: " + study.getCode());
@@ -314,7 +314,7 @@ public class StudyService {
     if (options.isUseS3() && s3StudyFileStorageService != null) {
       LOGGER.debug("Creating S3 folder for study: " + study.getCode());
       try {
-        s3StudyFileStorageService.createStorageFolder(study);
+        s3StudyFileStorageService.createFolder(study);
       } catch (StudyStorageException e) {
         e.printStackTrace();
         LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
@@ -491,11 +491,11 @@ public class StudyService {
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = studyStorageService.getStudyFolder(study, false);
+      folder = studyStorageService.findFolder(study, false);
     } catch (StudyStorageNotFoundException e) {
       LOGGER.warn("Storage folder not found for study: " + study.getCode());
       try {
-        folder = studyStorageService.createStudyFolder(study);
+        folder = studyStorageService.createFolder(study);
       } catch (Exception ex) {
         throw new StudyTrackerException(ex);
       }

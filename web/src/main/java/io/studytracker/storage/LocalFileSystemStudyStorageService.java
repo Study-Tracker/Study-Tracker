@@ -124,7 +124,7 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder getProgramFolder(Program program) throws StudyStorageNotFoundException {
+  public StorageFolder findFolder(Program program) throws StudyStorageNotFoundException {
     LOGGER.info("Fetching storage folder instance for program: " + program.getName());
     Path path = rootPath.resolve(namingService.getProgramStorageFolderName(program));
     LOGGER.info(path.toString());
@@ -143,15 +143,15 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   // TODO
   @Override
-  public StorageFolder getProgramFolder(Program program, boolean includeContents)
+  public StorageFolder findFolder(Program program, boolean includeContents)
       throws StudyStorageNotFoundException {
-    return getProgramFolder(program);
+    return findFolder(program);
   }
 
   @Override
-  public StorageFolder getStudyFolder(Study study) throws StudyStorageNotFoundException {
+  public StorageFolder findFolder(Study study) throws StudyStorageNotFoundException {
     LOGGER.info("Fetching storage folder instance for study: " + study.getCode());
-    StorageFolder programFolder = this.getProgramFolder(study.getProgram());
+    StorageFolder programFolder = this.findFolder(study.getProgram());
     Path programPath = Paths.get(programFolder.getPath());
     Path studyFolder = programPath.resolve(namingService.getStudyStorageFolderName(study));
     LOGGER.info(studyFolder.toString());
@@ -170,15 +170,15 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   // TODO
   @Override
-  public StorageFolder getStudyFolder(Study study, boolean includeContents)
+  public StorageFolder findFolder(Study study, boolean includeContents)
       throws StudyStorageNotFoundException {
-    return getStudyFolder(study);
+    return findFolder(study);
   }
 
   @Override
-  public StorageFolder getAssayFolder(Assay assay) throws StudyStorageNotFoundException {
+  public StorageFolder findFolder(Assay assay) throws StudyStorageNotFoundException {
     LOGGER.info("Fetching storage folder instance for assay: " + assay.getCode());
-    StorageFolder studyFolder = this.getStudyFolder(assay.getStudy());
+    StorageFolder studyFolder = this.findFolder(assay.getStudy());
     Path studyPath = Paths.get(studyFolder.getPath());
     Path assayFolder = studyPath.resolve(namingService.getAssayStorageFolderName(assay));
     LOGGER.info(assayFolder.toString());
@@ -197,13 +197,13 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
 
   // TODO
   @Override
-  public StorageFolder getAssayFolder(Assay assay, boolean includeContents)
+  public StorageFolder findFolder(Assay assay, boolean includeContents)
       throws StudyStorageNotFoundException {
-    return getAssayFolder(assay);
+    return findFolder(assay);
   }
 
   @Override
-  public StorageFolder createProgramFolder(Program program) throws StudyStorageException {
+  public StorageFolder createFolder(Program program) throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for program: " + program.getName());
     String folderName = namingService.getProgramStorageFolderName(program);
     Path programPath = rootPath.resolve(folderName);
@@ -237,9 +237,9 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createStudyFolder(Study study) throws StudyStorageException {
+  public StorageFolder createFolder(Study study) throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for study: " + study.getCode());
-    StorageFolder programFolder = this.getProgramFolder(study.getProgram());
+    StorageFolder programFolder = this.findFolder(study.getProgram());
     Path programPath = Paths.get(programFolder.getPath());
     Path studyPath = programPath.resolve(namingService.getStudyStorageFolderName(study));
     File newFolder = studyPath.toFile();
@@ -272,9 +272,9 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createAssayFolder(Assay assay) throws StudyStorageException {
+  public StorageFolder createFolder(Assay assay) throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for assay: " + assay.getCode());
-    StorageFolder studyFolder = this.getStudyFolder(assay.getStudy());
+    StorageFolder studyFolder = this.findFolder(assay.getStudy());
     Path studyPath = Paths.get(studyFolder.getPath());
     Path assayPath = studyPath.resolve(namingService.getAssayStorageFolderName(assay));
     File newFolder = assayPath.toFile();
@@ -307,53 +307,26 @@ public class LocalFileSystemStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFile saveStudyFile(File file, Study study) throws StudyStorageException {
+  public StorageFile saveFile(File file, Study study) throws StudyStorageException {
     LOGGER.info(
         String.format(
             "Saving file %s to storage folder instance for study %s",
             file.getName(), study.getCode()));
-    StorageFolder studyFolder = this.getStudyFolder(study);
-    return this.saveFileToFolder(file, studyFolder);
-//    Path studyPath = Paths.get(studyFolder.getPath());
-//    Path newFilePath = studyPath.resolve(file.getName());
-//    File newFile = newFilePath.toFile();
-//    try {
-//      FileUtils.copyFile(file, newFile);
-//    } catch (Exception e) {
-//      throw new StudyTrackerException(e);
-//    }
-//    StorageFile studyFile = new StorageFile();
-//    studyFile.setPath(newFilePath);
-//    studyFile.setUrl(getObjectUrl(newFilePath));
-//    studyFile.setName(newFile.getName());
-//    return studyFile;
+    StorageFolder studyFolder = this.findFolder(study);
+    return this.saveFile(file, studyFolder);
   }
 
   @Override
-  public StorageFile saveAssayFile(File file, Assay assay) throws StudyStorageException {
+  public StorageFile saveFile(File file, Assay assay) throws StudyStorageException {
     LOGGER.info(
         String.format(
             "Saving file %s to storage folder instance for assay %s",
             file.getName(), assay.getCode()));
-    StorageFolder assayFolder = this.getAssayFolder(assay);
-    return this.saveFileToFolder(file, assayFolder);
-//    Path assayPath = Paths.get(assayFolder.getPath());
-//    Path newFilePath = assayPath.resolve(file.getName());
-//    File newFile = newFilePath.toFile();
-//    try {
-//      FileUtils.copyFile(file, newFile);
-//    } catch (Exception e) {
-//      throw new StudyTrackerException(e);
-//    }
-//    StorageFile assayFile = new StorageFile();
-//    assayFile.setPath(newFilePath);
-//    assayFile.setUrl(getObjectUrl(newFilePath));
-//    assayFile.setName(newFile.getName());
-//    return assayFile;
+    StorageFolder assayFolder = this.findFolder(assay);
+    return this.saveFile(file, assayFolder);
   }
 
-  @Override
-  public StorageFile saveFileToFolder(File file, StorageFolder folder)
+  private StorageFile saveFile(File file, StorageFolder folder)
       throws StudyStorageException {
     Path path = Paths.get(folder.getPath());
     Path newFilePath = path.resolve(file.getName());
