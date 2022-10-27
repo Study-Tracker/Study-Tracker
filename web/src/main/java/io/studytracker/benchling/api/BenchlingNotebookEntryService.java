@@ -146,7 +146,7 @@ public final class BenchlingNotebookEntryService
       if (userOptional.isPresent()) {
         userIds.add(userOptional.get().getReferenceId());
       } else {
-        LOGGER.warn("Could not find user registered in Benchling: " + user);
+        LOGGER.warn("Could not find user registered in Benchling: " + user.getUsername());
       }
     }
     request.setAuthorIds(userIds);
