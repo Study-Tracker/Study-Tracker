@@ -15,17 +15,14 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Col, Row} from 'react-bootstrap'
-import {ActivityStream} from "../../common/activity";
-import {CardLoadingMessage} from "../../common/loading";
-import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
+import {Card} from "react-bootstrap";
+import Timeline from "../../common/detailsPage/Timeline";
 import PropTypes from "prop-types";
 
-const StudyTimelineTab = props => {
+const StudySummaryTimelineCard = ({study}) => {
 
-  const {study} = props;
-  const [activity, setActivity] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -37,30 +34,19 @@ const StudyTimelineTab = props => {
     })
   }, []);
 
-  let content = <CardLoadingMessage/>;
-  if (error !== null) {
-    content = <DismissableAlert
-        color={'warning'}
-        message={'Failed to load study activity.'}
-    />;
-  } else if (activity !== null) {
-    content = <ActivityStream activity={activity}/>;
-  }
-
   return (
-      <div className="timeline-tab">
-        <Row>
-          <Col sm={12}>
-            {content}
-          </Col>
-        </Row>
-      </div>
+      <Card>
+        <Card.Body>
+          <h5 className="card-title">Latest Activity</h5>
+          <Timeline events={activity} />
+        </Card.Body>
+      </Card>
   )
 
 }
 
-StudyTimelineTab.propTypes = {
+StudySummaryTimelineCard.propTypes = {
   study: PropTypes.object.isRequired
 }
 
-export default StudyTimelineTab;
+export default StudySummaryTimelineCard;

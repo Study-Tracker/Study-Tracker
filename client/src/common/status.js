@@ -78,9 +78,8 @@ export const SelectableStatusButton = props => {
   return (
       <Dropdown className="me-1 mb-1">
         <Dropdown.Toggle variant={config.color}>
-          <FontAwesomeIcon icon={config.icon}/>
-          &nbsp;&nbsp;
-          {config.label}
+          <FontAwesomeIcon icon={config.icon} className={"me-2"}/>
+          <span className={"me-2"}>{config.label}</span>
         </Dropdown.Toggle>
         <Dropdown.Menu>
           {options}

@@ -14,27 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  Breadcrumb,
-  Button,
-  Card,
-  Col,
-  Container,
-  Dropdown,
-  Nav,
-  Row,
-  Tab
-} from 'react-bootstrap';
-import {SelectableStatusButton, StatusButton} from "../../common/status";
+import {Breadcrumb, Card, Col, Container, Nav, Row, Tab} from 'react-bootstrap';
 import React, {useState} from "react";
-import {Menu} from "react-feather";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faFolderPlus, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {
-  StudyCollaborator,
-  StudyKeywords,
-  StudyTeam
-} from "../../common/studyMetadata";
 import ExternalLinks from "../../common/externalLinks";
 import StudyRelationships from "../../common/studyRelationships";
 import StudyAssaysTab from "./StudyAssaysTab";
@@ -52,64 +33,11 @@ import {RepairableNotebookFolderButton} from "../../common/eln";
 import PropTypes from "prop-types";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
-
-const StudyDetailHeader = ({study, user}) => {
-  return (
-      <Row className="justify-content-between align-items-center">
-        <Col>
-          <h3>{study.name}</h3>
-          <h5 className="text-muted">{study.code}</h5>
-        </Col>
-        <Col className="col-auto d-flex">
-          {
-            study.collaborator
-                ? (
-                    <React.Fragment>
-                      <Button
-                          className="me-1 mb-1"
-                          variant="outline-info"
-                          disabled
-                      >
-                        External Study
-                      </Button>
-                      &nbsp;&nbsp;
-                    </React.Fragment>
-                ) : ''
-          }
-          {
-            !study.active
-                ? <Button
-                    className="me-1 mb-1"
-                    variant="outline-danger"
-                    disabled
-                >
-                  Inactive Study
-                </Button>
-                : ''
-          }
-          {
-            study.legacy
-                ? <Button
-                    className="me-1 mb-1"
-                    variant="outline-warning"
-                    disabled
-                >
-                  Legacy Study
-                </Button>
-                : ''
-          }
-          {
-            user
-                ? <SelectableStatusButton status={study.status}
-                                          studyId={study.id}/>
-                : <StatusButton status={study.status}/>
-
-          }
-
-        </Col>
-      </Row>
-  );
-};
+import StudyDetailHeader from "./StudyDetailsHeader";
+import TeamMembers from "../../common/detailsPage/TeamMembers";
+import KeywordBadges from "../../common/detailsPage/KeywordBadges";
+import StudySummaryTimelineCard from "./StudySummaryTimelineCard";
+import Collaborator from "./Collaborator";
 
 const StudyDetails = props => {
 
@@ -162,170 +90,100 @@ const StudyDetails = props => {
         </Row>
 
         {/* Header */}
-        <StudyDetailHeader study={study} user={user}/>
+        <StudyDetailHeader
+            study={study}
+            handleAddToCollection={() => setShowCollectionModal(true)}
+            handleDelete={handleStudyDelete}
+        />
 
         <Row>
 
-          <Col lg={5}>
+          <Col md={8}>
+
+            {/*Summary Card*/}
             <Card className="details-card">
-
-              <Card.Header>
-
-                <div className="card-actions float-end">
-                  <Dropdown align="end">
-                    <Dropdown.Toggle as="a" bsPrefix="-">
-                      <Menu/>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-
-                      <Dropdown.Item
-                          onClick={() => setShowCollectionModal(true)}>
-                        <FontAwesomeIcon icon={faFolderPlus}/>
-                        &nbsp;
-                        Add to Collection
-                      </Dropdown.Item>
-
-                      {/*<DropdownItem onClick={() => console.log("Share!")}>*/}
-                      {/*  <FontAwesomeIcon icon={faShare}/>*/}
-                      {/*  &nbsp;*/}
-                      {/*  Share*/}
-                      {/*</DropdownItem>*/}
-
-                      <Dropdown.Divider/>
-
-                      <Dropdown.Item onClick={() =>
-                          navigate("/study/" + study.code + "/edit")}>
-                        <FontAwesomeIcon icon={faEdit}/>
-                        &nbsp;
-                        Edit
-                      </Dropdown.Item>
-
-                      <Dropdown.Item onClick={handleStudyDelete}>
-                        <FontAwesomeIcon icon={faTrash}/>
-                        &nbsp;
-                        Remove
-                      </Dropdown.Item>
-
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
-
-                <Card.Title tag="h5" className="mb-0 text-muted">
-                  Summary
-                </Card.Title>
-
-              </Card.Header>
-
               <Card.Body>
-                <Row>
-                  <Col xs={12}>
 
+                <Row>
+
+                  <Col xs={12}>
+                    <div className={"card-title h5"}>Summary</div>
+                  </Col>
+
+                  <Col md={12}>
+                    <div dangerouslySetInnerHTML={createMarkup(study.description)}/>
+                    <KeywordBadges keywords={study.keywords} />
+                  </Col>
+
+                </Row>
+
+                <Row>
+
+                  <Col sm={4}>
                     <h6 className="details-label">Program</h6>
                     <p>{study.program.name}</p>
+                  </Col>
 
+                  <Col sm={4}>
                     <h6 className="details-label">Code</h6>
                     <p>{study.code}</p>
+                  </Col>
 
-                    {
-                      !!study.externalCode
-                          ? (
-                              <React.Fragment>
-                                <h6 className="details-label">External Code</h6>
-                                <p>{study.externalCode}</p>
-                              </React.Fragment>
-                          ) : ''
-                    }
+                  {
+                    study.externalCode && (
+                          <Col sm={4}>
+                            <h6 className="details-label">External Code</h6>
+                            <p>{study.externalCode}</p>
+                          </Col>
+                      )
+                  }
 
-                    <h6 className="details-label">Description</h6>
-                    <div dangerouslySetInnerHTML={createMarkup(
-                        study.description)}/>
+                </Row>
 
-                    <h6 className="details-label">Created By</h6>
-                    <p>{study.createdBy.displayName}</p>
+                <Row>
 
-                    <h6 className="details-label">Last Updated</h6>
-                    <p>{new Date(study.updatedAt).toLocaleString()}</p>
+                  <Col sm={4}>
+                    <h6 className="details-label">Created</h6>
+                    <p>{new Date(study.createdAt).toLocaleString()}</p>
+                  </Col>
 
+                  <Col sm={4}>
                     <h6 className="details-label">Start Date</h6>
                     <p>{new Date(study.startDate).toLocaleString()}</p>
-
-                    <h6 className="details-label">End Date</h6>
-                    <p>
-                      {
-                        !!study.endDate
-                            ? new Date(study.endDate).toLocaleString()
-                            : "n/a"
-                      }
-                    </p>
-
                   </Col>
-                </Row>
-              </Card.Body>
-
-              {
-                study.collaborator
-                    ? (
-                        <Card.Body>
-                          <Row>
-                            <Col xs={12}>
-                              <div>
-                                <Card.Title>CRO/Collaborator</Card.Title>
-                                <StudyCollaborator
-                                    collaborator={study.collaborator}
-                                    externalCode={study.externalCode}
-                                />
-                              </div>
-                            </Col>
-                          </Row>
-                        </Card.Body>
-                    ) : ''
-              }
-
-              <Card.Body>
-                <Row>
-                  <Col xs={12}>
-                    <Card.Title>Study Team</Card.Title>
-                    <StudyTeam users={study.users} owner={study.owner}/>
-                  </Col>
-                </Row>
-              </Card.Body>
-
-              <Card.Body>
-                <Row>
-                  <Col xs={12}>
-
-                    <Card.Title>Workspaces</Card.Title>
-
-                    <RepairableStorageFolderButton
-                        folder={study.storageFolder}
-                        repairUrl={"/api/internal/study/" + study.id + "/storage/repair"}
-                    />
-
-                    &nbsp;&nbsp;
 
                     {
-                      features
-                      && features.notebook
-                      && features.notebook.isEnabled ? (
-                          <RepairableNotebookFolderButton
-                              folder={study.notebookFolder}
-                              repairUrl={"/api/internal/study/" + study.id + "/notebook/repair"}
-                          />
-                      ) : ""
+                      !!study.endDate
+                          ? (
+                              <Col sm={4}>
+                                <h6 className="details-label">End Date</h6>
+                                <p>{new Date(study.endDate).toLocaleString()}</p>
+                              </Col>
+                          ) : ""
                     }
 
+                  <Col md={12}>
+                    <h6 className="details-label">Study Team</h6>
+                    <TeamMembers owner={study.owner} users={study.users} />
                   </Col>
-                </Row>
-              </Card.Body>
 
-              <Card.Body>
+                </Row>
+
                 <Row>
                   <Col xs={12}>
-                    <StudyKeywords keywords={study.keywords} studyId={study.id} />
+                    <Collaborator
+                        collaborator={study.collaborator}
+                        externalCode={study.externalCode}
+                    />
                   </Col>
                 </Row>
+
               </Card.Body>
 
+            </Card> {/* End Summary Card */}
+
+            {/*External links Card*/}
+            <Card>
               <Card.Body>
                 <Row>
                   <Col xs={12}>
@@ -337,7 +195,10 @@ const StudyDetails = props => {
                   </Col>
                 </Row>
               </Card.Body>
+            </Card> {/* End External Links Card */}
 
+            {/*Study relationships card*/}
+            <Card>
               <Card.Body>
                 <Row>
                   <Col xs={12}>
@@ -349,11 +210,50 @@ const StudyDetails = props => {
                   </Col>
                 </Row>
               </Card.Body>
+            </Card> {/* End Study Relationships Card */}
 
-            </Card>
           </Col>
 
-          <Col lg="7">
+          <Col md={4}>
+
+            <StudySummaryTimelineCard study={study} />
+
+            {/*Workspaces Card*/}
+            <Card>
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+
+                    <Card.Title>Workspaces</Card.Title>
+
+                    <div className={"d-flex flex-column align-items-center"}>
+
+                      <RepairableStorageFolderButton
+                          folder={study.storageFolder}
+                          repairUrl={"/api/internal/study/" + study.id + "/storage/repair"}
+                      />
+
+                      {
+                        features
+                        && features.notebook
+                        && features.notebook.isEnabled ? (
+                            <RepairableNotebookFolderButton
+                                folder={study.notebookFolder}
+                                repairUrl={"/api/internal/study/" + study.id + "/notebook/repair"}
+                            />
+                        ) : ""
+                      }
+
+                    </div>
+
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+
+          </Col>
+
+          <Col md={12}>
 
             {/* Tabs */}
             <div className="tab">

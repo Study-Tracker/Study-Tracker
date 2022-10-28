@@ -16,7 +16,7 @@
 
 import React, {useEffect, useState} from "react";
 import {Col, Row} from 'react-bootstrap'
-import {Timeline} from "../../common/activity";
+import {ActivityStream} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
@@ -52,7 +52,7 @@ const AssayTimelineTab = props => {
 
   let content = <CardLoadingMessage/>;
   if (!!state.isLoaded && !!state.activity) {
-    content = <Timeline activity={state.activity}/>;
+    content = <ActivityStream activity={state.activity}/>;
   } else if (state.isError) {
     content = <DismissableAlert color={'warning'}
                                 message={'Failed to load assay activity.'}/>;
