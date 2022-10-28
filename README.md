@@ -36,11 +36,20 @@ Tracker, [see the wiki](https://github.com/Study-Tracker/Study-Tracker/wiki).
 ### File storage
 
 - Egnyte
+- Amazon S3
 - Local filesystem
 
 ### Event Management
 
 - AWS EventBridge
+
+### Single Sign-on
+
+- Okta
+
+### Source Code Management
+
+- GitLab
 
 ## Quick Start
 
