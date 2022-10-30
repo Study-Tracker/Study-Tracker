@@ -19,7 +19,7 @@ import Conclusions from "../../common/Conclusions";
 import axios from "axios";
 import PropTypes from "prop-types";
 import {Form as FormikForm, Formik} from "formik";
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import ReactQuill from "react-quill";
 import {FormGroup} from "../../common/forms/common";
 import FormikFormErrorNotification
@@ -56,93 +56,94 @@ const StudyConclusionsTab = props => {
   }
 
   return (
-      <div>
+      <Card>
+        <Card.Body>
 
-        <Conclusions
-            conclusions={conclusions}
-            showModal={setModalIsOpen}
-            isSignedIn={!!props.user}
-        />
+          <Conclusions
+              conclusions={conclusions}
+              showModal={setModalIsOpen}
+              isSignedIn={!!props.user}
+          />
 
-        <Formik
-            initialValues={conclusions || conclusionsDefaults}
-            onSubmit={handleFormSubmit}
-            validationSchema={conclusionsSchema}
-        >
-          {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleSubmit,
-              setFieldValue
-          }) => (
+          <Formik
+              initialValues={conclusions || conclusionsDefaults}
+              onSubmit={handleFormSubmit}
+              validationSchema={conclusionsSchema}
+          >
+            {({
+                values,
+                errors,
+                touched,
+                handleChange,
+                handleSubmit,
+                setFieldValue
+            }) => (
 
-              <>
+                <>
 
-                <FormikFormErrorNotification />
+                  <FormikFormErrorNotification />
 
-                <Modal
-                    show={modalIsOpen}
-                    onHide={() => setModalIsOpen(false)}
-                    size={"lg"}
-                >
+                  <Modal
+                      show={modalIsOpen}
+                      onHide={() => setModalIsOpen(false)}
+                      size={"lg"}
+                  >
 
-                  <Modal.Header closeButton>
-                    Add Conclusions
-                  </Modal.Header>
+                    <Modal.Header closeButton>
+                      Add Conclusions
+                    </Modal.Header>
 
-                  <Modal.Body className="m-3">
+                    <Modal.Body className="m-3">
 
-                    <Row>
-
-                      <Col sm={12}>
-                        <p>
-                          Add a brief summary of your study's conclusions. Supporting
-                          documents may be uploaded as attachments.
-                        </p>
-                      </Col>
-
-                      <FormikForm>
+                      <Row>
 
                         <Col sm={12}>
-                          <FormGroup>
-                            <ReactQuill
-                                theme="snow"
-                                name={'content'}
-                                value={values.content}
-                                onChange={(content) => {setFieldValue('content', content)}}
-                                className={(errors.content && touched.content) ? 'is-invalid' : ''}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                              {errors.content}
-                            </Form.Control.Feedback>
-                          </FormGroup>
+                          <p>
+                            Add a brief summary of your study's conclusions. Supporting
+                            documents may be uploaded as attachments.
+                          </p>
                         </Col>
 
-                      </FormikForm>
+                        <FormikForm>
 
-                    </Row>
+                          <Col sm={12}>
+                            <FormGroup>
+                              <ReactQuill
+                                  theme="snow"
+                                  name={'content'}
+                                  value={values.content}
+                                  onChange={(content) => {setFieldValue('content', content)}}
+                                  className={(errors.content && touched.content) ? 'is-invalid' : ''}
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {errors.content}
+                              </Form.Control.Feedback>
+                            </FormGroup>
+                          </Col>
 
-                  </Modal.Body>
+                        </FormikForm>
 
-                  <Modal.Footer>
-                    <Button variant={"secondary"}
-                            onClick={() => setModalIsOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button variant={"primary"} onClick={handleSubmit}>
-                      Save
-                    </Button>
-                  </Modal.Footer>
+                      </Row>
 
-                </Modal>
+                    </Modal.Body>
 
-              </>
-          )}
-        </Formik>
+                    <Modal.Footer>
+                      <Button variant={"secondary"}
+                              onClick={() => setModalIsOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button variant={"primary"} onClick={handleSubmit}>
+                        Save
+                      </Button>
+                    </Modal.Footer>
 
-      </div>
+                  </Modal>
+
+                </>
+            )}
+          </Formik>
+        </Card.Body>
+      </Card>
   );
 
 }

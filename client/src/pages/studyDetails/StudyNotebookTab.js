@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Col, Row} from "react-bootstrap";
+import {Card, Col, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {StorageFolderFileList} from "../../common/files";
 import axios from "axios";
@@ -40,19 +40,21 @@ const StudyNotebookTabContent = props => {
   }
 
   return (
-      <div>
-        <Row>
-          <Col sm={12}>
-            <StorageFolderFileList
-                folder={folder}
-                isLoaded={!!folder}
-                isError={!!error}
-                errorMessage={error}
-                folderFileKey={'entries'}
-            />
-          </Col>
-        </Row>
-      </div>
+      <Card>
+        <Card.Body>
+          <Row>
+            <Col sm={12}>
+              <StorageFolderFileList
+                  folder={folder}
+                  isLoaded={!!folder}
+                  isError={!!error}
+                  errorMessage={error}
+                  folderFileKey={'entries'}
+              />
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   )
 }
 

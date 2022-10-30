@@ -21,8 +21,8 @@ const Collaborator = ({collaborator, externalCode}) => {
   return (
       <div>
         <h6 className="details-label">CRO/Collaborator</h6>
-        <div className="collaborator bg-light mb-4">
-          <table className={"m-2"}>
+        <div className="collaborator bg-light p-3 mb-4">
+          <table>
             <tbody>
             <tr>
               <td><strong>External Study Code:</strong></td>

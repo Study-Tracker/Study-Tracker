@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-import {Breadcrumb, Card, Col, Container, Nav, Row, Tab} from 'react-bootstrap';
+import {Breadcrumb, Col, Container, Row, Tab, Tabs} from 'react-bootstrap';
 import React, {useState} from "react";
-import ExternalLinks from "../../common/externalLinks";
-import StudyRelationships from "../../common/studyRelationships";
 import StudyAssaysTab from "./StudyAssaysTab";
 import StudyFilesTab from "./StudyFilesTab";
 import StudyNotebookTab from './StudyNotebookTab';
@@ -28,16 +26,11 @@ import swal from "sweetalert";
 import AddToStudyCollectionModal
   from "../../common/modals/AddToStudyCollectionModal";
 import StudyCollectionsTab from "./StudyCollectionsTab";
-import {RepairableStorageFolderButton} from "../../common/files";
-import {RepairableNotebookFolderButton} from "../../common/eln";
 import PropTypes from "prop-types";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import StudyDetailHeader from "./StudyDetailsHeader";
-import TeamMembers from "../../common/detailsPage/TeamMembers";
-import KeywordBadges from "../../common/detailsPage/KeywordBadges";
-import StudySummaryTimelineCard from "./StudySummaryTimelineCard";
-import Collaborator from "./Collaborator";
+import StudyOverviewTab from "./StudyOverviewTab";
 
 const StudyDetails = props => {
 
@@ -72,10 +65,6 @@ const StudyDetails = props => {
     });
   }
 
-  const createMarkup = (content) => {
-    return {__html: content};
-  };
-
   return (
       <Container fluid className="animated fadeIn">
 
@@ -98,259 +87,60 @@ const StudyDetails = props => {
 
         <Row>
 
-          <Col md={8}>
-
-            {/*Summary Card*/}
-            <Card className="details-card">
-              <Card.Body>
-
-                <Row>
-
-                  <Col xs={12}>
-                    <div className={"card-title h5"}>Summary</div>
-                  </Col>
-
-                  <Col md={12}>
-                    <div dangerouslySetInnerHTML={createMarkup(study.description)}/>
-                    <KeywordBadges keywords={study.keywords} />
-                  </Col>
-
-                </Row>
-
-                <Row>
-
-                  <Col sm={4}>
-                    <h6 className="details-label">Program</h6>
-                    <p>{study.program.name}</p>
-                  </Col>
-
-                  <Col sm={4}>
-                    <h6 className="details-label">Code</h6>
-                    <p>{study.code}</p>
-                  </Col>
-
-                  {
-                    study.externalCode && (
-                          <Col sm={4}>
-                            <h6 className="details-label">External Code</h6>
-                            <p>{study.externalCode}</p>
-                          </Col>
-                      )
-                  }
-
-                </Row>
-
-                <Row>
-
-                  <Col sm={4}>
-                    <h6 className="details-label">Created</h6>
-                    <p>{new Date(study.createdAt).toLocaleString()}</p>
-                  </Col>
-
-                  <Col sm={4}>
-                    <h6 className="details-label">Start Date</h6>
-                    <p>{new Date(study.startDate).toLocaleString()}</p>
-                  </Col>
-
-                    {
-                      !!study.endDate
-                          ? (
-                              <Col sm={4}>
-                                <h6 className="details-label">End Date</h6>
-                                <p>{new Date(study.endDate).toLocaleString()}</p>
-                              </Col>
-                          ) : ""
-                    }
-
-                  <Col md={12}>
-                    <h6 className="details-label">Study Team</h6>
-                    <TeamMembers owner={study.owner} users={study.users} />
-                  </Col>
-
-                </Row>
-
-                <Row>
-                  <Col xs={12}>
-                    <Collaborator
-                        collaborator={study.collaborator}
-                        externalCode={study.externalCode}
-                    />
-                  </Col>
-                </Row>
-
-              </Card.Body>
-
-            </Card> {/* End Summary Card */}
-
-            {/*External links Card*/}
-            <Card>
-              <Card.Body>
-                <Row>
-                  <Col xs={12}>
-                    <ExternalLinks
-                        links={study.externalLinks || []}
-                        studyCode={study.code}
-                        user={user}
-                    />
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card> {/* End External Links Card */}
-
-            {/*Study relationships card*/}
-            <Card>
-              <Card.Body>
-                <Row>
-                  <Col xs={12}>
-                    <StudyRelationships
-                        relationships={study.studyRelationships}
-                        studyCode={study.code}
-                        user={user}
-                    />
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card> {/* End Study Relationships Card */}
-
-          </Col>
-
-          <Col md={4}>
-
-            <StudySummaryTimelineCard study={study} />
-
-            {/*Workspaces Card*/}
-            <Card>
-              <Card.Body>
-                <Row>
-                  <Col xs={12}>
-
-                    <Card.Title>Workspaces</Card.Title>
-
-                    <div className={"d-flex flex-column align-items-center"}>
-
-                      <RepairableStorageFolderButton
-                          folder={study.storageFolder}
-                          repairUrl={"/api/internal/study/" + study.id + "/storage/repair"}
-                      />
-
-                      {
-                        features
-                        && features.notebook
-                        && features.notebook.isEnabled ? (
-                            <RepairableNotebookFolderButton
-                                folder={study.notebookFolder}
-                                repairUrl={"/api/internal/study/" + study.id + "/notebook/repair"}
-                            />
-                        ) : ""
-                      }
-
-                    </div>
-
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-
-          </Col>
-
           <Col md={12}>
 
             {/* Tabs */}
-            <div className="tab">
-              <Tab.Container defaultActiveKey="timeline">
-                <Nav variant="tabs">
-                  <Nav.Item>
-                    <Nav.Link eventKey={"timeline"}>
-                      Timeline
-                    </Nav.Link>
-                  </Nav.Item>
+            <Tabs variant={"pills"} defaultActiveKey={"overview"}>
 
-                  <Nav.Item>
-                    <Nav.Link eventKey={"assays"}>
-                      Assays
-                    </Nav.Link>
-                  </Nav.Item>
+              <Tab eventKey={"overview"} title={"Overview"}>
+                <StudyOverviewTab
+                    study={study}
+                    user={user}
+                    features={features}
+                    handleAddToCollection={() => setShowCollectionModal(true)}
+                />
+              </Tab>
 
-                  <Nav.Item>
-                    <Nav.Link eventKey={"files"}>
-                      Files
-                    </Nav.Link>
-                  </Nav.Item>
+              <Tab eventKey={"assays"} title={"Assays"}>
+                <StudyAssaysTab study={study} user={user}/>
+              </Tab>
 
-                  {
-                    study.notebookFolder ? (
-                        <Nav.Item>
-                          <Nav.Link eventKey={"notebook"}>
-                            Notebook
-                          </Nav.Link>
-                        </Nav.Item>
-                    ) : ""
-                  }
+              <Tab eventKey={"files"} title={"Files"}>
+                <StudyFilesTab study={study} user={user}/>
+              </Tab>
 
-                  <Nav.Item>
-                    <Nav.Link eventKey={"conclusions"}>
-                      Conclusions
-                    </Nav.Link>
-                  </Nav.Item>
+              {
+                features
+                && features.notebook
+                && features.notebook.isEnabled
+                && study.notebookFolder ? (
+                    <Tab eventKey={"notebook"} title={"Notebook"}>
+                      <StudyNotebookTab study={study} user={user}/>
+                    </Tab>
+                ) : ""
+              }
 
-                  <Nav.Item>
-                    <Nav.Link eventKey={"comments"}>
-                      Comments
-                    </Nav.Link>
-                  </Nav.Item>
+              <Tab eventKey={"conclusions"} title={"Conclusions"}>
+                <StudyConclusionsTab study={study} user={user}/>
+              </Tab>
 
-                  <Nav.Item>
-                    <Nav.Link eventKey={"collections"}>
-                      Collections
-                    </Nav.Link>
-                  </Nav.Item>
+              <Tab eventKey={"comments"} title={"Comments"}>
+                <StudyCommentsTab study={study} user={user}/>
+              </Tab>
 
-                </Nav>
+              <Tab title={"Timeline"} eventKey={"timeline"}>
+                <StudyTimelineTab study={study} user={user}/>
+              </Tab>
 
-                <Tab.Content>
+              <Tab title={"Collections"} eventKey={"collections"}>
+                <StudyCollectionsTab
+                    study={study}
+                    showCollectionModal={setShowCollectionModal}
+                />
+              </Tab>
 
-                  {/* Assay Tab */}
-                  <Tab.Pane eventKey={"timeline"}>
-                    <StudyTimelineTab study={study} user={user}/>
-                  </Tab.Pane>
+            </Tabs>
 
-                  <Tab.Pane eventKey={"assays"}>
-                    <StudyAssaysTab study={study} user={user}/>
-                  </Tab.Pane>
-
-                  <Tab.Pane eventKey={"files"}>
-                    <StudyFilesTab study={study} user={user}/>
-                  </Tab.Pane>
-
-                  {
-                    features
-                    && features.notebook
-                    && features.notebook.isEnabled
-                    && study.notebookFolder ? (
-                        <Tab.Pane eventKey={"notebook"}>
-                          <StudyNotebookTab study={study} user={user}/>
-                        </Tab.Pane>
-                    ) : ""
-                  }
-
-                  <Tab.Pane eventKey={"conclusions"}>
-                    <StudyConclusionsTab study={study} user={user}/>
-                  </Tab.Pane>
-
-                  <Tab.Pane eventKey={"comments"}>
-                    <StudyCommentsTab study={study} user={user}/>
-                  </Tab.Pane>
-
-                  <Tab.Pane eventKey={"collections"}>
-                    <StudyCollectionsTab
-                        study={study}
-                        showCollectionModal={setShowCollectionModal}
-                    />
-                  </Tab.Pane>
-
-                </Tab.Content>
-              </Tab.Container>
-            </div>
           </Col>
         </Row>
 

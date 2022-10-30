@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Card, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFile} from "@fortawesome/free-solid-svg-icons";
 import React, {useState} from "react";
@@ -63,90 +63,93 @@ const StudyFilesTabContent = props => {
   }
 
   return (
-      <div>
+      <Card>
+        <Card.Body>
 
-        <Row className="justify-content-between align-items-center mb-2">
-          <Col>
-            <span className="float-end">
-              <Button variant="info"
-                      onClick={() => setModalIsOpen(true)}>
-                Upload Files
-                &nbsp;
-                <FontAwesomeIcon icon={faFile}/>
-              </Button>
-            </span>
-          </Col>
-        </Row>
+          <Row className="justify-content-between align-items-center mb-2">
+            <Col>
+              <span className="float-end">
+                <Button variant="info"
+                        onClick={() => setModalIsOpen(true)}>
+                  Upload Files
+                  &nbsp;
+                  <FontAwesomeIcon icon={faFile}/>
+                </Button>
+              </span>
+            </Col>
+          </Row>
 
-        <Row>
+          <Row>
 
-          {
-            showFolder ? (
-                <Col sm={12}>
-                  <StorageFolderFileList
-                      folder={folder}
-                      isLoaded={folder !== null}
-                      isError={error !== null}
-                  />
-                </Col>
-            ) : (
-                <Col sm={12} className={"text-center"}>
-
-                  <p>
-                    <img
-                        src={"/static/images/clip/data-storage.png"}
-                        alt="File storage"
-                        className="img-fluid"
-                        width={250}
+            {
+              showFolder ? (
+                  <Col sm={12}>
+                    <StorageFolderFileList
+                        folder={folder}
+                        isLoaded={folder !== null}
+                        isError={error !== null}
                     />
-                  </p>
+                  </Col>
+              ) : (
+                  <Col sm={12} className={"text-center"}>
 
-                  <p>
-                    Study files can be viewed in the native file browser,
-                    or viewed as a partial folder tree here. <em>Note:</em>
-                    &nbsp;loading and viewing files here may be slow and
-                    subject to rate limits.
-                  </p>
+                    <p>
+                      <img
+                          src={"/static/images/clip/data-storage.png"}
+                          alt="File storage"
+                          className="img-fluid"
+                          width={250}
+                      />
+                    </p>
 
-                  {
-                    study.storageFolder
-                    && study.storageFolder.url ? (
-                      <React.Fragment>
+                    <p>
+                      Study files can be viewed in the native file browser,
+                      or viewed as a partial folder tree here. <em>Note:</em>
+                      &nbsp;loading and viewing files here may be slow and
+                      subject to rate limits.
+                    </p>
 
-                        <Button
-                            variant="info"
-                            target={"_blank noopener noreferrer"}
-                            href={study.storageFolder.url}
-                        >
-                          View files in Egnyte
-                        </Button>
+                    {
+                      study.storageFolder
+                      && study.storageFolder.url ? (
+                        <React.Fragment>
 
-                        &nbsp;&nbsp;or&nbsp;&nbsp;
+                          <Button
+                              variant="info"
+                              target={"_blank noopener noreferrer"}
+                              href={study.storageFolder.url}
+                          >
+                            View files in Egnyte
+                          </Button>
 
-                      </React.Fragment>
-                    ) : ""
-                  }
+                          &nbsp;&nbsp;or&nbsp;&nbsp;
 
-                  <Button
-                      variant="primary"
-                      onClick={handleShowFolder}
-                  >
-                    Show files here
-                  </Button>
+                        </React.Fragment>
+                      ) : ""
+                    }
 
-                </Col>
-            )
-          }
+                    <Button
+                        variant="primary"
+                        onClick={handleShowFolder}
+                    >
+                      Show files here
+                    </Button>
 
-        </Row>
+                  </Col>
+              )
+            }
 
-        <UploadFilesModal
-            isOpen={modalIsOpen}
-            showModal={(bool) => setModalIsOpen(bool)}
-            handleSubmit={handleSubmit}
-        />
+          </Row>
 
-      </div>
+          <UploadFilesModal
+              isOpen={modalIsOpen}
+              showModal={(bool) => setModalIsOpen(bool)}
+              handleSubmit={handleSubmit}
+          />
+
+        </Card.Body>
+
+      </Card>
   )
 
 }

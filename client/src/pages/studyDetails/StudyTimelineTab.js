@@ -15,7 +15,7 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Col, Row} from 'react-bootstrap'
+import {Card, Col, Row} from 'react-bootstrap'
 import {ActivityStream} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
@@ -48,13 +48,15 @@ const StudyTimelineTab = props => {
   }
 
   return (
-      <div className="timeline-tab">
-        <Row>
-          <Col sm={12}>
-            {content}
-          </Col>
-        </Row>
-      </div>
+      <Card>
+        <Card.Body>
+          <Row>
+            <Col sm={12}>
+              {content}
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   )
 
 }

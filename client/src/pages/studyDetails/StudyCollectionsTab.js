@@ -15,7 +15,7 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Badge, Button, Col, Row, Table} from "react-bootstrap";
+import {Badge, Button, Card, Col, Row, Table} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
@@ -62,52 +62,54 @@ const StudyCollectionsTab = props => {
   });
 
   return (
-      <div>
+      <Card>
+        <Card.Body>
 
-        <Row className="justify-content-between align-items-center mb-4">
-          <Col>
-            <span className="float-end">
-              <Button
-                  variant="info"
-                  onClick={() => showCollectionModal(true)}
-              >
-                Add to Collection
-                &nbsp;
-                <FontAwesomeIcon icon={faPlusCircle}/>
-              </Button>
-            </span>
-          </Col>
-        </Row>
+          <Row className="justify-content-between align-items-center mb-4">
+            <Col>
+              <span className="float-end">
+                <Button
+                    variant="info"
+                    onClick={() => showCollectionModal(true)}
+                >
+                  Add to Collection
+                  &nbsp;
+                  <FontAwesomeIcon icon={faPlusCircle}/>
+                </Button>
+              </span>
+            </Col>
+          </Row>
 
-        <Row>
-          <Col xs={12}>
-            {
-              rows.length > 0
-                  ? (
-                      <Col xs={12}>
-                        <Table striped style={{fontSize: "inherit"}}>
-                          <thead>
-                          <tr>
-                            <th>Name</th>
-                            <th># Studies</th>
-                            <th>Visibility</th>
-                          </tr>
-                          </thead>
-                          <tbody>
-                            {rows}
-                          </tbody>
-                        </Table>
-                      </Col>
-                  )
-                  : (
-                      <div className={"text-center"}>
-                        <h4>This study does not belong to any collections.</h4>
-                      </div>
-                  )
-            }
-          </Col>
-        </Row>
-      </div>
+          <Row>
+            <Col xs={12}>
+              {
+                rows.length > 0
+                    ? (
+                        <Col xs={12}>
+                          <Table striped style={{fontSize: "inherit"}}>
+                            <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th># Studies</th>
+                              <th>Visibility</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                              {rows}
+                            </tbody>
+                          </Table>
+                        </Col>
+                    )
+                    : (
+                        <div className={"text-center"}>
+                          <h4>This study does not belong to any collections.</h4>
+                        </div>
+                    )
+              }
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   );
 
 }
