@@ -23,6 +23,7 @@ import io.studytracker.egnyte.exception.DuplicateFolderException;
 import io.studytracker.egnyte.exception.EgnyteException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Assay;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
 import io.studytracker.storage.StorageFile;
@@ -165,14 +166,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder findFolder(Program program) throws StudyStorageNotFoundException {
-    return this.findFolder(program, true);
-  }
-
-  @Override
-  public StorageFolder findFolder(Program program, boolean includeContents)
+  public StorageFolder findFolder(FileStorageLocation location, Program program)
       throws StudyStorageNotFoundException {
-    LOGGER.debug("getProgramFolder({}, {})", program.getName(), includeContents);
+    LOGGER.debug("Find folder {}", program.getName());
     String path = getProgramFolderPath(program);
     StorageFolder storageFolder;
     try {
@@ -195,12 +191,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder findFolder(Study study) throws StudyStorageNotFoundException {
-    return this.findFolder(study, true);
-  }
-
-  @Override
-  public StorageFolder findFolder(Study study, boolean includeContents)
+  public StorageFolder findFolder(FileStorageLocation location, Study study)
       throws StudyStorageNotFoundException {
     LOGGER.debug("getStudyFolder({}, {})", study.getName(), includeContents);
     String path = getStudyFolderPath(study);
@@ -225,12 +216,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder findFolder(Assay assay) throws StudyStorageNotFoundException {
-    return this.findFolder(assay, true);
-  }
-
-  @Override
-  public StorageFolder findFolder(Assay assay, boolean includeContents)
+  public StorageFolder findFolder(FileStorageLocation location, Assay assay)
       throws StudyStorageNotFoundException {
     LOGGER.debug("getAssayFolder({}, {})", assay.getName(), includeContents);
     String path = getAssayFolderPath(assay);
@@ -255,7 +241,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(Program program) throws StudyStorageException {
+  public StorageFolder createFolder(FileStorageLocation location, Program program) throws StudyStorageException {
     LOGGER.info(String.format("Creating folder for program %s", program.getName()));
     String path = getProgramFolderPath(program);
     StorageFolder storageFolder;
@@ -277,7 +263,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(Study study) throws StudyStorageException {
+  public StorageFolder createFolder(FileStorageLocation location, Study study) throws StudyStorageException {
     Program program = study.getProgram();
     String path = getStudyFolderPath(study);
     StorageFolder storageFolder;
@@ -302,7 +288,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(Assay assay) throws StudyStorageException {
+  public StorageFolder createFolder(FileStorageLocation location, Assay assay) throws StudyStorageException {
     Study study = assay.getStudy();
     LOGGER.info(
         String.format(
@@ -327,7 +313,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFile saveFile(File file, Study study) throws StudyStorageException {
+  public StorageFile saveFile(FileStorageLocation location, File file, Study study) throws StudyStorageException {
     LOGGER.debug("saveStudyFile({}, {})", file.getName(), study.getName());
     String path = getStudyFolderPath(study);
     StorageFile storageFile;
@@ -341,7 +327,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFile saveFile(File file, Assay assay) throws StudyStorageException {
+  public StorageFile saveFile(FileStorageLocation location, File file, Assay assay) throws StudyStorageException {
     LOGGER.debug("saveAssayFile({}, {})", file.getName(), assay.getName());
     String path = getAssayFolderPath(assay);
     StorageFile storageFile;

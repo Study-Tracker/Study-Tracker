@@ -16,11 +16,10 @@
 
 package io.studytracker.model;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -30,11 +29,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -44,13 +42,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  *   properties and display name of the integration. This record can be updated with new configuration
  *   if a new version of the configuration schema is published.
  *
- * @author williamoemler
+ * @author Will Oemler
  * @since 0.7.1
  */
 
 @Entity
 @Table(name = "integration_instances")
-@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @EntityListeners(AuditingEntityListener.class)
 public class IntegrationInstance implements Model {
 
@@ -62,18 +59,18 @@ public class IntegrationInstance implements Model {
   @JoinColumn(name = "supported_integration_id", nullable = false)
   private SupportedIntegration supportedIntegration;
 
-  @Column(name = "display_name", nullable = false)
+  @Column(name = "display_name", unique = true, nullable = false)
   private String displayName;
 
-  @Column(name = "name", nullable = false, updatable = false)
+  @Column(name = "name", unique = true, nullable = false, updatable = false)
   private String name;
 
   @Column(name = "active", nullable = false)
   private boolean active = true;
 
-  @Column(name = "configuration", columnDefinition = "json")
-  @Type(type = "json")
-  private Map<String, Object> configuration = new LinkedHashMap<>();
+  @OneToMany(mappedBy = "integrationInstance", cascade = CascadeType.ALL,
+      orphanRemoval = true, fetch = FetchType.LAZY)
+  private Set<IntegrationInstanceConfigurationValue> configurationValues = new HashSet<>();
 
   @CreatedDate
   @Column(name = "created_at", nullable = false)
@@ -126,14 +123,6 @@ public class IntegrationInstance implements Model {
     this.active = active;
   }
 
-  public Map<String, Object> getConfiguration() {
-    return configuration;
-  }
-
-  public void setConfiguration(Map<String, Object> configuration) {
-    this.configuration = configuration;
-  }
-
   public Date getCreatedAt() {
     return createdAt;
   }
@@ -150,8 +139,12 @@ public class IntegrationInstance implements Model {
     this.updatedAt = updatedAt;
   }
 
-  public Optional<Object> findConfigurationValue(String key) {
-    return Optional.ofNullable(configuration.get(key));
+  public Set<IntegrationInstanceConfigurationValue> getConfigurationValues() {
+    return configurationValues;
   }
 
+  public void setConfigurationValues(
+      Set<IntegrationInstanceConfigurationValue> configurationValues) {
+    this.configurationValues = configurationValues;
+  }
 }

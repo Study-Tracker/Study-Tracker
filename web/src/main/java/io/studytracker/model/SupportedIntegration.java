@@ -19,8 +19,6 @@ package io.studytracker.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,7 +30,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 /**
@@ -68,9 +65,9 @@ public class SupportedIntegration implements Model {
   @Column(name = "version", nullable = false)
   private Integer version;
 
-  @Column(name = "configuration_schema", columnDefinition = "json")
-  @Type(type = "json")
-  private Map<String, Object> configurationSchema = new LinkedHashMap<>();
+  @OneToMany(mappedBy = "supportedIntegration", cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY, orphanRemoval = true)
+  private Set<IntegrationConfigurationSchemaField> configurationSchemaFields = new HashSet<>();
 
   @OneToMany(
       mappedBy = "supportedIntegration",
@@ -112,11 +109,20 @@ public class SupportedIntegration implements Model {
     this.version = version;
   }
 
-  public Map<String, Object> getConfigurationSchema() {
-    return configurationSchema;
+  public Set<IntegrationConfigurationSchemaField> getConfigurationSchemaFields() {
+    return configurationSchemaFields;
   }
 
-  public void setConfigurationSchema(Map<String, Object> configurationSchema) {
-    this.configurationSchema = configurationSchema;
+  public void setConfigurationSchemaFields(
+      Set<IntegrationConfigurationSchemaField> configurationSchemaFields) {
+    this.configurationSchemaFields = configurationSchemaFields;
+  }
+
+  public Set<IntegrationInstance> getInstances() {
+    return instances;
+  }
+
+  public void setInstances(Set<IntegrationInstance> instances) {
+    this.instances = instances;
   }
 }
