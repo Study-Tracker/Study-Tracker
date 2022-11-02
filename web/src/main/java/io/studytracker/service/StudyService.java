@@ -302,7 +302,12 @@ public class StudyService {
     GitRepository gitRepository = null;
     if (gitService != null && options.isUseGit()) {
       LOGGER.debug("Creating Git repository for study: " + study.getName());
-      gitRepository = gitService.createStudyRepository(study);
+      try {
+        gitRepository = gitService.createStudyRepository(study);
+      } catch (Exception e) {
+        e.printStackTrace();
+        LOGGER.warn("Failed to create Git repository for study: " + study.getCode());
+      }
     }
 
     // S3 folder

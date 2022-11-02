@@ -209,7 +209,6 @@ const StudyRelationships = props => {
                               options={relationshipOptions}
                               name="type"
                               onChange={(selected) => setFieldValue("type", selected.value)}
-                              value={values.type}
                           />
                           <Form.Control.Feedback type="invalid">
                             {errors.type}
