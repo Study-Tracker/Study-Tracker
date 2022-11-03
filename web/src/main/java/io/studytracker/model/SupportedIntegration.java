@@ -125,4 +125,9 @@ public class SupportedIntegration implements Model {
   public void setInstances(Set<IntegrationInstance> instances) {
     this.instances = instances;
   }
+
+  public void addConfigurationSchemaField(IntegrationConfigurationSchemaField field) {
+    configurationSchemaFields.add(field);
+    field.setSupportedIntegration(this);
+  }
 }

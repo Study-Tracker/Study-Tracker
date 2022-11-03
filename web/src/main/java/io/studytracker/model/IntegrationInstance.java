@@ -147,4 +147,9 @@ public class IntegrationInstance implements Model {
       Set<IntegrationInstanceConfigurationValue> configurationValues) {
     this.configurationValues = configurationValues;
   }
+
+  public void addConfigurationValue(IntegrationInstanceConfigurationValue configurationValue) {
+    configurationValue.setIntegrationInstance(this);
+    configurationValues.add(configurationValue);
+  }
 }

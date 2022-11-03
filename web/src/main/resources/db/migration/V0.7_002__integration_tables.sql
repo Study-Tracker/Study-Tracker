@@ -9,6 +9,8 @@ CREATE TABLE file_storage_locations
     reference_id            VARCHAR(255),
     url                     VARCHAR(255),
     permissions             VARCHAR(255) NOT NULL,
+    default_study_location  BOOLEAN      NOT NULL,
+    default_data_location   BOOLEAN      NOT NULL,
     CONSTRAINT pk_file_storage_locations PRIMARY KEY (id)
 );
 
@@ -131,12 +133,12 @@ DROP TABLE notebook_entry_templates CASCADE;
 -- Add default supported integrations
 
 -- Egnyte
-INSERT INTO supported_integrations (id, name, active, version)
-VALUES (nextval('hibernate_sequence'), 'Egnyte', true, 1);
-
-INSERT INTO integration_configuration_schema_fields (id, display_name, field_name, type, required, description, active, "order", supported_integration_id)
-VALUES (nextval('hibernate_sequence'), 'Tenant Name', 'tenant-name', 'STRING', true, 'Tenant name, as it appears in your tenant URL. For example, if you access Egnyte at https://myorg.egnyte.com, then your tenant name is: "myorg"', true, 1, (select max(id) from supported_integrations));
-INSERT INTO integration_configuration_schema_fields (id, display_name, field_name, type, required, description, active, "order", supported_integration_id)
-VALUES (nextval('hibernate_sequence'), 'API Token', 'api-token', 'STRING', true, 'API token for making requests to the Egnyte API. This can be generated in the Developer portal.', true, 2, (select max(id) from supported_integrations));
-INSERT INTO integration_configuration_schema_fields (id, display_name, field_name, type, required, description, active, "order", supported_integration_id)
-VALUES (nextval('hibernate_sequence'), 'Root Path', 'root-path', 'STRING', true, 'Root folder to use for storing files. This folder must exist in Egnyte.', true, 3, (select max(id) from supported_integrations));
+-- INSERT INTO supported_integrations (id, name, active, version)
+-- VALUES (nextval('hibernate_sequence'), 'Egnyte', true, 1);
+--
+-- INSERT INTO integration_configuration_schema_fields (id, display_name, field_name, type, required, description, active, "order", supported_integration_id)
+-- VALUES (nextval('hibernate_sequence'), 'Tenant Name', 'tenant-name', 'STRING', true, 'Tenant name, as it appears in your tenant URL. For example, if you access Egnyte at https://myorg.egnyte.com, then your tenant name is: "myorg"', true, 1, (select max(id) from supported_integrations));
+-- INSERT INTO integration_configuration_schema_fields (id, display_name, field_name, type, required, description, active, "order", supported_integration_id)
+-- VALUES (nextval('hibernate_sequence'), 'API Token', 'api-token', 'STRING', true, 'API token for making requests to the Egnyte API. This can be generated in the Developer portal.', true, 2, (select max(id) from supported_integrations));
+-- INSERT INTO integration_configuration_schema_fields (id, display_name, field_name, type, required, description, active, "order", supported_integration_id)
+-- VALUES (nextval('hibernate_sequence'), 'Root Path', 'root-path', 'STRING', true, 'Root folder to use for storing files. This folder must exist in Egnyte.', true, 3, (select max(id) from supported_integrations));

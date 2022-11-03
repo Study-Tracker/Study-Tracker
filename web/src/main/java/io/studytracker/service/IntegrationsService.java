@@ -6,12 +6,15 @@ import io.studytracker.repository.IntegrationConfigurationSchemaFieldRepository;
 import io.studytracker.repository.IntegrationInstanceConfigurationValueRepository;
 import io.studytracker.repository.IntegrationInstanceRepository;
 import io.studytracker.repository.SupportedIntegrationRepository;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class IntegrationsService {
@@ -26,45 +29,57 @@ public class IntegrationsService {
 
   public static final Logger LOGGER = LoggerFactory.getLogger(IntegrationsService.class);
 
-  /**
-   * Lists all supported integrations.
-   *
-   * @return a list of supported integrations
-   */
-  public List<SupportedIntegration> findSupportedIntegrations() {
-    return supportedIntegrationRepository.findAll();
-  }
-
-
-  /**
-   * Lists all active integration instances.
-   * @return a list of active integration instances
-   */
-  public List<SupportedIntegration> findActiveSupportedIntegrations() {
-    return supportedIntegrationRepository.findByActive(true);
-  }
+  /* Supported Integrations */
 
   public Optional<SupportedIntegration> findLatestSupportedIntegrationByName(String name) {
     return supportedIntegrationRepository.findLatestByName(name);
   }
 
-  /**
-   * Lists all configured integrations instances.
-   *
-   * @return a list of configured integration instances
-   */
-  public List<IntegrationInstance> findIntegrationInstances() {
-    return integrationInstanceRepository.findAll();
+  public List<SupportedIntegration> findSupportedIntegrationsByName(String name) {
+    return supportedIntegrationRepository.findByName(name).stream()
+        .sorted(Comparator.comparing(SupportedIntegration::getVersion))
+        .collect(Collectors.toList());
   }
 
-  /**
-   * Returns a list of all active integration instances.
-   *
-   * @return a list of active integration instances
-   */
-  public List<IntegrationInstance> findActiveIntegrationInstances() {
-    return integrationInstanceRepository.findByActive(true);
+  public Optional<SupportedIntegration> findSupportedIntegrationByNameAndVersion(String name, Integer version) {
+    return supportedIntegrationRepository.findByNameAndVersion(name, version);
   }
+
+  @Transactional
+  public SupportedIntegration registerSupportedIntegration(SupportedIntegration integration) {
+    return supportedIntegrationRepository.save(integration);
+  }
+
+
+  /* Integration instances */
+
+  /**
+   * Returns a list of active integration instances for a given supported integration, defined by
+   *   name. This list will include integrations for all parent versions, regardless of whether they
+   *   are the latest definition or active.
+   *
+   * @param name
+   * @return
+   */
+  public List<IntegrationInstance> findActiveIntegrationsInstanceByParentName(String name) {
+    return integrationInstanceRepository.findBySupportedIntegrationName(name)
+        .stream()
+        .filter(IntegrationInstance::isActive)
+        .collect(Collectors.toList());
+  }
+
+  /***
+   * Registers a new {@link IntegrationInstance} with the system.
+   *
+   * @param instance the instance to register
+   * @return the registered instance
+   */
+  @Transactional
+  public IntegrationInstance createIntegrationInstance(IntegrationInstance instance) {
+    return integrationInstanceRepository.save(instance);
+  }
+
+  /* Getters and setters */
 
   @Autowired
   public void setSupportedIntegrationRepository(

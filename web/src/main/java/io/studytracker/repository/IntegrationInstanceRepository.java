@@ -17,4 +17,7 @@ public interface IntegrationInstanceRepository extends JpaRepository<Integration
   @Query("select i from IntegrationInstance i where i.supportedIntegration.id = ?1")
   List<IntegrationInstance> findBySupportedIntegrationId(Long supportedIntegrationId);
 
+  @Query("select i from IntegrationInstance  i where i.supportedIntegration.name = ?1")
+  List<IntegrationInstance> findBySupportedIntegrationName(String name);
+
 }

@@ -79,6 +79,12 @@ public class FileStorageLocation implements Model {
   @Enumerated(EnumType.STRING)
   private StoragePermissions permissions;
 
+  @Column(name = "default_study_location")
+  private boolean defaultStudyLocation = false;
+
+  @Column(name = "default_data_location")
+  private boolean defaultDataLocation = false;
+
   @Override
   public Long getId() {
     return id;
@@ -150,5 +156,21 @@ public class FileStorageLocation implements Model {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public boolean isDefaultStudyLocation() {
+    return defaultStudyLocation;
+  }
+
+  public void setDefaultStudyLocation(boolean defaultStudyLocation) {
+    this.defaultStudyLocation = defaultStudyLocation;
+  }
+
+  public boolean isDefaultDataLocation() {
+    return defaultDataLocation;
+  }
+
+  public void setDefaultDataLocation(boolean defaultDataLocation) {
+    this.defaultDataLocation = defaultDataLocation;
   }
 }
