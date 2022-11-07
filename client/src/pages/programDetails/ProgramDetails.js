@@ -100,8 +100,7 @@ const ProgramDetails = props => {
 
                       {
                         user && user.admin ? (
-                            <Dropdown.Item onclick={() =>
-                                navigate("/program/" + program.id + "/edit")}>
+                            <Dropdown.Item href={"/program/" + program.id + "/edit"}>
                               <FontAwesomeIcon icon={faEdit}/>
                               &nbsp;
                               Edit

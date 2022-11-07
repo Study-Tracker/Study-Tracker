@@ -28,6 +28,7 @@ import io.studytracker.repository.StudyRepository;
 import io.studytracker.service.ActivityService;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +73,9 @@ public class ActivityServiceTests {
     activityService.create(activity);
 
     Assert.assertNotNull(activity.getId());
-    activityList = activityService.findByStudy(study);
+    activityList = activityService.findByStudy(study).stream()
+        .sorted((a1, a2) -> a1.getDate().compareTo(a2.getDate()))
+        .collect(Collectors.toList());
     Assert.assertEquals(ACTION_COUNT + 1, activityList.size());
 
     activity = activityList.get(ACTION_COUNT);
