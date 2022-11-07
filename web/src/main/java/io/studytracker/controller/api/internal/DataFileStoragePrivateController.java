@@ -21,8 +21,8 @@ import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.IntegrationDefinition;
 import io.studytracker.model.IntegrationInstance;
-import io.studytracker.model.SupportedIntegration;
 import io.studytracker.service.FileSystemStorageService;
 import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.DataFileStorageServiceLookup;
@@ -83,8 +83,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     if (environment.containsProperty("egnyte.root-path")) {
 
       integrationCount++;
-      SupportedIntegration egnyteIntegration = new SupportedIntegration();
-      egnyteIntegration.setName("Egnyte");
+      IntegrationDefinition egnyteIntegration = new IntegrationDefinition();
+      egnyteIntegration.setType("Egnyte");
       egnyteIntegration.setId(integrationCount);
       egnyteIntegration.setActive(true);
       egnyteIntegration.setVersion(1);
@@ -92,7 +92,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       instanceCount++;
       IntegrationInstance egnyteInstance = new IntegrationInstance();
       egnyteInstance.setId(instanceCount);
-      egnyteInstance.setSupportedIntegration(egnyteIntegration);
+      egnyteInstance.setDefinition(egnyteIntegration);
       egnyteInstance.setDisplayName("Egnyte");
       egnyteInstance.setName(environment.getRequiredProperty("egnyte.root-url"));
       egnyteInstance.setActive(true);
@@ -113,8 +113,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     if (environment.containsProperty("aws.s3-buckets")) {
 
       integrationCount++;
-      SupportedIntegration awsIntegration = new SupportedIntegration();
-      awsIntegration.setName("Amazon Web Services");
+      IntegrationDefinition awsIntegration = new IntegrationDefinition();
+      awsIntegration.setType("Amazon Web Services");
       awsIntegration.setId(integrationCount);
       awsIntegration.setActive(true);
       awsIntegration.setVersion(1);
@@ -122,7 +122,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       instanceCount++;
       IntegrationInstance awsInstance = new IntegrationInstance();
       awsInstance.setId(instanceCount);
-      awsInstance.setSupportedIntegration(awsIntegration);
+      awsInstance.setDefinition(awsIntegration);
       awsInstance.setDisplayName("AWS S3");
       awsInstance.setName("AWS S3");
       awsInstance.setActive(true);

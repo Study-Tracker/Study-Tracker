@@ -20,9 +20,14 @@ import io.studytracker.egnyte.entity.EgnyteFile;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.exception.EgnyteException;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptions;
+import io.studytracker.egnyte.integration.EgnyteIntegrationV1;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.exception.InsufficientPrivilegesException;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.IntegrationInstance;
+import io.studytracker.repository.IntegrationInstanceRepository;
 import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
@@ -31,18 +36,31 @@ import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 
 public class EgnyteApiDataFileStorageService implements DataFileStorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EgnyteApiDataFileStorageService.class);
 
-  private final EgnyteRestApiClient client;
+  @Autowired
+  private EgnyteRestApiClient client;
 
-  public EgnyteApiDataFileStorageService(EgnyteRestApiClient client) {
-    this.client = client;
+  @Autowired
+  private IntegrationInstanceRepository integrationInstanceRepository;
+
+  private EgnyteIntegrationOptions getOptionsFromLocation(FileStorageLocation location) {
+    Optional<IntegrationInstance> optional = integrationInstanceRepository
+        .findById(location.getIntegrationInstance().getId());
+    if (optional.isPresent()) {
+      return new EgnyteIntegrationV1(optional.get());
+    } else {
+      throw new RecordNotFoundException("Integration instance not found: "
+          + location.getIntegrationInstance().getId());
+    }
   }
 
   @Override

@@ -85,6 +85,9 @@ public class FileStorageLocation implements Model {
   @Column(name = "default_data_location")
   private boolean defaultDataLocation = false;
 
+  @Column(name = "active", nullable = false)
+  private boolean active = true;
+
   @Override
   public Long getId() {
     return id;
@@ -172,5 +175,13 @@ public class FileStorageLocation implements Model {
 
   public void setDefaultDataLocation(boolean defaultDataLocation) {
     this.defaultDataLocation = defaultDataLocation;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 }

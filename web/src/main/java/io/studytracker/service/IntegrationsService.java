@@ -1,11 +1,27 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.studytracker.service;
 
+import io.studytracker.model.IntegrationDefinition;
 import io.studytracker.model.IntegrationInstance;
-import io.studytracker.model.SupportedIntegration;
 import io.studytracker.repository.IntegrationConfigurationSchemaFieldRepository;
+import io.studytracker.repository.IntegrationDefinitionRepository;
 import io.studytracker.repository.IntegrationInstanceConfigurationValueRepository;
 import io.studytracker.repository.IntegrationInstanceRepository;
-import io.studytracker.repository.SupportedIntegrationRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class IntegrationsService {
 
-  private SupportedIntegrationRepository supportedIntegrationRepository;
+  private IntegrationDefinitionRepository integrationDefinitionRepository;
 
   private IntegrationInstanceRepository integrationInstanceRepository;
 
@@ -31,23 +47,23 @@ public class IntegrationsService {
 
   /* Supported Integrations */
 
-  public Optional<SupportedIntegration> findLatestSupportedIntegrationByName(String name) {
-    return supportedIntegrationRepository.findLatestByName(name);
+  public Optional<IntegrationDefinition> findLatestSupportedIntegrationByName(String name) {
+    return integrationDefinitionRepository.findLatestByName(name);
   }
 
-  public List<SupportedIntegration> findSupportedIntegrationsByName(String name) {
-    return supportedIntegrationRepository.findByName(name).stream()
-        .sorted(Comparator.comparing(SupportedIntegration::getVersion))
+  public List<IntegrationDefinition> findSupportedIntegrationsByName(String name) {
+    return integrationDefinitionRepository.findByName(name).stream()
+        .sorted(Comparator.comparing(IntegrationDefinition::getVersion))
         .collect(Collectors.toList());
   }
 
-  public Optional<SupportedIntegration> findSupportedIntegrationByNameAndVersion(String name, Integer version) {
-    return supportedIntegrationRepository.findByNameAndVersion(name, version);
+  public Optional<IntegrationDefinition> findSupportedIntegrationByNameAndVersion(String name, Integer version) {
+    return integrationDefinitionRepository.findByNameAndVersion(name, version);
   }
 
   @Transactional
-  public SupportedIntegration registerSupportedIntegration(SupportedIntegration integration) {
-    return supportedIntegrationRepository.save(integration);
+  public IntegrationDefinition registerSupportedIntegration(IntegrationDefinition integration) {
+    return integrationDefinitionRepository.save(integration);
   }
 
 
@@ -83,8 +99,8 @@ public class IntegrationsService {
 
   @Autowired
   public void setSupportedIntegrationRepository(
-      SupportedIntegrationRepository supportedIntegrationRepository) {
-    this.supportedIntegrationRepository = supportedIntegrationRepository;
+      IntegrationDefinitionRepository integrationDefinitionRepository) {
+    this.integrationDefinitionRepository = integrationDefinitionRepository;
   }
 
   @Autowired

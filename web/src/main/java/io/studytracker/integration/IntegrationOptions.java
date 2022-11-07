@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package io.studytracker.repository;
+package io.studytracker.integration;
 
-import io.studytracker.model.IntegrationConfigurationSchemaField;
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import io.studytracker.model.IntegrationDefinition;
+import io.studytracker.model.IntegrationInstanceConfigurationValue;
+import java.util.Set;
 
-public interface IntegrationConfigurationSchemaFieldRepository
-    extends JpaRepository<IntegrationConfigurationSchemaField, Long> {
+public interface IntegrationOptions {
 
-  @Query("select f from IntegrationConfigurationSchemaField f where f.integrationDefinition.id = ?1")
-  List<IntegrationConfigurationSchemaField> findByIntegrationDefinitionId(Long integrationDefinitionId);
+  IntegrationDefinition getDefinition();
+
+  String getDisplayName();
+
+  String getName();
+
+  boolean isActive();
+
+  Set<IntegrationInstanceConfigurationValue> getConfigurationValues();
 
 }

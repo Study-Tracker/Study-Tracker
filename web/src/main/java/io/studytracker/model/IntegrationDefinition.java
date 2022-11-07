@@ -18,11 +18,14 @@ package io.studytracker.model;
 
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import io.studytracker.integration.IntegrationType;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -44,20 +47,21 @@ import org.hibernate.annotations.TypeDef;
  */
 
 @Entity
-@Table(name = "supported_integrations",
+@Table(name = "integration_definitions",
     uniqueConstraints = {
-      @UniqueConstraint(name = "uc_supportedintegration_name", columnNames = {"name", "version"})
+      @UniqueConstraint(name = "uc_integrationdefinition_name", columnNames = {"name", "version"})
     }
 )
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
-public class SupportedIntegration implements Model {
+public class IntegrationDefinition implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+  @Column(name = "type", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private IntegrationType type;
 
   @Column(name = "active", nullable = false)
   private boolean active = true;
@@ -65,12 +69,12 @@ public class SupportedIntegration implements Model {
   @Column(name = "version", nullable = false)
   private Integer version;
 
-  @OneToMany(mappedBy = "supportedIntegration", cascade = CascadeType.ALL,
+  @OneToMany(mappedBy = "integrationDefinition", cascade = CascadeType.ALL,
       fetch = FetchType.LAZY, orphanRemoval = true)
   private Set<IntegrationConfigurationSchemaField> configurationSchemaFields = new HashSet<>();
 
   @OneToMany(
-      mappedBy = "supportedIntegration",
+      mappedBy = "definition",
       fetch = FetchType.LAZY,
       cascade = CascadeType.ALL,
       orphanRemoval = true)
@@ -85,12 +89,12 @@ public class SupportedIntegration implements Model {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public IntegrationType getType() {
+    return type;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setType(IntegrationType name) {
+    this.type = name;
   }
 
   public boolean isActive() {
@@ -128,6 +132,6 @@ public class SupportedIntegration implements Model {
 
   public void addConfigurationSchemaField(IntegrationConfigurationSchemaField field) {
     configurationSchemaFields.add(field);
-    field.setSupportedIntegration(this);
+    field.setIntegrationDefinition(this);
   }
 }

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package io.studytracker.repository;
+package io.studytracker.egnyte.integration;
 
-import io.studytracker.model.IntegrationConfigurationSchemaField;
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import io.studytracker.integration.IntegrationOptions;
+import java.net.URL;
 
-public interface IntegrationConfigurationSchemaFieldRepository
-    extends JpaRepository<IntegrationConfigurationSchemaField, Long> {
+public interface EgnyteIntegrationOptions extends IntegrationOptions {
 
-  @Query("select f from IntegrationConfigurationSchemaField f where f.integrationDefinition.id = ?1")
-  List<IntegrationConfigurationSchemaField> findByIntegrationDefinitionId(Long integrationDefinitionId);
+  String getTenantName();
+  URL getRootUrl();
+  String getRootPath();
+  String getToken();
 
 }

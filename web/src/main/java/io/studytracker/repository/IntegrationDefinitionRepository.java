@@ -17,24 +17,22 @@
 package io.studytracker.repository;
 
 import io.studytracker.integration.IntegrationType;
-import io.studytracker.model.IntegrationInstance;
+import io.studytracker.model.IntegrationDefinition;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface IntegrationInstanceRepository extends JpaRepository<IntegrationInstance, Long> {
+public interface IntegrationDefinitionRepository extends JpaRepository<IntegrationDefinition, Long> {
 
-  List<IntegrationInstance> findByActive(Boolean active);
+  List<IntegrationDefinition> findByActive(Boolean active);
 
-  Optional<IntegrationInstance> findByName(String name);
+  List<IntegrationDefinition> findByType(IntegrationType type);
 
-  Optional<IntegrationInstance> findByDisplayName(String displayName);
+  Optional<IntegrationDefinition> findByTypeAndVersion(IntegrationType type, Integer version);
 
-  @Query("select i from IntegrationInstance i where i.definition.id = ?1")
-  List<IntegrationInstance> findByIntegrationDefinitionId(Long integrationDefinitionId);
-
-  @Query("select i from IntegrationInstance  i where i.definition.type = ?1")
-  List<IntegrationInstance> findByIntegrationType(IntegrationType type);
+  @Query("select i from IntegrationDefinition i where i.type = ?1 and i.active = true "
+      + "and i.version = (select max(version) from IntegrationDefinition where type = ?1)")
+  Optional<IntegrationDefinition> findLatestByType(IntegrationType type);
 
 }

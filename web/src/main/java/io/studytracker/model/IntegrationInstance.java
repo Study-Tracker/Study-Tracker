@@ -18,6 +18,7 @@ package io.studytracker.model;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,7 +39,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * Represents a single implementation of a {@link SupportedIntegration}, capturing the configuration
+ * Represents a single implementation of a {@link IntegrationDefinition}, capturing the configuration
  *   properties and display name of the integration. This record can be updated with new configuration
  *   if a new version of the configuration schema is published.
  *
@@ -56,8 +57,8 @@ public class IntegrationInstance implements Model {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "supported_integration_id", nullable = false)
-  private SupportedIntegration supportedIntegration;
+  @JoinColumn(name = "integration_definition_id", nullable = false)
+  private IntegrationDefinition definition;
 
   @Column(name = "display_name", unique = true, nullable = false)
   private String displayName;
@@ -91,12 +92,12 @@ public class IntegrationInstance implements Model {
     this.id = id;
   }
 
-  public SupportedIntegration getSupportedIntegration() {
-    return supportedIntegration;
+  public IntegrationDefinition getDefinition() {
+    return definition;
   }
 
-  public void setSupportedIntegration(SupportedIntegration supportedIntegration) {
-    this.supportedIntegration = supportedIntegration;
+  public void setDefinition(IntegrationDefinition integrationDefinition) {
+    this.definition = integrationDefinition;
   }
 
   public String getDisplayName() {
@@ -151,5 +152,12 @@ public class IntegrationInstance implements Model {
   public void addConfigurationValue(IntegrationInstanceConfigurationValue configurationValue) {
     configurationValue.setIntegrationInstance(this);
     configurationValues.add(configurationValue);
+  }
+
+  public Optional<String> getConfigurationValue(String key) {
+    return configurationValues.stream()
+        .filter(v -> v.getFieldName().equals(key))
+        .findFirst()
+        .map(IntegrationInstanceConfigurationValue::getValue);
   }
 }

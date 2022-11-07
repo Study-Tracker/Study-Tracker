@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package io.studytracker.repository;
+package io.studytracker.integration;
 
-import io.studytracker.model.IntegrationConfigurationSchemaField;
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+public enum IntegrationType {
 
-public interface IntegrationConfigurationSchemaFieldRepository
-    extends JpaRepository<IntegrationConfigurationSchemaField, Long> {
-
-  @Query("select f from IntegrationConfigurationSchemaField f where f.integrationDefinition.id = ?1")
-  List<IntegrationConfigurationSchemaField> findByIntegrationDefinitionId(Long integrationDefinitionId);
+  PLACEHOLDER_FILE_STORE,
+  LOCAL_FILE_SYSTEM,
+  EGNYTE,
+  AWS_S3,
+  AWS_EVENTBRIDGE,
+  GITLAB,
+  OKTA,
+  BENCHLING,
 
 }
