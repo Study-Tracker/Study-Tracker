@@ -51,11 +51,14 @@ const AssayTypeForm = props => {
     name: yup.string()
       .required("Name is required")
       .max(255, "Name must be less than 255 characters")
-      .test(
-          "unique",
-          "Name must be unique",
-          value => !assayTypes.find(d => !!value && d.name.toLowerCase() === value.toLowerCase())
-      ),
+      .when("id", {
+        is: id => id === undefined || id === null,
+        then: yup.string().test(
+            "unique",
+            "Name must be unique",
+            value => !assayTypes.find(d => !!value && d.name.toLowerCase() === value.toLowerCase())
+        )
+      }),
     description: yup.string()
       .required("Description is required")
       .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),

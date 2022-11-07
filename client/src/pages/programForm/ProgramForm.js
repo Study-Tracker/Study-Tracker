@@ -65,11 +65,14 @@ const ProgramForm = ({
     name: yup.string()
       .required("Name is required.")
       .max(255, "Name cannot be larger than 255 characters")
-      .test(
-        "unique",
-        "Name must be unique",
-        value => !programs.find(p => !!value && p.name.toLowerCase() === value.toLowerCase())
-      ),
+      .when("id", {
+        is: (id) => id === undefined || id === null,
+        then: yup.string().test(
+            "unique",
+            "Name must be unique",
+            value => !programs.find(p => !!value && p.name.toLowerCase() === value.toLowerCase())
+        )
+      }),
     description: yup.string()
       .required("Description is required.")
       .notOneOf(["<p></p>", "<p><br></p>"], "Description is required"),
