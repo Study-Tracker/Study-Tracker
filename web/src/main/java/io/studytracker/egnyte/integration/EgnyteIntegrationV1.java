@@ -32,10 +32,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public final class EgnyteIntegrationV1 implements EgnyteIntegrationOptions {
+
   public static final String TENANT_NAME = "tenant-name";
   public static final String ROOT_URL = "root-url";
   public static final String API_TOKEN = "api-token";
   public static final String ROOT_PATH = "root-path";
+  public static final String QPS = "qps";
+  public static final String USE_EXISTING = "use-existing";
 
   private String name;
   private String displayName;
@@ -123,6 +126,29 @@ public final class EgnyteIntegrationV1 implements EgnyteIntegrationOptions {
                 .description("Root URL for your Egnyte tenant.")
                 .required(false)
                 .order(4)
+                .build()
+        )
+        .configurationSchemaField(
+            new IntegrationConfigurationSchemaFieldBuilder()
+                .displayName("QPS")
+                .fieldName(QPS)
+                .type(CustomEntityFieldType.INTEGER)
+                .active(true)
+                .description("Maximum number of queries-per-second allowed by the Egnyte API. Defaults to 1.")
+                .required(false)
+                .order(5)
+                .build()
+        )
+        .configurationSchemaField(
+            new IntegrationConfigurationSchemaFieldBuilder()
+                .displayName("Use Existing Folders")
+                .fieldName(USE_EXISTING)
+                .type(CustomEntityFieldType.BOOLEAN)
+                .active(true)
+                .description("If 'true', when attempting to create new folders, Egnyte will use "
+                    + "existing folders with the same name rather than deleting-and-recreating them.")
+                .required(false)
+                .order(6)
                 .build()
         )
         .build();

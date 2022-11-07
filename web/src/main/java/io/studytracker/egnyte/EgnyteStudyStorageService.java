@@ -21,11 +21,16 @@ import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.exception.DuplicateFolderException;
 import io.studytracker.egnyte.exception.EgnyteException;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptions;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptionsFactory;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.IntegrationInstance;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
+import io.studytracker.repository.IntegrationInstanceRepository;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
@@ -42,15 +47,21 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EgnyteStudyStorageService.class);
 
-  private final EgnyteClientOperations egnyteClient;
+  @Autowired
+  private EgnyteClientOperations egnyteClient;
 
-  private final EgnyteOptions options;
+  @Autowired
+  private EgnyteFolderNamingService egnyteFolderNamingService;
 
-  @Autowired private EgnyteFolderNamingService egnyteFolderNamingService;
+  @Autowired
+  private IntegrationInstanceRepository integrationInstanceRepository;
 
-  public EgnyteStudyStorageService(EgnyteClientOperations egnyteClient, EgnyteOptions options) {
-    this.egnyteClient = egnyteClient;
-    this.options = options;
+  private EgnyteIntegrationOptions getOptionsFromLocation(FileStorageLocation location) {
+    IntegrationInstance instance = integrationInstanceRepository
+        .findById(location.getIntegrationInstance().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Integration instance not found: "
+            + location.getIntegrationInstance().getId()));
+    return EgnyteIntegrationOptionsFactory.create(instance);
   }
 
   public String getProgramFolderPath(Program program) {
@@ -169,6 +180,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   public StorageFolder findFolder(FileStorageLocation location, Program program)
       throws StudyStorageNotFoundException {
     LOGGER.debug("Find folder {}", program.getName());
+    EgnyteIntegrationOptions options = this.getOptionsFromLocation(location);
     String path = getProgramFolderPath(program);
     StorageFolder storageFolder;
     try {

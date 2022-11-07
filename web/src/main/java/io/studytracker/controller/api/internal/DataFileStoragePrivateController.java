@@ -21,21 +21,16 @@ import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.IntegrationDefinition;
-import io.studytracker.model.IntegrationInstance;
 import io.studytracker.service.FileSystemStorageService;
+import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.DataFileStorageServiceLookup;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.StorageLocationType;
 import io.studytracker.storage.StoragePermissions;
 import io.studytracker.storage.StorageUtils;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,95 +63,14 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   private FileSystemStorageService fileSystemStorageService;
 
   @Autowired
+  private StorageLocationService storageLocationService;
+
+  @Autowired
   private Environment environment;
-
-  private final List<FileStorageLocation> fileStorageLocations = new ArrayList<>();
-
-  // TODO: remove
-  @PostConstruct
-  public void init() {
-
-    long integrationCount = 0L;
-    long instanceCount = 0L;
-    long locationCount = 0L;
-
-    if (environment.containsProperty("egnyte.root-path")) {
-
-      integrationCount++;
-      IntegrationDefinition egnyteIntegration = new IntegrationDefinition();
-      egnyteIntegration.setType("Egnyte");
-      egnyteIntegration.setId(integrationCount);
-      egnyteIntegration.setActive(true);
-      egnyteIntegration.setVersion(1);
-
-      instanceCount++;
-      IntegrationInstance egnyteInstance = new IntegrationInstance();
-      egnyteInstance.setId(instanceCount);
-      egnyteInstance.setDefinition(egnyteIntegration);
-      egnyteInstance.setDisplayName("Egnyte");
-      egnyteInstance.setName(environment.getRequiredProperty("egnyte.root-url"));
-      egnyteInstance.setActive(true);
-
-      locationCount++;
-      FileStorageLocation egnyteStorageLocation = new FileStorageLocation();
-      egnyteStorageLocation.setId(locationCount);
-      egnyteStorageLocation.setIntegrationInstance(egnyteInstance);
-      egnyteStorageLocation.setType(StorageLocationType.EGNYTE_API);
-      egnyteStorageLocation.setRootFolderPath(environment.getRequiredProperty("egnyte.root-path"));
-      egnyteStorageLocation.setDisplayName("Egnyte");
-      egnyteStorageLocation.setName(environment.getRequiredProperty("egnyte.root-path"));
-      egnyteStorageLocation.setPermissions(StoragePermissions.READ_WRITE);
-
-      fileStorageLocations.add(egnyteStorageLocation);
-    }
-
-    if (environment.containsProperty("aws.s3-buckets")) {
-
-      integrationCount++;
-      IntegrationDefinition awsIntegration = new IntegrationDefinition();
-      awsIntegration.setType("Amazon Web Services");
-      awsIntegration.setId(integrationCount);
-      awsIntegration.setActive(true);
-      awsIntegration.setVersion(1);
-
-      instanceCount++;
-      IntegrationInstance awsInstance = new IntegrationInstance();
-      awsInstance.setId(instanceCount);
-      awsInstance.setDefinition(awsIntegration);
-      awsInstance.setDisplayName("AWS S3");
-      awsInstance.setName("AWS S3");
-      awsInstance.setActive(true);
-      awsInstance.setConfiguration(Collections.singletonMap("buckets", environment.getRequiredProperty("aws.s3-buckets")));
-
-      for (String bucket: environment.getRequiredProperty("aws.s3-buckets").split(",")) {
-        locationCount++;
-        bucket = bucket.trim();
-        FileStorageLocation s3StorageLocation = new FileStorageLocation();
-        s3StorageLocation.setId(locationCount);
-        s3StorageLocation.setType(StorageLocationType.AWS_S3);
-        s3StorageLocation.setIntegrationInstance(awsInstance);
-        s3StorageLocation.setRootFolderPath("");
-        s3StorageLocation.setDisplayName(bucket);
-        s3StorageLocation.setName(bucket);
-        s3StorageLocation.setPermissions(StoragePermissions.READ_WRITE);
-
-        fileStorageLocations.add(s3StorageLocation);
-      }
-
-    }
-
-  }
 
   @GetMapping("/locations")
   public List<FileStorageLocation> getFileStorageLocations() {
-    return fileStorageLocations;
-  }
-
-  private FileStorageLocation lookupFileStorageLocation(Long id) {
-    return fileStorageLocations.stream()
-        .filter(location -> location.getId().equals(id))
-        .findFirst()
-        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
+    return storageLocationService.findAll();
   }
 
   @GetMapping("")
@@ -165,7 +79,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       @RequestParam(name = "locationId") Long locationId
   ) {
     LOGGER.debug("Getting data storage folder");
-    FileStorageLocation location = lookupFileStorageLocation(locationId);
+    FileStorageLocation location = storageLocationService.findById(locationId)
+        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
     if (path == null) path = location.getRootFolderPath();
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
     try {
@@ -186,7 +101,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     LOGGER.info("Uploading file {} to data storage folder {}", file.getOriginalFilename(), path);
 
     // Get the location and check permissions
-    FileStorageLocation location = lookupFileStorageLocation(locationId);
+    FileStorageLocation location = storageLocationService.findById(locationId)
+        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
     if (!StoragePermissions.canWrite(location.getPermissions())) {
       throw new InsufficientPrivilegesException("Insufficient privileges to upload files.");
     }
@@ -216,7 +132,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       @RequestParam(name = "folderName") String folderName
   ) throws Exception {
     LOGGER.info("Creating new folder '{}' in data storage folder '{}'", folderName, path);
-    FileStorageLocation location = lookupFileStorageLocation(locationId);
+    FileStorageLocation location = storageLocationService.findById(locationId)
+        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
     if (!StoragePermissions.canWrite(location.getPermissions())) {
       throw new InsufficientPrivilegesException("Insufficient privileges to create folder");
     }
@@ -232,7 +149,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       @RequestParam(name = "locationId") Long locationId
   ) throws Exception {
     LOGGER.info("Downloading file from data storage folder {}", path);
-    FileStorageLocation location = lookupFileStorageLocation(locationId);
+    FileStorageLocation location = storageLocationService.findById(locationId)
+        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
     ByteArrayResource resource = (ByteArrayResource) storageService.fetchFile(location, path);
     HttpHeaders headers = new HttpHeaders();

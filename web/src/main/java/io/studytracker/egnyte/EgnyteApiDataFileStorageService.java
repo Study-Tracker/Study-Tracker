@@ -21,7 +21,7 @@ import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.exception.EgnyteException;
 import io.studytracker.egnyte.integration.EgnyteIntegrationOptions;
-import io.studytracker.egnyte.integration.EgnyteIntegrationV1;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptionsFactory;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
@@ -36,7 +36,6 @@ import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,22 +52,21 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   private IntegrationInstanceRepository integrationInstanceRepository;
 
   private EgnyteIntegrationOptions getOptionsFromLocation(FileStorageLocation location) {
-    Optional<IntegrationInstance> optional = integrationInstanceRepository
-        .findById(location.getIntegrationInstance().getId());
-    if (optional.isPresent()) {
-      return new EgnyteIntegrationV1(optional.get());
-    } else {
-      throw new RecordNotFoundException("Integration instance not found: "
-          + location.getIntegrationInstance().getId());
-    }
+    IntegrationInstance instance = integrationInstanceRepository
+        .findById(location.getIntegrationInstance().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Integration instance not found: "
+            + location.getIntegrationInstance().getId()));
+    return EgnyteIntegrationOptionsFactory.create(instance);
   }
 
   @Override
   public StorageFolder findFolderByPath(FileStorageLocation location, String path)
       throws StudyStorageNotFoundException {
     LOGGER.debug("Looking up folder by path: {}", path);
+    EgnyteIntegrationOptions options = this.getOptionsFromLocation(location);
     try {
-      EgnyteObject egnyteObject = client.findObjectByPath(path, -1);
+      EgnyteObject egnyteObject = client.findObjectByPath(
+          options.getRootUrl(), path, options.getToken());
       if (egnyteObject.isFolder()) {
         EgnyteFolder folder = (EgnyteFolder) egnyteObject;
         return EgnyteUtils.convertEgnyteFolderWithContents(folder, location.getRootFolderPath());
@@ -86,8 +84,10 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   public StorageFile findFileByPath(FileStorageLocation location, String path)
       throws StudyStorageNotFoundException {
     LOGGER.debug("Finding file by path: {}", path);
+    EgnyteIntegrationOptions options = this.getOptionsFromLocation(location);
     try {
-      EgnyteObject egnyteObject = client.findObjectByPath(path, -1);
+      EgnyteObject egnyteObject = client.findObjectByPath(
+          options.getRootUrl(), path, options.getToken());
       if (!egnyteObject.isFolder()) {
         EgnyteFile file = (EgnyteFile) egnyteObject;
         return EgnyteUtils.convertEgnyteFile(file);
@@ -105,11 +105,13 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   public StorageFolder createFolder(FileStorageLocation location, String path, String name)
       throws StudyStorageException {
     LOGGER.info("Creating folder: {} in {}", name, path);
+    EgnyteIntegrationOptions options = this.getOptionsFromLocation(location);
     try {
       if (!StoragePermissions.canWrite(location.getPermissions())) {
         throw new InsufficientPrivilegesException("Insufficient privileges to create folder");
       }
-      EgnyteFolder folder = client.createFolder(StorageUtils.joinPath(path, name));
+      EgnyteFolder folder = client.createFolder(
+          options.getRootUrl(), StorageUtils.joinPath(path, name), options.getToken());
       return EgnyteUtils.convertEgnyteFolder(folder);
     } catch (EgnyteException e) {
       e.printStackTrace();
@@ -122,11 +124,13 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
   public StorageFile saveFile(FileStorageLocation location, String path, File file)
       throws StudyStorageException {
     LOGGER.info("Uploading file: {} to {}", file.getName(), path);
+    EgnyteIntegrationOptions options = this.getOptionsFromLocation(location);
     try {
       if (!StoragePermissions.canWrite(location.getPermissions())) {
         throw new InsufficientPrivilegesException("Insufficient privileges to write files.");
       }
-      EgnyteFile egnyteFile = client.uploadFile(file, path);
+      EgnyteFile egnyteFile = client.uploadFile(
+          options.getRootUrl(), file, path, options.getToken());
       return EgnyteUtils.convertEgnyteFile(egnyteFile);
     } catch (EgnyteException e) {
       e.printStackTrace();
