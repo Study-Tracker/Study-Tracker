@@ -16,8 +16,8 @@
 
 package io.studytracker.storage;
 
-import io.studytracker.aws.S3DataFileStorageService;
-import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
+import io.studytracker.aws.S3StudyFileStorageService;
+import io.studytracker.egnyte.EgnyteStudyStorageService;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Helper class for determining the correct {@link DataFileStorageService} implementation for a
+ * Helper class for determining the correct {@link StudyStorageService} implementation for a
  *   given request.
  *
  * @author Will Oemler
@@ -33,23 +33,23 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class DataFileStorageServiceLookup {
+public class StudyFileStorageServiceLookup {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataFileStorageServiceLookup.class);
-
-  @Autowired(required = false)
-  private EgnyteApiDataFileStorageService egnyteApiDataFileStorageService;
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyFileStorageServiceLookup.class);
 
   @Autowired(required = false)
-  private S3DataFileStorageService s3DataFileStorageService;
+  private EgnyteStudyStorageService egnyteStudyStorageService;
 
-  public Optional<DataFileStorageService> lookup(StorageLocationType storageLocationType) {
-    LOGGER.debug("Looking up DataFileStorageService for storageLocationType: {}", storageLocationType);
+  @Autowired(required = false)
+  private S3StudyFileStorageService s3StudyFileStorageService;
+
+  public Optional<StudyStorageService> lookup(StorageLocationType storageLocationType) {
+    LOGGER.debug("Looking up StudyStorageService for storageLocationType: {}", storageLocationType);
     switch (storageLocationType) {
       case EGNYTE_API:
-        return Optional.ofNullable(egnyteApiDataFileStorageService);
+        return Optional.ofNullable(egnyteStudyStorageService);
       case AWS_S3:
-        return Optional.ofNullable(s3DataFileStorageService);
+        return Optional.ofNullable(s3StudyFileStorageService);
       default:
         return Optional.empty();
     }

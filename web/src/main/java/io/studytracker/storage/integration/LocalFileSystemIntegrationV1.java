@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.studytracker.storage;
+package io.studytracker.storage.integration;
 
 import io.studytracker.integration.IntegrationConfigurationSchemaFieldBuilder;
 import io.studytracker.integration.IntegrationDefinitionBuilder;
@@ -22,23 +22,64 @@ import io.studytracker.integration.IntegrationType;
 import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.IntegrationDefinition;
 import io.studytracker.model.IntegrationInstance;
+import io.studytracker.model.IntegrationInstanceConfigurationValue;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class LocalFileSystemIntegrationV1 {
+public class LocalFileSystemIntegrationV1 implements LocalFileSystemOptions {
 
   public static final String ROOT_PATH = "root-path";
+  public static final String OVERWRITE_EXISTING = "overwrite-existing";
+  public static final String USE_EXISTING = "use-existing";
 
+  private IntegrationInstance instance;
   private String rootPath;
+  private boolean overwriteExisting = false;
+  private boolean useExisting = true;
 
   public LocalFileSystemIntegrationV1(IntegrationInstance instance) {
+    this.instance = instance;
     this.rootPath = instance.getConfigurationValue(ROOT_PATH)
-        .orElseThrow(() -> new IllegalArgumentException("Root path must be specified."));
+        .orElseThrow(() -> new IllegalArgumentException("Missing configuration value for " + ROOT_PATH));
+    if (instance.hasConfigurationValue(OVERWRITE_EXISTING)) {
+      this.overwriteExisting = Boolean.parseBoolean(instance.getConfigurationValue(OVERWRITE_EXISTING)
+          .orElseThrow(() -> new IllegalArgumentException("Missing configuration value for " + OVERWRITE_EXISTING)));
+    }
+    if (instance.hasConfigurationValue(USE_EXISTING)) {
+      this.useExisting = Boolean.parseBoolean(instance.getConfigurationValue(USE_EXISTING)
+          .orElseThrow(() -> new IllegalArgumentException("Missing configuration value for " + USE_EXISTING)));
+    }
   }
 
-  public static IntegrationDefinition getDefinition() {
+  @Override
+  public IntegrationDefinition getDefinition() {
+    return instance.getDefinition();
+  }
+
+  @Override
+  public String getDisplayName() {
+    return instance.getDisplayName();
+  }
+
+  @Override
+  public String getName() {
+    return instance.getName();
+  }
+
+  @Override
+  public boolean isActive() {
+    return instance.isActive();
+  }
+
+  @Override
+  public Set<IntegrationInstanceConfigurationValue> getConfigurationValues() {
+    return instance.getConfigurationValues();
+  }
+
+  public static IntegrationDefinition getIntegrationDefinition() {
     return new IntegrationDefinitionBuilder()
         .type(IntegrationType.LOCAL_FILE_SYSTEM)
         .version(1)
@@ -56,6 +97,5 @@ public class LocalFileSystemIntegrationV1 {
         )
         .build();
   }
-
 
 }

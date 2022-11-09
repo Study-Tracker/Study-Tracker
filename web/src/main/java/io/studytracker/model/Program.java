@@ -18,8 +18,10 @@ package io.studytracker.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +32,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -59,7 +63,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           @NamedAttributeNode("createdBy"),
           @NamedAttributeNode("lastModifiedBy"),
           @NamedAttributeNode("notebookFolder"),
-          @NamedAttributeNode("storageFolder")
+          @NamedAttributeNode("primaryStorageFolder")
         }))
 public class Program implements Model {
 
@@ -102,7 +106,14 @@ public class Program implements Model {
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "storage_folder_id")
-  private FileStoreFolder storageFolder;
+  private FileStoreFolder primaryStorageFolder;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "program_storage_folders",
+      joinColumns = @JoinColumn(name = "program_id", nullable = false),
+      inverseJoinColumns = @JoinColumn(name = "storage_folder_id", nullable = false))
+  private Set<FileStoreFolder> storageFolders = new HashSet<>();
 
   @Column(name = "active", nullable = false)
   private boolean active = true;
@@ -191,12 +202,12 @@ public class Program implements Model {
     this.notebookFolder = notebookFolder;
   }
 
-  public FileStoreFolder getStorageFolder() {
-    return storageFolder;
+  public FileStoreFolder getPrimaryStorageFolder() {
+    return primaryStorageFolder;
   }
 
-  public void setStorageFolder(FileStoreFolder storageFolder) {
-    this.storageFolder = storageFolder;
+  public void setPrimaryStorageFolder(FileStoreFolder storageFolder) {
+    this.primaryStorageFolder = storageFolder;
   }
 
   public boolean isActive() {
@@ -213,5 +224,21 @@ public class Program implements Model {
 
   public void setAttributes(Map<String, String> attributes) {
     this.attributes = attributes;
+  }
+
+  public Set<FileStoreFolder> getStorageFolders() {
+    return storageFolders;
+  }
+
+  public void setStorageFolders(Set<FileStoreFolder> fileStoreFolders) {
+    this.storageFolders = fileStoreFolders;
+  }
+
+  public void addFileStoreFolder(FileStoreFolder folder) {
+    this.storageFolders.add(folder);
+  }
+
+  public void removeFileStoreFolder(FileStoreFolder folder) {
+    this.storageFolders.remove(folder);
   }
 }

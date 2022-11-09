@@ -77,12 +77,13 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   public StorageFolder getDataStorageFolder(
       @RequestParam(name = "path") String path,
       @RequestParam(name = "locationId") Long locationId
-  ) {
+  ) throws FileStorageException {
     LOGGER.debug("Getting data storage folder");
     FileStorageLocation location = storageLocationService.findById(locationId)
         .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
     if (path == null) path = location.getRootFolderPath();
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
+    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
     try {
       return storageService.findFolderByPath(location, path);
     } catch (Exception e) {
@@ -118,7 +119,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     }
 
     // Upload to the cloud service
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
+    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));;
     StorageFile storageFile = storageService.saveFile(location, path, localPath.toFile());
     LOGGER.debug("Uploaded file: " + storageFile.toString());
     return new ResponseEntity<>(storageFile, HttpStatus.OK);
@@ -137,7 +139,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     if (!StoragePermissions.canWrite(location.getPermissions())) {
       throw new InsufficientPrivilegesException("Insufficient privileges to create folder");
     }
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
+    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));;
     StorageFolder storageFolder = storageService.createFolder(location, path, folderName);
     LOGGER.debug("Created folder: " + storageFolder.toString());
     return new ResponseEntity<>(storageFolder, HttpStatus.OK);
@@ -151,7 +154,8 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     LOGGER.info("Downloading file from data storage folder {}", path);
     FileStorageLocation location = storageLocationService.findById(locationId)
         .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType());
+    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));;
     ByteArrayResource resource = (ByteArrayResource) storageService.fetchFile(location, path);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentDisposition(ContentDisposition.builder("attachment")

@@ -160,4 +160,9 @@ public class IntegrationInstance implements Model {
         .findFirst()
         .map(IntegrationInstanceConfigurationValue::getValue);
   }
+
+  public boolean hasConfigurationValue(String key) {
+    return configurationValues.stream()
+        .anyMatch(v -> v.getFieldName().equals(key));
+  }
 }

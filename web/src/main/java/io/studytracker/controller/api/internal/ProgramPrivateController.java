@@ -28,10 +28,12 @@ import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.model.Activity;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
+import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
@@ -68,7 +70,7 @@ public class ProgramPrivateController extends AbstractProgramController {
 
   @Autowired private ActivityMapper activityMapper;
 
-  @Autowired private StudyStorageService storageService;
+  @Autowired private StorageLocationService storageLocationService;
 
   @Autowired(required = false)
   private NotebookFolderService notebookFolderService;
@@ -175,7 +177,9 @@ public class ProgramPrivateController extends AbstractProgramController {
     }
     Program program = optional.get();
     try {
-      return new ResponseEntity<>(storageService.findFolder(program), HttpStatus.OK);
+      FileStorageLocation location = storageLocationService.findByFileStoreFolder(program.getPrimaryStorageFolder());
+      StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
+      return new ResponseEntity<>(studyStorageService.findFolder(location, program), HttpStatus.OK);
     } catch (StudyStorageNotFoundException e) {
       throw new RecordNotFoundException("Program folder not found:" + programId);
     }

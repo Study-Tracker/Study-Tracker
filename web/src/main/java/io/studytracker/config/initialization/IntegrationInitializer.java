@@ -29,9 +29,9 @@ import io.studytracker.repository.FileStorageLocationRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.IntegrationDefinitionRepository;
 import io.studytracker.repository.IntegrationInstanceRepository;
-import io.studytracker.storage.LocalFileSystemIntegrationV1;
 import io.studytracker.storage.StorageLocationType;
 import io.studytracker.storage.StoragePermissions;
+import io.studytracker.storage.integration.LocalFileSystemIntegrationV1;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
@@ -49,7 +49,7 @@ public class IntegrationInitializer {
 
   public static final List<IntegrationDefinition> INTEGRATION_DEFINITIONS = List.of(
       EgnyteIntegrationV1.getIntegrationDefinition(),
-      LocalFileSystemIntegrationV1.getDefinition()
+      LocalFileSystemIntegrationV1.getIntegrationDefinition()
   );
 
   @Autowired

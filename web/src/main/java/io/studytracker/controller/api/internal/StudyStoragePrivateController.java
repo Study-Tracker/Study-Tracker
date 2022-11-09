@@ -20,8 +20,10 @@ import io.studytracker.controller.api.AbstractStudyController;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.FileStorageException;
 import io.studytracker.model.Activity;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Study;
 import io.studytracker.service.FileSystemStorageService;
+import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
@@ -48,15 +50,16 @@ public class StudyStoragePrivateController extends AbstractStudyController {
 
   @Autowired private FileSystemStorageService fileStorageService;
 
-  @Autowired(required = false)
-  private StudyStorageService studyStorageService;
+  @Autowired private StorageLocationService storageLocationService;
 
   @GetMapping("")
   public StorageFolder getStudyStorageFolder(@PathVariable("studyId") String studyId)
       throws Exception {
     LOGGER.info("Fetching storage folder for study: " + studyId);
     Study study = getStudyFromIdentifier(studyId);
-    return studyStorageService.findFolder(study);
+    FileStorageLocation location = storageLocationService.findByFileStoreFolder(study.getPrimaryStorageFolder());
+    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
+    return studyStorageService.findFolder(location, study);
   }
 
   @PostMapping("")
@@ -74,7 +77,9 @@ public class StudyStoragePrivateController extends AbstractStudyController {
       e.printStackTrace();
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    StorageFile storageFile = studyStorageService.saveFile(path.toFile(), study);
+    FileStorageLocation location = storageLocationService.findByFileStoreFolder(study.getPrimaryStorageFolder());
+    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
+    StorageFile storageFile = studyStorageService.saveFile(location, path.toFile(), study);
 
     // Publish events
     Activity activity =

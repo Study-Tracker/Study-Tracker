@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.studytracker.aws.S3DataFileStorageService;
 import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
-import io.studytracker.egnyte.EgnyteClientOperations;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
 import io.studytracker.egnyte.EgnyteOptions;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
@@ -32,8 +31,6 @@ import io.studytracker.service.NamingOptions;
 import io.studytracker.storage.LocalFileSystemStudyStorageService;
 import io.studytracker.storage.StudyStorageService;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -62,19 +59,7 @@ public class StorageServiceConfiguration {
       Assert.notNull(
           env.getProperty("storage.local-dir"),
           "Local storage directory is not set. Eg. storage.local-dir=/path/to/storage");
-      Path path = Paths.get(env.getRequiredProperty("storage.local-dir"));
-      LocalFileSystemStudyStorageService service = new LocalFileSystemStudyStorageService(path);
-      if (env.containsProperty("storage.overwrite-existing")) {
-        service.setOverwriteExisting(
-            env.getRequiredProperty("storage.overwrite-existing", Boolean.class));
-      }
-      if (env.containsProperty("storage.use-existing")) {
-        service.setUseExisting(env.getRequiredProperty("storage.use-existing", Boolean.class));
-      }
-      if (env.containsProperty("storage.max-folder-read-depth")) {
-        service.setMaxDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
-      }
-      return service;
+      return new LocalFileSystemStudyStorageService();
     }
   }
 
@@ -152,21 +137,19 @@ public class StorageServiceConfiguration {
     }
 
     @Bean
-    public EgnyteRestApiClient egnyteClient(EgnyteOptions egnyteOptions, Environment env)
+    public EgnyteRestApiClient egnyteClient(Environment env)
         throws Exception {
-      return new EgnyteRestApiClient(egnyteRestTemplate(env), egnyteOptions);
+      return new EgnyteRestApiClient(egnyteRestTemplate(env));
     }
 
     @Bean
-    public EgnyteStudyStorageService egnyteStorageService(
-        EgnyteClientOperations egnyteClient, EgnyteOptions options) {
-      return new EgnyteStudyStorageService(egnyteClient, options);
+    public EgnyteStudyStorageService egnyteStorageService() {
+      return new EgnyteStudyStorageService();
     }
 
     @Bean
-    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService(
-        EgnyteRestApiClient egnyteClient) {
-      return new EgnyteApiDataFileStorageService(egnyteClient);
+    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService() {
+      return new EgnyteApiDataFileStorageService();
     }
   }
 

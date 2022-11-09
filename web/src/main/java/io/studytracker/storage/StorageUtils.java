@@ -16,6 +16,7 @@
 
 package io.studytracker.storage;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class StorageUtils {
@@ -58,10 +59,17 @@ public class StorageUtils {
    * @return the name of the file or folder
    */
   public static String getFileName(String path) {
-    if (path.endsWith("/")) {
-      path = path.substring(0, path.length() - 1);
-    }
-    return path.substring(path.lastIndexOf("/") + 1);
+    return new File(path).getName();
+  }
+
+  /**
+   * Returns the parent path of the provided file or folder path.
+   *
+   * @param path
+   * @return
+   */
+  public static String getParentPath(String path) {
+    return new File(path).getParentFile().getPath();
   }
 
 }

@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import io.studytracker.storage.StorageFolder;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -50,13 +51,14 @@ public class FileStoreFolder implements Model {
   @Column(name = "reference_id")
   private String referenceId;
 
-//  public static FileStoreFolder from(StorageFolder storageFolder) {
-//    FileStoreFolder f = new FileStoreFolder();
-//    f.setName(storageFolder.getName());
-//    f.setPath(storageFolder.getPath());
-//    f.setUrl(storageFolder.getUrl());
-//    return f;
-//  }
+  public static FileStoreFolder from(FileStorageLocation location, StorageFolder storageFolder) {
+    FileStoreFolder f = new FileStoreFolder();
+    f.setFileStorageLocation(location);
+    f.setName(storageFolder.getName());
+    f.setPath(storageFolder.getPath());
+    f.setUrl(storageFolder.getUrl());
+    return f;
+  }
 
   public Long getId() {
     return id;

@@ -71,7 +71,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("storageFolder"),
+        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("owner")
       }),
   @NamedEntityGraph(
@@ -80,7 +80,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("storageFolder"),
+        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("owner"),
@@ -141,7 +141,14 @@ public class Study implements Model {
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "storage_folder_id")
-  private FileStoreFolder storageFolder;
+  private FileStoreFolder primaryStorageFolder;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "study_storage_folders",
+      joinColumns = @JoinColumn(name = "study_id", nullable = false),
+      inverseJoinColumns = @JoinColumn(name = "storage_folder_id", nullable = false))
+  private Set<FileStoreFolder> storageFolders = new HashSet<>();
 
   @CreatedBy
   @ManyToOne(fetch = FetchType.LAZY)
@@ -400,12 +407,12 @@ public class Study implements Model {
     this.notebookFolder = notebookFolder;
   }
 
-  public FileStoreFolder getStorageFolder() {
-    return storageFolder;
+  public FileStoreFolder getPrimaryStorageFolder() {
+    return primaryStorageFolder;
   }
 
-  public void setStorageFolder(FileStoreFolder storageFolder) {
-    this.storageFolder = storageFolder;
+  public void setPrimaryStorageFolder(FileStoreFolder storageFolder) {
+    this.primaryStorageFolder = storageFolder;
   }
 
   public User getCreatedBy() {
@@ -548,6 +555,22 @@ public class Study implements Model {
 
   public String getAttribute(String key) {
     return this.attributes.get(key);
+  }
+
+  public Set<FileStoreFolder> getStorageFolders() {
+    return storageFolders;
+  }
+
+  public void setStorageFolders(Set<FileStoreFolder> fileStoreFolders) {
+    this.storageFolders = fileStoreFolders;
+  }
+
+  public void addFileStoreFolder(FileStoreFolder folder) {
+    this.storageFolders.add(folder);
+  }
+
+  public void removeFileStoreFolder(FileStoreFolder folder) {
+    this.storageFolders.remove(folder);
   }
 
 }

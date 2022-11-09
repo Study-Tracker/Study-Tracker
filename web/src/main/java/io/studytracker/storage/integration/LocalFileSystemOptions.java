@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.storage.integration;
 
-import io.studytracker.model.NotebookEntryTemplate;
-import java.util.Date;
-import lombok.Data;
+import io.studytracker.integration.IntegrationOptions;
 
-@Data
-public class NotebookEntryTemplateDetailsDto {
+public interface LocalFileSystemOptions extends IntegrationOptions {
 
-  private Long id;
-  private String name;
-  private String templateId;
-  private UserSlimDto createdBy;
-  private UserSlimDto lastModifiedBy;
-  private Date createdAt;
-  private Date updatedAt;
-  private boolean active;
-  private NotebookEntryTemplate.Category category;
-  private boolean isDefault;
+  String getRootPath();
+  boolean isOverwriteExisting();
+  boolean isUseExisting();
+
 }

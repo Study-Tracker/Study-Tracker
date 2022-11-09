@@ -25,5 +25,7 @@ public interface EgnyteIntegrationOptions extends IntegrationOptions {
   URL getRootUrl();
   String getRootPath();
   String getToken();
+  Integer getQps();
+  boolean isUseExisting();
 
 }

@@ -92,7 +92,7 @@ public interface AssayMapper {
   @Mapping(target = "studyId", source = "study.id")
   @Mapping(target = "assayTypeId", source = "assayType.id")
   @Mapping(target = "notebookFolderId", source = "notebookFolder.id")
-  @Mapping(target = "storageFolderId", source = "storageFolder.id")
+  @Mapping(target = "storageFolderId", source = "primaryStorageFolder.id")
   @Mapping(target = "users", source = "users", qualifiedByName = "userToId")
   @Mapping(target = "tasks", source = "tasks", qualifiedByName = "assayTaskToId")
   AssayDto toAssayDto(Assay assay);

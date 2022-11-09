@@ -63,7 +63,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       attributeNodes = {
         @NamedAttributeNode("assayType"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("storageFolder"),
+        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("users")
       }),
@@ -72,7 +72,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       attributeNodes = {
         @NamedAttributeNode(value = "assayType", subgraph = "assay-type-details"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("storageFolder"),
+        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
@@ -98,7 +98,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("assayType"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("storageFolder"),
+        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode(value = "study", subgraph = "study-summary")
       },
       subgraphs = {
@@ -162,7 +162,14 @@ public class Assay implements Model {
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "storage_folder_id")
-  private FileStoreFolder storageFolder;
+  private FileStoreFolder primaryStorageFolder;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "assay_storage_folders",
+      joinColumns = @JoinColumn(name = "assay_id", nullable = false),
+      inverseJoinColumns = @JoinColumn(name = "storage_folder_id", nullable = false))
+  private Set<FileStoreFolder> storageFolders = new HashSet<>();
 
   @Column(name = "active", nullable = false)
   private boolean active;
@@ -344,12 +351,12 @@ public class Assay implements Model {
     this.notebookFolder = notebookFolder;
   }
 
-  public FileStoreFolder getStorageFolder() {
-    return storageFolder;
+  public FileStoreFolder getPrimaryStorageFolder() {
+    return primaryStorageFolder;
   }
 
-  public void setStorageFolder(FileStoreFolder storageFolder) {
-    this.storageFolder = storageFolder;
+  public void setPrimaryStorageFolder(FileStoreFolder storageFolder) {
+    this.primaryStorageFolder = storageFolder;
   }
 
   public boolean isActive() {
@@ -410,4 +417,21 @@ public class Assay implements Model {
     }
     this.tasks = tasks;
   }
+
+  public Set<FileStoreFolder> getStorageFolders() {
+    return storageFolders;
+  }
+
+  public void setStorageFolders(Set<FileStoreFolder> fileStoreFolders) {
+    this.storageFolders = fileStoreFolders;
+  }
+
+  public void addFileStoreFolder(FileStoreFolder folder) {
+    this.storageFolders.add(folder);
+  }
+
+  public void removeFileStoreFolder(FileStoreFolder folder) {
+    this.storageFolders.remove(folder);
+  }
+
 }

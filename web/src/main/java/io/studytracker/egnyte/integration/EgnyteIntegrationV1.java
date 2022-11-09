@@ -16,6 +16,7 @@
 
 package io.studytracker.egnyte.integration;
 
+import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.integration.IntegrationConfigurationSchemaFieldBuilder;
 import io.studytracker.integration.IntegrationDefinitionBuilder;
 import io.studytracker.integration.IntegrationInstanceBuilder;
@@ -24,6 +25,8 @@ import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.IntegrationDefinition;
 import io.studytracker.model.IntegrationInstance;
 import io.studytracker.model.IntegrationInstanceConfigurationValue;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
@@ -46,9 +49,13 @@ public final class EgnyteIntegrationV1 implements EgnyteIntegrationOptions {
   private IntegrationDefinition definition;
   private Set<IntegrationInstanceConfigurationValue> configurationValues = new HashSet<>();
   private String tenantName;
-  private String rootUrl;
+  private URL rootUrl;
   private String rootPath;
   private String token;
+
+  private Integer qps = 1;
+
+  private boolean useExisting = true;
 
   public EgnyteIntegrationV1(IntegrationInstance instance) {
     this.name = instance.getName();
@@ -62,10 +69,23 @@ public final class EgnyteIntegrationV1 implements EgnyteIntegrationOptions {
         .orElseThrow(() -> new IllegalArgumentException("Missing root path"));
     this.token = instance.getConfigurationValue(API_TOKEN)
         .orElseThrow(() -> new IllegalArgumentException("Missing API token"));
-    if (instance.getConfigurationValue(ROOT_URL).isPresent()) {
-      this.rootUrl = instance.getConfigurationValue(ROOT_URL).get();
-    } else {
-      this.rootUrl = "https://" + tenantName + ".egnyte.com";
+    try {
+      if (instance.getConfigurationValue(ROOT_URL).isPresent()) {
+        this.rootUrl = new URL(instance.getConfigurationValue(ROOT_URL).get());
+      } else {
+        this.rootUrl = new URL("https://" + tenantName + ".egnyte.com");
+      }
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+      throw new StudyTrackerException("Invalid root URL", e);
+    }
+    if (instance.hasConfigurationValue(QPS)) {
+      this.qps = Integer.parseInt(instance.getConfigurationValue(QPS)
+          .orElseThrow(() -> new IllegalArgumentException("Missing QPS")));
+    }
+    if (instance.hasConfigurationValue(USE_EXISTING)) {
+      this.useExisting = Boolean.parseBoolean(instance.getConfigurationValue(USE_EXISTING)
+          .orElseThrow(() -> new IllegalArgumentException("Missing use existing")));
     }
   }
 

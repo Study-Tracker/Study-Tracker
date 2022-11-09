@@ -96,7 +96,7 @@ public class ProgramRepositoryTests {
     folder.setPath("/path/to/test");
     folder.setName("test");
     folder.setUrl("http://test");
-    program.setStorageFolder(folder);
+    program.setPrimaryStorageFolder(folder);
 
     programRepository.save(program);
 
@@ -117,13 +117,13 @@ public class ProgramRepositoryTests {
     Assert.assertNotNull(createdBy);
     Assert.assertEquals("test@email.com", createdBy.getEmail());
 
-    FileStoreFolder programFolder = created.getStorageFolder();
+    FileStoreFolder programFolder = created.getPrimaryStorageFolder();
     Assert.assertNotNull(programFolder.getId());
     Optional<FileStoreFolder> fileStoreFolderOptional =
         fileStoreFolderRepository.findById(programFolder.getId());
     Assert.assertTrue(fileStoreFolderOptional.isPresent());
 
-    created.setStorageFolder(null);
+    created.setPrimaryStorageFolder(null);
     programRepository.save(created);
     Assert.assertEquals(0, fileStoreFolderRepository.count());
 

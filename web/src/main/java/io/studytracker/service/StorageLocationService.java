@@ -16,9 +16,17 @@
 
 package io.studytracker.service;
 
+import io.studytracker.exception.FileStorageException;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.FileStoreFolder;
 import io.studytracker.repository.FileStorageLocationRepository;
+import io.studytracker.repository.FileStoreFolderRepository;
+import io.studytracker.storage.DataFileStorageService;
+import io.studytracker.storage.DataFileStorageServiceLookup;
 import io.studytracker.storage.StorageLocationType;
+import io.studytracker.storage.StudyFileStorageServiceLookup;
+import io.studytracker.storage.StudyStorageService;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -35,8 +43,45 @@ public class StorageLocationService {
   @Autowired
   private FileStorageLocationRepository fileStorageLocationRepository;
 
+  @Autowired
+  private FileStoreFolderRepository fileStoreFolderRepository;
+
+  @Autowired
+  private DataFileStorageServiceLookup dataFileStorageServiceLookup;
+
+  @Autowired
+  private StudyFileStorageServiceLookup studyFileStorageServiceLookup;
+
   public List<FileStorageLocation> findAll() {
     return fileStorageLocationRepository.findAll();
+  }
+
+  public FileStorageLocation findDefaultStudyLocation() throws FileStorageException {
+    List<FileStorageLocation> locations = fileStorageLocationRepository.findByDefaultStudyLocation();
+    if (locations.isEmpty()) {
+      throw new FileStorageException("No default study location has been set.");
+    } else if (locations.size() > 1) {
+      throw new FileStorageException("Multiple default study locations have been set. Change the "
+          + "default study location to one location.");
+    } else {
+      return locations.get(0);
+    }
+  }
+
+  public FileStorageLocation findDefaultDataLocation() throws FileStorageException {
+    List<FileStorageLocation> locations = fileStorageLocationRepository.findByDefaultDataLocation();
+    if (locations.isEmpty()) {
+      throw new FileStorageException("No default data location has been set.");
+    } else if (locations.size() > 1) {
+      throw new FileStorageException("Multiple default data locations have been set. Change the "
+          + "default data location to one location.");
+    } else {
+      return locations.get(0);
+    }
+  }
+
+  public FileStorageLocation findByFileStoreFolder(FileStoreFolder folder) {
+    return fileStorageLocationRepository.findByFileStoreFolderId(folder.getId());
   }
 
   public List<FileStorageLocation> findByType(StorageLocationType type) {
@@ -72,6 +117,34 @@ public class StorageLocationService {
     FileStorageLocation f = fileStorageLocationRepository.getById(id);
     f.setActive(false);
     fileStorageLocationRepository.save(f);
+  }
+
+  public StudyStorageService lookupStudyStorageService(FileStorageLocation location) {
+    return studyFileStorageServiceLookup.lookup(location.getType())
+        .orElseThrow(() -> new IllegalArgumentException("No storage service found for type: "
+            + location.getType()));
+  }
+
+  public StudyStorageService lookupStudyStorageService(FileStoreFolder folder) {
+    FileStorageLocation location = fileStorageLocationRepository
+        .findById(folder.getFileStorageLocation().getId())
+        .orElseThrow(() -> new RecordNotFoundException("File storage location not found: "
+            + folder.getFileStorageLocation().getId()));
+    return lookupStudyStorageService(location);
+  }
+
+  public DataFileStorageService lookupDataFileStorageService(FileStorageLocation location) {
+    return dataFileStorageServiceLookup.lookup(location.getType())
+        .orElseThrow(() -> new IllegalArgumentException("No storage service found for type: "
+            + location.getType()));
+  }
+
+  public DataFileStorageService lookupDataStorageService(FileStoreFolder folder) {
+    FileStorageLocation location = fileStorageLocationRepository
+        .findById(folder.getFileStorageLocation().getId())
+        .orElseThrow(() -> new RecordNotFoundException("File storage location not found: "
+            + folder.getFileStorageLocation().getId()));
+    return lookupDataFileStorageService(location);
   }
 
 }

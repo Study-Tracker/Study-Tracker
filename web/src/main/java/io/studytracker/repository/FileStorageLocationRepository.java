@@ -26,7 +26,16 @@ public interface FileStorageLocationRepository extends JpaRepository<FileStorage
 
   List<FileStorageLocation> findByType(StorageLocationType type);
 
+  @Query("select f from FileStorageLocation  f where f.defaultStudyLocation = true")
+  List<FileStorageLocation> findByDefaultStudyLocation();
+
+  @Query("select f from FileStorageLocation  f where f.defaultDataLocation = true")
+  List<FileStorageLocation> findByDefaultDataLocation();
+
   @Query("select f from FileStorageLocation f where f.integrationInstance.id = ?1")
   List<FileStorageLocation> findByIntegrationInstance(Long integrationInstanceId);
+
+  @Query("select l from FileStorageLocation l join FileStoreFolder f on l.id = f.fileStorageLocation.id where f.id = ?1")
+  FileStorageLocation findByFileStoreFolderId(Long fileStoreFolderId);
 
 }

@@ -119,7 +119,7 @@ public class StudyRepositoryTests {
     folder.setPath("/path/to/test");
     folder.setName("test");
     folder.setUrl("http://test");
-    program.setStorageFolder(folder);
+    program.setPrimaryStorageFolder(folder);
 
     programRepository.save(program);
   }
