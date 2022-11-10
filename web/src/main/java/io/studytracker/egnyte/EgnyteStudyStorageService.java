@@ -42,7 +42,6 @@ import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.util.UriUtils;
 
 public class EgnyteStudyStorageService implements StudyStorageService {
 
@@ -115,61 +114,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     return path;
   }
 
-  private StorageFolder convertEgnyteFolder(EgnyteFolder egnyteFolder, URL rootUrl) {
-    StorageFolder storageFolder = new StorageFolder();
-    storageFolder.setName(egnyteFolder.getName());
-    storageFolder.setPath(egnyteFolder.getPath());
-    if (egnyteFolder.getUrl() == null) {
-      storageFolder.setUrl(buildEgnyteUrl(rootUrl, egnyteFolder.getPath(), egnyteFolder.getName()));
-    } else {
-      storageFolder.setUrl(egnyteFolder.getUrl());
-    }
-    return storageFolder;
-  }
-
-  private String buildEgnyteUrl(URL rootUrl, String path, String name) {
-    if (name != null) {
-      path = path.replace("/" + name, "");
-    } else if (path.endsWith("/")) {
-      path = path.substring(0, path.length() - 1);
-    }
-    path = UriUtils.encodePath(path, "UTF-8").replace("&", "%26");
-    String url = rootUrl.toString();
-    if (url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
-    }
-    url = url + "/app/index.do#storage/files/1" + path;
-    return url;
-  }
-
-  private String buildEgnyteUrl(URL rootUrl, String path) {
-    return this.buildEgnyteUrl(rootUrl, path, null);
-  }
-
-  private StorageFile convertEgnyteFile(EgnyteFile egnyteFile, URL rootUrl) {
-
-    StorageFile storageFile = new StorageFile();
-    storageFile.setPath(egnyteFile.getPath());
-
-    if (egnyteFile.getName() == null) {
-      storageFile.setName(new File(egnyteFile.getPath()).getName());
-    } else {
-      storageFile.setName(egnyteFile.getName());
-    }
-
-    if (egnyteFile.getUrl() == null) {
-      storageFile.setUrl(buildEgnyteUrl(rootUrl, egnyteFile.getPath(), storageFile.getName()));
-    } else {
-      storageFile.setUrl(egnyteFile.getUrl());
-    }
-
-    return storageFile;
-  }
-
   private StorageFolder convertFolder(EgnyteFolder egnyteFolder, URL rootUrl) {
-    StorageFolder storageFolder = convertEgnyteFolder(egnyteFolder, rootUrl);
+    StorageFolder storageFolder = EgnyteUtils.convertEgnyteFolder(egnyteFolder, rootUrl);
     for (EgnyteFile file : egnyteFolder.getFiles()) {
-      storageFolder.getFiles().add(convertEgnyteFile(file, rootUrl));
+      storageFolder.getFiles().add(EgnyteUtils.convertEgnyteFile(file, rootUrl));
     }
     for (EgnyteFolder subFolder : egnyteFolder.getSubFolders()) {
       storageFolder.getSubFolders().add(convertFolder(subFolder, rootUrl));
@@ -183,7 +131,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       parentFolder.setPath(parentFile.getPath());
     }
     if (parentFolder != null) {
-      storageFolder.setParentFolder(convertEgnyteFolder(parentFolder, rootUrl));
+      storageFolder.setParentFolder(EgnyteUtils.convertEgnyteFolder(parentFolder, rootUrl));
     }
     return storageFolder;
   }
@@ -334,7 +282,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     StorageFile storageFile;
     try {
       EgnyteFile egnyteFile = egnyteClient.uploadFile(options.getRootUrl(), file, path, options.getToken());
-      storageFile = this.convertEgnyteFile(egnyteFile, options.getRootUrl());
+      storageFile = EgnyteUtils.convertEgnyteFile(egnyteFile, options.getRootUrl());
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
@@ -350,7 +298,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     StorageFile storageFile;
     try {
       EgnyteFile egnyteFile = egnyteClient.uploadFile(options.getRootUrl(), file, path, options.getToken());
-      storageFile = this.convertEgnyteFile(egnyteFile, options.getRootUrl());
+      storageFile = EgnyteUtils.convertEgnyteFile(egnyteFile, options.getRootUrl());
     } catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }

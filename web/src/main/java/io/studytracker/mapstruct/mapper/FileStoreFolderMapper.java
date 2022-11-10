@@ -20,6 +20,7 @@ import io.studytracker.mapstruct.dto.api.FileStoreFolderDto;
 import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
 import io.studytracker.model.FileStoreFolder;
 import java.util.List;
+import java.util.Set;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
@@ -30,4 +31,5 @@ public interface FileStoreFolderMapper {
 
   FileStoreFolderDto toDto(FileStoreFolder folder);
   List<FileStoreFolderDto> toDto(List<FileStoreFolder> folders);
+  Set<FileStoreFolderDto> toDto(Set<FileStoreFolder> folders);
 }

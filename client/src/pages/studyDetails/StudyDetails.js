@@ -297,7 +297,7 @@ const StudyDetails = props => {
                     <Card.Title>Workspaces</Card.Title>
 
                     <RepairableStorageFolderButton
-                        folder={study.storageFolder}
+                        folder={study.primaryStorageFolder}
                         repairUrl={"/api/internal/study/" + study.id + "/storage/repair"}
                     />
 

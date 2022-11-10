@@ -69,7 +69,8 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
           options.getRootUrl(), path, options.getToken());
       if (egnyteObject.isFolder()) {
         EgnyteFolder folder = (EgnyteFolder) egnyteObject;
-        return EgnyteUtils.convertEgnyteFolderWithContents(folder, location.getRootFolderPath());
+        return EgnyteUtils.convertEgnyteFolderWithContents(folder, options.getRootUrl(),
+            location.getRootFolderPath());
       } else {
         throw new EgnyteException("Object is not a folder: " + path);
       }
@@ -90,7 +91,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
           options.getRootUrl(), path, options.getToken());
       if (!egnyteObject.isFolder()) {
         EgnyteFile file = (EgnyteFile) egnyteObject;
-        return EgnyteUtils.convertEgnyteFile(file);
+        return EgnyteUtils.convertEgnyteFile(file, options.getRootUrl());
       } else {
         throw new EgnyteException("Object is not a file: " + path);
       }
@@ -112,7 +113,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
       }
       EgnyteFolder folder = client.createFolder(
           options.getRootUrl(), StorageUtils.joinPath(path, name), options.getToken());
-      return EgnyteUtils.convertEgnyteFolder(folder);
+      return EgnyteUtils.convertEgnyteFolder(folder, options.getRootUrl());
     } catch (EgnyteException e) {
       e.printStackTrace();
       LOGGER.error("Error while creating folder", e);
@@ -131,7 +132,7 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
       }
       EgnyteFile egnyteFile = client.uploadFile(
           options.getRootUrl(), file, path, options.getToken());
-      return EgnyteUtils.convertEgnyteFile(egnyteFile);
+      return EgnyteUtils.convertEgnyteFile(egnyteFile, options.getRootUrl());
     } catch (EgnyteException e) {
       e.printStackTrace();
       LOGGER.error("Error while uploading file", e);

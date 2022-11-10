@@ -38,7 +38,7 @@ public class StudyDetailsDto {
   private boolean legacy = false;
   private boolean active = true;
   private NotebookFolderDetailsDto notebookFolder;
-  private FileStoreFolderDetailsDto storageFolder;
+  private FileStoreFolderDetailsDto primaryStorageFolder;
   private UserSummaryDto createdBy;
   private UserSummaryDto lastModifiedBy;
   private Date startDate;
@@ -53,4 +53,5 @@ public class StudyDetailsDto {
   private Set<StudyRelationshipDetailsDto> studyRelationships = new HashSet<>();
   private StudyConclusionsDetailsDto conclusions;
   private Set<CommentDetailsDto> comments = new HashSet<>();
+  private Set<FileStoreFolderDetailsDto> storageFolders = new HashSet<>();
 }
