@@ -23,7 +23,7 @@ import io.studytracker.mapstruct.mapper.FileStoreFolderMapper;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.service.FileSystemStorageService;
-import io.studytracker.storage.StudyStorageService;
+import io.studytracker.service.StorageLocationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class StorageFolderPublicController extends AbstractApiController {
   private FileSystemStorageService fileStorageService;
 
   @Autowired
-  private StudyStorageService studyStorageService;
+  private StorageLocationService storageLocationService;
 
   @Autowired
   private FileStoreFolderRepository fileStoreFolderRepository;

@@ -46,12 +46,16 @@ public class IntegrationDefinitionBuilder {
 
   public IntegrationDefinitionBuilder configurationSchemaFields(
       Collection<IntegrationConfigurationSchemaField> fields) {
-    integration.getConfigurationSchemaFields().addAll(fields);
+    for (IntegrationConfigurationSchemaField field : fields) {
+      field.setIntegrationDefinition(integration);
+      integration.addConfigurationSchemaField(field);
+    }
     return this;
   }
 
   public IntegrationDefinitionBuilder configurationSchemaField(
       IntegrationConfigurationSchemaField field) {
+    field.setIntegrationDefinition(integration);
     integration.getConfigurationSchemaFields().add(field);
     return this;
   }

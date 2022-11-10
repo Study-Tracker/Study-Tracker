@@ -49,7 +49,7 @@ import org.hibernate.annotations.TypeDef;
 @Entity
 @Table(name = "integration_definitions",
     uniqueConstraints = {
-      @UniqueConstraint(name = "uc_integrationdefinition_name", columnNames = {"name", "version"})
+      @UniqueConstraint(name = "uc_integrationdefinition_name", columnNames = {"type", "version"})
     }
 )
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
@@ -70,7 +70,7 @@ public class IntegrationDefinition implements Model {
   private Integer version;
 
   @OneToMany(mappedBy = "integrationDefinition", cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY, orphanRemoval = true)
+      fetch = FetchType.EAGER, orphanRemoval = true)
   private Set<IntegrationConfigurationSchemaField> configurationSchemaFields = new HashSet<>();
 
   @OneToMany(

@@ -54,11 +54,15 @@ public class IntegrationInstanceBuilder {
 
   public IntegrationInstanceBuilder configurationValues(
       Collection<IntegrationInstanceConfigurationValue> values) {
-    instance.getConfigurationValues().addAll(values);
+    for (IntegrationInstanceConfigurationValue value : values) {
+      value.setIntegrationInstance(instance);
+      instance.addConfigurationValue(value);
+    }
     return this;
   }
 
   public IntegrationInstanceBuilder configurationValue(IntegrationInstanceConfigurationValue value) {
+    value.setIntegrationInstance(instance);
     instance.getConfigurationValues().add(value);
     return this;
   }
@@ -67,6 +71,7 @@ public class IntegrationInstanceBuilder {
     IntegrationInstanceConfigurationValue configurationValue = new IntegrationInstanceConfigurationValue();
     configurationValue.setFieldName(fieldName);
     configurationValue.setValue(value);
+    configurationValue.setIntegrationInstance(instance);
     instance.addConfigurationValue(configurationValue);
     return this;
   }

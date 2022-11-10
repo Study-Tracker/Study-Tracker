@@ -70,7 +70,7 @@ public class IntegrationInstance implements Model {
   private boolean active = true;
 
   @OneToMany(mappedBy = "integrationInstance", cascade = CascadeType.ALL,
-      orphanRemoval = true, fetch = FetchType.LAZY)
+      orphanRemoval = true, fetch = FetchType.EAGER)
   private Set<IntegrationInstanceConfigurationValue> configurationValues = new HashSet<>();
 
   @CreatedDate

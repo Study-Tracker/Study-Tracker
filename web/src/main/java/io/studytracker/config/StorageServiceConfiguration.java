@@ -22,11 +22,11 @@ import io.studytracker.aws.S3DataFileStorageService;
 import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
-import io.studytracker.egnyte.EgnyteOptions;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
+import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.service.NamingOptions;
 import io.studytracker.storage.LocalFileSystemStudyStorageService;
 import io.studytracker.storage.StudyStorageService;
@@ -88,15 +88,22 @@ public class StorageServiceConfiguration {
 
     @Bean
     public ObjectMapper egnyteObjectMapper(Environment env) throws Exception {
-      Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
+      String url;
+      if (env.containsProperty("egnyte.root-url")) {
+        url = env.getRequiredProperty("egnyte.root-url");
+      } else if (env.containsProperty("egnyte.tenant-name")) {
+        url = "https://" + env.getRequiredProperty("egnyte.tenant-name") + ".egnyte.com";
+      } else {
+        throw new InvalidConfigurationException(
+            "Egnyte root URL or tenant name is not set. Eg. egnyte.root-url=https://tenant.egnyte.com");
+      }
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.registerModule(
           new SimpleModule() {
             {
               addDeserializer(
                   EgnyteObject.class,
-                  new EgnyteObjectDeserializer(
-                      new URL(env.getRequiredProperty("egnyte.root-url"))));
+                  new EgnyteObjectDeserializer(new URL(url)));
             }
           });
       return objectMapper;
@@ -112,29 +119,29 @@ public class StorageServiceConfiguration {
       return restTemplate;
     }
 
-    @Bean
-    public EgnyteOptions egnyteOptions(Environment env) throws Exception {
-      Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
-      Assert.notNull(env.getProperty("egnyte.root-path"), "Egnyte root directory path is not set.");
-      Assert.notNull(env.getProperty("egnyte.api-token"), "Egnyte API token is not set.");
-      EgnyteOptions options = new EgnyteOptions();
-      options.setRootUrl(new URL(env.getRequiredProperty("egnyte.root-url")));
-      options.setRootPath(env.getRequiredProperty("egnyte.root-path"));
-      options.setToken(env.getRequiredProperty("egnyte.api-token"));
-      if (env.containsProperty("egnyte.qps")) {
-        options.setQps(env.getRequiredProperty("egnyte.qps", Integer.class));
-      } else if (env.containsProperty("egnyte.sleep")) {
-        options.setSleep(env.getRequiredProperty("egnyte.sleep", Integer.class));
-      }
-      if (env.containsProperty("storage.max-folder-read-depth")) {
-        options.setMaxReadDepth(
-            env.getRequiredProperty("storage.max-folder-read-depth", int.class));
-      }
-      if (env.containsProperty("storage.use-existing")) {
-        options.setUseExisting(env.getRequiredProperty("storage.use-existing", boolean.class));
-      }
-      return options;
-    }
+//    @Bean
+//    public EgnyteOptions egnyteOptions(Environment env) throws Exception {
+//      Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
+//      Assert.notNull(env.getProperty("egnyte.root-path"), "Egnyte root directory path is not set.");
+//      Assert.notNull(env.getProperty("egnyte.api-token"), "Egnyte API token is not set.");
+//      EgnyteOptions options = new EgnyteOptions();
+//      options.setRootUrl(new URL(env.getRequiredProperty("egnyte.root-url")));
+//      options.setRootPath(env.getRequiredProperty("egnyte.root-path"));
+//      options.setToken(env.getRequiredProperty("egnyte.api-token"));
+//      if (env.containsProperty("egnyte.qps")) {
+//        options.setQps(env.getRequiredProperty("egnyte.qps", Integer.class));
+//      } else if (env.containsProperty("egnyte.sleep")) {
+//        options.setSleep(env.getRequiredProperty("egnyte.sleep", Integer.class));
+//      }
+//      if (env.containsProperty("storage.max-folder-read-depth")) {
+//        options.setMaxReadDepth(
+//            env.getRequiredProperty("storage.max-folder-read-depth", int.class));
+//      }
+//      if (env.containsProperty("storage.use-existing")) {
+//        options.setUseExisting(env.getRequiredProperty("storage.use-existing", boolean.class));
+//      }
+//      return options;
+//    }
 
     @Bean
     public EgnyteRestApiClient egnyteClient(Environment env)

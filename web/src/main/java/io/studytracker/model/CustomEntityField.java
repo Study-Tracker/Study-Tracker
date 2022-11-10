@@ -50,8 +50,8 @@ public abstract class CustomEntityField implements Model {
   @Column(name = "active", nullable = false)
   private boolean active;
 
-  @Column(name = "order", nullable = false)
-  private Integer order;
+  @Column(name = "field_order", nullable = false)
+  private Integer fieldOrder;
 
   public Long getId() {
     return id;
@@ -109,11 +109,11 @@ public abstract class CustomEntityField implements Model {
     this.active = active;
   }
 
-  public Integer getOrder() {
-    return order;
+  public Integer getFieldOrder() {
+    return fieldOrder;
   }
 
-  public void setOrder(Integer order) {
-    this.order = order;
+  public void setFieldOrder(Integer order) {
+    this.fieldOrder = order;
   }
 }

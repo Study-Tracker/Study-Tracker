@@ -31,6 +31,7 @@ import io.studytracker.storage.StoragePermissions;
 import io.studytracker.storage.StorageUtils;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,9 @@ public class DataFileStoragePrivateController extends AbstractApiController {
 
   @GetMapping("/locations")
   public List<FileStorageLocation> getFileStorageLocations() {
-    return storageLocationService.findAll();
+    return storageLocationService.findAll().stream()
+        .filter(FileStorageLocation::isActive)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("")

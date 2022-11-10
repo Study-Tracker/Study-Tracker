@@ -39,7 +39,7 @@ public class StringFieldEncryptor implements AttributeConverter<String, String>,
 
   private static final String AES = "AES";
 
-  @Value("${application.secret:study-tracker}")
+  @Value("${application.secret}")
   public String secret;
 
   private Key key;
