@@ -56,7 +56,7 @@ public class IntegrationInstance implements Model {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "integration_definition_id", nullable = false)
   private IntegrationDefinition definition;
 

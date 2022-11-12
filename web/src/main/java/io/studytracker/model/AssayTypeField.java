@@ -38,7 +38,12 @@ public class AssayTypeField extends CustomEntityField {
   }
 
   public AssayTypeField(
-      AssayType assayType, String displayName, String fieldName, CustomEntityFieldType type) {
+      AssayType assayType,
+      String displayName,
+      String fieldName,
+      CustomEntityFieldType type,
+      Integer order
+  ) {
     super();
     this.setAssayType(assayType);
     this.setDisplayName(displayName);
@@ -46,6 +51,7 @@ public class AssayTypeField extends CustomEntityField {
     this.setType(type);
     this.setRequired(false);
     this.setActive(true);
+    this.setFieldOrder(order);
   }
 
   public AssayTypeField(
@@ -53,11 +59,13 @@ public class AssayTypeField extends CustomEntityField {
       String displayName,
       String fieldName,
       CustomEntityFieldType type,
+      Integer order,
       boolean required) {
     this.setAssayType(assayType);
     this.setDisplayName(displayName);
     this.setFieldName(fieldName);
     this.setType(type);
+    this.setFieldOrder(order);
     this.setRequired(required);
     this.setActive(true);
   }
@@ -67,6 +75,7 @@ public class AssayTypeField extends CustomEntityField {
       String displayName,
       String fieldName,
       CustomEntityFieldType type,
+      Integer order,
       boolean required,
       String description) {
     this.setAssayType(assayType);
@@ -74,6 +83,7 @@ public class AssayTypeField extends CustomEntityField {
     this.setFieldName(fieldName);
     this.setType(type);
     this.setRequired(required);
+    this.setFieldOrder(order);
     this.setActive(true);
     this.setDescription(description);
   }
@@ -84,5 +94,20 @@ public class AssayTypeField extends CustomEntityField {
 
   public void setAssayType(AssayType assayType) {
     this.assayType = assayType;
+  }
+
+  @Override
+  public String toString() {
+    return "AssayTypeField{" +
+        "id=" + this.getId() +
+        ", displayName='" + this.getDisplayName() + '\'' +
+        ", fieldName='" + this.getFieldName() + '\'' +
+        ", type=" + this.getType() +
+        ", required=" + this.isRequired() +
+        ", description='" + this.getDescription() + '\'' +
+        ", active=" + this.isActive() +
+        ", fieldOrder=" + this.getFieldOrder() +
+        ", assayType=" + assayType +
+        '}';
   }
 }

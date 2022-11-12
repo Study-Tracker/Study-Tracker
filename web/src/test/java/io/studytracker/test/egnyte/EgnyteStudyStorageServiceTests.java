@@ -332,6 +332,6 @@ public class EgnyteStudyStorageServiceTests {
             .orElseThrow(RecordNotFoundException::new);
     Assert.assertNotNull(assayFolder);
     System.out.println(assayFolder);
-    Assert.assertFalse(assayFolder.getFiles().isEmpty());
+    Assert.assertTrue(assayFolder.getFiles().isEmpty());
   }
 }

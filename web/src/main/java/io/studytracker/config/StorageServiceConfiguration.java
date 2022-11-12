@@ -29,7 +29,6 @@ import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.service.NamingOptions;
 import io.studytracker.storage.LocalFileSystemStudyStorageService;
-import io.studytracker.storage.StudyStorageService;
 import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +39,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -55,10 +53,7 @@ public class StorageServiceConfiguration {
   public static class LocalStudyStorageServiceConfiguration {
 
     @Bean
-    public StudyStorageService localFileSystemStudyStorageService(Environment env) {
-      Assert.notNull(
-          env.getProperty("storage.local-dir"),
-          "Local storage directory is not set. Eg. storage.local-dir=/path/to/storage");
+    public LocalFileSystemStudyStorageService localFileSystemStudyStorageService(Environment env) {
       return new LocalFileSystemStudyStorageService();
     }
   }

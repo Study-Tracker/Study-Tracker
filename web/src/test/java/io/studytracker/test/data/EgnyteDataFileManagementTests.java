@@ -66,7 +66,7 @@ public class EgnyteDataFileManagementTests {
   private EgnyteIntegrationOptions options;
 
   @Before
-  private void getOptionsFromLocation() {
+  public void getOptionsFromLocation() {
     IntegrationInstance instance = integrationInstanceRepository
         .findByIntegrationType(IntegrationType.EGNYTE)
         .get(0);

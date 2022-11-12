@@ -113,7 +113,21 @@ public abstract class CustomEntityField implements Model {
     return fieldOrder;
   }
 
-  public void setFieldOrder(Integer order) {
-    this.fieldOrder = order;
+  public void setFieldOrder(Integer fieldOrder) {
+    this.fieldOrder = fieldOrder;
+  }
+
+  @Override
+  public String toString() {
+    return "CustomEntityField{" +
+        "id=" + id +
+        ", displayName='" + displayName + '\'' +
+        ", fieldName='" + fieldName + '\'' +
+        ", type=" + type +
+        ", required=" + required +
+        ", description='" + description + '\'' +
+        ", active=" + active +
+        ", fieldOrder=" + fieldOrder +
+        '}';
   }
 }

@@ -28,11 +28,9 @@ public interface AssayTypeFieldMapper {
 
   AssayTypeFieldDetailsDto toDetailsDto(AssayTypeField field);
 
-
   List<AssayTypeFieldDetailsDto> toDetailsDtoList(List<AssayTypeField> fields);
 
   AssayTypeField fromDetailsDto(AssayTypeFieldDetailsDto dto);
-
 
   List<AssayTypeField> fromDetailsDtoList(List<AssayTypeFieldDetailsDto> dtos);
 

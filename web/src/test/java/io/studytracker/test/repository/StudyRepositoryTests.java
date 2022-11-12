@@ -20,6 +20,7 @@ import io.studytracker.Application;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Comment;
 import io.studytracker.model.ExternalLink;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
@@ -31,6 +32,7 @@ import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.CommentRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ExternalLinkRepository;
+import io.studytracker.repository.FileStorageLocationRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyConclusionsRepository;
@@ -76,6 +78,8 @@ public class StudyRepositoryTests {
   @Autowired private StudyConclusionsRepository studyConclusionsRepository;
   @Autowired private ExternalLinkRepository externalLinkRepository;
 
+  @Autowired private FileStorageLocationRepository fileStorageLocationRepository;
+
   @Before
   public void doBefore() {
     externalLinkRepository.deleteAll();
@@ -106,6 +110,7 @@ public class StudyRepositoryTests {
   private void createProgram() {
 
     User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
+    FileStorageLocation location = fileStorageLocationRepository.findAll().get(0);
 
     Program program = new Program();
     program.setActive(true);
@@ -119,6 +124,7 @@ public class StudyRepositoryTests {
     folder.setPath("/path/to/test");
     folder.setName("test");
     folder.setUrl("http://test");
+    folder.setFileStorageLocation(location);
     program.setPrimaryStorageFolder(folder);
 
     programRepository.save(program);

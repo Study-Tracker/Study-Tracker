@@ -43,6 +43,9 @@ public class StudyFileStorageServiceLookup {
   @Autowired(required = false)
   private S3StudyFileStorageService s3StudyFileStorageService;
 
+  @Autowired(required = false)
+  private LocalFileSystemStudyStorageService localFileSystemStudyStorageService;
+
   public Optional<StudyStorageService> lookup(StorageLocationType storageLocationType) {
     LOGGER.debug("Looking up StudyStorageService for storageLocationType: {}", storageLocationType);
     switch (storageLocationType) {
@@ -50,6 +53,8 @@ public class StudyFileStorageServiceLookup {
         return Optional.ofNullable(egnyteStudyStorageService);
       case AWS_S3:
         return Optional.ofNullable(s3StudyFileStorageService);
+      case LOCAL_FILE_SYSTEM:
+        return Optional.ofNullable(localFileSystemStudyStorageService);
       default:
         return Optional.empty();
     }

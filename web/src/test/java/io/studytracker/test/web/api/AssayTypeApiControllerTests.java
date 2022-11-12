@@ -135,6 +135,7 @@ public class AssayTypeApiControllerTests extends AbstractApiControllerTests {
     field.setType(CustomEntityFieldType.FLOAT);
     field.setDescription("This is a test");
     field.setRequired(true);
+    field.setFieldOrder(1);
     assayType.setFields(Set.of(field));
     AssayTypeTaskPayloadDto task = new AssayTypeTaskPayloadDto();
     task.setLabel("Test task");
@@ -200,6 +201,7 @@ public class AssayTypeApiControllerTests extends AbstractApiControllerTests {
     field.setType(CustomEntityFieldType.FLOAT);
     field.setDescription("This is a test");
     field.setRequired(true);
+    field.setFieldOrder(1);
     assayType.setFields(Set.of(field));
     AssayTypeTaskPayloadDto task = new AssayTypeTaskPayloadDto();
     task.setLabel("Test task");

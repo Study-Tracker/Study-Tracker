@@ -642,14 +642,14 @@ public class ExampleDataGenerator {
     List<AssayTypeField> fields =
         Arrays.asList(
             new AssayTypeField(
-                assayType, "No. Slides", "number_of_slides", CustomEntityFieldType.INTEGER, true),
-            new AssayTypeField(assayType, "Antibodies", "antibodies", CustomEntityFieldType.TEXT),
+                assayType, "No. Slides", "number_of_slides", CustomEntityFieldType.INTEGER, 1, true),
+            new AssayTypeField(assayType, "Antibodies", "antibodies", CustomEntityFieldType.TEXT, 2),
             new AssayTypeField(
-                assayType, "Concentration (ul/mg)", "concentration", CustomEntityFieldType.FLOAT),
-            new AssayTypeField(assayType, "Date", "date", CustomEntityFieldType.DATE),
+                assayType, "Concentration (ul/mg)", "concentration", CustomEntityFieldType.FLOAT, 3),
+            new AssayTypeField(assayType, "Date", "date", CustomEntityFieldType.DATE, 4),
             new AssayTypeField(
-                assayType, "External", "external", CustomEntityFieldType.BOOLEAN, true),
-            new AssayTypeField(assayType, "Stain", "stain", CustomEntityFieldType.STRING));
+                assayType, "External", "external", CustomEntityFieldType.BOOLEAN, 5, true),
+            new AssayTypeField(assayType, "Stain", "stain", CustomEntityFieldType.STRING, 6));
     assayTypeFieldRepository.saveAll(fields);
 
     AssayTypeTask task1 = new AssayTypeTask();
@@ -796,7 +796,7 @@ public class ExampleDataGenerator {
   }
 
   public void clearDatabase() {
-    LOGGER.info("Wiping collections...");
+    LOGGER.info("Wiping database...");
     studyCollectionRepository.deleteAll();
     passwordResetTokenRepository.deleteAll();
     externalLinkRepository.deleteAll();
