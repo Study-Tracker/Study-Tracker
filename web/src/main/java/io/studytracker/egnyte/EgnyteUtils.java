@@ -89,7 +89,7 @@ public class EgnyteUtils {
    * @param rootUrl the root URL of the Egnyte tenant
    * @param path the path to the file or folder
    * @param name the file or folder name
-   * @return
+   * @return the URL
    */
   private static String buildFileUrl(URL rootUrl, String path, String name) {
     if (name != null) {

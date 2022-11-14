@@ -27,7 +27,6 @@ import io.studytracker.integration.IntegrationType;
 import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.IntegrationInstance;
 import io.studytracker.repository.IntegrationInstanceRepository;
-import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import java.net.URL;
@@ -38,7 +37,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -47,18 +45,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"egnyte-test"})
 public class EgnyteDataFileManagementTests {
 
-  @Autowired
-  private Environment env;
-
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private EgnyteRestApiClient client;
 
   @Autowired
   private EgnyteApiDataFileStorageService storageService;
-
-  @Autowired
-  private StorageLocationService storageLocationService;
 
   @Autowired
   private IntegrationInstanceRepository integrationInstanceRepository;
@@ -75,9 +67,9 @@ public class EgnyteDataFileManagementTests {
 
   @Test
   public void getRootFolderTest() throws Exception {
-    String rootPath = options.getRootPath(); // env.getRequiredProperty("egnyte.root-path");
-    String token = options.getToken(); // env.getRequiredProperty("egnyte.api-token");
-    URL url = options.getRootUrl();  //new URL(env.getRequiredProperty("egnyte.root-url"));
+    String rootPath = options.getRootPath();
+    String token = options.getToken();
+    URL url = options.getRootUrl();
     EgnyteObject egnyteObject = client.findObjectByPath(url, rootPath, token);
     Assert.assertNotNull(egnyteObject);
     Assert.assertTrue(egnyteObject.isFolder());

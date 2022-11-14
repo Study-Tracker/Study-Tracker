@@ -139,7 +139,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       throw new InsufficientPrivilegesException("Insufficient privileges to create folder");
     }
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
-        .orElseThrow(() -> new FileStorageException("File storage service not found"));;
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
     StorageFolder storageFolder = storageService.createFolder(location, path, folderName);
     LOGGER.debug("Created folder: " + storageFolder.toString());
     return new ResponseEntity<>(storageFolder, HttpStatus.OK);
