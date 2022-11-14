@@ -21,7 +21,6 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.repository.FileStorageLocationRepository;
-import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.DataFileStorageServiceLookup;
 import io.studytracker.storage.StorageLocationType;
@@ -44,9 +43,6 @@ public class StorageLocationService {
   private FileStorageLocationRepository fileStorageLocationRepository;
 
   @Autowired
-  private FileStoreFolderRepository fileStoreFolderRepository;
-
-  @Autowired
   private DataFileStorageServiceLookup dataFileStorageServiceLookup;
 
   @Autowired
@@ -57,14 +53,26 @@ public class StorageLocationService {
   }
 
   public FileStorageLocation findDefaultStudyLocation() throws FileStorageException {
-    List<FileStorageLocation> locations = fileStorageLocationRepository.findByDefaultStudyLocation();
+    Optional<FileStorageLocation> optional = this.findDefaultStudyLocationByType(StorageLocationType.EGNYTE_API);
+    if (optional.isPresent()) return optional.get();
+    optional = this.findDefaultStudyLocationByType(StorageLocationType.LOCAL_FILE_SYSTEM);
+    if (optional.isPresent()) {
+      return optional.get();
+    } else {
+      throw new FileStorageException("Cannot find appropriate default study storage location.");
+    }
+  }
+
+  public Optional<FileStorageLocation> findDefaultStudyLocationByType(StorageLocationType type)
+      throws FileStorageException {
+    List<FileStorageLocation> locations = fileStorageLocationRepository.findByDefaultStudyLocationByType(type);
     if (locations.isEmpty()) {
-      throw new FileStorageException("No default study location has been set.");
+      return Optional.empty();
     } else if (locations.size() > 1) {
       throw new FileStorageException("Multiple default study locations have been set. Change the "
-          + "default study location to one location.");
+          + "default study location to one location per type.");
     } else {
-      return locations.get(0);
+      return Optional.of(locations.get(0));
     }
   }
 

@@ -48,9 +48,6 @@ public class EgnyteRestClientFileUploadTests {
 
   @Autowired private Environment env;
 
-  @Value("${egnyte.root-path}")
-  private String rootPath;
-
   @Value("${egnyte.root-url}")
   private String rootUrl;
 

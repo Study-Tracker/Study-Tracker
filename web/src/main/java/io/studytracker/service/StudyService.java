@@ -325,8 +325,8 @@ public class StudyService {
             .orElseThrow(() -> new RecordNotFoundException("Invalid S3 location ID: "
                 + options.getS3LocationId()));
         StudyStorageService s3Service = storageLocationService.lookupStudyStorageService(s3Location);
-        FileStoreFolder s3Folder = FileStoreFolder
-            .from(s3Location, s3Service.createFolder(s3Location, study));
+        StorageFolder storageFolder = s3Service.createFolder(s3Location, study);
+        FileStoreFolder s3Folder = FileStoreFolder.from(s3Location, storageFolder);
         study.addFileStoreFolder(s3Folder);
         studyRepository.save(study);
       } catch (StudyStorageException e) {

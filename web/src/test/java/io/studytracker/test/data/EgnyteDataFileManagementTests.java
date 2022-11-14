@@ -75,9 +75,9 @@ public class EgnyteDataFileManagementTests {
 
   @Test
   public void getRootFolderTest() throws Exception {
-    String rootPath = env.getRequiredProperty("egnyte.root-path");
-    String token = env.getRequiredProperty("egnyte.api-token");
-    URL url = new URL(env.getRequiredProperty("egnyte.root-url"));
+    String rootPath = options.getRootPath(); // env.getRequiredProperty("egnyte.root-path");
+    String token = options.getToken(); // env.getRequiredProperty("egnyte.api-token");
+    URL url = options.getRootUrl();  //new URL(env.getRequiredProperty("egnyte.root-url"));
     EgnyteObject egnyteObject = client.findObjectByPath(url, rootPath, token);
     Assert.assertNotNull(egnyteObject);
     Assert.assertTrue(egnyteObject.isFolder());
@@ -87,7 +87,7 @@ public class EgnyteDataFileManagementTests {
 
   @Test
   public void getFolderContentsTest() throws Exception {
-    String rootPath = env.getRequiredProperty("egnyte.root-path");
+    String rootPath = options.getRootPath();
     FileStorageLocation location = new FileStorageLocation();
     location.setRootFolderPath(rootPath);
     StorageFolder folder = storageService.findFolderByPath(location, rootPath);

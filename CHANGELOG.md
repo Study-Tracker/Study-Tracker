@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Changed the signature of the JWT created and returned to authenticated users to include creation and expiration times.
 - Updated program, study, and assay forms to make some features optional. Users can choose whether they want notebook and git resources created for them, rather than assuming they are required.
+- Updated the database schema to capture integration configuration parameters for external services that Study Tracker connects with. This will allow for admin users to connect services from within the application, without the need for back-end modifications and redeployment.
 
 ### Fixed
 - Fixed validation of Quill input fields to prevent empty inputs.

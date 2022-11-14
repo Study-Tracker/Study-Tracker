@@ -14,19 +14,41 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Col, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import FeatureToggleCard from "./FeatureToggleCard";
+import axios from "axios";
+import {S3_STORAGE_TYPE} from "../../config/storageConstants";
 
 const S3InputsCard = ({
     isActive,
     onChange,
-    selectedProgram,
-    selectedBucket
+    selectedProgram
 }) => {
 
   console.debug("Program: ", selectedProgram);
+  const [locations, setLocations] = useState([]);
+  const [error, setError] = useState(null);
+  const [selectedBucket, setSelectedBucket] = useState(null);
+
+  useEffect(() => {
+    axios.get("/api/internal/data-files/locations")
+    .then(response => {
+      const bucketLocations = response.data
+        .filter(location => location.active && location.type === S3_STORAGE_TYPE);
+      setLocations(bucketLocations);
+      const defaultLocation = bucketLocations.find(location => location.defaultStudyLocation === true);
+      if (!!defaultLocation) {
+        setSelectedBucket(defaultLocation);
+        onChange("s3LocationId", defaultLocation.id);
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      setError(error);
+    })
+  }, []);
 
   let bucketPath = selectedBucket || "";
   if (bucketPath && !bucketPath.endsWith("/")) {

@@ -16,6 +16,7 @@
 
 package io.studytracker.config.initialization;
 
+import io.studytracker.aws.integration.S3IntegrationV1;
 import io.studytracker.egnyte.integration.EgnyteIntegrationV1;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.integration.FileStorageLocationBuilder;
@@ -49,7 +50,8 @@ public class IntegrationInitializer {
 
   public static final List<IntegrationDefinition> INTEGRATION_DEFINITIONS = List.of(
       EgnyteIntegrationV1.getIntegrationDefinition(),
-      LocalFileSystemIntegrationV1.getIntegrationDefinition()
+      LocalFileSystemIntegrationV1.getIntegrationDefinition(),
+      S3IntegrationV1.getIntegrationDefinition()
   );
 
   @Autowired
@@ -67,6 +69,29 @@ public class IntegrationInitializer {
   @Autowired
   private IntegrationInstanceRepository integrationInstanceRepository;
 
+  private void registerIntegrationDefinitions() {
+    for (IntegrationDefinition integration : INTEGRATION_DEFINITIONS) {
+      Optional<IntegrationDefinition> integrationOptional = integrationDefinitionRepository
+          .findByTypeAndVersion(integration.getType(), integration.getVersion());
+
+      // Register new integration option
+      if (integrationOptional.isEmpty()) {
+        LOGGER.info("Initializing integration: {}", integration);
+        integrationDefinitionRepository.save(integration);
+      }
+
+      // Update existing option, if necessary
+      else {
+        IntegrationDefinition existingIntegration = integrationOptional.get();
+        if (existingIntegration.isActive() != integration.isActive()) {
+          LOGGER.info("Updating integration: {}", integration);
+          existingIntegration.setActive(integration.isActive());
+          integrationDefinitionRepository.save(existingIntegration);
+        }
+      }
+    }
+  }
+
   @PostConstruct
   @Transactional
   public void initializeIntegrations() throws InvalidConfigurationException {
@@ -74,26 +99,7 @@ public class IntegrationInitializer {
     try {
 
       // Register integration definitiions
-      for (IntegrationDefinition integration : INTEGRATION_DEFINITIONS) {
-        Optional<IntegrationDefinition> integrationOptional = integrationDefinitionRepository
-            .findByTypeAndVersion(integration.getType(), integration.getVersion());
-
-        // Register new integration option
-        if (integrationOptional.isEmpty()) {
-          LOGGER.info("Initializing integration: {}", integration);
-          integrationDefinitionRepository.save(integration);
-        }
-
-        // Update existing option, if necessary
-        else {
-          IntegrationDefinition existingIntegration = integrationOptional.get();
-          if (existingIntegration.isActive() != integration.isActive()) {
-            LOGGER.info("Updating integration: {}", integration);
-            existingIntegration.setActive(integration.isActive());
-            integrationDefinitionRepository.save(existingIntegration);
-          }
-        }
-      }
+      registerIntegrationDefinitions();
 
       // Register integration instances for legacy configurations
       FileStorageLocation defaultLocation = null;
@@ -205,6 +211,64 @@ public class IntegrationInitializer {
           LOGGER.info("Local file system integration instance already exists");
         }
 
+      }
+
+      //// AWS S3
+      if (env.containsProperty("aws.region") && env.containsProperty("aws.s3.buckets")) {
+
+        // Check to see if instance is registered
+        List<IntegrationInstance> awsS3Instances = integrationInstanceRepository
+            .findByIntegrationType(IntegrationType.AWS_S3);
+
+        String defaultStudyBucket = null;
+        String defaultBucketPath = null;
+        if (env.containsProperty("aws.s3.default-study-location")) {
+          String[] bits = env.getRequiredProperty("aws.s3.default-study-location")
+              .trim()
+              .replace("s3://", "")
+              .split("/", 2);
+          defaultStudyBucket = bits[0];
+          defaultBucketPath = bits.length > 1 ? bits[1] : "";
+        }
+
+        if (awsS3Instances.isEmpty()) {
+
+          // Register the integration instance
+          IntegrationDefinition s3Definition = integrationDefinitionRepository
+              .findLatestByType(IntegrationType.AWS_S3)
+              .orElseThrow(() -> new InvalidConfigurationException(
+                  "Could not find a suitable AWS S3 integration to initialize legacy storage location"));
+
+          for (String bucket: env.getRequiredProperty("aws.s3.buckets").split(",")) {
+
+            String bucketName = bucket.trim().replace("s3://", "");
+            IntegrationInstanceBuilder builder = new IntegrationInstanceBuilder()
+                .name("aws-s3-" + bucketName)
+                .displayName("AWS S3: " + bucketName)
+                .integrationDefinition(s3Definition)
+                .active(true)
+                .configurationValue(S3IntegrationV1.REGION, env.getRequiredProperty("aws.region"))
+                .configurationValue(S3IntegrationV1.BUCKET_NAME, bucketName);
+            IntegrationInstance s3Instance = integrationInstanceRepository.save(builder.build());
+
+            if (defaultStudyBucket != null && defaultStudyBucket.equals(bucketName)) {
+              FileStorageLocationBuilder locationBuilder = new FileStorageLocationBuilder()
+                  .integrationInstance(s3Instance)
+                  .type(StorageLocationType.AWS_S3)
+                  .displayName("AWS S3 Study Storage")
+                  .name("aws-s3-default-study-storage")
+                  .permissions(StoragePermissions.READ_WRITE)
+                  .rootFolderPath(defaultBucketPath)
+                  .defaultStudyLocation(true)
+                  .defaultDataLocation(false);
+              fileStorageLocationRepository.save(locationBuilder.build());
+            }
+
+          }
+
+        } else {
+          LOGGER.info("AWS S3 integration instance already exists");
+        }
       }
 
       // Update existing folder records

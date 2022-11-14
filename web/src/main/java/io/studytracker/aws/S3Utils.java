@@ -109,4 +109,8 @@ public class S3Utils {
     return builder.toString();
   }
 
+  public static String getBucketNameFromPath(String path) {
+    return path.trim().replace("s3://", "").split("/")[0];
+  }
+
 }

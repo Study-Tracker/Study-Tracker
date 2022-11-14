@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -66,9 +65,6 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   @Autowired
   private StorageLocationService storageLocationService;
 
-  @Autowired
-  private Environment environment;
-
   @GetMapping("/locations")
   public List<FileStorageLocation> getFileStorageLocations() {
     return storageLocationService.findAll().stream()
@@ -81,7 +77,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       @RequestParam(name = "path") String path,
       @RequestParam(name = "locationId") Long locationId
   ) throws FileStorageException {
-    LOGGER.debug("Getting data storage folder");
+    LOGGER.debug("Getting data storage folder: {}: {}", locationId, path);
     FileStorageLocation location = storageLocationService.findById(locationId)
         .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
     if (path == null) path = location.getRootFolderPath();
@@ -123,7 +119,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
 
     // Upload to the cloud service
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
-        .orElseThrow(() -> new FileStorageException("File storage service not found"));;
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
     StorageFile storageFile = storageService.saveFile(location, path, localPath.toFile());
     LOGGER.debug("Uploaded file: " + storageFile.toString());
     return new ResponseEntity<>(storageFile, HttpStatus.OK);

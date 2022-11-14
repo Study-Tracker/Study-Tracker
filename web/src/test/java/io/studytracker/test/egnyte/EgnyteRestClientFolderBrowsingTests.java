@@ -49,9 +49,6 @@ public class EgnyteRestClientFolderBrowsingTests {
   @Autowired
   private EgnyteRestApiClient client;
 
-  @Value("${egnyte.root-path}")
-  private String rootPath;
-
   @Value("${egnyte.root-url}")
   private String rootUrl;
 

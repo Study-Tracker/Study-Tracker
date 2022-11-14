@@ -446,7 +446,6 @@ const StudyForm = ({
                             onChange={(key, value) => setFieldValue(key, value)}
                             isActive={values.useS3}
                             selectedProgram={values.program}
-                            selectedBucket={features.aws.defaultS3StudyLocation || 'n/a'}
                         />
                     ) : ''
 

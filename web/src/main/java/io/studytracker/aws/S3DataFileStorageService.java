@@ -16,6 +16,8 @@
 
 package io.studytracker.aws;
 
+import io.studytracker.aws.integration.S3IntegrationOptions;
+import io.studytracker.aws.integration.S3IntegrationOptionsFactory;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.model.FileStorageLocation;
 import io.studytracker.storage.DataFileStorageService;
@@ -56,7 +58,8 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     LOGGER.debug("Looking up folder by path: {}", path);
 
     // Get the bucket
-    String bucketName = location.getName();
+    S3IntegrationOptions options = S3IntegrationOptionsFactory.create(location.getIntegrationInstance());
+    String bucketName = options.getBucketName();
     LOGGER.debug("Using bucket: {}", bucketName);
 
     // Clean the path input
@@ -89,7 +92,8 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     LOGGER.debug("Looking up file by path: {}", path);
 
     // Get the bucket
-    String bucketName = location.getName();
+    S3IntegrationOptions options = S3IntegrationOptionsFactory.create(location.getIntegrationInstance());
+    String bucketName = options.getBucketName();
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
@@ -120,7 +124,8 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     try {
 
       // Get the bucket
-      String bucketName = location.getName();
+      S3IntegrationOptions options = S3IntegrationOptionsFactory.create(location.getIntegrationInstance());
+      String bucketName = options.getBucketName();
 
       if (!StoragePermissions.canWrite(location.getPermissions())) {
         throw new InsufficientPrivilegesException("Insufficient privileges to create folder: " + fullPath);
@@ -145,7 +150,8 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     LOGGER.info("Uploading file: {} to path: {} in bucket: {}", file.getName(), path, location.getName());
 
     // Get the bucket
-    String bucketName = location.getName();
+    S3IntegrationOptions options = S3IntegrationOptionsFactory.create(location.getIntegrationInstance());
+    String bucketName = options.getBucketName();
 
     // Check permissions
     if (!StoragePermissions.canWrite(location.getPermissions())) {
@@ -173,7 +179,8 @@ public class S3DataFileStorageService  implements DataFileStorageService {
   public Resource fetchFile(FileStorageLocation location, String path) throws StudyStorageException {
 
     // Get the bucket
-    String bucketName = location.getName();
+    S3IntegrationOptions options = S3IntegrationOptionsFactory.create(location.getIntegrationInstance());
+    String bucketName = options.getBucketName();
 
     try {
       return new ByteArrayResource(
