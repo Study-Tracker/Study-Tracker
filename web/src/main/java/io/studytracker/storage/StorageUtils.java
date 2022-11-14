@@ -16,7 +16,6 @@
 
 package io.studytracker.storage;
 
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class StorageUtils {
@@ -50,16 +49,6 @@ public class StorageUtils {
     String slug1 = String.join("/", (Arrays.asList(path1.toLowerCase().split("/"))));
     String slug2 = String.join("/", (Arrays.asList(path2.toLowerCase().split("/"))));
     return slug1.equals(slug2);
-  }
-
-  /**
-   * Gets the name of the file or folder at the end of the path.
-   *
-   * @param path the path
-   * @return the name of the file or folder
-   */
-  public static String getFileName(String path) {
-    return Paths.get(path).getFileName().toString();
   }
 
 }

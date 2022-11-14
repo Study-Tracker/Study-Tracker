@@ -28,10 +28,10 @@ import io.studytracker.storage.DataFileStorageServiceLookup;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StoragePermissions;
-import io.studytracker.storage.StorageUtils;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,7 +158,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     ByteArrayResource resource = (ByteArrayResource) storageService.fetchFile(location, path);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentDisposition(ContentDisposition.builder("attachment")
-        .filename(StorageUtils.getFileName(path))
+        .filename(FilenameUtils.getName(path))
         .build());
     return ResponseEntity.ok()
         .headers(headers)
