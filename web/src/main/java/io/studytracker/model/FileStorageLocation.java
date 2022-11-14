@@ -29,6 +29,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -46,6 +49,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "file_storage_locations")
 @EntityListeners(AuditingEntityListener.class)
+@NamedEntityGraphs({
+    @NamedEntityGraph(name = "FileStorageLocation.details",
+        attributeNodes = {
+            @NamedAttributeNode("integrationInstance")
+        })
+})
 public class FileStorageLocation implements Model {
 
   @Id

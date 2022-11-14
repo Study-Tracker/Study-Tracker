@@ -38,6 +38,7 @@ public class DefaultController {
       "/admin/**",
       "/search/**",
       "/file-manager/**",
+      "/assaytypes/**",
   })
   public String home() {
     return "index";

@@ -33,7 +33,7 @@ const S3InputsCard = ({
   const [selectedBucket, setSelectedBucket] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/internal/data-files/locations")
+    axios.get("/api/internal/storage-locations")
     .then(response => {
       const bucketLocations = response.data
         .filter(location => location.active && location.type === S3_STORAGE_TYPE);
@@ -50,8 +50,9 @@ const S3InputsCard = ({
     })
   }, []);
 
-  let bucketPath = selectedBucket || "";
-  if (bucketPath && !bucketPath.endsWith("/")) {
+  console.debug("Selected Bucket", selectedBucket);
+  let bucketPath = selectedBucket ? selectedBucket.name + "/" + selectedBucket.rootFolderPath : "";
+  if (!!bucketPath && !bucketPath.endsWith("/")) {
     bucketPath += "/";
   }
   if (selectedProgram) {

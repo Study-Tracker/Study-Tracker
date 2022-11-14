@@ -109,13 +109,13 @@ public class StorageLocationService {
   public FileStorageLocation update(FileStorageLocation location) {
     FileStorageLocation f = fileStorageLocationRepository.getById(location.getId());
     f.setName(location.getName());
+    f.setDisplayName(location.getDisplayName());
     f.setRootFolderPath(location.getRootFolderPath());
     f.setPermissions(location.getPermissions());
     f.setDefaultDataLocation(location.isDefaultDataLocation());
     f.setDefaultStudyLocation(location.isDefaultStudyLocation());
     f.setReferenceId(location.getReferenceId());
     f.setUrl(location.getUrl());
-    f.setDisplayName(location.getDisplayName());
     f.setActive(location.isActive());
     return fileStorageLocationRepository.save(f);
   }

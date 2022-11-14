@@ -16,24 +16,30 @@
 
 package io.studytracker.mapstruct.dto.response;
 
-import io.studytracker.storage.StorageLocationType;
-import io.studytracker.storage.StoragePermissions;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Data;
 
 @Data
-public class FileStorageLocationDto {
+public class IntegrationInstanceDetailsDto {
 
   private Long id;
-  private IntegrationInstanceDto integrationInstance;
-  private StorageLocationType type;
+
+  private Object definition;
+
   private String displayName;
+
   private String name;
-  private String rootFolderPath;
-  private String referenceId;
-  private String url;
-  private StoragePermissions permissions;
-  private boolean defaultStudyLocation;
-  private boolean defaultDataLocation;
+
   private boolean active;
+
+  private Date createdAt;
+
+  private Date updatedAt;
+
+  @JsonIgnore
+  private Set<IntegrationInstanceConfigurationValueDetailsDto> configurationValues = new HashSet<>();
 
 }

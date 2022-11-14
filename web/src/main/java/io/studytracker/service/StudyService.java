@@ -154,21 +154,22 @@ public class StudyService {
    * @return storage folder record
    */
   private FileStoreFolder createDefaultStudyStorageFolder(Study study) {
-    FileStoreFolder folder = null;
     try {
       FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
       StudyStorageService storageService = storageLocationService.lookupStudyStorageService(location);
       StorageFolder storageFolder = storageService.createFolder(location, study);
-      folder = new FileStoreFolder();
+      FileStoreFolder folder = new FileStoreFolder();
       folder.setFileStorageLocation(location);
       folder.setName(storageFolder.getName());
       folder.setPath(storageFolder.getPath());
       folder.setUrl(storageFolder.getUrl());
+      folder.setReferenceId(storageFolder.getFolderId());
+      return fileStoreFolderRepository.save(folder);
     } catch (Exception e) {
       e.printStackTrace();
       LOGGER.warn("Failed to create storage folder for study: " + study.getCode());
+      return null;
     }
-    return folder;
   }
 
   /**
@@ -326,7 +327,8 @@ public class StudyService {
                 + options.getS3LocationId()));
         StudyStorageService s3Service = storageLocationService.lookupStudyStorageService(s3Location);
         StorageFolder storageFolder = s3Service.createFolder(s3Location, study);
-        FileStoreFolder s3Folder = FileStoreFolder.from(s3Location, storageFolder);
+        FileStoreFolder s3Folder = fileStoreFolderRepository
+            .save(FileStoreFolder.from(s3Location, storageFolder));
         study.addFileStoreFolder(s3Folder);
         studyRepository.save(study);
       } catch (StudyStorageException e) {
