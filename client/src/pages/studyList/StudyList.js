@@ -148,10 +148,10 @@ const columns = [
     csvExport: false,
     formatter: (c, d) => {
       let links = [];
-      if (!!d.storageFolder) {
+      if (!!d.primaryStorageFolder) {
         links.push(
             <a key={'files-links-' + d.id} target="_blank" rel="noopener noreferrer"
-               href={d.storageFolder.url}>Files</a>
+               href={d.primaryStorageFolder.url}>Files</a>
         )
       }
       if (!!d.notebookFolder) {

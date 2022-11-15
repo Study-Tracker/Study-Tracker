@@ -178,10 +178,10 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
 
     Program program = programRepository.findByName("Program X")
         .orElseThrow(RecordNotFoundException::new);
-    Assert.assertNotNull(program.getStorageFolder());
-    System.out.println(program.getStorageFolder().getPath());
-    System.out.println(program.getStorageFolder().getName());
-    System.out.println(program.getStorageFolder().getId());
+    Assert.assertNotNull(program.getPrimaryStorageFolder());
+    System.out.println(program.getPrimaryStorageFolder().getPath());
+    System.out.println(program.getPrimaryStorageFolder().getName());
+    System.out.println(program.getPrimaryStorageFolder().getId());
 
   }
 

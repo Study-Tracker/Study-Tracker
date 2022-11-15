@@ -56,7 +56,8 @@ const AssayTypeFieldInputs = props => {
         fieldName: "",
         type: "STRING",
         description: "",
-        required: false
+        required: false,
+        fieldOrder: fields.length + 1
       }
     ];
     setFields(newField);

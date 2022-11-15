@@ -16,13 +16,13 @@
 
 package io.studytracker.service;
 
-import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.DuplicateRecordException;
+import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -30,6 +30,7 @@ import io.studytracker.git.GitRepository;
 import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
@@ -69,8 +70,6 @@ public class StudyService {
 
   private ProgramRepository programRepository;
 
-  private StudyStorageService studyStorageService;
-
   private NotebookEntryService notebookEntryService;
 
   private NotebookFolderService notebookFolderService;
@@ -83,7 +82,7 @@ public class StudyService {
 
   private GitService gitService;
 
-  private S3StudyFileStorageService s3StudyFileStorageService;
+  private StorageLocationService storageLocationService;
 
   /**
    * Finds a single study, identified by its primary key ID
@@ -154,16 +153,24 @@ public class StudyService {
    * @param study study object
    * @return storage folder record
    */
-  private StorageFolder createStudyStorageFolder(Study study) {
-    StorageFolder folder = null;
+  private FileStoreFolder createDefaultStudyStorageFolder(Study study) {
     try {
-      studyStorageService.createStudyFolder(study);
-      folder = studyStorageService.getStudyFolder(study);
+      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
+      StudyStorageService storageService = storageLocationService.lookupStudyStorageService(location);
+      StorageFolder storageFolder = storageService.createFolder(location, study);
+      FileStoreFolder folder = new FileStoreFolder();
+      folder.setFileStorageLocation(location);
+      folder.setName(storageFolder.getName());
+      folder.setPath(storageFolder.getPath());
+      folder.setUrl(storageFolder.getUrl());
+      folder.setReferenceId(storageFolder.getFolderId());
+      return folder;
+//      return fileStoreFolderRepository.save(folder);
     } catch (Exception e) {
       e.printStackTrace();
       LOGGER.warn("Failed to create storage folder for study: " + study.getCode());
+      return null;
     }
-    return folder;
   }
 
   /**
@@ -254,7 +261,9 @@ public class StudyService {
                     new RecordNotFoundException("Invalid program: " + study.getProgram().getId()));
 
     // Create the study storage folder
-    study.setStorageFolder(FileStoreFolder.from(this.createStudyStorageFolder(study)));
+    FileStoreFolder folder = this.createDefaultStudyStorageFolder(study);
+    study.setPrimaryStorageFolder(folder);
+    study.addFileStoreFolder(folder);
 
     // Create the ELN folder
     NotebookEntry studySummaryEntry = null;
@@ -311,10 +320,18 @@ public class StudyService {
     }
 
     // S3 folder
-    if (options.isUseS3() && s3StudyFileStorageService != null) {
+    if (options.isUseS3() && options.getS3LocationId() != null) {
       LOGGER.debug("Creating S3 folder for study: " + study.getCode());
       try {
-        s3StudyFileStorageService.createStorageFolder(study);
+        FileStorageLocation s3Location = storageLocationService.findById(options.getS3LocationId())
+            .orElseThrow(() -> new RecordNotFoundException("Invalid S3 location ID: "
+                + options.getS3LocationId()));
+        StudyStorageService s3Service = storageLocationService.lookupStudyStorageService(s3Location);
+        StorageFolder storageFolder = s3Service.createFolder(s3Location, study);
+        FileStoreFolder s3Folder = fileStoreFolderRepository
+            .save(FileStoreFolder.from(s3Location, storageFolder));
+        study.addFileStoreFolder(s3Folder);
+        studyRepository.save(study);
       } catch (StudyStorageException e) {
         e.printStackTrace();
         LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
@@ -488,42 +505,55 @@ public class StudyService {
   @Transactional
   public void repairStorageFolder(Study study) {
 
+    // Get the location and storage service
+    FileStorageLocation location;
+    StudyStorageService studyStorageService;
+    try {
+      location = storageLocationService.findDefaultStudyLocation();
+      studyStorageService = storageLocationService.lookupStudyStorageService(location);
+    } catch (FileStorageException e) {
+      e.printStackTrace();
+      throw new StudyTrackerException("Could not find default storage location or service", e);
+    }
+
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = studyStorageService.getStudyFolder(study, false);
+      folder = studyStorageService.findFolder(location, study);
     } catch (StudyStorageNotFoundException e) {
       LOGGER.warn("Storage folder not found for study: " + study.getCode());
-      try {
-        folder = studyStorageService.createStudyFolder(study);
-      } catch (Exception ex) {
-        throw new StudyTrackerException(ex);
-      }
+      e.printStackTrace();
+      throw new StudyTrackerException(e);
     }
 
     // Check if a folder record exists in the database
-    List<FileStoreFolder> folders = fileStoreFolderRepository.findByPath(folder.getPath());
-    FileStoreFolder dbFolder = null;
+    List<FileStoreFolder> folders = fileStoreFolderRepository
+        .findByPath(location.getId(), folder.getPath());
+    FileStoreFolder fileStoreFolder = null;
     if (!folders.isEmpty()) {
-      dbFolder = folders.get(0);
+      fileStoreFolder = folders.get(0);
     }
 
     // Study has no folder record associated
-    if (study.getStorageFolder() == null) {
-      if (dbFolder != null) {
-        LOGGER.info("Repairing study folder missing association.");
-        study.setStorageFolder(dbFolder);
-      } else {
+    if (study.getPrimaryStorageFolder() == null) {
+      if (fileStoreFolder == null) {
         LOGGER.info("Repairing study folder with no record.");
-        study.setStorageFolder(FileStoreFolder.from(folder));
+        fileStoreFolder = FileStoreFolder.from(location, folder);
+      }
+      study.setPrimaryStorageFolder(fileStoreFolder);
+      if (study.getStorageFolders().stream().noneMatch(f -> (
+          f.getFileStorageLocation().getId().equals(location.getId())
+              && f.getPath().equals(folder.getPath())))) {
+        study.getStorageFolders().add(fileStoreFolder);
       }
       studyRepository.save(study);
     }
 
-    // Assay does have a folder record, but it is malformed
+    // Study does have a folder record, but it is malformed
     else {
       LOGGER.info("Repairing malformed study folder record.");
-      FileStoreFolder f = fileStoreFolderRepository.getById(study.getStorageFolder().getId());
+      FileStoreFolder f = fileStoreFolderRepository.getById(study.getPrimaryStorageFolder().getId());
+      f.setFileStorageLocation(location);
       f.setName(folder.getName());
       f.setPath(folder.getPath());
       f.setUrl(folder.getUrl());
@@ -572,8 +602,9 @@ public class StudyService {
   }
 
   @Autowired
-  public void setStudyStorageService(StudyStorageService studyStorageService) {
-    this.studyStorageService = studyStorageService;
+  public void setStorageLocationService(
+      StorageLocationService storageLocationService) {
+    this.storageLocationService = storageLocationService;
   }
 
   @Autowired(required = false)
@@ -606,9 +637,4 @@ public class StudyService {
     this.gitService = gitService;
   }
 
-  @Autowired(required = false)
-  public void setS3StudyFileStorageService(
-      S3StudyFileStorageService s3StudyFileStorageService) {
-    this.s3StudyFileStorageService = s3StudyFileStorageService;
-  }
 }

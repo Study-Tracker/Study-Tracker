@@ -16,20 +16,25 @@
 
 package io.studytracker.repository;
 
-import io.studytracker.model.NotebookEntryTemplate;
+import io.studytracker.integration.IntegrationType;
+import io.studytracker.model.IntegrationInstance;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-@Deprecated
-public interface NotebookEntryTemplateRepository
-    extends JpaRepository<NotebookEntryTemplate, Long> {
+public interface IntegrationInstanceRepository extends JpaRepository<IntegrationInstance, Long> {
 
-  @Override
-  @EntityGraph("entry-template-details")
-  Optional<NotebookEntryTemplate> findById(Long id);
+  List<IntegrationInstance> findByActive(Boolean active);
 
-  @Query("select t from NotebookEntryTemplate t where t.isDefault = true and t.category = ?1")
-  Optional<NotebookEntryTemplate> findDefaultByCategory(NotebookEntryTemplate.Category category);
+  Optional<IntegrationInstance> findByName(String name);
+
+  Optional<IntegrationInstance> findByDisplayName(String displayName);
+
+  @Query("select i from IntegrationInstance i where i.definition.id = ?1")
+  List<IntegrationInstance> findByIntegrationDefinitionId(Long integrationDefinitionId);
+
+  @Query("select i from IntegrationInstance  i where i.definition.type = ?1")
+  List<IntegrationInstance> findByIntegrationType(IntegrationType type);
+
 }

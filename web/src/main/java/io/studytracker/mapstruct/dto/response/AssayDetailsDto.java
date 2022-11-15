@@ -40,7 +40,7 @@ public class AssayDetailsDto {
   private Date startDate;
   private Date endDate;
   private NotebookFolderDetailsDto notebookFolder;
-  private FileStoreFolderDetailsDto storageFolder;
+  private FileStoreFolderDetailsDto primaryStorageFolder;
   private boolean active = true;
   private Date createdAt;
   private Date updatedAt;
@@ -48,4 +48,5 @@ public class AssayDetailsDto {
   private Map<String, Object> fields = new LinkedHashMap<>();
   private Map<String, String> attributes = new HashMap<>();
   private Set<AssayTaskDetailsDto> tasks = new HashSet<>();
+  private Set<FileStoreFolderDetailsDto> storageFolders = new HashSet<>();
 }

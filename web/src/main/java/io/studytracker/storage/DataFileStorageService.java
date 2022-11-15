@@ -22,6 +22,12 @@ import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
 import org.springframework.core.io.Resource;
 
+/**
+ * Storage service for storing files using local file system or integrated storage service.
+ *
+ * @author Will Oemler
+ * @since 0.7.1
+ */
 public interface DataFileStorageService {
 
   /**
@@ -65,7 +71,7 @@ public interface DataFileStorageService {
    * @return the uploaded file object
    * @throws StudyStorageException if the file cannot be uploaded
    */
-  StorageFile uploadFile(FileStorageLocation location, String path, File file) throws StudyStorageException;
+  StorageFile saveFile(FileStorageLocation location, String path, File file) throws StudyStorageException;
 
   /**
    * Downloads the file at the provided path.
@@ -75,6 +81,6 @@ public interface DataFileStorageService {
    * @return the downloaded file byte stream
    * @throws StudyStorageException if the file cannot be downloaded
    */
-  Resource downloadFile(FileStorageLocation location, String path) throws StudyStorageException;
+  Resource fetchFile(FileStorageLocation location, String path) throws StudyStorageException;
 
 }

@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.integration;
 
-import io.studytracker.model.NotebookEntryTemplate;
-import lombok.Data;
+import io.studytracker.model.IntegrationDefinition;
+import io.studytracker.model.IntegrationInstanceConfigurationValue;
+import java.util.Set;
 
-@Data
-public class NotebookEntryTemplateSlimDto {
+public interface IntegrationOptions {
 
-  private Long id;
-  private String name;
-  private String templateId;
-  private boolean active;
-  private NotebookEntryTemplate.Category category;
-  private boolean isDefault;
+  IntegrationDefinition getDefinition();
+
+  String getDisplayName();
+
+  String getName();
+
+  boolean isActive();
+
+  Set<IntegrationInstanceConfigurationValue> getConfigurationValues();
+
 }

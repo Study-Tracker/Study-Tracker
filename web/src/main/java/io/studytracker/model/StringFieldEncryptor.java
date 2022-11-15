@@ -35,11 +35,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Converter
-public class FieldEncryptor implements AttributeConverter<String, String>, InitializingBean {
+public class StringFieldEncryptor implements AttributeConverter<String, String>, InitializingBean {
 
   private static final String AES = "AES";
 
-  @Value("${application.secret:study-tracker}")
+  @Value("${application.secret}")
   public String secret;
 
   private Key key;

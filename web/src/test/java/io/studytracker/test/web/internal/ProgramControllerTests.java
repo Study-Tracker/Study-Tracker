@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
@@ -173,14 +174,19 @@ public class ProgramControllerTests {
         .andExpect(jsonPath("$", hasKey("active")))
         .andExpect(jsonPath("$.active", is(true)));
 
-    program.setActive(false);
+    ProgramFormDto dto = new ProgramFormDto();
+    dto.setId(program.getId());
+    dto.setName(program.getName());
+    dto.setCode(program.getCode());
+    dto.setDescription(program.getDescription());
+    dto.setActive(false);
 
     mockMvc
         .perform(
             put("/api/internal/program/" + program.getId())
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
+                .content(objectMapper.writeValueAsBytes(dto)))
         .andExpect(status().isOk());
   }
 

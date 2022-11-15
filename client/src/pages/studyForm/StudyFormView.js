@@ -47,6 +47,7 @@ const StudyFormView = () => {
         programsLoaded: true
       }));
     }).catch(error => {
+      console.error(error);
       setState(prevState => ({
         ...prevState,
         isError: true,
@@ -71,6 +72,7 @@ const StudyFormView = () => {
         keywordCategoriesLoaded: true
       }))
     }).catch(error => {
+      console.error(error);
       setState(prevState => ({
         ...prevState,
         isError: true,
@@ -90,6 +92,7 @@ const StudyFormView = () => {
         }));
       })
       .catch(error => {
+        console.error(error);
         setState(prevState => ({
           ...prevState,
           isError: true,
@@ -102,6 +105,7 @@ const StudyFormView = () => {
         studyLoaded: true
       }))
     }
+
   }, []);
 
 

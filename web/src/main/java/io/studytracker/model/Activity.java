@@ -178,4 +178,41 @@ public class Activity implements Model {
   public void removeData(String key) {
     this.data.remove(key);
   }
+
+  public static Builder builder(EventType type, User user  ) {
+    return new Builder(type, user);
+  }
+
+  public static class Builder {
+    private final Activity activity;
+
+    public Builder(EventType type, User user) {
+      this.activity = new Activity(type, user);
+    }
+
+    public Builder withProgram(Program program) {
+      this.activity.setProgram(program);
+      return this;
+    }
+
+    public Builder withStudy(Study study) {
+      this.activity.setStudy(study);
+      return this;
+    }
+
+    public Builder withAssay(Assay assay) {
+      this.activity.setAssay(assay);
+      return this;
+    }
+
+    public Builder addData(String key, Object value) {
+      this.activity.addData(key, value);
+      return this;
+    }
+
+    public Activity build() {
+      return this.activity;
+    }
+  }
+
 }

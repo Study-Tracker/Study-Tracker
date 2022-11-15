@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package io.studytracker.model;
+package io.studytracker.mapstruct.dto.response;
 
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import io.studytracker.storage.StorageLocationType;
+import io.studytracker.storage.StoragePermissions;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 @Data
-public class SupportedIntegration implements Model {
+public class FileStorageLocationDetailsDto {
 
-  @Id
   private Long id;
-
+  private IntegrationInstanceDetailsDto integrationInstance;
+  private StorageLocationType type;
+  private String displayName;
   private String name;
-
-  private boolean active = true;
-
-  private Integer version;
-
-  private Map<String, Object> configurationSchema = new LinkedHashMap<>();
+  private String rootFolderPath;
+  private String referenceId;
+  private String url;
+  private StoragePermissions permissions;
+  private boolean defaultStudyLocation;
+  private boolean defaultDataLocation;
+  private boolean active;
 
 }

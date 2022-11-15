@@ -14,23 +14,5 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
 
-import io.studytracker.model.NotebookEntryTemplate;
-import java.util.Date;
-import lombok.Data;
-
-@Data
-public class NotebookEntryTemplateDetailsDto {
-
-  private Long id;
-  private String name;
-  private String templateId;
-  private UserSlimDto createdBy;
-  private UserSlimDto lastModifiedBy;
-  private Date createdAt;
-  private Date updatedAt;
-  private boolean active;
-  private NotebookEntryTemplate.Category category;
-  private boolean isDefault;
-}
+export const S3_STORAGE_TYPE = 'AWS_S3';

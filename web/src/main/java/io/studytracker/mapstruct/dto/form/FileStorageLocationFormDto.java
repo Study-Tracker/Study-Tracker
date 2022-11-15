@@ -16,23 +16,26 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.studytracker.model.NotebookEntryTemplate;
+import io.studytracker.storage.StorageLocationType;
+import io.studytracker.storage.StoragePermissions;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class NotebookEntryTemplateFormDto {
+public class FileStorageLocationFormDto {
 
   private Long id;
-  private @NotNull(message = "Template name must not be empty") String name;
-  private @NotNull(message = "Template id must not be empty") String templateId;
-  //  private UserSlimDto createdBy;
-  //  private UserSlimDto lastModifiedBy;
-  //  private Date createdAt;
-  //  private Date updatedAt;
+  private @NotNull Long integrationInstanceId;
+  private StorageLocationType type;
+  private @NotEmpty String displayName;
+  private @NotEmpty String name;
+  private String rootFolderPath;
+  private String referenceId;
+  private String url;
+  private @NotNull StoragePermissions permissions;
+  private boolean defaultStudyLocation = false;
+  private boolean defaultDataLocation = false;
   private boolean active = true;
-  private NotebookEntryTemplate.Category category;
-  private boolean isDefault = false;
+
 }

@@ -21,6 +21,7 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -30,7 +31,8 @@ import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
-import io.studytracker.storage.LocalFileSystemStudyStorageService;
+import io.studytracker.service.StorageLocationService;
+import io.studytracker.storage.LocalFileSystemStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
@@ -58,7 +60,7 @@ public class LocalStorageStudyStorageServiceTests {
 
   private static final Resource TEST_FILE = new ClassPathResource("test.txt");
 
-  @Autowired private LocalFileSystemStudyStorageService storageService;
+  @Autowired private LocalFileSystemStorageService storageService;
 
   @Autowired private StudyRepository studyRepository;
 
@@ -73,6 +75,9 @@ public class LocalStorageStudyStorageServiceTests {
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
+
+  @Autowired
+  private StorageLocationService storageLocationService;
 
   @Before
   public void doBefore() {
@@ -105,10 +110,11 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
 
+    FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createStudyFolder(study);
+      folder = storageService.createFolder(location, study);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -119,7 +125,7 @@ public class LocalStorageStudyStorageServiceTests {
       Assert.assertTrue(exception instanceof StudyStorageDuplicateException);
     } else {
       Assert.assertNotNull(folder);
-      StorageFolder studyFolder = storageService.getStudyFolder(study);
+      StorageFolder studyFolder = storageService.findFolder(location, study);
       Assert.assertNotNull(studyFolder);
       Assert.assertEquals(folder.getPath(), studyFolder.getPath());
     }
@@ -127,7 +133,7 @@ public class LocalStorageStudyStorageServiceTests {
     exception = null;
     StorageFile file = null;
     try {
-      file = storageService.saveStudyFile(TEST_FILE.getFile(), study);
+      file = storageService.saveFile(location, TEST_FILE.getFile(), study);
     } catch (Exception e) {
       exception = e;
     }
@@ -137,7 +143,7 @@ public class LocalStorageStudyStorageServiceTests {
   }
 
   @Test
-  public void getInvalidStudyFolderTest() {
+  public void getInvalidStudyFolderTest() throws Exception {
     Program program =
         programRepository
             .findByName("Clinical Program A")
@@ -149,10 +155,11 @@ public class LocalStorageStudyStorageServiceTests {
     study.setOwner(user);
     study.setCode("BAD-STUDY");
 
+    FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.getStudyFolder(study);
+      folder = storageService.findFolder(location, study);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -190,7 +197,9 @@ public class LocalStorageStudyStorageServiceTests {
     studyRepository.save(study);
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
-    storageService.createStudyFolder(study);
+
+    FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
+    storageService.createFolder(location, study);
 
     Assay assay = new Assay();
     assay.setName("Test assay");
@@ -209,7 +218,7 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createAssayFolder(assay);
+      folder = storageService.createFolder(location, assay);
     } catch (Exception e) {
       e.printStackTrace();
       exception = e;
@@ -220,7 +229,7 @@ public class LocalStorageStudyStorageServiceTests {
       Assert.assertTrue(exception instanceof StudyStorageDuplicateException);
     } else {
       Assert.assertNotNull(folder);
-      StorageFolder assayFolder = storageService.getAssayFolder(assay);
+      StorageFolder assayFolder = storageService.findFolder(location, assay);
       Assert.assertNotNull(assayFolder);
       Assert.assertEquals(folder.getPath(), assayFolder.getPath());
     }
@@ -228,7 +237,7 @@ public class LocalStorageStudyStorageServiceTests {
     exception = null;
     StorageFile file = null;
     try {
-      file = storageService.saveAssayFile(TEST_FILE.getFile(), assay);
+      file = storageService.saveFile(location, TEST_FILE.getFile(), assay);
     } catch (Exception e) {
       exception = e;
     }
@@ -238,7 +247,7 @@ public class LocalStorageStudyStorageServiceTests {
   }
 
   @Test
-  public void getInvalidAssayFolderTest() {
+  public void getInvalidAssayFolderTest() throws Exception {
 
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     AssayType assayType =
@@ -252,7 +261,8 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.getAssayFolder(assay);
+      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
+      folder = storageService.findFolder(location, assay);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();

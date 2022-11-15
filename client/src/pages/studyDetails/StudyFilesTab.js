@@ -109,14 +109,14 @@ const StudyFilesTabContent = props => {
                   </p>
 
                   {
-                    study.storageFolder
-                    && study.storageFolder.url ? (
+                    study.primaryStorageFolder
+                    && study.primaryStorageFolder.url ? (
                       <React.Fragment>
 
                         <Button
                             variant="info"
                             target={"_blank noopener noreferrer"}
-                            href={study.storageFolder.url}
+                            href={study.primaryStorageFolder.url}
                         >
                           View files in Egnyte
                         </Button>

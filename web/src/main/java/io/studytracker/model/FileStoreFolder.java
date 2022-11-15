@@ -19,9 +19,12 @@ package io.studytracker.model;
 import io.studytracker.storage.StorageFolder;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -31,6 +34,10 @@ public class FileStoreFolder implements Model {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "file_storage_location_id", nullable = false)
+  private FileStorageLocation fileStorageLocation;
 
   @Column(name = "url", length = 1024)
   private String url;
@@ -44,8 +51,9 @@ public class FileStoreFolder implements Model {
   @Column(name = "reference_id")
   private String referenceId;
 
-  public static FileStoreFolder from(StorageFolder storageFolder) {
+  public static FileStoreFolder from(FileStorageLocation location, StorageFolder storageFolder) {
     FileStoreFolder f = new FileStoreFolder();
+    f.setFileStorageLocation(location);
     f.setName(storageFolder.getName());
     f.setPath(storageFolder.getPath());
     f.setUrl(storageFolder.getUrl());
@@ -90,5 +98,13 @@ public class FileStoreFolder implements Model {
 
   public void setReferenceId(String referenceId) {
     this.referenceId = referenceId;
+  }
+
+  public FileStorageLocation getFileStorageLocation() {
+    return fileStorageLocation;
+  }
+
+  public void setFileStorageLocation(FileStorageLocation fileStorageLocation) {
+    this.fileStorageLocation = fileStorageLocation;
   }
 }

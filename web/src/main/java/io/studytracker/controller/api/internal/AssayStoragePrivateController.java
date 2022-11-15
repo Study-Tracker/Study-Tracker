@@ -21,7 +21,9 @@ import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.FileStorageException;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.service.FileSystemStorageService;
+import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
@@ -48,14 +50,15 @@ public class AssayStoragePrivateController extends AbstractAssayController {
 
   @Autowired private FileSystemStorageService fileStorageService;
 
-  @Autowired(required = false)
-  private StudyStorageService studyStorageService;
+  @Autowired private StorageLocationService storageLocationService;
 
   @GetMapping("")
   public StorageFolder getStorageFolder(@PathVariable("assayId") String assayId) throws Exception {
     LOGGER.info("Fetching storage folder for assay: " + assayId);
     Assay assay = getAssayFromIdentifier(assayId);
-    return studyStorageService.getAssayFolder(assay);
+    FileStorageLocation location = storageLocationService.findByFileStoreFolder(assay.getPrimaryStorageFolder());
+    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
+    return studyStorageService.findFolder(location, assay);
   }
 
   @PostMapping("")
@@ -73,7 +76,9 @@ public class AssayStoragePrivateController extends AbstractAssayController {
       e.printStackTrace();
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    StorageFile storageFile = studyStorageService.saveAssayFile(path.toFile(), assay);
+    FileStorageLocation location = storageLocationService.findByFileStoreFolder(assay.getPrimaryStorageFolder());
+    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
+    StorageFile storageFile = studyStorageService.saveFile(location, path.toFile(), assay);
 
     // Publish events
     Activity activity =

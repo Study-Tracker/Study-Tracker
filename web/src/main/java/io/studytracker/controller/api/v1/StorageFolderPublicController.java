@@ -21,11 +21,12 @@ import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.FileStoreFolderDto;
 import io.studytracker.mapstruct.mapper.FileStoreFolderMapper;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.service.FileSystemStorageService;
-import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.StudyStorageService;
+import io.studytracker.service.StorageLocationService;
+import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.exception.StudyStorageException;
 import java.nio.file.Path;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class StorageFolderPublicController extends AbstractApiController {
   private FileSystemStorageService fileStorageService;
 
   @Autowired
-  private StudyStorageService studyStorageService;
+  private StorageLocationService storageLocationService;
 
   @Autowired
   private FileStoreFolderRepository fileStoreFolderRepository;
@@ -86,6 +87,10 @@ public class StorageFolderPublicController extends AbstractApiController {
         fileStoreFolderRepository
             .findById(id)
             .orElseThrow(() -> new RecordNotFoundException("Cannot file folder with ID: " + id));
+    FileStorageLocation location = storageLocationService.findById(folder.getFileStorageLocation().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Cannot file storage location with ID: "
+            + folder.getFileStorageLocation().getId()));
+    DataFileStorageService storageService = storageLocationService.lookupDataFileStorageService(location);
     Path path;
     try {
       path = fileStorageService.store(file);
@@ -94,12 +99,12 @@ public class StorageFolderPublicController extends AbstractApiController {
       e.printStackTrace();
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    StorageFolder storageFolder = new StorageFolder();
-    storageFolder.setName(folder.getName());
-    storageFolder.setPath(folder.getPath());
-    storageFolder.setUrl(folder.getUrl());
+//    StorageFolder storageFolder = new StorageFolder();
+//    storageFolder.setName(folder.getName());
+//    storageFolder.setPath(folder.getPath());
+//    storageFolder.setUrl(folder.getUrl());
     try {
-      studyStorageService.saveFileToFolder(path.toFile(), storageFolder);
+      storageService.saveFile(location, folder.getPath(), path.toFile());
       return new ResponseEntity<>(HttpStatus.OK);
     } catch (StudyStorageException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

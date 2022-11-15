@@ -34,7 +34,7 @@ public class StudySummaryDto {
   private boolean legacy = false;
   private boolean active = true;
   private NotebookFolderDetailsDto notebookFolder;
-  private FileStoreFolderDetailsDto storageFolder;
+  private FileStoreFolderDetailsDto primaryStorageFolder;
   private Date startDate;
   private Date endDate;
   private Date createdAt;
