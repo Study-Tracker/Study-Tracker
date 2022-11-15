@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, {useState} from 'react';
-import {
-  Download,
-  File,
-  Folder,
-  Info,
-  Link,
-  MoreHorizontal
-} from "react-feather";
+import React, {useContext, useState} from 'react';
+import {Download, File, Folder, Link, MoreHorizontal} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {Dropdown} from "react-bootstrap";
 import PropTypes from "prop-types";
+import NotyfContext from "../../context/NotyfContext";
 
 const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
+
+  const notyf = useContext(NotyfContext);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
@@ -39,6 +35,17 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
       handlePathChange(item.path);
     }
   };
+
+  const handleCopyS3Path = (d) => {
+    const path = dataSource.name + "/" + d.path;
+    navigator.clipboard.writeText(path);
+    notyf.open({message: "Copied S3 path to clipboard", type: "success"});
+  }
+
+  const handleCopyUrl = (d) => {
+    navigator.clipboard.writeText(d.url);
+    notyf.open({message: "Copied URL clipboard", type: "success"});
+  }
 
   const columns = [
     {
@@ -136,13 +143,25 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
                     ) : ""
                 }
 
-                <Dropdown.Item onClick={() => console.log("Click!")}>
-                  <Link className="align-middle me-2" size={18} /> Copy Link
-                </Dropdown.Item>
+                {
+                  dataSource.type === "AWS_S3" ? (
+                      <Dropdown.Item onClick={() => handleCopyS3Path(d)}>
+                        <Link className="align-middle me-2" size={18} /> Copy S3 Path
+                      </Dropdown.Item>
+                  ) : ""
+                }
 
-                <Dropdown.Item onClick={() => console.log("Click!")}>
-                  <Info className="align-middle me-2" size={18} /> Details
-                </Dropdown.Item>
+                {
+                  !!d.url ? (
+                      <Dropdown.Item onClick={() => handleCopyUrl(d)}>
+                        <Link className="align-middle me-2" size={18} /> Copy Link
+                      </Dropdown.Item>
+                  ) : ""
+                }
+
+                {/*<Dropdown.Item onClick={() => console.log("Click!")}>*/}
+                {/*  <Info className="align-middle me-2" size={18} /> Details*/}
+                {/*</Dropdown.Item>*/}
 
               </Dropdown.Menu>
             </Dropdown>
