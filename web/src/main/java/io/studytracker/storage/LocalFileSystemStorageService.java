@@ -169,6 +169,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
         String.format(
             "Saving file %s to storage folder instance for study %s",
             file.getName(), study.getCode()));
+    validatePath(location, file.getPath());
     StorageFolder studyFolder = this.findFolder(location, study);
     return this.saveFileToFolder(file, studyFolder);
   }
@@ -179,6 +180,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
         String.format(
             "Saving file %s to storage folder instance for assay %s",
             file.getName(), assay.getCode()));
+    validatePath(location, file.getPath());
     StorageFolder assayFolder = this.findFolder(location, assay);
     return this.saveFileToFolder(file, assayFolder);
   }
@@ -186,6 +188,12 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   @Override
   public StorageFolder findFolderByPath(FileStorageLocation location, String path)
       throws StudyStorageNotFoundException {
+    try {
+      validatePath(location, path);
+    } catch (StudyStorageException e) {
+      e.printStackTrace();
+      throw new StudyStorageNotFoundException(e);
+    }
     Path folderPath = Paths.get(path).normalize();
     File file = folderPath.toFile();
     if (!file.isDirectory() || !file.exists()) {
@@ -202,6 +210,12 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   @Override
   public StorageFile findFileByPath(FileStorageLocation location, String path)
       throws StudyStorageNotFoundException {
+    try {
+      validatePath(location, path);
+    } catch (StudyStorageException e) {
+      e.printStackTrace();
+      throw new StudyStorageNotFoundException(e);
+    }
     Path filePath = Paths.get(path).normalize();
     File file = filePath.toFile();
     if (!file.isFile() || !file.exists()) {
@@ -219,6 +233,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
 
     LOGGER.info("Creating storage folder {} at path {} for location {}",
         name, path, location.getName());
+    validatePath(location, path);
     LocalFileSystemOptions options = getOptionsFromLocation(location);
     Path newFolderPath = Paths.get(path).normalize().resolve(name);
     File newFolder = newFolderPath.toFile();
@@ -271,6 +286,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   public StorageFile saveFile(FileStorageLocation location, String path, File file)
       throws StudyStorageException {
     LOGGER.info("Saving file {} to storage location {} at path {}", file.getName(), location.getName(), path);
+    validatePath(location, path);
     return saveFileToPath(file, Paths.get(path).normalize());
   }
 
@@ -285,11 +301,13 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   }
 
   private StorageFile saveFileToFolder(File file, StorageFolder folder) {
-    return saveFileToPath(file, Paths.get(folder.getPath()).normalize());
+    return saveFileToPath(file, Paths.get(folder.getPath()));
   }
 
   private StorageFile saveFileToPath(File file, Path path) {
-    Path newFilePath = path.normalize().resolve(FilenameUtils.getName(file.getName()));
+    String fileName = FilenameUtils.getName(file.getName());
+    Path cleanPath = path.normalize();
+    Path newFilePath = cleanPath.resolve(fileName);
     File newFile = newFilePath.toFile();
     try {
       FileUtils.copyFile(file, newFile);
@@ -300,6 +318,14 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
     studyFile.setPath(newFilePath);
     studyFile.setName(newFile.getName());
     return studyFile;
+  }
+
+  private void validatePath(FileStorageLocation location, String path) throws StudyStorageException {
+    Path cleanPath = Paths.get(path).normalize();
+    Path locationPath = Paths.get(location.getRootFolderPath());
+    if (!cleanPath.startsWith(locationPath)) {
+      throw new StudyStorageException("Path is not within the storage location: " + path);
+    }
   }
 
 }
