@@ -186,7 +186,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   @Override
   public StorageFolder findFolderByPath(FileStorageLocation location, String path)
       throws StudyStorageNotFoundException {
-    Path folderPath = Paths.get(FilenameUtils.getPath(path));
+    Path folderPath = Paths.get(path).normalize();
     File file = folderPath.toFile();
     if (!file.isDirectory() || !file.exists()) {
       throw new StudyStorageNotFoundException("Cannot find folder at path: " + path);
@@ -202,7 +202,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   @Override
   public StorageFile findFileByPath(FileStorageLocation location, String path)
       throws StudyStorageNotFoundException {
-    Path filePath = Paths.get(path);
+    Path filePath = Paths.get(path).normalize();
     File file = filePath.toFile();
     if (!file.isFile() || !file.exists()) {
       throw new StudyStorageNotFoundException("Cannot find file at path: " + path);
@@ -220,8 +220,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
     LOGGER.info("Creating storage folder {} at path {} for location {}",
         name, path, location.getName());
     LocalFileSystemOptions options = getOptionsFromLocation(location);
-    Path newFolderPath = Paths.get(FilenameUtils.getPath(path))
-        .resolve(FilenameUtils.getName(name));
+    Path newFolderPath = Paths.get(path).normalize().resolve(name);
     File newFolder = newFolderPath.toFile();
 
     // Folder exists
@@ -272,25 +271,25 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   public StorageFile saveFile(FileStorageLocation location, String path, File file)
       throws StudyStorageException {
     LOGGER.info("Saving file {} to storage location {} at path {}", file.getName(), location.getName(), path);
-    return saveFileToPath(file, Paths.get(FilenameUtils.getPath(path)));
+    return saveFileToPath(file, Paths.get(path).normalize());
   }
 
   @Override
   public Resource fetchFile(FileStorageLocation location, String path)
       throws StudyStorageException {
     try {
-      return new ByteArrayResource(Files.readAllBytes(Paths.get(FilenameUtils.getPath(path))));
+      return new ByteArrayResource(Files.readAllBytes(Paths.get(path).normalize()));
     } catch (IOException e) {
       throw new StudyStorageException("Failed to read file from path: " + path, e);
     }
   }
 
   private StorageFile saveFileToFolder(File file, StorageFolder folder) {
-    return saveFileToPath(file, Paths.get(folder.getPath()));
+    return saveFileToPath(file, Paths.get(folder.getPath()).normalize());
   }
 
   private StorageFile saveFileToPath(File file, Path path) {
-    Path newFilePath = path.resolve(FilenameUtils.getName(file.getName()));
+    Path newFilePath = path.normalize().resolve(FilenameUtils.getName(file.getName()));
     File newFile = newFilePath.toFile();
     try {
       FileUtils.copyFile(file, newFile);
