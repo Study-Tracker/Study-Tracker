@@ -89,7 +89,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("externalLinks"),
         @NamedAttributeNode("conclusions"),
         @NamedAttributeNode("comments"),
-        @NamedAttributeNode("studyRelationships")
+        @NamedAttributeNode("studyRelationships"),
+        @NamedAttributeNode("storageFolders")
       },
     subgraphs = {
           @NamedSubgraph(

@@ -28,7 +28,7 @@ import io.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.service.NamingOptions;
-import io.studytracker.storage.LocalFileSystemStudyStorageService;
+import io.studytracker.storage.LocalFileSystemStorageService;
 import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,8 +53,8 @@ public class StorageServiceConfiguration {
   public static class LocalStudyStorageServiceConfiguration {
 
     @Bean
-    public LocalFileSystemStudyStorageService localFileSystemStudyStorageService(Environment env) {
-      return new LocalFileSystemStudyStorageService();
+    public LocalFileSystemStorageService localFileSystemStudyStorageService(Environment env) {
+      return new LocalFileSystemStorageService();
     }
   }
 

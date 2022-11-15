@@ -43,6 +43,9 @@ public class DataFileStorageServiceLookup {
   @Autowired(required = false)
   private S3DataFileStorageService s3DataFileStorageService;
 
+  @Autowired(required = false)
+  private LocalFileSystemStorageService localFileSystemStorageService;
+
   public Optional<DataFileStorageService> lookup(StorageLocationType storageLocationType) {
     LOGGER.debug("Looking up DataFileStorageService for storageLocationType: {}", storageLocationType);
     switch (storageLocationType) {
@@ -50,6 +53,8 @@ public class DataFileStorageServiceLookup {
         return Optional.ofNullable(egnyteApiDataFileStorageService);
       case AWS_S3:
         return Optional.ofNullable(s3DataFileStorageService);
+      case LOCAL_FILE_SYSTEM:
+        return Optional.ofNullable(localFileSystemStorageService);
       default:
         return Optional.empty();
     }

@@ -32,7 +32,7 @@ import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.service.StorageLocationService;
-import io.studytracker.storage.LocalFileSystemStudyStorageService;
+import io.studytracker.storage.LocalFileSystemStorageService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
@@ -60,7 +60,7 @@ public class LocalStorageStudyStorageServiceTests {
 
   private static final Resource TEST_FILE = new ClassPathResource("test.txt");
 
-  @Autowired private LocalFileSystemStudyStorageService storageService;
+  @Autowired private LocalFileSystemStorageService storageService;
 
   @Autowired private StudyRepository studyRepository;
 

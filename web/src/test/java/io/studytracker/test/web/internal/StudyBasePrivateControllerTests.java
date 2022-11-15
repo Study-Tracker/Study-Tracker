@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.form.StudyFormDto;
 import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
@@ -225,7 +226,12 @@ public class StudyBasePrivateControllerTests {
   @Test
   public void updateWithoutAutheotizationTest() throws Exception {
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
-    study.setStatus(Status.ON_HOLD);
+    StudyFormDto dto = new StudyFormDto();
+    dto.setId(study.getId());
+    dto.setCode(study.getCode());
+    dto.setName(study.getName());
+    dto.setDescription(study.getDescription());
+    dto.setStatus(Status.ON_HOLD);
 
     mockMvc
         .perform(

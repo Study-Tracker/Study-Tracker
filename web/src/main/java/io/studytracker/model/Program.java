@@ -63,7 +63,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           @NamedAttributeNode("createdBy"),
           @NamedAttributeNode("lastModifiedBy"),
           @NamedAttributeNode("notebookFolder"),
-          @NamedAttributeNode("primaryStorageFolder")
+          @NamedAttributeNode("primaryStorageFolder"),
+          @NamedAttributeNode("storageFolders")
         }))
 public class Program implements Model {
 

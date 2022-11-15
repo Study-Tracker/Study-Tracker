@@ -164,7 +164,8 @@ public class StudyService {
       folder.setPath(storageFolder.getPath());
       folder.setUrl(storageFolder.getUrl());
       folder.setReferenceId(storageFolder.getFolderId());
-      return fileStoreFolderRepository.save(folder);
+      return folder;
+//      return fileStoreFolderRepository.save(folder);
     } catch (Exception e) {
       e.printStackTrace();
       LOGGER.warn("Failed to create storage folder for study: " + study.getCode());
