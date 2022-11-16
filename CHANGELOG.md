@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Will update and improve assay task functionality to allow capturing of additional information.
 - Will add a notifications feature that will capture and display notifications for users.
 
+## [0.7.2] - 2022-XX-XX
+
+### Fixed
+
+- Fixed a bug with study and assay list display, due to missing fields.
+
 ## [0.7.1] - 2022-11-15
 
 ### Added
