@@ -54,11 +54,11 @@ const StudyListView = props => {
       data.dimensions[filter.MY_STUDY] = data.cf.dimension(d => {
         if (!!user) {
           if (d.owner.id === user.id) return true;
-          else {
-            for (const u of d.users) {
-              if (u.id === user.id) return true;
-            }
-          }
+          // else {
+          //   for (const u of d.users) {
+          //     if (u.id === user.id) return true;
+          //   }
+          // }
         }
         return false;
       });

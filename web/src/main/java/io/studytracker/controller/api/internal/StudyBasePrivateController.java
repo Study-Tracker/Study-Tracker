@@ -52,7 +52,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
 @RequestMapping("/api/internal/study")
 public class StudyBasePrivateController extends AbstractStudyController {
@@ -74,14 +73,14 @@ public class StudyBasePrivateController extends AbstractStudyController {
     List<Study> studies;
 
     // Search
-    if (!StringUtils.isEmpty(search)) {
+    if (StringUtils.hasText(search)) {
       studies = getStudyService().search(search);
     }
 
     // Find by program
     else if (programId != null) {
       Optional<Program> optional = getProgramService().findById(programId);
-      if (!optional.isPresent()) {
+      if (optional.isEmpty()) {
         throw new RecordNotFoundException("Cannot find program with ID: " + programId);
       }
       studies = getStudyService().findByProgram(optional.get());
@@ -90,19 +89,19 @@ public class StudyBasePrivateController extends AbstractStudyController {
     // Find by owner
     else if (owner != null) {
       Optional<User> optional = getUserService().findById(owner);
-      if (!optional.isPresent()) {
+      if (optional.isEmpty()) {
         throw new RecordNotFoundException("Cannot find user record: " + owner);
       }
       studies =
           getStudyService().findAll().stream()
-              .filter(study -> study.getOwner().equals(owner) && study.isActive())
+              .filter(study -> study.getOwner().getId().equals(owner) && study.isActive())
               .collect(Collectors.toList());
     }
 
     // Find by user
     else if (userId != null) {
       Optional<User> optional = getUserService().findById(userId);
-      if (!optional.isPresent()) {
+      if (optional.isEmpty()) {
         throw new RecordNotFoundException("Cannot find user record: " + userId);
       }
       User user = optional.get();
