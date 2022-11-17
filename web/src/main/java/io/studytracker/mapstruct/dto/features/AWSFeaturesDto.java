@@ -17,7 +17,7 @@ public class AWSFeaturesDto {
 
   @JsonProperty("isEnabled")
   public boolean isEnabled() {
-    return StringUtils.hasText(region) && StringUtils.hasText(accessKey);
+    return StringUtils.hasText(region) && StringUtils.hasText(defaultS3StudyLocation);
   }
 
 }
