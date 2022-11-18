@@ -58,8 +58,9 @@ public final class BenchlingNotebookUserService
     String authHeader = generateAuthorizationHeader();
 
     // Lookup user by ID
-    if (user.getConfiguration().containsKey(UserConfigurations.BENCHLING_USER_ID)) {
-      String benchlingUserId = user.getConfiguration().get(UserConfigurations.BENCHLING_USER_ID);
+    if (user.getAttributes() != null
+        && user.getAttributes().containsKey(UserConfigurations.BENCHLING_USER_ID)) {
+      String benchlingUserId = user.getAttributes().get(UserConfigurations.BENCHLING_USER_ID);
       Optional<BenchlingUser> optional = this.getClient().findUserById(benchlingUserId, authHeader);
       if (optional.isPresent()) {
         return Optional.of(this.convertUser(optional.get()));
@@ -72,7 +73,7 @@ public final class BenchlingNotebookUserService
     boolean hasNext = true;
     while (hasNext) {
       BenchlingUserList userList =
-          this.getClient().findUsersByUsername(user.getEmail(), authHeader, nextToken);
+          this.getClient().findUsersByUsername(user.getEmail().replaceAll("@.+", ""), authHeader, nextToken);
       users.addAll(userList.getUsers());
       nextToken = userList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
