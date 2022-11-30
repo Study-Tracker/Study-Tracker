@@ -16,9 +16,12 @@
 
 application.host-name=
 
+
 # Required
 # Character sequence used for seeding encryption keys. This should ideally be a long, random string
-# of characters. It is important that you do not change this value after setting it.
+# of characters between 16 and 512 characters. It is important that you do not change this value
+# after setting it.
+
 application.secret=
 
 
@@ -26,7 +29,8 @@ application.secret=
 
 # Required
 # The first time Study Tracker starts, an admin user will be created. You must specify an email and
-# default password for the admin account. The password can be changed after initial startup.
+# default password for the admin account. The password can be changed after initial startup. If no
+# password is provided, a random one will be generated and printed to the console at startup.
 
 admin.email=
 admin.password=
@@ -62,7 +66,9 @@ aws.region=
 aws.access-key-id=
 aws.secret-access-key=
 
+
 # If events.mode is set to 'eventbridge', then you must provide the name of the event bus to use.
+
 aws.eventbridge.bus-name=
 
 

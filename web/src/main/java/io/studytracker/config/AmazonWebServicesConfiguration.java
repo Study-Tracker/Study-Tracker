@@ -16,12 +16,14 @@
 
 package io.studytracker.config;
 
+import io.studytracker.config.properties.AWSProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -33,17 +35,16 @@ public class AmazonWebServicesConfiguration {
 
   @Autowired private Environment env;
 
+  @Autowired private AWSProperties properties;
+
   @Bean
   public AwsCredentialsProvider credentialsProvider() {
-    if (env.containsProperty("aws.secret-access-key")
-        && env.containsProperty("aws.access-key-id")) {
-      Assert.isTrue(
-          env.containsProperty("aws.secret-access-key"),
-          "Property 'aws.secret-access-key' must be set.");
+    if (properties.getAccessKeyId() != null && properties.getSecretAccessKey() != null) {
+      Assert.isTrue(StringUtils.hasText(properties.getAccessKeyId())
+          && StringUtils.hasText(properties.getSecretAccessKey()),
+          "AWS access key ID and secret access key must be set");
       AwsCredentials credentials =
-          AwsBasicCredentials.create(
-              env.getRequiredProperty("aws.access-key-id"),
-              env.getRequiredProperty("aws.secret-access-key"));
+          AwsBasicCredentials.create(properties.getAccessKeyId(), properties.getSecretAccessKey());
       return StaticCredentialsProvider.create(credentials);
     } else {
       return null;

@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRe
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -33,11 +34,11 @@ import org.springframework.context.annotation.PropertySource;
 		}
 	)
 @PropertySource("classpath:defaults.properties")
+@ConfigurationPropertiesScan("io.studytracker.config.properties")
 public class Application {
 
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(Application.class)
-//				.allowCircularReferences(true)
 				.run(args);
 	}
 

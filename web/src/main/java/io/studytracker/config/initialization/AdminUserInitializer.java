@@ -16,6 +16,7 @@
 
 package io.studytracker.config.initialization;
 
+import io.studytracker.config.properties.AdminProperties;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.security.UserPasswordGenerator;
@@ -24,7 +25,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -39,13 +39,13 @@ public class AdminUserInitializer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AdminUserInitializer.class);
 
-  @Autowired private Environment env;
-
   @Autowired private UserService userService;
 
   @Autowired private PasswordEncoder passwordEncoder;
 
   @Autowired private UserPasswordGenerator passwordGenerator;
+
+  @Autowired private AdminProperties adminProperties;
 
   @PostConstruct
   public void initializeAdminUser() {
@@ -53,14 +53,10 @@ public class AdminUserInitializer {
       return;
     }
     LOGGER.info("No users present in the Study Tracker database. Initializing admin user...");
-    String password =
-        env.containsProperty("admin.password")
-            ? env.getRequiredProperty("admin.password")
+    String password = adminProperties.getPassword() != null
+            ? adminProperties.getPassword()
             : passwordGenerator.generatePassword();
-    String email =
-        env.containsProperty("admin.email")
-            ? env.getRequiredProperty("admin.email")
-            : "admin@studytracker.com";
+    String email = adminProperties.getEmail();
     User user = new User();
     user.setActive(true);
     user.setDisplayName("Study Tracker Admin");

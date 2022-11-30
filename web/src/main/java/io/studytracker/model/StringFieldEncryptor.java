@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import io.studytracker.config.properties.ApplicationProperties;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.util.Base64;
@@ -25,8 +26,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,19 +35,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Converter
-public class StringFieldEncryptor implements AttributeConverter<String, String>, InitializingBean {
+public class StringFieldEncryptor implements AttributeConverter<String, String> {
 
   private static final String AES = "AES";
 
-  @Value("${application.secret}")
-  public String secret;
+  private final Key key;
+  private final Cipher cipher;
 
-  private Key key;
-  private Cipher cipher;
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    key = new SecretKeySpec(secret.getBytes(), AES);
+  @Autowired
+  public StringFieldEncryptor(ApplicationProperties properties) throws Exception {
+    key = new SecretKeySpec(properties.getSecret().getBytes(), AES);
     cipher = Cipher.getInstance(AES);
   }
 
