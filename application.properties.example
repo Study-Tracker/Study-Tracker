@@ -76,13 +76,14 @@ aws.eventbridge.bus-name=
 
 # Required
 # Provide SMTP connection details for outgoing emails.
-spring.mail.host=
-spring.mail.port=
-spring.mail.username=
-spring.mail.password=
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
-email.outgoing-email-address=${spring.mail.username}
+email.host=
+email.port=
+email.username=
+email.password=
+email.smtp-auth=true
+email.smtp-start-tls=true
+email.outgoing-email-address=
+email.protocol=smtp
 
 
 ### Notebook ###

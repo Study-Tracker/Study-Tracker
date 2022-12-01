@@ -33,16 +33,22 @@ public @interface ConfigurationModeConstraint {
     }
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(String s, ConstraintValidatorContext context) {
+      boolean valid = false;
       if ((s == null || s.isEmpty())) {
-        return allowEmpty;
+        valid = allowEmpty;
       }
       for (String option : options) {
         if (option.equalsIgnoreCase(s.toLowerCase())) {
-          return true;
+          valid = true;
+          break;
         }
       }
-      return false;
+      if (!valid) {
+        context.buildConstraintViolationWithTemplate("Invalid configuration mode. Check the documentation for valid options.")
+            .addConstraintViolation();
+      }
+      return valid;
     }
   }
 

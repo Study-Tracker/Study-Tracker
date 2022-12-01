@@ -24,4 +24,13 @@ public class AWSProperties {
   @Valid
   private EventBridgeProperties eventbridge;
 
+
+  @Getter
+  @Setter
+  public static class EventBridgeProperties {
+
+    private String busName;
+
+  }
+
 }

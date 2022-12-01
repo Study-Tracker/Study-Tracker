@@ -5,12 +5,13 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "aws.eventbridge")
+@ConfigurationProperties(prefix = "notebook")
 @Validated
 @Getter
 @Setter
-public class EventBridgeProperties {
+public class NotebookProperties {
 
-  private String busName;
+  @ConfigurationModeConstraint(options = {"none", "benchling"})
+  private String mode;
 
 }

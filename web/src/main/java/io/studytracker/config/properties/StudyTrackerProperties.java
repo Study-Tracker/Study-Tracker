@@ -16,6 +16,9 @@ public class StudyTrackerProperties {
   private ApplicationProperties application;
 
   @Valid
+  private ServerProperties server;
+
+  @Valid
   private AdminProperties admin;
 
   @Valid
@@ -26,5 +29,18 @@ public class StudyTrackerProperties {
 
   @Valid
   private AWSProperties aws;
+
+  @Valid
+  private EmailProperties email;
+
+  @Valid
+  private NotebookProperties notebook;
+
+
+  @Getter
+  @Setter
+  public static class ServerProperties {
+    private Integer port;
+  }
 
 }

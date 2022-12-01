@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.2] - 2022-XX-XX
 
+### Added
+
+- Added bean property bindings to configuration properties for easier reference and validation. Any misconfigured properties will throw a more accessible error message at startup.
+
+### Changed
+
+- Updated configuration properties for email integration. The old properties were spring-specific, but will still work.
+
 ### Fixed
 
 - Fixed a bug with study and assay list display, due to missing fields.
