@@ -16,6 +16,7 @@
 
 package io.studytracker.config;
 
+import io.studytracker.config.properties.ElasticsearchProperties;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
@@ -27,7 +28,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,23 +48,33 @@ public class SearchServiceConfiguration {
   @ConditionalOnProperty(name = "search.mode", havingValue = "elasticsearch")
   public static class ElasticsearchConfiguration {
 
-    @Value("${elasticsearch.host}")
-    private String host;
+    @Autowired
+    private ElasticsearchProperties properties;
 
-    @Value("${elasticsearch.port}")
-    private Integer port;
-
-    @Value("${elasticsearch.use-ssl:#{false}}")
-    private Boolean useSsl;
-
-    @Value("${elasticsearch.username:#{null}}")
-    private String username;
-
-    @Value("${elasticsearch.password:#{null}}")
-    private String password;
+//    @Value("${elasticsearch.host}")
+//    private String host;
+//
+//    @Value("${elasticsearch.port}")
+//    private Integer port;
+//
+//    @Value("${elasticsearch.use-ssl:#{false}}")
+//    private Boolean useSsl;
+//
+//    @Value("${elasticsearch.username:#{null}}")
+//    private String username;
+//
+//    @Value("${elasticsearch.password:#{null}}")
+//    private String password;
 
     @Bean
     public RestHighLevelClient client() {
+
+      String host = properties.getHost();
+      Integer port = properties.getPort();
+      Boolean useSsl = properties.getUseSsl();
+      String username = properties.getUsername();
+      String password = properties.getPassword();
+
       ClientConfigurationBuilderWithRequiredEndpoint builder = ClientConfiguration.builder();
       if (port == null && useSsl) {
         port = 443;

@@ -19,14 +19,9 @@ package io.studytracker.egnyte;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
-import io.studytracker.service.NamingOptions;
 import io.studytracker.service.NamingService;
 
 public class EgnyteFolderNamingService extends NamingService {
-
-  public EgnyteFolderNamingService(NamingOptions options) {
-    super(options);
-  }
 
   @Override
   public String getStudyStorageFolderName(Study study) {

@@ -37,15 +37,18 @@ public @interface ConfigurationModeConstraint {
       boolean valid = false;
       if ((s == null || s.isEmpty())) {
         valid = allowEmpty;
-      }
-      for (String option : options) {
-        if (option.equalsIgnoreCase(s.toLowerCase())) {
-          valid = true;
-          break;
+      } else {
+        for (String option : options) {
+          if (option.equalsIgnoreCase(s.toLowerCase())) {
+            valid = true;
+            break;
+          }
         }
       }
       if (!valid) {
-        context.buildConstraintViolationWithTemplate("Invalid configuration mode. Check the documentation for valid options.")
+        context.buildConstraintViolationWithTemplate("Invalid configuration mode. Valid options are: "
+                + String.join(", ", options)
+                + (allowEmpty ? "  This field may also be null or empty." : ""))
             .addConstraintViolation();
       }
       return valid;

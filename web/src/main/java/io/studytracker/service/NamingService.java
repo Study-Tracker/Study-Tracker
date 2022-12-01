@@ -16,6 +16,7 @@
 
 package io.studytracker.service;
 
+import io.studytracker.config.properties.StudyProperties;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Collaborator;
@@ -24,22 +25,21 @@ import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 /** Service definition for naming study folders, notebook entries, and more. */
 public class NamingService {
 
-  private final NamingOptions options;
+  @Autowired
+  private StudyProperties studyProperties;
 
+  @Autowired
   private ProgramService programService;
 
+  @Autowired
   private StudyRepository studyRepository;
 
+  @Autowired
   private AssayRepository assayRepository;
-
-  public NamingService(NamingOptions options) {
-    this.options = options;
-  }
 
   /**
    * Generates a new {@link Study} code, given that study's record.
@@ -52,13 +52,13 @@ public class NamingService {
       throw new StudyTrackerException("Legacy studies do not receive new study codes.");
     }
     Program program = study.getProgram();
-    Integer count = options.getStudyCodeCounterStart();
+    Integer count = studyProperties.getStudyCodeCounterStart();
     for (Program p : programService.findByCode(program.getCode())) {
       count = count + (studyRepository.findActiveProgramStudies(p.getId())).size();
     }
     return program.getCode()
         + "-"
-        + String.format("%0" + options.getStudyCodeMinimumDigits() + "d", count);
+        + String.format("%0" + studyProperties.getStudyCodeMinDigits() + "d", count);
   }
 
   /**
@@ -73,11 +73,11 @@ public class NamingService {
       throw new StudyTrackerException("External studies require a valid collaborator reference.");
     }
     int count =
-        options.getExternalStudyCodeCounterStart()
+        studyProperties.getExternalCodeCounterStart()
             + studyRepository.findByExternalCodePrefix(collaborator.getCode() + "-").size();
     return collaborator.getCode()
         + "-"
-        + String.format("%0" + options.getExternalStudyCodeMinimumDigits() + "d", count);
+        + String.format("%0" + studyProperties.getExternalCodeMinDigits() + "d", count);
   }
 
   /**
@@ -89,10 +89,10 @@ public class NamingService {
   public String generateAssayCode(Assay assay) {
     Study study = assay.getStudy();
     String prefix = study.getCode().split("-")[0] + "-";
-    long count = options.getAssayCodeCounterStart() + assayRepository.countByCodePrefix(prefix);
+    long count = studyProperties.getAssayCodeCounterStart() + assayRepository.countByCodePrefix(prefix);
     return study.getCode()
         + "-"
-        + String.format("%0" + options.getAssayCodeMinimumDigits() + "d", count);
+        + String.format("%0" + studyProperties.getAssayCodeMinDigits() + "d", count);
   }
 
   /**
@@ -137,18 +137,4 @@ public class NamingService {
     return program.getName();
   }
 
-  @Autowired
-  public void setProgramService(@Lazy ProgramService programService) {
-    this.programService = programService;
-  }
-
-  @Autowired
-  public void setStudyRepository(@Lazy StudyRepository studyRepository) {
-    this.studyRepository = studyRepository;
-  }
-
-  @Autowired
-  public void setAssayRepository(@Lazy AssayRepository assayRepository) {
-    this.assayRepository = assayRepository;
-  }
 }

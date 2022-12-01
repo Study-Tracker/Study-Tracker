@@ -17,6 +17,7 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.aws.integration.S3IntegrationV1;
+import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.egnyte.integration.EgnyteIntegrationV1;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.integration.FileStorageLocationBuilder;
@@ -42,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * Creates records for {@link IntegrationDefinition} instances, allowing for configuration of
@@ -64,6 +66,9 @@ public class IntegrationInitializer {
 
   @Autowired
   private Environment env;
+
+  @Autowired
+  private StudyTrackerProperties properties;
 
   @Autowired
   private IntegrationDefinitionRepository integrationDefinitionRepository;
@@ -125,22 +130,18 @@ public class IntegrationInitializer {
 
       // Create an integration instance
       IntegrationInstanceBuilder builder = new IntegrationInstanceBuilder()
-          .name(env.getRequiredProperty("egnyte.tenant-name") + "-egnyte")
+          .name(properties.getEgnyte().getTenantName() + "-egnyte")
           .displayName("Egnyte")
           .integrationDefinition(egnyteDef)
           .active(true)
-          .configurationValue(EgnyteIntegrationV1.TENANT_NAME,
-              env.getRequiredProperty("egnyte.tenant-name"))
-          .configurationValue(EgnyteIntegrationV1.API_TOKEN,
-              env.getRequiredProperty("egnyte.api-token"))
-          .configurationValue(EgnyteIntegrationV1.ROOT_PATH,
-              env.getRequiredProperty("egnyte.root-path"));
-      if (env.containsProperty("egnyte.root-url")) {
-        builder.configurationValue(EgnyteIntegrationV1.ROOT_URL,
-            env.getRequiredProperty("egnyte.root-url"));
+          .configurationValue(EgnyteIntegrationV1.TENANT_NAME, properties.getEgnyte().getTenantName())
+          .configurationValue(EgnyteIntegrationV1.API_TOKEN, properties.getEgnyte().getApiToken())
+          .configurationValue(EgnyteIntegrationV1.ROOT_PATH, properties.getEgnyte().getRootPath());
+      if (StringUtils.hasText(properties.getEgnyte().getRootUrl())) {
+        builder.configurationValue(EgnyteIntegrationV1.ROOT_URL, properties.getEgnyte().getRootUrl());
       } else {
         builder.configurationValue(EgnyteIntegrationV1.ROOT_URL,
-            "https://" + env.getRequiredProperty("egnyte.tenant-name") + ".egnyte.com");
+            "https://" + properties.getEgnyte().getTenantName() + ".egnyte.com");
       }
       IntegrationInstance egnyteInstance = integrationInstanceRepository.save(builder.build());
 
@@ -151,7 +152,7 @@ public class IntegrationInitializer {
           .displayName("Egnyte Study Folder")
           .name("egnyte-study-folder")
           .permissions(StoragePermissions.READ_WRITE)
-          .rootFolderPath(env.getRequiredProperty("egnyte.root-path"))
+          .rootFolderPath(properties.getEgnyte().getRootPath())
           .defaultStudyLocation(true)
           .defaultDataLocation(false);
       return fileStorageLocationRepository.save(locationBuilder.build());
@@ -194,7 +195,7 @@ public class IntegrationInitializer {
           .integrationDefinition(localFileSystemDef)
           .active(true)
           .configurationValue(LocalFileSystemIntegrationV1.ROOT_PATH,
-              env.getRequiredProperty("storage.local-dir"));
+              properties.getStorage().getLocalDir());
       IntegrationInstance localFileSystemInstance
           = integrationInstanceRepository.save(builder.build());
 
@@ -205,7 +206,7 @@ public class IntegrationInitializer {
           .displayName("Local Study Folder")
           .name("local-study-folder")
           .permissions(StoragePermissions.READ_WRITE)
-          .rootFolderPath(env.getRequiredProperty("storage.local-dir"))
+          .rootFolderPath(properties.getStorage().getLocalDir())
           .defaultStudyLocation(true)
           .defaultDataLocation(false);
       return fileStorageLocationRepository.save(locationBuilder.build());

@@ -16,52 +16,18 @@
 
 package io.studytracker.config;
 
-import io.studytracker.service.NamingOptions;
 import io.studytracker.service.NamingService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
 
 @Configuration
 public class ServiceConfiguration {
 
-  private Environment env;
-
   @Bean
   @Primary
   public NamingService namingService() {
-    NamingOptions namingOptions = new NamingOptions();
-    if (env.containsProperty("study.study-code-counter-start")) {
-      namingOptions.setStudyCodeCounterStart(
-          env.getRequiredProperty("study.study-code-counter-start", Integer.class));
-    }
-    if (env.containsProperty("study.study-code-min-digits")) {
-      namingOptions.setStudyCodeMinimumDigits(
-          env.getRequiredProperty("study.study-code-min-digits", Integer.class));
-    }
-    if (env.containsProperty("study.external-code-counter-start")) {
-      namingOptions.setExternalStudyCodeCounterStart(
-          env.getRequiredProperty("study.external-code-counter-start", Integer.class));
-    }
-    if (env.containsProperty("study.external-code-min-digits")) {
-      namingOptions.setExternalStudyCodeMinimumDigits(
-          env.getRequiredProperty("study.external-code-min-digits", Integer.class));
-    }
-    if (env.containsProperty("study.assay-code-counter-start")) {
-      namingOptions.setAssayCodeCounterStart(
-          env.getRequiredProperty("study.assay-code-counter-start", Integer.class));
-    }
-    if (env.containsProperty("study.assay-code-min-digits")) {
-      namingOptions.setAssayCodeMinimumDigits(
-          env.getRequiredProperty("study.assay-code-min-digits", Integer.class));
-    }
-    return new NamingService(namingOptions);
+    return new NamingService();
   }
 
-  @Autowired
-  public void setEnv(Environment env) {
-    this.env = env;
-  }
 }

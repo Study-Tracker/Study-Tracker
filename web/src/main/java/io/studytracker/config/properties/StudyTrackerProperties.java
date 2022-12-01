@@ -36,6 +36,18 @@ public class StudyTrackerProperties {
   @Valid
   private NotebookProperties notebook;
 
+  @Valid
+  private StorageProperties storage;
+
+  @Valid
+  private EgnyteProperties egnyte;
+
+  @Valid
+  private StudyProperties study;
+
+  @Valid
+  private SearchProperties search;
+
 
   @Getter
   @Setter

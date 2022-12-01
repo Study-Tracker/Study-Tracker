@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.service.FileSystemStorageService;
 import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +68,8 @@ public class WebAppConfiguration {
   }
 
   @Bean
-  public FileSystemStorageService fileSystemStorageService() {
-    return new FileSystemStorageService(Paths.get(env.getRequiredProperty("storage.temp-dir")));
+  public FileSystemStorageService fileSystemStorageService(StorageProperties storageProperties) {
+    return new FileSystemStorageService(Paths.get(storageProperties.getTempDir()));
   }
 
   @Bean
