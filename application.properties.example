@@ -19,6 +19,7 @@ application.host-name=
 # Required
 # Character sequence used for seeding encryption keys. This should ideally be a long, random string
 # of characters. It is important that you do not change this value after setting it.
+
 application.secret=
 
 
@@ -102,41 +103,52 @@ benchling.api.client-secret=
 ### File Storage ###
 
 # Options: local, egnyte. Defaults to local
+
 storage.mode=
 
 # If storage.use-existing is set to 'true', Study Tracker will use existing folders with the same
 # name when trying to create new ones. If set to 'false', Study Tracker throw an error when trying
 # to create a folder that already exists. Defaults to 'true'.
+
 storage.use-existing=true
 
 # Sets the maximum recursive read depth for the local file storage. The higher the number, the
 # longer it will take to load folder contents and the larger the folder tree that will be returned.
+
 storage.max-folder-read-depth=3
 
 # Local file storage
 # Sets the directory used for uploading files.
+
 storage.temp-dir=
+
 # Sets the folder in which the root program/study/assay storage folder hierarchy will be created.
 # Required if storage.mode is set to 'local'.
+
 storage.local-dir=
 
 
 ### Egnyte ###
 
 # Required if storage.mode is set to 'egnyte'.
+
 egnyte.tenant-name=
 egnyte.root-url=https://${egnyte.tenant-name}.egnyte.com
 egnyte.api-token=
 
 # Sets the folder in which the root program/study/assay storage folder hierarchy will be created.
+
 egnyte.root-path=
+
 # Sets the maximum number of API requests that will be made to egnyte every second.
+
 egnyte.qps=3
 
 
 ### Studies ###
 
 # You can change default study code creation behavior here.
+
 study.code-counter-start=10001
 
 
@@ -146,6 +158,7 @@ study.code-counter-start=10001
 # To enable, set search.mode to 'elasticsearch'. The host value should be the full host name
 # (without protocol) and the port number. So if my host is https://myelasticdb.com, then the
 # value for elasticsearch.host would be 'myelasticdb.com' and the port would be set to 443.
+
 search.mode=
 elasticsearch.host=
 elasticsearch.port=

@@ -22,6 +22,7 @@ import NotyfContext from "../../context/NotyfContext";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import Select from "react-select";
+import {FormGroup} from "../forms/common";
 
 const StorageLocationFormModal = ({
   isOpen,
@@ -35,35 +36,21 @@ const StorageLocationFormModal = ({
   const [integrations, setIntegrations] = useState([]);
 
   const locationSchema = yup.object().shape({
-    integrationInstanceId: yup.number()
+    integrationInstance: yup.object()
       .required("Integration instance is required"),
-    // type: yup.string()
-    //   .required("Storage type is required"),
     displayName: yup.string()
       .required("Display name is required")
       .max(255, "Display name must be less than 255 characters"),
-    // name: yup.string()
-    //   .required("Name is required")
-    //   .max(255, "Name must be less than 255 characters"),
     rootFolderPath: yup.string()
-      .required("Root folder path is required")
       .max(1024, "Root folder path must be less than 1024 characters"),
-    // referenceId: yup.string()
-    //   .max(255, "Reference ID must be less than 255 characters"),
-    // url: yup.string()
-    //   .max(1024, "URL must be less than 1024 characters"),
     permissions: yup.string()
       .required("Storage permissions are required."),
   });
 
   const locationDefault = {
-    integrationInstanceId: null,
-    // type: "",
+    integrationInstance: null,
     displayName: "",
-    // name: "",
     rootFolderPath: "",
-    // referenceId: "",
-    // url: "",
     permissions: "READ_WRITE",
     defaultStudyLocation: false,
     defaultDataLocation: false,
@@ -108,12 +95,13 @@ const StorageLocationFormModal = ({
     })
   }
 
-  const storageServiceOptions = integrations.map(integration => {
+  let storageServiceOptions = [];
+  integrations.forEach(integration => {
     if (["EGNYTE", "AWS_S3", "LOCAL_FILE_SYSTEM"].indexOf(integration.definition.type) > -1) {
-      return {
+      storageServiceOptions.push({
         value: integration.id,
         label: integration.name
-      }
+      });
     }
   });
 
@@ -147,17 +135,17 @@ const StorageLocationFormModal = ({
 
                   <Row>
                     <Col>
-                      <Form.Group>
+                      <FormGroup>
                         <Form.Label>Storage Service *</Form.Label>
                         <Select
                             name={"integrationInstanceId"}
                             className={"react-select-container " + (errors.integrationInstanceId && touched.integrationInstanceId ? "is-invalid" : "")}
                             classNamePrefix="react-select"
                             invalid={errors.integrationInstanceId && touched.integrationInstanceId}
-                            value={storageServiceOptions.find(option => option.value === values.integrationInstanceId)}
+                            defaultValue={values.integrationInstanceId ? storageServiceOptions.find(option => option.value === values.integrationInstanceId) : null}
                             isDisabled={!!values.id}
                             options={storageServiceOptions}
-                            onChange={selected => setFieldValue("integrationInstanceId", selected.value)}
+                            onChange={selected => setFieldValue("integrationInstance", integrations.filter(d => d.id === selected.value)[0])}
                         />
                         <Form.Control.Feedback type={"invalid"}>
                           You must select a storage service.
@@ -165,13 +153,13 @@ const StorageLocationFormModal = ({
                         <Form.Text>
                           Select a storage service to use for this location.
                         </Form.Text>
-                      </Form.Group>
+                      </FormGroup>
                     </Col>
                   </Row>
 
                   <Row>
                     <Col>
-                      <Form.Group>
+                      <FormGroup>
                         <Form.Label>Name *</Form.Label>
                         <Form.Control
                           type={"text"}
@@ -183,14 +171,14 @@ const StorageLocationFormModal = ({
                         <Form.Control.Feedback type={"invalid"}>
                           {errors.displayName}
                         </Form.Control.Feedback>
-                      </Form.Group>
+                      </FormGroup>
                     </Col>
                   </Row>
 
                   <Row>
                     <Col>
-                      <Form.Group>
-                        <Form.Label>Folder Path *</Form.Label>
+                      <FormGroup>
+                        <Form.Label>Folder Path</Form.Label>
                         <Form.Control
                             type={"text"}
                             name={"rootFolderPath"}
@@ -202,22 +190,23 @@ const StorageLocationFormModal = ({
                           {errors.rootFolderPath}
                         </Form.Control.Feedback>
                         <Form.Text>
-                          Provide the full absolute path to the folder where files will be stored.
+                          Provide the full, absolute path to the folder where files will be stored.
+                          If left blank, the root folder will be used.
                         </Form.Text>
-                      </Form.Group>
+                      </FormGroup>
                     </Col>
                   </Row>
 
                   <Row>
                     <Col>
-                      <Form.Group>
+                      <FormGroup>
                         <Form.Label>Permissions</Form.Label>
                         <Select
                             name={"permissions"}
                             className={"react-select-container " + (errors.permissions && touched.permissions ? "is-invalid" : "")}
                             classNamePrefix="react-select"
                             invalid={errors.permissions && touched.permissions}
-                            value={storageServiceOptions.find(option => option.value === values.integrationInstanceId)}
+                            defaultValue={values.permissions ? permissionsOptions.find(option => option.value === values.permissions) : null}
                             isDisabled={!!values.id}
                             options={permissionsOptions}
                             onChange={selected => setFieldValue("permissions", selected.value)}
@@ -225,7 +214,7 @@ const StorageLocationFormModal = ({
                         <Form.Text>
                           Select the access permissions for this location.
                         </Form.Text>
-                      </Form.Group>
+                      </FormGroup>
                     </Col>
                   </Row>
 

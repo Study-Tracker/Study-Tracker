@@ -16,6 +16,7 @@
 
 package io.studytracker.mapstruct.dto.form;
 
+import io.studytracker.mapstruct.dto.response.IntegrationInstanceDetailsDto;
 import io.studytracker.storage.StorageLocationType;
 import io.studytracker.storage.StoragePermissions;
 import javax.validation.constraints.NotEmpty;
@@ -26,7 +27,7 @@ import lombok.Data;
 public class FileStorageLocationFormDto {
 
   private Long id;
-  private @NotNull Long integrationInstanceId;
+  private @NotNull IntegrationInstanceDetailsDto integrationInstance;
   private StorageLocationType type;
   private @NotEmpty String displayName;
   private String name;

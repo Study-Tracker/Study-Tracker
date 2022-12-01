@@ -75,8 +75,14 @@ public class FileStorageLocationPrivateController extends AbstractApiController 
   @PostMapping("")
   public HttpEntity<FileStorageLocationDetailsDto> create(@Valid @RequestBody FileStorageLocationFormDto dto) {
     LOGGER.info("Creating new file storage location: {}", dto);
-    FileStorageLocation location
-        = storageLocationService.create(mapper.fromForm(dto));
+    FileStorageLocation location;
+    try {
+      location = storageLocationService.create(mapper.fromForm(dto));
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.error("Error creating file storage location: {}", e.getMessage());
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     Activity activity = StorageActivityUtils
         .fromNewStorageLocation(location, this.getAuthenticatedUser());
     this.logActivity(activity);
