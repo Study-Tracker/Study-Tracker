@@ -25,8 +25,8 @@ import io.studytracker.mapstruct.mapper.FileStorageLocationMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.FileStorageLocation;
 import io.studytracker.service.StorageLocationService;
+import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +58,7 @@ public class FileStorageLocationPrivateController extends AbstractApiController 
   @GetMapping("")
   public List<FileStorageLocationDetailsDto> findAll() {
     LOGGER.debug("findAll()");
-    List<FileStorageLocation> locations = storageLocationService.findAll().stream()
-        .filter(FileStorageLocation::isActive)
-        .collect(Collectors.toList());
+    List<FileStorageLocation> locations = storageLocationService.findAll();
     return mapper.toDetailsList(locations);
   }
 
@@ -78,6 +76,8 @@ public class FileStorageLocationPrivateController extends AbstractApiController 
     FileStorageLocation location;
     try {
       location = storageLocationService.create(mapper.fromForm(dto));
+    } catch (StudyStorageNotFoundException e) {
+      throw new RecordNotFoundException("The requested folder does not exist: " + dto.getRootFolderPath());
     } catch (Exception e) {
       e.printStackTrace();
       LOGGER.error("Error creating file storage location: {}", e.getMessage());

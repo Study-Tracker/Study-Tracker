@@ -28,11 +28,11 @@ const StorageLocationFormModal = ({
   isOpen,
   setIsOpen,
   selectedLocation,
-  locations
+  handleFormSubmit,
+  formikRef
 }) => {
 
   const notyf = useContext(NotyfContext);
-  // const [locations, setLocation] = useState([]);
   const [integrations, setIntegrations] = useState([]);
 
   const locationSchema = yup.object().shape({
@@ -68,33 +68,6 @@ const StorageLocationFormModal = ({
     })
   }, [])
 
-  const submitForm = (values, {setSubmitting, resetForm}) => {
-    const url = selectedLocation
-        ? "/api/internal/storage-locations/" + selectedLocation.id
-        : "/api/internal/storage-locations";
-    const method = selectedLocation ? "PUT" : "POST";
-    axios({
-      method: method,
-      url: url,
-      data: values,
-      headers: {
-        "Content-Type": "application/json"
-      },
-    })
-    .then(response => {
-      notyf.open({message: 'Storage location saved.', type: 'success'});
-      setIsOpen(false);
-    })
-    .catch(e => {
-      console.error(e);
-      notyf.open({message: 'Failed to save storage location.', type: 'error'});
-    })
-    .finally(() => {
-      setSubmitting(false);
-      resetForm();
-    })
-  }
-
   let storageServiceOptions = [];
   integrations.forEach(integration => {
     if (["EGNYTE", "AWS_S3", "LOCAL_FILE_SYSTEM"].indexOf(integration.definition.type) > -1) {
@@ -114,8 +87,10 @@ const StorageLocationFormModal = ({
   return (
       <Formik
           initialValues={selectedLocation || locationDefault}
-          onSubmit={submitForm}
+          onSubmit={handleFormSubmit}
           validationSchema={locationSchema}
+          innerRef={formikRef}
+          enableReinitialize={true}
       >
         {({
           values,
@@ -218,6 +193,45 @@ const StorageLocationFormModal = ({
                     </Col>
                   </Row>
 
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Form.Check
+                            type={"switch"}
+                            label={"Active"}
+                            onChange={(e) => setFieldValue("active", e.target.checked)}
+                            defaultChecked={values.active}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Form.Check
+                            type={"switch"}
+                            label={"Default study storage location"}
+                            onChange={(e) => setFieldValue("defaultStudyLocation", e.target.checked)}
+                            defaultChecked={values.defaultStudyLocation}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+
+                  {/*<Row>*/}
+                  {/*  <Col>*/}
+                  {/*    <FormGroup>*/}
+                  {/*      <Form.Check*/}
+                  {/*          type={"switch"}*/}
+                  {/*          label={"Default data storage location"}*/}
+                  {/*          onChange={(e) => setFieldValue("defaultDataLocation", e.target.checked)}*/}
+                  {/*          defaultChecked={values.defaultDataLocation}*/}
+                  {/*      />*/}
+                  {/*    </FormGroup>*/}
+                  {/*  </Col>*/}
+                  {/*</Row>*/}
+
                 </FormikForm>
               </Modal.Body>
 
@@ -248,6 +262,8 @@ StorageLocationFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
   selectedLocation: PropTypes.object,
+  handleFormSubmit: PropTypes.func.isRequired,
+  formikRef: PropTypes.object.isRequired
 }
 
 export default StorageLocationFormModal;

@@ -16,13 +16,23 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import {Badge} from "react-bootstrap";
+import {Badge, Dropdown} from "react-bootstrap";
 import {CheckCircle} from "react-feather";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {
+  faCheckCircle,
+  faEdit,
+  faTimesCircle
+} from "@fortawesome/free-solid-svg-icons";
 
-const StorageLocationTable = ({locations}) => {
+const StorageLocationTable = ({
+  locations,
+  handleLocationEdit,
+  handleToggleLocationActive
+}) => {
 
   const columns = [
     {
@@ -33,6 +43,24 @@ const StorageLocationTable = ({locations}) => {
     {
       dataField: "type",
       text: "Type",
+      formatter: (c, d) => {
+        switch (d.type) {
+          case "LOCAL_FILE_SYSTEM":
+            return "Local File System";
+          case "AWS_S3":
+            return "Amazon S3";
+          case "EGNYTE_API":
+            return "Egnyte API";
+          default:
+            return d.type;
+        }
+      },
+      sort: true
+    },
+    {
+      dataField: "name",
+      text: "Source",
+      formatter: (c, d) => <code>{d.name}</code>,
       sort: true
     },
     {
@@ -55,6 +83,13 @@ const StorageLocationTable = ({locations}) => {
     {
       dataField: "permissions",
       text: "Permissions",
+      formatter: (c, d) => {
+        if (d.permissions === "READ_WRITE") {
+          return <Badge bg="info">Read / Write</Badge>;
+        } else {
+          return <Badge bg="secondary">Read Only</Badge>;
+        }
+      },
       sort: true
     },
     {
@@ -65,14 +100,66 @@ const StorageLocationTable = ({locations}) => {
         return d.defaultStudyLocation ? <CheckCircle className={"text-success"} /> : "";
       }
     },
+    // {
+    //   dataField: "defaultDataLocation",
+    //   text: "Data Default",
+    //   sort: false,
+    //   formatter: (c, d, i, x) => {
+    //     return d.defaultDataLocation ? <CheckCircle className={"text-success"} /> : "";
+    //   }
+    // },
     {
-      dataField: "defaultDataLocation",
-      text: "Data Default",
+      dataField: "controls",
+      text: "",
       sort: false,
-      formatter: (c, d, i, x) => {
-        return d.defaultDataLocation ? <CheckCircle className={"text-success"} /> : "";
+      formatter: (c, d) => {
+        return (
+            <React.Fragment>
+
+              <Dropdown>
+
+                <Dropdown.Toggle variant={"outline-primary"}>
+                  &nbsp;Options&nbsp;
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+
+                  <Dropdown.Item
+                      onClick={() => handleLocationEdit(d)}
+                  >
+                    <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
+                    Edit Location
+                  </Dropdown.Item>
+
+                  <Dropdown.Divider/>
+
+                  {
+                    !!d.active ? (
+                        <Dropdown.Item
+                            className={"text-warning"}
+                            onClick={() => handleToggleLocationActive(d, false)}
+                        >
+                          <FontAwesomeIcon icon={faTimesCircle} className={"me-2"} />
+                          Set Inactive
+                        </Dropdown.Item>
+                    ) : (
+                        <Dropdown.Item
+                            className={"text-warning"}
+                            onClick={() => handleToggleLocationActive(d, true)}
+                        >
+                          <FontAwesomeIcon icon={faCheckCircle} className={"me-2"} />
+                          Set Active
+                        </Dropdown.Item>
+                    )
+                  }
+
+                </Dropdown.Menu>
+              </Dropdown>
+
+            </React.Fragment>
+        )
       }
-    },
+    }
   ];
 
   return (

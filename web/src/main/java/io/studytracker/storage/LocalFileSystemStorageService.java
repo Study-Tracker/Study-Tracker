@@ -300,6 +300,30 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
     }
   }
 
+  @Override
+  public boolean fileExists(FileStorageLocation location, String path) {
+    try {
+      validatePath(location, path);
+    } catch (StudyStorageException e) {
+      return false;
+    }
+    Path filePath = Paths.get(path).normalize();
+    File file = filePath.toFile();
+    return file.exists() && file.isFile();
+  }
+
+  @Override
+  public boolean folderExists(FileStorageLocation location, String path) {
+    try {
+      validatePath(location, path);
+    } catch (StudyStorageException e) {
+      return false;
+    }
+    Path filePath = Paths.get(path).normalize();
+    File file = filePath.toFile();
+    return file.exists() && !file.isFile();
+  }
+
   private StorageFile saveFileToFolder(File file, StorageFolder folder) {
     return saveFileToPath(file, Paths.get(folder.getPath()));
   }

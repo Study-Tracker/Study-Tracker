@@ -127,6 +127,11 @@ public class StorageLocationService {
     DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
         .orElseThrow(() -> new FileStorageException("Cannot find storage service for type: "
             + location.getType()));
+    if (!storageService.folderExists(location, location.getRootFolderPath())) {
+      throw new StudyStorageNotFoundException("The requested root folder does not exist: "
+          + location.getRootFolderPath());
+    }
+
     StorageFolder folder = storageService.findFolderByPath(location, location.getRootFolderPath());
 
     location.setReferenceId(folder.getFolderId());
@@ -187,7 +192,9 @@ public class StorageLocationService {
   }
 
   private String generateLocationName(FileStorageLocation location) {
-    IntegrationInstance instance = location.getIntegrationInstance();
+    IntegrationInstance instance = integrationInstanceRepository.findById(location.getIntegrationInstance().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Integration instance not found: "
+            + location.getIntegrationInstance().getId()));
     switch (location.getType()) {
       case EGNYTE_API:
         EgnyteIntegrationOptions egnyteOptions = EgnyteIntegrationOptionsFactory.create(instance);

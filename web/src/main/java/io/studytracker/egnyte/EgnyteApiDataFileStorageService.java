@@ -20,6 +20,7 @@ import io.studytracker.egnyte.entity.EgnyteFile;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.exception.EgnyteException;
+import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.egnyte.integration.EgnyteIntegrationOptions;
 import io.studytracker.egnyte.integration.EgnyteIntegrationOptionsFactory;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
@@ -145,5 +146,39 @@ public class EgnyteApiDataFileStorageService implements DataFileStorageService {
       throws StudyStorageException {
     LOGGER.info("Downloading file: {}", path);
     throw new StudyStorageException("Not implemented");
+  }
+
+  @Override
+  public boolean fileExists(FileStorageLocation location, String path) {
+    LOGGER.debug("Checking if file exists: {}", path);
+    EgnyteIntegrationOptions options = this.getOptionsFromLocation(location);
+    try {
+      EgnyteObject egnyteObject = client.findObjectByPath(
+          options.getRootUrl(), path, options.getToken());
+      return !egnyteObject.isFolder();
+    } catch (EgnyteException e) {
+      if (!(e.getCause() instanceof ObjectNotFoundException)) {
+        e.printStackTrace();
+        LOGGER.error("Error while checking if file exists", e);
+      }
+      return false;
+    }
+  }
+
+  @Override
+  public boolean folderExists(FileStorageLocation location, String path) {
+    LOGGER.debug("Checking if folder exists: {}", path);
+    EgnyteIntegrationOptions options = this.getOptionsFromLocation(location);
+    try {
+      EgnyteObject egnyteObject = client.findObjectByPath(
+          options.getRootUrl(), path, options.getToken());
+      return egnyteObject.isFolder();
+    } catch (EgnyteException e) {
+      if (!(e.getCause() instanceof ObjectNotFoundException)) {
+        e.printStackTrace();
+        LOGGER.error("Error while checking if folder exists", e);
+      }
+      return false;
+    }
   }
 }

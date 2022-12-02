@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import axios from "axios";
-import {Button, Card} from "react-bootstrap";
+import {Button, Card, Col, Row} from "react-bootstrap";
 import {FolderPlus} from "react-feather";
 import {SettingsLoadingMessage} from "../../../common/loading";
 import {SettingsErrorMessage} from "../../../common/errors";
@@ -34,6 +34,8 @@ const StorageLocationSettings = () => {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const formikRef = useRef();
 
   useEffect(() => {
     setIsLoading(true);
@@ -51,10 +53,57 @@ const StorageLocationSettings = () => {
     });
   }, [loadCounter]);
 
+  const handleSubmitForm = (values, {setSubmitting, resetForm}) => {
+    const url = selectedLocation
+        ? "/api/internal/storage-locations/" + selectedLocation.id
+        : "/api/internal/storage-locations";
+    const method = selectedLocation ? "PUT" : "POST";
+    axios({
+      method: method,
+      url: url,
+      data: values,
+      headers: {
+        "Content-Type": "application/json"
+      },
+    })
+    .then(response => {
+      notyf.open({message: 'Storage location saved.', type: 'success'});
+      resetForm();
+      setShowModal(false);
+    })
+    .catch(e => {
+      console.error(e);
+      if (e.response.status === 404) {
+        notyf.open({message: 'The requested folder does not exist: ' + values.rootFolderPath, type: 'error'});
+      } else {
+        notyf.open({message: 'Failed to save storage location.', type: 'error'});
+      }
+    })
+    .finally(() => {
+      setSubmitting(false);
+      setLoadCounter(loadCounter + 1);
+    })
+  }
+
+  const handleLocationEdit = (location) => {
+    console.debug("Edit location: ", location);
+    formikRef.current?.resetForm();
+    setSelectedLocation(location);
+    setShowModal(true);
+  }
+
+  const handleLocationActiveToggle = (location, active) => {
+
+  }
+
   let content = '';
   if (isLoading) content = <SettingsLoadingMessage />;
   else if (error) content = <SettingsErrorMessage />;
-  else content = <StorageLocationTable locations={locations} />;
+  else content = <StorageLocationTable
+          locations={locations}
+          handleLocationEdit={handleLocationEdit}
+          handleToggleLocationActive={handleLocationActiveToggle}
+      />;
 
   return (
       <Card>
@@ -65,7 +114,11 @@ const StorageLocationSettings = () => {
             <span className="float-end">
               <Button
                   variant={"primary"}
-                  onClick={() => setShowModal(true)}
+                  onClick={() => {
+                    formikRef.current?.resetForm();
+                    setSelectedLocation(null);
+                    setShowModal(true);
+                  }}
               >
                 Add Location
                 &nbsp;
@@ -76,11 +129,31 @@ const StorageLocationSettings = () => {
         </Card.Header>
 
         <Card.Body>
-          {content}
+
+          <Row>
+            <Col>
+              <div className="info-alert">
+                Storage locations are folders in local file systems or cloud services that Study Tracker
+                users can use to store their data. A default storage location will be created on
+                application startup, dependent on the <code>storage.mode</code> setting used, which
+                will determine where program, study, and assay folders are created by default. You
+                can add additional storage locations here from the available configured storage systems.
+              </div>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col>
+              {content}
+            </Col>
+          </Row>
+
           <StorageLocationFormModal
               isOpen={showModal} 
               setIsOpen={setShowModal}
-              locations={locations}
+              selectedLocation={selectedLocation}
+              handleFormSubmit={handleSubmitForm}
+              formikRef={formikRef}
           />
         </Card.Body>
 
