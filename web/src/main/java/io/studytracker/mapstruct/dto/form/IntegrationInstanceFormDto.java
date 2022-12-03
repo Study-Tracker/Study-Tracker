@@ -16,27 +16,26 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.mapstruct.dto.response.IntegrationInstanceDetailsDto;
-import io.studytracker.storage.StorageLocationType;
-import io.studytracker.storage.StoragePermissions;
+import io.studytracker.mapstruct.dto.response.IntegrationInstanceConfigurationValueDetailsDto;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class FileStorageLocationFormDto {
+public class IntegrationInstanceFormDto {
 
   private Long id;
-  private @NotNull IntegrationInstanceDetailsDto integrationInstance;
-  private StorageLocationType type;
+
+  private @NotNull Long integrationDefinitionId;
+
   private @NotEmpty String displayName;
-  private String name;
-  private String rootFolderPath;
-  private String referenceId;
-  private String url;
-  private @NotNull StoragePermissions permissions;
-  private boolean defaultStudyLocation = false;
-  private boolean defaultDataLocation = false;
+
+  private @NotEmpty String name;
+
   private boolean active = true;
+
+  private Set<IntegrationInstanceConfigurationValueDetailsDto> configurationValues = new HashSet<>();
 
 }

@@ -83,4 +83,22 @@ public interface DataFileStorageService {
    */
   Resource fetchFile(FileStorageLocation location, String path) throws StudyStorageException;
 
+  /**
+   * Returns true if the file exists at the provided path.
+   *
+   * @param location the storage location
+   * @param path the path to the object to check
+   * @return true if the file exists
+   */
+  boolean fileExists(FileStorageLocation location, String path);
+
+  /**
+   * Returns true if the folder exists at the provided path.
+   *
+   * @param location the storage location
+   * @param path the path to the object to check
+   * @return true if the folder exists
+   */
+  boolean folderExists(FileStorageLocation location, String path);
+
 }

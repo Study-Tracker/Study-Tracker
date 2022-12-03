@@ -33,6 +33,8 @@ import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
 import BenchlingIntegrationSettings from "./BenchlingIntegrationSettings";
 import EgnyteIntegrationSettings from "./EgnyteIntegrationSettings";
 import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
+import StorageLocationSettings
+  from "./storageLocationSettings/StorageLocationSettings";
 
 const settings = {
   "users": {
@@ -58,6 +60,12 @@ const settings = {
     category: "site-settings",
     label: "Programs",
     tag: ProgramSettings
+  },
+  "storage-locations": {
+    id: "storage-locations",
+    category: "site-settings",
+    label: "Storage Locations",
+    tag: StorageLocationSettings
   },
 
   // Integrations

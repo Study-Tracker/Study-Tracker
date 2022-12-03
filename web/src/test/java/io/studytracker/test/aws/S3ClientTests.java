@@ -100,16 +100,44 @@ public class S3ClientTests {
 
   @Test
   public void objectExistsTest() throws Exception {
+
     ListObjectsV2Request request = ListObjectsV2Request.builder()
         .bucket(bucketName)
         .prefix("test/test1.txt")
         .delimiter("/")
         .build();
     ListObjectsV2Response response = s3Client.listObjectsV2(request);
+    System.out.println(response.toString());
     Assert.assertEquals(response.contents().size(), 1);
     response.contents().forEach(object -> {
       System.out.println(object.toString());
     });
+
+    request = ListObjectsV2Request.builder()
+        .bucket(bucketName)
+        .prefix("test/doesnt-exist.txt")
+        .delimiter("/")
+        .build();
+    response = s3Client.listObjectsV2(request);
+    Assert.assertEquals(response.contents().size(), 0);
+    System.out.println(response.toString());
+
+    request = ListObjectsV2Request.builder()
+        .bucket(bucketName)
+        .prefix("doesnt-exist/")
+        .build();
+    response = s3Client.listObjectsV2(request);
+    Assert.assertEquals(response.keyCount().intValue(), 0);
+    System.out.println(response.toString());
+
+    request = ListObjectsV2Request.builder()
+        .bucket(bucketName)
+        .prefix("test/")
+        .build();
+    response = s3Client.listObjectsV2(request);
+    Assert.assertTrue(response.keyCount() > 0);
+    System.out.println(response.toString());
+
   }
 
   @Test
