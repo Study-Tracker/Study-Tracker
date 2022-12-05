@@ -16,16 +16,24 @@
 
 package io.studytracker.service;
 
+import io.studytracker.aws.integration.S3IntegrationOptions;
+import io.studytracker.aws.integration.S3IntegrationOptionsFactory;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptions;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptionsFactory;
 import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
+import io.studytracker.model.IntegrationInstance;
 import io.studytracker.repository.FileStorageLocationRepository;
+import io.studytracker.repository.IntegrationInstanceRepository;
 import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.DataFileStorageServiceLookup;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageLocationType;
 import io.studytracker.storage.StudyFileStorageServiceLookup;
 import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -47,6 +55,9 @@ public class StorageLocationService {
 
   @Autowired
   private StudyFileStorageServiceLookup studyFileStorageServiceLookup;
+
+  @Autowired
+  private IntegrationInstanceRepository integrationInstanceRepository;
 
   public List<FileStorageLocation> findAll() {
     return fileStorageLocationRepository.findAll();
@@ -101,14 +112,39 @@ public class StorageLocationService {
   }
 
   @Transactional
-  public FileStorageLocation create(FileStorageLocation location) {
+  public FileStorageLocation create(FileStorageLocation location)
+      throws FileStorageException, StudyStorageNotFoundException {
+
+    // Lookup the integration instance
+    IntegrationInstance integrationInstance = integrationInstanceRepository
+        .findById(location.getIntegrationInstance().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Integration instance not found: "
+            + location.getIntegrationInstance().getId()));
+    location.setIntegrationInstance(integrationInstance);
+    location.setType(StorageLocationType.fromIntegrationType(integrationInstance.getDefinition().getType()));
+
+    // Make sure that the requested path exists
+    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
+        .orElseThrow(() -> new FileStorageException("Cannot find storage service for type: "
+            + location.getType()));
+    if (!storageService.folderExists(location, location.getRootFolderPath())) {
+      throw new StudyStorageNotFoundException("The requested root folder does not exist: "
+          + location.getRootFolderPath());
+    }
+
+    StorageFolder folder = storageService.findFolderByPath(location, location.getRootFolderPath());
+
+    location.setReferenceId(folder.getFolderId());
+    location.setUrl(folder.getUrl());
+    location.setName(generateLocationName(location));
+
     return fileStorageLocationRepository.save(location);
   }
 
   @Transactional
   public FileStorageLocation update(FileStorageLocation location) {
     FileStorageLocation f = fileStorageLocationRepository.getById(location.getId());
-    f.setName(location.getName());
+    f.setName(generateLocationName(location));
     f.setDisplayName(location.getDisplayName());
     f.setRootFolderPath(location.getRootFolderPath());
     f.setPermissions(location.getPermissions());
@@ -153,6 +189,25 @@ public class StorageLocationService {
         .orElseThrow(() -> new RecordNotFoundException("File storage location not found: "
             + folder.getFileStorageLocation().getId()));
     return lookupDataFileStorageService(location);
+  }
+
+  private String generateLocationName(FileStorageLocation location) {
+    IntegrationInstance instance = integrationInstanceRepository.findById(location.getIntegrationInstance().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Integration instance not found: "
+            + location.getIntegrationInstance().getId()));
+    switch (location.getType()) {
+      case EGNYTE_API:
+        EgnyteIntegrationOptions egnyteOptions = EgnyteIntegrationOptionsFactory.create(instance);
+        return egnyteOptions.getTenantName().toLowerCase()
+            + "-egnyte-"
+            + location.getDisplayName().toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z0-9-]", "");
+      case AWS_S3:
+        S3IntegrationOptions s3Options = S3IntegrationOptionsFactory.create(instance);
+        String bucketName = s3Options.getBucketName();
+        return (!bucketName.startsWith("s3") ? "s3://" : "") + s3Options.getBucketName();
+      default:
+        return location.getDisplayName().toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z0-9-]", "");
+    }
   }
 
 }

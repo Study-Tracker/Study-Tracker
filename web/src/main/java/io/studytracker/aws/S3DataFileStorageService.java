@@ -34,11 +34,8 @@ import org.springframework.core.io.Resource;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -190,22 +187,46 @@ public class S3DataFileStorageService  implements DataFileStorageService {
     }
   }
 
-  private boolean exists(String bucketName, String path) {
-    LOGGER.debug("Checking if path '{}' exists in bucket: {}", path, bucketName);
-    if (path.trim().equals("")) {
-      return true;
-    }
-    HeadObjectRequest request = HeadObjectRequest.builder()
-        .bucket(bucketName)
-        .key(path)
-        .build();
+  @Override
+  public boolean fileExists(FileStorageLocation location, String path) {
+
+    // Get the bucket
+    S3IntegrationOptions options = S3IntegrationOptionsFactory.create(location.getIntegrationInstance());
+    String bucketName = options.getBucketName();
+
     try {
-      HeadObjectResponse response = client.headObject(request);
-      LOGGER.debug("Found object: {}", response);
-      return true;
-    } catch (NoSuchKeyException e) {
+      ListObjectsV2Request request = ListObjectsV2Request.builder()
+          .bucket(bucketName)
+          .prefix(path)
+          .delimiter("/")
+          .build();
+      ListObjectsV2Response response = client.listObjectsV2(request);
+      return response.contents().size() > 0;
+    } catch (Exception e) {
       return false;
     }
+
+  }
+
+  @Override
+  public boolean folderExists(FileStorageLocation location, String path) {
+
+    // Get the bucket
+    S3IntegrationOptions options = S3IntegrationOptionsFactory.create(location.getIntegrationInstance());
+    String bucketName = options.getBucketName();
+
+    try {
+      ListObjectsV2Request request = ListObjectsV2Request.builder()
+          .bucket(bucketName)
+          .prefix(path)
+          .build();
+      ListObjectsV2Response response = client.listObjectsV2(request);
+      return response.keyCount() > 0;
+    } catch (Exception e) {
+      return false;
+    }
+
+
   }
 
 }

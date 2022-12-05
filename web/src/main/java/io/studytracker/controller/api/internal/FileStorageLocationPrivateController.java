@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractApiController;
@@ -9,8 +25,8 @@ import io.studytracker.mapstruct.mapper.FileStorageLocationMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.FileStorageLocation;
 import io.studytracker.service.StorageLocationService;
+import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +56,10 @@ public class FileStorageLocationPrivateController extends AbstractApiController 
   private FileStorageLocationMapper mapper;
 
   @GetMapping("")
-  public List<FileStorageLocation> findAll() {
+  public List<FileStorageLocationDetailsDto> findAll() {
     LOGGER.debug("findAll()");
-    return storageLocationService.findAll().stream()
-        .filter(FileStorageLocation::isActive)
-        .collect(Collectors.toList());
+    List<FileStorageLocation> locations = storageLocationService.findAll();
+    return mapper.toDetailsList(locations);
   }
 
   @GetMapping("/{id}")
@@ -58,8 +73,16 @@ public class FileStorageLocationPrivateController extends AbstractApiController 
   @PostMapping("")
   public HttpEntity<FileStorageLocationDetailsDto> create(@Valid @RequestBody FileStorageLocationFormDto dto) {
     LOGGER.info("Creating new file storage location: {}", dto);
-    FileStorageLocation location
-        = storageLocationService.create(mapper.fromForm(dto));
+    FileStorageLocation location;
+    try {
+      location = storageLocationService.create(mapper.fromForm(dto));
+    } catch (StudyStorageNotFoundException e) {
+      throw new RecordNotFoundException("The requested folder does not exist: " + dto.getRootFolderPath());
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.error("Error creating file storage location: {}", e.getMessage());
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     Activity activity = StorageActivityUtils
         .fromNewStorageLocation(location, this.getAuthenticatedUser());
     this.logActivity(activity);
@@ -67,7 +90,7 @@ public class FileStorageLocationPrivateController extends AbstractApiController 
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<FileStorageLocationDetailsDto> create(@PathVariable("id") Long id,
+  public HttpEntity<FileStorageLocationDetailsDto> update(@PathVariable("id") Long id,
       @Valid @RequestBody FileStorageLocationFormDto dto) {
     LOGGER.info("Updating existing file storage location: {} {}", id, dto);
     FileStorageLocation location

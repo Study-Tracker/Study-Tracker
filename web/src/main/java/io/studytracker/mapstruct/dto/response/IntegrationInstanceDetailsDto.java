@@ -27,7 +27,7 @@ public class IntegrationInstanceDetailsDto {
 
   private Long id;
 
-  private Object definition;
+  private IntegrationDefinitionDetailsDto definition;
 
   private String displayName;
 

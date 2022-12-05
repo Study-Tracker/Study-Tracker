@@ -19,8 +19,12 @@ application.host-name=
 
 # Required
 # Character sequence used for seeding encryption keys. This should ideally be a long, random string
+<<<<<<< HEAD
 # of characters between 16 and 512 characters. It is important that you do not change this value
 # after setting it.
+=======
+# of characters. It is important that you do not change this value after setting it.
+>>>>>>> main
 
 application.secret=
 

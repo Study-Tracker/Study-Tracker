@@ -16,8 +16,25 @@
 
 package io.studytracker.storage;
 
+import io.studytracker.integration.IntegrationType;
+
 public enum StorageLocationType {
   LOCAL_FILE_SYSTEM,
   EGNYTE_API,
   AWS_S3
+  ;
+
+  public static StorageLocationType fromIntegrationType(IntegrationType integrationType) {
+    switch (integrationType) {
+      case LOCAL_FILE_SYSTEM:
+        return LOCAL_FILE_SYSTEM;
+      case EGNYTE:
+        return EGNYTE_API;
+      case AWS_S3:
+        return AWS_S3;
+      default:
+        throw new IllegalArgumentException("Unsupported file storage location integration type: " + integrationType);
+    }
+  }
+
 }
