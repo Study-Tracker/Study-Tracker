@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -32,8 +31,6 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 @Configuration
 @ConditionalOnProperty(name = "aws.access-key-id", havingValue = "")
 public class AmazonWebServicesConfiguration {
-
-  @Autowired private Environment env;
 
   @Autowired private AWSProperties properties;
 

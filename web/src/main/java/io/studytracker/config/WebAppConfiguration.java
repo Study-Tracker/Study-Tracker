@@ -23,13 +23,11 @@ import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.service.FileSystemStorageService;
 import java.nio.file.Paths;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -38,8 +36,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan(basePackages = {"io.studytracker.controller", "io.studytracker.exception"})
 @PropertySource("classpath:web.properties")
 public class WebAppConfiguration {
-
-  @Autowired private Environment env;
 
   @Bean
   public WebMvcConfigurer webMvcConfigurer() {

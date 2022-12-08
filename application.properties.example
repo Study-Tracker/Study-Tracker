@@ -208,17 +208,20 @@ server.ssl.key-store-password=
 
 # Optional
 # If using Okta for SSO, set option to 'okta-saml'
-security.sso=
+sso.mode=
 
 # Okta
 sso.okta.url=
-saml.audience=
-saml.idp=
-saml.metadata-url=
-saml.metadata-base-url=
-saml.keystore.location=
-saml.keystore.alias=
-saml.keystore.password=
+
+# SAML (eg. Okta SAML)
+sso.saml.audience=
+sso.saml.idp=
+sso.saml.metadata-url=
+sso.saml.metadata-base-url=
+sso.saml.keystore.location=
+sso.saml.keystore.alias=
+sso.saml.keystore.password=
+sso.saml.max-authentication-age=
 
 
 ### Git ###
@@ -226,6 +229,7 @@ saml.keystore.password=
 # Optional
 # If you wish to integrate Study Tracker with a Git server, you can enable that here. Currently, only
 # GitLab is supported. Options: 'none', 'gitlab'. Default: 'none'
+
 git.mode=
 
 ## GitLab
@@ -233,6 +237,16 @@ git.mode=
 # root-group-id value should be the identifier of the group you would like study repositories
 # created within. You should create an access key to grant permission to Study Tracker to create
 # and read repositories within this group, that key should be provided here.
+# Optional
+
 gitlab.url=
 gitlab.access_key=
 gitlab.root-group-id=
+
+# You can alternatively provide a username, password, client ID, and client secret to access the
+# GitLab API, but this is less secure and not recommended.
+
+gitlab.client-id=
+gitlab.client-secret=
+gitlab.username=
+gitlab.password=

@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test"})
+@ActiveProfiles({"test", "mail-test"})
 public class MailServiceTests {
 
   @Autowired private EmailService emailService;

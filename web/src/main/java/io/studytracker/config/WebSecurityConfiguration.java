@@ -16,6 +16,8 @@
 
 package io.studytracker.config;
 
+import io.studytracker.config.properties.SingleSignOnProperties;
+import io.studytracker.config.properties.SingleSignOnProperties.SamlKeystoreProperties;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.User;
 import io.studytracker.security.AppUserDetails;
@@ -46,7 +48,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -245,29 +246,32 @@ public class WebSecurityConfiguration {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(WebOktaSSOAppSecurityConfiguration.class);
 
-    @Value("${saml.audience}")
-    private String samlAudience;
+    @Autowired
+    private SingleSignOnProperties properties;
 
-    @Value("${saml.keystore.location}")
-    private String samlKeystoreLocation;
-
-    @Value("${saml.keystore.password}")
-    private String samlKeystorePassword;
-
-    @Value("${saml.keystore.alias}")
-    private String samlKeystoreAlias;
-
-    @Value("${saml.idp}")
-    private String defaultIdp;
-
-    @Value("${saml.metadata-url}")
-    private String metadataUrl;
-
-    @Value("${saml.metadata-base-url}")
-    private String metadataBaseUrl;
-
-    @Value("${saml.max-authentication-age:86400}")
-    private long maxAuthenticationAge;
+//    @Value("${saml.audience}")
+//    private String samlAudience;
+//
+//    @Value("${saml.keystore.location}")
+//    private String samlKeystoreLocation;
+//
+//    @Value("${saml.keystore.password}")
+//    private String samlKeystorePassword;
+//
+//    @Value("${saml.keystore.alias}")
+//    private String samlKeystoreAlias;
+//
+//    @Value("${saml.idp}")
+//    private String defaultIdp;
+//
+//    @Value("${saml.metadata-url}")
+//    private String metadataUrl;
+//
+//    @Value("${saml.metadata-base-url}")
+//    private String metadataBaseUrl;
+//
+//    @Value("${saml.max-authentication-age:86400}")
+//    private long maxAuthenticationAge;
 
     @Autowired private AppUserDetailsService appUserDetailsService;
 
@@ -335,7 +339,7 @@ public class WebSecurityConfiguration {
     @Bean
     public WebSSOProfileConsumer webSSOprofileConsumer() {
       WebSSOProfileConsumerImpl consumer = new WebSSOProfileConsumerImpl();
-      consumer.setMaxAuthenticationAge(maxAuthenticationAge);
+      consumer.setMaxAuthenticationAge(properties.getSaml().getMaxAuthenticationAge());
       return consumer;
     }
 
@@ -369,6 +373,8 @@ public class WebSecurityConfiguration {
     public KeyManager keyManager() {
 
       DefaultResourceLoader loader = new DefaultResourceLoader();
+      SamlKeystoreProperties keystore = properties.getSaml().getKeystore();
+      String samlKeystoreLocation = properties.getSaml().getKeystore().getLocation();
 
       // Enforce absolute paths for non-relative paths
       if (!samlKeystoreLocation.startsWith("classpath:")
@@ -383,8 +389,8 @@ public class WebSecurityConfiguration {
       }
 
       Map<String, String> passwords = new HashMap<>();
-      passwords.put(samlKeystoreAlias, samlKeystorePassword);
-      return new JKSKeyManager(storeFile, samlKeystorePassword, passwords, samlKeystoreAlias);
+      passwords.put(keystore.getAlias(), keystore.getPassword());
+      return new JKSKeyManager(storeFile, keystore.getPassword(), passwords, keystore.getAlias());
 
     }
 
@@ -425,7 +431,7 @@ public class WebSecurityConfiguration {
     public ExtendedMetadataDelegate oktaExtendedMetadataProvider(Timer backgroundTaskTimer)
         throws MetadataProviderException {
       HTTPMetadataProvider metadataProvider =
-          new HTTPMetadataProvider(backgroundTaskTimer, httpClient(), metadataUrl);
+          new HTTPMetadataProvider(backgroundTaskTimer, httpClient(), properties.getSaml().getMetadataUrl());
       metadataProvider.setParserPool(parserPool());
       metadataProvider.initialize();
 
@@ -445,7 +451,7 @@ public class WebSecurityConfiguration {
       List<MetadataProvider> providers = new ArrayList<>();
       providers.add(oktaExtendedMetadataProvider);
       CachingMetadataManager metadataManager = new CachingMetadataManager(providers);
-      metadataManager.setDefaultIDP(defaultIdp);
+      metadataManager.setDefaultIDP(properties.getSaml().getIdp());
       return metadataManager;
     }
 
@@ -534,11 +540,11 @@ public class WebSecurityConfiguration {
 
     public MetadataGenerator metadataGenerator() {
       MetadataGenerator metadataGenerator = new MetadataGenerator();
-      metadataGenerator.setEntityId(samlAudience);
+      metadataGenerator.setEntityId(properties.getSaml().getAudience());
       metadataGenerator.setExtendedMetadata(extendedMetadata());
       metadataGenerator.setIncludeDiscoveryExtension(false);
       metadataGenerator.setKeyManager(keyManager());
-      metadataGenerator.setEntityBaseURL(metadataBaseUrl);
+      metadataGenerator.setEntityBaseURL(properties.getSaml().getMetadataBaseUrl());
       return metadataGenerator;
     }
 

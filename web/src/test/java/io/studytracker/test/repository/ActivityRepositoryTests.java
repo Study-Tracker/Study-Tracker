@@ -57,6 +57,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test"})
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+//@EnableConfigurationProperties({StudyTrackerProperties.class})
 public class ActivityRepositoryTests {
 
   @Autowired private UserRepository userRepository;

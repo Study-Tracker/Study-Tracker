@@ -16,6 +16,7 @@
 
 package io.studytracker.controller;
 
+import io.studytracker.config.properties.SingleSignOnProperties;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.UnauthorizedException;
@@ -36,7 +37,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +46,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,7 +68,8 @@ public class AuthenticationController {
 
   @Autowired private EmailService emailService;
 
-  @Autowired private Environment env;
+  @Autowired
+  private SingleSignOnProperties ssoProperties;
 
   @PostMapping("/auth/login")
   public String submitLogin(@ModelAttribute AuthCredentials credentials) {
@@ -139,15 +141,15 @@ public class AuthenticationController {
   @GetMapping("/auth/options")
   public HttpEntity<?> getAuthenticationOptions() {
 
+    LOGGER.info("Processing authentication options request: {}", ssoProperties.toString());
     Map<String, Object> data = new LinkedHashMap<>();
 
     // Single sign-on
-    if (env.containsProperty("security.sso")) {
+    if (StringUtils.hasText(ssoProperties.getMode())) {
       Map<String, Object> sso = new LinkedHashMap<>();
-      if (env.getRequiredProperty("security.sso").equals("okta-saml")
-          && env.containsProperty("sso.okta.url")
-          && !env.getRequiredProperty("sso.okta.url").equals("")) {
-        sso.put("okta", env.getRequiredProperty("sso.okta.url"));
+      if (ssoProperties.getMode().equals("okta-saml")
+          && StringUtils.hasText(ssoProperties.getOkta().getUrl())) {
+        sso.put("okta", ssoProperties.getOkta().getUrl());
       }
       data.put("sso", sso);
     }

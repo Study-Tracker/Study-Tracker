@@ -24,55 +24,65 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "aws")
+@ConfigurationProperties(prefix = "sso")
 @Validated
 @Getter
 @Setter
-public class AWSProperties {
+@ToString
+public class SingleSignOnProperties {
 
-  private String region;
-
-  @JsonIgnore
-  private String accessKeyId;
-
-  @JsonIgnore
-  private String secretAccessKey;
+  @ConfigurationModeConstraint(options = {"okta-saml"})
+  private String mode;
 
   @Valid
-  private final EventBridgeProperties eventbridge = new EventBridgeProperties();
+  private final OktaSsoProperties okta = new OktaSsoProperties();
 
   @Valid
-  private final S3Properties s3 = new S3Properties();
+  private final SamlSsoProperties saml = new SamlSsoProperties();
 
-  @Override
-  public String toString() {
-    return "AWSProperties{" +
-        "region='" + region + '\'' +
-        ", accessKeyId='" + accessKeyId.substring(0, 5) + "*****'" +
-        ", secretAccessKey='*****'" +
-        ", eventbridge=" + eventbridge +
-        ", s3=" + s3 +
-        '}';
-  }
 
   @Getter
   @Setter
   @ToString
-  public static class EventBridgeProperties {
+  public static class OktaSsoProperties {
 
-    private String busName;
+    private String url;
 
   }
 
   @Getter
   @Setter
   @ToString
-  public static class S3Properties {
+  public static class SamlSsoProperties {
 
-    private String defaultStudyLocation;
+    private String audience;
+    private String idp;
+    private String metadataUrl;
+    private String metadataBaseUrl;
+    private Integer maxAuthenticationAge;
+    @Valid private SamlKeystoreProperties keystore;
 
-    private String buckets;
+  }
 
+  @Getter
+  @Setter
+  public static class SamlKeystoreProperties {
+
+    private String location;
+
+    private String alias;
+
+    @JsonIgnore
+    private String password;
+
+    @Override
+    public String toString() {
+      return "SamlKeystoreProperties{" +
+          "location='" + location + '\'' +
+          ", alias='" + alias + '\'' +
+          ", password='*****'" +
+          '}';
+    }
   }
 
 }

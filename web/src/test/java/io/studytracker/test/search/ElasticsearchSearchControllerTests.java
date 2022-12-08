@@ -84,11 +84,12 @@ public class ElasticsearchSearchControllerTests {
         .andExpect(jsonPath("$", hasKey("maxScore")))
         .andExpect(jsonPath("$.maxScore", greaterThan(0.0)))
         .andExpect(jsonPath("$", hasKey("hits")))
-        .andExpect(jsonPath("$.hits", hasSize(3)))
+        .andExpect(jsonPath("$.hits", hasSize(2)))
         .andExpect(jsonPath("$.hits[0]", hasKey("score")))
         .andExpect(jsonPath("$.hits[0].score", greaterThan(0.0)))
         .andExpect(jsonPath("$.hits[0]", hasKey("document")))
-        .andExpect(jsonPath("$.hits[0].document", hasKey("code")))
-        .andExpect(jsonPath("$.hits[0].document.code", Matchers.is("PPB-00001")));
+        .andExpect(jsonPath("$.hits[0].document", hasKey("data")))
+        .andExpect(jsonPath("$.hits[0].document.data", hasKey("code")))
+        .andExpect(jsonPath("$.hits[0].document.data.code", Matchers.is("PPB-00001")));
   }
 }

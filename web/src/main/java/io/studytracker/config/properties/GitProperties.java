@@ -16,35 +16,20 @@
 
 package io.studytracker.config.properties;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "storage")
+@ConfigurationProperties(prefix = "git")
 @Validated
 @Getter
 @Setter
 @ToString
-public class StorageProperties {
+public class GitProperties {
 
-  @ConfigurationModeConstraint(options = {"local", "egnyte"})
+  @ConfigurationModeConstraint(options = {"none", "gitlab"})
   private String mode;
-
-  private Boolean useExisting;
-
-  @Deprecated
-  @Min(0)
-  @Max(5)
-  private Integer maxFolderReadDepth;
-
-  @NotEmpty
-  private String tempDir;
-
-  private String localDir;
 
 }

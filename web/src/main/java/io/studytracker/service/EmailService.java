@@ -48,7 +48,7 @@ public class EmailService {
   }
 
   public void sendPasswordResetEmail(String emailAddress, String token) {
-
+    LOGGER.info("Sending password reset email to {}", emailAddress);
     if (mailSender == null) {
       LOGGER.warn(
           "Mail service is not configured. Check config properties and restart the application if necessary.");
@@ -74,7 +74,7 @@ public class EmailService {
   }
 
   public void sendNewUserEmail(String emailAddress, String token) {
-
+    LOGGER.info("Sending new user email to {}", emailAddress);
     if (mailSender == null) {
       LOGGER.warn(
           "Mail service is not configured. Check config properties and restart the application if necessary.");

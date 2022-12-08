@@ -16,10 +16,16 @@
 
 package io.studytracker.config;
 
+import io.studytracker.config.properties.EmailProperties;
 import io.studytracker.service.NamingService;
+import java.util.Properties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
 public class ServiceConfiguration {
@@ -28,6 +34,31 @@ public class ServiceConfiguration {
   @Primary
   public NamingService namingService() {
     return new NamingService();
+  }
+
+  @ConditionalOnExpression("!T(org.springframework.util.StringUtils).isEmpty('${email.host:}')")
+  @Configuration
+  public static class MailServiceConfiguration {
+
+    @Autowired
+    private EmailProperties emailProperties;
+
+    @Bean
+    public JavaMailSender javaMailSender() {
+      JavaMailSenderImpl sender = new JavaMailSenderImpl();
+      Properties props = sender.getJavaMailProperties();
+      props.put("mail.transport.protocol", emailProperties.getProtocol());
+      sender.setHost(emailProperties.getHost());
+      sender.setPort(emailProperties.getPort());
+      if (emailProperties.getSmtpAuth()) {
+        sender.setUsername(emailProperties.getUsername());
+        sender.setPassword(emailProperties.getPassword());
+        props.put("mail.smtp.auth", emailProperties.getSmtpAuth());
+        props.put("mail.smtp.starttls.enable", emailProperties.getSmtpStartTls());
+      }
+      return sender;
+    }
+
   }
 
 }

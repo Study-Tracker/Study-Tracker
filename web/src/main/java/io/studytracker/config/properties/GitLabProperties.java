@@ -16,35 +16,45 @@
 
 package io.studytracker.config.properties;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.net.URL;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "storage")
+@ConfigurationProperties(prefix = "gitlab")
 @Validated
 @Getter
 @Setter
-@ToString
-public class StorageProperties {
+public class GitLabProperties {
 
-  @ConfigurationModeConstraint(options = {"local", "egnyte"})
-  private String mode;
+  private URL url;
 
-  private Boolean useExisting;
+  private String accessKey;
 
-  @Deprecated
-  @Min(0)
-  @Max(5)
-  private Integer maxFolderReadDepth;
+  private Integer rootGroupId;
 
-  @NotEmpty
-  private String tempDir;
+  private String clientId;
 
-  private String localDir;
+  @JsonIgnore
+  private String clientSecret;
 
+  private String username;
+
+  @JsonIgnore
+  private String password;
+
+  @Override
+  public String toString() {
+    return "GitLabProperties{" +
+        "url=" + url +
+        ", accessKey='" + accessKey.substring(0,5) + "*****'" +
+        ", rootGroupId=" + rootGroupId +
+        ", clientId='" + clientId + '\'' +
+        ", clientSecret='" + clientSecret + '\'' +
+        ", username='" + username + '\'' +
+        ", password='*****'" +
+        '}';
+  }
 }

@@ -17,6 +17,7 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.aws.integration.S3IntegrationV1;
+import io.studytracker.config.properties.AWSProperties.S3Properties;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.egnyte.integration.EgnyteIntegrationV1;
 import io.studytracker.exception.InvalidConfigurationException;
@@ -40,7 +41,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -63,9 +63,6 @@ public class IntegrationInitializer {
       LocalFileSystemIntegrationV1.getIntegrationDefinition(),
       S3IntegrationV1.getIntegrationDefinition()
   );
-
-  @Autowired
-  private Environment env;
 
   @Autowired
   private StudyTrackerProperties properties;
@@ -226,11 +223,12 @@ public class IntegrationInitializer {
     // Check to see if instance is registered
     List<IntegrationInstance> awsS3Instances = integrationInstanceRepository
         .findByIntegrationType(IntegrationType.AWS_S3);
+    S3Properties s3Properties = properties.getAws().getS3();
 
     String defaultStudyBucket = null;
     String defaultBucketPath = null;
-    if (env.containsProperty("aws.s3.default-study-location")) {
-      String[] bits = env.getRequiredProperty("aws.s3.default-study-location")
+    if (StringUtils.hasText(s3Properties.getDefaultStudyLocation())) {
+      String[] bits = s3Properties.getDefaultStudyLocation()
           .trim()
           .replace("s3://", "")
           .split("/", 2);
@@ -246,7 +244,7 @@ public class IntegrationInitializer {
           .orElseThrow(() -> new InvalidConfigurationException(
               "Could not find a suitable AWS S3 integration to initialize legacy storage location"));
 
-      for (String bucket: env.getRequiredProperty("aws.s3.buckets").split(",")) {
+      for (String bucket: s3Properties.getBuckets().split(",")) {
 
         String bucketName = bucket.trim().replace("s3://", "");
         IntegrationInstanceBuilder builder = new IntegrationInstanceBuilder()
@@ -254,7 +252,7 @@ public class IntegrationInitializer {
             .displayName("AWS S3: " + bucketName)
             .integrationDefinition(s3Definition)
             .active(true)
-            .configurationValue(S3IntegrationV1.REGION, env.getRequiredProperty("aws.region"))
+            .configurationValue(S3IntegrationV1.REGION, properties.getAws().getRegion())
             .configurationValue(S3IntegrationV1.BUCKET_NAME, bucketName);
         IntegrationInstance s3Instance = integrationInstanceRepository.save(builder.build());
 
@@ -292,8 +290,8 @@ public class IntegrationInitializer {
       boolean updateFlag = false; // for triggering update of existing folder records
 
       // Is Egnyte being used?
-      if (env.containsProperty("storage.mode")
-          && env.getRequiredProperty("storage.mode").equals("egnyte")) {
+      if (StringUtils.hasText(properties.getStorage().getMode())
+          && properties.getStorage().getMode().equals("egnyte")) {
         defaultLocation = registerEgnyteInstances();
       }
 
@@ -306,7 +304,8 @@ public class IntegrationInitializer {
       if (defaultLocation != null) updateFlag = true;
 
       //// AWS S3
-      if (env.containsProperty("aws.region") && env.containsProperty("aws.s3.buckets")) {
+      if (StringUtils.hasText(properties.getAws().getRegion())
+          && StringUtils.hasText(properties.getAws().getS3().getBuckets())) {
         registerS3Integrations();
       }
 
