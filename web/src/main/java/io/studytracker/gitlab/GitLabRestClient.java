@@ -16,6 +16,7 @@
 
 package io.studytracker.gitlab;
 
+import io.studytracker.config.properties.GitLabProperties;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.gitlab.entities.GitLabAuthenticationToken;
 import io.studytracker.gitlab.entities.GitLabGroup;
@@ -46,12 +47,12 @@ public final class GitLabRestClient {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitLabRestClient.class);
 
   private final RestTemplate restTemplate;
-  private final GitLabOptions options;
+  private final GitLabProperties properties;
 
 
-  public GitLabRestClient(RestTemplate restTemplate, GitLabOptions options) {
+  public GitLabRestClient(RestTemplate restTemplate, GitLabProperties properties) {
     this.restTemplate = restTemplate;
-    this.options = options;
+    this.properties = properties;
   }
 
   /**
@@ -60,14 +61,14 @@ public final class GitLabRestClient {
    * @return the access token
    */
   public GitLabAuthenticationToken authenticate() {
-    URL url = joinUrls(options.getRootUrl(), "/oauth/token");
+    URL url = joinUrls(properties.getUrl(), "/oauth/token");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Content-Type", "application/x-www-form-urlencoded");
     headers.set("Accept", "application/json");
     MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
     data.add("grant_type", "password");
-    data.add("username", options.getUsername());
-    data.add("password", options.getPassword());
+    data.add("username", properties.getUsername());
+    data.add("password", properties.getPassword());
     HttpEntity<?> request = new HttpEntity<>(data, headers);
     ResponseEntity<GitLabAuthenticationToken> response = restTemplate.exchange(
         url.toString(), HttpMethod.POST, request, GitLabAuthenticationToken.class);
@@ -87,7 +88,7 @@ public final class GitLabRestClient {
    */
   public List<GitLabUser> findUsers(@NotNull String token, String query) {
     LOGGER.debug("Finding users with query: {}", query);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/users" + (query != null ? "?search=" + query : ""));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -122,7 +123,7 @@ public final class GitLabRestClient {
    */
   public Optional<GitLabUser> findUserById(@NotNull String token, @NotNull Integer userId) {
     LOGGER.debug("Finding user with id: {}", userId);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/users/" + userId.toString());
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -146,7 +147,7 @@ public final class GitLabRestClient {
    */
   public List<GitLabNamespace> findNamespaces(@NotNull String token, String query) {
     LOGGER.debug("Finding namespaces with query: {}", query);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/namespaces" + (query != null ? "?search=" + query : ""));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -171,7 +172,7 @@ public final class GitLabRestClient {
    */
   public Optional<GitLabNamespace> findNamespaceById(@NotNull String token, @NotNull Integer namespaceId) {
     LOGGER.debug("Finding namespace with id: {}", namespaceId);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/namespaces/" + namespaceId.toString());
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -205,7 +206,7 @@ public final class GitLabRestClient {
    */
   public List<GitLabGroup> findGroups(@NotNull String token, String query) {
     LOGGER.debug("Finding groups with query: {}", query);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/groups" + (query != null ? "?search=" + query : ""));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -240,7 +241,7 @@ public final class GitLabRestClient {
    */
   public Optional<GitLabGroup> findGroupById(@NotNull String token, @NotNull Integer groupId) {
     LOGGER.debug("Finding group with id: {}", groupId);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/groups/" + groupId.toString());
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -257,7 +258,7 @@ public final class GitLabRestClient {
 
   public GitLabGroup createNewGroup(@NotNull String token, @NotNull GitLabNewGroupRequest newGroupRequest) {
     LOGGER.debug("Creating new group with name: {}", newGroupRequest.getName());
-    URL url = joinUrls(options.getRootUrl(), "/api/v4/groups");
+    URL url = joinUrls(properties.getUrl(), "/api/v4/groups");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
     headers.set("Accept", "application/json");
@@ -281,7 +282,7 @@ public final class GitLabRestClient {
    */
   public List<GitLabProject> findProjects(@NotNull String token, String query) {
     LOGGER.debug("Finding projects with query: {}", query);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/projects" + (query != null ? "?search=" + query : ""));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -315,7 +316,7 @@ public final class GitLabRestClient {
    */
   public Optional<GitLabProject> findProjectById(@NotNull String token, @NotNull Integer projectId) {
     LOGGER.debug("Finding project with id: {}", projectId);
-    URL url = joinUrls(options.getRootUrl(),
+    URL url = joinUrls(properties.getUrl(),
         "/api/v4/projects/" + projectId.toString());
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -344,7 +345,7 @@ public final class GitLabRestClient {
       GitLabUser user
   ) {
     LOGGER.info("Creating project: {}", newProjectRequest);
-    URL url = joinUrls(options.getRootUrl(), "/api/v4/projects"
+    URL url = joinUrls(properties.getUrl(), "/api/v4/projects"
         + (user != null ? "/user/" + user.getId().toString() : ""));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + token);
@@ -382,11 +383,4 @@ public final class GitLabRestClient {
     }
   }
 
-  public RestTemplate getRestTemplate() {
-    return restTemplate;
-  }
-
-  public GitLabOptions getOptions() {
-    return options;
-  }
 }

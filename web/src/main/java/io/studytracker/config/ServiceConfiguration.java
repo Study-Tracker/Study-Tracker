@@ -16,52 +16,49 @@
 
 package io.studytracker.config;
 
-import io.studytracker.service.NamingOptions;
+import io.studytracker.config.properties.EmailProperties;
 import io.studytracker.service.NamingService;
+import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
 public class ServiceConfiguration {
 
-  private Environment env;
-
   @Bean
   @Primary
   public NamingService namingService() {
-    NamingOptions namingOptions = new NamingOptions();
-    if (env.containsProperty("study.study-code-counter-start")) {
-      namingOptions.setStudyCodeCounterStart(
-          env.getRequiredProperty("study.study-code-counter-start", Integer.class));
-    }
-    if (env.containsProperty("study.study-code-min-digits")) {
-      namingOptions.setStudyCodeMinimumDigits(
-          env.getRequiredProperty("study.study-code-min-digits", Integer.class));
-    }
-    if (env.containsProperty("study.external-code-counter-start")) {
-      namingOptions.setExternalStudyCodeCounterStart(
-          env.getRequiredProperty("study.external-code-counter-start", Integer.class));
-    }
-    if (env.containsProperty("study.external-code-min-digits")) {
-      namingOptions.setExternalStudyCodeMinimumDigits(
-          env.getRequiredProperty("study.external-code-min-digits", Integer.class));
-    }
-    if (env.containsProperty("study.assay-code-counter-start")) {
-      namingOptions.setAssayCodeCounterStart(
-          env.getRequiredProperty("study.assay-code-counter-start", Integer.class));
-    }
-    if (env.containsProperty("study.assay-code-min-digits")) {
-      namingOptions.setAssayCodeMinimumDigits(
-          env.getRequiredProperty("study.assay-code-min-digits", Integer.class));
-    }
-    return new NamingService(namingOptions);
+    return new NamingService();
   }
 
-  @Autowired
-  public void setEnv(Environment env) {
-    this.env = env;
+  @ConditionalOnExpression("!T(org.springframework.util.StringUtils).isEmpty('${email.host:}')")
+  @Configuration
+  public static class MailServiceConfiguration {
+
+    @Autowired
+    private EmailProperties emailProperties;
+
+    @Bean
+    public JavaMailSender javaMailSender() {
+      JavaMailSenderImpl sender = new JavaMailSenderImpl();
+      Properties props = sender.getJavaMailProperties();
+      props.put("mail.transport.protocol", emailProperties.getProtocol());
+      sender.setHost(emailProperties.getHost());
+      sender.setPort(emailProperties.getPort());
+      if (emailProperties.getSmtpAuth()) {
+        sender.setUsername(emailProperties.getUsername());
+        sender.setPassword(emailProperties.getPassword());
+        props.put("mail.smtp.auth", emailProperties.getSmtpAuth());
+        props.put("mail.smtp.starttls.enable", emailProperties.getSmtpStartTls());
+      }
+      return sender;
+    }
+
   }
+
 }

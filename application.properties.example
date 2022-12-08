@@ -16,9 +16,15 @@
 
 application.host-name=
 
+
 # Required
 # Character sequence used for seeding encryption keys. This should ideally be a long, random string
+<<<<<<< HEAD
+# of characters between 16 and 512 characters. It is important that you do not change this value
+# after setting it.
+=======
 # of characters. It is important that you do not change this value after setting it.
+>>>>>>> main
 
 application.secret=
 
@@ -27,7 +33,8 @@ application.secret=
 
 # Required
 # The first time Study Tracker starts, an admin user will be created. You must specify an email and
-# default password for the admin account. The password can be changed after initial startup.
+# default password for the admin account. The password can be changed after initial startup. If no
+# password is provided, a random one will be generated and printed to the console at startup.
 
 admin.email=
 admin.password=
@@ -63,7 +70,9 @@ aws.region=
 aws.access-key-id=
 aws.secret-access-key=
 
+
 # If events.mode is set to 'eventbridge', then you must provide the name of the event bus to use.
+
 aws.eventbridge.bus-name=
 
 
@@ -71,13 +80,14 @@ aws.eventbridge.bus-name=
 
 # Required
 # Provide SMTP connection details for outgoing emails.
-spring.mail.host=
-spring.mail.port=
-spring.mail.username=
-spring.mail.password=
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
-email.outgoing-email-address=${spring.mail.username}
+email.host=
+email.port=
+email.username=
+email.password=
+email.smtp-auth=true
+email.smtp-start-tls=true
+email.outgoing-email-address=
+email.protocol=smtp
 
 
 ### Notebook ###
@@ -102,6 +112,8 @@ benchling.api.client-secret=
 
 ### File Storage ###
 
+# Determines where to create project folders and store study files uploaded by users. Can be either
+# a local file system (default), or a cloud storage service (eg. Egnyte).
 # Options: local, egnyte. Defaults to local
 
 storage.mode=
@@ -130,6 +142,9 @@ storage.local-dir=
 
 ### Egnyte ###
 
+# Configure connectivity with your Egnyte tenant. This requires having already registered an
+# application and API key in the Egnyte developer portal, and then used the key to generate
+# an authorization token.
 # Required if storage.mode is set to 'egnyte'.
 
 egnyte.tenant-name=
@@ -147,9 +162,16 @@ egnyte.qps=3
 
 ### Studies ###
 
-# You can change default study code creation behavior here.
+# You can change default study code creation behavior here. The 'counter-start' properties will
+# set the initial counter value for study and assay codes. The 'min-digits' properties will set the
+# minimum number of digits to use for the counter portion of the code.
 
-study.code-counter-start=10001
+#study.study-code-counter-start=101
+#study.study-code-min-digits=3
+#study.assay-code-counter-start=101
+#study.assay-code-min-digits=3
+#study.external-code-counter-start=101
+#study.external-code-min-digits=3
 
 
 ### Search ###
@@ -160,6 +182,9 @@ study.code-counter-start=10001
 # value for elasticsearch.host would be 'myelasticdb.com' and the port would be set to 443.
 
 search.mode=
+
+# Elasticsearch
+
 elasticsearch.host=
 elasticsearch.port=
 elasticsearch.use-ssl=
@@ -183,17 +208,20 @@ server.ssl.key-store-password=
 
 # Optional
 # If using Okta for SSO, set option to 'okta-saml'
-security.sso=
+sso.mode=
 
 # Okta
 sso.okta.url=
-saml.audience=
-saml.idp=
-saml.metadata-url=
-saml.metadata-base-url=
-saml.keystore.location=
-saml.keystore.alias=
-saml.keystore.password=
+
+# SAML (eg. Okta SAML)
+sso.saml.audience=
+sso.saml.idp=
+sso.saml.metadata-url=
+sso.saml.metadata-base-url=
+sso.saml.keystore.location=
+sso.saml.keystore.alias=
+sso.saml.keystore.password=
+sso.saml.max-authentication-age=
 
 
 ### Git ###
@@ -201,6 +229,7 @@ saml.keystore.password=
 # Optional
 # If you wish to integrate Study Tracker with a Git server, you can enable that here. Currently, only
 # GitLab is supported. Options: 'none', 'gitlab'. Default: 'none'
+
 git.mode=
 
 ## GitLab
@@ -208,6 +237,16 @@ git.mode=
 # root-group-id value should be the identifier of the group you would like study repositories
 # created within. You should create an access key to grant permission to Study Tracker to create
 # and read repositories within this group, that key should be provided here.
+# Optional
+
 gitlab.url=
 gitlab.access_key=
 gitlab.root-group-id=
+
+# You can alternatively provide a username, password, client ID, and client secret to access the
+# GitLab API, but this is less secure and not recommended.
+
+gitlab.client-id=
+gitlab.client-secret=
+gitlab.username=
+gitlab.password=

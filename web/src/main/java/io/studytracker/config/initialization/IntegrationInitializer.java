@@ -17,6 +17,8 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.aws.integration.S3IntegrationV1;
+import io.studytracker.config.properties.AWSProperties.S3Properties;
+import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.egnyte.integration.EgnyteIntegrationV1;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.integration.FileStorageLocationBuilder;
@@ -39,9 +41,9 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * Creates records for {@link IntegrationDefinition} instances, allowing for configuration of
@@ -63,7 +65,7 @@ public class IntegrationInitializer {
   );
 
   @Autowired
-  private Environment env;
+  private StudyTrackerProperties properties;
 
   @Autowired
   private IntegrationDefinitionRepository integrationDefinitionRepository;
@@ -125,22 +127,18 @@ public class IntegrationInitializer {
 
       // Create an integration instance
       IntegrationInstanceBuilder builder = new IntegrationInstanceBuilder()
-          .name(env.getRequiredProperty("egnyte.tenant-name") + "-egnyte")
+          .name(properties.getEgnyte().getTenantName() + "-egnyte")
           .displayName("Egnyte")
           .integrationDefinition(egnyteDef)
           .active(true)
-          .configurationValue(EgnyteIntegrationV1.TENANT_NAME,
-              env.getRequiredProperty("egnyte.tenant-name"))
-          .configurationValue(EgnyteIntegrationV1.API_TOKEN,
-              env.getRequiredProperty("egnyte.api-token"))
-          .configurationValue(EgnyteIntegrationV1.ROOT_PATH,
-              env.getRequiredProperty("egnyte.root-path"));
-      if (env.containsProperty("egnyte.root-url")) {
-        builder.configurationValue(EgnyteIntegrationV1.ROOT_URL,
-            env.getRequiredProperty("egnyte.root-url"));
+          .configurationValue(EgnyteIntegrationV1.TENANT_NAME, properties.getEgnyte().getTenantName())
+          .configurationValue(EgnyteIntegrationV1.API_TOKEN, properties.getEgnyte().getApiToken())
+          .configurationValue(EgnyteIntegrationV1.ROOT_PATH, properties.getEgnyte().getRootPath());
+      if (StringUtils.hasText(properties.getEgnyte().getRootUrl())) {
+        builder.configurationValue(EgnyteIntegrationV1.ROOT_URL, properties.getEgnyte().getRootUrl());
       } else {
         builder.configurationValue(EgnyteIntegrationV1.ROOT_URL,
-            "https://" + env.getRequiredProperty("egnyte.tenant-name") + ".egnyte.com");
+            "https://" + properties.getEgnyte().getTenantName() + ".egnyte.com");
       }
       IntegrationInstance egnyteInstance = integrationInstanceRepository.save(builder.build());
 
@@ -151,7 +149,7 @@ public class IntegrationInitializer {
           .displayName("Egnyte Study Folder")
           .name("egnyte-study-folder")
           .permissions(StoragePermissions.READ_WRITE)
-          .rootFolderPath(env.getRequiredProperty("egnyte.root-path"))
+          .rootFolderPath(properties.getEgnyte().getRootPath())
           .defaultStudyLocation(true)
           .defaultDataLocation(false);
       return fileStorageLocationRepository.save(locationBuilder.build());
@@ -194,7 +192,7 @@ public class IntegrationInitializer {
           .integrationDefinition(localFileSystemDef)
           .active(true)
           .configurationValue(LocalFileSystemIntegrationV1.ROOT_PATH,
-              env.getRequiredProperty("storage.local-dir"));
+              properties.getStorage().getLocalDir());
       IntegrationInstance localFileSystemInstance
           = integrationInstanceRepository.save(builder.build());
 
@@ -205,7 +203,7 @@ public class IntegrationInitializer {
           .displayName("Local Study Folder")
           .name("local-study-folder")
           .permissions(StoragePermissions.READ_WRITE)
-          .rootFolderPath(env.getRequiredProperty("storage.local-dir"))
+          .rootFolderPath(properties.getStorage().getLocalDir())
           .defaultStudyLocation(true)
           .defaultDataLocation(false);
       return fileStorageLocationRepository.save(locationBuilder.build());
@@ -225,11 +223,12 @@ public class IntegrationInitializer {
     // Check to see if instance is registered
     List<IntegrationInstance> awsS3Instances = integrationInstanceRepository
         .findByIntegrationType(IntegrationType.AWS_S3);
+    S3Properties s3Properties = properties.getAws().getS3();
 
     String defaultStudyBucket = null;
     String defaultBucketPath = null;
-    if (env.containsProperty("aws.s3.default-study-location")) {
-      String[] bits = env.getRequiredProperty("aws.s3.default-study-location")
+    if (StringUtils.hasText(s3Properties.getDefaultStudyLocation())) {
+      String[] bits = s3Properties.getDefaultStudyLocation()
           .trim()
           .replace("s3://", "")
           .split("/", 2);
@@ -245,7 +244,7 @@ public class IntegrationInitializer {
           .orElseThrow(() -> new InvalidConfigurationException(
               "Could not find a suitable AWS S3 integration to initialize legacy storage location"));
 
-      for (String bucket: env.getRequiredProperty("aws.s3.buckets").split(",")) {
+      for (String bucket: s3Properties.getBuckets().split(",")) {
 
         String bucketName = bucket.trim().replace("s3://", "");
         IntegrationInstanceBuilder builder = new IntegrationInstanceBuilder()
@@ -253,7 +252,7 @@ public class IntegrationInitializer {
             .displayName("AWS S3: " + bucketName)
             .integrationDefinition(s3Definition)
             .active(true)
-            .configurationValue(S3IntegrationV1.REGION, env.getRequiredProperty("aws.region"))
+            .configurationValue(S3IntegrationV1.REGION, properties.getAws().getRegion())
             .configurationValue(S3IntegrationV1.BUCKET_NAME, bucketName);
         IntegrationInstance s3Instance = integrationInstanceRepository.save(builder.build());
 
@@ -291,8 +290,8 @@ public class IntegrationInitializer {
       boolean updateFlag = false; // for triggering update of existing folder records
 
       // Is Egnyte being used?
-      if (env.containsProperty("storage.mode")
-          && env.getRequiredProperty("storage.mode").equals("egnyte")) {
+      if (StringUtils.hasText(properties.getStorage().getMode())
+          && properties.getStorage().getMode().equals("egnyte")) {
         defaultLocation = registerEgnyteInstances();
       }
 
@@ -305,7 +304,8 @@ public class IntegrationInitializer {
       if (defaultLocation != null) updateFlag = true;
 
       //// AWS S3
-      if (env.containsProperty("aws.region") && env.containsProperty("aws.s3.buckets")) {
+      if (StringUtils.hasText(properties.getAws().getRegion())
+          && StringUtils.hasText(properties.getAws().getS3().getBuckets())) {
         registerS3Integrations();
       }
 

@@ -16,6 +16,7 @@
 
 package io.studytracker.gitlab;
 
+import io.studytracker.config.properties.GitLabProperties;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.git.GitAttributes;
 import io.studytracker.git.GitGroup;
@@ -51,7 +52,7 @@ public class GitLabService implements GitService {
 
   private GitLabRestClient client;
 
-  private GitLabOptions options;
+  private GitLabProperties properties;
 
   private ProgramRepository programRepository;
 
@@ -62,8 +63,8 @@ public class GitLabService implements GitService {
   private UserRepository userRepository;
 
   private String getAccessToken() {
-    if (StringUtils.hasText(options.getAccessToken())) {
-      return options.getAccessToken();
+    if (StringUtils.hasText(properties.getAccessKey())) {
+      return properties.getAccessKey();
     } else {
       GitLabAuthenticationToken token = client.authenticate();
       return token.getAccessToken();
@@ -140,8 +141,8 @@ public class GitLabService implements GitService {
     String token = getAccessToken();
 
     // Get the parent group
-    LOGGER.debug("Looking up root GitLab group: {}", options.getRootGroupId());
-    Optional<GitLabGroup> parentGroupOptional = client.findGroupById(token, options.getRootGroupId());
+    LOGGER.debug("Looking up root GitLab group: {}", properties.getRootGroupId());
+    Optional<GitLabGroup> parentGroupOptional = client.findGroupById(token, properties.getRootGroupId());
     if (parentGroupOptional.isEmpty()) {
       throw new RecordNotFoundException("Root group not found. Check your GitLab configuration");
     }
@@ -196,7 +197,7 @@ public class GitLabService implements GitService {
     if (!groups.isEmpty()) {
       for (GitLabGroup group : groups) {
         if (group.getPath().equals(GitLabUtils.getPathFromName(program.getName()))) {
-          Optional<GitLabGroup> parentGroupOptional = client.findGroupById(token, options.getRootGroupId());
+          Optional<GitLabGroup> parentGroupOptional = client.findGroupById(token, properties.getRootGroupId());
           if (parentGroupOptional.isEmpty()) {
             throw new RecordNotFoundException("Root group not found. Check your GitLab configuration");
           }
@@ -367,8 +368,8 @@ public class GitLabService implements GitService {
   }
 
   @Autowired
-  public void setOptions(GitLabOptions options) {
-    this.options = options;
+  public void setProperties(GitLabProperties properties) {
+    this.properties = properties;
   }
 
   @Autowired

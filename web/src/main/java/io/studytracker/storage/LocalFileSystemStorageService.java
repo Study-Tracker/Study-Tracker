@@ -169,7 +169,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
         String.format(
             "Saving file %s to storage folder instance for study %s",
             file.getName(), study.getCode()));
-    validatePath(location, file.getPath());
+//    validatePath(location, file.getPath());
     StorageFolder studyFolder = this.findFolder(location, study);
     return this.saveFileToFolder(file, studyFolder);
   }
@@ -180,7 +180,7 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
         String.format(
             "Saving file %s to storage folder instance for assay %s",
             file.getName(), assay.getCode()));
-    validatePath(location, file.getPath());
+//    validatePath(location, file.getPath());
     StorageFolder assayFolder = this.findFolder(location, assay);
     return this.saveFileToFolder(file, assayFolder);
   }

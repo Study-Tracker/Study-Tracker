@@ -79,8 +79,12 @@ public class EgnyteDataFileManagementTests {
 
   @Test
   public void getFolderContentsTest() throws Exception {
+    IntegrationInstance instance = integrationInstanceRepository
+        .findByIntegrationType(IntegrationType.EGNYTE)
+        .get(0);
     String rootPath = options.getRootPath();
     FileStorageLocation location = new FileStorageLocation();
+    location.setIntegrationInstance(instance);
     location.setRootFolderPath(rootPath);
     StorageFolder folder = storageService.findFolderByPath(location, rootPath);
     Assert.assertNotNull(folder);

@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package io.studytracker.benchling.api;
+package io.studytracker.config.properties;
 
-import java.net.URL;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
-@Data
-public class BenchlingElnOptions {
+@ConfigurationProperties(prefix = "search")
+@Validated
+@Getter
+@Setter
+@ToString
+public class SearchProperties {
 
-  private URL rootUrl;
-  private String username;
-  private String password;
-  private String apiToken;
-  private String rootEntity;
-  private String rootFolderUrl;
+  @ConfigurationModeConstraint(options = {"elasticsearch"})
+  private String mode;
+
 }
