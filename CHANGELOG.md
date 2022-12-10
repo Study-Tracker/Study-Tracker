@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed a bug with study and assay list display, due to missing fields.
+- Fixed a bug where failed study notebook loading would crash the web app.
 
 ## [0.7.1] - 2022-11-15
 

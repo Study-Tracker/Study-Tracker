@@ -78,6 +78,7 @@ public final class BenchlingElnRestClient {
    */
   public BenchlingAuthenticationToken acquireApplicationAuthenticationToken(
       @NotNull String clientId, @NotNull String clientSecret) {
+    LOGGER.debug("Acquiring application authentication token for client ID: {}", clientId);
     URL url = joinUrls(rootUrl, "api/v2/token");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Accept", "application/json");
@@ -104,6 +105,7 @@ public final class BenchlingElnRestClient {
    * @return
    */
   public BenchlingProjectList findProjects(@NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Finding Benchling projects");
     String url = resolveUrl("/api/v2/projects", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -130,6 +132,7 @@ public final class BenchlingElnRestClient {
    */
   public Optional<BenchlingProject> findProjectById(
       @NotNull String id, @NotNull String authHeader) {
+    LOGGER.debug("Finding Benchling project by ID: {}", id);
     String url = resolveUrl("/api/v2/projects/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -157,6 +160,7 @@ public final class BenchlingElnRestClient {
    */
   private BenchlingFolderList findFolders(
       @NotNull String param, @NotNull String value, @NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Finding Benchling folders by {} = {}", param, value);
     Map<String, String> map = new HashMap<>();
     map.put(param, value);
     map.put("nextToken", nextToken);
@@ -216,6 +220,7 @@ public final class BenchlingElnRestClient {
    * @return
    */
   public Optional<BenchlingFolder> findFolderById(@NotNull String id, @NotNull String authHeader) {
+    LOGGER.debug("Finding Benchling folder by ID: {}", id);
     String url = resolveUrl("/api/v2/folders/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -229,6 +234,8 @@ public final class BenchlingElnRestClient {
     BenchlingFolder folder = null;
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       folder = response.getBody();
+    } else {
+      LOGGER.warn("Benchling API request failed: {}", response);
     }
     return Optional.ofNullable(folder);
   }
@@ -243,6 +250,7 @@ public final class BenchlingElnRestClient {
    */
   public BenchlingFolder createFolder(
       @NotNull String name, @NotNull String parentFolderId, @NotNull String authHeader) {
+    LOGGER.info("Creating Benchling folder {}  in parent folder with ID {}", name, parentFolderId);
     String url = resolveUrl("/api/v2/folders");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -272,7 +280,7 @@ public final class BenchlingElnRestClient {
    */
   public Optional<BenchlingEntry> findEntryById(
       @NotNull String entryId, @NotNull String authHeader) {
-    LOGGER.info("Requesting entry with ID: " + entryId);
+    LOGGER.debug("Requesting entry with ID: " + entryId);
     String url = resolveUrl("/api/v2/entries/" + entryId);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -297,6 +305,7 @@ public final class BenchlingElnRestClient {
    * @return
    */
   public BenchlingEntryList findAllEntries(@NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Requesting all Benchling notebook entries");
     String url = resolveUrl("/api/v2/entries", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -319,6 +328,7 @@ public final class BenchlingElnRestClient {
    */
   public BenchlingEntryList findProjectEntries(
       @NotNull String projectId, @NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Requesting all Benchling notebook entries for project with ID: " + projectId);
     Map<String, String> map = new HashMap<>();
     map.put("projectId", projectId);
     map.put("nextToken", nextToken);
@@ -337,6 +347,7 @@ public final class BenchlingElnRestClient {
 
   public BenchlingEntry createEntry(
       @NotNull BenchlingEntryRequest entryRequest, @NotNull String authHeader) {
+    LOGGER.info("Creating Benchling entry {}", entryRequest.toString());
     String url = resolveUrl("/api/v2/entries");
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -361,6 +372,7 @@ public final class BenchlingElnRestClient {
    */
   public BenchlingEntryTemplateList findEntryTemplates(
       @NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Requesting all Benchling entry templates");
     String url =
         resolveUrl("/api/v2/entry-templates", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
@@ -387,6 +399,7 @@ public final class BenchlingElnRestClient {
    */
   public BenchlingEntryTemplate findEntryTemplateById(
       @NotNull String id, @NotNull String authHeader) {
+    LOGGER.debug("Requesting entry template with ID: " + id);
     String url = resolveUrl("/api/v2/entry-templates/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -404,6 +417,7 @@ public final class BenchlingElnRestClient {
   }
 
   public BenchlingEntrySchemaList findEntrySchemas(@NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Requesting all Benchling entry schemas");
     String url =
         resolveUrl("/api/v2/entry-schemas", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
@@ -423,6 +437,7 @@ public final class BenchlingElnRestClient {
 
   public Optional<BenchlingEntrySchema> findEntrySchemaById(
       @NotNull String id, @NotNull String authHeader) {
+    LOGGER.debug("Requesting entry schema with ID: " + id);
     String url = resolveUrl("/api/v2/entry-schemas/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -440,6 +455,7 @@ public final class BenchlingElnRestClient {
   }
 
   public BenchlingUserList findUsers(@NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Requesting all Benchling users");
     String url = resolveUrl("/api/v2/users", Collections.singletonMap("nextToken", nextToken));
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
@@ -458,6 +474,7 @@ public final class BenchlingElnRestClient {
 
   public BenchlingUserList findUsersByUsername(
       @NotNull String username, @NotNull String authHeader, String nextToken) {
+    LOGGER.debug("Requesting all Benchling users with username: " + username);
     String url =
         resolveUrl(
             "/api/v2/users?handles=" + username, Collections.singletonMap("nextToken", nextToken));
@@ -477,6 +494,7 @@ public final class BenchlingElnRestClient {
   }
 
   public Optional<BenchlingUser> findUserById(@NotNull String id, @NotNull String authHeader) {
+    LOGGER.debug("Requesting user with ID: " + id);
     String url = resolveUrl("/api/v2/users/" + id);
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", authHeader);
