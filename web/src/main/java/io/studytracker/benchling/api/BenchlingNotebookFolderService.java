@@ -254,7 +254,7 @@ public final class BenchlingNotebookFolderService
   @Override
   public Optional<NotebookFolder> findProgramFolder(Program program) {
 
-    LOGGER.info("Fetching benchling notebook entry for program: " + program.getName());
+    LOGGER.info("Fetching benchling notebook folder for program: " + program.getName());
     Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByProgramId(program.getId());
 
     if (elnFolderOptional.isPresent()) {
@@ -276,7 +276,7 @@ public final class BenchlingNotebookFolderService
 
   private Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents) {
 
-    LOGGER.info("Fetching notebook entry for study: " + study.getCode());
+    LOGGER.info("Fetching notebook folder for study: " + study.getCode());
     Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByStudyId(study.getId());
 
     // Does the study have the folder object set?
@@ -302,7 +302,7 @@ public final class BenchlingNotebookFolderService
   @Override
   public Optional<NotebookFolder> findAssayFolder(Assay assay) {
 
-    LOGGER.info("Fetching notebook entry for assay: " + assay.getCode());
+    LOGGER.info("Fetching notebook folder for assay: " + assay.getCode());
     Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByAssayId(assay.getId());
 
     if (elnFolderOptional.isPresent()) {
