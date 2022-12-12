@@ -19,7 +19,6 @@ package io.studytracker.egnyte.rest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.egnyte.EgnyteClientOperations;
-import io.studytracker.egnyte.EgnyteOptions;
 import io.studytracker.egnyte.entity.EgnyteFile;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
@@ -31,10 +30,8 @@ import io.studytracker.exception.StudyTrackerException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -56,31 +53,29 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
   private static final Logger LOGGER = LoggerFactory.getLogger(EgnyteRestApiClient.class);
 
   private final RestTemplate restTemplate;
-  private final EgnyteOptions options;
 
-  public EgnyteRestApiClient(RestTemplate restTemplate, EgnyteOptions options) {
+  public EgnyteRestApiClient(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
-    this.options = options;
   }
 
   private void doBefore() {
     try {
-      TimeUnit.MILLISECONDS.sleep(options.getSleep());
+      TimeUnit.MILLISECONDS.sleep(500);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
   }
 
   @Override
-  public EgnyteFolder createFolder(String folderPath) throws EgnyteException {
+  public EgnyteFolder createFolder(URL rootUrl, String folderPath, String token) throws EgnyteException {
     if (folderPath == null) {
       throw new IllegalArgumentException("folderPath cannot be null");
     }
     LOGGER.info("Making request to Egnyte API to create directory: " + folderPath);
     doBefore();
-    URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/" + folderPath);
+    URL url = joinUrls(rootUrl, "/pubapi/v1/fs/" + folderPath);
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + options.getToken());
+    headers.set("Authorization", "Bearer " + token);
     headers.set("Content-Type", "application/json");
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("action", "add_folder");
@@ -95,8 +90,7 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
       String responseBody = e.getResponseBodyAsString();
       Map<String, String> json = null;
       try {
-        TypeReference<HashMap<String, String>> typeReference =
-            new TypeReference<HashMap<String, String>>() {};
+        TypeReference<HashMap<String, String>> typeReference = new TypeReference<>() {};
         json = new ObjectMapper().readValue(responseBody, typeReference);
         LOGGER.warn(json.toString());
       } catch (Exception ex) {
@@ -120,7 +114,7 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
   }
 
   @Override
-  public EgnyteObject findObjectByPath(String path, int depth) throws EgnyteException {
+  public EgnyteObject findObjectByPath(URL rootUrl, String path, String token) throws EgnyteException {
     if (path == null) {
       throw new IllegalArgumentException("Path cannot be null.");
     }
@@ -128,11 +122,11 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
 
     doBefore();
 
-    URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/" + path);
+    URL url = joinUrls(rootUrl, "/pubapi/v1/fs/" + path);
     LOGGER.debug("Request URL: " + url);
 
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + options.getToken());
+    headers.set("Authorization", "Bearer " + token);
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
     ResponseEntity<EgnyteObject> response = null;
     try {
@@ -147,44 +141,20 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
       }
     }
 
-    EgnyteObject object = response.getBody();
-    LOGGER.debug(object.toString());
-
-    // Object is a folder
-    if (object.isFolder()) {
-      EgnyteFolder folder = (EgnyteFolder) object;
-      if (depth > -1 && depth < options.getMaxReadDepth()) {
-        List<EgnyteFolder> subFolders = new ArrayList<>();
-        for (int i = 0; i < folder.getSubFolders().size(); i++) {
-          EgnyteFolder subFolder = folder.getSubFolders().get(i);
-          subFolders.add((EgnyteFolder) findObjectByPath(subFolder.getPath(), depth + 1));
-        }
-        folder.setSubFolders(subFolders);
-      }
-      return folder;
-    }
-
-    // Object is a file
-    else {
-      return object;
-    }
+    LOGGER.debug("Response: {}", response.getBody());
+    return response.getBody();
   }
 
   @Override
-  public EgnyteObject findObjectByPath(String path) throws EgnyteException {
-    return findObjectByPath(path, 0);
-  }
-
-  @Override
-  public EgnyteFolder findFolderById(String folderId) throws EgnyteException {
+  public EgnyteFolder findFolderById(URL rootUrl, String folderId, String token) throws EgnyteException {
     if (folderId == null) {
       throw new IllegalArgumentException("folderId cannot be null");
     }
     LOGGER.info("Making request to Egnyte API for folder with ID: " + folderId);
     doBefore();
-    URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/ids/folder/" + folderId);
+    URL url = joinUrls(rootUrl, "/pubapi/v1/fs/ids/folder/" + folderId);
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + options.getToken());
+    headers.set("Authorization", "Bearer " + token);
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
     try {
       ResponseEntity<EgnyteFolder> response =
@@ -205,12 +175,12 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
   }
 
   @Override
-  public EgnyteFile findFileById(String fileId) throws EgnyteException {
+  public EgnyteFile findFileById(URL rootUrl, String fileId, String token) throws EgnyteException {
     LOGGER.info("Making request to Egnyte API for file with ID: " + fileId);
     doBefore();
-    URL url = joinUrls(options.getRootUrl(), "/pubapi/v1/fs/ids/file/" + fileId);
+    URL url = joinUrls(rootUrl, "/pubapi/v1/fs/ids/file/" + fileId);
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + options.getToken());
+    headers.set("Authorization", "Bearer " + token);
     HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
 
     try {
@@ -230,16 +200,16 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
   }
 
   @Override
-  public EgnyteFile uploadFile(File file, String path) throws EgnyteException {
+  public EgnyteFile uploadFile(URL rootUrl, File file, String path, String token) throws EgnyteException {
     LOGGER.info(
         String.format(
             "Making request to Egnyte API to upload file %s to directory %s",
             file.getName(), path));
     doBefore();
     URL url =
-        joinUrls(options.getRootUrl(), "/pubapi/v1/fs-content/" + path + "/" + file.getName());
+        joinUrls(rootUrl, "/pubapi/v1/fs-content/" + path + "/" + file.getName());
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + options.getToken());
+    headers.set("Authorization", "Bearer " + token);
     headers.set("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
     body.add("file", new FileSystemResource(file));
@@ -248,27 +218,6 @@ public class EgnyteRestApiClient implements EgnyteClientOperations {
       ResponseEntity<EgnyteFile> response =
           restTemplate.exchange(url.toString(), HttpMethod.POST, request, EgnyteFile.class);
       return response.getBody();
-    } catch (HttpStatusCodeException e) {
-      if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-        throw new ObjectNotFoundException("Requested resource was not found.");
-      } else if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
-        throw new UnauthorizedException("You do not have permission to perform this operation.");
-      } else {
-        throw new EgnyteException(e.getResponseBodyAsString());
-      }
-    }
-  }
-
-  @Override
-  public void deleteObjectByPath(String path) throws EgnyteException {
-    LOGGER.info(String.format("Making request to Egnyte API to delete object at path: %s", path));
-    doBefore();
-    URL url = joinUrls(options.getRootUrl(), path);
-    HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + options.getToken());
-    HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(null, headers);
-    try {
-      restTemplate.exchange(url.toString(), HttpMethod.DELETE, request, Object.class);
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
         throw new ObjectNotFoundException("Requested resource was not found.");

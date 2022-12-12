@@ -18,6 +18,7 @@ package io.studytracker.benchling.api;
 
 import io.studytracker.benchling.api.entities.BenchlingAuthenticationToken;
 import io.studytracker.benchling.api.entities.BenchlingEntry;
+import io.studytracker.config.properties.BenchlingProperties;
 import io.studytracker.eln.NotebookEntry;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import javax.annotation.PostConstruct;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
 public abstract class AbstractBenchlingApiService {
@@ -33,23 +33,8 @@ public abstract class AbstractBenchlingApiService {
   @Autowired
   private BenchlingElnRestClient client;
 
-  @Value("${benchling.tenant-name}")
-  private String tenantName;
-
-  @Value("${benchling.api.username:}")
-  private String username;
-
-  @Value("${benchling.api.password:}")
-  private String password;
-
-  @Value("${benchling.api.client-id:}")
-  private String clientId;
-
-  @Value("${benchling.api.client-secret:}")
-  private String clientSecret;
-
-  @Value("${benchling.api.token:}")
-  private String token;
+  @Autowired
+  private BenchlingProperties properties;
 
   private URL rootUrl;
 
@@ -57,8 +42,8 @@ public abstract class AbstractBenchlingApiService {
 
   @PostConstruct
   public void init() throws MalformedURLException {
-    rootUrl = new URL("https://" + tenantName + ".benchling.com");
-    rootFolderUrl = new URL(rootUrl, "/" + tenantName + "/f_");
+    rootUrl = new URL("https://" + properties.getTenantName() + ".benchling.com");
+    rootFolderUrl = new URL(rootUrl, "/" + properties.getTenantName() + "/f_");
   }
 
   /**
@@ -69,6 +54,11 @@ public abstract class AbstractBenchlingApiService {
    * @return token
    */
   protected String generateAuthorizationHeader() {
+    String token = properties.getApi().getToken();
+    String username = properties.getApi().getUsername();
+    String password = properties.getApi().getPassword();
+    String clientId = properties.getApi().getClientId();
+    String clientSecret = properties.getApi().getClientSecret();
     if (StringUtils.hasText(token)) {
       return "Basic " + token;
     } else if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
@@ -78,8 +68,7 @@ public abstract class AbstractBenchlingApiService {
     } else {
       BenchlingAuthenticationToken benchlingAuthenticationToken =
           client.acquireApplicationAuthenticationToken(clientId, clientSecret);
-      String token = benchlingAuthenticationToken.getAccessToken();
-      return "Bearer " + token;
+      return "Bearer " + benchlingAuthenticationToken.getAccessToken();
     }
   }
 

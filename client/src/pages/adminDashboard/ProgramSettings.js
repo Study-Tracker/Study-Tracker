@@ -213,9 +213,9 @@ const ProgramsTable = ({
       sort: false,
       // headerStyle: {width: '40%'},
       formatter: (c, d, i, x) => {
-        if (!!d.storageFolder) {
-          if (!!d.storageFolder.url) {
-            return <a href={d.storageFolder.url} target="_blank" rel="noopener noreferrer">Files
+        if (!!d.primaryStorageFolder) {
+          if (!!d.primaryStorageFolder.url) {
+            return <a href={d.primaryStorageFolder.url} target="_blank" rel="noopener noreferrer">Files
               Folder</a>
           } else {
             return <Badge bg="warning">ERROR</Badge>
@@ -373,7 +373,7 @@ const ProgramDetailsModal = ({program, isOpen, showModal}) => {
               <h4>File Storage</h4>
               <p>
                 <RepairableStorageFolderLink
-                    folder={program.storageFolder}
+                    folder={program.primaryStorageFolder}
                     repairUrl={"/api/internal/program/" + program.id + "/storage/repair"}
                 />
               </p>

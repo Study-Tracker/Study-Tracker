@@ -82,7 +82,7 @@ public interface StudyMapper {
   @Mapping(target = "programId", source = "program.id")
   @Mapping(target = "collaboratorId", source = "collaborator.id")
   @Mapping(target = "notebookFolderId", source = "notebookFolder.id")
-  @Mapping(target = "storageFolderId", source = "storageFolder.id")
+  @Mapping(target = "storageFolderId", source = "primaryStorageFolder.id")
   @Mapping(target = "users", source = "users", qualifiedByName = "userToId")
   @Mapping(target = "comments", source = "comments", qualifiedByName = "commentToId")
   @Mapping(target = "keywords", source = "keywords", qualifiedByName = "keywordToId")

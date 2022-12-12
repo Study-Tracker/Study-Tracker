@@ -68,7 +68,7 @@ export const MyActiveStudies = ({count}) => {
           <Row className="g-0 w-100">
             <Col xs="6">
               <div className="illustration-text p-3 m-1">
-                <a href={"/studies?myStudy=true&status=IN_PLANNING,ACTIVE"}>
+                <a href={"/studies?myStudy=true&status=IN_PLANNING&status=ACTIVE"}>
                   <p className="mb-0">
                     You have
                   </p>

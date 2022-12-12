@@ -17,13 +17,15 @@
 package io.studytracker.config;
 
 import io.studytracker.aws.EventBridgeService;
+import io.studytracker.config.properties.AWSProperties;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.LocalEventsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
@@ -46,15 +48,16 @@ public class EventsServiceConfiguration {
   @ConditionalOnProperty(name = "events.mode", havingValue = "eventbridge")
   public static class EventBridgeConfiguration {
 
-    @Autowired private Environment env;
-
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired(required = false)
     private AwsCredentialsProvider credentialsProvider;
 
+    @Autowired
+    private AWSProperties properties;
+
     @Bean
     public EventBridgeClient eventBridgeClient() {
-      Region region = Region.of(env.getRequiredProperty("aws.region"));
+      Region region = Region.of(properties.getRegion());
       EventBridgeClientBuilder builder = EventBridgeClient.builder().region(region);
       if (credentialsProvider != null) {
         builder.credentialsProvider(credentialsProvider);
@@ -64,8 +67,10 @@ public class EventsServiceConfiguration {
 
     @Bean
     public EventBridgeService eventBridgeService() {
-      return new EventBridgeService(
-          eventBridgeClient(), env.getRequiredProperty("aws.eventbridge.bus-name"));
+      Assert.isTrue(properties.getEventbridge() != null
+              && StringUtils.hasText(properties.getEventbridge().getBusName()),
+          "EventBridge bus name must be set with property: aws.eventbridge.bus-name");
+      return new EventBridgeService(eventBridgeClient(), properties.getEventbridge().getBusName());
     }
   }
 }

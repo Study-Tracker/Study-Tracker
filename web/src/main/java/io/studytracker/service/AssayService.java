@@ -20,6 +20,7 @@ import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
+import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -30,6 +31,7 @@ import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayTypeField;
 import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.ELNFolder;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -68,7 +70,7 @@ public class AssayService {
 
   @Autowired private AssayTaskRepository assayTaskRepository;
 
-  @Autowired private StudyStorageService storageService;
+  @Autowired private StorageLocationService storageLocationService;
 
   @Autowired(required = false)
   private NotebookFolderService notebookFolderService;
@@ -207,9 +209,12 @@ public class AssayService {
     // Create the storage folder
     if (options.isUseStorage()) {
       try {
-        storageService.createAssayFolder(assay);
-        StorageFolder folder = storageService.getAssayFolder(assay);
-        assay.setStorageFolder(FileStoreFolder.from(folder));
+        FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
+        StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
+        StorageFolder storageFolder = studyStorageService.createFolder(location, assay);
+        FileStoreFolder folder = FileStoreFolder.from(location, storageFolder);
+        assay.setPrimaryStorageFolder(folder);
+        assay.addFileStoreFolder(folder);
       } catch (Exception e) {
         e.printStackTrace();
         LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode());
@@ -347,35 +352,47 @@ public class AssayService {
   @Transactional
   public void repairStorageFolder(Assay assay) {
 
+    // Get the location and storage service
+    FileStorageLocation location;
+    StudyStorageService studyStorageService;
+    try {
+      location = storageLocationService.findDefaultStudyLocation();
+      studyStorageService = storageLocationService.lookupStudyStorageService(location);
+    } catch (FileStorageException e) {
+      e.printStackTrace();
+      throw new StudyTrackerException("Could not find default storage location or service", e);
+    }
+
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = storageService.getAssayFolder(assay, false);
+      folder = studyStorageService.findFolder(location, assay);
     } catch (StudyStorageNotFoundException e) {
       LOGGER.warn("Storage folder not found for assay: " + assay.getCode());
-      try {
-        folder = storageService.createAssayFolder(assay);
-      } catch (Exception ex) {
-        throw new StudyTrackerException(ex);
-      }
+      e.printStackTrace();
+      throw new StudyTrackerException(e);
+
     }
     LOGGER.debug(folder.toString());
 
     // Check if a folder record exists in the database
-    List<FileStoreFolder> folders = fileStoreFolderRepository.findByPath(folder.getPath());
-    FileStoreFolder dbFolder = null;
+    List<FileStoreFolder> folders = fileStoreFolderRepository
+        .findByPath(location.getId(), folder.getPath());
+    FileStoreFolder fileStoreFolder = null;
     if (!folders.isEmpty()) {
-      dbFolder = folders.get(0);
+      fileStoreFolder = folders.get(0);
     }
 
     // Assay has no folder record associated
-    if (assay.getStorageFolder() == null) {
-      if (dbFolder != null) {
-        LOGGER.info("Repairing assay folder missing association.");
-        assay.setStorageFolder(dbFolder);
-      } else {
-        LOGGER.info("Repairing assay folder with no record.");
-        assay.setStorageFolder(FileStoreFolder.from(folder));
+    if (assay.getPrimaryStorageFolder() == null) {
+      if (fileStoreFolder == null) {
+        fileStoreFolder = FileStoreFolder.from(location, folder);
+      }
+      assay.setPrimaryStorageFolder(fileStoreFolder);
+      if (assay.getStorageFolders().stream().noneMatch(f -> (
+          f.getFileStorageLocation().getId().equals(location.getId())
+              && f.getPath().equals(folder.getPath())))) {
+        assay.getStorageFolders().add(fileStoreFolder);
       }
       assayRepository.save(assay);
     }
@@ -383,7 +400,8 @@ public class AssayService {
     // Assay does have a folder record, but it is malformed
     else {
       LOGGER.info("Repairing malformed assay folder record.");
-      FileStoreFolder f = fileStoreFolderRepository.getById(assay.getStorageFolder().getId());
+      FileStoreFolder f = fileStoreFolderRepository.getById(assay.getPrimaryStorageFolder().getId());
+      f.setFileStorageLocation(location);
       f.setName(folder.getName());
       f.setPath(folder.getPath());
       f.setUrl(folder.getUrl());

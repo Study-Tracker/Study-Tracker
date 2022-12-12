@@ -18,10 +18,19 @@ package io.studytracker.storage;
 
 import io.studytracker.aws.S3DataFileStorageService;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+/**
+ * Helper class for determining the correct {@link DataFileStorageService} implementation for a
+ *   given request.
+ *
+ * @author Will Oemler
+ * @since 0.7.1
+ */
 
 @Component
 public class DataFileStorageServiceLookup {
@@ -34,15 +43,20 @@ public class DataFileStorageServiceLookup {
   @Autowired(required = false)
   private S3DataFileStorageService s3DataFileStorageService;
 
-  public DataFileStorageService lookup(StorageLocationType storageLocationType) {
+  @Autowired(required = false)
+  private LocalFileSystemStorageService localFileSystemStorageService;
+
+  public Optional<DataFileStorageService> lookup(StorageLocationType storageLocationType) {
     LOGGER.debug("Looking up DataFileStorageService for storageLocationType: {}", storageLocationType);
     switch (storageLocationType) {
       case EGNYTE_API:
-        return egnyteApiDataFileStorageService;
+        return Optional.ofNullable(egnyteApiDataFileStorageService);
       case AWS_S3:
-        return s3DataFileStorageService;
+        return Optional.ofNullable(s3DataFileStorageService);
+      case LOCAL_FILE_SYSTEM:
+        return Optional.ofNullable(localFileSystemStorageService);
       default:
-        throw new IllegalArgumentException("Unsupported storage location type: " + storageLocationType);
+        return Optional.empty();
     }
   }
 

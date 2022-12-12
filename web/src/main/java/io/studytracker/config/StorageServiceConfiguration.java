@@ -20,20 +20,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.studytracker.aws.S3DataFileStorageService;
 import io.studytracker.aws.S3StudyFileStorageService;
+import io.studytracker.config.properties.EgnyteProperties;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
-import io.studytracker.egnyte.EgnyteClientOperations;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
-import io.studytracker.egnyte.EgnyteOptions;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
-import io.studytracker.service.NamingOptions;
-import io.studytracker.storage.LocalFileSystemStudyStorageService;
-import io.studytracker.storage.StudyStorageService;
+import io.studytracker.exception.InvalidConfigurationException;
+import io.studytracker.storage.LocalFileSystemStorageService;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -41,9 +37,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -58,23 +53,8 @@ public class StorageServiceConfiguration {
   public static class LocalStudyStorageServiceConfiguration {
 
     @Bean
-    public StudyStorageService localFileSystemStudyStorageService(Environment env) {
-      Assert.notNull(
-          env.getProperty("storage.local-dir"),
-          "Local storage directory is not set. Eg. storage.local-dir=/path/to/storage");
-      Path path = Paths.get(env.getRequiredProperty("storage.local-dir"));
-      LocalFileSystemStudyStorageService service = new LocalFileSystemStudyStorageService(path);
-      if (env.containsProperty("storage.overwrite-existing")) {
-        service.setOverwriteExisting(
-            env.getRequiredProperty("storage.overwrite-existing", Boolean.class));
-      }
-      if (env.containsProperty("storage.use-existing")) {
-        service.setUseExisting(env.getRequiredProperty("storage.use-existing", Boolean.class));
-      }
-      if (env.containsProperty("storage.max-folder-read-depth")) {
-        service.setMaxDepth(env.getRequiredProperty("storage.max-folder-read-depth", int.class));
-      }
-      return service;
+    public LocalFileSystemStorageService localFileSystemStudyStorageService() {
+      return new LocalFileSystemStorageService();
     }
   }
 
@@ -84,98 +64,63 @@ public class StorageServiceConfiguration {
   public static class EgnyteServiceConfiguration {
 
     @Bean
-    public EgnyteFolderNamingService egnyteFolderNamingService(Environment env) {
-      NamingOptions namingOptions = new NamingOptions();
-      if (env.containsProperty("study.study-code-counter-start")) {
-        namingOptions.setStudyCodeCounterStart(
-            env.getRequiredProperty("study.study-code-counter-start", Integer.class));
-      }
-      if (env.containsProperty("study.external-code-counter-start")) {
-        namingOptions.setExternalStudyCodeCounterStart(
-            env.getRequiredProperty("study.external-code-counter-start", Integer.class));
-      }
-      if (env.containsProperty("study.assay-code-counter-start")) {
-        namingOptions.setAssayCodeCounterStart(
-            env.getRequiredProperty("study.assay-code-counter-start", Integer.class));
-      }
-      return new EgnyteFolderNamingService(namingOptions);
+    public EgnyteFolderNamingService egnyteFolderNamingService() {
+      return new EgnyteFolderNamingService();
     }
 
     @Bean
-    public ObjectMapper egnyteObjectMapper(Environment env) throws Exception {
-      Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
+    public ObjectMapper egnyteObjectMapper(EgnyteProperties egnyteProperties) throws Exception {
+      String url;
+      if (StringUtils.hasText(egnyteProperties.getRootUrl())) {
+        url = egnyteProperties.getRootUrl();
+      } else if (StringUtils.hasText(egnyteProperties.getTenantName())) {
+        url = "https://" + egnyteProperties.getTenantName() + ".egnyte.com";
+      } else {
+        throw new InvalidConfigurationException(
+            "Egnyte root URL or tenant name is not set. Eg. egnyte.root-url=https://tenant.egnyte.com");
+      }
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.registerModule(
           new SimpleModule() {
             {
               addDeserializer(
                   EgnyteObject.class,
-                  new EgnyteObjectDeserializer(
-                      new URL(env.getRequiredProperty("egnyte.root-url"))));
+                  new EgnyteObjectDeserializer(new URL(url)));
             }
           });
       return objectMapper;
     }
 
     @Bean
-    public RestTemplate egnyteRestTemplate(Environment env) throws Exception {
+    public RestTemplate egnyteRestTemplate(EgnyteProperties egnyteProperties) throws Exception {
       RestTemplate restTemplate = new RestTemplateBuilder().build();
       MappingJackson2HttpMessageConverter httpMessageConverter =
           new MappingJackson2HttpMessageConverter();
-      httpMessageConverter.setObjectMapper(egnyteObjectMapper(env));
+      httpMessageConverter.setObjectMapper(egnyteObjectMapper(egnyteProperties));
       restTemplate.getMessageConverters().add(0, httpMessageConverter);
       return restTemplate;
     }
 
     @Bean
-    public EgnyteOptions egnyteOptions(Environment env) throws Exception {
-      Assert.notNull(env.getProperty("egnyte.root-url"), "Egnyte root URL is not set.");
-      Assert.notNull(env.getProperty("egnyte.root-path"), "Egnyte root directory path is not set.");
-      Assert.notNull(env.getProperty("egnyte.api-token"), "Egnyte API token is not set.");
-      EgnyteOptions options = new EgnyteOptions();
-      options.setRootUrl(new URL(env.getRequiredProperty("egnyte.root-url")));
-      options.setRootPath(env.getRequiredProperty("egnyte.root-path"));
-      options.setToken(env.getRequiredProperty("egnyte.api-token"));
-      if (env.containsProperty("egnyte.qps")) {
-        options.setQps(env.getRequiredProperty("egnyte.qps", Integer.class));
-      } else if (env.containsProperty("egnyte.sleep")) {
-        options.setSleep(env.getRequiredProperty("egnyte.sleep", Integer.class));
-      }
-      if (env.containsProperty("storage.max-folder-read-depth")) {
-        options.setMaxReadDepth(
-            env.getRequiredProperty("storage.max-folder-read-depth", int.class));
-      }
-      if (env.containsProperty("storage.use-existing")) {
-        options.setUseExisting(env.getRequiredProperty("storage.use-existing", boolean.class));
-      }
-      return options;
-    }
-
-    @Bean
-    public EgnyteRestApiClient egnyteClient(EgnyteOptions egnyteOptions, Environment env)
+    public EgnyteRestApiClient egnyteClient(EgnyteProperties egnyteProperties)
         throws Exception {
-      return new EgnyteRestApiClient(egnyteRestTemplate(env), egnyteOptions);
+      return new EgnyteRestApiClient(egnyteRestTemplate(egnyteProperties));
     }
 
     @Bean
-    public EgnyteStudyStorageService egnyteStorageService(
-        EgnyteClientOperations egnyteClient, EgnyteOptions options) {
-      return new EgnyteStudyStorageService(egnyteClient, options);
+    public EgnyteStudyStorageService egnyteStorageService() {
+      return new EgnyteStudyStorageService();
     }
 
     @Bean
-    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService(
-        EgnyteRestApiClient egnyteClient) {
-      return new EgnyteApiDataFileStorageService(egnyteClient);
+    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService() {
+      return new EgnyteApiDataFileStorageService();
     }
   }
 
   @Configuration
   @ConditionalOnProperty(name = "aws.region", havingValue = "")
   public static class S3StorageServiceConfiguration {
-
-    @Autowired
-    private Environment env;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired(required = false)

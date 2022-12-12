@@ -30,18 +30,17 @@ const FileManagerMenu = ({
     switch (type) {
       case "EGNYTE_API":
         return <FontAwesomeIcon icon={faServer} className={"me-2"} />
-        // return <Server size={18} className={"me-2"} />; // faServer;
       case "AWS_S3":
         return <FontAwesomeIcon icon={faAws} className={"me-2"} />
-        // return <Cloud size={18} className={"me-2"} />;  //faCloud;
       default:
         return <FontAwesomeIcon icon={faFolder} className={"me-2"} />
-        // return <Folder size={18} className={"me-2"} />; //faFolder;
     }
   }
 
   const renderDataSourceMenu = () => {
-    return locations.map(ds => {
+    return locations
+    .filter(location => location.active)
+    .map(ds => {
       return (
           <ListGroup.Item
               action

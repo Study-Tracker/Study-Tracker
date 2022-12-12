@@ -18,8 +18,12 @@ package io.studytracker.test.benchling;
 
 import io.studytracker.Application;
 import io.studytracker.benchling.api.BenchlingNotebookFolderService;
+import io.studytracker.benchling.api.BenchlingNotebookUserService;
 import io.studytracker.eln.NotebookFolder;
+import io.studytracker.eln.NotebookUser;
+import io.studytracker.model.User;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,11 +36,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"benchling-test", "example"})
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class BenchlingServiceTests {
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private BenchlingNotebookFolderService benchlingNotebookFolderService;
+
+  @Autowired
+  private BenchlingNotebookUserService benchlingNotebookUserService;
 
   @Test
   public void findProjectsFoldersTest() {
@@ -46,6 +53,18 @@ public class BenchlingServiceTests {
     for (NotebookFolder folder: folders) {
       System.out.println(folder);
     }
+  }
+
+  @Test
+  public void findUserTest() {
+    User user = new User();
+    user.setUsername("woemler@vesaliustx.com");
+    user.setEmail("woemler@vesaliustx.com");
+    user.setDisplayName("Will Oemler");
+    Optional<NotebookUser> optional = benchlingNotebookUserService.findNotebookUser(user);
+    Assert.assertTrue(optional.isPresent());
+    NotebookUser notebookUser = optional.get();
+    Assert.assertEquals(notebookUser.getEmail(), user.getEmail());
   }
 
 }

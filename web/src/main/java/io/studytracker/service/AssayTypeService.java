@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,8 @@ import org.springframework.util.StringUtils;
 
 @Service
 public class AssayTypeService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssayTypeService.class);
 
   @Autowired private AssayTypeRepository assayTypeRepository;
 
@@ -59,14 +63,16 @@ public class AssayTypeService {
     for (AssayTypeField field : assayType.getFields()) {
 
       // Check for required input
-      if (StringUtils.isEmpty(field.getFieldName())
-          || StringUtils.isEmpty(field.getDisplayName())
-          || field.getType() == null) {
+      if (!StringUtils.hasText(field.getFieldName())
+          || !StringUtils.hasText(field.getDisplayName())
+          || field.getType() == null
+          || field.getFieldOrder() == null
+      ) {
         throw new InvalidConstraintException(
             "Assay type "
                 + assayType.getName()
                 + " field is missing required attributes: "
-                + assayType);
+                + field);
       }
 
       // Check that a field with the name doesn't exist
@@ -93,6 +99,7 @@ public class AssayTypeService {
 
   @Transactional
   public AssayType create(AssayType assayType) {
+    LOGGER.info("Creating new assay type: {}", assayType);
     validateFields(assayType);
     for (AssayTypeField field : assayType.getFields()) {
       field.setAssayType(assayType);
@@ -100,13 +107,12 @@ public class AssayTypeService {
     for (AssayTypeTask task : assayType.getTasks()) {
       task.setAssayType(assayType);
     }
-    assayTypeRepository.save(assayType);
-    return assayType;
+    return assayTypeRepository.save(assayType);
   }
 
   @Transactional
   public AssayType update(AssayType assayType) {
-
+    LOGGER.info("Updating assay type: {}", assayType);
     validateFields(assayType);
     for (AssayTypeField field : assayType.getFields()) {
       field.setAssayType(assayType);
@@ -120,12 +126,14 @@ public class AssayTypeService {
 
   @Transactional
   public void toggleActive(AssayType assayType) {
+    LOGGER.info("Toggling active status for assay type: {}", assayType);
     assayType.setActive(!assayType.isActive());
     assayTypeRepository.save(assayType);
   }
 
   @Transactional
   public void delete(AssayType assayType) {
+    LOGGER.info("Deleting assay type: {}", assayType);
     assayType.setActive(false);
     assayTypeRepository.save(assayType);
   }

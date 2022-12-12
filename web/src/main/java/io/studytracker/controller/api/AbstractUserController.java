@@ -21,6 +21,7 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.PasswordResetToken;
 import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.service.EmailService;
 import io.studytracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,10 @@ public abstract class AbstractUserController extends AbstractApiController {
     userService.create(user);
 
     // Generate a password reset token and send a welcome email
-    PasswordResetToken token = userService.createPasswordResetToken(user, 30);
-    emailService.sendNewUserEmail(user.getEmail(), token.getToken());
+    if (user.getType().equals(UserType.STANDARD_USER)) {
+      PasswordResetToken token = userService.createPasswordResetToken(user, 30);
+      emailService.sendNewUserEmail(user.getEmail(), token.getToken());
+    }
     return user;
   }
 

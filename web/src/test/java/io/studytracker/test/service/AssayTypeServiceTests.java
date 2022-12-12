@@ -82,6 +82,7 @@ public class AssayTypeServiceTests {
     field.setFieldName("name");
     field.setRequired(true);
     field.setType(CustomEntityFieldType.STRING);
+    field.setFieldOrder(1);
     assayType.addField(field);
     assayTypeService.create(assayType);
     Assert.assertEquals(ASSAY_TYPE_COUNT + 1, assayTypeService.count());
@@ -104,6 +105,7 @@ public class AssayTypeServiceTests {
     field.setFieldName("name");
     field.setRequired(true);
     field.setType(CustomEntityFieldType.STRING);
+    field.setFieldOrder(1);
     assayType.addField(field);
     assayTypeService.create(assayType);
     Assert.assertEquals(ASSAY_TYPE_COUNT + 1, assayTypeService.count());
@@ -120,6 +122,7 @@ public class AssayTypeServiceTests {
     field.setFieldName("description");
     field.setRequired(false);
     field.setType(CustomEntityFieldType.TEXT);
+    field.setFieldOrder(2);
     assayType.getFields().add(field);
     assayTypeService.update(assayType);
 
@@ -141,6 +144,7 @@ public class AssayTypeServiceTests {
     field.setFieldName("name");
     field.setRequired(true);
     field.setType(CustomEntityFieldType.STRING);
+    field.setFieldOrder(1);
     assayType.setFields(new HashSet<>(Arrays.asList(field)));
     assayTypeService.create(assayType);
     Assert.assertEquals(ASSAY_TYPE_COUNT + 1, assayTypeService.count());

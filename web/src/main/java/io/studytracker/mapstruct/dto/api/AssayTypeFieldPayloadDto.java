@@ -29,4 +29,5 @@ public class AssayTypeFieldPayloadDto {
   private boolean required = false;
   private String description;
   private boolean active = true;
+  private @NotNull Integer fieldOrder;
 }

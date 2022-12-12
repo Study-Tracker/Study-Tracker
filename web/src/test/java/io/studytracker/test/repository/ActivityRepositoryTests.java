@@ -22,6 +22,7 @@ import io.studytracker.events.util.EntityViewUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Activity;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
@@ -30,6 +31,7 @@ import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.ELNFolderRepository;
+import io.studytracker.repository.FileStorageLocationRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
@@ -55,6 +57,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test"})
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+//@EnableConfigurationProperties({StudyTrackerProperties.class})
 public class ActivityRepositoryTests {
 
   @Autowired private UserRepository userRepository;
@@ -63,6 +66,8 @@ public class ActivityRepositoryTests {
   @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
   @Autowired private StudyRepository studyRepository;
   @Autowired private ActivityRepository activityRepository;
+
+  @Autowired private FileStorageLocationRepository fileStorageLocationRepository;
 
   @Before
   public void doBefore() {
@@ -91,6 +96,7 @@ public class ActivityRepositoryTests {
   private void createProgram() {
 
     User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
+    FileStorageLocation location = fileStorageLocationRepository.findAll().get(0);
 
     Program program = new Program();
     program.setActive(true);
@@ -104,7 +110,8 @@ public class ActivityRepositoryTests {
     folder.setPath("/path/to/test");
     folder.setName("test");
     folder.setUrl("http://test");
-    program.setStorageFolder(folder);
+    folder.setFileStorageLocation(location);
+    program.setPrimaryStorageFolder(folder);
 
     programRepository.save(program);
   }

@@ -94,6 +94,7 @@ public class UserService {
     User u = userRepository.getById(user.getId());
     u.setDisplayName(user.getDisplayName());
     u.setEmail(user.getEmail());
+    u.setUsername(user.getUsername());
     u.setActive(user.isActive());
     u.setAdmin(user.isAdmin());
     u.setTitle(user.getTitle());

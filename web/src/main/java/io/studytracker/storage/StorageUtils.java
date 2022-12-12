@@ -51,17 +51,4 @@ public class StorageUtils {
     return slug1.equals(slug2);
   }
 
-  /**
-   * Gets the name of the file or folder at the end of the path.
-   *
-   * @param path the path
-   * @return the name of the file or folder
-   */
-  public static String getFileName(String path) {
-    if (path.endsWith("/")) {
-      path = path.substring(0, path.length() - 1);
-    }
-    return path.substring(path.lastIndexOf("/") + 1);
-  }
-
 }

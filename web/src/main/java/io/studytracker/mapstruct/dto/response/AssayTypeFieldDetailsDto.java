@@ -29,4 +29,5 @@ public class AssayTypeFieldDetailsDto {
   private boolean required = false;
   private String description;
   private boolean active = true;
+  private Integer fieldOrder;
 }

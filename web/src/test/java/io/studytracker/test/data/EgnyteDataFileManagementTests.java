@@ -20,17 +20,23 @@ import io.studytracker.Application;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptions;
+import io.studytracker.egnyte.integration.EgnyteIntegrationOptionsFactory;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
+import io.studytracker.integration.IntegrationType;
 import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.IntegrationInstance;
+import io.studytracker.repository.IntegrationInstanceRepository;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import java.net.URL;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -39,9 +45,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"egnyte-test"})
 public class EgnyteDataFileManagementTests {
 
-  @Autowired
-  private Environment env;
-
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private EgnyteRestApiClient client;
@@ -49,10 +52,25 @@ public class EgnyteDataFileManagementTests {
   @Autowired
   private EgnyteApiDataFileStorageService storageService;
 
+  @Autowired
+  private IntegrationInstanceRepository integrationInstanceRepository;
+
+  private EgnyteIntegrationOptions options;
+
+  @Before
+  public void getOptionsFromLocation() {
+    IntegrationInstance instance = integrationInstanceRepository
+        .findByIntegrationType(IntegrationType.EGNYTE)
+        .get(0);
+    options = EgnyteIntegrationOptionsFactory.create(instance);
+  }
+
   @Test
   public void getRootFolderTest() throws Exception {
-    String rootPath = env.getRequiredProperty("egnyte.root-path");
-    EgnyteObject egnyteObject = client.findObjectByPath(rootPath, -1);
+    String rootPath = options.getRootPath();
+    String token = options.getToken();
+    URL url = options.getRootUrl();
+    EgnyteObject egnyteObject = client.findObjectByPath(url, rootPath, token);
     Assert.assertNotNull(egnyteObject);
     Assert.assertTrue(egnyteObject.isFolder());
     EgnyteFolder folder = (EgnyteFolder) egnyteObject;
@@ -61,8 +79,12 @@ public class EgnyteDataFileManagementTests {
 
   @Test
   public void getFolderContentsTest() throws Exception {
-    String rootPath = env.getRequiredProperty("egnyte.root-path");
+    IntegrationInstance instance = integrationInstanceRepository
+        .findByIntegrationType(IntegrationType.EGNYTE)
+        .get(0);
+    String rootPath = options.getRootPath();
     FileStorageLocation location = new FileStorageLocation();
+    location.setIntegrationInstance(instance);
     location.setRootFolderPath(rootPath);
     StorageFolder folder = storageService.findFolderByPath(location, rootPath);
     Assert.assertNotNull(folder);

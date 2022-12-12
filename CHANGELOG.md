@@ -8,8 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Study Tracker will eventually deprecate support of Elasticsearch 7.10 in favor of newer versions.
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Updates to the UI of the various 'Details' pages and the main page are in progress.
+- Will update and improve assay task functionality to allow capturing of additional information.
+- Will add a notifications feature that will capture and display notifications for users.
 
-## [0.7.1] - 2022-XX-XX
+## [0.7.2] - 2022-XX-XX
+
+### Added
+
+- Added bean property bindings to configuration properties for easier reference and validation. Any misconfigured properties will throw a more accessible error message at startup.
+
+### Changed
+
+- Updated configuration properties for email integration. The old properties were spring-specific, but will still work.
+
+### Fixed
+
+- Fixed a bug with study and assay list display, due to missing fields.
+- Fixed a bug where failed study notebook loading would crash the web app.
+
+## [0.7.1] - 2022-11-15
 
 ### Added
 - Added File Manager tool to the Study Tracker UI. This tool allows the browsing of storage locations registered within Study Tracker. Users can navigate & create folders, and upload & download files.
@@ -21,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Changed the signature of the JWT created and returned to authenticated users to include creation and expiration times.
 - Updated program, study, and assay forms to make some features optional. Users can choose whether they want notebook and git resources created for them, rather than assuming they are required.
+- Updated the database schema to capture integration configuration parameters for external services that Study Tracker connects with. This will allow for admin users to connect services from within the application, without the need for back-end modifications and redeployment.
 
 ### Fixed
 - Fixed validation of Quill input fields to prevent empty inputs.

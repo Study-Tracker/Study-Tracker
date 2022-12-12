@@ -16,6 +16,7 @@
 
 package io.studytracker.service;
 
+import io.studytracker.config.properties.StudyTrackerProperties;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
@@ -33,25 +34,21 @@ public class EmailService {
 
   private JavaMailSender mailSender;
 
+  @Autowired
+  private StudyTrackerProperties properties;
+
   @Value("#{servletContext.contextPath}")
   private String contextPath;
 
-  @Value("${email.outgoing-email-address:#{null}}")
-  private String outgoingEmail;
-
-  @Value("${server.port:8080}")
-  private Integer port;
-
-  @Value("${application.host-name:localhost}")
-  private String host;
-
   private String getRootUrl() {
+    Integer port = properties.getServer().getPort();
+    String host = properties.getApplication().getHostName();
     String protocol = port.equals(443) || port.equals(8443) ? "https" : "http";
     return protocol + "://" + host + ":" + port + "/" + contextPath;
   }
 
   public void sendPasswordResetEmail(String emailAddress, String token) {
-
+    LOGGER.info("Sending password reset email to {}", emailAddress);
     if (mailSender == null) {
       LOGGER.warn(
           "Mail service is not configured. Check config properties and restart the application if necessary.");
@@ -70,14 +67,14 @@ public class EmailService {
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(emailAddress);
-    message.setFrom(outgoingEmail);
+    message.setFrom(properties.getEmail().getOutgoingEmailAddress());
     message.setSubject("Study Tracker: Password reset request");
     message.setText(text);
     mailSender.send(message);
   }
 
   public void sendNewUserEmail(String emailAddress, String token) {
-
+    LOGGER.info("Sending new user email to {}", emailAddress);
     if (mailSender == null) {
       LOGGER.warn(
           "Mail service is not configured. Check config properties and restart the application if necessary.");
@@ -95,7 +92,7 @@ public class EmailService {
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(emailAddress);
-    message.setFrom(outgoingEmail);
+    message.setFrom(properties.getEmail().getOutgoingEmailAddress());
     message.setSubject("Welcome to Study Tracker");
     message.setText(text);
     mailSender.send(message);

@@ -17,11 +17,13 @@
 package io.studytracker.test.repository;
 
 import io.studytracker.Application;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.ELNFolderRepository;
+import io.studytracker.repository.FileStorageLocationRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.UserRepository;
@@ -52,6 +54,8 @@ public class ProgramRepositoryTests {
   @Autowired private ELNFolderRepository elnFolderRepository;
   @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
 
+  @Autowired private FileStorageLocationRepository fileStorageLocationRepository;
+
   @Before
   public void doBefore() {
     programRepository.deleteAll();
@@ -79,6 +83,7 @@ public class ProgramRepositoryTests {
   public void newProgramTest() {
 
     User user = createUser();
+    FileStorageLocation location = fileStorageLocationRepository.findAll().get(0);
 
     Assert.assertEquals(0, programRepository.count());
     Assert.assertEquals(0, fileStoreFolderRepository.count());
@@ -96,7 +101,8 @@ public class ProgramRepositoryTests {
     folder.setPath("/path/to/test");
     folder.setName("test");
     folder.setUrl("http://test");
-    program.setStorageFolder(folder);
+    folder.setFileStorageLocation(location);
+    program.setPrimaryStorageFolder(folder);
 
     programRepository.save(program);
 
@@ -117,13 +123,13 @@ public class ProgramRepositoryTests {
     Assert.assertNotNull(createdBy);
     Assert.assertEquals("test@email.com", createdBy.getEmail());
 
-    FileStoreFolder programFolder = created.getStorageFolder();
+    FileStoreFolder programFolder = created.getPrimaryStorageFolder();
     Assert.assertNotNull(programFolder.getId());
     Optional<FileStoreFolder> fileStoreFolderOptional =
         fileStoreFolderRepository.findById(programFolder.getId());
     Assert.assertTrue(fileStoreFolderOptional.isPresent());
 
-    created.setStorageFolder(null);
+    created.setPrimaryStorageFolder(null);
     programRepository.save(created);
     Assert.assertEquals(0, fileStoreFolderRepository.count());
 

@@ -26,5 +26,6 @@ public class StudyOptions {
   private boolean useGit = false;
   private boolean useStorage = true;
   private boolean useS3 = false;
+  private Long s3LocationId;
 
 }

@@ -383,7 +383,7 @@ const AssayDetails = props => {
                     <Card.Title>Workspaces</Card.Title>
 
                     <RepairableStorageFolderButton
-                        folder={assay.storageFolder}
+                        folder={assay.primaryStorageFolder}
                         repairUrl={"/api/internal/assay/" + assay.id + "/storage/repair"}
                     />
 

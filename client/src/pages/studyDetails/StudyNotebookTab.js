@@ -35,7 +35,7 @@ const StudyNotebookTabContent = props => {
     .then(response => setFolder(response.data))
     .catch(e => {
       console.error(e);
-      setError(e);
+      setError(e.message);
     });
   }
 

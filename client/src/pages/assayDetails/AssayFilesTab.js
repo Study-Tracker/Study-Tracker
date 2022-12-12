@@ -116,14 +116,14 @@ const AssayFilesTab = props => {
                   </p>
 
                   {
-                    assay.storageFolder
-                    && assay.storageFolder.url ? (
+                    assay.primaryStorageFolder
+                    && assay.primaryStorageFolder.url ? (
                         <React.Fragment>
 
                           <Button
                               variant="info"
                               target={"_blank noopener noreferrer"}
-                              href={assay.storageFolder.url}
+                              href={assay.primaryStorageFolder.url}
                           >
                             View files in Egnyte
                           </Button>

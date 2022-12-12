@@ -19,8 +19,10 @@ package io.studytracker;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -29,15 +31,16 @@ import org.springframework.context.annotation.PropertySource;
 		exclude = {
 				UserDetailsServiceAutoConfiguration.class,
 				ElasticsearchRepositoriesAutoConfiguration.class,
-				ElasticsearchRestClientAutoConfiguration.class
+				ElasticsearchRestClientAutoConfiguration.class,
+				MailSenderAutoConfiguration.class
 		}
 	)
 @PropertySource("classpath:defaults.properties")
+@ConfigurationPropertiesScan("io.studytracker.config.properties")
 public class Application {
 
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(Application.class)
-//				.allowCircularReferences(true)
 				.run(args);
 	}
 

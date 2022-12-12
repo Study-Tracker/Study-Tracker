@@ -109,18 +109,18 @@ const StudyFilesTabContent = props => {
                       subject to rate limits.
                     </p>
 
-                    {
-                      study.storageFolder
-                      && study.storageFolder.url ? (
-                        <React.Fragment>
+                  {
+                    study.primaryStorageFolder
+                    && study.primaryStorageFolder.url ? (
+                      <React.Fragment>
 
-                          <Button
-                              variant="info"
-                              target={"_blank noopener noreferrer"}
-                              href={study.storageFolder.url}
-                          >
-                            View files in Egnyte
-                          </Button>
+                        <Button
+                            variant="info"
+                            target={"_blank noopener noreferrer"}
+                            href={study.primaryStorageFolder.url}
+                        >
+                          View files in Egnyte
+                        </Button>
 
                           &nbsp;&nbsp;or&nbsp;&nbsp;
 

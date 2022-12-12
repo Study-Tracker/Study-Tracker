@@ -18,9 +18,11 @@ package io.studytracker.service;
 
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
+import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
+import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
@@ -29,8 +31,6 @@ import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
-import io.studytracker.storage.exception.StudyStorageException;
-import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -50,8 +50,6 @@ public class ProgramService {
 
   private ProgramRepository programRepository;
 
-  private StudyStorageService studyStorageService;
-
   private NotebookFolderService notebookFolderService;
 
   private FileStoreFolderRepository fileStoreFolderRepository;
@@ -59,6 +57,8 @@ public class ProgramService {
   private ELNFolderRepository elnFolderRepository;
 
   private GitService gitService;
+
+  private StorageLocationService storageLocationService;
 
   public Optional<Program> findById(Long id) {
     return programRepository.findById(id);
@@ -89,11 +89,14 @@ public class ProgramService {
 
     // Create the storage folder
     try {
-      studyStorageService.createProgramFolder(program);
-      StorageFolder storageFolder = studyStorageService.getProgramFolder(program);
+      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
+      StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
+      StorageFolder storageFolder = studyStorageService.createFolder(location, program);
       LOGGER.debug("Created storage folder: " + storageFolder.getPath());
-      program.setStorageFolder(FileStoreFolder.from(storageFolder));
-    } catch (StudyStorageException e) {
+      FileStoreFolder folder = FileStoreFolder.from(location, storageFolder);
+      program.setPrimaryStorageFolder(folder);
+      program.addFileStoreFolder(folder);
+    } catch (Exception e) {
       throw new StudyTrackerException(e);
     }
 
@@ -188,20 +191,28 @@ public class ProgramService {
   @Transactional
   public void repairStorageFolder(Program program) {
 
+    // Get the location and storage service
+    FileStorageLocation location;
+    StudyStorageService studyStorageService;
+    try {
+      location = storageLocationService.findDefaultStudyLocation();
+      studyStorageService = storageLocationService.lookupStudyStorageService(location);
+    } catch (FileStorageException e) {
+      e.printStackTrace();
+      throw new StudyTrackerException("Could not find default storage location or service", e);
+    }
+
     // Find or create the storage folder
     StorageFolder folder;
     try {
-      folder = studyStorageService.getProgramFolder(program, false);
-    } catch (StudyStorageNotFoundException e) {
-      try {
-        folder = studyStorageService.createProgramFolder(program);
-      } catch (Exception ex) {
-        throw new StudyTrackerException(ex);
-      }
+      folder = studyStorageService.findFolder(location, program);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new StudyTrackerException(e);
     }
 
     // Update the  program record
-    FileStoreFolder f = fileStoreFolderRepository.getById(program.getStorageFolder().getId());
+    FileStoreFolder f = fileStoreFolderRepository.getById(program.getPrimaryStorageFolder().getId());
     f.setName(folder.getName());
     f.setPath(folder.getPath());
     f.setUrl(folder.getUrl());
@@ -234,11 +245,6 @@ public class ProgramService {
     this.programRepository = programRepository;
   }
 
-  @Autowired
-  public void setStudyStorageService(StudyStorageService studyStorageService) {
-    this.studyStorageService = studyStorageService;
-  }
-
   @Autowired(required = false)
   public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
     this.notebookFolderService = notebookFolderService;
@@ -257,5 +263,11 @@ public class ProgramService {
   @Autowired(required = false)
   public void setGitService(GitService gitService) {
     this.gitService = gitService;
+  }
+
+  @Autowired
+  public void setStorageLocationService(
+      StorageLocationService storageLocationService) {
+    this.storageLocationService = storageLocationService;
   }
 }
