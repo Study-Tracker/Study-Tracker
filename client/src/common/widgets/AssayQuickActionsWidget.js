@@ -16,17 +16,13 @@
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-  faFolderPlus,
-  faPersonRunning,
-  faPlusSquare
-} from "@fortawesome/free-solid-svg-icons";
+import {faPersonRunning, faPlusSquare} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {useNavigate} from "react-router-dom";
+import PropTypes from "prop-types";
 
-const StudyQuickActionsWidget = ({
-    study,
-    handleAddToCollection
+const AssayQuickActionsWidget = ({
+    assay
 }) => {
 
   const navigate = useNavigate();
@@ -48,7 +44,7 @@ const StudyQuickActionsWidget = ({
                   What's next?
                 </h4>
                 <p className="mb-0">
-                  Jump to the next step in your study workflow.
+                  Jump to the next step in your assay workflow.
                 </p>
                 <br/>
                 <Dropdown className="me-1 mb-1">
@@ -58,14 +54,9 @@ const StudyQuickActionsWidget = ({
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
 
-                    <Dropdown.Item onClick={() => navigate("/study/" + study.code + "/assays/new")}>
+                    <Dropdown.Item onClick={() => console.log("Click")}>
                       <FontAwesomeIcon icon={faPlusSquare} className={"me-2"}/>
-                      New Assay
-                    </Dropdown.Item>
-
-                    <Dropdown.Item onClick={handleAddToCollection}>
-                      <FontAwesomeIcon icon={faFolderPlus} className={"me-2"}/>
-                      Add to Collection
+                      TBD
                     </Dropdown.Item>
 
                   </Dropdown.Menu>
@@ -78,4 +69,8 @@ const StudyQuickActionsWidget = ({
   )
 }
 
-export default StudyQuickActionsWidget;
+AssayQuickActionsWidget.propTypes = {
+  assay: PropTypes.object.isRequired,
+}
+
+export default AssayQuickActionsWidget;
