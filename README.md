@@ -2,6 +2,7 @@
 
 ![example branch parameter](https://github.com/Study-Tracker/Study-Tracker/actions/workflows/build-and-test.yml/badge.svg?branch=main)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ff2b66794fc540d5a74bda46d5913d37)](https://www.codacy.com/gh/Study-Tracker/Study-Tracker/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Study-Tracker/Study-Tracker&amp;utm_campaign=Badge_Grade)
+[![Documentation](https://img.shields.io/badge/GitBook-Documentation-lightblue?logo=gitbook)](https://study-tracker.gitbook.io/documentation/)
 
 Study Tracker makes the job of managing your team's research easier by providing a user-friendly web
 application that serves as a single source-of-truth for your organization. Save time by
@@ -24,8 +25,8 @@ the application.
 
 ## Documentation
 
-For instructions about how to configure and deploy Study
-Tracker, [see the wiki](https://github.com/Study-Tracker/Study-Tracker/wiki).
+For instructions about how to configure deploy Study
+Tracker, [see Gitbook](https://study-tracker.gitbook.io/documentation/).
 
 ## Supported Integrations
 
