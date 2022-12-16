@@ -69,7 +69,7 @@ public class StorageFolderPublicController extends AbstractApiController {
   public Page<FileStoreFolderDto> findAllStorageFolder(Pageable pageable) {
     LOGGER.debug("Fethching all storage folders");
     Page<FileStoreFolder> page = fileStoreFolderRepository.findAll(pageable);
-    return new PageImpl<>(fileStoreFolderMapper.toDto(page.getContent()), pageable, page.getTotalElements());
+    return new PageImpl<>(fileStoreFolderMapper.toDtoList(page.getContent()), pageable, page.getTotalElements());
   }
 
   @GetMapping("/{id}")

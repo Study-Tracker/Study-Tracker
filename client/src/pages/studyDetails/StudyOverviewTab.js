@@ -182,7 +182,7 @@ const StudyOverviewTab = ({
                   <div className={"d-flex flex-column align-items-center"}>
 
                     <RepairableStorageFolderButton
-                        folder={study.storageFolder}
+                        folder={study.primaryStorageFolder}
                         repairUrl={"/api/internal/study/" + study.id + "/storage/repair"}
                     />
 

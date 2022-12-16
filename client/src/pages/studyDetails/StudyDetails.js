@@ -17,7 +17,6 @@
 import {Breadcrumb, Col, Container, Row, Tab, Tabs} from 'react-bootstrap';
 import React, {useState} from "react";
 import StudyAssaysTab from "./StudyAssaysTab";
-import StudyFilesTab from "./StudyFilesTab";
 import StudyNotebookTab from './StudyNotebookTab';
 import StudyConclusionsTab from "./StudyConclusionsTab";
 import StudyCommentsTab from "./StudyCommentsTab";
@@ -31,6 +30,7 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import StudyDetailHeader from "./StudyDetailsHeader";
 import StudyOverviewTab from "./StudyOverviewTab";
+import StudyFileManagerTab from "./StudyFileManagerTab";
 
 const StudyDetails = props => {
 
@@ -105,8 +105,12 @@ const StudyDetails = props => {
                 <StudyAssaysTab study={study} user={user}/>
               </Tab>
 
-              <Tab eventKey={"files"} title={"Files"}>
-                <StudyFilesTab study={study} user={user}/>
+              {/*<Tab eventKey={"files"} title={"Files"}>*/}
+              {/*  <StudyFilesTab study={study} user={user}/>*/}
+              {/*</Tab>*/}
+
+              <Tab title={"Files"} eventKey={"files"}>
+                <StudyFileManagerTab study={study} user={user}/>
               </Tab>
 
               {

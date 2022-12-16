@@ -26,4 +26,7 @@ public class FileStoreFolderDetailsDto {
   private String name;
   private String path;
   private String referenceId;
+  private boolean primary = false;
+  private Long fileStorageLocationId;
+
 }
