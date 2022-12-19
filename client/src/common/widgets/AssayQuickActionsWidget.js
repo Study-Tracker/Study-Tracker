@@ -43,9 +43,9 @@ const AssayQuickActionsWidget = ({
                 <h4 className="illustration-text">
                   What's next?
                 </h4>
-                <p className="mb-0">
-                  Jump to the next step in your assay workflow.
-                </p>
+                {/*<p className="mb-0">*/}
+                {/*  Jump to the next step in your assay workflow.*/}
+                {/*</p>*/}
                 <br/>
                 <Dropdown className="me-1 mb-1">
                   <Dropdown.Toggle variant={"outline-primary"}>

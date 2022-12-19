@@ -27,17 +27,24 @@ import AddToStudyCollectionModal
 import StudyCollectionsTab from "./StudyCollectionsTab";
 import PropTypes from "prop-types";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import StudyDetailHeader from "./StudyDetailsHeader";
 import StudyOverviewTab from "./StudyOverviewTab";
 import StudyFileManagerTab from "./StudyFileManagerTab";
 
 const StudyDetails = props => {
 
+  const location = useLocation();
+  const navigate = useNavigate();
   const {study, user, features} = props;
+  const [selectedTab, setSelectedTab] = useState(location.hash.replace("#", "") || "overview");
   const [showCollectionModal, setShowCollectionModal] = useState(false);
   const [modalError, setModalError] = useState(null);
-  const navigate = useNavigate();
+
+  const handleTabSelect = (key) => {
+    setSelectedTab(key);
+    navigate("#" + key);
+  }
 
   const handleStudyDelete = () => {
     swal({
@@ -90,7 +97,11 @@ const StudyDetails = props => {
           <Col md={12}>
 
             {/* Tabs */}
-            <Tabs variant={"pills"} defaultActiveKey={"overview"}>
+            <Tabs
+                variant={"pills"}
+                activeKey={selectedTab}
+                onSelect={handleTabSelect}
+            >
 
               <Tab eventKey={"overview"} title={"Overview"}>
                 <StudyOverviewTab

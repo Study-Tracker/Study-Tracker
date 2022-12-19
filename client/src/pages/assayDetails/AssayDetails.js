@@ -14,29 +14,32 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useState} from "react";
 import {Col, Container, Row, Tab, Tabs} from "react-bootstrap";
 import AssayTimelineTab from "./AssayTimelineTab";
-import AssayFilesTab from "./AssayFilesTab";
 import AssayNotebookTab from "./AssayNotebookTab";
 import swal from "sweetalert";
 import {Breadcrumbs} from "../../common/common";
 import PropTypes from "prop-types";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import axios from "axios";
 import AssayDetailsHeader from "./AssayDetailsHeader";
 import AssayOverviewTab from "./AssayOverviewTab";
-
-const createMarkup = (content) => {
-  return {__html: content};
-};
+import AssayFileManagerTab from "./AssayFileManagerTab";
 
 const AssayDetails = props => {
 
+  const location = useLocation();
+  const navigate = useNavigate();
   const {user, study, features} = props;
+  const [selectedTab, setSelectedTab] = useState(location.hash.replace("#", "") || "overview");
   const [assay, setAssay] = React.useState(props.assay);
   const [error, setError] = React.useState(null);
-  const navigate = useNavigate();
+
+  const handleTabSelect = (key) => {
+    setSelectedTab(key);
+    navigate("#" + key);
+  }
 
   const handleAssayDelete = () => {
     swal({
@@ -82,7 +85,11 @@ const AssayDetails = props => {
 
           <Col md={12}>
 
-            <Tabs variant={"pills"} defaultActiveKey="overview">
+            <Tabs
+                variant={"pills"}
+                activeKey={selectedTab}
+                onSelect={handleTabSelect}
+            >
 
               <Tab eventKey={"overview"} title={"Overview"}>
                 <AssayOverviewTab
@@ -95,7 +102,7 @@ const AssayDetails = props => {
               </Tab>
 
               <Tab eventKey={"files"} title={"Files"}>
-                <AssayFilesTab assay={assay} user={user} />
+                <AssayFileManagerTab assay={assay} user={user} />
               </Tab>
 
               {

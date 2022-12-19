@@ -61,7 +61,7 @@ const StudyFileManagerMenu = ({
 
         <Card.Header>
           <Card.Title tag="h5" className="mb-0 text-muted">
-            Study Folders
+            Storage Folders
           </Card.Title>
         </Card.Header>
 

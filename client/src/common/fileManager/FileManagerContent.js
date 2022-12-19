@@ -46,12 +46,13 @@ const FolderSizeBadge = ({folder}) => {
   );
 }
 
-const pathIsWithinRoot = (path, root) => {
+const pathIsChild = (path, parent) => {
+  console.debug("pathIsChild", path, parent);
   if (!path.startsWith("/")) path = "/" + path;
-  if (!root.startsWith("/")) root = "/" + root;
+  if (!parent.startsWith("/")) parent = "/" + parent;
   if (!path.endsWith("/")) path = path + "/";
-  if (!root.endsWith("/")) root = root + "/";
-  return path.indexOf(root) === -1;
+  if (!parent.endsWith("/")) parent = parent + "/";
+  return path.indexOf(parent) > -1;
 }
 
 const FileManagerContent = ({location, path}) => {
@@ -61,6 +62,7 @@ const FileManagerContent = ({location, path}) => {
 
   const notyf = useContext(NotyfContext);
 
+  const [rootPath, setRootPath] = useState(path || location.rootFolderPath);
   const [folder, setFolder] = useState(null);
   const [currentPath, setCurrentPath] = useState(path || location.rootFolderPath);
   const [history, setHistory] = useState([]);
@@ -77,6 +79,7 @@ const FileManagerContent = ({location, path}) => {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
+    setRootPath(path || location.rootFolderPath);
     axios.get("/api/internal/data-files", {
       params: {
         path: currentPath,
@@ -126,44 +129,6 @@ const FileManagerContent = ({location, path}) => {
     setUploadModalIsOpen(false);
     setRefreshCount(refreshCount + 1);
   }
-
-  // /**
-  //  * Uploads the provided files to the current folder.
-  //  * @param files
-  //  */
-  // const handleUploadFiles = (files) => {
-  //   console.debug("Files", files);
-  //   setUploadError(null);
-  //   const requests = files.map(file => {
-  //     const data = new FormData();
-  //     data.append("file", file);
-  //     data.append("locationId", location.id);
-  //     data.append("path", currentPath);
-  //     return axios.post('/api/internal/data-files/upload', data)
-  //       .then(response => {
-  //         return {
-  //           ...file,
-  //           success: response.status === 200,
-  //         }
-  //       });
-  //   });
-  //   Promise.all(requests)
-  //   .then((result) => {
-  //     console.debug("Upload result: ", result);
-  //     setUploadModalIsOpen(false);
-  //     setRefreshCount(refreshCount + 1);
-  //     notyf.open({message: "Files uploaded successfully", type: "success"});
-  //   })
-  //   .catch(e => {
-  //     console.error(e);
-  //     console.error("Failed to upload files");
-  //     let errorMessage = e.message;
-  //     if (uploadError) {
-  //       errorMessage = errorMessage + " - " + uploadError;
-  //     }
-  //     setUploadError(errorMessage);
-  //   });
-  // }
 
   /**
    * Creates a new folder in the current folder.
@@ -303,18 +268,21 @@ const FileManagerContent = ({location, path}) => {
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <Breadcrumb>
+
                     <Breadcrumb.Item
-                        onClick={() => handlePathUpdate(location.rootFolderPath)}
+                        onClick={() => handlePathUpdate(rootPath)}
                     >
                       Home
                     </Breadcrumb.Item>
+
                     {
-                      folder ? folder.path.split("/").map((path, index) => {
-                        if (index === 0 && path === "") return null;
-                        if (index === folder.path.split("/").length - 1 && path === "") return null;
-                        const label = path === "" ? "root" : path;
+                      folder ? folder.path.split("/")
+                      .map((path, index) => {
+                        if (index === 0 && path === "") return null; // empty first folder name
+                        if (index === folder.path.split("/").length - 1 && path === "") return null; // empty last folder name
+                        const label = path === "" ? "root" : path; // folder name
                         const pathSlice = folder.path.split("/").slice(0, index + 1).join("/");
-                        if (pathIsWithinRoot(pathSlice, location.rootFolderPath)) {
+                        if (!pathIsChild(pathSlice, rootPath)) {
                           return (
                               <Breadcrumb.Item key={index} active={true}>
                                 {label}
@@ -334,7 +302,7 @@ const FileManagerContent = ({location, path}) => {
                       }) : ""
                     }
                   </Breadcrumb>
-                  {/*<FolderPathBreadcrumbs dataSource={dataSource} folder={folder} />*/}
+
                 </div>
                 <div>
                   <FolderSizeBadge folder={folder} />

@@ -140,7 +140,7 @@ const StudyRelationships = props => {
           {
             !!props.user ? (
                 <span className="float-end">
-                <Button size={"sm"} variant={"primary"}
+                <Button size={"sm"} variant={"link"}
                         onClick={() => setModalIsOpen(true)}>
                   Add <PlusCircle className="feather feather-button-sm"/>
                 </Button>
