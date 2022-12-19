@@ -14,7 +14,34 @@
  * limitations under the License.
  */
 
-@import "variables";
+@primary-light-bg: #e0eafc;
+
+@primary-light-text: #3f80ea;
+
+@success-light-bg: #b5f3d9;
+
+@success-light-text: #00c36a;
+
+@info-light-bg: #d2edf8;
+
+@info-light-text: #1f9bcf;
+
+@warning-light-bg: #fce8d1;
+
+@warning-light-text: #e5a54b;
+
+@danger-light-bg: #fddfdf;
+
+@danger-light-text: #d9534f;
+
+@secondary-light-bg: #d0d4d8;
+
+@secondary-light-text: #6c757d;
+
+@tertiary-light-bg: #e8e0fc;
+
+@tertiary-light-text: #673fea;
+
 @import "forms";
 @import "file-manager";
 @import "animations";
@@ -344,6 +371,14 @@ table td .dropdown {
   flex-wrap: wrap;
   align-items: center;
   margin-left: 10px;
+
+  &:hover {
+    .team-member {
+      margin-left: 0;
+      margin-right: 10px;
+    }
+  }
+
   .team-member {
     display: inline-block;
     flex-shrink: 0;
@@ -352,6 +387,7 @@ table td .dropdown {
     z-index: 0;
     margin-left: -10px;
     transition: all 0.3s ease;
+
     .team-member-label {
       display: flex;
       align-items: center;
@@ -363,38 +399,48 @@ table td .dropdown {
       background-position: center center;
       background-size: cover;
       border-radius: 0.475rem;
+
+      &.team-member-primary {
+        background: @primary-light-bg;
+        color: @primary-light-text !important;
+      }
+
+      &.team-member-success {
+        background: @success-light-bg;
+        color: @success-light-text !important;
+      }
+
+      &.team-member-info {
+        background: @info-light-bg;
+        color: @info-light-text !important;
+      }
+
+      &.team-member-warning {
+        background: @warning-light-bg;
+        color: @warning-light-text !important;
+      }
+
+      &.team-member-danger {
+        background: @danger-light-bg;
+        color: @danger-light-text !important;
+      }
+
+      &.team-member-secondary {
+        background: @secondary-light-bg;
+        color: @secondary-light-text !important;
+      }
+
+      &.team-member-tertiary {
+        background: @tertiary-light-bg;
+        color: @tertiary-light-text !important;
+      }
+
     }
-    .team-member-label.team-member-primary {
-      background: @primary-light-bg;
-      color: @primary-light-text !important;
-    }
-    .team-member-label.team-member-success {
-      background: @success-light-bg;
-      color: @success-light-text !important;
-    }
-    .team-member-label.team-member-info {
-      background: @info-light-bg;
-      color: @info-light-text !important;
-    }
-    .team-member-label.team-member-warning {
-      background: @warning-light-bg;
-      color: @warning-light-text !important;
-    }
-    .team-member-label.team-member-danger {
-      background: @danger-light-bg;
-      color: @danger-light-text !important;
-    }
-    .team-member-label.team-member-secondary {
-      background: @secondary-light-bg;
-      color: @secondary-light-text !important;
-    }
-    .team-member-label.team-member-tertiary {
-      background: @tertiary-light-bg;
-      color: @tertiary-light-text !important;
-    }
+
     .team-member-circle {
       border-radius: 50%;
     }
+
     img {
       width: 50px;
       height: 50px;
@@ -402,19 +448,15 @@ table td .dropdown {
       display: inline-block;
       border-radius: 0.475rem;
     }
+
   }
+
   .team-member-label {
     position: relative;
     width: 50px;
     height: 50px;
   }
-}
 
-.team-members:hover {
-  .team-member {
-    margin-left: 0;
-    margin-right: 10px;
-  }
 }
 
 .team-member:hover {
@@ -451,5 +493,5 @@ table td .dropdown {
 .btn.keyword-btn {
   font-weight: 700;
   border-radius: 0.3rem;
-  padding: 0.10rem 0.5rem;
+  padding: 0.1rem 0.5rem;
 }

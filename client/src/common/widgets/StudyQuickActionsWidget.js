@@ -16,11 +16,8 @@
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-  faFolderPlus,
-  faPersonRunning,
-  faPlusSquare
-} from "@fortawesome/free-solid-svg-icons";
+import {faPersonRunning,} from "@fortawesome/free-solid-svg-icons";
+import {faFolderOpen, faPlusSquare} from "@fortawesome/free-regular-svg-icons";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
@@ -64,7 +61,7 @@ const StudyQuickActionsWidget = ({
                     </Dropdown.Item>
 
                     <Dropdown.Item onClick={handleAddToCollection}>
-                      <FontAwesomeIcon icon={faFolderPlus} className={"me-2"}/>
+                      <FontAwesomeIcon icon={faFolderOpen} className={"me-2"}/>
                       Add to Collection
                     </Dropdown.Item>
 
