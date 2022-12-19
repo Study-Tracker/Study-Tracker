@@ -365,6 +365,11 @@ table td .dropdown {
   background-color: #3f80ea !important;
 }
 
+.team-member:hover {
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
 /* Team members */
 .team-members {
   display: flex;
@@ -372,11 +377,10 @@ table td .dropdown {
   align-items: center;
   margin-left: 10px;
 
-  &:hover {
-    .team-member {
-      margin-left: 0;
-      margin-right: 10px;
-    }
+  .team-member-label {
+    position: relative;
+    width: 50px;
+    height: 50px;
   }
 
   .team-member {
@@ -451,17 +455,13 @@ table td .dropdown {
 
   }
 
-  .team-member-label {
-    position: relative;
-    width: 50px;
-    height: 50px;
+  &:hover {
+    .team-member {
+      margin-left: 0;
+      margin-right: 10px;
+    }
   }
 
-}
-
-.team-member:hover {
-  transition: all 0.3s ease;
-  z-index: 1;
 }
 
 .team-member.team-member-35px {
@@ -476,12 +476,15 @@ table td .dropdown {
 }
 
 .team-member.team-member-circle {
+
   .team-member-label {
     border-radius: 50%;
   }
+
   img {
     border-radius: 50%;
   }
+
 }
 
 /* Keywords */
