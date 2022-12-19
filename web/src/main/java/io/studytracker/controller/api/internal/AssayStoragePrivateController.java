@@ -19,15 +19,22 @@ package io.studytracker.controller.api.internal;
 import io.studytracker.controller.api.AbstractAssayController;
 import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.FileStorageException;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
+import io.studytracker.mapstruct.mapper.FileStoreFolderMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
 import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.FileStoreFolder;
+import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.service.FileSystemStorageService;
 import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +59,29 @@ public class AssayStoragePrivateController extends AbstractAssayController {
 
   @Autowired private StorageLocationService storageLocationService;
 
+  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
+
+  @Autowired private FileStoreFolderMapper fileStoreFolderMapper;
+
   @GetMapping("")
-  public StorageFolder getStorageFolder(@PathVariable("assayId") String assayId) throws Exception {
+  public List<FileStoreFolderDetailsDto> getStudyStorageFolders(@PathVariable("assayId") String assayId) {
+    LOGGER.info("Fetching storage folder for assay: " + assayId);
+    Assay assay = getAssayFromIdentifier(assayId);
+    List<FileStoreFolderDetailsDto> folders = new ArrayList<>();
+    for (FileStoreFolder fsf: assay.getStorageFolders()) {
+      FileStoreFolder folder = fileStoreFolderRepository.findById(fsf.getId())
+          .orElseThrow(() -> new RecordNotFoundException("Folder not found: " + fsf.getId()));
+      FileStoreFolderDetailsDto dto = fileStoreFolderMapper.toDetailsDto(folder);
+      if (assay.getPrimaryStorageFolder().getId().equals(dto.getId())) {
+        dto.setPrimary(true);
+      }
+      folders.add(dto);
+    }
+    return folders;
+  }
+
+  @GetMapping("/{folderId}/contents")
+  public StorageFolder getStorageFolderContents(@PathVariable("assayId") String assayId) throws Exception {
     LOGGER.info("Fetching storage folder for assay: " + assayId);
     Assay assay = getAssayFromIdentifier(assayId);
     FileStorageLocation location = storageLocationService.findByFileStoreFolder(assay.getPrimaryStorageFolder());

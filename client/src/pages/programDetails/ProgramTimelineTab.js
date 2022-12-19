@@ -16,7 +16,7 @@
 
 import React, {useEffect, useState} from "react";
 import {Col, Row} from 'react-bootstrap'
-import {Timeline} from "../../common/activity";
+import {ActivityStream} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
@@ -44,7 +44,7 @@ const ProgramTimelineTab = props => {
     content = <DismissableAlert color={'warning'}
                                 message={'Failed to load program activity.'}/>;
   } else if (!!activity) {
-    content = <Timeline activity={activity}/>;
+    content = <ActivityStream activity={activity}/>;
   }
 
   return (

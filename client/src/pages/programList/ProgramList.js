@@ -15,81 +15,9 @@
  */
 
 import React from "react";
-import {Badge, Button, Card, Col, Container, Row,} from "react-bootstrap";
-import BootstrapTable from "react-bootstrap-table-next";
-import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
-import paginationFactory from "react-bootstrap-table2-paginator";
-import {File} from "react-feather";
+import {Card, Col, Container, Row,} from "react-bootstrap";
 import PropTypes from "prop-types";
-
-const columns = [
-  {
-    dataField: "name",
-    text: "Name",
-    sort: true,
-    headerStyle: {width: '50%%'},
-    formatter: (c, d) => {
-      return (
-          <a href={"/program/" + d.id}>{d.name}</a>
-      )
-    },
-    sortFunc: (a, b, order, dataField, rowA, rowB) => {
-      if (rowA.name > rowB.name) {
-        return order === "desc" ? -1 : 1;
-      }
-      if (rowB.name > rowA.name) {
-        return order === "desc" ? 1 : -1;
-      }
-      return 0;
-    },
-  },
-  {
-    dataField: "code",
-    text: "Code",
-    sort: true,
-    headerStyle: {width: '20%'},
-    formatter: (cell, d) => d.code
-  },
-  {
-    dataField: "active",
-    text: "Active",
-    sort: true,
-    headerStyle: {width: '20%'},
-    formatter: (c, d) => {
-      if (d.active) {
-        return (
-            <Badge bg="success">
-              Active
-            </Badge>
-        )
-      } else {
-        return (
-            <Badge bg="warning">
-              Inactive
-            </Badge>
-        )
-      }
-    }
-  }
-];
-
-const ExportToCsv = ({onExport}) => {
-  const handleClick = () => {
-    onExport();
-  };
-  return (
-      <span>
-        <Button variant={'primary'} onClick={handleClick}>
-          Export to CSV
-          &nbsp;
-          <File className="feather align-middle ms-2 mb-1"/>
-        </Button>
-      </span>
-  );
-};
-ExportToCsv.propTypes = {
-  onExport: PropTypes.func.isRequired
-}
+import ProgramListTable from "../../common/ProgramListTable";
 
 const ProgramList = ({programs}) => {
 
@@ -106,40 +34,7 @@ const ProgramList = ({programs}) => {
           <Col lg={12}>
             <Card>
               <Card.Body>
-                <ToolkitProvider
-                    keyField="id"
-                    data={programs}
-                    columns={columns}
-                    search
-                    exportCSV
-                >
-                  {props => (
-                      <div>
-                        <div className="float-end">
-                          <ExportToCsv{...props.csvProps} />
-                          &nbsp;&nbsp;
-                          <Search.SearchBar
-                              {...props.searchProps}
-                          />
-                        </div>
-                        <BootstrapTable
-                            bootstrap4
-                            keyField="id"
-                            bordered={false}
-                            pagination={paginationFactory({
-                              sizePerPage: 10,
-                              sizePerPageList: [10, 20, 40, 80]
-                            })}
-                            defaultSorted={[{
-                              dataField: "name",
-                              order: "asc"
-                            }]}
-                            {...props.baseProps}
-                        >
-                        </BootstrapTable>
-                      </div>
-                  )}
-                </ToolkitProvider>
+                <ProgramListTable programs={programs} />
               </Card.Body>
             </Card>
           </Col>

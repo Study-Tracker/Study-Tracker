@@ -16,7 +16,7 @@
 
 import React from "react";
 import {Card, Col, Container, Row} from "react-bootstrap";
-import {Timeline} from "../../common/activity";
+import {ActivityStream} from "../../common/activity";
 import {
   ActiveStudies,
   CompletedStudies,
@@ -95,7 +95,7 @@ const FrontPageTimeline = ({
                       <Row>
 
                         <Col xs={12}>
-                          <Timeline activity={activity}/>
+                          <ActivityStream activity={activity}/>
                         </Col>
 
                         <Col xs={12}>

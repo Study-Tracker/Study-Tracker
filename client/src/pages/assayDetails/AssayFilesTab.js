@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Card, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFile} from "@fortawesome/free-solid-svg-icons";
 import React, {useState} from "react";
@@ -65,95 +65,96 @@ const AssayFilesTab = props => {
   }
 
   return (
-      <Col>
+      <Card>
+        <Card.Body>
 
-        <Row className="justify-content-between align-items-center">
-          <Col>
-            {
-              !!user
-                  ? (
-                      <span className="float-end">
-                        <Button variant="info"
-                                onClick={() => setModalIsOpen(true)}>
-                          Upload Files
-                          &nbsp;
-                          <FontAwesomeIcon icon={faFile}/>
-                        </Button>
-                      </span>
-                  ) : ''
-            }
-          </Col>
-        </Row>
-
-        <Row>
-
-          {
-            showFolder ? (
-                <Col sm={12}>
-                  <StorageFolderFileList
-                      folder={folder}
-                      isLoaded={!!folder}
-                      isError={!!error}
-                  />
-                </Col>
-            ) : (
-                <Col sm={12} className={"text-center"}>
-
-                  <p>
-                    <img
-                        src={"/static/images/clip/data-storage.png"}
-                        alt="File storage"
-                        className="img-fluid"
-                        width={250}
-                    />
-                  </p>
-
-                  <p>
-                    Study files can be viewed in the native file browser,
-                    or viewed as a partial folder tree here. <em>Note:</em>
-                    &nbsp;loading and viewing files here may be slow and
-                    subject to rate limits.
-                  </p>
-
-                  {
-                    assay.primaryStorageFolder
-                    && assay.primaryStorageFolder.url ? (
-                        <React.Fragment>
-
-                          <Button
-                              variant="info"
-                              target={"_blank noopener noreferrer"}
-                              href={assay.primaryStorageFolder.url}
-                          >
-                            View files in Egnyte
+          <Row className="justify-content-between align-items-center">
+            <Col>
+              {
+                !!user
+                    ? (
+                        <span className="float-end">
+                          <Button variant="info"
+                                  onClick={() => setModalIsOpen(true)}>
+                            Upload Files
+                            &nbsp;
+                            <FontAwesomeIcon icon={faFile}/>
                           </Button>
+                        </span>
+                    ) : ''
+              }
+            </Col>
+          </Row>
 
-                          &nbsp;&nbsp;or&nbsp;&nbsp;
+          <Row>
 
-                        </React.Fragment>
-                    ) : ""
-                  }
+            {
+              showFolder ? (
+                  <Col sm={12}>
+                    <StorageFolderFileList
+                        folder={folder}
+                        isLoaded={!!folder}
+                        isError={!!error}
+                    />
+                  </Col>
+              ) : (
+                  <Col sm={12} className={"text-center"}>
 
-                  <Button
-                      variant="primary"
-                      onClick={handleShowFolder}
-                  >
-                    Show files here
-                  </Button>
+                    <p>
+                      <img
+                          src={"/static/images/clip/data-storage.png"}
+                          alt="File storage"
+                          className="img-fluid"
+                          width={250}
+                      />
+                    </p>
 
-                </Col>
-            )
-          }
+                    <p>
+                      Study files can be viewed in the native file browser,
+                      or viewed as a partial folder tree here. <em>Note:</em>
+                      &nbsp;loading and viewing files here may be slow and
+                      subject to rate limits.
+                    </p>
 
-        </Row>
+                    {
+                      assay.primaryStorageFolder
+                      && assay.primaryStorageFolder.url ? (
+                          <React.Fragment>
 
-        <UploadFilesModal
-            isOpen={modalIsOpen}
-            showModal={(bool) => setModalIsOpen(bool)}
-            handleSubmit={handleSubmit}
-        />
+                            <Button
+                                variant="info"
+                                target={"_blank noopener noreferrer"}
+                                href={assay.primaryStorageFolder.url}
+                            >
+                              View files in Egnyte
+                            </Button>
 
-      </Col>
+                            &nbsp;&nbsp;or&nbsp;&nbsp;
+
+                          </React.Fragment>
+                      ) : ""
+                    }
+
+                    <Button
+                        variant="primary"
+                        onClick={handleShowFolder}
+                    >
+                      Show files here
+                    </Button>
+
+                  </Col>
+              )
+            }
+
+          </Row>
+
+          <UploadFilesModal
+              isOpen={modalIsOpen}
+              showModal={(bool) => setModalIsOpen(bool)}
+              handleSubmit={handleSubmit}
+          />
+        </Card.Body>
+      </Card>
   )
 
 }

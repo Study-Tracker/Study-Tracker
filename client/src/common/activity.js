@@ -154,8 +154,6 @@ const ActivityIcon = ({action}) => {
 const ActivityMessage = ({activity}) => {
   switch (activity.eventType) {
 
-      // Notebook entry templates
-
     case studyActions.NEW_ENTRY_TEMPLATE.value:
       return (
           <>
@@ -1048,7 +1046,7 @@ export const StudyTimelineActivity = ({activity}) => {
   )
 };
 
-export const Timeline = ({activity}) => {
+export const ActivityStream = ({activity}) => {
   console.debug("Study activity", activity);
   if (!activity || activity.length === 0) {
     return <h5 className="text-muted">There is no activity to display</h5>;

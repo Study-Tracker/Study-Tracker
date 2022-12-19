@@ -15,8 +15,8 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Col, Row} from 'react-bootstrap'
-import {Timeline} from "../../common/activity";
+import {Card, Col, Row} from 'react-bootstrap'
+import {ActivityStream} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
@@ -44,17 +44,19 @@ const StudyTimelineTab = props => {
         message={'Failed to load study activity.'}
     />;
   } else if (activity !== null) {
-    content = <Timeline activity={activity}/>;
+    content = <ActivityStream activity={activity}/>;
   }
 
   return (
-      <div className="timeline-tab">
-        <Row>
-          <Col sm={12}>
-            {content}
-          </Col>
-        </Row>
-      </div>
+      <Card>
+        <Card.Body>
+          <Row>
+            <Col sm={12}>
+              {content}
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   )
 
 }

@@ -19,15 +19,22 @@ package io.studytracker.controller.api.internal;
 import io.studytracker.controller.api.AbstractStudyController;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.FileStorageException;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
+import io.studytracker.mapstruct.mapper.FileStoreFolderMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Study;
+import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.service.FileSystemStorageService;
 import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,12 +59,34 @@ public class StudyStoragePrivateController extends AbstractStudyController {
 
   @Autowired private StorageLocationService storageLocationService;
 
+  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
+
+  @Autowired private FileStoreFolderMapper fileStoreFolderMapper;
+
   @GetMapping("")
-  public StorageFolder getStudyStorageFolder(@PathVariable("studyId") String studyId)
+  public List<FileStoreFolderDetailsDto> getStudyStorageFolders(@PathVariable("studyId") String studyId) {
+    LOGGER.info("Fetching storage folder for study: " + studyId);
+    Study study = getStudyFromIdentifier(studyId);
+    List<FileStoreFolderDetailsDto> folders = new ArrayList<>();
+    for (FileStoreFolder fsf: study.getStorageFolders()) {
+      FileStoreFolder folder = fileStoreFolderRepository.findById(fsf.getId())
+          .orElseThrow(() -> new RecordNotFoundException("Folder not found: " + fsf.getId()));
+      FileStoreFolderDetailsDto dto = fileStoreFolderMapper.toDetailsDto(folder);
+      if (study.getPrimaryStorageFolder().getId().equals(dto.getId())) {
+        dto.setPrimary(true);
+      }
+      folders.add(dto);
+    }
+    return folders;
+  }
+
+  @GetMapping("/{folderId}/contents")
+  public StorageFolder getStudyStorageFolder(@PathVariable("studyId") String studyId,
+      @PathVariable("folderId") Long folderId)
       throws Exception {
     LOGGER.info("Fetching storage folder for study: " + studyId);
     Study study = getStudyFromIdentifier(studyId);
-    FileStorageLocation location = storageLocationService.findByFileStoreFolder(study.getPrimaryStorageFolder());
+    FileStorageLocation location = storageLocationService.findByFileStoreFolderId(folderId);
     StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
     return studyStorageService.findFolder(location, study);
   }

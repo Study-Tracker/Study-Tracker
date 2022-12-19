@@ -19,12 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated the Study and Assay details pages with a new design. This includes an updated summary tab, the replacement of the old Files tab with a new File Manager tab, and more.
 - Updated configuration properties for email integration. The old properties were spring-specific, but will still work.
 
 ### Fixed
 
 - Fixed a bug with study and assay list display, due to missing fields.
 - Fixed a bug where failed study notebook loading would crash the web app.
+- Fixed an issue with missing database records for study and assay folders.
 
 ## [0.7.1] - 2022-11-15
 

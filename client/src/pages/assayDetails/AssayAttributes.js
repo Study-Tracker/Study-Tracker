@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.api;
+import {Col, Row} from "react-bootstrap";
+import React from "react";
+import PropTypes from "prop-types";
 
-import lombok.Data;
+const AssayAttributes = ({attributes}) => {
+  let items = [];
+  for (let k of Object.keys(attributes)) {
+    let v = attributes[k];
+    items.push(
+        <div key={"assay-attributes-" + k}>
+          <h6 className="details-label">{k}</h6>
+          <p>{v || "n/a"}</p>
+        </div>
+    )
+  }
+  return (
+      <Row>
+        <Col xs={12}>
+          {items}
+        </Col>
+      </Row>
+  )
+};
 
-@Data
-public class FileStoreFolderDto {
-
-  private Long id;
-  private String url;
-  private String name;
-  private String path;
-  private String referenceId;
-  private Long fileStorageLocationId;
+AssayAttributes.propTypes = {
+  attributes: PropTypes.object.isRequired
 }
+
+export default AssayAttributes;

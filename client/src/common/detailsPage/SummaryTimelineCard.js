@@ -14,52 +14,46 @@
  * limitations under the License.
  */
 
-import {Card, Col, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {StorageFolderFileList} from "../../common/files";
 import axios from "axios";
+import {Card} from "react-bootstrap";
+import Timeline from "../../common/detailsPage/Timeline";
 import PropTypes from "prop-types";
 
-const StudyNotebookTabContent = props => {
+const SummaryTimelineCard = ({study, assay}) => {
 
-  const {study} = props;
-  const [folder, setFolder] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    refreshData();
-  }, []);
-
-  const refreshData = () => {
-    axios.get('/api/internal/study/' + study.code + '/notebook')
-    .then(response => setFolder(response.data))
+    let url = null;
+    if (study) {
+      url = "/api/internal/study/" + study.code + "/activity";
+    } else if (assay) {
+      url = "/api/internal/assay/" + assay.id + "/activity";
+    }
+    axios.get(url)
+    .then(response => setActivity(response.data))
     .catch(e => {
+      setError(e);
       console.error(e);
-      setError(e.message);
-    });
-  }
+    })
+  }, []);
 
   return (
       <Card>
         <Card.Body>
-          <Row>
-            <Col sm={12}>
-              <StorageFolderFileList
-                  folder={folder}
-                  isLoaded={!!folder}
-                  isError={!!error}
-                  errorMessage={error}
-                  folderFileKey={'entries'}
-              />
-            </Col>
-          </Row>
+          <h5 className="card-title">Latest Activity</h5>
+          <Timeline events={activity} />
         </Card.Body>
       </Card>
   )
+
 }
 
-StudyNotebookTabContent.propTypes = {
-  study: PropTypes.object.isRequired
+SummaryTimelineCard.propTypes = {
+  study: PropTypes.object,
+  assay: PropTypes.object
 }
 
-export default StudyNotebookTabContent;
+export default SummaryTimelineCard;

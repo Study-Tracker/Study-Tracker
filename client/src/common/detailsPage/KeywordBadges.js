@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.api;
+import React from "react";
+import PropTypes from "prop-types";
+import {Badge} from "react-bootstrap";
 
-import lombok.Data;
+const KeywordBadges = ({keywords}) => {
 
-@Data
-public class FileStoreFolderDto {
+  const badges = keywords.map((keyword, i) => {
+    return (
+        <Badge key={i} bg={"info"} className={"me-2 keyword-badge"}>
+          {keyword.category.name}: {keyword.keyword}
+        </Badge>
+    )
+  })
 
-  private Long id;
-  private String url;
-  private String name;
-  private String path;
-  private String referenceId;
-  private Long fileStorageLocationId;
+  return (
+      <div>{badges}</div>
+  )
 }
+
+KeywordBadges.propTypes = {
+  keywords: PropTypes.array.isRequired
+}
+
+export default KeywordBadges;

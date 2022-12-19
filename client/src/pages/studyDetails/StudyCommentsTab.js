@@ -15,7 +15,7 @@
  */
 
 import React, {createRef, useState} from "react";
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Button, Card, Col, Form, Row} from 'react-bootstrap';
 import Comment from "../../common/Comment";
 import {MessageCircle} from 'react-feather';
 import swal from 'sweetalert';
@@ -149,84 +149,85 @@ const StudyCommentsTab = props => {
       );
 
   return (
-      <div>
+      <Card>
+        <Card.Body>
 
-        <Row>
-          {content}
-        </Row>
+          <Row>
+            {content}
+          </Row>
 
-        <Row>
-          <Col sm={12}>
-            <div className="d-flex mt-3">
-              <div className="flex-grow-1 ms-3">
+          <Row>
+            <Col sm={12}>
+              <div className="d-flex mt-3">
+                <div className="flex-grow-1 ms-3">
 
-                <div className="mb-2 text-center" hidden={showInput}>
-                  <Button variant={'info'} onClick={() => toggleInput()}>
-                    Add Comment
-                    &nbsp;
-                    <MessageCircle className="feather align-middle mb-1"/>
-                  </Button>
+                  <div className="mb-2 text-center" hidden={showInput}>
+                    <Button variant={'info'} onClick={() => toggleInput()}>
+                      Add Comment
+                      &nbsp;
+                      <MessageCircle className="feather align-middle mb-1"/>
+                    </Button>
+                  </div>
+
+                  <div className="mb-2" hidden={!showInput}>
+
+                    <Formik
+                        initialValues={commentDefault}
+                        onSubmit={handleFormSubmit}
+                        validationSchema={commentSchema}
+                    >
+                      {({
+                        values,
+                        errors,
+                        touched,
+                        handleChange
+                      }) => (
+                          <FormikForm>
+
+                            <Form.Group className="mb-2">
+                              <Form.Label>New Comment</Form.Label>
+                              <Form.Control
+                                  ref={textInput}
+                                  as={'textarea'}
+                                  name={"text"}
+                                  className={(!!errors.text && touched.text) ? 'is-invalid' : ''}
+                                  rows={3}
+                                  value={values.text}
+                                  onChange={handleChange}
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {errors.text}
+                              </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Button
+                                variant={'secondary'}
+                                onClick={() => toggleInput()}
+                            >
+                              Cancel
+                            </Button>
+                            &nbsp;&nbsp;
+                            <Button
+                                variant={'primary'}
+                                type="submit"
+                            >
+                              Submit
+                            </Button>
+
+                          </FormikForm>
+
+                      )}
+
+                    </Formik>
+
+                  </div>
+
                 </div>
-
-                <div className="mb-2" hidden={!showInput}>
-
-                  <Formik
-                      initialValues={commentDefault}
-                      onSubmit={handleFormSubmit}
-                      validationSchema={commentSchema}
-                  >
-                    {({
-                      values,
-                      errors,
-                      touched,
-                      handleChange
-                    }) => (
-                        <FormikForm>
-
-                          <Form.Group className="mb-2">
-                            <Form.Label>New Comment</Form.Label>
-                            <Form.Control
-                                ref={textInput}
-                                as={'textarea'}
-                                name={"text"}
-                                className={(!!errors.text && touched.text) ? 'is-invalid' : ''}
-                                rows={3}
-                                value={values.text}
-                                onChange={handleChange}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                              {errors.text}
-                            </Form.Control.Feedback>
-                          </Form.Group>
-
-                          <Button
-                              variant={'secondary'}
-                              onClick={() => toggleInput()}
-                          >
-                            Cancel
-                          </Button>
-                          &nbsp;&nbsp;
-                          <Button
-                              variant={'primary'}
-                              type="submit"
-                          >
-                            Submit
-                          </Button>
-
-                        </FormikForm>
-
-                    )}
-
-                  </Formik>
-
-                </div>
-
               </div>
-            </div>
-          </Col>
-        </Row>
-
-      </div>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   );
 
 }

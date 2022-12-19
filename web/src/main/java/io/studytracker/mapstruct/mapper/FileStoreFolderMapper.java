@@ -22,14 +22,19 @@ import io.studytracker.model.FileStoreFolder;
 import java.util.List;
 import java.util.Set;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface FileStoreFolderMapper {
+
   FileStoreFolder fromDetailsDto(FileStoreFolderDetailsDto dto);
 
+  @Mapping(target = "fileStorageLocationId", source = "fileStorageLocation.id")
   FileStoreFolderDetailsDto toDetailsDto(FileStoreFolder folder);
+  List<FileStoreFolderDetailsDto> toDetailsDtoList(List<FileStoreFolder> folders);
 
+  @Mapping(target = "fileStorageLocationId", source = "fileStorageLocation.id")
   FileStoreFolderDto toDto(FileStoreFolder folder);
-  List<FileStoreFolderDto> toDto(List<FileStoreFolder> folders);
-  Set<FileStoreFolderDto> toDto(Set<FileStoreFolder> folders);
+  List<FileStoreFolderDto> toDtoList(List<FileStoreFolder> folders);
+  Set<FileStoreFolderDto> toDtoSet(Set<FileStoreFolder> folders);
 }

@@ -103,6 +103,10 @@ public class StorageLocationService {
     return fileStorageLocationRepository.findByFileStoreFolderId(folder.getId());
   }
 
+  public FileStorageLocation findByFileStoreFolderId(Long folderId) {
+    return fileStorageLocationRepository.findByFileStoreFolderId(folderId);
+  }
+
   public List<FileStorageLocation> findByType(StorageLocationType type) {
     return fileStorageLocationRepository.findByType(type);
   }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Card, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import {AssaySummaryCards} from "../../common/assays";
@@ -27,27 +27,29 @@ const StudyAssaysTab = ({study, user}) => {
   const navigate = useNavigate();
 
   return (
-      <div>
-        <Row className="justify-content-between align-items-center mb-4">
-          <Col>
-            {
-              !!user
-                  ? (
-                      <span className="float-end">
-                        <Button variant="info" onClick={() => navigate(
-                            "/study/" + study.code + "/assays/new")}>
-                          New Assay
-                          &nbsp;
-                          <FontAwesomeIcon icon={faPlusCircle}/>
-                        </Button>
-                      </span>
-                  ) : ''
-            }
-          </Col>
-        </Row>
+      <Card>
+        <Card.Body>
+          <Row className="justify-content-between align-items-center mb-4">
+            <Col>
+              {
+                !!user
+                    ? (
+                        <span className="float-end">
+                          <Button variant="info" onClick={() => navigate(
+                              "/study/" + study.code + "/assays/new")}>
+                            New Assay
+                            &nbsp;
+                            <FontAwesomeIcon icon={faPlusCircle}/>
+                          </Button>
+                        </span>
+                    ) : ''
+              }
+            </Col>
+          </Row>
 
-        <AssaySummaryCards studyCode={study.code}/>
-      </div>
+          <AssaySummaryCards studyCode={study.code}/>
+        </Card.Body>
+      </Card>
   );
 
 };
