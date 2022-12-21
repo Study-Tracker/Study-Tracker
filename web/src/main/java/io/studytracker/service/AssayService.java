@@ -146,6 +146,8 @@ public class AssayService {
         return Double.class.isAssignableFrom(clazz);
       case BOOLEAN:
         return Boolean.class.isAssignableFrom(clazz);
+      case DROPDOWN:
+        return String.class.isAssignableFrom(clazz);
       default:
         return false;
     }

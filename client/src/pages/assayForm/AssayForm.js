@@ -23,9 +23,7 @@ import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
 import swal from 'sweetalert';
 import {AssayTypeDropdown} from "../../common/forms/assayTypes";
-import {
-  AssayTypeFieldCaptureInputList
-} from "../../common/forms/assayTypeFieldCapture";
+import AssayTypeFieldCaptureInputList from "./AssayTypeFieldCaptureInputList";
 import AttributeInputs from "../../common/forms/AttributeInputs";
 import TaskInputs from "../../common/forms/TaskInputs";
 import {LoadingOverlay} from "../../common/loading";

@@ -40,7 +40,7 @@ const AssayFieldData = ({assay}) => {
 
       const value = assayFields[f.fieldName];
 
-      if (["STRING", "INTEGER", "FLOAT"].indexOf(f.type) > -1) {
+      if (["STRING", "INTEGER", "FLOAT", "DROPDOWN"].indexOf(f.type) > -1) {
         fields.push(
             <div key={"assay-field-display-" + f.fieldName}>
               <h6 className="details-label">{f.displayName}</h6>

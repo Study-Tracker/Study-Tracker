@@ -30,4 +30,6 @@ public class AssayTypeFieldDetailsDto {
   private String description;
   private boolean active = true;
   private Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }
