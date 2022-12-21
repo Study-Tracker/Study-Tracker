@@ -23,10 +23,10 @@ import AssayQuickActionsWidget
 import SummaryTimelineCard from "../../common/detailsPage/SummaryTimelineCard";
 import {RepairableStorageFolderButton} from "../../common/files";
 import {RepairableNotebookFolderButton} from "../../common/eln";
-import AssayFieldData from "./AssayFieldData";
 import {AssayTaskList} from "../../common/assayTasks";
 import axios from "axios";
 import swal from "sweetalert";
+import AssayFieldDataTable from "./AssayFieldDataTable";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -156,7 +156,8 @@ const AssayOverviewTab = ({
                         <Row>
                           <Col xs={12}>
                             <Card.Title>{assay.assayType.name} Metadata</Card.Title>
-                            <AssayFieldData assay={assay}/>
+                            {/*<AssayFieldData assay={assay}/>*/}
+                            <AssayFieldDataTable assay={assay}/>
                           </Col>
                         </Row>
                       </Card.Body>
