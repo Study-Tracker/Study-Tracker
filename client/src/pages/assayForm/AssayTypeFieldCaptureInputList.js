@@ -21,10 +21,12 @@ import StringFieldInput from "../../common/forms/customFields/StringFieldInput";
 import BooleanFieldInput
   from "../../common/forms/customFields/BooleanFieldInput";
 import DateFieldInput from "../../common/forms/customFields/DateFieldInput";
-import NumberFieldInput from "../../common/forms/customFields/NumberFieldInput";
+import IntegerFieldInput
+  from "../../common/forms/customFields/IntegerFieldInput";
 import TextFieldInput from "../../common/forms/customFields/TextFieldInput";
 import DropdownFieldInput
   from "../../common/forms/customFields/DropdownFieldInput";
+import FloatFieldInput from "../../common/forms/customFields/FloatFieldInput";
 
 const AssayTypeFieldCaptureInputList = ({
   assayType,
@@ -72,7 +74,7 @@ const AssayTypeFieldCaptureInputList = ({
         break;
 
       case "INTEGER":
-        input = <NumberFieldInput
+        input = <IntegerFieldInput
             field={f}
             value={value}
             handleUpdate={handleUpdate}
@@ -81,7 +83,7 @@ const AssayTypeFieldCaptureInputList = ({
         break;
 
       case "FLOAT":
-        input = <NumberFieldInput
+        input = <FloatFieldInput
             field={f}
             value={value}
             handleUpdate={handleUpdate}

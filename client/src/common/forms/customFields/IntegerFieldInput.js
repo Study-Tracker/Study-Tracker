@@ -19,7 +19,7 @@ import {Form} from "react-bootstrap";
 import React from "react";
 import PropTypes from "prop-types";
 
-const NumberFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
+const IntegerFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
   return (
       <FormGroup>
         <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
@@ -27,12 +27,7 @@ const NumberFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
             type="number"
             defaultValue={value || field.defaultValue || null}
             onChange={e => {
-              let value = e.target.value;
-              if (field.type === "INTEGER") {
-                value = parseInt(value, 10);
-              } else if (field.type === "FLOAT") {
-                value = parseFloat(value);
-              }
+              let value = parseInt(e.target.value, 10);
               handleUpdate({[field.fieldName]: value})
             }}
             isInvalid={isInvalid}
@@ -45,7 +40,7 @@ const NumberFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
   )
 };
 
-NumberFieldInput.propTypes = {
+IntegerFieldInput.propTypes = {
   field: PropTypes.object.isRequired,
   value: PropTypes.any,
   handleUpdate: PropTypes.func.isRequired,
@@ -53,4 +48,4 @@ NumberFieldInput.propTypes = {
   error: PropTypes.string
 }
 
-export default NumberFieldInput;
+export default IntegerFieldInput;

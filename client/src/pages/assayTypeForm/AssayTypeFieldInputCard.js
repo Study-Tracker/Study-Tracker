@@ -29,76 +29,76 @@ const AssayTypeFieldInputCard = ({
 }) => {
 
   const renderDefaultValueInput = () => {
+    let control = '';
     if (field.type === "BOOLEAN") {
-      return (
-          <Col md={6} lg={3}>
-            <FormGroup>
-              <Form.Label>Default Value</Form.Label>
-              <Select
-                  options={[{value: true, label: "True"}, {value: false, label: "False"}]}
-                  className={"react-select-container"}
-                  classNamePrefix={"react-select"}
-                  onChange={selected => handleFieldUpdate({"defaultValue": selected.value}, index)}
-              />
-            </FormGroup>
-          </Col>
+      control = (
+          <Select
+              options={[{value: true, label: "True"}, {value: false, label: "False"}]}
+              className={"react-select-container"}
+              classNamePrefix={"react-select"}
+              onChange={selected => handleFieldUpdate({"defaultValue": selected.value}, index)}
+          />
       )
     }
-    else if (field.type === "NUMBER") {
-      return (
-          <Col md={6} lg={3}>
-            <FormGroup>
-              <Form.Label>Default Value</Form.Label>
-              <Form.Control
-                  type="number"
-                  value={field.defaultValue}
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    if (field.type === "INTEGER") {
-                      value = parseInt(value, 10);
-                    } else if (field.type === "FLOAT") {
-                      value = parseFloat(value);
-                    }
-                    handleFieldUpdate({"defaultValue": value}, index)
-                  }}
-              />
-            </FormGroup>
-          </Col>
+    else if (field.type === "INTEGER") {
+      control = (
+          <Form.Control
+              type="number"
+              value={field.defaultValue}
+              onChange={(e) => {
+                let value = parseInt(e.target.value, 10);
+                handleFieldUpdate({"defaultValue": value}, index)
+              }}
+          />
+      )
+    }
+    else if (field.type === "FLOAT") {
+      control = (
+          <Form.Control
+              type="number"
+              step="any"
+              value={field.defaultValue}
+              onChange={(e) => {
+                let value = parseFloat(e.target.value);
+                handleFieldUpdate({"defaultValue": value}, index)
+              }}
+          />
       )
     }
     else if (field.type === "DROPDOWN") {
-      return (
-          <Col md={6} lg={3}>
-            <FormGroup>
-              <Form.Label>Default Value</Form.Label>
-              <Select
-                  options={
-                    field.dropdownOptions.split("\n")
-                    .map(o => { return {value: o, label: o} })
-                  }
-                  className={"react-select-container"}
-                  classNamePrefix={"react-select"}
-                  onChange={selected => handleFieldUpdate({"defaultValue": selected.value}, index)}
-              />
-            </FormGroup>
-          </Col>
+      const options = field.dropdownOptions
+          ? field.dropdownOptions.split("\n")
+          .map(o => { return {value: o, label: o} })
+          : [];
+      control = (
+          <Select
+              options={options}
+              className={"react-select-container"}
+              classNamePrefix={"react-select"}
+              onChange={selected => handleFieldUpdate({"defaultValue": selected.value}, index)}
+          />
       );
     }
     else {
-      return (
-          <Col md={6} lg={3}>
-            <FormGroup>
-              <Form.Label>Default Value</Form.Label>
-              <Form.Control
-                  type="text"
-                  value={field.defaultValue}
-                  onChange={(e) => handleFieldUpdate(
-                      {"defaultValue": e.target.value}, index)}
-              />
-            </FormGroup>
-          </Col>
+      control = (
+          <Form.Control
+              type="text"
+              value={field.defaultValue}
+              onChange={(e) => handleFieldUpdate(
+                  {"defaultValue": e.target.value}, index)}
+          />
       );
     }
+
+    return (
+        <Col md={6} lg={4}>
+          <FormGroup>
+            <Form.Label>Default Value</Form.Label>
+            {control}
+          </FormGroup>
+        </Col>
+    )
+
   }
 
   return (
@@ -116,7 +116,7 @@ const AssayTypeFieldInputCard = ({
         <Card.Body className="pb-3 pr-3 pl-3 pt-0">
           <Row>
 
-            <Col md={6} lg={3}>
+            <Col md={6} lg={4}>
               <FormGroup>
                 <Form.Label>Name *</Form.Label>
                 <Form.Control
@@ -133,7 +133,7 @@ const AssayTypeFieldInputCard = ({
               </FormGroup>
             </Col>
 
-            <Col md={6} lg={3}>
+            <Col md={6} lg={4}>
               <FormGroup>
                 <Form.Label>Type</Form.Label>
                 <Form.Select
@@ -154,7 +154,7 @@ const AssayTypeFieldInputCard = ({
               </FormGroup>
             </Col>
 
-            <Col md={12} lg={4}>
+            <Col md={6} lg={4}>
               <FormGroup>
                 <Form.Label>Description</Form.Label>
                 <Form.Control
@@ -169,7 +169,7 @@ const AssayTypeFieldInputCard = ({
 
             {
               field.type === "DROPDOWN" && (
-                    <Col md={12} lg={4}>
+                    <Col md={6} lg={4}>
                       <FormGroup>
                         <Form.Label>Dropdown Options *</Form.Label>
                         <Form.Control
@@ -189,26 +189,15 @@ const AssayTypeFieldInputCard = ({
 
             { renderDefaultValueInput() }
 
-            {/*<Col md={6} lg={3}>*/}
-            {/*  <FormGroup>*/}
-            {/*    <Form.Label>Default Value</Form.Label>*/}
-            {/*    <Form.Control*/}
-            {/*        type="text"*/}
-            {/*        value={field.defaultValue}*/}
-            {/*        onChange={(e) => handleFieldUpdate(*/}
-            {/*            {"defaultValue": e.target.value}, index)}*/}
-            {/*    />*/}
-            {/*  </FormGroup>*/}
-            {/*</Col>*/}
-
-            <Col md={6} lg={1}>
+            <Col md={6} lg={4}>
               <Form.Check
-                  type="checkbox"
+                  className="mt-4"
+                  type="switch"
                   onChange={(e) => {
                     handleFieldUpdate({"required": e.target.checked}, index)
                   }}
                   checked={field.required}
-                  label={"Required"}
+                  label={"Field is required"}
               />
             </Col>
 

@@ -19,31 +19,34 @@ import {Form} from "react-bootstrap";
 import React from "react";
 import PropTypes from "prop-types";
 
-const BooleanFieldInput = ({field, value, handleUpdate}) => {
+const FloatFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
   return (
       <FormGroup>
-        <Form.Check
-            id={"assay-field-" + field.fieldName + "-check"}
-            type="switch"
-            label={field.displayName}
-            // checked={value != null ? value : field.defaultValue === "true"}
-            // checked={value}
-            defaultChecked={field.defaultValue === "true"}
-            onChange={e => handleUpdate(
-                {
-                  [field.fieldName]: e.target.checked
-                }
-            )}
+        <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
+        <Form.Control
+            type="number"
+            step="any"
+            defaultValue={value || field.defaultValue || null}
+            onChange={e => {
+              let value = parseFloat(e.target.value);
+              handleUpdate({[field.fieldName]: value})
+            }}
+            isInvalid={isInvalid}
         />
         <Form.Text>{field.description}</Form.Text>
+        <Form.Control.Feedback type={"invalid"}>
+          {error || field.displayName + " is required"}
+        </Form.Control.Feedback>
       </FormGroup>
   )
 };
 
-BooleanFieldInput.propTypes = {
+FloatFieldInput.propTypes = {
   field: PropTypes.object.isRequired,
-  value: PropTypes.bool,
-  handleUpdate: PropTypes.func.isRequired
+  value: PropTypes.any,
+  handleUpdate: PropTypes.func.isRequired,
+  isInvalid: PropTypes.bool,
+  error: PropTypes.string
 }
 
-export default BooleanFieldInput;
+export default FloatFieldInput;

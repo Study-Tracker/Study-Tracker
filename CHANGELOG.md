@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added bean property bindings to configuration properties for easier reference and validation. Any misconfigured properties will throw a more accessible error message at startup.
+- Added dropdown-select and file-upload inputs to the Assay Type custom field definitions. You can now also set default values for Assay Type custom fields.
 
 ### Changed
 
