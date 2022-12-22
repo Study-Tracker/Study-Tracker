@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-import {Col, Row, Table} from "react-bootstrap";
+import {Button, Col, Row, Table} from "react-bootstrap";
 import React from "react";
 import PropTypes from "prop-types";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faFile} from "@fortawesome/free-regular-svg-icons";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -72,10 +74,20 @@ const AssayFieldData = ({assay}) => {
             </tr>
         );
       } else if (f.type === "FILE") {
+        let val = "n/a";
+        if (value) {
+          const d = JSON.parse(value);
+          if (d.downloadable) {
+            const url = "/api/internal/data-files/download?locationId="
+          }
+          val = <Button variant={"outline-info"} href={""}>
+            <FontAwesomeIcon icon={faFile} />
+          </Button>
+        }
         fields.push(
             <tr key={"assay-field-display-" + f.fieldName}>
               <td className="fw-bolder">{f.displayName}</td>
-              <td>{value || 'n/a'}</td>
+              <td>{val}</td>
             </tr>
         );
       }

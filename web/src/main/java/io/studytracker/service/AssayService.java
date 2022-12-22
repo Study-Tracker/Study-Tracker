@@ -16,6 +16,8 @@
 
 package io.studytracker.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
@@ -89,6 +91,8 @@ public class AssayService {
   @Autowired private ELNFolderRepository elnFolderRepository;
 
   @Autowired(required = false) private GitService gitService;
+
+  @Autowired private ObjectMapper objectMapper;
 
   public Page<Assay> findAll(Pageable pageable) {
     return assayRepository.findAll(pageable);
@@ -243,7 +247,10 @@ public class AssayService {
                   storageLocationService.lookupDataFileStorageService(location);
               StorageFile movedFile = dataFileStorageService
                   .saveFile(location, folder.getPath(), new File(localPath));
-              assay.getFields().put(field.getFieldName(), movedFile.getPath());
+//              assay.getFields().put(field.getFieldName(), movedFile.getPath());
+              JsonNode node = objectMapper.valueToTree(movedFile);
+              node.
+              assay.getFields().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
             } catch (Exception e) {
               e.printStackTrace();
               LOGGER.warn("Failed to move file for assay: " + assay.getCode());
