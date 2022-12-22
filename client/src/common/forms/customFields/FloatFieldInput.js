@@ -26,7 +26,7 @@ const FloatFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
         <Form.Control
             type="number"
             step="any"
-            defaultValue={value || field.defaultValue || null}
+            defaultValue={value || null}
             onChange={e => {
               let value = parseFloat(e.target.value);
               handleUpdate({[field.fieldName]: value})

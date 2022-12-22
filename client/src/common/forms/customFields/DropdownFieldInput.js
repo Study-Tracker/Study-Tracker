@@ -35,11 +35,7 @@ const DropdownFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
           onChange={selected => handleUpdate(
               { [field.fieldName]: selected.value }
           )}
-          defaultValue={() => {
-            if (value) return {value: value, label: value}
-            else if (field.defaultValue) return {value: field.defaultValue, label: field.defaultValue}
-            else return null
-          }}
+          defaultValue={!!value ? {value: value, label: value} : null}
         />
         <Form.Text>{field.description}</Form.Text>
         <Form.Control.Feedback type={"invalid"}>

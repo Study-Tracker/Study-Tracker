@@ -25,7 +25,7 @@ const StringFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
         <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
         <Form.Control
             type="text"
-            defaultValue={value || field.defaultValue || ''}
+            defaultValue={value || ''}
             onChange={e => handleUpdate(
                 {
                   [field.fieldName]: e.target.value

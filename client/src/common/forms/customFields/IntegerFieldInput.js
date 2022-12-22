@@ -25,7 +25,7 @@ const IntegerFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
         <Form.Label>{field.displayName}{field.required ? " *" : ""}</Form.Label>
         <Form.Control
             type="number"
-            defaultValue={value || field.defaultValue || null}
+            defaultValue={value || null}
             onChange={e => {
               let value = parseInt(e.target.value, 10);
               handleUpdate({[field.fieldName]: value})

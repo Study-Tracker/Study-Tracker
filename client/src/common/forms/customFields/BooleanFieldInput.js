@@ -26,9 +26,7 @@ const BooleanFieldInput = ({field, value, handleUpdate}) => {
             id={"assay-field-" + field.fieldName + "-check"}
             type="switch"
             label={field.displayName}
-            // checked={value != null ? value : field.defaultValue === "true"}
-            // checked={value}
-            defaultChecked={field.defaultValue === "true"}
+            defaultChecked={value != null ? value : false}
             onChange={e => handleUpdate(
                 {
                   [field.fieldName]: e.target.checked

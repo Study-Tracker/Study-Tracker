@@ -26,7 +26,7 @@ const TextFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
         <Form.Control
             as="textarea"
             rows={3}
-            defaultValue={value || field.defaultValue || ''}
+            defaultValue={value || ''}
             onChange={e => handleUpdate(
                 {
                   [field.fieldName]: e.target.value

@@ -101,9 +101,6 @@ const AssayForm = props => {
               return value[f.fieldName] !== undefined
                   && value[f.fieldName] !== null
                   && value[f.fieldName] !== ""
-                  && f.defaultValue !== undefined
-                  && f.defaultValue !== null
-                  && f.defaultValue !== ""
             });
           }
       ),
@@ -131,21 +128,22 @@ const AssayForm = props => {
     let uploadErrors = false;
     for (let i in values.assayType.fields) {
       const assayTypeField = values.assayType.fields[i];
-      console.debug("Assay type field: ", assayTypeField);
       if (assayTypeField.type === "FILE") {
         const file = values.fields[assayTypeField.fieldName];
-        console.debug("Uploading file: ", file);
-        const formData = new FormData();
-        formData.append("file", file);
-        const localPath = await axios.post(
-            "/api/internal/data-files/temp-upload", formData)
-        .then(response => response.data.filePath)
-        .catch(e => {
-          console.error(e);
-          uploadErrors = true;
-        });
-        if (uploadErrors) break;
-        values.fields[assayTypeField.fieldName] = localPath;
+        if (file) {
+          console.debug("Uploading file: ", file);
+          const formData = new FormData();
+          formData.append("file", file);
+          const localPath = await axios.post(
+              "/api/internal/data-files/temp-upload", formData)
+          .then(response => response.data.filePath)
+          .catch(e => {
+            console.error(e);
+            uploadErrors = true;
+          });
+          if (uploadErrors) break;
+          values.fields[assayTypeField.fieldName] = localPath;
+        }
       }
     }
     if (uploadErrors) {

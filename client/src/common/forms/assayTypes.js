@@ -35,7 +35,18 @@ export const AssayTypeDropdown = ({
 
     const fields = {};
     for (let f of assayType.fields) {
-      fields[f.fieldName] = f.type === "BOOLEAN" ? false : null;
+      if (f.type === "BOOLEAN") {
+        fields[f.fieldName] = f.defaultValue === "true" || false;
+      }
+      else if (f.type === "INTEGER") {
+        fields[f.fieldName] = parseInt(f.defaultValue, 10);
+      }
+      else if (f.type === "FLOAT") {
+        fields[f.fieldName] = parseFloat(f.defaultValue);
+      }
+      else {
+        fields[f.fieldName] = f.defaultValue || null;
+      }
     }
 
     const tasks = [];
