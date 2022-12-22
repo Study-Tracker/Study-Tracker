@@ -51,4 +51,15 @@ public class StorageUtils {
     return slug1.equals(slug2);
   }
 
+  public static String normalizePath(String path) {
+    if (!path.startsWith("/")) path = "/" + path;
+    if (!path.endsWith("/")) path += "/";
+    return path;
+  }
+
+  public static String cleanInputPath(String path) {
+    if (path == null) return null;
+    return path.replaceAll("\\.\\.", ".");
+  }
+
 }

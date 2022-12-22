@@ -40,9 +40,13 @@ import io.studytracker.repository.AssayTaskRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.StudyRepository;
+import io.studytracker.storage.DataFileStorageService;
+import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -148,6 +152,8 @@ public class AssayService {
         return Boolean.class.isAssignableFrom(clazz);
       case DROPDOWN:
         return String.class.isAssignableFrom(clazz);
+      case FILE:
+        return String.class.isAssignableFrom(clazz);
       default:
         return false;
     }
@@ -208,19 +214,44 @@ public class AssayService {
                 () ->
                     new RecordNotFoundException("Cannot find study: " + assay.getStudy().getId()));
 
-    // Create the storage folder
+    // Manage assay storage
     if (options.isUseStorage()) {
+
+      // Create default storage folder
+      FileStorageLocation location = null;
+      FileStoreFolder folder = null;
       try {
-        FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
+        location = storageLocationService.findDefaultStudyLocation();
         StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
         StorageFolder storageFolder = studyStorageService.createFolder(location, assay);
-        FileStoreFolder folder = FileStoreFolder.from(location, storageFolder);
+        folder = FileStoreFolder.from(location, storageFolder);
         assay.setPrimaryStorageFolder(folder);
         assay.addFileStoreFolder(folder);
       } catch (Exception e) {
         e.printStackTrace();
         LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode());
       }
+
+      // Move uploaded files to new folder
+      if (location != null && folder != null) {
+        for (AssayTypeField field : assay.getAssayType().getFields()) {
+          if (field.getType().equals(CustomEntityFieldType.FILE)) {
+            try {
+              String localPath = StorageUtils.cleanInputPath(
+                  assay.getFields().get(field.getFieldName()).toString());
+              DataFileStorageService dataFileStorageService =
+                  storageLocationService.lookupDataFileStorageService(location);
+              StorageFile movedFile = dataFileStorageService
+                  .saveFile(location, folder.getPath(), new File(localPath));
+              assay.getFields().put(field.getFieldName(), movedFile.getPath());
+            } catch (Exception e) {
+              e.printStackTrace();
+              LOGGER.warn("Failed to move file for assay: " + assay.getCode());
+            }
+          }
+        }
+      }
+
     }
 
     // Create the ELN folder

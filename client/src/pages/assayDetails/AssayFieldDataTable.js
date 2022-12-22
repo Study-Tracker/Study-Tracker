@@ -71,6 +71,13 @@ const AssayFieldData = ({assay}) => {
               <td>{!!value ? new Date(value).toLocaleString() : 'n/a'}</td>
             </tr>
         );
+      } else if (f.type === "FILE") {
+        fields.push(
+            <tr key={"assay-field-display-" + f.fieldName}>
+              <td className="fw-bolder">{f.displayName}</td>
+              <td>{value || 'n/a'}</td>
+            </tr>
+        );
       }
 
     }

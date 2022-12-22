@@ -29,7 +29,9 @@ import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StoragePermissions;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -123,6 +125,27 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     StorageFile storageFile = storageService.saveFile(location, path, localPath.toFile());
     LOGGER.debug("Uploaded file: " + storageFile.toString());
     return new ResponseEntity<>(storageFile, HttpStatus.OK);
+
+  }
+
+  @PostMapping("/temp-upload")
+  public HttpEntity<Map<String, Object>> uploadTemporaryFile(
+      @RequestParam("file") MultipartFile file
+  ) throws Exception {
+
+    LOGGER.info("Uploading temp file {}", file.getOriginalFilename());
+
+    // Save the file locally
+    Path localPath;
+    try {
+      localPath = fileSystemStorageService.store(file);
+      LOGGER.debug("Local file path: " + localPath);
+    } catch (FileStorageException e) {
+      e.printStackTrace();
+      throw new FileStorageException("Failed to upload file: " + file.getOriginalFilename() ,e);
+    }
+
+    return ResponseEntity.ok(Collections.singletonMap("filePath", localPath.toString()));
 
   }
 

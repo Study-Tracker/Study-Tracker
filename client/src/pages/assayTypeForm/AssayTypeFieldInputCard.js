@@ -30,10 +30,19 @@ const AssayTypeFieldInputCard = ({
 
   const renderDefaultValueInput = () => {
     let control = '';
+
+    // Return empty for some types
+    if (field.type === 'FILE' || field.type === 'DATE') {
+      return control;
+    }
+
     if (field.type === "BOOLEAN") {
       control = (
           <Select
-              options={[{value: true, label: "True"}, {value: false, label: "False"}]}
+              options={[
+                {value: true, label: "True"},
+                {value: false, label: "False"}
+              ]}
               className={"react-select-container"}
               classNamePrefix={"react-select"}
               onChange={selected => handleFieldUpdate({"defaultValue": selected.value}, index)}

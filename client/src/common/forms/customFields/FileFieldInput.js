@@ -27,9 +27,7 @@ const FileFieldInput = ({field, value, handleUpdate, isInvalid, error}) => {
             type="file"
             defaultValue={value || field.defaultValue || ''}
             onChange={e => handleUpdate(
-                {
-                  [field.fieldName]: e.target.value
-                }
+                { [field.fieldName]: e.currentTarget.files[0] }
             )}
         />
         <Form.Text>{field.description}</Form.Text>

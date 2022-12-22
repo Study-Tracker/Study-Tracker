@@ -27,6 +27,7 @@ import TextFieldInput from "../../common/forms/customFields/TextFieldInput";
 import DropdownFieldInput
   from "../../common/forms/customFields/DropdownFieldInput";
 import FloatFieldInput from "../../common/forms/customFields/FloatFieldInput";
+import FileFieldInput from "../../common/forms/customFields/FileFieldInput";
 
 const AssayTypeFieldCaptureInputList = ({
   assayType,
@@ -118,7 +119,12 @@ const AssayTypeFieldCaptureInputList = ({
         break;
 
       case "FILE":
-        input = "";
+        input = <FileFieldInput
+            field={f}
+            value={value}
+            handleUpdate={handleUpdate}
+            isInvalid={errors.fields && f.required && !value}
+        />;
         break;
 
       default:
