@@ -32,6 +32,7 @@ public interface FileStoreFolderMapper {
   @Mapping(target = "fileStorageLocationId", source = "fileStorageLocation.id")
   FileStoreFolderDetailsDto toDetailsDto(FileStoreFolder folder);
   List<FileStoreFolderDetailsDto> toDetailsDtoList(List<FileStoreFolder> folders);
+  Set<FileStoreFolderDetailsDto> toDetailsDtoSet(Set<FileStoreFolder> folders);
 
   @Mapping(target = "fileStorageLocationId", source = "fileStorageLocation.id")
   FileStoreFolderDto toDto(FileStoreFolder folder);

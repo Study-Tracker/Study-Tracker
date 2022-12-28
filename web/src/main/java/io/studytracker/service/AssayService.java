@@ -16,7 +16,6 @@
 
 package io.studytracker.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
@@ -239,7 +238,9 @@ public class AssayService {
       // Move uploaded files to new folder
       if (location != null && folder != null) {
         for (AssayTypeField field : assay.getAssayType().getFields()) {
-          if (field.getType().equals(CustomEntityFieldType.FILE)) {
+          if (field.getType().equals(CustomEntityFieldType.FILE)
+              && assay.getFields().containsKey(field.getFieldName())
+              && assay.getFields().get(field.getFieldName()) != null) {
             try {
               String localPath = StorageUtils.cleanInputPath(
                   assay.getFields().get(field.getFieldName()).toString());
@@ -248,8 +249,6 @@ public class AssayService {
               StorageFile movedFile = dataFileStorageService
                   .saveFile(location, folder.getPath(), new File(localPath));
 //              assay.getFields().put(field.getFieldName(), movedFile.getPath());
-              JsonNode node = objectMapper.valueToTree(movedFile);
-              node.
               assay.getFields().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
             } catch (Exception e) {
               e.printStackTrace();

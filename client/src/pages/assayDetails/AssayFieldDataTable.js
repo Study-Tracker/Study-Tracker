@@ -77,11 +77,12 @@ const AssayFieldData = ({assay}) => {
         let val = "n/a";
         if (value) {
           const d = JSON.parse(value);
-          if (d.downloadable) {
-            const url = "/api/internal/data-files/download?locationId="
-          }
-          val = <Button variant={"outline-info"} href={""}>
-            <FontAwesomeIcon icon={faFile} />
+          let url = d.url;
+          // if (d.downloadable) {
+          //   url = "/api/internal/data-files/download?locationId="; // TODO: fix reference to locationId
+          // }
+          val = <Button variant={"link"} href={url} target={"_blank"}>
+            <FontAwesomeIcon icon={faFile} className={"me-2"} /> {d.name}
           </Button>
         }
         fields.push(
@@ -98,7 +99,7 @@ const AssayFieldData = ({assay}) => {
   return (
       <Row>
         <Col xs={12}>
-          <Table size={"sm"} borderless={true}>
+          <Table size={"sm"} borderless={true} striped={true}>
             <tbody>
               {fields}
             </tbody>

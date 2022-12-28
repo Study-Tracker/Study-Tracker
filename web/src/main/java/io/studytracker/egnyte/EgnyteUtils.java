@@ -26,7 +26,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.springframework.web.util.UriUtils;
 
 public class EgnyteUtils {
 
@@ -40,7 +39,7 @@ public class EgnyteUtils {
   public static StorageFile convertEgnyteFile(EgnyteFile egnyteFile, URL rootUrl) {
     StorageFile storageFile = new StorageFile();
     if (egnyteFile.getUrl() == null && rootUrl != null) {
-      storageFile.setUrl(buildFileUrl(rootUrl, egnyteFile.getPath(), storageFile.getName()));
+      storageFile.setUrl(buildFileUrl(rootUrl, egnyteFile));
     } else {
       storageFile.setUrl(egnyteFile.getUrl());
     }
@@ -87,22 +86,15 @@ public class EgnyteUtils {
    * Constructs a URL for the given Egnyte path.
    *
    * @param rootUrl the root URL of the Egnyte tenant
-   * @param path the path to the file or folder
-   * @param name the file or folder name
+   * @param egnyteFile the Egnyte file object
    * @return the URL
    */
-  private static String buildFileUrl(URL rootUrl, String path, String name) {
-    if (name != null) {
-      path = path.replace("/" + name, "");
-    } else if (path.endsWith("/")) {
-      path = path.substring(0, path.length() - 1);
-    }
-    path = UriUtils.encodePath(path, "UTF-8").replace("&", "%26");
+  private static String buildFileUrl(URL rootUrl, EgnyteFile egnyteFile) {
     String url = rootUrl.toString();
     if (url.endsWith("/")) {
       url = url.substring(0, url.length() - 1);
     }
-    url = url + "/app/index.do#storage/files/1" + path;
+    url = url + "/navigate/file/" + egnyteFile.getGroupId();
     return url;
   }
 
