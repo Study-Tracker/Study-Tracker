@@ -34,7 +34,6 @@ const AssayTypeFieldInputs = props => {
   }, []);
 
   const onContainerReady = container => {
-    console.debug("Container", container);
     containers.push(container);
   };
 

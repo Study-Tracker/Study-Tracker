@@ -19,6 +19,7 @@ import {Card, Col, Form, Row} from 'react-bootstrap'
 import {XCircle} from 'react-feather'
 import {FormGroup} from "../../common/forms/common";
 import PropTypes from "prop-types";
+import Select from "react-select";
 
 const AssayTypeFieldInputCard = ({
   field,
@@ -26,6 +27,89 @@ const AssayTypeFieldInputCard = ({
   handleFieldUpdate,
   handleRemoveField
 }) => {
+
+  const renderDefaultValueInput = () => {
+    let control = '';
+
+    // Return empty for some types
+    if (field.type === 'FILE' || field.type === 'DATE') {
+      return control;
+    }
+
+    if (field.type === "BOOLEAN") {
+      control = (
+          <Select
+              options={[
+                {value: true, label: "True"},
+                {value: false, label: "False"}
+              ]}
+              className={"react-select-container"}
+              classNamePrefix={"react-select"}
+              onChange={selected => handleFieldUpdate({"defaultValue": selected.value}, index)}
+          />
+      )
+    }
+    else if (field.type === "INTEGER") {
+      control = (
+          <Form.Control
+              type="number"
+              value={field.defaultValue}
+              onChange={(e) => {
+                let value = parseInt(e.target.value, 10);
+                handleFieldUpdate({"defaultValue": value}, index)
+              }}
+          />
+      )
+    }
+    else if (field.type === "FLOAT") {
+      control = (
+          <Form.Control
+              type="number"
+              step="any"
+              value={field.defaultValue}
+              onChange={(e) => {
+                let value = parseFloat(e.target.value);
+                handleFieldUpdate({"defaultValue": value}, index)
+              }}
+          />
+      )
+    }
+    else if (field.type === "DROPDOWN") {
+      const options = field.dropdownOptions
+          ? field.dropdownOptions.split("\n")
+          .map(o => { return {value: o, label: o} })
+          : [];
+      control = (
+          <Select
+              options={options}
+              className={"react-select-container"}
+              classNamePrefix={"react-select"}
+              onChange={selected => handleFieldUpdate({"defaultValue": selected.value}, index)}
+          />
+      );
+    }
+    else {
+      control = (
+          <Form.Control
+              type="text"
+              value={field.defaultValue}
+              onChange={(e) => handleFieldUpdate(
+                  {"defaultValue": e.target.value}, index)}
+          />
+      );
+    }
+
+    return (
+        <Col md={6} lg={4}>
+          <FormGroup>
+            <Form.Label>Default Value</Form.Label>
+            {control}
+          </FormGroup>
+        </Col>
+    )
+
+  }
+
   return (
       <Card className="mb-3 bg-light cursor-grab border">
 
@@ -41,7 +125,7 @@ const AssayTypeFieldInputCard = ({
         <Card.Body className="pb-3 pr-3 pl-3 pt-0">
           <Row>
 
-            <Col md={6} lg={3}>
+            <Col md={6} lg={4}>
               <FormGroup>
                 <Form.Label>Name *</Form.Label>
                 <Form.Control
@@ -58,7 +142,7 @@ const AssayTypeFieldInputCard = ({
               </FormGroup>
             </Col>
 
-            <Col md={6} lg={3}>
+            <Col md={6} lg={4}>
               <FormGroup>
                 <Form.Label>Type</Form.Label>
                 <Form.Select
@@ -73,11 +157,13 @@ const AssayTypeFieldInputCard = ({
                   <option value="FLOAT">Float</option>
                   <option value="BOOLEAN">Boolean</option>
                   <option value="DATE">Date</option>
+                  <option value="DROPDOWN">Dropdown</option>
+                  <option value="FILE">File</option>
                 </Form.Select>
               </FormGroup>
             </Col>
 
-            <Col md={12} lg={4}>
+            <Col md={6} lg={4}>
               <FormGroup>
                 <Form.Label>Description</Form.Label>
                 <Form.Control
@@ -90,14 +176,37 @@ const AssayTypeFieldInputCard = ({
               </FormGroup>
             </Col>
 
-            <Col md={6} lg={1}>
+            {
+              field.type === "DROPDOWN" && (
+                    <Col md={6} lg={4}>
+                      <FormGroup>
+                        <Form.Label>Dropdown Options *</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={4}
+                            value={field.dropdownOptions}
+                            onChange={(e) => handleFieldUpdate(
+                                {"dropdownOptions": e.target.value}, index)}
+                        />
+                        <Form.Text>
+                          Enter one option per line.
+                        </Form.Text>
+                      </FormGroup>
+                    </Col>
+                )
+            }
+
+            { renderDefaultValueInput() }
+
+            <Col md={6} lg={4}>
               <Form.Check
-                  type="checkbox"
+                  className="mt-4"
+                  type="switch"
                   onChange={(e) => {
                     handleFieldUpdate({"required": e.target.checked}, index)
                   }}
                   checked={field.required}
-                  label={"Required"}
+                  label={"Field is required"}
               />
             </Col>
 

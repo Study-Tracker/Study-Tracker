@@ -30,4 +30,6 @@ public class AssayTypeFieldPayloadDto {
   private String description;
   private boolean active = true;
   private @NotNull Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }

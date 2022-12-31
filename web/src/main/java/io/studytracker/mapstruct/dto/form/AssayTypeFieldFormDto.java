@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package io.studytracker.model;
+package io.studytracker.mapstruct.dto.form;
 
-public enum CustomEntityFieldType {
-  STRING,
-  TEXT,
-  INTEGER,
-  FLOAT,
-  DATE,
-  BOOLEAN,
-  FILE,
-  DROPDOWN
+import io.studytracker.model.CustomEntityFieldType;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
+public class AssayTypeFieldFormDto {
+
+  private Long id;
+  private @NotEmpty String displayName;
+  private String fieldName;
+  private @NotNull CustomEntityFieldType type;
+  private boolean required = false;
+  private String description;
+  private boolean active = true;
+  private @NotNull Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }

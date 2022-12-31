@@ -23,9 +23,7 @@ import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
 import swal from 'sweetalert';
 import {AssayTypeDropdown} from "../../common/forms/assayTypes";
-import {
-  AssayTypeFieldCaptureInputList
-} from "../../common/forms/assayTypeFieldCapture";
+import AssayTypeFieldCaptureInputList from "./AssayTypeFieldCaptureInputList";
 import AttributeInputs from "../../common/forms/AttributeInputs";
 import TaskInputs from "../../common/forms/TaskInputs";
 import {LoadingOverlay} from "../../common/loading";
@@ -96,20 +94,23 @@ const AssayForm = props => {
           "required fields",
           "Required assay type fields are missing",
           (value, context) => {
-            const requiredFields = context.parent.assayType ? context.parent.assayType.fields.filter(f => f.required) : [];
-            return requiredFields.every(f => value[f.fieldName] !== undefined && value[f.fieldName] !== null && value[f.fieldName] !== "");
+            const requiredFields = context.parent.assayType
+                ? context.parent.assayType.fields.filter(f => f.required)
+                : [];
+            return requiredFields.every(f => {
+              return value[f.fieldName] !== undefined
+                  && value[f.fieldName] !== null
+                  && value[f.fieldName] !== ""
+            });
           }
       ),
 
   });
 
-  const handleFormSubmit = (values, {setSubmitting}) => {
+  const handleFormSubmit = async (values, {setSubmitting}) => {
 
     console.debug("Submit values: ", values);
-    const isUpdate = !!values.id;
-    const url = isUpdate
-        ? '/api/internal/study/' + study.code + '/assays/' + values.id
-        : '/api/internal/study/' + study.code + '/assays'
+    setSubmitting(true);
 
     // Sort the tasks
     if (!!values.tasks && values.tasks.length > 0) {
@@ -123,7 +124,44 @@ const AssayForm = props => {
     }
     console.debug("Submit values with sorted tasks: ", values);
 
-    axios({
+    // Upload any files
+    let uploadErrors = false;
+    for (let i in values.assayType.fields) {
+      const assayTypeField = values.assayType.fields[i];
+      if (assayTypeField.type === "FILE") {
+        const file = values.fields[assayTypeField.fieldName];
+        if (file) {
+          console.debug("Uploading file: ", file);
+          const formData = new FormData();
+          formData.append("file", file);
+          const localPath = await axios.post(
+              "/api/internal/data-files/temp-upload", formData)
+          .then(response => response.data.filePath)
+          .catch(e => {
+            console.error(e);
+            uploadErrors = true;
+          });
+          if (uploadErrors) break;
+          values.fields[assayTypeField.fieldName] = localPath;
+        }
+      }
+    }
+    if (uploadErrors) {
+      setSubmitting(false);
+      swal(
+          "Something went wrong",
+          "There was a problem uploading one or more attached files. If this error persists, please contact Study Tracker support."
+      );
+      return;
+    }
+
+    // Submit the assay data
+    const isUpdate = !!values.id;
+    const url = isUpdate
+        ? '/api/internal/study/' + study.code + '/assays/' + values.id
+        : '/api/internal/study/' + study.code + '/assays'
+
+    await axios({
       url: url,
       method: isUpdate ? 'put': 'post',
       data: values
@@ -131,7 +169,6 @@ const AssayForm = props => {
     .then(async response => {
       const json = response.data;
       console.debug(json);
-      setSubmitting(false);
       if (response.status === 200 || response.status === 201) {
         navigate("/study/" + study.code + "/assay/" + json.code);
       } else {
@@ -144,12 +181,14 @@ const AssayForm = props => {
       }
     })
     .catch(e => {
-      setSubmitting(false);
       swal(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
       );
       console.error(e);
+    })
+    .finally(() => {
+      setSubmitting(false);
     });
 
   }

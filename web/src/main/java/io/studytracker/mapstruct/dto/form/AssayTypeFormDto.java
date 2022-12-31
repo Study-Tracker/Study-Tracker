@@ -16,7 +16,6 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.mapstruct.dto.response.AssayTypeFieldDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssayTypeTaskDetailsDto;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,7 @@ public class AssayTypeFormDto {
   @NotNull private String name;
   @NotNull private String description;
   private boolean active = true;
-  private Set<AssayTypeFieldDetailsDto> fields = new HashSet<>();
+  private Set<AssayTypeFieldFormDto> fields = new HashSet<>();
   private Set<AssayTypeTaskDetailsDto> tasks = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
 }

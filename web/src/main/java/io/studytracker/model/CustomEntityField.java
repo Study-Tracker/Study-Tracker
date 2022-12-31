@@ -53,6 +53,12 @@ public abstract class CustomEntityField implements Model {
   @Column(name = "field_order", nullable = false)
   private Integer fieldOrder;
 
+  @Column(name = "dropdown_options", length = 2048)
+  private String dropdownOptions;
+
+  @Column(name = "default_value")
+  private String defaultValue;
+
   public Long getId() {
     return id;
   }
@@ -117,6 +123,22 @@ public abstract class CustomEntityField implements Model {
     this.fieldOrder = fieldOrder;
   }
 
+  public String getDropdownOptions() {
+    return dropdownOptions;
+  }
+
+  public void setDropdownOptions(String dropdownOptions) {
+    this.dropdownOptions = dropdownOptions;
+  }
+
+  public String getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
   @Override
   public String toString() {
     return "CustomEntityField{" +
@@ -128,6 +150,8 @@ public abstract class CustomEntityField implements Model {
         ", description='" + description + '\'' +
         ", active=" + active +
         ", fieldOrder=" + fieldOrder +
+        ", dropdownOptions=" + dropdownOptions +
+        ", defaultValue=" + defaultValue +
         '}';
   }
 }
