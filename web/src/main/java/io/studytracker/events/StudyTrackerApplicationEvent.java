@@ -59,6 +59,6 @@ public class StudyTrackerApplicationEvent extends ApplicationEvent implements St
 
   @Override
   public HostInformation getHost() {
-    return null;
+    return host;
   }
 }
