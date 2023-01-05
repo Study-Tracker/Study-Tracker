@@ -18,12 +18,14 @@ package io.studytracker.aws;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.studytracker.config.HostInformation;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.StudyTrackerEvent;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequestEntry;
@@ -33,6 +35,9 @@ import software.amazon.awssdk.services.eventbridge.model.PutEventsResultEntry;
 public class EventBridgeService implements EventsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EventBridgeService.class);
+
+  @Autowired
+  private HostInformation hostInformation;
 
   private final EventBridgeClient client;
 
@@ -48,7 +53,7 @@ public class EventBridgeService implements EventsService {
 
   @Override
   public void dispatchEvent(Activity activity) {
-    EventBridgeEvent event = new EventBridgeEvent(activity);
+    EventBridgeEvent event = new EventBridgeEvent(activity, hostInformation);
     this.dispatchEvent(event);
   }
 
