@@ -16,6 +16,7 @@
 
 package io.studytracker.events;
 
+import io.studytracker.config.HostInformation;
 import io.studytracker.model.Activity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,10 +24,11 @@ import org.springframework.context.ApplicationEventPublisher;
 public class LocalEventsService implements EventsService {
 
   @Autowired private ApplicationEventPublisher eventPublisher;
+  @Autowired private HostInformation hostInformation;
 
   @Override
   public void dispatchEvent(Activity activity) {
-    StudyTrackerApplicationEvent event = new StudyTrackerApplicationEvent(this, activity);
+    StudyTrackerApplicationEvent event = new StudyTrackerApplicationEvent(this, activity, hostInformation);
     this.dispatchEvent(event);
   }
 

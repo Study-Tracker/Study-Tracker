@@ -16,6 +16,7 @@
 
 package io.studytracker.aws;
 
+import io.studytracker.config.HostInformation;
 import io.studytracker.events.EventType;
 import io.studytracker.events.StudyTrackerEvent;
 import io.studytracker.model.Activity;
@@ -30,11 +31,13 @@ public class EventBridgeEvent implements StudyTrackerEvent {
   private final String triggeredBy;
   private final Date date;
   private final Map<String, Object> data;
+  private final HostInformation host;
 
-  public EventBridgeEvent(Activity activity) {
+  public EventBridgeEvent(Activity activity, HostInformation host) {
     this.eventType = activity.getEventType();
     this.triggeredBy = activity.getUser().getEmail();
     this.date = activity.getDate();
     this.data = activity.getData();
+    this.host = host;
   }
 }

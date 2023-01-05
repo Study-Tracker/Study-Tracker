@@ -16,6 +16,7 @@
 
 package io.studytracker.events;
 
+import io.studytracker.config.HostInformation;
 import io.studytracker.model.Activity;
 import java.util.Date;
 import java.util.Map;
@@ -24,10 +25,12 @@ import org.springframework.context.ApplicationEvent;
 public class StudyTrackerApplicationEvent extends ApplicationEvent implements StudyTrackerEvent {
 
   private final Activity activity;
+  private final HostInformation host;
 
-  public StudyTrackerApplicationEvent(Object source, Activity activity) {
+  public StudyTrackerApplicationEvent(Object source, Activity activity, HostInformation host) {
     super(source);
     this.activity = activity;
+    this.host = host;
   }
 
   public Activity getActivity() {
@@ -52,5 +55,10 @@ public class StudyTrackerApplicationEvent extends ApplicationEvent implements St
   @Override
   public Date getDate() {
     return activity.getDate();
+  }
+
+  @Override
+  public HostInformation getHost() {
+    return host;
   }
 }

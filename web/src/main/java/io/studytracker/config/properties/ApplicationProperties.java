@@ -38,10 +38,22 @@ public class ApplicationProperties {
   @JsonIgnore
   private String secret;
 
+  private String name;
+
+  private String version;
+
+  private String javaVersion;
+
+  private String buildTime;
+
   @Override
   public String toString() {
     return "ApplicationProperties{" +
         "hostName='" + hostName + '\'' +
+        ", name='" + name + '\'' +
+        ", version='" + version + '\'' +
+        ", javaVersion='" + javaVersion + '\'' +
+        ", buildTime='" + buildTime + '\'' +
         ", secret='*****'" +
         '}';
   }
