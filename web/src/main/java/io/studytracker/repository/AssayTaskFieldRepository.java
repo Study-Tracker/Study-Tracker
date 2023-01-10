@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.repository;
 
-import lombok.Data;
+import io.studytracker.model.AssayTaskField;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-@Data
-public class UserSlimDto {
+public interface AssayTaskFieldRepository extends JpaRepository<AssayTaskField, Long> {
 
-  private Long id;
-  private String displayName;
-  private String email;
-  private String username;
+  @Query("select f from AssayTaskField f where f.assayTask.id = ?1")
+  List<AssayTaskField> findByAssayTaskId(Long assayTaskId);
 
-  public UserSlimDto() {
-  }
-
-  public UserSlimDto(Long id) {
-    this.id = id;
-  }
 }

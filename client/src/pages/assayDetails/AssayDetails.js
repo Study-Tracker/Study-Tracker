@@ -26,6 +26,7 @@ import axios from "axios";
 import AssayDetailsHeader from "./AssayDetailsHeader";
 import AssayOverviewTab from "./AssayOverviewTab";
 import AssayFileManagerTab from "./AssayFileManagerTab";
+import AssayTasksTab from "./AssayTasksTab";
 
 const AssayDetails = props => {
 
@@ -70,7 +71,7 @@ const AssayDetails = props => {
             <Breadcrumbs crumbs={[
               {label: "Home", url: "/"},
               {label: "Study " + study.code, url: "/study/" + study.code},
-              {label: "Assay Details"}
+              {label: "Assay " + assay.code}
             ]}/>
           </Col>
         </Row>
@@ -94,7 +95,12 @@ const AssayDetails = props => {
               <Tab eventKey={"overview"} title={"Overview"}>
                 <AssayOverviewTab
                   assay={assay}
+                  handleTabSelect={handleTabSelect}
                 />
+              </Tab>
+
+              <Tab eventKey={"tasks"} title={"Tasks"}>
+                <AssayTasksTab assay={assay} user={user} />
               </Tab>
 
               <Tab eventKey={"timeline"} title={"Timeline"}>

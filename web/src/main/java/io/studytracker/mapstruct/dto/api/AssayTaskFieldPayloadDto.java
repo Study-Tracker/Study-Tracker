@@ -14,32 +14,22 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.form;
+package io.studytracker.mapstruct.dto.api;
 
-import io.studytracker.mapstruct.dto.response.UserSlimDto;
-import io.studytracker.model.TaskStatus;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import io.studytracker.model.CustomEntityFieldType;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class AssayTaskFormDto {
-
+public class AssayTaskFieldPayloadDto {
   private Long id;
-  @NotNull private TaskStatus status;
-  @NotNull private String label;
-  private Integer order;
-  private Date createdAt;
-  private Date updatedAt;
-  private UserSlimDto createdBy;
-  private UserSlimDto lastModifiedBy;
-  private UserSlimDto assignedTo;
-  private Date dueDate;
-  private Set<AssayTaskFieldFormDto> fields = new HashSet<>();
-  private Map<String, Object> data = new HashMap<>();
-
+  private @NotNull String displayName;
+  private String fieldName;
+  private @NotNull CustomEntityFieldType type;
+  private boolean required = false;
+  private String description;
+  private boolean active = true;
+  private @NotNull Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }

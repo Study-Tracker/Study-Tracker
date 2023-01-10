@@ -23,10 +23,8 @@ import AssayQuickActionsWidget
 import SummaryTimelineCard from "../../common/detailsPage/SummaryTimelineCard";
 import {RepairableStorageFolderButton} from "../../common/files";
 import {RepairableNotebookFolderButton} from "../../common/eln";
-import {AssayTaskList} from "../../common/assayTasks";
-import axios from "axios";
-import swal from "sweetalert";
 import AssayFieldDataTable from "./AssayFieldDataTable";
+import AssayTasksWidget from "./AssayTasksWidget";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -35,51 +33,9 @@ const createMarkup = (content) => {
 const AssayOverviewTab = ({
   assay,
   user,
-  features
+  features,
+  handleTabSelect
 }) => {
-
-  const handleTaskUpdate = (task) => {
-
-    let tasks = assay.tasks;
-    let oldTasks = tasks;
-    let updatedTask = null;
-    for (let i = 0; i < tasks.length; i++) {
-      if (tasks[i].order === task.order) {
-        updatedTask = tasks[i];
-        if (updatedTask.status === "TODO") {
-          updatedTask.status = "COMPLETE";
-        } else if (updatedTask.status
-            === "COMPLETE") {
-          updatedTask.status = "INCOMPLETE";
-        } else if (updatedTask.status
-            === "INCOMPLETE") {
-          updatedTask.status = "TODO";
-        }
-        updatedTask.updatedAt = new Date().getTime();
-      }
-    }
-
-    // Update before the request
-    let updated = assay;
-    updated.tasks = tasks;
-    // setAssay(updated);
-
-    axios.put("/api/internal/assay/" + assay.code + "/tasks", updatedTask)
-    .then(response => {
-      console.log("Task successfully updated.");
-    })
-    .catch(e => {
-      console.error("Failed to update assay tasks.");
-      console.error(e);
-      updated.tasks = oldTasks;
-      // setAssay(updated);
-      swal(
-          "Task update failed",
-          "Please try updating the task again and contact Study Tracker support if the problem persists."
-      );
-    })
-
-  }
 
   return (
       <Row>
@@ -165,33 +121,14 @@ const AssayOverviewTab = ({
                 ) : ""
           }
 
-          {
-            assay.tasks.length > 0
-                ? (
-                    <Card>
-                      <Card.Body>
-                        <Card.Title>
-                          Tasks
-                          {
-                            !!user
-                                ? (
-                                    <small
-                                        className="float-end text-muted font-italic">
-                                      Click to toggle status
-                                    </small>
-                                )
-                                : ''
-                          }
-                        </Card.Title>
-                        <AssayTaskList
-                            tasks={assay.tasks}
-                            user={user}
-                            handleUpdate={handleTaskUpdate}
-                        />
-                      </Card.Body>
-                    </Card>
-                ) : ''
-          }
+          <Row>
+            <Col xs={12} sm={6} className="d-flex">
+              <AssayTasksWidget
+                  tasks={assay.tasks}
+                  handleClick={() => handleTabSelect("tasks")}
+              />
+            </Col>
+          </Row>
 
         </Col>
 

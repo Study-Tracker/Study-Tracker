@@ -34,8 +34,6 @@ public interface AssayTaskMapper {
 
   List<AssayTaskDetailsDto> toDetailsDtoList(List<AssayTask> tasks);
 
-  AssayTask fromDetailsDto(AssayTaskDetailsDto dto);
-
   AssayTask fromFormDto(AssayTaskFormDto dto);
 
   @Mapping(target = "assignedTo", source = "assignedTo.id")

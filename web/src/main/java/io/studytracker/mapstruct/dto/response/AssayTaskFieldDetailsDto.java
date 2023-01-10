@@ -16,29 +16,20 @@
 
 package io.studytracker.mapstruct.dto.response;
 
-import io.studytracker.model.TaskStatus;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import io.studytracker.model.CustomEntityFieldType;
 import lombok.Data;
 
 @Data
-public class AssayTaskDetailsDto {
+public class AssayTaskFieldDetailsDto {
 
   private Long id;
-  private TaskStatus status;
-  private String label;
-  private Integer order;
-  private Date createdAt;
-  private Date updatedAt;
-  private UserSlimDto createdBy;
-  private UserSlimDto lastModifiedBy;
-  private UserSlimDto assignedTo;
-  private Date dueDate;
-
-  private Set<AssayTaskFieldDetailsDto> fields = new HashSet<>();
-
-  private Map<String, Object> data = new HashMap<>();
+  private String displayName;
+  private String fieldName;
+  private CustomEntityFieldType type;
+  private boolean required = false;
+  private String description;
+  private boolean active = true;
+  private Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }

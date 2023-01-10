@@ -19,11 +19,17 @@ package io.studytracker.service;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
+import io.studytracker.model.AssayTaskField;
+import io.studytracker.model.TaskStatus;
 import io.studytracker.repository.AssayRepository;
+import io.studytracker.repository.AssayTaskFieldRepository;
 import io.studytracker.repository.AssayTaskRepository;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,11 +39,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AssayTaskService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssayTaskService.class);
+
   @Autowired
   private AssayRepository assayRepository;
 
   @Autowired
   private AssayTaskRepository assayTaskRepository;
+
+  @Autowired
+  private AssayTaskFieldRepository assayTaskFieldRepository;
 
   public Optional<AssayTask> findById(Long id) {
     return assayTaskRepository.findById(id);
@@ -65,14 +76,17 @@ public class AssayTaskService {
 
   @Transactional
   public AssayTask addAssayTask(AssayTask task, Assay assay) {
+    LOGGER.info("Adding new task to assay {}: {}", assay.getCode(), task);
     if (task.getOrder() == null) {
       task.setOrder(assay.getTasks().size());
     }
     task.setAssay(assay);
-    return assayTaskRepository.save(task);
-//    assay.addTask(task);
-//    assayRepository.save(assay);
-//    return task;
+    for (AssayTaskField field: task.getFields()) {
+      field.setAssayTask(task);
+    }
+    AssayTask created = assayTaskRepository.save(task);
+    return assayTaskRepository.findById(created.getId())
+        .orElseThrow(() -> new RecordNotFoundException("Cannot find assay task: " + created.getId()));
   }
 
   @Transactional
@@ -82,12 +96,31 @@ public class AssayTaskService {
     t.setStatus(task.getStatus());
     t.setOrder(task.getOrder());
     t.setLabel(task.getLabel());
+    t.setDueDate(task.getDueDate());
+    t.setAssignedTo(task.getAssignedTo());
+    t.getFields().clear();
+    t.addFields(task.getFields());
+    t.setData(task.getData());
     assayTaskRepository.save(t);
     Assay a = assayRepository.getById(assay.getId());
     a.setUpdatedAt(new Date());
     assayRepository.save(a);
     return assayTaskRepository.findById(task.getId())
         .orElseThrow(() -> new RecordNotFoundException("Cannot find assay task: " + task.getId()));
+  }
+
+  @Transactional
+  public void updateAssayTaskStatus(AssayTask task, TaskStatus status, Map<String, Object> data) {
+    AssayTask t = assayTaskRepository.getById(task.getId());
+    t.setStatus(status);
+    if (data != null) {
+      t.setData(data);
+    }
+    assayTaskRepository.save(t);
+  }
+
+  public void updateAssayTaskStatus(AssayTask task, TaskStatus status) {
+    this.updateAssayTaskStatus(task, status, null);
   }
 
   @Transactional

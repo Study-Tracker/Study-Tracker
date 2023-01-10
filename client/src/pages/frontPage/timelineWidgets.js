@@ -27,6 +27,7 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
+import StatWidget from "../../common/widgets/StatWidget";
 
 export const WelcomeBack = () => {
   return (
@@ -134,86 +135,6 @@ export const MyCompleteStudies = ({count}) => {
 
 MyCompleteStudies.propTypes = {
   count: PropTypes.number.isRequired
-}
-
-const IllustrationWidget = ({header, text, image}) => {
-  return (
-      <Card className="flex-fill illustration">
-        <Card.Body className="p-0 d-flex flex-fill">
-          <Row className="g-0 w-100">
-
-            <Col xs={6}>
-              <div className="illustration-text p-3 m-1">
-                <h4 className="illustration-text">
-                  {header}
-                </h4>
-                <p className="mb-0">
-                  {text}
-                </p>
-              </div>
-            </Col>
-
-            <Col xs={6} className="align-self-end text-end">
-              <img
-                  src={image}
-                  className="img-fluid illustration-img"
-              />
-            </Col>
-
-          </Row>
-        </Card.Body>
-      </Card>
-  )
-}
-
-IllustrationWidget.propTypes = {
-  header: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired
-}
-
-const StatWidget = ({label, value, icon: Icon, color, url}) => {
-  return (
-      <Card className="flex-fill">
-        <Card.Body className="py-4">
-
-          <div className="d-flex align-items-start">
-
-            <div className="flex-grow-1">
-              {
-                !!url ? (
-                    <a href={url}>
-                      <h3 className="mb-2">{value}</h3>
-                      <p className="mb-2">{label}</p>
-                    </a>
-                ) : (
-                    <React.Fragment>
-                      <h3 className="mb-2">{value}</h3>
-                      <p className="mb-2">{label}</p>
-                    </React.Fragment>
-                )
-              }
-            </div>
-
-            <div className="d-inline-block ms-3">
-              <div className={"stat stat-" + color}>
-                <Icon className={"align-md feather-lg "}/>
-              </div>
-            </div>
-
-          </div>
-
-        </Card.Body>
-      </Card>
-  )
-}
-
-StatWidget.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  icon: PropTypes.elementType.isRequired,
-  color: PropTypes.string.isRequired,
-  url: PropTypes.string
 }
 
 export const ActiveStudies = ({count}) => {

@@ -39,7 +39,7 @@ const StudyDetailHeader = ({
       <Row className="justify-content-between align-items-center">
         <Col>
           <h3>{study.name}</h3>
-          <h5 className="text-muted">{study.code}</h5>
+          {/*<h5 className="text-muted">{study.code}</h5>*/}
         </Col>
         <Col className="col-auto d-flex">
           {
