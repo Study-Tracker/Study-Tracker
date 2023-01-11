@@ -14,43 +14,26 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useRef, useState} from "react";
-import {Badge, Card} from 'react-bootstrap'
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {LoadingMessageCard} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
 import PropTypes from "prop-types";
 import AssayTasksContentPlaceholder from "./AssayTasksContentPlaceholder";
 import AssayTaskFormModal from "./AssayTaskFormModal";
-
-const TaskStatusBadge = ({status}) => {
-
-    let color = 'secondary';
-    let label = 'Unknown';
-    if (status === 'TODO') {
-      color = 'info';
-      label = "To Do";
-    } else if (status === 'COMPLETE') {
-      color = 'success';
-      label = "Complete";
-    } else if (status === 'INCOMPLETE') {
-      color = 'danger';
-      label = "Incomplete";
-    }
-
-    return (
-        <Badge className="me-2" color={color}>{label}</Badge>
-    )
-
-}
+import TaskCard from "./TaskCard";
+import NotyfContext from "../../context/NotyfContext";
+import {Button, Col, Row} from "react-bootstrap";
 
 const AssayTasksTab = ({assay, user}) => {
 
   const [tasks, setTasks] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [error, setError] = useState(null);
   const [loadCounter, setLoadCounter] = useState(0);
   const formikRef = useRef();
+  const notyf = useContext(NotyfContext);
 
   useEffect(() => {
     axios.get("/api/internal/assay/" + assay.code + "/tasks")
@@ -65,11 +48,8 @@ const AssayTasksTab = ({assay, user}) => {
   const handleFormSubmit = (values, {setSubmitting, resetForm}) => {
     console.debug("Form values", values);
     const isUpdate = !!values.id;
-    const url = isUpdate
-        ? "/api/internal/assay/" + assay.id + "/tasks/" + values.id
-        : "/api/internal/assay/" + assay.id + "/tasks";
     axios({
-      url: url,
+      url: "/api/internal/assay/" + assay.id + "/tasks",
       method: isUpdate ? "put" : "post",
       data: values
     })
@@ -82,55 +62,61 @@ const AssayTasksTab = ({assay, user}) => {
       console.error(e);
     })
     .finally(() => {
+      notyf.open({
+        type: "success",
+        message: isUpdate ? "Task successfully updated." : "Task created"
+      });
       setSubmitting(false);
       setModalIsOpen(false);
       setLoadCounter(loadCounter + 1);
     });
   }
 
-  const handleTaskUpdate = (task) => {
+  const updateTask = (data) => {
+    axios({
+      url: "/api/internal/assay/" + assay.id + "/tasks",
+      method: "patch",
+      data: data
+    })
+    .then(response => {
+      console.debug("Updated task", response.data);
+      notyf.open({
+        type: "success",
+        message: "Task successfully updated."
+      });
+      setLoadCounter(loadCounter + 1);
+    })
+    .catch(e => {
+      console.error(e);
+      notyf.open({
+        type: "error",
+        message: "Failed to update task."
+      });
+    })
+  }
 
-    console.log("Click!");
+  const handleTaskComplete = (task) => {
+    const values = {...task, status: "COMPLETE"};
+    updateTask(values);
+  }
 
-    // let tasks = assay.tasks;
-    // let oldTasks = tasks;
-    // let updatedTask = null;
-    // for (let i = 0; i < tasks.length; i++) {
-    //   if (tasks[i].order === task.order) {
-    //     updatedTask = tasks[i];
-    //     if (updatedTask.status === "TODO") {
-    //       updatedTask.status = "COMPLETE";
-    //     } else if (updatedTask.status
-    //         === "COMPLETE") {
-    //       updatedTask.status = "INCOMPLETE";
-    //     } else if (updatedTask.status
-    //         === "INCOMPLETE") {
-    //       updatedTask.status = "TODO";
-    //     }
-    //     updatedTask.updatedAt = new Date().getTime();
-    //   }
-    // }
-    //
-    // // Update before the request
-    // let updated = assay;
-    // updated.tasks = tasks;
-    // // setAssay(updated);
-    //
-    // axios.put("/api/internal/assay/" + assay.code + "/tasks", updatedTask)
-    // .then(response => {
-    //   console.log("Task successfully updated.");
-    // })
-    // .catch(e => {
-    //   console.error("Failed to update assay tasks.");
-    //   console.error(e);
-    //   updated.tasks = oldTasks;
-    //   // setAssay(updated);
-    //   swal(
-    //       "Task update failed",
-    //       "Please try updating the task again and contact Study Tracker support if the problem persists."
-    //   );
-    // })
+  const handleTaskIncomplete = (task) => {
+    const values = {...task, status: "INCOMPLETE"};
+    updateTask(values);
+  }
 
+  const handleTaskReset = (task) => {
+    const values = {...task, status: "TODO", data: {}};
+    updateTask(values);
+  }
+
+  const handleTaskEdit = (task) => {
+    setSelectedTask(task);
+    setModalIsOpen(true);
+  }
+
+  const handleTaskDelete = (task) => {
+    console.log("Delete!");
   }
 
   const taskCards = !tasks ? [] : tasks.sort((a, b) => {
@@ -138,16 +124,17 @@ const AssayTasksTab = ({assay, user}) => {
   })
   .map((task, index) => {
     return (
-        <Card>
-          <Card.Body>
-            <p className="text-muted">Task #{index+1}</p>
-            <h3>
-              <TaskStatusBadge status={task.status} />
-              {task.label}
-            </h3>
-          </Card.Body>
-        </Card>
-    )
+        <TaskCard
+            key={index + "-task-card"}
+            task={task}
+            index={index}
+            handleTaskComplete={handleTaskComplete}
+            handleTaskIncomplete={handleTaskIncomplete}
+            handleTaskEdit={handleTaskEdit}
+            handleTaskDelete={handleTaskDelete}
+            handleTaskReset={handleTaskReset}
+        />
+    );
   });
 
   return (
@@ -158,8 +145,12 @@ const AssayTasksTab = ({assay, user}) => {
         }
 
         {
-          !!error && <DismissableAlert color={'warning'}
-                                       message={'Failed to load assay tasks.'}/>
+          !!error && (
+              <DismissableAlert
+                  color={'warning'}
+                  message={'Failed to load assay tasks.'}
+              />
+            )
         }
 
         {taskCards}
@@ -172,7 +163,20 @@ const AssayTasksTab = ({assay, user}) => {
             )
         }
 
+        <Row>
+          <Col className={"d-flex justify-content-center"}>
+            <Button
+                className={"ps-5 pe-5"}
+                variant={"primary"}
+                onClick={() => setModalIsOpen(true)}
+            >
+              Add Task
+            </Button>
+          </Col>
+        </Row>
+
         <AssayTaskFormModal
+            task={selectedTask}
             modalIsOpen={modalIsOpen}
             setModalIsOpen={setModalIsOpen}
             handleFormSubmit={handleFormSubmit}
