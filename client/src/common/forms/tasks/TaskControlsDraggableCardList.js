@@ -27,7 +27,11 @@ const TaskControlsDraggableCardList = ({
   const handleAddTask = () => {
     const newTasks = [
       ...tasks,
-      {label: "", status: "TODO"}
+      {
+        label: "",
+        status: "TODO",
+        order: tasks.length
+      }
     ];
     handleUpdate(newTasks);
   }
@@ -81,6 +85,7 @@ const TaskControlsDraggableCardList = ({
                             >
                               <TaskControlsCard
                                   task={task}
+                                  index={index}
                                   handleUpdate={(key, value) => handleUpdateTask({[key]: value}, index)}
                                   handleRemoveTask={() => handleRemoveTask(index)}
                                   errors={errors}
@@ -97,10 +102,16 @@ const TaskControlsDraggableCardList = ({
           </Droppable>
         </DragDropContext>
 
+        {
+          !!errors.tasks
+              ? (<div className={"invalid-feedback"}>{errors.tasks}</div>)
+              : ''
+        }
+
         <Row>
           <Col md={12}>
             <Button
-                variant="primary"
+                variant="info"
                 onClick={handleAddTask}
                 className={"ps-5 pe-5"}
             >

@@ -143,7 +143,9 @@ const AttributeInputs = props => {
           <Col md={12} className="mt-2">
             <Button
                 variant="info"
-                onClick={handleAddAttributeClick}>
+                onClick={handleAddAttributeClick}
+                className={"ps-5 pe-5"}
+            >
               <FontAwesomeIcon icon={faPlusCircle}/> Add Attribute
             </Button>
           </Col>

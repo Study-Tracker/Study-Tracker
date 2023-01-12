@@ -105,7 +105,9 @@ const AssayTypeFieldInputs = props => {
           <Col md={12}>
             <Button
                 variant="info"
-                onClick={handleAddFieldClick}>
+                onClick={handleAddFieldClick}
+                className={"ps-5 pe-5"}
+            >
               <FontAwesomeIcon icon={faPlusCircle}/> Add Field
             </Button>
           </Col>

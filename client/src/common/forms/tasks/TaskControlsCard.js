@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 
 const TaskControlsCard = ({
     task,
+    index,
     handleUpdate,
     errors,
     touched,
@@ -15,7 +16,7 @@ const TaskControlsCard = ({
   return (
       <Card className="mb-3 bg-light cursor-grab border">
         <Card.Header className="bg-light pt-0 pb-0 mt-3 d-flex justify-content-between">
-          <div className="text-muted text-lg">#{task.order+1}</div>
+          <div className="text-muted text-lg">#{index+1}</div>
           <div className="card-actions">
             <a className="text-danger" title={"Remove field"}
                onClick={handleRemoveTask}>
@@ -38,6 +39,7 @@ const TaskControlsCard = ({
 
 TaskControlsCard.propTypes = {
   task: PropTypes.object.isRequired,
+  index: PropTypes.number.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   errors: PropTypes.object.isRequired,
   touched: PropTypes.object.isRequired,

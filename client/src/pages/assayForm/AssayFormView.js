@@ -65,7 +65,7 @@ const AssayFormView = props => {
     }
 
     const assayTypes = await axios.get("/api/internal/assaytype/")
-    .then(async response => await response.data)
+    .then(async response => await response.data.filter(t => t.active === true))
     .catch(error => {
       console.error(error);
       setState(prevState => ({

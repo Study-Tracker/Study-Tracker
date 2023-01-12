@@ -505,10 +505,6 @@ const AssayForm = props => {
                           errors={errors}
                           touched={touched}
                       />
-                      {/*<TaskInputs*/}
-                      {/*    tasks={values.tasks}*/}
-                      {/*    handleUpdate={(tasks) => setFieldValue("tasks", tasks)}*/}
-                      {/*/>*/}
                     </Card.Body>
                   </Card>
 
