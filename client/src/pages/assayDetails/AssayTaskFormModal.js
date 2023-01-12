@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Button, Modal} from "react-bootstrap";
 import React from "react";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
-import {FormGroup} from "../../common/forms/common";
-import DatePicker from "react-datepicker";
-import AsyncSelect from "react-select/async";
 import axios from "axios";
+import TaskControls from "../../common/forms/tasks/TaskControls";
 
 const AssayTaskFormModal = ({
     modalIsOpen,
@@ -34,7 +32,8 @@ const AssayTaskFormModal = ({
   const taskDefaults = {
     label: "",
     status: "TODO",
-    assignedTo: null
+    assignedTo: null,
+    fields: []
   };
 
   const taskSchema = yup.object().shape({
@@ -44,7 +43,13 @@ const AssayTaskFormModal = ({
     status: yup.string()
       .required("Status is required"),
     assignedTo: yup.object()
-      .nullable(true)
+      .nullable(true),
+    fields: yup.array().of(yup.object())
+    .test(
+        "not empty",
+        "Field labels must not be empty",
+        value => !value.find(d => !d.fieldName || d.fieldName.trim() === '')
+    ),
   })
 
   const userAutocomplete = (input, callback) => {
@@ -92,62 +97,70 @@ const AssayTaskFormModal = ({
               <Modal.Body>
                 <FormikForm autoComplete={"off"}>
 
-                  <Row>
+                  <TaskControls
+                      task={values}
+                      errors={errors}
+                      touched={touched}
+                      handleUpdate={(field, value) => setFieldValue(field, value)}
+                      colWidth={12}
+                  />
 
-                    <Col md={12}>
-                      <FormGroup>
-                        <Form.Label>Label *</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name={"label"}
-                            className={(errors.label && touched.label) ? "is-invalid" : ""}
-                            isInvalid={touched.label && errors.label}
-                            value={values.label}
-                            onChange={e => setFieldValue("label", e.target.value)}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {errors.label}
-                        </Form.Control.Feedback>
-                      </FormGroup>
-                    </Col>
+                  {/*<Row>*/}
 
-                    <Col md={12}>
-                      <FormGroup>
-                        <Form.Label>Due Date</Form.Label>
-                        <DatePicker
-                            maxlength="2"
-                            className={"form-control " + (!!errors.dueDate ? " is-invalid" : '')}
-                            invalid={!!errors.dueDate}
-                            wrapperClassName="form-control"
-                            selected={values.dueDate}
-                            name="dueDate"
-                            onChange={(date) => setFieldValue("dueDate", !!date ? date.getTime() : null)}
-                            isClearable={true}
-                            dateFormat=" MM / dd / yyyy"
-                            placeholderText="MM / DD / YYYY"
-                        />
-                      </FormGroup>
-                    </Col>
+                  {/*  <Col md={12}>*/}
+                  {/*    <FormGroup>*/}
+                  {/*      <Form.Label>Label *</Form.Label>*/}
+                  {/*      <Form.Control*/}
+                  {/*          type="text"*/}
+                  {/*          name={"label"}*/}
+                  {/*          className={(errors.label && touched.label) ? "is-invalid" : ""}*/}
+                  {/*          isInvalid={touched.label && errors.label}*/}
+                  {/*          value={values.label}*/}
+                  {/*          onChange={e => setFieldValue("label", e.target.value)}*/}
+                  {/*      />*/}
+                  {/*      <Form.Control.Feedback type="invalid">*/}
+                  {/*        {errors.label}*/}
+                  {/*      </Form.Control.Feedback>*/}
+                  {/*    </FormGroup>*/}
+                  {/*  </Col>*/}
 
-                    <Col sm={12}>
-                      <FormGroup>
-                        <Form.Label>Assigned To</Form.Label>
-                        <AsyncSelect
-                            placeholder="Search-for and select a team member..."
-                            className={"react-select-container"}
-                            classNamePrefix="react-select"
-                            loadOptions={userAutocomplete}
-                            value={values.assignedTo ? {label: values.assignedTo.displayName, value: values.assignedTo.id, obj: values.assignedTo} : null}
-                            onChange={(selected) => {
-                              setFieldValue("assignedTo", selected ? selected.obj : null);
-                            }}
-                            defaultOptions={true}
-                            isClearable={true}
-                        />
-                      </FormGroup>
-                    </Col>
+                  {/*  <Col md={12}>*/}
+                  {/*    <FormGroup>*/}
+                  {/*      <Form.Label>Due Date</Form.Label>*/}
+                  {/*      <DatePicker*/}
+                  {/*          maxlength="2"*/}
+                  {/*          className={"form-control " + (!!errors.dueDate ? " is-invalid" : '')}*/}
+                  {/*          invalid={!!errors.dueDate}*/}
+                  {/*          wrapperClassName="form-control"*/}
+                  {/*          selected={values.dueDate}*/}
+                  {/*          name="dueDate"*/}
+                  {/*          onChange={(date) => setFieldValue("dueDate", !!date ? date.getTime() : null)}*/}
+                  {/*          isClearable={true}*/}
+                  {/*          dateFormat=" MM / dd / yyyy"*/}
+                  {/*          placeholderText="MM / DD / YYYY"*/}
+                  {/*      />*/}
+                  {/*    </FormGroup>*/}
+                  {/*  </Col>*/}
 
-                  </Row>
+                  {/*  <Col sm={12}>*/}
+                  {/*    <FormGroup>*/}
+                  {/*      <Form.Label>Assigned To</Form.Label>*/}
+                  {/*      <AsyncSelect*/}
+                  {/*          placeholder="Search-for and select a team member..."*/}
+                  {/*          className={"react-select-container"}*/}
+                  {/*          classNamePrefix="react-select"*/}
+                  {/*          loadOptions={userAutocomplete}*/}
+                  {/*          value={values.assignedTo ? {label: values.assignedTo.displayName, value: values.assignedTo.id, obj: values.assignedTo} : null}*/}
+                  {/*          onChange={(selected) => {*/}
+                  {/*            setFieldValue("assignedTo", selected ? selected.obj : null);*/}
+                  {/*          }}*/}
+                  {/*          defaultOptions={true}*/}
+                  {/*          isClearable={true}*/}
+                  {/*      />*/}
+                  {/*    </FormGroup>*/}
+                  {/*  </Col>*/}
+
+                  {/*</Row>*/}
 
                 </FormikForm>
               </Modal.Body>

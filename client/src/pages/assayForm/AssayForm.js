@@ -25,7 +25,6 @@ import swal from 'sweetalert';
 import {AssayTypeDropdown} from "../../common/forms/assayTypes";
 import AssayTypeFieldCaptureInputList from "./AssayTypeFieldCaptureInputList";
 import AttributeInputs from "../../common/forms/AttributeInputs";
-import TaskInputs from "../../common/forms/TaskInputs";
 import {LoadingOverlay} from "../../common/loading";
 import ReactQuill from "react-quill";
 import {Breadcrumbs} from "../../common/common";
@@ -38,6 +37,8 @@ import axios from "axios";
 import FormikFormErrorNotification
   from "../../common/forms/FormikFormErrorNotification";
 import NotebookInputsCard from "../../common/forms/NotebookInputsCard";
+import TaskControlsDraggableCardList
+  from "../../common/forms/tasks/TaskControlsDraggableCardList";
 
 const AssayForm = props => {
 
@@ -81,7 +82,7 @@ const AssayForm = props => {
     startDate: yup.number()
       .typeError("Start date is required")
       .required("Start date is required."),
-    endDate: yup.number(),
+    endDate: yup.number().nullable(true),
     assayType: yup.object().required("Assay type is required"),
     attributes: yup.object()
       .test(
@@ -111,18 +112,6 @@ const AssayForm = props => {
 
     console.debug("Submit values: ", values);
     setSubmitting(true);
-
-    // Sort the tasks
-    if (!!values.tasks && values.tasks.length > 0) {
-      const tasks = document.getElementById("task-input-container").children;
-      if (tasks.length > 0) {
-        for (let i = 0; i < tasks.length; i++) {
-          let idx = parseInt(tasks[i].dataset.index, 10);
-          values.tasks[idx].order = i;
-        }
-      }
-    }
-    console.debug("Submit values with sorted tasks: ", values);
 
     // Upload any files
     let uploadErrors = false;
@@ -510,10 +499,16 @@ const AssayForm = props => {
                       </h6>
                     </Card.Header>
                     <Card.Body>
-                      <TaskInputs
+                      <TaskControlsDraggableCardList
                           tasks={values.tasks}
                           handleUpdate={(tasks) => setFieldValue("tasks", tasks)}
+                          errors={errors}
+                          touched={touched}
                       />
+                      {/*<TaskInputs*/}
+                      {/*    tasks={values.tasks}*/}
+                      {/*    handleUpdate={(tasks) => setFieldValue("tasks", tasks)}*/}
+                      {/*/>*/}
                     </Card.Body>
                   </Card>
 
