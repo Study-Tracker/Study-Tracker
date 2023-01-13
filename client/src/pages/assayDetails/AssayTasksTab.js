@@ -48,8 +48,11 @@ const AssayTasksTab = ({assay, user}) => {
   const handleFormSubmit = (values, {setSubmitting, resetForm}) => {
     console.debug("Form values", values);
     const isUpdate = !!values.id;
+    const url = isUpdate
+        ? "/api/internal/assay/" + assay.id + "/tasks/" + values.id
+        : "/api/internal/assay/" + assay.id + "/tasks";
     axios({
-      url: "/api/internal/assay/" + assay.id + "/tasks",
+      url: url,
       method: isUpdate ? "put" : "post",
       data: values
     })
@@ -74,7 +77,7 @@ const AssayTasksTab = ({assay, user}) => {
 
   const updateTask = (data) => {
     axios({
-      url: "/api/internal/assay/" + assay.id + "/tasks",
+      url: "/api/internal/assay/" + assay.id + "/tasks/" + data.id,
       method: "patch",
       data: data
     })
@@ -116,7 +119,25 @@ const AssayTasksTab = ({assay, user}) => {
   }
 
   const handleTaskDelete = (task) => {
-    console.log("Delete!");
+    axios({
+      url: "/api/internal/assay/" + assay.id + "/tasks/" + task.id,
+      method: "delete"
+    })
+    .then(response => {
+      console.debug("Updated task", response.data);
+      notyf.open({
+        type: "success",
+        message: "Task successfully removed."
+      });
+      setLoadCounter(loadCounter + 1);
+    })
+    .catch(e => {
+      console.error(e);
+      notyf.open({
+        type: "error",
+        message: "Failed to remove task."
+      });
+    })
   }
 
   const taskCards = !tasks ? [] : tasks.sort((a, b) => {

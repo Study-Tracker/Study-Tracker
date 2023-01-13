@@ -63,38 +63,42 @@ public class AssayTasksPrivateController extends AbstractAssayController {
     return new ResponseEntity<>(this.getAssayTaskMapper().toDetailsDto(task), HttpStatus.CREATED);
   }
 
-  @PutMapping("")
+  @PutMapping("/{taskId}")
   public HttpEntity<AssayTaskDetailsDto> updateTask(
       @PathVariable("assayId") String assayId,
+      @PathVariable("taskId") Long taskId,
       @RequestBody AssayTaskFormDto dto
   ) {
-    LOGGER.info("Updating assay task: {}", dto);
+    LOGGER.info("Updating assay task {}: {}", taskId, dto);
     Assay assay = this.getAssayFromIdentifier(assayId);
     AssayTask task = this.updateExistingAssayTask(this.getAssayTaskMapper().fromFormDto(dto), assay);
     return new ResponseEntity<>(this.getAssayTaskMapper().toDetailsDto(task), HttpStatus.OK);
   }
 
-  @PatchMapping("")
+  @PatchMapping("/{taskId}")
   public HttpEntity<?> updateTaskStatus(
       @PathVariable("assayId") String assayId,
+      @PathVariable("taskId") Long taskId,
       @RequestBody AssayTaskFormDto dto
   ) {
-    LOGGER.info("Updating assay task status: {}", dto);
+    LOGGER.info("Updating assay task status {}: {}", taskId, dto);
     Assay assay = this.getAssayFromIdentifier(assayId);
     this.updateAssayTaskStatus(this.getAssayTaskMapper().fromFormDto(dto), assay);
     return ResponseEntity.ok().build();
   }
 
-  @DeleteMapping("")
+  @DeleteMapping("/{taskId}")
   public HttpEntity<?> removeTask(
       @PathVariable("assayId") String assayId,
-      @RequestBody AssayTaskFormDto dto
+      @PathVariable("taskId") Long taskId
   ) {
+    LOGGER.info("Removing assay task: {}", taskId);
 
     User user = this.getAuthenticatedUser();
     Assay assay = this.getAssayFromIdentifier(assayId);
     assay.setLastModifiedBy(user);
-    AssayTask task = this.getAssayTaskMapper().fromFormDto(dto);
+    AssayTask task = this.getAssayTaskService().findById(taskId)
+        .orElseThrow(() -> new IllegalArgumentException("Task not found: " + taskId));
     this.getAssayTaskService().deleteAssayTask(task, assay);
 
     Activity activity = AssayActivityUtils.fromTaskDeleted(assay, user, task);
