@@ -60,6 +60,10 @@ public class AssayTypeService {
     return assayTypeRepository.findAll();
   }
 
+  public List<AssayType> findAllWithDetails() {
+    return assayTypeRepository.findAllWithDetails();
+  }
+
   private void validateFields(Collection<? extends CustomEntityField> fields) {
     Set<String> fieldNames = new HashSet<>();
     Set<String> displayNames = new HashSet<>();

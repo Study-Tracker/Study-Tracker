@@ -18,6 +18,7 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
 import io.studytracker.events.util.AssayActivityUtils;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.AssayTaskFormDto;
 import io.studytracker.mapstruct.dto.response.AssayTaskDetailsDto;
 import io.studytracker.model.Activity;
@@ -50,6 +51,13 @@ public class AssayTasksPrivateController extends AbstractAssayController {
   public List<AssayTaskDetailsDto> fetchTasks(@PathVariable("assayId") String assayId) {
     Assay assay = this.getAssayFromIdentifier(assayId);
     return this.getAssayTaskMapper().toDetailsDtoList(this.getAssayTaskService().findAssayTasks(assay));
+  }
+
+  @GetMapping("/{taskId}")
+  public AssayTaskDetailsDto fetchTaskById(@PathVariable("taskId") Long taskId) {
+    AssayTask task = this.getAssayTaskService().findById(taskId)
+        .orElseThrow(() -> new RecordNotFoundException("Assay task not found: " + taskId));
+    return this.getAssayTaskMapper().toDetailsDto(task);
   }
 
   @PostMapping("")

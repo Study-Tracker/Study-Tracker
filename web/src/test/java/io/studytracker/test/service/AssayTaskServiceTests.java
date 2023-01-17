@@ -27,6 +27,7 @@ import io.studytracker.model.TaskStatus;
 import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTaskFieldRepository;
+import io.studytracker.repository.AssayTaskRepository;
 import io.studytracker.service.AssayTaskService;
 import java.util.Date;
 import java.util.List;
@@ -52,6 +53,8 @@ public class AssayTaskServiceTests {
   @Autowired private AssayTaskFieldRepository assayTaskFieldRepository;
 
   @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired
+  private AssayTaskRepository assayTaskRepository;
 
   @Before
   public void doBefore() {
@@ -201,7 +204,7 @@ public class AssayTaskServiceTests {
     Assert.assertNotNull(tasks);
     Assert.assertFalse(tasks.isEmpty());
     Assert.assertEquals(1, tasks.size());
-    AssayTask task = tasks.get(0);
+    AssayTask task = assayTaskRepository.findById(tasks.get(0).getId()).orElseThrow();
     Assert.assertEquals(TaskStatus.TODO, task.getStatus());
 
     task.setStatus(TaskStatus.COMPLETE);

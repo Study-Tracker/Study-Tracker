@@ -43,6 +43,7 @@ import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.TaskStatus;
 import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
+import io.studytracker.repository.AssayTaskRepository;
 import io.studytracker.service.UserService;
 import java.util.Date;
 import java.util.HashSet;
@@ -79,6 +80,8 @@ public class AssayTaskControllerTests {
   @Autowired private AssayTaskMapper mapper;
 
   private String username;
+  @Autowired
+  private AssayTaskRepository assayTaskRepository;
 
   @Before
   public void doBefore() {
@@ -230,7 +233,7 @@ public class AssayTaskControllerTests {
 
     mockMvc
         .perform(
-            put("/api/internal/assay/xxxxxxx/tasks")
+            put("/api/internal/assay/xxxxxxx/tasks/" + task.getId())
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(dto)))
@@ -239,7 +242,7 @@ public class AssayTaskControllerTests {
 
     mockMvc
         .perform(
-            put("/api/internal/assay/" + assay.getCode() + "/tasks")
+            put("/api/internal/assay/" + assay.getCode() + "/tasks/" + task.getId())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(dto)))
@@ -248,7 +251,7 @@ public class AssayTaskControllerTests {
 
     mockMvc
         .perform(
-            put("/api/internal/assay/" + assay.getCode() + "/tasks")
+            put("/api/internal/assay/" + assay.getCode() + "/tasks/" + task.getId())
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(dto)))
@@ -256,11 +259,13 @@ public class AssayTaskControllerTests {
         .andExpect(status().isOk());
 
     mockMvc
-        .perform(get("/api/internal/assay/" + assay.getCode() + "/tasks").with(user(username)).with(csrf()))
+        .perform(get("/api/internal/assay/" + assay.getCode() + "/tasks/" + task.getId())
+            .with(user(username)).with(csrf()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("status")))
-        .andExpect(jsonPath("$[0].status", is("COMPLETE")));
+        .andExpect(jsonPath("$", hasKey("id")))
+        .andExpect(jsonPath("$.id", is(task.getId().intValue())))
+        .andExpect(jsonPath("$", hasKey("status")))
+        .andExpect(jsonPath("$.status", is("COMPLETE")));
   }
 
   @Test
@@ -269,11 +274,12 @@ public class AssayTaskControllerTests {
         assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     User user = assay.getOwner();
 
-    AssayTask task = assay.getTasks().stream().findFirst().get();
+    AssayTask task = assayTaskRepository.findById(assay.getTasks().stream().findFirst().get().getId())
+        .orElseThrow();
 
     mockMvc
         .perform(
-            delete("/api/internal/assay/xxxxxxx/tasks")
+            delete("/api/internal/assay/xxxxxxx/tasks/" + task.getId())
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDetailsDto(task))))
@@ -282,7 +288,7 @@ public class AssayTaskControllerTests {
 
     mockMvc
         .perform(
-            delete("/api/internal/assay/" + assay.getCode() + "/tasks")
+            delete("/api/internal/assay/" + assay.getCode() + "/tasks/" + task.getId())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDetailsDto(task))))
@@ -291,7 +297,7 @@ public class AssayTaskControllerTests {
 
     mockMvc
         .perform(
-            delete("/api/internal/assay/" + assay.getCode() + "/tasks")
+            delete("/api/internal/assay/" + assay.getCode() + "/tasks/" + task.getId())
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toDetailsDto(task))))

@@ -55,7 +55,8 @@ const AssayTypeDropdown = ({
       tasks.push({
         "label": t.label,
         "status": t.status,
-        "order": t.order
+        "order": t.order,
+        "fields": t.fields || []
       });
     }
 

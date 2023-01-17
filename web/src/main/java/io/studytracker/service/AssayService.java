@@ -29,6 +29,7 @@ import io.studytracker.git.GitService;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayTask;
+import io.studytracker.model.AssayTaskField;
 import io.studytracker.model.AssayTypeField;
 import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.ELNFolder;
@@ -206,6 +207,9 @@ public class AssayService {
     assay.setActive(true);
 
     for (AssayTask task : assay.getTasks()) {
+      for (AssayTaskField field : task.getFields()) {
+        field.setAssayTask(task);
+      }
       task.setAssay(assay);
     }
 

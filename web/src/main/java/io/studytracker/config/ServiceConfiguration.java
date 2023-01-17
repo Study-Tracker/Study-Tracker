@@ -16,10 +16,9 @@
 
 package io.studytracker.config;
 
-import io.studytracker.config.properties.EmailProperties;
 import io.studytracker.service.NamingService;
 import java.util.Properties;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,25 +35,43 @@ public class ServiceConfiguration {
     return new NamingService();
   }
 
-  @ConditionalOnExpression("!T(org.springframework.util.StringUtils).isEmpty('${email.host:}')")
+  @ConditionalOnExpression("!T(org.springframework.util.StringUtils).isEmpty('${spring.mail.host:}')")
   @Configuration
   public static class MailServiceConfiguration {
 
-    @Autowired
-    private EmailProperties emailProperties;
+    @Value("${spring.mail.host}")
+    private String host;
+
+    @Value("${spring.mail.port}")
+    private Integer port;
+
+    @Value("${spring.mail.username}")
+    private String username;
+
+    @Value("${spring.mail.password}")
+    private String password;
+
+    @Value("${spring.mail.protocol}")
+    private String protocol;
+
+    @Value("${spring.mail.properties.mail.smtp.auth}")
+    private Boolean smtpAuth;
+
+    @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
+    private Boolean startTls;
 
     @Bean
     public JavaMailSender javaMailSender() {
       JavaMailSenderImpl sender = new JavaMailSenderImpl();
       Properties props = sender.getJavaMailProperties();
-      props.put("mail.transport.protocol", emailProperties.getProtocol());
-      sender.setHost(emailProperties.getHost());
-      sender.setPort(emailProperties.getPort());
-      if (emailProperties.getSmtpAuth()) {
-        sender.setUsername(emailProperties.getUsername());
-        sender.setPassword(emailProperties.getPassword());
-        props.put("mail.smtp.auth", emailProperties.getSmtpAuth());
-        props.put("mail.smtp.starttls.enable", emailProperties.getSmtpStartTls());
+      props.put("mail.transport.protocol", protocol);
+      sender.setHost(host);
+      sender.setPort(port);
+      if (smtpAuth) {
+        sender.setUsername(username);
+        sender.setPassword(password);
+        props.put("mail.smtp.auth", smtpAuth);
+        props.put("mail.smtp.starttls.enable", startTls);
       }
       return sender;
     }

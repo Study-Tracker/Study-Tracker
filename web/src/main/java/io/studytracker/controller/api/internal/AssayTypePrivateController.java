@@ -47,7 +47,7 @@ public class AssayTypePrivateController extends AbstractAssayTypeController {
 
   @GetMapping("")
   public List<AssayTypeDetailsDto> findAll() {
-    return this.getAssayTypeMapper().toDetailsDtoList(this.getAssayTypeService().findAll());
+    return this.getAssayTypeMapper().toDetailsDtoList(this.getAssayTypeService().findAllWithDetails());
   }
 
   @GetMapping("/{id}")
