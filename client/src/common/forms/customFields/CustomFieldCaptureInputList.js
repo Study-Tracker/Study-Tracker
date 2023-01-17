@@ -17,26 +17,23 @@
 import React from "react";
 import {Col, Row} from 'react-bootstrap'
 import PropTypes from "prop-types";
-import StringFieldInput from "../../common/forms/customFields/StringFieldInput";
-import BooleanFieldInput
-  from "../../common/forms/customFields/BooleanFieldInput";
-import DateFieldInput from "../../common/forms/customFields/DateFieldInput";
-import IntegerFieldInput
-  from "../../common/forms/customFields/IntegerFieldInput";
-import TextFieldInput from "../../common/forms/customFields/TextFieldInput";
-import DropdownFieldInput
-  from "../../common/forms/customFields/DropdownFieldInput";
-import FloatFieldInput from "../../common/forms/customFields/FloatFieldInput";
-import FileFieldInput from "../../common/forms/customFields/FileFieldInput";
+import StringFieldInput from "./StringFieldInput";
+import BooleanFieldInput from "./BooleanFieldInput";
+import DateFieldInput from "./DateFieldInput";
+import IntegerFieldInput from "./IntegerFieldInput";
+import TextFieldInput from "./TextFieldInput";
+import DropdownFieldInput from "./DropdownFieldInput";
+import FloatFieldInput from "./FloatFieldInput";
+import FileFieldInput from "./FileFieldInput";
 
-const AssayTypeFieldCaptureInputList = ({
-  assayType,
-  assayFields,
+const CustomFieldCaptureInputList = ({
+  fields,
+  data,
   handleUpdate,
   errors
 }) => {
 
-  let inputs = assayType.fields
+  let inputs = fields
   .sort((a, b) => {
     if (a.id > b.id) {
       return 1;
@@ -49,8 +46,8 @@ const AssayTypeFieldCaptureInputList = ({
   .map(f => {
 
     let value = null;
-    if (assayFields.hasOwnProperty(f.fieldName)) {
-      value = assayFields[f.fieldName];
+    if (data.hasOwnProperty(f.fieldName)) {
+      value = data[f.fieldName];
     }
 
     let input = null;
@@ -152,11 +149,11 @@ const AssayTypeFieldCaptureInputList = ({
   )
 };
 
-AssayTypeFieldCaptureInputList.propTypes = {
-  assayType: PropTypes.object.isRequired,
-  assayFields: PropTypes.object.isRequired,
+CustomFieldCaptureInputList.propTypes = {
+  fields: PropTypes.array.isRequired,
+  data: PropTypes.object.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   errors: PropTypes.object.isRequired
 }
 
-export default AssayTypeFieldCaptureInputList;
+export default CustomFieldCaptureInputList;

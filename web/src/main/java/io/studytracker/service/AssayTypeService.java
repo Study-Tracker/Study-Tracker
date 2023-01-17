@@ -20,7 +20,10 @@ import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.AssayTypeField;
 import io.studytracker.model.AssayTypeTask;
+import io.studytracker.model.AssayTypeTaskField;
+import io.studytracker.model.CustomEntityField;
 import io.studytracker.repository.AssayTypeRepository;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -57,10 +60,10 @@ public class AssayTypeService {
     return assayTypeRepository.findAll();
   }
 
-  private void validateFields(AssayType assayType) {
+  private void validateFields(Collection<? extends CustomEntityField> fields) {
     Set<String> fieldNames = new HashSet<>();
     Set<String> displayNames = new HashSet<>();
-    for (AssayTypeField field : assayType.getFields()) {
+    for (CustomEntityField field : fields) {
 
       // Check for required input
       if (!StringUtils.hasText(field.getFieldName())
@@ -69,18 +72,14 @@ public class AssayTypeService {
           || field.getFieldOrder() == null
       ) {
         throw new InvalidConstraintException(
-            "Assay type "
-                + assayType.getName()
-                + " field is missing required attributes: "
+            "Custom field is missing required attributes: "
                 + field);
       }
 
       // Check that a field with the name doesn't exist
       if (fieldNames.contains(field.getFieldName())) {
         throw new InvalidConstraintException(
-            "Assay type "
-                + assayType.getName()
-                + " already contains a field with name: "
+            "Entity already contains a field with name: "
                 + field.getFieldName());
       }
       fieldNames.add(field.getFieldName());
@@ -88,9 +87,7 @@ public class AssayTypeService {
       // Check that a field with the display name doesn't exist
       if (displayNames.contains(field.getDisplayName())) {
         throw new InvalidConstraintException(
-            "Assay type "
-                + assayType.getName()
-                + " already contains a field with display name: "
+            "Entity already contains a field with display name: "
                 + field.getDisplayName());
       }
       displayNames.add(field.getDisplayName());
@@ -100,24 +97,50 @@ public class AssayTypeService {
   @Transactional
   public AssayType create(AssayType assayType) {
     LOGGER.info("Creating new assay type: {}", assayType);
-    validateFields(assayType);
+    try {
+      validateFields(assayType.getFields());
+    } catch (InvalidConstraintException e) {
+      throw new InvalidConstraintException("Assay type field validation failed: " + assayType.getName());
+    }
     for (AssayTypeField field : assayType.getFields()) {
       field.setAssayType(assayType);
     }
     for (AssayTypeTask task : assayType.getTasks()) {
+      try {
+        validateFields(task.getFields());
+      } catch (InvalidConstraintException e) {
+        throw new InvalidConstraintException("Assay type task field validation failed: " + task.getLabel());
+      }
+      for (AssayTypeTaskField tf: task.getFields()) {
+        tf.setAssayTypeTask(task);
+      }
       task.setAssayType(assayType);
     }
-    return assayTypeRepository.save(assayType);
+    assayTypeRepository.save(assayType);
+    return assayTypeRepository.findById(assayType.getId())
+        .orElseThrow(() -> new IllegalStateException("Assay type not found after creation: " + assayType.getName()));
   }
 
   @Transactional
   public AssayType update(AssayType assayType) {
     LOGGER.info("Updating assay type: {}", assayType);
-    validateFields(assayType);
+    try {
+      validateFields(assayType.getFields());
+    } catch (InvalidConstraintException e) {
+      throw new InvalidConstraintException("Assay type field validation failed: " + assayType.getName());
+    }
     for (AssayTypeField field : assayType.getFields()) {
       field.setAssayType(assayType);
     }
     for (AssayTypeTask task : assayType.getTasks()) {
+      try {
+        validateFields(task.getFields());
+      } catch (InvalidConstraintException e) {
+        throw new InvalidConstraintException("Assay type task field validation failed: " + task.getLabel());
+      }
+      for (AssayTypeTaskField tf: task.getFields()) {
+        tf.setAssayTypeTask(task);
+      }
       task.setAssayType(assayType);
     }
     assayTypeRepository.save(assayType);

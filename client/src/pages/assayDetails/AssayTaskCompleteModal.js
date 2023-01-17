@@ -20,20 +20,13 @@ import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import TaskControls from "../../common/forms/tasks/TaskControls";
 
-const AssayTaskFormModal = ({
+const AssayTaskCompleteModal = ({
     modalIsOpen,
     setModalIsOpen,
     task,
     handleFormSubmit,
     formikRef
 }) => {
-
-  const taskDefaults = {
-    label: "",
-    status: "TODO",
-    assignedTo: null,
-    fields: []
-  };
 
   const taskSchema = yup.object().shape({
     label: yup.string()
@@ -53,7 +46,7 @@ const AssayTaskFormModal = ({
 
   return (
       <Formik
-          initialValues={task || taskDefaults}
+          initialValues={task}
           validationSchema={taskSchema}
           onSubmit={handleFormSubmit}
           innerRef={formikRef}
@@ -71,7 +64,6 @@ const AssayTaskFormModal = ({
             <Modal
                 show={modalIsOpen}
                 onHide={() => setModalIsOpen(false)}
-                size="lg"
             >
               <Modal.Header closeButton>
                 <Modal.Title>{task ? "Edit Task" : "New Task"}</Modal.Title>
@@ -115,8 +107,8 @@ const AssayTaskFormModal = ({
 
 }
 
-AssayTaskFormModal.propTypes = {
+AssayTaskCompleteModal.propTypes = {
 
 }
 
-export default AssayTaskFormModal;
+export default AssayTaskCompleteModal;

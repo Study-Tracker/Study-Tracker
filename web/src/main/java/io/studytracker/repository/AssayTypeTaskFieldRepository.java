@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.repository;
 
-import io.studytracker.model.TaskStatus;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import lombok.Data;
+import io.studytracker.model.AssayTypeTaskField;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-@Data
-public class AssayTypeTaskDetailsDto {
+public interface AssayTypeTaskFieldRepository extends JpaRepository<AssayTypeTaskField, Long> {
 
-  private Long id;
-  private TaskStatus status;
-  private String label;
-  private Integer order;
-  private Date createdAt;
-  private Date updatedAt;
-  private Set<AssayTypeTaskFieldDetailsDto> fields = new HashSet<>();
+  @Query("select f from AssayTypeTaskField f where f.assayTypeTask.id = ?1")
+  List<AssayTypeTaskField> findByAssayTypeTaskId(Long assayTypeTaskId);
+
 }

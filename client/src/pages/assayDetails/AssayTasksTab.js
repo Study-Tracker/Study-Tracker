@@ -24,15 +24,18 @@ import AssayTaskFormModal from "./AssayTaskFormModal";
 import TaskCard from "./TaskCard";
 import NotyfContext from "../../context/NotyfContext";
 import {Button, Col, Row} from "react-bootstrap";
+import AssayTaskCompleteModal from "./AssayTaskCompleteModal";
 
 const AssayTasksTab = ({assay, user}) => {
 
   const [tasks, setTasks] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [completeModalIsOpen, setCompleteModalIsOpen] = useState(false);
   const [error, setError] = useState(null);
   const [loadCounter, setLoadCounter] = useState(0);
   const formikRef = useRef();
+  const completeFormikRef = useRef();
   const notyf = useContext(NotyfContext);
 
   useEffect(() => {
@@ -75,6 +78,32 @@ const AssayTasksTab = ({assay, user}) => {
     });
   }
 
+  const handleCompleteFormSubmit = (values, {setSubmitting, resetForm}) => {
+    console.debug("Form values", values);
+    axios({
+      url: "/api/internal/assay/" + assay.id + "/tasks/" + values.id,
+      method: "patch",
+      data: values
+    })
+    .then(response => {
+      const json = response.data;
+      console.debug("Task", json);
+      resetForm();
+    })
+    .catch(e => {
+      console.error(e);
+    })
+    .finally(() => {
+      notyf.open({
+        type: "success",
+        message: "Task successfully updated."
+      });
+      setSubmitting(false);
+      setModalIsOpen(false);
+      setLoadCounter(loadCounter + 1);
+    });
+  }
+
   const updateTask = (data) => {
     axios({
       url: "/api/internal/assay/" + assay.id + "/tasks/" + data.id,
@@ -100,7 +129,12 @@ const AssayTasksTab = ({assay, user}) => {
 
   const handleTaskComplete = (task) => {
     const values = {...task, status: "COMPLETE"};
-    updateTask(values);
+    if (task.fields && task.fields.length > 0) {
+      setSelectedTask(task);
+      setCompleteModalIsOpen(true);
+    } else {
+      updateTask(values);
+    }
   }
 
   const handleTaskIncomplete = (task) => {
@@ -115,6 +149,11 @@ const AssayTasksTab = ({assay, user}) => {
 
   const handleTaskEdit = (task) => {
     setSelectedTask(task);
+    setModalIsOpen(true);
+  }
+
+  const handleNewTaskClick = () => {
+    setSelectedTask(null);
     setModalIsOpen(true);
   }
 
@@ -140,24 +179,6 @@ const AssayTasksTab = ({assay, user}) => {
     })
   }
 
-  const taskCards = !tasks ? [] : tasks.sort((a, b) => {
-    return a.order - b.order;
-  })
-  .map((task, index) => {
-    return (
-        <TaskCard
-            key={index + "-task-card"}
-            task={task}
-            index={index}
-            handleTaskComplete={handleTaskComplete}
-            handleTaskIncomplete={handleTaskIncomplete}
-            handleTaskEdit={handleTaskEdit}
-            handleTaskDelete={handleTaskDelete}
-            handleTaskReset={handleTaskReset}
-        />
-    );
-  });
-
   return (
       <>
 
@@ -174,27 +195,51 @@ const AssayTasksTab = ({assay, user}) => {
             )
         }
 
-        {taskCards}
+        {
+          tasks && (
+              tasks.sort((a, b) => {
+                return a.order - b.order;
+              })
+              .map((task, index) => {
+                return (
+                    <TaskCard
+                        key={index + "-task-card"}
+                        task={task}
+                        index={index}
+                        handleTaskComplete={handleTaskComplete}
+                        handleTaskIncomplete={handleTaskIncomplete}
+                        handleTaskEdit={handleTaskEdit}
+                        handleTaskDelete={handleTaskDelete}
+                        handleTaskReset={handleTaskReset}
+                    />
+                );
+              })
+            )
+        }
 
         {
-          !error && taskCards.length === 0 && (
+          !error && (!tasks || tasks.length === 0) && (
               <AssayTasksContentPlaceholder
                   handleClick={() => setModalIsOpen(true)}
               />
             )
         }
 
-        <Row>
-          <Col className={"d-flex justify-content-center"}>
-            <Button
-                className={"ps-5 pe-5"}
-                variant={"primary"}
-                onClick={() => setModalIsOpen(true)}
-            >
-              Add Task
-            </Button>
-          </Col>
-        </Row>
+        {
+          tasks && tasks.length > 0 && (
+                <Row>
+                  <Col className={"d-flex justify-content-center"}>
+                    <Button
+                        className={"ps-5 pe-5"}
+                        variant={"primary"}
+                        onClick={handleNewTaskClick}
+                    >
+                      Add Task
+                    </Button>
+                  </Col>
+                </Row>
+          )
+        }
 
         <AssayTaskFormModal
             task={selectedTask}
@@ -203,6 +248,14 @@ const AssayTasksTab = ({assay, user}) => {
             handleFormSubmit={handleFormSubmit}
             formikRef={formikRef}
 
+        />
+
+        <AssayTaskCompleteModal
+            task={selectedTask}
+            modalIsOpen={completeModalIsOpen}
+            setModalIsOpen={setCompleteModalIsOpen}
+            handleFormSubmit={handleCompleteFormSubmit}
+            formikRef={completeFormikRef}
         />
 
       </>

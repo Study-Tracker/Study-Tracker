@@ -21,7 +21,6 @@ import swal from 'sweetalert';
 import {LoadingOverlay} from "../../common/loading";
 import Select from "react-select";
 import AttributeInputs from "../../common/forms/AttributeInputs";
-import AssayTypeFieldInputs from "./AssayTypeFieldInputs";
 import {Breadcrumbs} from "../../common/common";
 import {FormGroup} from "../../common/forms/common";
 import {useNavigate} from "react-router-dom";
@@ -33,6 +32,8 @@ import FormikFormErrorNotification
   from "../../common/forms/FormikFormErrorNotification";
 import TaskControlsDraggableCardList
   from "../../common/forms/tasks/TaskControlsDraggableCardList";
+import CustomFieldDefinitionDraggableCardList
+  from "../../common/forms/customFields/CustomFieldDefinitionDraggableCardList";
 
 const AssayTypeForm = props => {
 
@@ -314,13 +315,21 @@ const AssayTypeForm = props => {
 
                         </Row>
 
-                        <AssayTypeFieldInputs
-                            fields={values.fields}
+                        <CustomFieldDefinitionDraggableCardList
                             handleUpdate={(fields) => {
                               setFieldValue("fields", fields)
                             }}
+                            fields={values.fields}
                             error={errors.fields}
                         />
+
+                        {/*<AssayTypeFieldInputs*/}
+                        {/*    fields={values.fields}*/}
+                        {/*    handleUpdate={(fields) => {*/}
+                        {/*      setFieldValue("fields", fields)*/}
+                        {/*    }}*/}
+                        {/*    error={errors.fields}*/}
+                        {/*/>*/}
 
                         <Row>
                           <Col>
@@ -351,14 +360,6 @@ const AssayTypeForm = props => {
                             errors={errors}
                             touched={touched}
                         />
-
-                        {/*<TaskInputs*/}
-                        {/*    tasks={values.tasks}*/}
-                        {/*    handleUpdate={(tasks) => {*/}
-                        {/*      setFieldValue("tasks", tasks)*/}
-                        {/*    }}*/}
-                        {/*    error={errors.tasks}*/}
-                        {/*/>*/}
 
                         <Row>
                           <Col>

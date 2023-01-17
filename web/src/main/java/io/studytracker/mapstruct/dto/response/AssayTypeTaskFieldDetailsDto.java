@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.form;
+package io.studytracker.mapstruct.dto.response;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.validation.constraints.NotNull;
+import io.studytracker.model.CustomEntityFieldType;
 import lombok.Data;
 
 @Data
-public class AssayTypeFormDto {
+public class AssayTypeTaskFieldDetailsDto {
 
   private Long id;
-  @NotNull private String name;
-  @NotNull private String description;
+  private String displayName;
+  private String fieldName;
+  private CustomEntityFieldType type;
+  private boolean required = false;
+  private String description;
   private boolean active = true;
-  private Set<AssayTypeFieldFormDto> fields = new HashSet<>();
-  private Set<AssayTypeTaskFormDto> tasks = new HashSet<>();
-  private Map<String, String> attributes = new HashMap<>();
+  private Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }

@@ -16,21 +16,19 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import java.util.HashMap;
+import io.studytracker.model.TaskStatus;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class AssayTypeFormDto {
+public class AssayTypeTaskFormDto {
 
   private Long id;
-  @NotNull private String name;
-  @NotNull private String description;
-  private boolean active = true;
-  private Set<AssayTypeFieldFormDto> fields = new HashSet<>();
-  private Set<AssayTypeTaskFormDto> tasks = new HashSet<>();
-  private Map<String, String> attributes = new HashMap<>();
+  @NotNull private TaskStatus status;
+  @NotNull private String label;
+  private Integer order;
+  private Set<AssayTypeTaskFieldFormDto> fields = new HashSet<>();
+
 }

@@ -17,9 +17,10 @@
 import React from "react";
 import Select from "react-select";
 import {Form} from 'react-bootstrap';
-import {FormGroup} from "./common";
+import {FormGroup} from "../../common/forms/common";
+import PropTypes from "prop-types";
 
-export const AssayTypeDropdown = ({
+const AssayTypeDropdown = ({
   assayTypes,
   selectedType,
   onChange,
@@ -108,3 +109,13 @@ export const AssayTypeDropdown = ({
   );
 
 };
+
+AssayTypeDropdown.propTypes = {
+  assayTypes: PropTypes.array.isRequired,
+  selectedType: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  isInvalid: PropTypes.bool,
+  disabled: PropTypes.bool
+};
+
+export default AssayTypeDropdown;

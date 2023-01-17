@@ -22,8 +22,9 @@ import {StatusDropdown} from "../../common/forms/status";
 import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
 import swal from 'sweetalert';
-import {AssayTypeDropdown} from "../../common/forms/assayTypes";
-import AssayTypeFieldCaptureInputList from "./AssayTypeFieldCaptureInputList";
+import AssayTypeDropdown from "./AssayTypeDropdown";
+import CustomFieldCaptureInputList
+  from "../../common/forms/customFields/CustomFieldCaptureInputList";
 import AttributeInputs from "../../common/forms/AttributeInputs";
 import {LoadingOverlay} from "../../common/loading";
 import ReactQuill from "react-quill";
@@ -471,9 +472,9 @@ const AssayForm = props => {
                                 </h6>
                               </Card.Header>
                               <Card.Body>
-                                <AssayTypeFieldCaptureInputList
-                                    assayType={values.assayType}
-                                    assayFields={values.fields}
+                                <CustomFieldCaptureInputList
+                                    fields={values.assayType.fields}
+                                    data={values.fields}
                                     handleUpdate={data => {
                                       setFieldValue("fields", {
                                         ...values.fields,

@@ -19,3 +19,22 @@ ALTER TABLE assay_tasks
 
 ALTER TABLE assay_task_fields
     ADD CONSTRAINT FK_ASSAY_TASK_FIELDS_ON_ASSAY_TASK FOREIGN KEY (assay_task_id) REFERENCES assay_tasks (id);
+
+CREATE TABLE assay_type_task_fields
+(
+    id                 BIGINT       NOT NULL,
+    display_name       VARCHAR(255) NOT NULL,
+    field_name         VARCHAR(255) NOT NULL,
+    type               VARCHAR(255) NOT NULL,
+    required           BOOLEAN      NOT NULL,
+    description        VARCHAR(1024),
+    active             BOOLEAN      NOT NULL,
+    field_order        INTEGER      NOT NULL,
+    dropdown_options   VARCHAR(2048),
+    default_value      VARCHAR(255),
+    assay_type_task_id BIGINT       NOT NULL,
+    CONSTRAINT pk_assay_type_task_fields PRIMARY KEY (id)
+);
+
+ALTER TABLE assay_type_task_fields
+    ADD CONSTRAINT FK_ASSAY_TYPE_TASK_FIELDS_ON_ASSAY_TYPE_TASK FOREIGN KEY (assay_type_task_id) REFERENCES assay_type_tasks (id);

@@ -68,14 +68,19 @@ public class AssayTypePrivateController extends AbstractAssayTypeController {
     AssayType assayType = this.getAssayTypeMapper().fromFormDto(dto);
     assayType.setActive(true);
     AssayType created = this.createNewAssayType(assayType);
+    LOGGER.info("New assay type: {}", created);
     return new ResponseEntity<>(this.getAssayTypeMapper().toDetailsDto(created), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
   public HttpEntity<AssayType> update(
-      @PathVariable("id") String id, @RequestBody @Valid AssayTypeFormDto dto) {
+      @PathVariable("id") Long id, @RequestBody @Valid AssayTypeFormDto dto) {
     LOGGER.info("Updating assay type");
     LOGGER.info(dto.toString());
+    Optional<AssayType> optional = this.getAssayTypeService().findById(id);
+    if (optional.isEmpty()) {
+      throw new RecordNotFoundException();
+    }
     AssayType assayType = this.updateExistingAssayType(this.getAssayTypeMapper().fromFormDto(dto));
     return new ResponseEntity<>(assayType, HttpStatus.OK);
   }

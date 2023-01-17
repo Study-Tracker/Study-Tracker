@@ -28,6 +28,7 @@ const AssayTasksContentPlaceholder = ({handleClick}) => {
                   <Button
                       color={"primary"}
                       onClick={handleClick}
+                      className={"ps-5 pe-5"}
                   >
                     Add a task
                   </Button>

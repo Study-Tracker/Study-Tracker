@@ -25,27 +25,27 @@ import javax.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "assay_type_fields")
+@Table(name = "assay_type_task_fields")
 @EntityListeners(AuditingEntityListener.class)
-public class AssayTypeField extends CustomEntityField {
+public class AssayTypeTaskField extends CustomEntityField {
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "assay_type_id", nullable = false)
-  private AssayType assayType;
+  @JoinColumn(name = "assay_type_task_id", nullable = false)
+  private AssayTypeTask assayTypeTask;
 
-  public AssayTypeField() {
+  public AssayTypeTaskField() {
     super();
   }
 
-  public AssayTypeField(
-      AssayType assayType,
+  public AssayTypeTaskField(
+      AssayTypeTask assayTypeTask,
       String displayName,
       String fieldName,
       CustomEntityFieldType type,
       Integer order
   ) {
     super();
-    this.setAssayType(assayType);
+    this.setAssayTypeTask(assayTypeTask);
     this.setDisplayName(displayName);
     this.setFieldName(fieldName);
     this.setType(type);
@@ -54,14 +54,14 @@ public class AssayTypeField extends CustomEntityField {
     this.setFieldOrder(order);
   }
 
-  public AssayTypeField(
-      AssayType assayType,
+  public AssayTypeTaskField(
+      AssayTypeTask assayTypeTask,
       String displayName,
       String fieldName,
       CustomEntityFieldType type,
       Integer order,
       boolean required) {
-    this.setAssayType(assayType);
+    this.setAssayTypeTask(assayTypeTask);
     this.setDisplayName(displayName);
     this.setFieldName(fieldName);
     this.setType(type);
@@ -70,15 +70,15 @@ public class AssayTypeField extends CustomEntityField {
     this.setActive(true);
   }
 
-  public AssayTypeField(
-      AssayType assayType,
+  public AssayTypeTaskField(
+      AssayTypeTask assayTypeTask,
       String displayName,
       String fieldName,
       CustomEntityFieldType type,
       Integer order,
       boolean required,
       String description) {
-    this.setAssayType(assayType);
+    this.setAssayTypeTask(assayTypeTask);
     this.setDisplayName(displayName);
     this.setFieldName(fieldName);
     this.setType(type);
@@ -88,17 +88,17 @@ public class AssayTypeField extends CustomEntityField {
     this.setDescription(description);
   }
 
-  public AssayType getAssayType() {
-    return assayType;
+  public AssayTypeTask getAssayTypeTask() {
+    return assayTypeTask;
   }
 
-  public void setAssayType(AssayType assayType) {
-    this.assayType = assayType;
+  public void setAssayTypeTask(AssayTypeTask assayTypeTask) {
+    this.assayTypeTask = assayTypeTask;
   }
 
   @Override
   public String toString() {
-    return "AssayTypeField{" +
+    return "AssayTypeTaskField{" +
         "id=" + this.getId() +
         ", displayName='" + this.getDisplayName() + '\'' +
         ", fieldName='" + this.getFieldName() + '\'' +
@@ -107,7 +107,7 @@ public class AssayTypeField extends CustomEntityField {
         ", description='" + this.getDescription() + '\'' +
         ", active=" + this.isActive() +
         ", fieldOrder=" + this.getFieldOrder() +
-//        ", assayType=" + assayType +
+//        ", assayTypeTask=" + assayTypeTask +
         '}';
   }
 }
