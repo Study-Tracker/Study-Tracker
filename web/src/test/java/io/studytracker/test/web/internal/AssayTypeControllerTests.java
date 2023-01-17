@@ -261,6 +261,49 @@ public class AssayTypeControllerTests {
         .andExpect(jsonPath("$.tasks[0].fields[0].required", is(true)))
     ;
 
+    AssayType created = assayTypeRepository.findAll().stream()
+        .filter(at -> at.getName().equals("Test assay type"))
+        .findFirst()
+        .orElseThrow();
+
+    mockMvc
+        .perform(
+            get("/api/internal/assaytype/" + created.getId())
+                .with(user(user.getEmail())).with(csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("id")))
+        .andExpect(jsonPath("$.id", notNullValue()))
+        .andExpect(jsonPath("$", hasKey("name")))
+        .andExpect(jsonPath("$.name", is("Test assay type")))
+        .andExpect(jsonPath("$", hasKey("description")))
+        .andExpect(jsonPath("$.description", is("This is a test")))
+        .andExpect(jsonPath("$", hasKey("fields")))
+        .andExpect(jsonPath("$.fields", hasSize(0)))
+        .andExpect(jsonPath("$", hasKey("tasks")))
+        .andExpect(jsonPath("$.tasks", hasSize(1)))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("label")))
+        .andExpect(jsonPath("$.tasks[0].label", is("Test task")))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("status")))
+        .andExpect(jsonPath("$.tasks[0].status", is("TODO")))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("fields")))
+        .andExpect(jsonPath("$.tasks[0].fields", hasSize(1)))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("displayName")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].displayName", is("Test field 1")))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("fieldName")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].fieldName", is("test_field_1")))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("type")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].type", is("STRING")))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("fieldOrder")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].fieldOrder", is(1)))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("active")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].active", is(true)))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("description")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].description", is("This is a test")))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("required")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].required", is(true)))
+    ;
+
   }
 
   @Test

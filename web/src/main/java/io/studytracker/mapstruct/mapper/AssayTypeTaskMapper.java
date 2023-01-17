@@ -28,17 +28,22 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface AssayTypeTaskMapper {
 
+  // Internal DTO
   AssayTypeTaskDetailsDto toDetailsDto(AssayTypeTask task);
-
   List<AssayTypeTaskDetailsDto> toDetailsDtoList(List<AssayTypeTask> tasks);
   Set<AssayTypeTaskDetailsDto> toDetailsDtoSet(Set<AssayTypeTask> tasks);
 
+  // Public DTO
   AssayTypeTaskDto toDto(AssayTypeTask task);
   List<AssayTypeTaskDto> toDtoList(List<AssayTypeTask> tasks);
   Set<AssayTypeTaskDto> toDtoSet(Set<AssayTypeTask> tasks);
+
+  // Public payload DTO
   AssayTypeTask fromPayloadDto(AssayTypeTaskPayloadDto dto);
   Set<AssayTypeTask> fromPayloadDtoSet(Set<AssayTypeTaskPayloadDto> dtos);
   List<AssayTypeTask> fromPayloadDtoList(List<AssayTypeTaskPayloadDto> dtos);
+
+  // Private form DTO
   AssayTypeTask fromFormDto(AssayTypeTaskFormDto dto);
   Set<AssayTypeTask> fromFormDtoSet(Set<AssayTypeTaskFormDto> dto);
   List<AssayTypeTask> fromFormDtoList(List<AssayTypeTaskFormDto> dto);

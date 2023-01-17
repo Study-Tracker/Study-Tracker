@@ -63,11 +63,8 @@ public class AssayTypePrivateController extends AbstractAssayTypeController {
 
   @PostMapping("")
   public HttpEntity<AssayTypeDetailsDto> create(@RequestBody @Valid AssayTypeFormDto dto) {
-    LOGGER.info("Creating assay type");
-    LOGGER.info(dto.toString());
-    AssayType assayType = this.getAssayTypeMapper().fromFormDto(dto);
-    assayType.setActive(true);
-    AssayType created = this.createNewAssayType(assayType);
+    LOGGER.info("Creating assay type: {}", dto);
+    AssayType created = this.createNewAssayType(this.getAssayTypeMapper().fromFormDto(dto));
     LOGGER.info("New assay type: {}", created);
     return new ResponseEntity<>(this.getAssayTypeMapper().toDetailsDto(created), HttpStatus.CREATED);
   }
@@ -75,13 +72,13 @@ public class AssayTypePrivateController extends AbstractAssayTypeController {
   @PutMapping("/{id}")
   public HttpEntity<AssayType> update(
       @PathVariable("id") Long id, @RequestBody @Valid AssayTypeFormDto dto) {
-    LOGGER.info("Updating assay type");
-    LOGGER.info(dto.toString());
+    LOGGER.info("Updating assay type: {}", dto);
     Optional<AssayType> optional = this.getAssayTypeService().findById(id);
     if (optional.isEmpty()) {
       throw new RecordNotFoundException();
     }
     AssayType assayType = this.updateExistingAssayType(this.getAssayTypeMapper().fromFormDto(dto));
+    LOGGER.info("Updated assay type: {}", assayType);
     return new ResponseEntity<>(assayType, HttpStatus.OK);
   }
 

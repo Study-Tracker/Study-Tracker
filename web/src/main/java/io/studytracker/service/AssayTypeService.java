@@ -144,7 +144,8 @@ public class AssayTypeService {
       task.setAssayType(assayType);
     }
     assayTypeRepository.save(assayType);
-    return assayType;
+    return assayTypeRepository.findById(assayType.getId())
+        .orElseThrow(() -> new IllegalStateException("Assay type not found after creation: " + assayType.getName()));
   }
 
   @Transactional
