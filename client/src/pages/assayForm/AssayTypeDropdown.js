@@ -52,11 +52,17 @@ const AssayTypeDropdown = ({
 
     const tasks = [];
     for (let t of assayType.tasks) {
+      const taskFields = t.fields ? t.fields.map(f => {
+        return {
+          ...f,
+          id: null
+        }
+      }) : []
       tasks.push({
         "label": t.label,
         "status": t.status,
         "order": t.order,
-        "fields": t.fields || []
+        "fields":taskFields
       });
     }
 

@@ -16,7 +16,6 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.mapstruct.dto.response.AssayTaskDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssayTypeDetailsDto;
 import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
@@ -55,7 +54,7 @@ public class AssayFormDto {
   private Set<UserSlimDto> users = new HashSet<>();
   private Map<String, Object> fields = new LinkedHashMap<>();
   private Map<String, String> attributes = new HashMap<>();
-  private Set<AssayTaskDetailsDto> tasks = new HashSet<>();
+  private Set<AssayTaskFormDto> tasks = new HashSet<>();
   private Boolean useGit;
   private Boolean useNotebook;
   private Boolean useStorage;
