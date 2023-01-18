@@ -30,6 +30,7 @@ const AssayTasksTab = ({assay, user}) => {
 
   const [tasks, setTasks] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [taskToComplete, setTaskToComplete] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [completeModalIsOpen, setCompleteModalIsOpen] = useState(false);
   const [error, setError] = useState(null);
@@ -78,8 +79,41 @@ const AssayTasksTab = ({assay, user}) => {
     });
   }
 
-  const handleCompleteFormSubmit = (values, {setSubmitting, resetForm}) => {
+  const handleCompleteFormSubmit = async (values, {setSubmitting, resetForm}) => {
     console.debug("Form values", values);
+    setSubmitting(true);
+
+    // Upload any files
+    let uploadErrors = false;
+    for (let i in values.fields) {
+      const field = values.fields[i];
+      if (field.type === "FILE") {
+        const file = values.data[field.fieldName];
+        if (file) {
+          console.debug("Uploading file: ", file);
+          const formData = new FormData();
+          formData.append("file", file);
+          const localPath = await axios.post(
+              "/api/internal/data-files/temp-upload", formData)
+          .then(response => response.data.filePath)
+          .catch(e => {
+            console.error(e);
+            uploadErrors = true;
+          });
+          if (uploadErrors) break;
+          values.data[field.fieldName] = localPath;
+        }
+      }
+    }
+    if (uploadErrors) {
+      setSubmitting(false);
+      notyf.open({
+        type: "error",
+        message: "Error uploading task files."
+      });
+      return;
+    }
+
     axios({
       url: "/api/internal/assay/" + assay.id + "/tasks/" + values.id,
       method: "patch",
@@ -99,7 +133,7 @@ const AssayTasksTab = ({assay, user}) => {
         message: "Task successfully updated."
       });
       setSubmitting(false);
-      setModalIsOpen(false);
+      setCompleteModalIsOpen(false);
       setLoadCounter(loadCounter + 1);
     });
   }
@@ -130,7 +164,7 @@ const AssayTasksTab = ({assay, user}) => {
   const handleTaskComplete = (task) => {
     const values = {...task, status: "COMPLETE"};
     if (task.fields && task.fields.length > 0) {
-      setSelectedTask(task);
+      setTaskToComplete(values);
       setCompleteModalIsOpen(true);
     } else {
       updateTask(values);
@@ -251,7 +285,7 @@ const AssayTasksTab = ({assay, user}) => {
         />
 
         <AssayTaskCompleteModal
-            task={selectedTask}
+            task={taskToComplete}
             modalIsOpen={completeModalIsOpen}
             setModalIsOpen={setCompleteModalIsOpen}
             handleFormSubmit={handleCompleteFormSubmit}

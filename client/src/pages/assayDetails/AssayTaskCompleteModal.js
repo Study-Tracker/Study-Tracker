@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-import {Button, Modal} from "react-bootstrap";
+import {Button, Col, Modal, Row} from "react-bootstrap";
 import React from "react";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
-import TaskControls from "../../common/forms/tasks/TaskControls";
+import CustomFieldCaptureInputList
+  from "../../common/forms/customFields/CustomFieldCaptureInputList";
+import {DismissableAlert} from "../../common/errors";
 
 const AssayTaskCompleteModal = ({
     modalIsOpen,
@@ -28,25 +30,33 @@ const AssayTaskCompleteModal = ({
     formikRef
 }) => {
 
+  const defaultValues = {
+    label: "",
+    fields: [],
+    data: {}
+  };
+
   const taskSchema = yup.object().shape({
-    label: yup.string()
-      .required("Label is required")
-      .max(1024, "Label must be less than 1024 characters"),
-    status: yup.string()
-      .required("Status is required"),
-    assignedTo: yup.object()
-      .nullable(true),
-    fields: yup.array().of(yup.object())
+    data: yup.object()
     .test(
-        "not empty",
-        "Field labels must not be empty",
-        value => !value.find(d => !d.fieldName || d.fieldName.trim() === '')
+        "required fields",
+        "Required field inputs are missing",
+        (value, context) => {
+          const requiredFields = context.parent.fields
+              ? context.parent.fields.filter(f => f.required)
+              : [];
+          return requiredFields.every(f => {
+            return value[f.fieldName] !== undefined
+                && value[f.fieldName] !== null
+                && value[f.fieldName] !== ""
+          });
+        }
     ),
   })
 
   return (
       <Formik
-          initialValues={task}
+          initialValues={task || defaultValues}
           validationSchema={taskSchema}
           onSubmit={handleFormSubmit}
           innerRef={formikRef}
@@ -66,16 +76,33 @@ const AssayTaskCompleteModal = ({
                 onHide={() => setModalIsOpen(false)}
             >
               <Modal.Header closeButton>
-                <Modal.Title>{task ? "Edit Task" : "New Task"}</Modal.Title>
+                <Modal.Title>Complete task: {values.label}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <FormikForm autoComplete={"off"}>
 
-                  <TaskControls
-                      task={values}
+                  <Row>
+                    <Col>
+                      <p>Please provide any required input to complete the task.</p>
+                    </Col>
+                  </Row>
+
+                  {
+                    errors && errors.data && (
+                        <DismissableAlert color={"warning"} message={"One or more required fields has errors."}/>
+                      )
+                  }
+
+                  <CustomFieldCaptureInputList
+                      fields={values.fields}
+                      data={values.data}
+                      handleUpdate={data => {
+                        setFieldValue("data", {
+                          ...values.data,
+                          ...data
+                        });
+                      }}
                       errors={errors}
-                      touched={touched}
-                      handleUpdate={(field, value) => setFieldValue(field, value)}
                       colWidth={12}
                   />
 

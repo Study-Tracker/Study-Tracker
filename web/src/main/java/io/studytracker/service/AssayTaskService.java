@@ -16,14 +16,26 @@
 
 package io.studytracker.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayTaskField;
+import io.studytracker.model.CustomEntityFieldType;
+import io.studytracker.model.FileStorageLocation;
+import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.TaskStatus;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTaskFieldRepository;
 import io.studytracker.repository.AssayTaskRepository;
+import io.studytracker.storage.DataFileStorageService;
+import io.studytracker.storage.StorageFile;
+import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
+import io.studytracker.storage.StudyStorageService;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +61,12 @@ public class AssayTaskService {
 
   @Autowired
   private AssayTaskFieldRepository assayTaskFieldRepository;
+
+  @Autowired
+  private StorageLocationService storageLocationService;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   public Optional<AssayTask> findById(Long id) {
     return assayTaskRepository.findById(id);
@@ -91,6 +109,7 @@ public class AssayTaskService {
 
   @Transactional
   public AssayTask updateAssayTask(AssayTask task, Assay assay) {
+    LOGGER.info("Updating task {} of assay {}: {}", task.getId(), assay.getCode(), task);
     AssayTask t = assayTaskRepository.getById(task.getId());
     t.setAssay(assay);
     t.setStatus(task.getStatus());
@@ -111,6 +130,43 @@ public class AssayTaskService {
 
   @Transactional
   public void updateAssayTaskStatus(AssayTask task, TaskStatus status, Map<String, Object> data) {
+    LOGGER.info("Updating task {} status to {}: {}", task.getId(), status, data);
+
+    // Handle uploaded files
+    try {
+
+      Assay assay = assayRepository.findById(task.getAssay().getId())
+          .orElseThrow(() -> new InvalidRequestException("Cannot find assay: " + task.getAssay().getId()));
+      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
+      StudyStorageService storageService = storageLocationService
+          .lookupStudyStorageService(location);
+      StorageFolder storageFolder = storageService.findFolder(location, assay);
+      FileStoreFolder folder = FileStoreFolder.from(location, storageFolder);
+
+      for (AssayTaskField field : task.getFields()) {
+        if (field.getType().equals(CustomEntityFieldType.FILE)
+            && task.getData().containsKey(field.getFieldName())
+            && task.getData().get(field.getFieldName()) != null) {
+          try {
+            String localPath = StorageUtils.cleanInputPath(
+                task.getData().get(field.getFieldName()).toString());
+            DataFileStorageService dataFileStorageService =
+                storageLocationService.lookupDataFileStorageService(location);
+            StorageFile movedFile = dataFileStorageService
+                .saveFile(location, folder.getPath(), new File(localPath));
+            task.getData().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
+          } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.warn("Failed to move file for assay: " + assay.getCode());
+          }
+        }
+      }
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      throw new StudyTrackerException("Failed to upload task files", exception);
+    }
+
     AssayTask t = assayTaskRepository.getById(task.getId());
     t.setStatus(status);
     if (data != null) {

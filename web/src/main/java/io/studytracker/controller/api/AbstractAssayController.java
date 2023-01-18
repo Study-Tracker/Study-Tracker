@@ -249,6 +249,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
   }
 
   protected void updateAssayTaskStatus(AssayTask assayTask, Assay assay) {
+    assayTask.setAssay(assay);
     User user = this.getAuthenticatedUser();
     assay.setLastModifiedBy(user);
     this.getAssayTaskService().updateAssayTaskStatus(assayTask, assayTask.getStatus(), assayTask.getData());

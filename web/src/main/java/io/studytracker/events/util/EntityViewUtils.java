@@ -170,6 +170,8 @@ public class EntityViewUtils {
     view.put(
         "assignedTo", task.getAssignedTo() != null ? task.getAssignedTo().getDisplayName() : null);
     view.put("dueDate", task.getDueDate());
+    view.put("fields", task.getFields());
+    view.put("data", task.getData());
     return view;
   }
 

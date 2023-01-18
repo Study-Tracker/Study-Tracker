@@ -30,7 +30,8 @@ const CustomFieldCaptureInputList = ({
   fields,
   data,
   handleUpdate,
-  errors
+  errors,
+  colWidth = 6,
 }) => {
 
   let inputs = fields
@@ -135,7 +136,7 @@ const CustomFieldCaptureInputList = ({
     }
 
     return (
-        <Col key={"field-" + f.fieldName + "-key"} sm={12} md={6}>
+        <Col key={"field-" + f.fieldName + "-key"} md={colWidth}>
           {input}
         </Col>
     );
@@ -153,7 +154,8 @@ CustomFieldCaptureInputList.propTypes = {
   fields: PropTypes.array.isRequired,
   data: PropTypes.object.isRequired,
   handleUpdate: PropTypes.func.isRequired,
-  errors: PropTypes.object.isRequired
+  errors: PropTypes.object.isRequired,
+  colWidth: PropTypes.number,
 }
 
 export default CustomFieldCaptureInputList;

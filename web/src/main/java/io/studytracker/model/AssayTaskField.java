@@ -107,7 +107,6 @@ public class AssayTaskField extends CustomEntityField {
         ", description='" + this.getDescription() + '\'' +
         ", active=" + this.isActive() +
         ", fieldOrder=" + this.getFieldOrder() +
-        ", assayTask=" + assayTask +
         '}';
   }
 }

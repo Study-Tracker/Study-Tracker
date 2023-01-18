@@ -1,4 +1,12 @@
-import {Badge, Card, Col, Dropdown, Row} from "react-bootstrap";
+import {
+  Badge,
+  Card,
+  Col,
+  Dropdown,
+  OverlayTrigger,
+  Row,
+  Tooltip
+} from "react-bootstrap";
 import React from "react";
 import PropTypes from "prop-types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -8,6 +16,8 @@ import {
   faEdit
 } from "@fortawesome/free-regular-svg-icons";
 import {faTrash, faUndoAlt} from "@fortawesome/free-solid-svg-icons";
+import CustomFieldDataTable from "./CustomFieldDataTable";
+import {FileText} from "react-feather";
 
 const TaskStatusBadge = ({status}) => {
 
@@ -51,7 +61,21 @@ const TaskCard = ({
 
             <Col xs={5} className={"d-flex align-items-center"}>
               <div>
-                <span className="fw-bolder">{task.label}</span>
+
+                <span className="fw-bolder text-lg">
+                  {task.label}
+                  {
+                    task.fields && task.fields.length > 0 && task.status !== "COMPLETE" && (
+                      <OverlayTrigger placement={"top"} overlay={(
+                          <Tooltip>This task requires input to complete.</Tooltip>
+                      )}>
+                        {/*<FontAwesomeIcon icon={faFileCircleCheck} className="ms-2 text-info" />*/}
+                        <FileText size={18} className="ms-2 text-info" />
+                      </OverlayTrigger>
+                    )
+                  }
+                </span>
+
                 {
                     task.dueDate && task.status !== "COMPLETE" && (
                         <>
@@ -153,6 +177,24 @@ const TaskCard = ({
             </Col>
 
           </Row>
+
+          {
+            task.status === "COMPLETE" && task.fields.length > 0 && (
+                <Row className={"d-flex justify-content-center mt-4"}>
+                  <Col sm={12} md={10}>
+                    <Row>
+                      <Col xs={12}>
+                        <span className="text-muted">Task Data</span>
+                      </Col>
+                      <Col xs={12}>
+                        <CustomFieldDataTable fields={task.fields} data={task.data} />
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+            )
+          }
+
         </Card.Body>
       </Card>
   )
