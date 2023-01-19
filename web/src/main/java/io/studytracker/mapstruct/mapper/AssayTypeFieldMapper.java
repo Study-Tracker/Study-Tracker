@@ -18,25 +18,31 @@ package io.studytracker.mapstruct.mapper;
 
 import io.studytracker.mapstruct.dto.api.AssayTypeFieldDto;
 import io.studytracker.mapstruct.dto.api.AssayTypeFieldPayloadDto;
+import io.studytracker.mapstruct.dto.form.AssayTypeFieldFormDto;
 import io.studytracker.mapstruct.dto.response.AssayTypeFieldDetailsDto;
 import io.studytracker.model.AssayTypeField;
 import java.util.List;
+import java.util.Set;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface AssayTypeFieldMapper {
 
   AssayTypeFieldDetailsDto toDetailsDto(AssayTypeField field);
-
+  Set<AssayTypeFieldDetailsDto> toDetailsDtoSet(Set<AssayTypeField> fields);
   List<AssayTypeFieldDetailsDto> toDetailsDtoList(List<AssayTypeField> fields);
 
-  AssayTypeField fromDetailsDto(AssayTypeFieldDetailsDto dto);
+  AssayTypeField fromFormDto(AssayTypeFieldFormDto dto);
+  List<AssayTypeField> fromFormDtoList(List<AssayTypeFieldFormDto> dtoList);
+  Set<AssayTypeField> fromFormDtoSet(Set<AssayTypeFieldFormDto> dtoSet);
 
-  List<AssayTypeField> fromDetailsDtoList(List<AssayTypeFieldDetailsDto> dtos);
 
   AssayTypeFieldDto toDto(AssayTypeField field);
   List<AssayTypeFieldDto> toDtoList(List<AssayTypeField> fields);
+  Set<AssayTypeFieldDto> toDtoSet(Set<AssayTypeField> fields);
 
   AssayTypeField fromPayloadDto(AssayTypeFieldPayloadDto dto);
+  List<AssayTypeField> fromPayloadDtoList(List<AssayTypeFieldPayloadDto> dtoList);
+  Set<AssayTypeField> fromPayloadDtoSet(Set<AssayTypeFieldPayloadDto> dtoSet);
 
 }

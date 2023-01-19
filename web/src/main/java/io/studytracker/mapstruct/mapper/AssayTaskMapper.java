@@ -34,9 +34,9 @@ public interface AssayTaskMapper {
 
   List<AssayTaskDetailsDto> toDetailsDtoList(List<AssayTask> tasks);
 
-  AssayTask fromDetailsDto(AssayTaskDetailsDto dto);
-
   AssayTask fromFormDto(AssayTaskFormDto dto);
+  List<AssayTask> fromFormDtoList(List<AssayTaskFormDto> dtoList);
+  Set<AssayTask> fromFormDtoSet(Set<AssayTaskFormDto> dtoSet);
 
   @Mapping(target = "assignedTo", source = "assignedTo.id")
   @Mapping(target = "createdBy", source = "createdBy.id")
@@ -44,7 +44,10 @@ public interface AssayTaskMapper {
   @Mapping(target = "assayId", source = "assay.id")
   AssayTaskDto toDto(AssayTask task);
   List<AssayTaskDto> toDtoList(List<AssayTask> tasks);
+  Set<AssayTask> toDtoSet(Set<AssayTask> tasks);
 
   @Mapping(target = "assignedTo", ignore = true)
   AssayTask fromPayload(AssayTaskPayloadDto dto);
+  List<AssayTask> fromPayloadList(List<AssayTaskPayloadDto> dtoList);
+  Set<AssayTask> fromPayloadSet(Set<AssayTaskPayloadDto> dtoSet);
 }

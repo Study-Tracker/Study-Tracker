@@ -21,8 +21,6 @@ import swal from 'sweetalert';
 import {LoadingOverlay} from "../../common/loading";
 import Select from "react-select";
 import AttributeInputs from "../../common/forms/AttributeInputs";
-import AssayTypeFieldInputs from "./AssayTypeFieldInputs";
-import TaskInputs from "../../common/forms/TaskInputs";
 import {Breadcrumbs} from "../../common/common";
 import {FormGroup} from "../../common/forms/common";
 import {useNavigate} from "react-router-dom";
@@ -32,6 +30,10 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import FormikFormErrorNotification
   from "../../common/forms/FormikFormErrorNotification";
+import TaskControlsDraggableCardList
+  from "../../common/forms/tasks/TaskControlsDraggableCardList";
+import CustomFieldDefinitionDraggableCardList
+  from "../../common/forms/customFields/CustomFieldDefinitionDraggableCardList";
 
 const AssayTypeForm = props => {
 
@@ -84,17 +86,6 @@ const AssayTypeForm = props => {
   });
 
   const handleFormSubmit = (values, {setSubmitting}) => {
-
-    // Get the order of tasks
-    if (!!values.tasks && values.tasks.length > 0) {
-      const tasks = document.getElementById("task-input-container").children;
-      if (tasks.length > 0) {
-        for (let i = 0; i < tasks.length; i++) {
-          let idx = parseInt(tasks[i].dataset.index, 10);
-          values.tasks[idx].order = i;
-        }
-      }
-    }
 
     console.debug("Form values: ", values);
 
@@ -324,11 +315,11 @@ const AssayTypeForm = props => {
 
                         </Row>
 
-                        <AssayTypeFieldInputs
-                            fields={values.fields}
+                        <CustomFieldDefinitionDraggableCardList
                             handleUpdate={(fields) => {
                               setFieldValue("fields", fields)
                             }}
+                            fields={values.fields}
                             error={errors.fields}
                         />
 
@@ -355,12 +346,11 @@ const AssayTypeForm = props => {
 
                         </Row>
 
-                        <TaskInputs
+                        <TaskControlsDraggableCardList
                             tasks={values.tasks}
-                            handleUpdate={(tasks) => {
-                              setFieldValue("tasks", tasks)
-                            }}
-                            error={errors.tasks}
+                            handleUpdate={(tasks) => setFieldValue("tasks", tasks)}
+                            errors={errors}
+                            touched={touched}
                         />
 
                         <Row>

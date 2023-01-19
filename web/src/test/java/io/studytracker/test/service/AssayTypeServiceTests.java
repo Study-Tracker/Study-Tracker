@@ -20,7 +20,11 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.AssayTypeField;
+import io.studytracker.model.AssayTypeTask;
+import io.studytracker.model.AssayTypeTaskField;
 import io.studytracker.model.CustomEntityFieldType;
+import io.studytracker.model.TaskStatus;
+import io.studytracker.repository.AssayTypeTaskFieldRepository;
 import io.studytracker.service.AssayTypeService;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,6 +48,9 @@ public class AssayTypeServiceTests {
   private static final int ASSAY_TYPE_COUNT = ExampleDataGenerator.ASSAY_TYPE_COUNT;
 
   @Autowired private AssayTypeService assayTypeService;
+
+  @Autowired
+  private AssayTypeTaskFieldRepository assayTypeTaskFieldRepository;
 
   @Autowired private ExampleDataGenerator exampleDataGenerator;
 
@@ -91,6 +98,90 @@ public class AssayTypeServiceTests {
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals("Test", optional.get().getName());
     Assert.assertFalse(optional.get().getFields().isEmpty());
+  }
+
+  @Test
+  public void createAssayTypeWithTaskFieldsTest() {
+    Assert.assertEquals(ASSAY_TYPE_COUNT, assayTypeService.count());
+    AssayType assayType = new AssayType();
+    assayType.setActive(true);
+    assayType.setName("Test");
+    assayType.setDescription("This is a test");
+
+    AssayTypeTask task = new AssayTypeTask();
+    task.setLabel("Step 1");
+    task.setOrder(0);
+    task.setStatus(TaskStatus.TODO);
+    task.setAssayType(assayType);
+    AssayTypeTaskField field = new AssayTypeTaskField();
+    field.setType(CustomEntityFieldType.STRING);
+    field.setFieldOrder(0);
+    field.setFieldName("field-1");
+    field.setDisplayName("Field 1");
+    field.setRequired(true);
+    field.setActive(true);
+    field.setDescription("This is a test");
+    field.setAssayTypeTask(task);
+    task.addField(field);
+    assayType.addTask(task);
+
+    task = new AssayTypeTask();
+    task.setLabel("Step 2");
+    task.setOrder(1);
+    task.setAssayType(assayType);
+    task.setStatus(TaskStatus.TODO);
+    field = new AssayTypeTaskField();
+    field.setType(CustomEntityFieldType.INTEGER);
+    field.setFieldOrder(0);
+    field.setFieldName("field-a");
+    field.setDisplayName("Field A");
+    field.setRequired(false);
+    field.setActive(true);
+    field.setDescription("This is a test");
+    field.setAssayTypeTask(task);
+    task.addField(field);
+    assayType.addTask(task);
+
+    assayTypeService.create(assayType);
+    Assert.assertEquals(ASSAY_TYPE_COUNT + 1, assayTypeService.count());
+
+    Optional<AssayType> optional = assayTypeService.findByName("Test");
+    Assert.assertTrue(optional.isPresent());
+    AssayType created = optional.get();
+    Assert.assertEquals("Test", created.getName());
+    Assert.assertFalse(created.getTasks().isEmpty());
+    Assert.assertEquals(2, created.getTasks().size());
+
+    AssayTypeTask task1 = created.getTasks().stream()
+        .filter(t -> t.getLabel().equals("Step 1")).findFirst().get();
+    Assert.assertEquals("Step 1", task1.getLabel());
+    Assert.assertEquals(0, task1.getOrder().intValue());
+    List<AssayTypeTaskField> list = assayTypeTaskFieldRepository.findByAssayTypeTaskId(task1.getId());
+    Assert.assertEquals(1, list.size());
+    AssayTypeTaskField taskField = list.get(0);
+    Assert.assertEquals("field-1", taskField.getFieldName());
+    Assert.assertEquals("Field 1", taskField.getDisplayName());
+    Assert.assertEquals(CustomEntityFieldType.STRING, taskField.getType());
+    Assert.assertEquals(0, taskField.getFieldOrder().intValue());
+    Assert.assertTrue(taskField.isRequired());
+    Assert.assertTrue(taskField.isActive());
+    Assert.assertEquals("This is a test", taskField.getDescription());
+
+    AssayTypeTask task2 = created.getTasks().stream()
+        .filter(t -> t.getLabel().equals("Step 2")).findFirst().get();
+    Assert.assertEquals("Step 2", task2.getLabel());
+    Assert.assertEquals(1, task2.getOrder().intValue());
+    list = assayTypeTaskFieldRepository.findByAssayTypeTaskId(task2.getId());
+    Assert.assertEquals(1, list.size());
+    taskField = list.get(0);
+    Assert.assertEquals("field-a", taskField.getFieldName());
+    Assert.assertEquals("Field A", taskField.getDisplayName());
+    Assert.assertEquals(CustomEntityFieldType.INTEGER, taskField.getType());
+    Assert.assertEquals(0, taskField.getFieldOrder().intValue());
+    Assert.assertFalse(taskField.isRequired());
+    Assert.assertTrue(taskField.isActive());
+    Assert.assertEquals("This is a test", taskField.getDescription());
+
   }
 
   @Test

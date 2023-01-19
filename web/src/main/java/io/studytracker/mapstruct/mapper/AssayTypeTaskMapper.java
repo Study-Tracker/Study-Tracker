@@ -18,22 +18,34 @@ package io.studytracker.mapstruct.mapper;
 
 import io.studytracker.mapstruct.dto.api.AssayTypeTaskDto;
 import io.studytracker.mapstruct.dto.api.AssayTypeTaskPayloadDto;
+import io.studytracker.mapstruct.dto.form.AssayTypeTaskFormDto;
 import io.studytracker.mapstruct.dto.response.AssayTypeTaskDetailsDto;
 import io.studytracker.model.AssayTypeTask;
 import java.util.List;
+import java.util.Set;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface AssayTypeTaskMapper {
 
+  // Internal DTO
   AssayTypeTaskDetailsDto toDetailsDto(AssayTypeTask task);
-
   List<AssayTypeTaskDetailsDto> toDetailsDtoList(List<AssayTypeTask> tasks);
+  Set<AssayTypeTaskDetailsDto> toDetailsDtoSet(Set<AssayTypeTask> tasks);
 
-  AssayTypeTask fromDetailsDto(AssayTypeTaskDetailsDto dto);
-
+  // Public DTO
   AssayTypeTaskDto toDto(AssayTypeTask task);
   List<AssayTypeTaskDto> toDtoList(List<AssayTypeTask> tasks);
+  Set<AssayTypeTaskDto> toDtoSet(Set<AssayTypeTask> tasks);
+
+  // Public payload DTO
   AssayTypeTask fromPayloadDto(AssayTypeTaskPayloadDto dto);
+  Set<AssayTypeTask> fromPayloadDtoSet(Set<AssayTypeTaskPayloadDto> dtos);
+  List<AssayTypeTask> fromPayloadDtoList(List<AssayTypeTaskPayloadDto> dtos);
+
+  // Private form DTO
+  AssayTypeTask fromFormDto(AssayTypeTaskFormDto dto);
+  Set<AssayTypeTask> fromFormDtoSet(Set<AssayTypeTaskFormDto> dto);
+  List<AssayTypeTask> fromFormDtoList(List<AssayTypeTaskFormDto> dto);
 
 }

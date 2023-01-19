@@ -32,17 +32,9 @@ public interface AssayTypeMapper {
 
   List<AssayTypeDetailsDto> toDetailsDtoList(List<AssayType> assayTypes);
 
-  AssayType fromDetailsDto(AssayTypeDetailsDto dto);
-
-  List<AssayType> fromDetailsDtoList(List<AssayTypeDetailsDto> dtos);
-
   AssayTypeSlimDto toSlimDto(AssayType assayType);
 
   List<AssayTypeSlimDto> toSlimDtoList(List<AssayType> assayTypes);
-
-  AssayType fromSlimDto(AssayTypeSlimDto dto);
-
-  List<AssayType> fromSlimDtoList(List<AssayTypeSlimDto> dtos);
 
   AssayType fromFormDto(AssayTypeFormDto dto);
 

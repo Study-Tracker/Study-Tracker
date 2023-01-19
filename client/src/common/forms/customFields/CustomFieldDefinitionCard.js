@@ -17,11 +17,11 @@
 import React from "react";
 import {Card, Col, Form, Row} from 'react-bootstrap'
 import {XCircle} from 'react-feather'
-import {FormGroup} from "../../common/forms/common";
 import PropTypes from "prop-types";
 import Select from "react-select";
+import {FormGroup} from "../common";
 
-const AssayTypeFieldInputCard = ({
+const CustomFieldDefinitionCard = ({
   field,
   index,
   handleFieldUpdate,
@@ -113,8 +113,9 @@ const AssayTypeFieldInputCard = ({
   return (
       <Card className="mb-3 bg-light cursor-grab border">
 
-        <Card.Header className="bg-light pt-0 pb-0">
-          <div className="card-actions float-end">
+        <Card.Header className="bg-light pt-0 pb-0 mt-3 d-flex justify-content-between">
+          <div className="text-muted text-lg">#{index+1}</div>
+          <div className="card-actions">
             <a className="text-danger" title={"Remove field"}
                onClick={() => handleRemoveField(index)}>
               <XCircle className="align-middle mt-3" size={12}/>
@@ -135,7 +136,7 @@ const AssayTypeFieldInputCard = ({
                       let val = e.target.value;
                       handleFieldUpdate({
                         "displayName": val,
-                        "fieldName": val.replace(/[\W]+/g, "_")
+                        "fieldName": val.replace(/\W+/g, "_")
                       }, index);
                     }}
                 />
@@ -216,11 +217,11 @@ const AssayTypeFieldInputCard = ({
   )
 };
 
-AssayTypeFieldInputCard.propTypes = {
+CustomFieldDefinitionCard.propTypes = {
   field: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
   handleFieldUpdate: PropTypes.func.isRequired,
   handleRemoveField: PropTypes.func.isRequired
 }
 
-export default AssayTypeFieldInputCard;
+export default CustomFieldDefinitionCard;

@@ -33,12 +33,10 @@ public class NotebookFeaturesDto {
 
   @JsonProperty("label")
   public String getLabel() {
-    switch (mode) {
-      case "benchling":
-        return "Benchling";
-      default:
-        return "None";
+    if ("benchling".equals(mode)) {
+      return "Benchling";
     }
+    return "None";
   }
 
 }

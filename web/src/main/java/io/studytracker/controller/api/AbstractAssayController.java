@@ -248,6 +248,17 @@ public abstract class AbstractAssayController extends AbstractApiController {
     return updated;
   }
 
+  protected void updateAssayTaskStatus(AssayTask assayTask, Assay assay) {
+    assayTask.setAssay(assay);
+    User user = this.getAuthenticatedUser();
+    assay.setLastModifiedBy(user);
+    this.getAssayTaskService().updateAssayTaskStatus(assayTask, assayTask.getStatus(), assayTask.getData());
+    AssayTask updated = this.getAssayTaskService().findById(assayTask.getId())
+        .orElseThrow(RecordNotFoundException::new);
+    Activity activity = AssayActivityUtils.fromAssayTaskUpdate(assay, user, updated);
+    this.logActivity(activity);
+  }
+
   protected void deleteAssayTask(AssayTask assayTask, Assay assay) {
     User user = this.getAuthenticatedUser();
     assay.setLastModifiedBy(user);

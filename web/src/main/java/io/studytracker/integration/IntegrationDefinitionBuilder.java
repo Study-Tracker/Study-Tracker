@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 
 public class IntegrationDefinitionBuilder {
 
-  private IntegrationDefinition integration;
+  private final IntegrationDefinition integration;
 
   public IntegrationDefinitionBuilder() {
     integration = new IntegrationDefinition();

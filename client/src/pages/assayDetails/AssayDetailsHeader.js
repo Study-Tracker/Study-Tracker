@@ -30,9 +30,9 @@ const AssayDetailsHeader = ({assay, study, handleDelete}) => {
       <Row className="justify-content-between align-items-center">
 
         <Col>
-          <h5 className="text-muted">{assay.assayType.name} Assay</h5>
+          {/*<h5 className="text-muted">{assay.assayType.name} Assay</h5>*/}
           <h3>{assay.name}</h3>
-          <h4>{assay.code}</h4>
+          {/*<h4>{assay.code}</h4>*/}
         </Col>
 
         <Col xs={"auto"} className={"d-flex"}>

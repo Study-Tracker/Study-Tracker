@@ -29,6 +29,7 @@ import javax.persistence.FetchType;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.hibernate.annotations.Type;
@@ -42,7 +43,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NamedEntityGraphs({
   @NamedEntityGraph(
       name = "assay-type-details",
-      attributeNodes = {@NamedAttributeNode("fields"), @NamedAttributeNode("tasks")})
+      attributeNodes = {
+          @NamedAttributeNode("fields"),
+          @NamedAttributeNode(value = "tasks", subgraph = "assay-type-task-details")
+      },
+      subgraphs = {
+          @NamedSubgraph(
+              name = "assay-type-task-details",
+              attributeNodes = {@NamedAttributeNode("fields")}
+          )
+      })
 })
 public class AssayType extends CustomEntity {
 
@@ -126,5 +136,14 @@ public class AssayType extends CustomEntity {
 
   public void setAttributes(Map<String, String> attributes) {
     this.attributes = attributes;
+  }
+
+  @Override
+  public String toString() {
+    return "AssayType{" +
+        "fields=" + (fields != null ? fields.toString() : "[...]") +
+        ", tasks=" + (tasks != null ? tasks.toString() : "[...]") +
+        ", attributes=" + attributes +
+        '}';
   }
 }

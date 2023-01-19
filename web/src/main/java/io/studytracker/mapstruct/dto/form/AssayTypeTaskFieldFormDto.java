@@ -14,32 +14,24 @@
  * limitations under the License.
  */
 
-import React from "react";
-import PropTypes from "prop-types";
+package io.studytracker.mapstruct.dto.form;
 
-const TaskInputList = props => {
+import io.studytracker.model.CustomEntityFieldType;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
 
-  const handleContainerLoaded = container => {
-    if (container) {
-      props.onContainerLoaded(container);
-    }
-  }
+@Data
+public class AssayTypeTaskFieldFormDto {
 
-  return (
-      <div
-          id="task-input-container"
-          ref={handleContainerLoaded}
-          className={props.isInvalid ? "is-invalid" : ""}
-      >
-        {props.children}
-      </div>
-  )
-
+  private Long id;
+  private @NotEmpty String displayName;
+  private String fieldName;
+  private @NotNull CustomEntityFieldType type;
+  private boolean required = false;
+  private String description;
+  private boolean active = true;
+  private @NotNull Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }
-
-TaskInputList.propTypes = {
-  onContainerLoaded: PropTypes.func.isRequired,
-  isInvalid: PropTypes.bool
-}
-
-export default TaskInputList;

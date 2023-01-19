@@ -80,7 +80,7 @@ const StudyDetails = props => {
           <Col>
             <Breadcrumb>
               <Breadcrumb.Item href={"/"}>Home</Breadcrumb.Item>
-              <Breadcrumb.Item active>Study Detail</Breadcrumb.Item>
+              <Breadcrumb.Item active>Study {study.code}</Breadcrumb.Item>
             </Breadcrumb>
           </Col>
         </Row>

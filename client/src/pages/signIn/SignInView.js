@@ -36,6 +36,8 @@ const SignInView = props => {
     .then(response => setSsoOptions(response.data));
   }, []);
 
+  console.debug("SSO Options: ", ssoOptions);
+
   return (
       <NoNavWrapper>
         <SignInForm

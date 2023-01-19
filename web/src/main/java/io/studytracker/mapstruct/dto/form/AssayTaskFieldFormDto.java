@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-import React from "react";
-import SideBar from "./SideBar";
-import NavBar from "./NavBar";
-import Footer from "./Footer";
-import StudyFilters from "../filters/filters";
+package io.studytracker.mapstruct.dto.form;
 
-const MainPageWrapper = ({children, user}) => (
-    <React.Fragment>
-      <div className="wrapper">
-        <SideBar/>
-        <div className="main">
-          <NavBar />
-          <div className="content">
-            {children}
-          </div>
-          <Footer/>
-        </div>
-      </div>
-      <StudyFilters/>
-    </React.Fragment>
-);
+import io.studytracker.model.CustomEntityFieldType;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
 
-export default MainPageWrapper;
+@Data
+public class AssayTaskFieldFormDto {
+
+  private Long id;
+  private @NotEmpty String displayName;
+  private String fieldName;
+  private @NotNull CustomEntityFieldType type;
+  private boolean required = false;
+  private String description;
+  private boolean active = true;
+  private @NotNull Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
+}

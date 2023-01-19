@@ -25,4 +25,11 @@ public class UserSlimDto {
   private String displayName;
   private String email;
   private String username;
+
+  public UserSlimDto() {
+  }
+
+  public UserSlimDto(Long id) {
+    this.id = id;
+  }
 }

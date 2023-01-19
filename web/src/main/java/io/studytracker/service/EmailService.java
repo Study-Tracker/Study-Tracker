@@ -32,6 +32,7 @@ public class EmailService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailService.class);
 
+  @Autowired(required = false)
   private JavaMailSender mailSender;
 
   @Autowired
@@ -98,8 +99,4 @@ public class EmailService {
     mailSender.send(message);
   }
 
-  @Autowired(required = false)
-  public void setMailSender(JavaMailSender mailSender) {
-    this.mailSender = mailSender;
-  }
 }

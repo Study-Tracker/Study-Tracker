@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
 
 public class FileStorageLocationBuilder {
 
-  private FileStorageLocation location;
+  private final FileStorageLocation location;
 
   public FileStorageLocationBuilder() {
     location = new FileStorageLocation();

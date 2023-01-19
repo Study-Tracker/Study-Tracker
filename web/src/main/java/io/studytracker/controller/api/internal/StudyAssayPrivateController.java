@@ -17,7 +17,7 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
-import io.studytracker.exception.NotebookException;
+import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.AssayFormDto;
@@ -25,6 +25,7 @@ import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssaySummaryDto;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayOptions;
+import io.studytracker.model.AssayType;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
@@ -67,13 +68,16 @@ public class StudyAssayPrivateController extends AbstractAssayController {
   public HttpEntity<AssayDetailsDto> create(
       @PathVariable("studyId") String studyId,
       @RequestBody @Valid AssayFormDto dto
-  ) throws RecordNotFoundException, NotebookException {
+  ) {
 
     LOGGER.info("Creating assay");
     LOGGER.info(dto.toString());
 
     Study study = this.getStudyFromIdentifier(studyId);
     Assay assay = this.getAssayMapper().fromAssayForm(dto);
+    AssayType assayType = this.getAssayTypeService().findById(dto.getAssayType().getId())
+        .orElseThrow(() -> new InvalidRequestException("Assay type not found: " + dto.getAssayType().getId()));
+    assay.setAssayType(assayType);
     AssayOptions options = this.getAssayMapper().optionsFromAssayForm(dto);
     User user = this.getAuthenticatedUser();
     Assay created = this.createAssay(assay, study, user, options);

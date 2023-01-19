@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 
 public class IntegrationInstanceBuilder {
 
-  private IntegrationInstance instance;
+  private final IntegrationInstance instance;
 
   public IntegrationInstanceBuilder() {
     instance = new IntegrationInstance();

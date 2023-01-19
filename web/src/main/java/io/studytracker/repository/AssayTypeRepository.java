@@ -17,9 +17,11 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.AssayType;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface AssayTypeRepository extends JpaRepository<AssayType, Long> {
 
@@ -29,4 +31,8 @@ public interface AssayTypeRepository extends JpaRepository<AssayType, Long> {
 
   @EntityGraph("assay-type-details")
   Optional<AssayType> findByName(String name);
+
+  @EntityGraph("assay-type-details")
+  @Query("select a from AssayType a")
+  List<AssayType> findAllWithDetails();
 }

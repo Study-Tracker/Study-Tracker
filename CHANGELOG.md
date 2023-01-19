@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added bean property bindings to configuration properties for easier reference and validation. Any misconfigured properties will throw a more accessible error message at startup.
 - Added dropdown-select and file-upload inputs to the Assay Type custom field definitions. You can now also set default values for Assay Type custom fields.
 - Added host information to event payload. This will allow consumers to know which host and what Study Tracker version the event originated from.
+- Added additional functionality to Assay Tasks. You can now assign assign tasks to users, set due dates, and require additional information to be filled out in custom forms when tasks are completed. 
 
 ### Changed
 
@@ -29,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug with study and assay list display, due to missing fields.
 - Fixed a bug where failed study notebook loading would crash the web app.
 - Fixed an issue with missing database records for study and assay folders.
+- Fixed a bug preventing assays to be updated, due to failed end date validation.
 
 ## [0.7.1] - 2022-11-15
 

@@ -21,6 +21,7 @@ import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.Collaborator;
 import io.studytracker.model.Comment;
+import io.studytracker.model.CustomEntityField;
 import io.studytracker.model.ExternalLink;
 import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Keyword;
@@ -170,6 +171,10 @@ public class EntityViewUtils {
     view.put(
         "assignedTo", task.getAssignedTo() != null ? task.getAssignedTo().getDisplayName() : null);
     view.put("dueDate", task.getDueDate());
+    view.put("fields", task.getFields().stream()
+        .map(EntityViewUtils::createCustomEntityFieldView)
+        .collect(Collectors.toList()));
+    view.put("data", task.getData());
     return view;
   }
 
@@ -178,9 +183,25 @@ public class EntityViewUtils {
     view.put("id", assayType.getId());
     view.put("name", assayType.getName());
     view.put("active", assayType.isActive());
-    view.put("fields", assayType.getFields());
+    view.put("fields", assayType.getFields().stream()
+        .map(EntityViewUtils::createCustomEntityFieldView)
+        .collect(Collectors.toList()));
     view.put("tasks", assayType.getTasks());
     view.put("attributes", assayType.getAttributes());
+    return view;
+  }
+
+  public static Map<String, Object> createCustomEntityFieldView(CustomEntityField field) {
+    Map<String, Object> view = new HashMap<>();
+    view.put("id", field.getId());
+    view.put("displayName", field.getDisplayName());
+    view.put("fieldName", field.getFieldName());
+    view.put("fieldOrder", field.getFieldOrder());
+    view.put("defaultValue", field.getDefaultValue());
+    view.put("description", field.getDescription());
+    view.put("type", field.getType());
+    view.put("active", field.isActive());
+    view.put("dropdownOptions", field.getDropdownOptions());
     return view;
   }
 

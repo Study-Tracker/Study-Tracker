@@ -34,12 +34,17 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.AssayFormDto;
+import io.studytracker.mapstruct.dto.form.AssayTaskFieldFormDto;
+import io.studytracker.mapstruct.dto.form.AssayTaskFormDto;
+import io.studytracker.mapstruct.dto.response.AssayTypeDetailsDto;
 import io.studytracker.mapstruct.dto.response.UserSlimDto;
 import io.studytracker.mapstruct.mapper.AssayMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
+import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
+import io.studytracker.model.TaskStatus;
 import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
@@ -50,6 +55,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -140,24 +146,29 @@ public class StudyAssayPrivateControllerTests {
 
     AssayType assayType =
         assayTypeRepository.findByName("Histology").orElseThrow(RecordNotFoundException::new);
+    AssayTypeDetailsDto assayTypeDto = new AssayTypeDetailsDto();
+    assayTypeDto.setId(assayType.getId());
+
     Assert.assertEquals(NUM_ASSAYS, assayRepository.count());
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     User user = study.getOwner();
+    UserSlimDto userDto = new UserSlimDto();
+    userDto.setId(user.getId());
 
-    Assay assay = new Assay();
-    assay.setStudy(study);
+    AssayFormDto assay = new AssayFormDto();
     assay.setActive(true);
     assay.setName("Test assay");
     assay.setDescription("This is a test");
     assay.setStatus(Status.IN_PLANNING);
     assay.setStartDate(new Date());
-    assay.setAssayType(assayType);
-    assay.setOwner(user);
-    assay.setUsers(Collections.singleton(user));
-    assay.setCreatedBy(user);
-    assay.setLastModifiedBy(user);
+    assay.setAssayType(assayTypeDto);
+    assay.setOwner(userDto);
+    assay.setUsers(Collections.singleton(userDto));
+    assay.setCreatedBy(userDto);
+    assay.setLastModifiedBy(userDto);
     assay.setUpdatedAt(new Date());
     assay.setAttributes(Collections.singletonMap("key", "value"));
+
     Map<String, Object> fields = new LinkedHashMap<>();
     fields.put("number_of_slides", 10);
     fields.put("antibodies", "AKT1, AKT2, AKT3");
@@ -167,12 +178,31 @@ public class StudyAssayPrivateControllerTests {
     fields.put("stain", "DAPI");
     assay.setFields(fields);
 
+    Set<AssayTaskFormDto> tasks = new HashSet<>();
+    AssayTaskFormDto task = new AssayTaskFormDto();
+    task.setLabel("Step 1");
+    task.setStatus(TaskStatus.TODO);
+    task.setOrder(0);
+    task.setAssignedTo(userDto);
+    task.setDueDate(new Date());
+    tasks.add(task);
+    AssayTaskFieldFormDto taskField = new AssayTaskFieldFormDto();
+    taskField.setDisplayName("Text field");
+    taskField.setFieldName("text_field");
+    taskField.setFieldOrder(0);
+    taskField.setActive(true);
+    taskField.setRequired(true);
+    taskField.setType(CustomEntityFieldType.STRING);
+    taskField.setDescription("This is a text field");
+    task.setFields(Collections.singleton(taskField));
+    assay.setTasks(tasks);
+
     mockMvc
         .perform(
             post("/api/internal/study/XXXXXX/assays/")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
+                .content(objectMapper.writeValueAsBytes(assay)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isNotFound());
 
@@ -181,7 +211,7 @@ public class StudyAssayPrivateControllerTests {
             post("/api/internal/study/" + study.getCode() + "/assays/")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
+                .content(objectMapper.writeValueAsBytes(assay)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().is3xxRedirection());
 
@@ -190,7 +220,7 @@ public class StudyAssayPrivateControllerTests {
             post("/api/internal/study/" + study.getCode() + "/assays/")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(assayMapper.toAssayDetails(assay))))
+                .content(objectMapper.writeValueAsBytes(assay)))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
@@ -198,14 +228,75 @@ public class StudyAssayPrivateControllerTests {
         .andExpect(jsonPath("$", hasKey("name")))
         .andExpect(jsonPath("$.name", is("Test assay")))
         .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is("CPA-10001-001")));
+        .andExpect(jsonPath("$.code", is("CPA-10001-001")))
+    ;
+
+    Assay created = assayRepository.findByStudyId(study.getId()).get(0);
 
     mockMvc
-        .perform(get("/api/internal/study/CPA-10001/assays").with(user(username)).with(csrf()))
+        .perform(get("/api/internal/assay/" + created.getId()).with(user(username)).with(csrf()))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("code")))
-        .andExpect(jsonPath("$[0].code", is("CPA-10001-001")));
+        .andExpect(jsonPath("$", hasKey("id")))
+        .andExpect(jsonPath("$.id", is(created.getId().intValue())))
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is("CPA-10001-001")))
+        .andExpect(jsonPath("$", hasKey("name")))
+        .andExpect(jsonPath("$.name", is("Test assay")))
+        .andExpect(jsonPath("$", hasKey("status")))
+        .andExpect(jsonPath("$.status", is("IN_PLANNING")))
+        .andExpect(jsonPath("$", hasKey("active")))
+        .andExpect(jsonPath("$.active", is(true)))
+        .andExpect(jsonPath("$", hasKey("assayType")))
+        .andExpect(jsonPath("$.assayType", hasKey("name")))
+        .andExpect(jsonPath("$.assayType.name", is("Histology")))
+        .andExpect(jsonPath("$", hasKey("owner")))
+        .andExpect(jsonPath("$.owner", hasKey("id")))
+        .andExpect(jsonPath("$.owner.id", is(user.getId().intValue())))
+        .andExpect(jsonPath("$", hasKey("fields")))
+        .andExpect(jsonPath("$.fields", hasKey("number_of_slides")))
+        .andExpect(jsonPath("$.fields.number_of_slides", is(10)))
+        .andExpect(jsonPath("$.fields", hasKey("antibodies")))
+        .andExpect(jsonPath("$.fields.antibodies", is("AKT1, AKT2, AKT3")))
+        .andExpect(jsonPath("$.fields", hasKey("concentration")))
+        .andExpect(jsonPath("$.fields.concentration", is(1.2345)))
+        .andExpect(jsonPath("$.fields", hasKey("date")))
+        .andExpect(jsonPath("$.fields.date", notNullValue()))
+        .andExpect(jsonPath("$.fields", hasKey("external")))
+        .andExpect(jsonPath("$.fields.external", is(true)))
+        .andExpect(jsonPath("$.fields", hasKey("stain")))
+        .andExpect(jsonPath("$.fields.stain", is("DAPI")))
+        .andExpect(jsonPath("$", hasKey("attributes")))
+        .andExpect(jsonPath("$.attributes", hasKey("key")))
+        .andExpect(jsonPath("$.attributes.key", is("value")))
+        .andExpect(jsonPath("$", hasKey("tasks")))
+        .andExpect(jsonPath("$.tasks", hasSize(1)))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("label")))
+        .andExpect(jsonPath("$.tasks[0].label", is("Step 1")))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("status")))
+        .andExpect(jsonPath("$.tasks[0].status", is("TODO")))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("order")))
+        .andExpect(jsonPath("$.tasks[0].order", is(0)))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("assignedTo")))
+        .andExpect(jsonPath("$.tasks[0].assignedTo", hasKey("id")))
+        .andExpect(jsonPath("$.tasks[0].assignedTo.id", is(user.getId().intValue())))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("dueDate")))
+        .andExpect(jsonPath("$.tasks[0].dueDate", notNullValue()))
+        .andExpect(jsonPath("$.tasks[0]", hasKey("fields")))
+        .andExpect(jsonPath("$.tasks[0].fields", hasSize(1)))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("displayName")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].displayName", is("Text field")))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("fieldName")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].fieldName", is("text_field")))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("fieldOrder")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].fieldOrder", is(0)))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("required")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].required", is(true)))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("active")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].active", is(true)))
+        .andExpect(jsonPath("$.tasks[0].fields[0]", hasKey("type")))
+        .andExpect(jsonPath("$.tasks[0].fields[0].type", is("STRING")))
+    ;
   }
 
   @Test

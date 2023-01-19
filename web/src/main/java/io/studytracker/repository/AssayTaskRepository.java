@@ -18,12 +18,18 @@ package io.studytracker.repository;
 
 import io.studytracker.model.AssayTask;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface AssayTaskRepository extends JpaRepository<AssayTask, Long> {
+
+  @EntityGraph("assay-task-details")
+  @Override
+  Optional<AssayTask> findById(Long id);
 
   @Query("select v from AssayTask v where v.assay.id = ?1")
   List<AssayTask> findByAssayId(Long assayId);

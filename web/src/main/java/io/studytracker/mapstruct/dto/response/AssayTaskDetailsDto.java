@@ -18,6 +18,10 @@ package io.studytracker.mapstruct.dto.response;
 
 import io.studytracker.model.TaskStatus;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import lombok.Data;
 
 @Data
@@ -33,4 +37,8 @@ public class AssayTaskDetailsDto {
   private UserSlimDto lastModifiedBy;
   private UserSlimDto assignedTo;
   private Date dueDate;
+
+  private Set<AssayTaskFieldDetailsDto> fields = new HashSet<>();
+
+  private Map<String, Object> data = new HashMap<>();
 }

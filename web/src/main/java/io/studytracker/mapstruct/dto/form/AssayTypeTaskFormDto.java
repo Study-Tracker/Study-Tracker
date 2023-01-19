@@ -14,32 +14,21 @@
  * limitations under the License.
  */
 
-import {Col, Row} from "react-bootstrap";
-import React from "react";
-import PropTypes from "prop-types";
+package io.studytracker.mapstruct.dto.form;
 
-const AssayAttributes = ({attributes}) => {
-  let items = [];
-  for (let k of Object.keys(attributes)) {
-    let v = attributes[k];
-    items.push(
-        <div key={"assay-attributes-" + k}>
-          <h6 className="details-label">{k}</h6>
-          <p>{v || "n/a"}</p>
-        </div>
-    )
-  }
-  return (
-      <Row>
-        <Col xs={12}>
-          {items}
-        </Col>
-      </Row>
-  )
-};
+import io.studytracker.model.TaskStatus;
+import java.util.HashSet;
+import java.util.Set;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
 
-AssayAttributes.propTypes = {
-  attributes: PropTypes.object.isRequired
+@Data
+public class AssayTypeTaskFormDto {
+
+  private Long id;
+  @NotNull private TaskStatus status;
+  @NotNull private String label;
+  private Integer order;
+  private Set<AssayTypeTaskFieldFormDto> fields = new HashSet<>();
+
 }
-
-export default AssayAttributes;

@@ -14,32 +14,22 @@
  * limitations under the License.
  */
 
-import React from "react";
-import PropTypes from "prop-types";
+package io.studytracker.mapstruct.dto.response;
 
-const AssayTypeFieldInputList = props => {
+import io.studytracker.model.CustomEntityFieldType;
+import lombok.Data;
 
-  const handleContainerLoaded = container => {
-    if (container) {
-      props.onContainerLoaded(container);
-    }
-  }
+@Data
+public class AssayTypeTaskFieldDetailsDto {
 
-  return (
-      <div
-          id="field-input-container"
-          ref={handleContainerLoaded}
-          className={props.isInvalid ? "is-invalid" : ""}
-      >
-        {props.children}
-      </div>
-  )
-
+  private Long id;
+  private String displayName;
+  private String fieldName;
+  private CustomEntityFieldType type;
+  private boolean required = false;
+  private String description;
+  private boolean active = true;
+  private Integer fieldOrder;
+  private String defaultValue;
+  private String dropdownOptions;
 }
-
-AssayTypeFieldInputList.propTypes = {
-  onContainerLoaded: PropTypes.func.isRequired,
-  isInvalid: PropTypes.bool
-}
-
-export default AssayTypeFieldInputList;

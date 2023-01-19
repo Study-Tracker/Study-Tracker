@@ -25,12 +25,11 @@ public class LocalFileSystemOptionsFactory {
     if (!instance.getDefinition().getType().equals(IntegrationType.LOCAL_FILE_SYSTEM)) {
       throw new IllegalArgumentException("Integration type is not " + IntegrationType.LOCAL_FILE_SYSTEM);
     }
-    switch (instance.getDefinition().getVersion()) {
-      case 1:
-        return new LocalFileSystemIntegrationV1(instance);
-      default:
-        throw new IllegalArgumentException("Unsupported integration version: " + instance.getDefinition().getVersion());
+    if (instance.getDefinition().getVersion() == 1) {
+      return new LocalFileSystemIntegrationV1(instance);
     }
+    throw new IllegalArgumentException(
+        "Unsupported integration version: " + instance.getDefinition().getVersion());
   }
 
 }

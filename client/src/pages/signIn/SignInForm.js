@@ -28,12 +28,10 @@ const SignInForm = ({ssoOptions, isError, message}) => {
     });
   }
 
-  console.debug("SSO Options: ", ssoOptions);
-
   return (
       <Container fluid className="animated fadeIn">
         <Row className="justify-content-center">
-          <Col xs={12} sm={10} md={8} lg={6} xl={4}>
+          <Col xs={12} sm={10} md={8} lg={6}>
 
             <div className="text-center mt-4">
               <h2>Welcome to Study Tracker</h2>
