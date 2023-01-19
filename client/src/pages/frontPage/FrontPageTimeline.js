@@ -62,7 +62,7 @@ const FrontPageTimeline = ({
 
             <Row className="study-statistics">
 
-              <Col xs={12} sm={6} md={4} lg={12} className="d-flex">
+              <Col xs={12} sm={6} md={6} lg={12} className="d-flex">
                 <WelcomeBack/>
               </Col>
 
@@ -70,16 +70,16 @@ const FrontPageTimeline = ({
                 <ActiveStudies count={userStats.activeStudyCount}/>
               </Col>
 
-              <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">
+              <Col xs={12} sm={6}md={4} lg={12} className="d-flex">
                 <NewStudies count={newStudies}/>
               </Col>
 
-              <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">
+              <Col xs={12} sm={6} md={4} lg={12} className="d-flex">
                 <CompletedStudies count={completedStudies}
                                   label={"Completed Studies This Month"}/>
               </Col>
 
-              <Col xs={12} sm={6} sm={4} md={3} lg={12} className="d-flex">
+              <Col xs={12} sm={6} md={4} lg={12} className="d-flex">
                 <TotalStudies count={totalStudies}/>
               </Col>
 

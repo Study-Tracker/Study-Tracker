@@ -323,14 +323,6 @@ const AssayTypeForm = props => {
                             error={errors.fields}
                         />
 
-                        {/*<AssayTypeFieldInputs*/}
-                        {/*    fields={values.fields}*/}
-                        {/*    handleUpdate={(fields) => {*/}
-                        {/*      setFieldValue("fields", fields)*/}
-                        {/*    }}*/}
-                        {/*    error={errors.fields}*/}
-                        {/*/>*/}
-
                         <Row>
                           <Col>
                             <hr/>

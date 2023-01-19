@@ -46,6 +46,7 @@ public class GitLabRestClientTests {
   @Autowired
   private GitLabRestClient client;
 
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private GitLabOptions options;
 

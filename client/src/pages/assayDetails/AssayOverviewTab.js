@@ -112,7 +112,6 @@ const AssayOverviewTab = ({
                         <Row>
                           <Col xs={12}>
                             <Card.Title>{assay.assayType.name} Metadata</Card.Title>
-                            {/*<AssayFieldData assay={assay}/>*/}
                             <AssayFieldDataTable assay={assay}/>
                           </Col>
                         </Row>

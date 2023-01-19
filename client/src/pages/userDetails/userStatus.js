@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Badge, Button, Dropdown} from "react-bootstrap";
+import {Button, Dropdown} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import {statuses} from "../../config/userActivityConstants";
@@ -76,8 +76,3 @@ export const SelectableUserStatusButton = props => {
   )
 
 }
-
-export const UserStatusBadge = ({status}) => {
-  const config = !!status ? statuses.ACTIVE : statuses.INACTIVE;
-  return <Badge bg={config.color}>{config.label}</Badge>
-};

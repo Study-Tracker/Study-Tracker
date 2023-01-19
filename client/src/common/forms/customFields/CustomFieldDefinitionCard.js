@@ -136,7 +136,7 @@ const CustomFieldDefinitionCard = ({
                       let val = e.target.value;
                       handleFieldUpdate({
                         "displayName": val,
-                        "fieldName": val.replace(/[\W]+/g, "_")
+                        "fieldName": val.replace(/\W+/g, "_")
                       }, index);
                     }}
                 />

@@ -67,64 +67,68 @@ const AttributeInputs = props => {
     props.handleUpdate(arrayToAttributeMap(updated));
   }
 
-  let inputs = attributes
-  .filter(attribute => !attribute.key.startsWith("_"))
-  .map((a, i) => {
-    return (
-        <Row key={'attributes-inputs-' + i}>
-          <Col xs={5}>
-            <FormGroup>
-              <Form.Label/>
-              <Form.Control
-                  type="text"
-                  value={a.key}
-                  onChange={(e) => handleValueUpdate(e.target.value,
-                      a.value, i)}
-              />
-            </FormGroup>
-          </Col>
-          <Col xs={5}>
-            <FormGroup>
-              <Form.Label/>
-              <Form.Control
-                  type="text"
-                  value={a.value}
-                  onChange={(e) => handleValueUpdate(a.key,
-                      e.target.value, i)}
-              />
-            </FormGroup>
-          </Col>
-          <Col xs={2}>
-            <a
-                className="text-danger"
-                title={"Remove attribute"}
-                onClick={() => handleRemoveAttributeClick(i)}
-            >
-              <Trash className="align-middle mt-4" size={18}/>
-            </a>
-          </Col>
-        </Row>
-    )
-  });
-
   return (
       <React.Fragment>
 
-        <Row>
-          <Col xs={5}>
-            <FormGroup>
-              <Form.Label>Name</Form.Label>
-            </FormGroup>
-          </Col>
-          <Col xs={5}>
-            <FormGroup>
-              <Form.Label>Value</Form.Label>
-            </FormGroup>
-          </Col>
-          <Col xs={2}></Col>
-        </Row>
+        {
+          attributes.length > 0 && (
+                <Row>
+                  <Col xs={5}>
+                    <FormGroup>
+                      <Form.Label>Name</Form.Label>
+                    </FormGroup>
+                  </Col>
+                  <Col xs={5}>
+                    <FormGroup>
+                      <Form.Label>Value</Form.Label>
+                    </FormGroup>
+                  </Col>
+                  <Col xs={2}></Col>
+                </Row>
+          )
+        }
 
-        {inputs}
+        {
+          attributes
+          .filter(attribute => !attribute.key.startsWith("_"))
+          .map((a, i) => {
+            return (
+                <Row key={'attributes-inputs-' + i}>
+                  <Col xs={5}>
+                    <FormGroup>
+                      <Form.Label/>
+                      <Form.Control
+                          type="text"
+                          value={a.key}
+                          onChange={(e) => handleValueUpdate(e.target.value,
+                              a.value, i)}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={5}>
+                    <FormGroup>
+                      <Form.Label/>
+                      <Form.Control
+                          type="text"
+                          value={a.value}
+                          onChange={(e) => handleValueUpdate(a.key,
+                              e.target.value, i)}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col xs={2}>
+                    <a
+                        className="text-danger"
+                        title={"Remove attribute"}
+                        onClick={() => handleRemoveAttributeClick(i)}
+                    >
+                      <Trash className="align-middle mt-4" size={18}/>
+                    </a>
+                  </Col>
+                </Row>
+            )
+          })
+        }
 
         {
           !!props.error

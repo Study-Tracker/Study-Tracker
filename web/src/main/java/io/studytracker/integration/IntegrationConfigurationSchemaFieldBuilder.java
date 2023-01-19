@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 
 public class IntegrationConfigurationSchemaFieldBuilder {
 
-  private IntegrationConfigurationSchemaField field;
+  private final IntegrationConfigurationSchemaField field;
 
   public IntegrationConfigurationSchemaFieldBuilder() {
     field = new IntegrationConfigurationSchemaField();

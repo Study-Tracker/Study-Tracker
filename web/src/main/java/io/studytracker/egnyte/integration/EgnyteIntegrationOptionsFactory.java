@@ -10,12 +10,10 @@ public class EgnyteIntegrationOptionsFactory {
       throw new IllegalArgumentException("Integration type is not Egnyte");
     }
 
-    switch (instance.getDefinition().getVersion()) {
-      case 1:
-        return new EgnyteIntegrationV1(instance);
-      default:
-        throw new IllegalArgumentException("Unsupported Egnyte integration version");
+    if (instance.getDefinition().getVersion() == 1) {
+      return new EgnyteIntegrationV1(instance);
     }
+    throw new IllegalArgumentException("Unsupported Egnyte integration version");
   }
 
 }
