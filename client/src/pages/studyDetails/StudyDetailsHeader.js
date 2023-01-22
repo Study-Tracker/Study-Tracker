@@ -17,7 +17,8 @@
 import {useNavigate} from "react-router-dom";
 import {Button, Col, Dropdown, Row} from "react-bootstrap";
 import React from "react";
-import {SelectableStatusButton} from "../../common/status";
+import SelectableStatusButton
+  from "../../common/detailsPage/SelectableStatusButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
   faBars,

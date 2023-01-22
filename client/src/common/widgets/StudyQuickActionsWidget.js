@@ -16,10 +16,19 @@
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPersonRunning,} from "@fortawesome/free-solid-svg-icons";
-import {faFolderOpen, faPlusSquare} from "@fortawesome/free-regular-svg-icons";
+import {
+  faPersonRunning,
+  faTriangleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faFolderOpen,
+  faPlusSquare,
+  faSquareCheck
+} from "@fortawesome/free-regular-svg-icons";
 import React from "react";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
+import NotyfContext from "../../context/NotyfContext";
 
 const StudyQuickActionsWidget = ({
     study,
@@ -27,6 +36,21 @@ const StudyQuickActionsWidget = ({
 }) => {
 
   const navigate = useNavigate();
+  const notyf = React.useContext(NotyfContext);
+
+  const handleStatusChange = (status) => {
+    axios.post("/api/internal/study/" + study.id + "/status", {
+      status: status
+    })
+    .then(() => window.location.reload())
+    .catch(e => {
+      notyf.open({
+        type: 'error',
+        message: 'Error changing status'
+      });
+      console.error(e);
+    });
+  }
 
   return (
       <Card className="illustration flex-fill">
@@ -44,9 +68,6 @@ const StudyQuickActionsWidget = ({
                 <h4 className="illustration-text">
                   What's next?
                 </h4>
-                {/*<p className="mb-0">*/}
-                {/*  Jump to the next step in your study workflow.*/}
-                {/*</p>*/}
                 <br/>
                 <Dropdown className="me-1 mb-1">
                   <Dropdown.Toggle variant={"outline-primary"}>
@@ -54,6 +75,33 @@ const StudyQuickActionsWidget = ({
                     Actions
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
+
+                    {
+                      (study.status === "IN_PLANNING" || study.status === "NEEDS_ATTENTION") && (
+                            <Dropdown.Item onClick={() => handleStatusChange("ACTIVE")}>
+                              <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
+                              Set status to 'Active'
+                            </Dropdown.Item>
+                      )
+                    }
+
+                    {
+                        study.status === "ACTIVE" && (
+                            <Dropdown.Item onClick={() => handleStatusChange("COMPLETE")}>
+                              <FontAwesomeIcon icon={faSquareCheck} className={"me-2"}/>
+                              Set status to 'Complete'
+                            </Dropdown.Item>
+                        )
+                    }
+
+                    {
+                        study.status === "COMPLETE" && (
+                            <Dropdown.Item onClick={() => handleStatusChange("NEEDS_ATTENTION")}>
+                              <FontAwesomeIcon icon={faTriangleExclamation} className={"me-2"}/>
+                              Set status to 'Needs attention'
+                            </Dropdown.Item>
+                        )
+                    }
 
                     <Dropdown.Item onClick={() => navigate("/study/" + study.code + "/assays/new")}>
                       <FontAwesomeIcon icon={faPlusSquare} className={"me-2"}/>

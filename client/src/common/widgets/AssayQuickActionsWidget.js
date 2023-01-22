@@ -16,16 +16,35 @@
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPersonRunning, faPlusSquare} from "@fortawesome/free-solid-svg-icons";
+import {
+  faPersonRunning,
+  faTriangleExclamation
+} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
-import {useNavigate} from "react-router-dom";
 import PropTypes from "prop-types";
+import {faSquareCheck} from "@fortawesome/free-regular-svg-icons";
+import NotyfContext from "../../context/NotyfContext";
+import axios from "axios";
 
 const AssayQuickActionsWidget = ({
     assay
 }) => {
 
-  const navigate = useNavigate();
+  const notyf = React.useContext(NotyfContext);
+
+  const handleStatusChange = (status) => {
+    axios.post("/api/internal/assay/" + assay.id + "/status", {
+      status: status
+    })
+    .then(() => window.location.reload())
+    .catch(e => {
+      notyf.open({
+        type: 'error',
+        message: 'Error changing status'
+      });
+      console.error(e);
+    });
+  }
 
   return (
       <Card className="illustration flex-fill">
@@ -43,9 +62,6 @@ const AssayQuickActionsWidget = ({
                 <h4 className="illustration-text">
                   What's next?
                 </h4>
-                {/*<p className="mb-0">*/}
-                {/*  Jump to the next step in your assay workflow.*/}
-                {/*</p>*/}
                 <br/>
                 <Dropdown className="me-1 mb-1">
                   <Dropdown.Toggle variant={"outline-primary"}>
@@ -54,10 +70,32 @@ const AssayQuickActionsWidget = ({
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
 
-                    <Dropdown.Item onClick={() => console.log("Click")}>
-                      <FontAwesomeIcon icon={faPlusSquare} className={"me-2"}/>
-                      TBD
-                    </Dropdown.Item>
+                    {
+                      (assay.status === "IN_PLANNING" || assay.status === "NEEDS_ATTENTION") && (
+                            <Dropdown.Item onClick={() => handleStatusChange("ACTIVE")}>
+                              <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
+                              Set status to 'Active'
+                            </Dropdown.Item>
+                        )
+                    }
+
+                    {
+                        assay.status === "ACTIVE" && (
+                            <Dropdown.Item onClick={() => handleStatusChange("COMPLETE")}>
+                              <FontAwesomeIcon icon={faSquareCheck} className={"me-2"}/>
+                              Set status to 'Complete'
+                            </Dropdown.Item>
+                        )
+                    }
+
+                    {
+                        assay.status === "COMPLETE" && (
+                            <Dropdown.Item onClick={() => handleStatusChange("NEEDS_ATTENTION")}>
+                              <FontAwesomeIcon icon={faTriangleExclamation} className={"me-2"}/>
+                              Set status to 'Needs attention'
+                            </Dropdown.Item>
+                        )
+                    }
 
                   </Dropdown.Menu>
                 </Dropdown>
