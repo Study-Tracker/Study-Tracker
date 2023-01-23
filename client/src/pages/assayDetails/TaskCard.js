@@ -69,7 +69,6 @@ const TaskCard = ({
                       <OverlayTrigger placement={"top"} overlay={(
                           <Tooltip>This task requires input to complete.</Tooltip>
                       )}>
-                        {/*<FontAwesomeIcon icon={faFileCircleCheck} className="ms-2 text-info" />*/}
                         <FileText size={18} className="ms-2 text-info" />
                       </OverlayTrigger>
                     )
