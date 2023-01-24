@@ -32,7 +32,6 @@ const createMarkup = (content) => {
 
 const AssayOverviewTab = ({
   assay,
-  user,
   features,
   handleTabSelect
 }) => {
@@ -179,6 +178,8 @@ const AssayOverviewTab = ({
 
 AssayOverviewTab.propTypes = {
   assay: PropTypes.object.isRequired,
+  features: PropTypes.object.isRequired,
+  handleTabSelect: PropTypes.func.isRequired
 }
 
 export default AssayOverviewTab;

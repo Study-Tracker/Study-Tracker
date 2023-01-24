@@ -24,7 +24,7 @@ import SearchHits from "./SearchHits";
 import {useSearchParams} from "react-router-dom";
 import axios from "axios";
 
-const SearchResultsView = props => {
+const SearchResultsView = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState({
@@ -43,18 +43,6 @@ const SearchResultsView = props => {
     .then(response => {
 
       console.debug(response.data);
-
-      // const data = {};
-      // data.cf = crossfilter(hits);
-      // data.dimensions = {};
-      // data.dimensions.allData = data.cf.dimension(d => d);
-      // data.dimensions[filter.PROGRAM] = data.cf.dimension(d => d.program.id);
-      // data.dimensions[filter.LEGACY] = data.cf.dimension(d => d.legacy);
-      // data.dimensions[filter.EXTERNAL] = data.cf.dimension(
-      //     d => !!d.collaborator);
-      // data.dimensions[filter.MY_STUDY] = data.cf.dimension(
-      //     d => props.user && d.owner.id === props.user.id);
-      // data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
 
       setState(prevState => ({
         ...prevState,
@@ -83,24 +71,7 @@ const SearchResultsView = props => {
 
     } else if (state.isLoaded) {
 
-      // Apply filters
-      // console.log("Filters: ");
-      // console.log(props.filters);
-      //
-      // for (let key of Object.keys(state.data.dimensions)) {
-      //   state.data.dimensions[key].filterAll();
-      //   if (props.filters.hasOwnProperty(key) && props.filters[key]
-      //       != null) {
-      //     if (Array.isArray(props.filters[key])) {
-      //       state.data.dimensions[key].filter(
-      //           d => props.filters[key].indexOf(d) > -1);
-      //     } else {
-      //       state.data.dimensions[key].filter(props.filters[key]);
-      //     }
-      //   }
-      // }
-
-      content = <SearchHits hits={state.hits}/>;
+      content = <SearchHits hits={state.hits.hits}/>;
 
     }
 

@@ -88,6 +88,7 @@ const NavBar = props => {
                       onSubmit={(values => {
                         console.log("Searching for: " + values.q);
                         navigate("/search?q=" + values.q);
+                        navigate(0);
                       })}
                   >
                     {({
@@ -98,6 +99,7 @@ const NavBar = props => {
                             inline="true"
                             className="d-none d-sm-inline-block"
                             onSubmit={handleSubmit}
+                            autoComplete={"off"}
                         >
                           <InputGroup className="input-group-navbar">
                             <Form.Control

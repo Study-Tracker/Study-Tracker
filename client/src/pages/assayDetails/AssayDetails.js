@@ -96,6 +96,7 @@ const AssayDetails = props => {
                 <AssayOverviewTab
                   assay={assay}
                   handleTabSelect={handleTabSelect}
+                  features={features}
                 />
               </Tab>
 
