@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 import {useNavigate} from "react-router-dom";
 import {Button, Col, Dropdown, Row} from "react-bootstrap";
 import React from "react";
-import {SelectableStatusButton} from "../../common/status";
+import SelectableStatusButton
+  from "../../common/detailsPage/SelectableStatusButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
   faBars,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,7 @@
  */
 
 import React from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {Badge, Button, Dropdown} from 'react-bootstrap';
-import swal from "sweetalert";
+import {Badge} from 'react-bootstrap';
 import {
   AlertCircle,
   ArrowDownCircle,
@@ -28,66 +26,6 @@ import {
   XCircle
 } from 'react-feather';
 import {statuses} from "../config/statusConstants";
-import axios from "axios";
-
-export const StatusButton = ({status}) => {
-  const config = statuses[status];
-  return (
-      <Button className="me-1" variant={config.color} disabled>
-        <FontAwesomeIcon icon={config.icon}
-                         className="align-middle"/> {config.label}
-      </Button>
-  )
-};
-
-export const SelectableStatusButton = props => {
-
-  const handleChange = (e) => {
-    let url = null;
-    if (!!props.studyId) {
-      url = "/api/internal/study/" + props.studyId + "/status";
-    } else if (!!props.assayId) {
-      url = "/api/internal/assay/" + props.assayId + "/status"
-    }
-    axios.post(url, {status: e.target.dataset.value})
-    .then(() => window.location.reload())
-    .catch(e => {
-      swal(
-          "Something went wrong",
-          "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-      );
-      console.error(e);
-    });
-  }
-
-  const {status} = props;
-  const config = statuses[status];
-  const options = [];
-  for (const k in statuses) {
-    const s = statuses[k];
-    options.push(
-        <Dropdown.Item
-            key={'status-option-' + s.label}
-            onClick={handleChange}
-            data-value={s.value}
-        >
-          {s.label}
-        </Dropdown.Item>
-    );
-  }
-  return (
-      <Dropdown className="me-1 mb-1">
-        <Dropdown.Toggle variant={config.color}>
-          <FontAwesomeIcon icon={config.icon} className={"me-2"}/>
-          <span className={"me-2"}>{config.label}</span>
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          {options}
-        </Dropdown.Menu>
-      </Dropdown>
-  )
-
-}
 
 export const StatusBadge = ({status}) => {
   const config = statuses[status];

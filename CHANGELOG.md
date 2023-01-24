@@ -7,18 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Study Tracker will eventually deprecate support of Elasticsearch 7.10 in favor of newer versions.
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
-- Updates to the UI of the various 'Details' pages and the main page are in progress.
-- Will update and improve assay task functionality to allow capturing of additional information.
 - Will add a notifications feature that will capture and display notifications for users.
 
-## [0.7.2] - 2022-XX-XX
+## [0.8.0] - 2023-01-26
 
 ### Added
 
+- Added additional functionality to Assay Tasks. You can now assign tasks to users, set due dates, and require additional information to be filled out in custom forms when tasks are completed.
 - Added bean property bindings to configuration properties for easier reference and validation. Any misconfigured properties will throw a more accessible error message at startup.
 - Added dropdown-select and file-upload inputs to the Assay Type custom field definitions. You can now also set default values for Assay Type custom fields.
-- Added host information to event payload. This will allow consumers to know which host and what Study Tracker version the event originated from.
-- Added additional functionality to Assay Tasks. You can now assign assign tasks to users, set due dates, and require additional information to be filled out in custom forms when tasks are completed. 
+- Added host information to event payload. This will allow consumers to know which host and what Study Tracker version the event originated from. 
 
 ### Changed
 
@@ -31,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug where failed study notebook loading would crash the web app.
 - Fixed an issue with missing database records for study and assay folders.
 - Fixed a bug preventing assays to be updated, due to failed end date validation.
+- A number of small UI bugs.
 
 ## [0.7.1] - 2022-11-15
 

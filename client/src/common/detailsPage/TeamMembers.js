@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,13 @@ const TeamMembers = ({users, owner}) => {
   return (
       <div className={"team-members mb-3 pt-2 pb-2"}>
         {
-          users.map((user, i) => {
+          users
+          .sort((a, b) => a.displayName.localeCompare(b.displayName))
+          .sort((a, b) => a.id === owner.id ? -1 : 1)
+          .map((user, i) => {
             return (
-                <OverlayTrigger placement={"top"} overlay={<Tooltip>{user.displayName}</Tooltip>}>
-                  <div key={user.id} className={"team-member team-member-35px team-member-circle"}>
+                <OverlayTrigger placement={"top"} overlay={<Tooltip>{user.displayName}{user.id === owner.id ? " (owner)" : ""}</Tooltip>}>
+                  <div key={user.id} className={"team-member team-member-35px team-member-circle " + (user.id === owner.id ? "team-member-highlight" : "")}>
                     <span className={"team-member-label fw-bold " + (getLabelClass(i))}>{getUserInitials(user)}</span>
                   </div>
                 </OverlayTrigger>

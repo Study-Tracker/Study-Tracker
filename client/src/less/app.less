@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -365,11 +365,6 @@ table td .dropdown {
   background-color: #3f80ea !important;
 }
 
-.team-member:hover {
-  transition: all 0.3s ease;
-  z-index: 1;
-}
-
 /* Team members */
 .team-members {
   display: flex;
@@ -391,6 +386,16 @@ table td .dropdown {
     z-index: 0;
     margin-left: -10px;
     transition: all 0.3s ease;
+
+    &:hover {
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    &.team-member-highlight {
+      border-radius: 2rem;
+      border: #8bcfeb solid 5px;
+    }
 
     .team-member-label {
       display: flex;

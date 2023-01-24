@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import IllustrationWidget from "../../common/widgets/IllustrationWidget";
 import {Button} from "react-bootstrap";
+import {useNavigate} from "react-router-dom";
 
 const AssayTasksWidget = ({tasks, handleClick}) => {
   const activeCount = tasks.filter(t => t.status === 'TODO').length;
@@ -27,6 +28,7 @@ const AssayTasksWidget = ({tasks, handleClick}) => {
   const incompleteCount = tasks.filter(t => t.status === 'INCOMPLETE').length;
   const isEmpty = tasks.length === 0;
   const isComplete = completedCount === tasks.length;
+  const navigate = useNavigate();
 
   if (isEmpty) {
     return (
@@ -36,7 +38,10 @@ const AssayTasksWidget = ({tasks, handleClick}) => {
             body={(
                 <Button
                     color={"primary"}
-                    onClick={() => console.log("Click")}
+                    onClick={() => {
+                      navigate("#tasks");
+                      navigate(0);
+                    }}
                 >
                   Add a task
                 </Button>

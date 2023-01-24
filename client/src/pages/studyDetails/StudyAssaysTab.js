@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,49 +14,157 @@
  * limitations under the License.
  */
 
-import {Button, Card, Col, Row} from "react-bootstrap";
+import {Button, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
-import {AssaySummaryCards} from "../../common/assays";
-import React from "react";
+import {
+  faArrowDown19,
+  faArrowDown91,
+  faArrowDownAZ,
+  faArrowDownZA,
+  faPlusCircle
+} from "@fortawesome/free-solid-svg-icons";
+import React, {useEffect} from "react";
 import PropTypes from "prop-types";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
+import NotyfContext from "../../context/NotyfContext";
+import AssaySummaryCard from "./AssaySummaryCard";
+import StudyAssaysContentPlaceholder from "./StudyAssaysContentPlaceholder";
 
-const StudyAssaysTab = ({study, user}) => {
+const StudyAssaysTab = ({study}) => {
+
+  const sortAtoZ = (a, b) => a.name.localeCompare(b.name);
+  const sortZtoA = (a, b) => b.name.localeCompare(a.name);
+  const sortNewestFirst = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+  const sortOldestFirst = (a, b) => new Date(a.createdAt) - new Date(b.createdAt);
 
   const navigate = useNavigate();
+  const notyf = React.useContext(NotyfContext);
+  const [assays, setAssays] = React.useState([]);
+  const [error, setError] = React.useState(null);
+  const [sortOrder, setSortOrder] = React.useState("NEWEST_FIRST");
+  const [sortIcon, setSortIcon] = React.useState(faArrowDown19);
+
+  useEffect(() => {
+    axios.get("/api/internal/study/" + study.code + "/assays")
+    .then(response => {
+      console.debug("Assays", response.data);
+      setAssays(response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    })
+    .catch(error => {
+      setError(error);
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Error loading assays."
+      })
+    })
+  }, []);
+
+  const handleAssaySort = (order) => {
+    let updated = Array.from(assays);
+    switch (order) {
+      case "A_TO_Z":
+        setAssays(updated.sort(sortAtoZ));
+        setSortIcon(faArrowDownAZ);
+        return;
+      case "Z_TO_A":
+        setAssays(updated.sort(sortZtoA));
+        setSortIcon(faArrowDownZA);
+        return;
+      case "NEWEST_FIRST":
+        setAssays(updated.sort(sortNewestFirst));
+        setSortIcon(faArrowDown19);
+        return;
+      case "OLDEST_FIRST":
+        setAssays(updated.sort(sortOldestFirst));
+        setSortIcon(faArrowDown91);
+        return;
+      default:
+        setAssays(updated.sort(sortNewestFirst));
+        setSortIcon(faArrowDown19);
+        return;
+    }
+  }
+
+  const handleAddAssay = () => {
+    navigate("/study/" + study.code + "/assays/new");
+  }
 
   return (
-      <Card>
-        <Card.Body>
-          <Row className="justify-content-between align-items-center mb-4">
-            <Col>
-              {
-                !!user
-                    ? (
-                        <span className="float-end">
-                          <Button variant="info" onClick={() => navigate(
-                              "/study/" + study.code + "/assays/new")}>
-                            New Assay
-                            &nbsp;
-                            <FontAwesomeIcon icon={faPlusCircle}/>
-                          </Button>
-                        </span>
-                    ) : ''
-              }
-            </Col>
-          </Row>
+      <>
 
-          <AssaySummaryCards studyCode={study.code}/>
-        </Card.Body>
-      </Card>
+        <Row className="mb-3 justify-content-end">
+
+          <div className="col-auto">
+            <Dropdown className="me-1 mb-1">
+              <Dropdown.Toggle variant={"outline-info"}>
+                <FontAwesomeIcon icon={sortIcon} className={"me-2"}/>
+                Sort
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+
+                <Dropdown.Item onClick={() => handleAssaySort("NEWEST_FIRST")}>
+                  Newest first
+                </Dropdown.Item>
+
+                <Dropdown.Item onClick={() => handleAssaySort("OLDEST_FIRST")}>
+                  Oldest first
+                </Dropdown.Item>
+
+                <Dropdown.Item onClick={() => handleAssaySort("A_TO_Z")}>
+                 A-Z
+                </Dropdown.Item>
+
+                <Dropdown.Item onClick={() => handleAssaySort("Z_TO_A")}>
+                  Z-A
+                </Dropdown.Item>
+
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+
+          <div className="col-auto">
+            <Button
+                variant="info"
+                onClick={handleAddAssay}
+            >
+              <FontAwesomeIcon icon={faPlusCircle} className="me-2"/>
+              Add Assay
+            </Button>
+          </div>
+
+        </Row>
+
+        {
+          assays && assays.length > 0 && (
+            assays.map(assay => (
+                <Row>
+                  <Col xs={12}>
+                    <AssaySummaryCard assay={assay} study={study}/>
+                  </Col>
+                </Row>
+            ))
+          )
+        }
+
+        {
+          (!assays || assays.length === 0) && (
+              <Row>
+                <Col xs={12}>
+                  <StudyAssaysContentPlaceholder handleClick={handleAddAssay}/>
+                </Col>
+              </Row>
+          )
+        }
+
+      </>
   );
 
 };
 
 StudyAssaysTab.propTypes = {
-  study: PropTypes.object.isRequired,
-  user: PropTypes.object
+  study: PropTypes.object.isRequired
 }
 
 export default StudyAssaysTab;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,7 @@ const NavBar = props => {
                       onSubmit={(values => {
                         console.log("Searching for: " + values.q);
                         navigate("/search?q=" + values.q);
+                        navigate(0);
                       })}
                   >
                     {({
@@ -98,6 +99,7 @@ const NavBar = props => {
                             inline="true"
                             className="d-none d-sm-inline-block"
                             onSubmit={handleSubmit}
+                            autoComplete={"off"}
                         >
                           <InputGroup className="input-group-navbar">
                             <Form.Control

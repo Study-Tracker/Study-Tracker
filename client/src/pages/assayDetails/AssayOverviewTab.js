@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ const createMarkup = (content) => {
 
 const AssayOverviewTab = ({
   assay,
-  user,
   features,
   handleTabSelect
 }) => {
@@ -179,6 +178,8 @@ const AssayOverviewTab = ({
 
 AssayOverviewTab.propTypes = {
   assay: PropTypes.object.isRequired,
+  features: PropTypes.object.isRequired,
+  handleTabSelect: PropTypes.func.isRequired
 }
 
 export default AssayOverviewTab;

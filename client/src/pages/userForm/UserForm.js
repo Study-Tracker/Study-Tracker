@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,7 +258,10 @@ const UserForm = props => {
                                   name={"email"}
                                   isInvalid={!!errors.email}
                                   value={values.email}
-                                  onChange={handleChange}
+                                  onChange={e => {
+                                    setFieldValue("email", e.target.value);
+                                    setFieldValue("username", e.target.value);
+                                  }}
                               />
                               <Form.Control.Feedback type={"invalid"}>
                                 {errors.email}
@@ -275,6 +278,7 @@ const UserForm = props => {
                                   isInvalid={!!errors.username}
                                   value={values.username}
                                   onChange={handleChange}
+                                  disabled={true}
                               />
                               <Form.Control.Feedback type={"invalid"}>
                                 {errors.username}
