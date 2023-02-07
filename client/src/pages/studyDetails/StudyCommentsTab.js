@@ -47,14 +47,15 @@ const StudyCommentsTab = props => {
       setComments([...comments, newComment]);
       setShowInput(false);
       resetForm();
-      setSubmitting(false);
     })
     .catch(error => {
       console.error(error);
-      setSubmitting(false);
       swal("Your comment failed to create.",
           "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
     })
+    .finally(() => {
+      setSubmitting(false);
+    });
   };
 
   const toggleInput = () => {
@@ -180,7 +181,8 @@ const StudyCommentsTab = props => {
                         values,
                         errors,
                         touched,
-                        handleChange
+                        handleChange,
+                        isSubmitting
                       }) => (
                           <FormikForm>
 
@@ -210,8 +212,9 @@ const StudyCommentsTab = props => {
                             <Button
                                 variant={'primary'}
                                 type="submit"
+                                disabled={isSubmitting}
                             >
-                              Submit
+                              {isSubmitting ? "Saving..." : "Save"}
                             </Button>
 
                           </FormikForm>

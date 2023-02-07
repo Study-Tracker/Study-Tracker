@@ -215,9 +215,12 @@ const ExternalLinks = props => {
                           onClick={() => setModalIsOpen(false)}>
                     Cancel
                   </Button>
-                  <Button variant={"primary"}
-                          onClick={handleSubmit}>
-                    Save
+                  <Button
+                      variant={"primary"}
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Saving..." : "Save"}
                   </Button>
                 </Modal.Footer>
 

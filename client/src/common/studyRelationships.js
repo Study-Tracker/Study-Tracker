@@ -77,7 +77,6 @@ const StudyRelationships = props => {
   const handleFormSubmit = (values, {setSubmitting}) => {
     axios.post("/api/internal/study/" + props.studyCode + "/relationships", values)
     .then(response => {
-      setSubmitting(false);
       setRelationships([...relationships, response.data]);
       setError(null);
       setModalIsOpen(false);
@@ -86,6 +85,9 @@ const StudyRelationships = props => {
       console.error(error);
       setError(error.response.data.message);
     })
+    .finally(() => {
+      setSubmitting(false);
+    });
 
   }
 
@@ -262,8 +264,9 @@ const StudyRelationships = props => {
                   <Button
                       variant={"primary"}
                       onClick={handleSubmit}
+                      disabled={isSubmitting}
                   >
-                    Save
+                    {isSubmitting ? "Saving..." : "Save"}
                   </Button>
                 </Modal.Footer>
 
