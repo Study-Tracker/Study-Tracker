@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
+## [0.8.1] - 2023-02-XX
+
+### Fixed
+
+- Fixed an issue where some study details inputs would not disable on submission, allowing duplicate records to be created if the user clicked the submit button multiple times.
+- Fixed 'My Active Studies' link on the main page.
+
 ## [0.8.0] - 2023-01-26
 
 ### Added
