@@ -25,6 +25,7 @@ const StudyCollectionsTab = props => {
   const {study, showCollectionModal} = props;
   const [collections, setCollections] = useState([]);
   const [error, setError] = useState(null);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   useEffect(() => {
     axios.get("/api/internal/study/" + study.id + "/studycollection")
@@ -33,7 +34,7 @@ const StudyCollectionsTab = props => {
     }).catch(error => {
       setError(error);
     });
-  }, []);
+  }, [refreshCount]);
 
   let rows = collections.sort((a, b) => {
     if (a.name > b.name) {

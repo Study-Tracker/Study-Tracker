@@ -143,7 +143,7 @@ export const ActiveStudies = ({count}) => {
       icon={ChevronsRight}
       value={count}
       color={"info"}
-      url={"/studies?myStudy=true&status=IN_PLANNING,ACTIVE"}
+      url={"/studies?myStudy=true&status=IN_PLANNING&status=ACTIVE"}
   />
 }
 

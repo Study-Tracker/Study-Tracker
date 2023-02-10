@@ -76,7 +76,8 @@ const StudyConclusionsTab = props => {
                 touched,
                 handleChange,
                 handleSubmit,
-                setFieldValue
+                setFieldValue,
+                isSubmitting
             }) => (
 
                 <>
@@ -132,8 +133,8 @@ const StudyConclusionsTab = props => {
                               onClick={() => setModalIsOpen(false)}>
                         Cancel
                       </Button>
-                      <Button variant={"primary"} onClick={handleSubmit}>
-                        Save
+                      <Button variant={"primary"} disabled={isSubmitting} onClick={handleSubmit}>
+                        {isSubmitting ? "Saving..." : "Save"}
                       </Button>
                     </Modal.Footer>
 

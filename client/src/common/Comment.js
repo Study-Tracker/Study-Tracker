@@ -105,7 +105,8 @@ const Comment = props => {
                   values,
                   errors,
                   touched,
-                  handleChange
+                  handleChange,
+                  isSubmitting
                 }) => (
                     <FormikForm>
 
@@ -132,8 +133,8 @@ const Comment = props => {
                           Cancel
                         </Button>
                         &nbsp;
-                        <Button variant={'primary'} type={"submit"}>
-                          Submit
+                        <Button variant={'primary'} type={"submit"} disabled={isSubmitting}>
+                          {isSubmitting ? 'Saving...' : 'Save'}
                         </Button>
                       </div>
 
