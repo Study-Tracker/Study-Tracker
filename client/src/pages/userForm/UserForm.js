@@ -72,8 +72,10 @@ const UserForm = props => {
     type: yup.string()
       .required("Type is required")
       .oneOf(["STANDARD_USER", "SYSTEM_USER", "API_USER"]),
-    title: yup.string(),
-    department: yup.string(),
+    title: yup.string()
+      .nullable(),
+    department: yup.string()
+      .nullable(),
     attributes: yup.object()
       .test(
           "not empty",

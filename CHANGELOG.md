@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed an issue where some study details inputs would not disable on submission, allowing duplicate records to be created if the user clicked the submit button multiple times.
 - Fixed 'My Active Studies' link on the main page.
+- Fixed an issue where null values in optional inputs of the user form would throw validation errors.
 
 ## [0.8.0] - 2023-01-26
 
