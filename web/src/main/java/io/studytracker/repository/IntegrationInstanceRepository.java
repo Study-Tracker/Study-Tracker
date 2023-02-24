@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+@Deprecated
 public interface IntegrationInstanceRepository extends JpaRepository<IntegrationInstance, Long> {
 
   List<IntegrationInstance> findByActive(Boolean active);

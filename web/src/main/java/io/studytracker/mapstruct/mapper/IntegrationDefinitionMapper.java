@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import org.mapstruct.Mapper;
 
+@Deprecated
 @Mapper(componentModel = "spring")
 public interface IntegrationDefinitionMapper {
 

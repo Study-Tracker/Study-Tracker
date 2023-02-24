@@ -18,6 +18,7 @@ package io.studytracker.mapstruct.mapper;
 
 import org.mapstruct.Mapper;
 
+@Deprecated
 @Mapper(componentModel = "spring")
 public interface IntegrationInstanceConfigurationValueMapper {
 

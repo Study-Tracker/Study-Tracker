@@ -41,7 +41,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -53,7 +52,8 @@ import org.springframework.util.StringUtils;
  * @author Will Oemler
  * @since 0.7.1
  */
-@Component
+//@Component
+@Deprecated
 public class IntegrationInitializer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationInitializer.class);

@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+@Deprecated
 @Entity
 @Table(name = "integration_instance_configuration_values", uniqueConstraints = {
     @UniqueConstraint(name = "uc_integrationinstanceconfigurationvalue", columnNames = {

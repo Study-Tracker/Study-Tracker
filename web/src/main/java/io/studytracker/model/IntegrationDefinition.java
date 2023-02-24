@@ -46,6 +46,7 @@ import org.hibernate.annotations.TypeDef;
  * @since 0.7.1
  */
 
+@Deprecated
 @Entity
 @Table(name = "integration_definitions",
     uniqueConstraints = {

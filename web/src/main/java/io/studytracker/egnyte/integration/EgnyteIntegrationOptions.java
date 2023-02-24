@@ -19,6 +19,7 @@ package io.studytracker.egnyte.integration;
 import io.studytracker.integration.IntegrationOptions;
 import java.net.URL;
 
+@Deprecated
 public interface EgnyteIntegrationOptions extends IntegrationOptions {
 
   String getTenantName();

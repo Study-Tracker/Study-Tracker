@@ -16,6 +16,7 @@
 
 package io.studytracker.integration;
 
+@Deprecated
 public enum IntegrationType {
 
   PLACEHOLDER_FILE_STORE,

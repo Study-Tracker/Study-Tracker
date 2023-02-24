@@ -19,6 +19,7 @@ package io.studytracker.mapstruct.dto.response;
 import io.studytracker.model.CustomEntityFieldType;
 import lombok.Data;
 
+@Deprecated
 @Data
 public class IntegrationConfigurationSchemaFieldDetailsDto {
 

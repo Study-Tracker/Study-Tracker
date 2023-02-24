@@ -27,6 +27,7 @@ import io.studytracker.model.IntegrationInstanceConfigurationValue;
 import java.util.Set;
 import lombok.Data;
 
+@Deprecated
 @Data
 public class S3IntegrationV1 implements S3IntegrationOptions, IntegrationOptions {
 

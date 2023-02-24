@@ -16,6 +16,7 @@
 
 package io.studytracker.aws.integration;
 
+@Deprecated
 public interface S3IntegrationOptions {
 
   String getRegion();

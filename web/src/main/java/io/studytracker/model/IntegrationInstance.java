@@ -47,6 +47,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  * @since 0.7.1
  */
 
+@Deprecated
 @Entity
 @Table(name = "integration_instances")
 @EntityListeners(AuditingEntityListener.class)

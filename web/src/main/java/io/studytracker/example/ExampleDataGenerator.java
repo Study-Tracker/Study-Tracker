@@ -34,6 +34,7 @@ import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.KeywordCategory;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -53,6 +54,7 @@ import io.studytracker.repository.CommentRepository;
 import io.studytracker.repository.ExternalLinkRepository;
 import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.KeywordRepository;
+import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyCollectionRepository;
@@ -80,6 +82,7 @@ import org.springframework.util.Assert;
 
 public class ExampleDataGenerator {
 
+  public static final int ORGANIZATION_COUNT = 1;
   public static final int PROGRAM_COUNT = 5;
   public static final int USER_COUNT = 3;
   public static final int COLLABORATOR_COUNT = 4;
@@ -101,6 +104,7 @@ public class ExampleDataGenerator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 
+  @Autowired private OrganizationRepository organizationRepository;
   @Autowired private ProgramRepository programRepository;
 
   @Autowired private UserRepository userRepository;
@@ -138,6 +142,14 @@ public class ExampleDataGenerator {
   @Autowired private StudyCollectionRepository studyCollectionRepository;
 
   @Autowired private StorageLocationService storageLocationService;
+
+  public List<Organization> generateExampleOrganizations() {
+    Organization organization = new Organization();
+    organization.setName("My Organization");
+    organization.setActive(true);
+    organization.setDescription("Example Organization");
+    return Collections.singletonList(organization);
+  }
 
   public List<Program> generateExamplePrograms(List<User> users) {
     User user = users.get(0);
@@ -815,6 +827,7 @@ public class ExampleDataGenerator {
     keywordCategoryRepository.deleteAll();
     programRepository.deleteAll();
     userRepository.deleteAll();
+    organizationRepository.deleteAll();
   }
 
   public void populateDatabase() {
@@ -823,6 +836,11 @@ public class ExampleDataGenerator {
       LOGGER.info("Preparing to populate database with example data...");
       this.clearDatabase();
       LOGGER.info("Inserting example data...");
+
+      // Organizations
+      List<Organization> organizations = generateExampleOrganizations();
+      organizationRepository.saveAll(organizations);
+
       userRepository.saveAll(generateExampleUsers());
       programRepository.saveAll(generateExamplePrograms(userRepository.findAll()));
       generateExampleAssayTypes();

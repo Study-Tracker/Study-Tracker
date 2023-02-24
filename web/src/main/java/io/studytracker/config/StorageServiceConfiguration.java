@@ -19,6 +19,7 @@ package io.studytracker.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.studytracker.aws.S3DataFileStorageService;
+import io.studytracker.aws.S3Service;
 import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.config.properties.EgnyteProperties;
 import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
@@ -28,6 +29,8 @@ import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.exception.InvalidConfigurationException;
+import io.studytracker.repository.AwsIntegrationRepository;
+import io.studytracker.repository.S3BucketRepository;
 import io.studytracker.storage.LocalFileSystemStorageService;
 import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,6 +139,12 @@ public class StorageServiceConfiguration {
         builder.credentialsProvider(credentialsProvider);
       }
       return builder.build();
+    }
+
+    @Bean
+    public S3Service s3Service(S3Client s3Client, AwsIntegrationRepository awsIntegrationRepository,
+        S3BucketRepository s3BucketRepository) {
+      return new S3Service(s3Client, s3BucketRepository, awsIntegrationRepository);
     }
 
     @Bean

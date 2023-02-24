@@ -19,6 +19,7 @@ package io.studytracker.egnyte.integration;
 import io.studytracker.integration.IntegrationType;
 import io.studytracker.model.IntegrationInstance;
 
+@Deprecated
 public class EgnyteIntegrationOptionsFactory {
 
   public static EgnyteIntegrationOptions create(IntegrationInstance instance) {
