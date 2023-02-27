@@ -64,7 +64,7 @@ public class StudyCollectionActivityUtils {
   public static Activity fromStudyAddedToCollection(
       Study study, StudyCollection collection, User user) {
     Activity activity = new Activity();
-    activity.setEventType(EventType.NEW_STUDY_COLLECTION);
+    activity.setEventType(EventType.STUDY_ADDED_TO_COLLECTION);
     activity.setDate(new Date());
     activity.setUser(user);
     activity.setStudy(study);
@@ -77,7 +77,7 @@ public class StudyCollectionActivityUtils {
   public static Activity fromStudyRemovedFromCollection(
       Study study, StudyCollection collection, User user) {
     Activity activity = new Activity();
-    activity.setEventType(EventType.NEW_STUDY_COLLECTION);
+    activity.setEventType(EventType.STUDY_REMOVED_FROM_COLLECTION);
     activity.setDate(new Date());
     activity.setUser(user);
     activity.setStudy(study);
