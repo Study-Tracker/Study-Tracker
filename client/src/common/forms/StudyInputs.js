@@ -19,13 +19,12 @@ import {Col, Form, Row} from "react-bootstrap";
 import AsyncSelect from "react-select/async";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
-import {FormGroup} from "../../common/forms/common";
+import {FormGroup} from "./common";
 import axios from "axios";
 import PropTypes from "prop-types";
 
-const StudyInputs = props => {
+const StudyInputs = ({studies, onChange}) => {
 
-  const {studies, onChange} = props;
 
   const studyAutocomplete = (input, callback) => {
     axios.get("/api/internal/autocomplete/study?q=" + input)
@@ -69,7 +68,7 @@ const StudyInputs = props => {
   const handleRemoveStudy = (e) => {
     const selected = parseInt(e.currentTarget.dataset.id, 10);
     console.debug("Selected study", selected);
-    onChange(props.studies.filter(study => study.id !== selected));
+    onChange(studies.filter(study => study.id !== selected));
   }
 
   // Study list

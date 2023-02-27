@@ -24,13 +24,15 @@ import {
   Row
 } from "react-bootstrap";
 import React from "react";
-import {File, Menu, XCircle} from "react-feather";
+import {Edit2, File, Menu, XCircle} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {StatusBadge} from "../../common/status";
+import PropTypes from "prop-types";
+import StudyUpdateModal from "./StudyUpdateModal";
 
 const StudyCollectionDetailsHeader = ({collection}) => {
   return (
@@ -49,17 +51,26 @@ const ExportToCsv = (props) => {
   return (
       <span>
         <Button variant={'primary'} onClick={handleClick}>
+          <File className="feather align-middle me-2 mb-1"/>
           Export to CSV
-          &nbsp;
-          <File className="feather align-middle ms-2 mb-1"/>
         </Button>
       </span>
   );
 };
 
-const StudyCollectionDetails = props => {
+const StudyCollectionDetails = ({
+  collection,
+  handleRemoveStudy,
+  handleUpdateCollection,
+  user
+}) => {
 
-  const {collection, handleRemoveStudy, user} = props;
+  const [modalIsOpen, setModalIsOpen] = React.useState(false);
+
+  const handleStudiesUpdate = (studies) => {
+    const updated = collection.studies = studies;
+    handleUpdateCollection(updated);
+  };
 
   const columns = [
     {
@@ -336,12 +347,23 @@ const StudyCollectionDetails = props => {
                       >
                         {props => (
                             <div>
-                              <div className="float-end">
-                                <ExportToCsv{...props.csvProps} />
-                                &nbsp;&nbsp;
-                                <Search.SearchBar
-                                    {...props.searchProps}
-                                />
+                              <div className={"d-flex justify-content-between"}>
+
+                                <div>
+                                  <Button variant={"primary"} onClick={() => setModalIsOpen(true)}>
+                                    <Edit2 className="feather align-middle me-2" />
+                                    Edit Studies
+                                  </Button>
+                                </div>
+
+                                <div>
+                                  <ExportToCsv{...props.csvProps} />
+                                  &nbsp;&nbsp;
+                                  <Search.SearchBar
+                                      {...props.searchProps}
+                                  />
+                                </div>
+
                               </div>
                               <BootstrapTable
                                   bootstrap4
@@ -371,9 +393,24 @@ const StudyCollectionDetails = props => {
           </Col>
 
         </Row>
+
+        <StudyUpdateModal
+            isOpen={modalIsOpen}
+            closeModal={() => setModalIsOpen(false)}
+            studies={collection.studies}
+            handleUpdate={handleStudiesUpdate}
+        />
+
       </Container>
   );
 
+}
+
+StudyCollectionDetails.propTypes = {
+  collection: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  updateCollection: PropTypes.func.isRequired,
+  removeStudyFromCollection: PropTypes.func.isRequired,
 }
 
 export default StudyCollectionDetails;

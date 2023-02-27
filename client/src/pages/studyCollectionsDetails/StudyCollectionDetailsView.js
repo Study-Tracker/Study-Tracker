@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import StandardWrapper from "../../common/structure/StandardWrapper";
@@ -23,16 +23,16 @@ import swal from "sweetalert";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import {useParams} from "react-router-dom";
+import NotyfContext from "../../context/NotyfContext";
 
-const StudyCollectionDetailsView = props => {
+const StudyCollectionDetailsView = ({}) => {
 
   const params = useParams();
-  const [state, setState] = useState({
-    collectionId: params.collectionId,
-    isLoaded: false,
-    isError: false
-  });
+  const collectionId = params.collectionId;
+  const [collection, setCollection] = useState(null);
+  const [error, setError] = useState(null);
   const user = useSelector(s => s.user.value);
+  const notyf = useContext(NotyfContext);
 
   const handleRemoveStudy = (id) => {
     swal({
@@ -42,56 +42,71 @@ const StudyCollectionDetailsView = props => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/internal/studycollection/" + state.collection.id + "/" + id)
+        axios.delete("/api/internal/studycollection/" + collection.id + "/" + id)
         .then(response => {
-          let collection = state.collection;
-          collection.studies = collection.studies.filter(s => s.id === id);
-          setState(prevState => ({
-            ...prevState,
-            collection 
-          }));
+          const updated = collection;
+          updated.studies = collection.studies.filter(s => s.id === id);
+          setCollection(updated);
         })
         .catch(error => {
           console.error(error);
+          notyf.open({
+            type: "error",
+            message: "There was an error removing the study from the collection."
+          })
         })
       }
     });
+  }
 
+  const handleUpdateCollection = (collection) => {
+    axios.put("/api/internal/studycollection/" + collection.id, collection)
+    .then(response => {
+      setCollection(response.data);
+      notyf.open({
+        type: "success",
+        message: "Successfully updated study collection."
+      })
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "There was an error updating the study collection."
+      })
+    })
   }
 
   useEffect(() => {
-    axios.get("/api/internal/studycollection/" + state.collectionId)
+    axios.get("/api/internal/studycollection/" + collectionId)
     .then(response => {
-      setState(prevState => ({
-        ...prevState,
-        collection: response.data,
-        isLoaded: true
-      }));
+      setCollection(response.data);
       console.debug(response.data);
     })
     .catch(error => {
       console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
+      setError(error);
+      notyf.open({
+        type: "error",
+        message: "There was an error loading the study collection."
+      })
     })
   }, []);
 
 
   let content = <LoadingMessage/>;
-  if (state.isError) {
+  if (error) {
     content = <ErrorMessage/>;
-  } else if (state.isLoaded) {
+  } else if (collection) {
     content = <StudyCollectionDetails
-        collection={state.collection}
+        collection={collection}
         user={user}
+        handleUpdateCollection={handleUpdateCollection}
         handleRemoveStudy={handleRemoveStudy}
     />;
   }
   return (
-      <StandardWrapper {...props}>
+      <StandardWrapper>
         {content}
       </StandardWrapper>
   );
