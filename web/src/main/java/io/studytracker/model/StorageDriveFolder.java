@@ -16,9 +16,7 @@
 
 package io.studytracker.model;
 
-import io.studytracker.model.StorageDrive.DriveType;
 import java.util.Date;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -28,51 +26,53 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "egnyte_drives", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_egnyte_drives", columnNames = {"egnyte_integration_id", "name"})
-})
+@Table(name = "storage_drive_folders")
 @EntityListeners(AuditingEntityListener.class)
-public class EgnyteDrive implements StorageDriveDetails {
+public class StorageDriveFolder {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @OneToOne(optional = false, targetEntity = StorageDrive.class, cascade = CascadeType.ALL)
-  @JoinColumn(name = "storage_drive_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "storage_drive_id", nullable = false, updatable = false)
   private StorageDrive storageDrive;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "egnyte_integration_id", nullable = false)
-  private EgnyteIntegration egnyteIntegration;
+  @Column(name = "path", nullable = false, length = 2048)
+  private String path;
 
-  @Column(name = "name", nullable = false, updatable = false)
+  @Column(name = "name", nullable = false)
   private String name;
 
-  @CreatedDate
-  @Column(name = "created_at", nullable = false)
+  @Column(name = "is_browser_root", nullable = false)
+  private boolean browserRoot = false;
+
+  @Column(name = "is_study_root", nullable = false)
+  private boolean studyRoot = false;
+
+  @Column(name = "is_write_enabled", nullable = false)
+  private boolean writeEnabled = false;
+
+  @Column(name = "is_delete_enabled", nullable = false)
+  private boolean deleteEnabled = false;
+
+  @Column(name = "created_at", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
+  @CreatedDate
   private Date createdAt;
 
-  @LastModifiedDate
-  @Column(name = "updated_at")
+  @Column(name = "updated_at", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
+  @LastModifiedDate
   private Date updatedAt;
-
-  @Override
-  public DriveType getDriveType() {
-    return DriveType.EGNYTE;
-  }
 
   public Long getId() {
     return id;
@@ -90,12 +90,12 @@ public class EgnyteDrive implements StorageDriveDetails {
     this.storageDrive = storageDrive;
   }
 
-  public EgnyteIntegration getEgnyteIntegration() {
-    return egnyteIntegration;
+  public String getPath() {
+    return path;
   }
 
-  public void setEgnyteIntegration(EgnyteIntegration egnyteIntegration) {
-    this.egnyteIntegration = egnyteIntegration;
+  public void setPath(String path) {
+    this.path = path;
   }
 
   public String getName() {
@@ -104,6 +104,38 @@ public class EgnyteDrive implements StorageDriveDetails {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public boolean isBrowserRoot() {
+    return browserRoot;
+  }
+
+  public void setBrowserRoot(boolean browserRoot) {
+    this.browserRoot = browserRoot;
+  }
+
+  public boolean isStudyRoot() {
+    return studyRoot;
+  }
+
+  public void setStudyRoot(boolean studyRoot) {
+    this.studyRoot = studyRoot;
+  }
+
+  public boolean isWriteEnabled() {
+    return writeEnabled;
+  }
+
+  public void setWriteEnabled(boolean writeEnabled) {
+    this.writeEnabled = writeEnabled;
+  }
+
+  public boolean isDeleteEnabled() {
+    return deleteEnabled;
+  }
+
+  public void setDeleteEnabled(boolean deleteEnabled) {
+    this.deleteEnabled = deleteEnabled;
   }
 
   public Date getCreatedAt() {

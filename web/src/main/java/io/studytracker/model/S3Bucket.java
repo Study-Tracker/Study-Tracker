@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import io.studytracker.model.StorageDrive.DriveType;
 import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -41,7 +42,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     @UniqueConstraint(name = "uq_s3_buckets", columnNames = {"aws_integration_id", "name"})
 })
 @EntityListeners(AuditingEntityListener.class)
-public class S3Bucket {
+public class S3Bucket implements StorageDriveDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -67,6 +68,11 @@ public class S3Bucket {
   @Column(name = "updated_at")
   @Temporal(TemporalType.TIMESTAMP)
   private Date updatedAt;
+
+  @Override
+  public DriveType getDriveType() {
+    return DriveType.S3;
+  }
 
   public Long getId() {
     return id;

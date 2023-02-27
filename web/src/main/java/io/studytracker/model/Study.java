@@ -71,7 +71,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("owner")
       }),
   @NamedEntityGraph(
@@ -80,7 +79,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("owner"),
@@ -140,16 +138,12 @@ public class Study implements Model {
   @JoinColumn(name = "notebook_folder_id")
   private ELNFolder notebookFolder;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "storage_folder_id")
-  private FileStoreFolder primaryStorageFolder;
-
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(
-      name = "study_storage_folders",
-      joinColumns = @JoinColumn(name = "study_id", nullable = false),
-      inverseJoinColumns = @JoinColumn(name = "storage_folder_id", nullable = false))
-  private Set<FileStoreFolder> storageFolders = new HashSet<>();
+  @OneToMany(
+      mappedBy = "study",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private Set<StudyStorageFolder> storageFolders = new HashSet<>();
 
   @CreatedBy
   @ManyToOne(fetch = FetchType.LAZY)
@@ -408,14 +402,6 @@ public class Study implements Model {
     this.notebookFolder = notebookFolder;
   }
 
-  public FileStoreFolder getPrimaryStorageFolder() {
-    return primaryStorageFolder;
-  }
-
-  public void setPrimaryStorageFolder(FileStoreFolder storageFolder) {
-    this.primaryStorageFolder = storageFolder;
-  }
-
   public User getCreatedBy() {
     return createdBy;
   }
@@ -558,19 +544,19 @@ public class Study implements Model {
     return this.attributes.get(key);
   }
 
-  public Set<FileStoreFolder> getStorageFolders() {
+  public Set<StudyStorageFolder> getStorageFolders() {
     return storageFolders;
   }
 
-  public void setStorageFolders(Set<FileStoreFolder> fileStoreFolders) {
+  public void setStorageFolders(Set<StudyStorageFolder> fileStoreFolders) {
     this.storageFolders = fileStoreFolders;
   }
 
-  public void addFileStoreFolder(FileStoreFolder folder) {
+  public void addFileStoreFolder(StudyStorageFolder folder) {
     this.storageFolders.add(folder);
   }
 
-  public void removeFileStoreFolder(FileStoreFolder folder) {
+  public void removeFileStoreFolder(StudyStorageFolder folder) {
     this.storageFolders.remove(folder);
   }
 

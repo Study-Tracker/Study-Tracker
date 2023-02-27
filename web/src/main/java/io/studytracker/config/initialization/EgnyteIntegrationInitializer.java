@@ -21,6 +21,7 @@ import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.egnyte.EgnyteIntegrationService;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.model.EgnyteDrive;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.service.OrganizationService;
@@ -96,7 +97,11 @@ public class EgnyteIntegrationInitializer {
   }
 
   private void registerEgnyteDrives(EgnyteIntegration egnyteIntegration) {
-
+    List<EgnyteDrive> drives = egnyteIntegrationService.listIntegrationDrives(egnyteIntegration);
+    if (drives.size() == 0) {
+      LOGGER.info("Registering Egnyte drives for integration {}", egnyteIntegration.getTenantName());
+//      egnyteIntegrationService.registerDrives(egnyteIntegration);
+    }
   }
 
   @PostConstruct
@@ -115,10 +120,8 @@ public class EgnyteIntegrationInitializer {
     }
 
     try {
-
       // Register Egnyte integration
       EgnyteIntegration egnyteIntegration = registerEgnyteIntegrations(organization);
-
       if (egnyteIntegration != null) {
 
       }

@@ -16,18 +16,9 @@
 
 package io.studytracker.repository;
 
-import io.studytracker.model.FileStoreFolder;
-import java.util.List;
+import io.studytracker.model.EgnyteDriveFolder;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-@Deprecated
-public interface FileStoreFolderRepository extends JpaRepository<FileStoreFolder, Long> {
-
-  @Query("select f from FileStoreFolder  f where f.fileStorageLocation.id = ?1 and f.path = ?2")
-  List<FileStoreFolder> findByPath(Long locationId, String path);
-
-  @Query("select f from FileStoreFolder f where f.fileStorageLocation.name = 'PLACEHOLDER_FILE_STORE'")
-  List<FileStoreFolder> findFoldersWithPlaceholderLocations();
+public interface EgnyteDriveFolderRepository extends JpaRepository<EgnyteDriveFolder, Long> {
 
 }

@@ -16,18 +16,14 @@
 
 package io.studytracker.repository;
 
-import io.studytracker.model.FileStoreFolder;
+import io.studytracker.model.AssayStorageFolder;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-@Deprecated
-public interface FileStoreFolderRepository extends JpaRepository<FileStoreFolder, Long> {
+public interface AssayStorageFolderRepository extends JpaRepository<AssayStorageFolder, Long> {
 
-  @Query("select f from FileStoreFolder  f where f.fileStorageLocation.id = ?1 and f.path = ?2")
-  List<FileStoreFolder> findByPath(Long locationId, String path);
-
-  @Query("select f from FileStoreFolder f where f.fileStorageLocation.name = 'PLACEHOLDER_FILE_STORE'")
-  List<FileStoreFolder> findFoldersWithPlaceholderLocations();
+  @Query("SELECT a FROM AssayStorageFolder a WHERE a.assay.id = ?1")
+  List<AssayStorageFolder> findByAssayId(Long assayId);
 
 }

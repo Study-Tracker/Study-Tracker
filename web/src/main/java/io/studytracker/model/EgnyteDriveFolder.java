@@ -32,41 +32,41 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import org.springframework.boot.actuate.audit.listener.AuditListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "egnyte_drives", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_egnyte_drives", columnNames = {"egnyte_integration_id", "name"})
-})
-@EntityListeners(AuditingEntityListener.class)
-public class EgnyteDrive implements StorageDriveDetails {
+@Table(name = "local_drive_folders")
+@EntityListeners(AuditListener.class)
+public class EgnyteDriveFolder implements StorageDriveFolderDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @OneToOne(optional = false, targetEntity = StorageDrive.class, cascade = CascadeType.ALL)
-  @JoinColumn(name = "storage_drive_id", nullable = false)
-  private StorageDrive storageDrive;
+  @OneToOne(optional = false, targetEntity = StorageDriveFolder.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "storage_drive_folder_id", nullable = false)
+  private StorageDriveFolder storageDriveFolder;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "egnyte_integration_id", nullable = false)
-  private EgnyteIntegration egnyteIntegration;
+  @JoinColumn(name = "egnyte_drive_id", nullable = false, updatable = false)
+  private EgnyteDrive egnyteDrive;
 
-  @Column(name = "name", nullable = false, updatable = false)
-  private String name;
+  @Column(name = "folder_id", nullable = false)
+  private String folderId;
 
-  @CreatedDate
-  @Column(name = "created_at", nullable = false)
+  @Column(name = "web_url")
+  private String webUrl;
+
+  @Column(name = "created_at", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
+  @CreatedDate
   private Date createdAt;
 
-  @LastModifiedDate
-  @Column(name = "updated_at")
+  @Column(name = "updated_at", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
+  @LastModifiedDate
   private Date updatedAt;
 
   @Override
@@ -74,6 +74,7 @@ public class EgnyteDrive implements StorageDriveDetails {
     return DriveType.EGNYTE;
   }
 
+  @Override
   public Long getId() {
     return id;
   }
@@ -82,28 +83,37 @@ public class EgnyteDrive implements StorageDriveDetails {
     this.id = id;
   }
 
-  public StorageDrive getStorageDrive() {
-    return storageDrive;
+  public StorageDriveFolder getStorageDriveFolder() {
+    return storageDriveFolder;
   }
 
-  public void setStorageDrive(StorageDrive storageDrive) {
-    this.storageDrive = storageDrive;
+  public void setStorageDriveFolder(StorageDriveFolder storageDriveFolder) {
+    this.storageDriveFolder = storageDriveFolder;
   }
 
-  public EgnyteIntegration getEgnyteIntegration() {
-    return egnyteIntegration;
+  public EgnyteDrive getEgnyteDrive() {
+    return egnyteDrive;
   }
 
-  public void setEgnyteIntegration(EgnyteIntegration egnyteIntegration) {
-    this.egnyteIntegration = egnyteIntegration;
+  public void setEgnyteDrive(EgnyteDrive egnyteDrive) {
+    this.egnyteDrive = egnyteDrive;
   }
 
-  public String getName() {
-    return name;
+  public String getFolderId() {
+    return folderId;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setFolderId(String folderId) {
+    this.folderId = folderId;
+  }
+
+  public void setWebUrl(String webUrl) {
+    this.webUrl = webUrl;
+  }
+
+  @Override
+  public String getWebUrl() {
+    return webUrl;
   }
 
   public Date getCreatedAt() {
