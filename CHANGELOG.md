@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Studies can no longer be added to collections they already belong to.
 
 ### Changed
-- You can now more easily edit collection studies from the collection details page.
+- You can now more easily edit collection studies from the collection details page. Study collections can now also be deleted from the collection details page.
 
 ## [0.8.1] - 2023-02-10
 

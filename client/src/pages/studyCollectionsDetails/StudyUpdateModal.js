@@ -21,10 +21,6 @@ import StudyInputs from "../../common/forms/StudyInputs";
 
 const StudyUpdateModal = ({studies, isOpen, closeModal, handleUpdate}) => {
 
-  const handleStudyUpdate = (updatedStudies) => {
-
-  }
-
   return (
       <Modal
           show={isOpen}
