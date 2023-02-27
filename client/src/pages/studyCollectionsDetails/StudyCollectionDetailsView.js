@@ -31,6 +31,7 @@ const StudyCollectionDetailsView = ({}) => {
   const collectionId = params.collectionId;
   const [collection, setCollection] = useState(null);
   const [error, setError] = useState(null);
+  const [loadCount, setLoadCount] = useState(0);
   const user = useSelector(s => s.user.value);
   const notyf = useContext(NotyfContext);
 
@@ -44,9 +45,7 @@ const StudyCollectionDetailsView = ({}) => {
       if (val) {
         axios.delete("/api/internal/studycollection/" + collection.id + "/" + id)
         .then(response => {
-          const updated = collection;
-          updated.studies = collection.studies.filter(s => s.id === id);
-          setCollection(updated);
+          setLoadCount(loadCount + 1);
         })
         .catch(error => {
           console.error(error);
@@ -62,7 +61,7 @@ const StudyCollectionDetailsView = ({}) => {
   const handleUpdateCollection = (collection) => {
     axios.put("/api/internal/studycollection/" + collection.id, collection)
     .then(response => {
-      setCollection(response.data);
+      setLoadCount(loadCount + 1)
       notyf.open({
         type: "success",
         message: "Successfully updated study collection."
@@ -81,7 +80,7 @@ const StudyCollectionDetailsView = ({}) => {
     axios.get("/api/internal/studycollection/" + collectionId)
     .then(response => {
       setCollection(response.data);
-      console.debug(response.data);
+      console.debug("Study collection", response.data);
     })
     .catch(error => {
       console.error(error);
@@ -91,7 +90,7 @@ const StudyCollectionDetailsView = ({}) => {
         message: "There was an error loading the study collection."
       })
     })
-  }, []);
+  }, [loadCount]);
 
 
   let content = <LoadingMessage/>;

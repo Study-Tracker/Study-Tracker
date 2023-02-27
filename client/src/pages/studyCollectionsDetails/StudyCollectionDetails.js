@@ -24,7 +24,7 @@ import {
   Row
 } from "react-bootstrap";
 import React from "react";
-import {Edit2, File, Menu, XCircle} from "react-feather";
+import {Edit2, File, Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit} from "@fortawesome/free-solid-svg-icons";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
@@ -50,7 +50,7 @@ const ExportToCsv = (props) => {
   };
   return (
       <span>
-        <Button variant={'primary'} onClick={handleClick}>
+        <Button variant={'outline-primary'} onClick={handleClick}>
           <File className="feather align-middle me-2 mb-1"/>
           Export to CSV
         </Button>
@@ -68,8 +68,10 @@ const StudyCollectionDetails = ({
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   const handleStudiesUpdate = (studies) => {
-    const updated = collection.studies = studies;
-    handleUpdateCollection(updated);
+    handleUpdateCollection({
+      ...collection,
+      studies: studies
+    });
   };
 
   const columns = [
@@ -180,24 +182,24 @@ const StudyCollectionDetails = ({
 
           ) : ''
     },
-    {
-      dataField: "remove",
-      text: "Remove",
-      sort: false,
-      searchable: false,
-      headerStyle: {width: '10%'},
-      formatter: (c, d, i, x) => {
-        return (
-            <div>
-              <a className="text-danger"
-                 title={"Remove study from collection"}
-                 onClick={() => handleRemoveStudy(d.id)}>
-                <XCircle className="align-middle me-1" size={18}/>
-              </a>
-            </div>
-        )
-      }
-    },
+    // {
+    //   dataField: "remove",
+    //   text: "Remove",
+    //   sort: false,
+    //   searchable: false,
+    //   headerStyle: {width: '10%'},
+    //   formatter: (c, d, i, x) => {
+    //     return (
+    //         <div>
+    //           <a className="text-danger"
+    //              title={"Remove study from collection"}
+    //              onClick={() => handleRemoveStudy(d.id)}>
+    //             <XCircle className="align-middle me-1" size={18}/>
+    //           </a>
+    //         </div>
+    //     )
+    //   }
+    // },
     {
       dataField: 'search',
       text: 'Search',
@@ -409,8 +411,8 @@ const StudyCollectionDetails = ({
 StudyCollectionDetails.propTypes = {
   collection: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
-  updateCollection: PropTypes.func.isRequired,
-  removeStudyFromCollection: PropTypes.func.isRequired,
+  handleUpdateCollection: PropTypes.func.isRequired,
+  handleRemoveStudy: PropTypes.func.isRequired,
 }
 
 export default StudyCollectionDetails;
