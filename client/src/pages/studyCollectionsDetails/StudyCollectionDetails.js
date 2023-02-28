@@ -23,14 +23,20 @@ import {
   Dropdown,
   Row
 } from "react-bootstrap";
-import React from "react";
-import {File, Menu, XCircle} from "react-feather";
+import React, {useContext} from "react";
+import {Edit2, File, Menu} from "react-feather";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit} from "@fortawesome/free-solid-svg-icons";
+import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import {StatusBadge} from "../../common/status";
+import PropTypes from "prop-types";
+import StudyUpdateModal from "./StudyUpdateModal";
+import swal from "sweetalert";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import NotyfContext from "../../context/NotyfContext";
 
 const StudyCollectionDetailsHeader = ({collection}) => {
   return (
@@ -48,18 +54,54 @@ const ExportToCsv = (props) => {
   };
   return (
       <span>
-        <Button variant={'primary'} onClick={handleClick}>
+        <Button variant={'outline-primary'} onClick={handleClick}>
+          <File className="feather align-middle me-2 mb-1"/>
           Export to CSV
-          &nbsp;
-          <File className="feather align-middle ms-2 mb-1"/>
         </Button>
       </span>
   );
 };
 
-const StudyCollectionDetails = props => {
+const StudyCollectionDetails = ({
+  collection,
+  handleRemoveStudy,
+  handleUpdateCollection,
+  user
+}) => {
 
-  const {collection, handleRemoveStudy, user} = props;
+  const [modalIsOpen, setModalIsOpen] = React.useState(false);
+  const navigate = useNavigate();
+  const notyf = useContext(NotyfContext);
+
+  const handleStudiesUpdate = (studies) => {
+    handleUpdateCollection({
+      ...collection,
+      studies: studies
+    });
+  };
+
+  const handleCollectionDelete = () => {
+    swal({
+      title: "Are you sure you want to delete this collection?",
+      icon: "warning",
+      buttons: true
+    })
+    .then(val => {
+      if (val) {
+        axios.delete("/api/internal/studycollection/" + collection.id)
+        .then(response => {
+          navigate("/collections");
+        })
+        .catch(error => {
+          console.error(error);
+          notyf.open({
+            type: "error",
+            message: "Error deleting collection."
+          })
+        })
+      }
+    });
+  }
 
   const columns = [
     {
@@ -170,24 +212,6 @@ const StudyCollectionDetails = props => {
           ) : ''
     },
     {
-      dataField: "remove",
-      text: "Remove",
-      sort: false,
-      searchable: false,
-      headerStyle: {width: '10%'},
-      formatter: (c, d, i, x) => {
-        return (
-            <div>
-              <a className="text-danger"
-                 title={"Remove study from collection"}
-                 onClick={() => handleRemoveStudy(d.id)}>
-                <XCircle className="align-middle me-1" size={18}/>
-              </a>
-            </div>
-        )
-      }
-    },
-    {
       dataField: 'search',
       text: 'Search',
       sort: false,
@@ -256,9 +280,13 @@ const StudyCollectionDetails = props => {
 
                       <Dropdown.Item
                           href={"/collection/" + collection.id + "/edit"}>
-                        <FontAwesomeIcon icon={faEdit}/>
-                        &nbsp;
+                        <FontAwesomeIcon className={"me-2"} icon={faEdit}/>
                         Edit
+                      </Dropdown.Item>
+
+                      <Dropdown.Item onClick={handleCollectionDelete}>
+                        <FontAwesomeIcon className={"me-2"} icon={faTrash}/>
+                        Delete
                       </Dropdown.Item>
 
                     </Dropdown.Menu>
@@ -336,12 +364,23 @@ const StudyCollectionDetails = props => {
                       >
                         {props => (
                             <div>
-                              <div className="float-end">
-                                <ExportToCsv{...props.csvProps} />
-                                &nbsp;&nbsp;
-                                <Search.SearchBar
-                                    {...props.searchProps}
-                                />
+                              <div className={"d-flex justify-content-between"}>
+
+                                <div>
+                                  <Button variant={"primary"} onClick={() => setModalIsOpen(true)}>
+                                    <Edit2 className="feather align-middle me-2" />
+                                    Edit Studies
+                                  </Button>
+                                </div>
+
+                                <div>
+                                  <ExportToCsv{...props.csvProps} />
+                                  &nbsp;&nbsp;
+                                  <Search.SearchBar
+                                      {...props.searchProps}
+                                  />
+                                </div>
+
                               </div>
                               <BootstrapTable
                                   bootstrap4
@@ -371,9 +410,24 @@ const StudyCollectionDetails = props => {
           </Col>
 
         </Row>
+
+        <StudyUpdateModal
+            isOpen={modalIsOpen}
+            closeModal={() => setModalIsOpen(false)}
+            studies={collection.studies}
+            handleUpdate={handleStudiesUpdate}
+        />
+
       </Container>
   );
 
+}
+
+StudyCollectionDetails.propTypes = {
+  collection: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  handleUpdateCollection: PropTypes.func.isRequired,
+  handleRemoveStudy: PropTypes.func.isRequired,
 }
 
 export default StudyCollectionDetails;

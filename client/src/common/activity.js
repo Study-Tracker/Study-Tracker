@@ -24,6 +24,7 @@ import {
   FilePlus,
   FileText,
   Link,
+  List,
   MessageCircle,
   Star,
   Tag,
@@ -144,6 +145,15 @@ const ActivityIcon = ({action}) => {
 
     case studyActions.UPDATED_STUDY_KEYWORDS.value:
       return <Tag size={36} className="align-middle text-info me-4"/>;
+
+    case studyActions.NEW_STUDY_COLLECTION.value:
+      return <List size={36} className="align-middle text-info me-4"/>;
+
+    case studyActions.UPDATED_STUDY_COLLECTION.value:
+      return <Edit size={36} className="align-middle text-warning me-4"/>;
+
+    case studyActions.DELETED_STUDY_COLLECTION.value:
+      return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
     default:
       return <Bell size={36} className="align-middle text-info me-4"/>;
@@ -1001,6 +1011,112 @@ const ActivityMessage = ({activity}) => {
               &nbsp;has removed an external link for study:&nbsp;
               <a href={"/study/"
                   + activity.data.study.code}>{activity.data.study.code}</a>
+            </p>
+        );
+
+      }
+
+    case studyActions.NEW_STUDY_COLLECTION.value:
+
+      if (!!activity.data.legacyStudy) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has created a new study collection."}
+            />
+        );
+
+      } else if (!activity.data.collection) {
+        return (
+            <p>
+              <a href={"/user/" + activity.user.id}>{activity.user.displayName}</a>
+              &nbsp;
+              has created a new study collection.
+            </p>
+        )
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/" + activity.user.id}>{activity.user.displayName}</a>
+              &nbsp;
+              has created a new study collection:
+              &nbsp;
+              <a href={"/collection/" + activity.data.collection.id}>{activity.data.collection.name}</a>
+            </p>
+        );
+
+      }
+
+    case studyActions.UPDATED_STUDY_COLLECTION.value:
+
+      if (!!activity.data.legacyStudy || !activity.data.collection) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has updated an existing study collection."}
+            />
+        );
+
+      } else if (!activity.data.collection) {
+
+        return (
+            <p>
+              <a href={"/user/" + activity.user.id}>{activity.user.displayName}</a>
+              &nbsp;
+              has updated an existing study collection.
+            </p>
+        )
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/" + activity.user.id}>{activity.user.displayName}</a>
+              &nbsp;
+              has updated an existing study collection:
+              &nbsp;
+              <a href={"/collection/" + activity.data.collection.id}>{activity.data.collection.name}</a>
+            </p>
+        );
+
+      }
+
+    case studyActions.DELETED_STUDY_COLLECTION.value:
+
+      if (!!activity.data.legacyStudy || !activity.data.collection) {
+
+        return (
+            <LegacyStudyLabel
+                legacyStudy={activity.data.legacyStudy}
+                user={activity.user}
+                text={"has deleted a study collection."}
+            />
+        );
+
+      } else if (!activity.data.collection) {
+
+        return (
+            <p>
+              <a href={"/user/" + activity.user.id}>{activity.user.displayName}</a>
+              &nbsp;
+              deleted a study collection.
+            </p>
+        )
+
+      } else {
+
+        return (
+            <p>
+              <a href={"/user/" + activity.user.id}>{activity.user.displayName}</a>
+              &nbsp;
+              has deleted study collection:
+              &nbsp;
+              <a href={"/collection/" + activity.data.collection.id}>{activity.data.collection.name}</a>
             </p>
         );
 

@@ -136,7 +136,7 @@ const ExportToCsv = ({onExport}) => {
   };
   return (
       <span>
-        <Button variant={'primary'} onClick={handleClick}>
+        <Button variant={'outline-primary'} onClick={handleClick}>
           Export to CSV
           &nbsp;
           <File className="feather align-middle ms-2 mb-1"/>
