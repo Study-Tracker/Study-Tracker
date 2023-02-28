@@ -207,6 +207,23 @@ export const studyActions = {
     value: "DELETED_USER",
     label: "Program User",
     visible: false
+  },
+
+  // Collections
+  NEW_STUDY_COLLECTION: {
+    value: "NEW_STUDY_COLLECTION",
+    label: "New Study Collection",
+    visible: true
+  },
+  UPDATED_STUDY_COLLECTION: {
+    value: "UPDATED_STUDY_COLLECTION",
+    label: "Updated Study Collection",
+    visible: true
+  },
+  DELETED_STUDY_COLLECTION: {
+    value: "DELETED_STUDY_COLLECTION",
+    label: "Study Collection Deleted",
+    visible: true
   }
 
 };

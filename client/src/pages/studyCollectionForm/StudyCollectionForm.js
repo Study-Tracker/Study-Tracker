@@ -19,7 +19,7 @@ import swal from "sweetalert";
 import {LoadingOverlay} from "../../common/loading";
 import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import Select from "react-select";
-import StudyInputs from "./StudyInputs";
+import StudyInputs from "../../common/forms/StudyInputs";
 import {Breadcrumbs} from "../../common/common";
 import {FormGroup} from "../../common/forms/common";
 import {useNavigate} from "react-router-dom";
