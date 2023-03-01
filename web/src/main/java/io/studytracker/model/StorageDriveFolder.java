@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import io.studytracker.storage.StorageFolder;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -73,6 +74,14 @@ public class StorageDriveFolder {
   @Temporal(TemporalType.TIMESTAMP)
   @LastModifiedDate
   private Date updatedAt;
+
+  public static StorageDriveFolder from(StorageDrive drive, StorageFolder f) {
+    StorageDriveFolder folder = new StorageDriveFolder();
+    folder.setPath(f.getPath());
+    folder.setName(f.getName());
+    folder.setStorageDrive(drive);
+    return folder;
+  }
 
   public Long getId() {
     return id;

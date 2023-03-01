@@ -24,5 +24,6 @@ public class ProgramOptions {
   private boolean useNotebook = true;
   private boolean useGit = true;
   private boolean useStorage = true;
+  private StorageDriveFolder parentFolder;
 
 }

@@ -18,6 +18,7 @@ package io.studytracker.storage;
 
 import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
+import io.studytracker.model.StorageDrive.DriveType;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,14 +47,14 @@ public class StudyFileStorageServiceLookup {
   @Autowired(required = false)
   private LocalFileSystemStorageService localFileSystemStorageService;
 
-  public Optional<StudyStorageService> lookup(StorageLocationType storageLocationType) {
-    LOGGER.debug("Looking up StudyStorageService for storageLocationType: {}", storageLocationType);
-    switch (storageLocationType) {
-      case EGNYTE_API:
+  public Optional<StudyStorageService> lookup(DriveType driveType) {
+    LOGGER.debug("Looking up StudyStorageService for storageLocationType: {}", driveType);
+    switch (driveType) {
+      case EGNYTE:
         return Optional.ofNullable(egnyteStudyStorageService);
-      case AWS_S3:
+      case S3:
         return Optional.ofNullable(s3StudyFileStorageService);
-      case LOCAL_FILE_SYSTEM:
+      case LOCAL:
         return Optional.ofNullable(localFileSystemStorageService);
       default:
         return Optional.empty();

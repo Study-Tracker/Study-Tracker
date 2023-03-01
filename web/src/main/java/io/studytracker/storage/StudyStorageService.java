@@ -17,8 +17,8 @@
 package io.studytracker.storage;
 
 import io.studytracker.model.Assay;
-import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Program;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
@@ -37,64 +37,68 @@ public interface StudyStorageService {
    * Returns reference to a {@link Program} instance's storage folder. Throws a {@link
    * StudyStorageNotFoundException} if the folder does not exist;
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param program the program
    * @return the storage folder
    */
-  StorageFolder findFolder(FileStorageLocation location, Program program) throws StudyStorageNotFoundException;
+  StorageDriveFolder findFolder(StorageDriveFolder parentFolder, Program program) throws StudyStorageNotFoundException;
 
   /**
    * Returns reference to a {@link Study} instance's storage folder. Throws a {@link
    * StudyStorageNotFoundException} if the folder does not exist;
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param study the study
    * @return the storage folder
    */
-  StorageFolder findFolder(FileStorageLocation location, Study study) throws StudyStorageNotFoundException;
+  StorageDriveFolder findFolder(StorageDriveFolder parentFolder, Study study) throws StudyStorageNotFoundException;
 
   /**
    * Returns reference to a {@link Assay} instance's storage folder. Throws a {@link
    * StudyStorageNotFoundException} if the folder does not exist;
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param assay the assay
    * @return the storage folder
    */
-  StorageFolder findFolder(FileStorageLocation location, Assay assay) throws StudyStorageNotFoundException;
+  StorageDriveFolder findFolder(StorageDriveFolder parentFolder, Assay assay) throws StudyStorageNotFoundException;
 
   /**
-   * Creates a folder for the target {@link Program}. Throws a {@link
-   * StudyStorageDuplicateException} if the folder already exists and a {@link
-   * io.studytracker.storage.exception.StudyStorageWriteException} if the folder cannot be created.
+   * Creates a {@link StorageDriveFolder} and accompanying
+   * {@link io.studytracker.model.StorageDriveFolderDetails} object for the target
+   * {@link Program}. Throws a {@link StudyStorageDuplicateException} if the folder already exists
+   * and a {@link io.studytracker.storage.exception.StudyStorageWriteException} if the folder cannot
+   * be created.
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param program the program
    * @return the created storage folder
    */
-  StorageFolder createFolder(FileStorageLocation location, Program program) throws StudyStorageException;
+  StorageDriveFolder createFolder(StorageDriveFolder parentFolder, Program program) throws StudyStorageException;
 
   /**
-   * Creates a new directory in the storage file system for the target {@link Study}. Throws a
-   * {@link StudyStorageDuplicateException} if the folder already exists and a {@link
+   * Creates a {@link StorageDriveFolder} and accompanying
+   * {@link io.studytracker.model.StorageDriveFolderDetails} object for the target {@link Study}.
+   * Throws a {@link StudyStorageDuplicateException} if the folder already exists and a {@link
    * io.studytracker.storage.exception.StudyStorageWriteException} if the folder cannot be created.
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param study the study
    * @return the created storage folder
    */
-  StorageFolder createFolder(FileStorageLocation location, Study study) throws StudyStorageException;
+  StorageDriveFolder createFolder(StorageDriveFolder parentFolder, Study study) throws StudyStorageException;
 
   /**
-   * Creates a new directory in the storage file system for the target {@link Assay}. Throws a
-   * {@link StudyStorageDuplicateException} if the folder already exists and a {@link
+   * Creates a {@link StorageDriveFolder} and accompanying
+   * {@link io.studytracker.model.StorageDriveFolderDetails} object for the target {@link Assay}.
+   * Throws a {@link StudyStorageDuplicateException} if the folder already exists and a {@link
    * io.studytracker.storage.exception.StudyStorageWriteException} if the folder cannot be created.
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param assay the assay
    * @return the created storage folder
    */
-  StorageFolder createFolder(FileStorageLocation location, Assay assay) throws StudyStorageException;
+  StorageDriveFolder createFolder(StorageDriveFolder parentFolder, Assay assay) throws StudyStorageException;
 
   /**
    * Uploads the target file to the appropriate directory for the target {@link Study}. Throws a
@@ -102,12 +106,13 @@ public interface StudyStorageService {
    * io.studytracker.storage.exception.StudyStorageWriteException} if the file cannot be written,
    * and a {@link StudyStorageNotFoundException} if the target folder cannot be found.
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param file the file to upload
    * @param study the study to associate the file with
    * @return the uploaded file reference
    */
-  StorageFile saveFile(FileStorageLocation location, File file, Study study) throws StudyStorageException;
+  @Deprecated
+  StorageFile saveFile(StorageDriveFolder parentFolder, File file, Study study) throws StudyStorageException;
 
   /**
    * Uploads the target file to the appropriate directory for the target {@link Assay}. Throws a *
@@ -115,11 +120,12 @@ public interface StudyStorageService {
    * io.studytracker.storage.exception.StudyStorageWriteException} if the file cannot be written,
    * and a * {@link StudyStorageNotFoundException} if the target folder cannot be found.
    *
-   * @param location the storage location
+   * @param parentFolder the parent folder
    * @param file the file to upload
    * @param assay the assay to associate the file with
    * @return the uploaded file reference
    */
-  StorageFile saveFile(FileStorageLocation location, File file, Assay assay) throws StudyStorageException;
+  @Deprecated
+  StorageFile saveFile(StorageDriveFolder parentFolder, File file, Assay assay) throws StudyStorageException;
 
 }

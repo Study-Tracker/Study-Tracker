@@ -39,4 +39,22 @@ public interface StorageDriveFolderRepository extends JpaRepository<StorageDrive
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.id = ?1 AND f.storageDrive.organization.id = ?2")
   Optional<StorageDriveFolder> findByIdAndOrganization(Long id, Long organizationId);
 
+  @Query("SELECT f FROM StorageDriveFolder f JOIN ProgramStorageFolder pf WHERE pf.program.id = ?1")
+  List<StorageDriveFolder> findByProgramId(Long programId);
+
+  @Query("SELECT f FROM StorageDriveFolder f JOIN ProgramStorageFolder pf WHERE pf.primary = true and pf.program.id = ?1")
+  Optional<StorageDriveFolder> findPrimaryByProgramId(Long programId);
+
+  @Query("SELECT f FROM StorageDriveFolder f JOIN StudyStorageFolder pf WHERE pf.study.id = ?1")
+  List<StorageDriveFolder> findByStudyId(Long programId);
+
+  @Query("SELECT f FROM StorageDriveFolder f JOIN StudyStorageFolder pf WHERE pf.primary = true and pf.study.id = ?1")
+  Optional<StorageDriveFolder> findPrimaryByStudyId(Long programId);
+
+  @Query("SELECT f FROM StorageDriveFolder f JOIN AssayStorageFolder pf WHERE pf.assay.id = ?1")
+  List<StorageDriveFolder> findByAssayId(Long programId);
+
+  @Query("SELECT f FROM StorageDriveFolder f JOIN AssayStorageFolder pf WHERE pf.primary = true and pf.assay.id = ?1")
+  Optional<StorageDriveFolder> findPrimaryByAssayId(Long programId);
+
 }

@@ -16,10 +16,15 @@
 
 package io.studytracker.storage;
 
+import io.studytracker.model.Assay;
 import io.studytracker.model.Organization;
+import io.studytracker.model.Program;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.StorageDriveFolderDetails;
+import io.studytracker.model.Study;
+import io.studytracker.repository.StorageDriveFolderDetailsOperations;
 import io.studytracker.repository.StorageDriveFolderRepository;
-import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +39,10 @@ public class StorageDriveFolderService {
   private static final Logger LOGGER = LoggerFactory.getLogger(StorageDriveFolderService.class);
 
   @Autowired private OrganizationService organizationService;
-  @Autowired private StorageDriveRepository driveRepository;
   @Autowired private StorageDriveFolderRepository folderRepository;
+  @Autowired private StudyFileStorageServiceLookup studyFileStorageServiceLookup;
+  @Autowired private StorageDriveRepositoryLookup storageDriveRepositoryLookup;
+
 
   public List<StorageDriveFolder> findAll() {
     LOGGER.debug("Find all drive folders for organization");
@@ -60,5 +67,50 @@ public class StorageDriveFolderService {
     Organization organization = organizationService.getCurrentOrganization();
     return folderRepository.findByIdAndOrganization(id, organization.getId());
   }
+
+  public List<StorageDriveFolder> findByProgram(Program program) {
+    return folderRepository.findByProgramId(program.getId());
+  }
+
+  public Optional<StorageDriveFolder> findPrimaryProgramFolder(Program program) {
+    return folderRepository.findPrimaryByProgramId(program.getId());
+  }
+
+  public List<StorageDriveFolder> findByStudy(Study study) {
+    return folderRepository.findByStudyId(study.getId());
+  }
+
+  public Optional<StorageDriveFolder> findPrimaryStudyFolder(Study study) {
+    return folderRepository.findPrimaryByStudyId(study.getId());
+  }
+
+  public List<StorageDriveFolder> findByAssay(Assay assay) {
+    return folderRepository.findByAssayId(assay.getId());
+  }
+
+  public Optional<StorageDriveFolder> findPrimaryAssayFolder(Assay assay) {
+    return folderRepository.findPrimaryByAssayId(assay.getId());
+  }
+
+  public StudyStorageService lookupStudyStorageService(StorageDriveFolder folder) {
+    return studyFileStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
+        .orElseThrow(() -> new IllegalArgumentException("No storage service found for folder: "
+        + folder.getId()));
+  }
+
+  public StudyStorageService lookupStudyStorageService(DriveType driveType) {
+    return studyFileStorageServiceLookup.lookup(driveType)
+        .orElseThrow(() -> new IllegalArgumentException("No storage service found for drive type: "
+            + driveType));
+  }
+
+  public StorageDriveFolderDetails lookupFolderDetails(StorageDriveFolder folder) {
+     StorageDriveFolderDetailsOperations<?> repository = storageDriveRepositoryLookup
+         .lookupFolderRepository(folder.getStorageDrive().getDriveType());
+     return ((Optional<StorageDriveFolderDetails>) repository.findByStorageDriveFolderId(folder.getId()))
+         .orElseThrow(() -> new IllegalArgumentException("No folder details found for folder: " + folder.getId()));
+  }
+
+
 
 }

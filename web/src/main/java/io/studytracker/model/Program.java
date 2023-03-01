@@ -221,11 +221,22 @@ public class Program implements Model {
     this.storageFolders = fileStoreFolders;
   }
 
-  public void addFileStoreFolder(ProgramStorageFolder folder) {
-    this.storageFolders.add(folder);
+  public void addStorageFolder(StorageDriveFolder folder) {
+    this.addStorageFolder(folder, false);
   }
 
-  public void removeFileStoreFolder(ProgramStorageFolder folder) {
+  public void addStorageFolder(StorageDriveFolder folder, boolean isPrimary) {
+    if (isPrimary) {
+      this.storageFolders.forEach(f -> f.setPrimary(false));
+    }
+    ProgramStorageFolder programStorageFolder = new ProgramStorageFolder();
+    programStorageFolder.setProgram(this);
+    programStorageFolder.setStorageDriveFolder(folder);
+    programStorageFolder.setPrimary(isPrimary);
+    this.getStorageFolders().add(programStorageFolder);
+  }
+
+  public void removeStorageFolder(ProgramStorageFolder folder) {
     this.storageFolders.remove(folder);
   }
 }

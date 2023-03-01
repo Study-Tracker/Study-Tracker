@@ -80,17 +80,17 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     return egnyteIntegrationRepository.save(i);
   }
 
-    @Override
-    public boolean validate(EgnyteIntegration instance) {
-      return false;
-    }
+  @Override
+  public boolean validate(EgnyteIntegration instance) {
+    return false;
+  }
 
-    @Override
-    public boolean test(EgnyteIntegration instance) {
-      return false;
-    }
+  @Override
+  public boolean test(EgnyteIntegration instance) {
+    return false;
+  }
 
-    @Override
+  @Override
   @Transactional
   public void remove(EgnyteIntegration integration) {
     LOGGER.info("Removing Egnyte integration: {}", integration.getId());
@@ -99,7 +99,9 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     egnyteIntegrationRepository.save(i);
   }
 
-
+  public EgnyteIntegration findByStorageDrive(StorageDrive storageDrive) {
+    return egnyteIntegrationRepository.findByStorageDriveId(storageDrive.getId());
+  }
 
   // Egnyte drives
 

@@ -18,18 +18,16 @@ package io.studytracker.service;
 
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
-import io.studytracker.exception.FileStorageException;
+import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.ELNFolderRepository;
-import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
-import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StudyStorageService;
 import java.util.Date;
 import java.util.List;
@@ -52,13 +50,11 @@ public class ProgramService {
 
   private NotebookFolderService notebookFolderService;
 
-  private FileStoreFolderRepository fileStoreFolderRepository;
-
   private ELNFolderRepository elnFolderRepository;
 
   private GitService gitService;
 
-  private StorageLocationService storageLocationService;
+  private StorageDriveFolderService storageDriveFolderService;
 
   public Optional<Program> findById(Long id) {
     return programRepository.findById(id);
@@ -84,20 +80,16 @@ public class ProgramService {
   public Program create(@NotNull Program program, @NotNull ProgramOptions options) {
     LOGGER.info("Creating new program with name: " + program.getName());
 
-    program.setCreatedAt(new Date());
-    program.setUpdatedAt(new Date());
-
     // Create the storage folder
-    try {
-      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-      StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-      StorageFolder storageFolder = studyStorageService.createFolder(location, program);
-      LOGGER.debug("Created storage folder: " + storageFolder.getPath());
-      FileStoreFolder folder = FileStoreFolder.from(location, storageFolder);
-      program.setPrimaryStorageFolder(folder);
-      program.addFileStoreFolder(folder);
-    } catch (Exception e) {
-      throw new StudyTrackerException(e);
+    if (options.isUseStorage() && options.getParentFolder() != null) {
+      try {
+        StorageDriveFolder parentFolder = options.getParentFolder();
+        StudyStorageService studyStorageService = storageDriveFolderService.lookupStudyStorageService(parentFolder);
+        StorageDriveFolder programFolder = studyStorageService.createFolder(parentFolder, program);
+        program.addStorageFolder(programFolder, true);
+      } catch (Exception e) {
+        throw new StudyTrackerException(e);
+      }
     }
 
     // Create the notebook folder
@@ -191,32 +183,35 @@ public class ProgramService {
   @Transactional
   public void repairStorageFolder(Program program) {
 
+    // TODO
+    throw new InvalidRequestException("Not implemented");
+
     // Get the location and storage service
-    FileStorageLocation location;
-    StudyStorageService studyStorageService;
-    try {
-      location = storageLocationService.findDefaultStudyLocation();
-      studyStorageService = storageLocationService.lookupStudyStorageService(location);
-    } catch (FileStorageException e) {
-      e.printStackTrace();
-      throw new StudyTrackerException("Could not find default storage location or service", e);
-    }
-
-    // Find or create the storage folder
-    StorageFolder folder;
-    try {
-      folder = studyStorageService.findFolder(location, program);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new StudyTrackerException(e);
-    }
-
-    // Update the  program record
-    FileStoreFolder f = fileStoreFolderRepository.getById(program.getPrimaryStorageFolder().getId());
-    f.setName(folder.getName());
-    f.setPath(folder.getPath());
-    f.setUrl(folder.getUrl());
-    fileStoreFolderRepository.save(f);
+//    FileStorageLocation location;
+//    StudyStorageService studyStorageService;
+//    try {
+//      location = storageLocationService.findDefaultStudyLocation();
+//      studyStorageService = storageLocationService.lookupStudyStorageService(location);
+//    } catch (FileStorageException e) {
+//      e.printStackTrace();
+//      throw new StudyTrackerException("Could not find default storage location or service", e);
+//    }
+//
+//    // Find or create the storage folder
+//    StorageFolder folder;
+//    try {
+//      folder = studyStorageService.findFolder(location, program);
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//      throw new StudyTrackerException(e);
+//    }
+//
+//    // Update the  program record
+//    FileStoreFolder f = fileStoreFolderRepository.getById(program.getPrimaryStorageFolder().getId());
+//    f.setName(folder.getName());
+//    f.setPath(folder.getPath());
+//    f.setUrl(folder.getUrl());
+//    fileStoreFolderRepository.save(f);
   }
 
   @Transactional
@@ -250,10 +245,6 @@ public class ProgramService {
     this.notebookFolderService = notebookFolderService;
   }
 
-  @Autowired
-  public void setFileStoreFolderRepository(FileStoreFolderRepository fileStoreFolderRepository) {
-    this.fileStoreFolderRepository = fileStoreFolderRepository;
-  }
 
   @Autowired
   public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {
@@ -266,8 +257,8 @@ public class ProgramService {
   }
 
   @Autowired
-  public void setStorageLocationService(
-      StorageLocationService storageLocationService) {
-    this.storageLocationService = storageLocationService;
+  public void setStorageDriveFolderService(
+      StorageDriveFolderService storageDriveFolderService) {
+    this.storageDriveFolderService = storageDriveFolderService;
   }
 }
