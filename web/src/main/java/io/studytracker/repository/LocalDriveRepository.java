@@ -18,6 +18,7 @@ package io.studytracker.repository;
 
 import io.studytracker.model.LocalDrive;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -27,6 +28,6 @@ public interface LocalDriveRepository extends JpaRepository<LocalDrive, Long> {
   List<LocalDrive> findByOrganizationId(Long organizationId);
 
   @Query("SELECT l FROM LocalDrive l WHERE l.storageDrive.id = ?1")
-  LocalDrive findByStorageDriveId(Long storageDriveId);
+  Optional<LocalDrive> findByStorageDriveId(Long storageDriveId);
 
 }

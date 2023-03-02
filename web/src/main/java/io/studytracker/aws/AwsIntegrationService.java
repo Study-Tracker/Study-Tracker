@@ -19,13 +19,18 @@ package io.studytracker.aws;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Organization;
+import io.studytracker.model.S3Bucket;
 import io.studytracker.repository.AwsIntegrationRepository;
+import io.studytracker.repository.S3BucketRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.Bucket;
 
 @Service
 public class AwsIntegrationService implements IntegrationService<AwsIntegration> {
@@ -33,9 +38,12 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   private static final Logger LOGGER = LoggerFactory.getLogger(AwsIntegrationService.class);
 
   private final AwsIntegrationRepository awsIntegrationRepository;
+  private final S3BucketRepository s3BucketRepository;
 
-  public AwsIntegrationService(AwsIntegrationRepository awsIntegrationRepository) {
+  public AwsIntegrationService(AwsIntegrationRepository awsIntegrationRepository,
+      S3BucketRepository s3BucketRepository) {
     this.awsIntegrationRepository = awsIntegrationRepository;
+    this.s3BucketRepository = s3BucketRepository;
   }
 
   @Override
@@ -92,4 +100,43 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   public boolean test(AwsIntegration instance) {
     return false;
   }
+
+  // S3
+
+  public List<String> listAvailableBuckets(AwsIntegration integration) {
+    LOGGER.debug("Listing available buckets");
+    S3Client s3Client = AWSClientFactory.createS3Client(integration);
+    return s3Client.listBuckets().buckets().stream()
+        .map(Bucket::name)
+        .collect(Collectors.toList());
+  }
+
+  public boolean bucketExists(AwsIntegration integration, String bucketName) {
+    return this.listAvailableBuckets(integration).contains(bucketName);
+  }
+
+  public List<S3Bucket> findRegisteredBuckets(AwsIntegration integration) {
+    return s3BucketRepository.findByAwsIntegrationId(integration.getId());
+  }
+
+  public boolean bucketIsRegistered(AwsIntegration integration, String bucketName) {
+    return s3BucketRepository.findByIntegrationAndName(integration.getId(), bucketName).isPresent();
+  }
+
+  @Transactional
+  public S3Bucket registerBucket(S3Bucket bucket) {
+    LOGGER.info("Registering bucket {}", bucket.getName());
+    if (!this.bucketExists(bucket.getAwsIntegration(), bucket.getName())) {
+      throw new IllegalArgumentException("Bucket does not exist");
+    }
+    return s3BucketRepository.save(bucket);
+  }
+
+  @Transactional
+  public void removeBucket(Long id) {
+    S3Bucket b = s3BucketRepository.getById(id);
+    b.getStorageDrive().setActive(false);
+    s3BucketRepository.save(b);
+  }
+
 }

@@ -17,11 +17,17 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.S3Bucket;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface S3BucketRepository extends JpaRepository<S3Bucket, Long> {
 
-  Optional<S3Bucket> findByName(String name);
+  @Query("SELECT b FROM S3Bucket b WHERE b.awsIntegration.id = ?1 and b.name = ?2")
+  Optional<S3Bucket> findByIntegrationAndName(Long integrationId, String name);
+
+  @Query("SELECT b FROM S3Bucket b WHERE b.awsIntegration.id = ?1")
+  List<S3Bucket> findByAwsIntegrationId(Long integrationId);
 
 }

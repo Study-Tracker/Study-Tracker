@@ -16,7 +16,7 @@
 
 package io.studytracker.storage;
 
-import io.studytracker.aws.S3StudyFileStorageService;
+import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.model.StorageDrive.DriveType;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public class StudyFileStorageServiceLookup {
   private EgnyteStudyStorageService egnyteStudyStorageService;
 
   @Autowired(required = false)
-  private S3StudyFileStorageService s3StudyFileStorageService;
+  private S3StudyStorageService s3StudyStorageService;
 
   @Autowired(required = false)
   private LocalFileSystemStorageService localFileSystemStorageService;
@@ -53,7 +53,7 @@ public class StudyFileStorageServiceLookup {
       case EGNYTE:
         return Optional.ofNullable(egnyteStudyStorageService);
       case S3:
-        return Optional.ofNullable(s3StudyFileStorageService);
+        return Optional.ofNullable(s3StudyStorageService);
       case LOCAL:
         return Optional.ofNullable(localFileSystemStorageService);
       default:

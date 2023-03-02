@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.studytracker.aws.S3DataFileStorageService;
 import io.studytracker.aws.S3Service;
-import io.studytracker.aws.S3StudyFileStorageService;
+import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.config.properties.EgnyteProperties;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
@@ -153,8 +153,8 @@ public class StorageServiceConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "aws.s3.default-study-location", havingValue = "")
-    public S3StudyFileStorageService s3StudyFileStorageService() {
-      return new S3StudyFileStorageService();
+    public S3StudyStorageService s3StudyFileStorageService() {
+      return new S3StudyStorageService();
     }
   }
 
