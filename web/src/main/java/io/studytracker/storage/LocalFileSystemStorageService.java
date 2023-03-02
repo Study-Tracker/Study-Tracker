@@ -16,21 +16,20 @@
 
 package io.studytracker.storage;
 
-import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.IntegrationInstance;
 import io.studytracker.model.Program;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
-import io.studytracker.repository.IntegrationInstanceRepository;
+import io.studytracker.repository.LocalDriveRepository;
 import io.studytracker.service.NamingService;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import io.studytracker.storage.exception.StudyStorageWriteException;
 import io.studytracker.storage.integration.LocalFileSystemOptions;
-import io.studytracker.storage.integration.LocalFileSystemOptionsFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-public class LocalFileSystemStorageService implements StudyStorageService, DataFileStorageService {
+public class LocalFileSystemStorageService implements StudyStorageService {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(LocalFileSystemStorageService.class);
@@ -55,15 +54,10 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   private NamingService namingService;
 
   @Autowired
-  private IntegrationInstanceRepository integrationInstanceRepository;
+  private LocalDriveRepository localDriveRepository;
 
-  private LocalFileSystemOptions getOptionsFromLocation(FileStorageLocation location) {
-    IntegrationInstance instance = integrationInstanceRepository
-        .findById(location.getIntegrationInstance().getId())
-        .orElseThrow(() -> new RecordNotFoundException("Integration instance not found: "
-            + location.getIntegrationInstance().getId()));
-    return LocalFileSystemOptionsFactory.create(instance);
-  }
+  @Autowired
+  private StorageProperties storageProperties;
 
   /**
    * Returns {@link StorageFile} instances for every file in the target folder, at the top level.
@@ -113,36 +107,8 @@ public class LocalFileSystemStorageService implements StudyStorageService, DataF
   }
 
   @Override
-  public StorageFolder findFolder(FileStorageLocation location, Program program) throws StudyStorageNotFoundException {
-    LOGGER.info("Fetching storage folder instance for program: " + program.getName());
-    LocalFileSystemOptions options = getOptionsFromLocation(location);
-    Path path = Paths.get(options.getRootPath()).resolve(namingService.getProgramStorageFolderName(program));
-    LOGGER.info(path.toString());
-    return findFolderByPath(location, path.toString());
-  }
-
-  @Override
-  public StorageFolder findFolder(FileStorageLocation location, Study study) throws StudyStorageNotFoundException {
-    LOGGER.info("Fetching storage folder instance for study: " + study.getCode());
-    StorageFolder programFolder = this.findFolder(location, study.getProgram());
-    Path programPath = Paths.get(programFolder.getPath());
-    Path studyFolder = programPath.resolve(namingService.getStudyStorageFolderName(study));
-    LOGGER.info(studyFolder.toString());
-    return findFolderByPath(location, studyFolder.toString());
-  }
-
-  @Override
-  public StorageFolder findFolder(FileStorageLocation location, Assay assay) throws StudyStorageNotFoundException {
-    LOGGER.info("Fetching storage folder instance for assay: " + assay.getCode());
-    StorageFolder studyFolder = this.findFolder(location, assay.getStudy());
-    Path studyPath = Paths.get(studyFolder.getPath());
-    Path assayFolder = studyPath.resolve(namingService.getAssayStorageFolderName(assay));
-    LOGGER.info(assayFolder.toString());
-    return findFolderByPath(location, assayFolder.toString());
-  }
-
-  @Override
-  public StorageFolder createFolder(FileStorageLocation location, Program program) throws StudyStorageException {
+  public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
+      throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for program: " + program.getName());
     LocalFileSystemOptions options = getOptionsFromLocation(location);
     String folderName = namingService.getProgramStorageFolderName(program);

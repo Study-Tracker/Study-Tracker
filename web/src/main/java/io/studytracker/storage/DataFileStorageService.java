@@ -28,6 +28,7 @@ import org.springframework.core.io.Resource;
  * @author Will Oemler
  * @since 0.7.1
  */
+@Deprecated
 public interface DataFileStorageService {
 
   /**

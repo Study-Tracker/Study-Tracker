@@ -22,7 +22,6 @@ import io.studytracker.aws.S3DataFileStorageService;
 import io.studytracker.aws.S3Service;
 import io.studytracker.aws.S3StudyFileStorageService;
 import io.studytracker.config.properties.EgnyteProperties;
-import io.studytracker.egnyte.EgnyteApiDataFileStorageService;
 import io.studytracker.egnyte.EgnyteFolderNamingService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.egnyte.entity.EgnyteObject;
@@ -115,10 +114,10 @@ public class StorageServiceConfiguration {
       return new EgnyteStudyStorageService();
     }
 
-    @Bean
-    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService() {
-      return new EgnyteApiDataFileStorageService();
-    }
+//    @Bean
+//    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService() {
+//      return new EgnyteApiDataFileStorageService();
+//    }
   }
 
   @Configuration

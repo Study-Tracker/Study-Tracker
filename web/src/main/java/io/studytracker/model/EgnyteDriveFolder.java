@@ -37,7 +37,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
-@Table(name = "local_drive_folders")
+@Table(name = "egnyte_drive_folders")
 @EntityListeners(AuditListener.class)
 public class EgnyteDriveFolder implements StorageDriveFolderDetails {
 

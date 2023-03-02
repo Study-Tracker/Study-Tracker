@@ -22,7 +22,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Helper class for determining the correct {@link DataFileStorageService} implementation for a
@@ -32,7 +31,8 @@ import org.springframework.stereotype.Component;
  * @since 0.7.1
  */
 
-@Component
+//@Component
+@Deprecated
 public class DataFileStorageServiceLookup {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DataFileStorageServiceLookup.class);

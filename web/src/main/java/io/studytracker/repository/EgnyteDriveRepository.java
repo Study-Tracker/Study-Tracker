@@ -18,6 +18,7 @@ package io.studytracker.repository;
 
 import io.studytracker.model.EgnyteDrive;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,5 +26,8 @@ public interface EgnyteDriveRepository extends JpaRepository<EgnyteDrive, Long> 
 
   @Query("SELECT d FROM EgnyteDrive d WHERE d.egnyteIntegration.id = ?1")
   List<EgnyteDrive> findByIntegrationId(Long integrationId);
+
+  @Query("SELECT d FROM EgnyteDrive d WHERE d.storageDrive.id = ?1")
+  Optional<EgnyteDrive> findByStorageDriveId(Long id);
 
 }

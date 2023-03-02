@@ -18,12 +18,14 @@ package io.studytracker.storage;
 
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
+import org.springframework.core.io.Resource;
 
 /**
  * Base interface for a service that reads and writes study files to a connected file system.
@@ -32,36 +34,6 @@ import java.io.File;
  * @since < 0.6.0
  */
 public interface StudyStorageService {
-
-  /**
-   * Returns reference to a {@link Program} instance's storage folder. Throws a {@link
-   * StudyStorageNotFoundException} if the folder does not exist;
-   *
-   * @param parentFolder the parent folder
-   * @param program the program
-   * @return the storage folder
-   */
-  StorageDriveFolder findFolder(StorageDriveFolder parentFolder, Program program) throws StudyStorageNotFoundException;
-
-  /**
-   * Returns reference to a {@link Study} instance's storage folder. Throws a {@link
-   * StudyStorageNotFoundException} if the folder does not exist;
-   *
-   * @param parentFolder the parent folder
-   * @param study the study
-   * @return the storage folder
-   */
-  StorageDriveFolder findFolder(StorageDriveFolder parentFolder, Study study) throws StudyStorageNotFoundException;
-
-  /**
-   * Returns reference to a {@link Assay} instance's storage folder. Throws a {@link
-   * StudyStorageNotFoundException} if the folder does not exist;
-   *
-   * @param parentFolder the parent folder
-   * @param assay the assay
-   * @return the storage folder
-   */
-  StorageDriveFolder findFolder(StorageDriveFolder parentFolder, Assay assay) throws StudyStorageNotFoundException;
 
   /**
    * Creates a {@link StorageDriveFolder} and accompanying
@@ -74,7 +46,7 @@ public interface StudyStorageService {
    * @param program the program
    * @return the created storage folder
    */
-  StorageDriveFolder createFolder(StorageDriveFolder parentFolder, Program program) throws StudyStorageException;
+  StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program) throws StudyStorageException;
 
   /**
    * Creates a {@link StorageDriveFolder} and accompanying
@@ -86,7 +58,7 @@ public interface StudyStorageService {
    * @param study the study
    * @return the created storage folder
    */
-  StorageDriveFolder createFolder(StorageDriveFolder parentFolder, Study study) throws StudyStorageException;
+  StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study) throws StudyStorageException;
 
   /**
    * Creates a {@link StorageDriveFolder} and accompanying
@@ -98,34 +70,96 @@ public interface StudyStorageService {
    * @param assay the assay
    * @return the created storage folder
    */
-  StorageDriveFolder createFolder(StorageDriveFolder parentFolder, Assay assay) throws StudyStorageException;
+  StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay) throws StudyStorageException;
 
   /**
-   * Uploads the target file to the appropriate directory for the target {@link Study}. Throws a
-   * {@link StudyStorageDuplicateException} if the file already exists, a {@link
-   * io.studytracker.storage.exception.StudyStorageWriteException} if the file cannot be written,
-   * and a {@link StudyStorageNotFoundException} if the target folder cannot be found.
+   * Creates a new folder at the given path.
    *
-   * @param parentFolder the parent folder
-   * @param file the file to upload
-   * @param study the study to associate the file with
-   * @return the uploaded file reference
+   * @param parentFolder the storage location
+   * @param path the path to the folder to create the new folder within
+   * @param name the name of the new folder
+   * @return the new folder
+   * @throws StudyStorageException if the folder cannot be created
    */
-  @Deprecated
-  StorageFile saveFile(StorageDriveFolder parentFolder, File file, Study study) throws StudyStorageException;
+  StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name) throws StudyStorageException;
 
   /**
-   * Uploads the target file to the appropriate directory for the target {@link Assay}. Throws a *
-   * {@link StudyStorageDuplicateException} if the file already exists, a * {@link
-   * io.studytracker.storage.exception.StudyStorageWriteException} if the file cannot be written,
-   * and a * {@link StudyStorageNotFoundException} if the target folder cannot be found.
+   * Looks up a folder and its contents by path, given a parent folder.
    *
    * @param parentFolder the parent folder
-   * @param file the file to upload
-   * @param assay the assay to associate the file with
-   * @return the uploaded file reference
+   * @param path the path to the folder
+   * @return the folder
+   * @throws StudyStorageNotFoundException if the folder is not found
    */
-  @Deprecated
-  StorageFile saveFile(StorageDriveFolder parentFolder, File file, Assay assay) throws StudyStorageException;
+  StorageFolder findFolderByPath(StorageDriveFolder parentFolder, String path) throws StudyStorageNotFoundException;
+
+  /**
+   * Looks up a folder and its contents by path, given a parent drive.
+   *
+   * @param drive the parent storage drive
+   * @param path the path to the folder
+   * @return the folder
+   * @throws StudyStorageNotFoundException if the folder is not found
+   */
+  StorageFolder findFolderByPath(StorageDrive drive, String path) throws StudyStorageNotFoundException;
+
+  /**
+   * Finds a file by its path in the file system, given a parent folder.
+   *
+   * @param parentFolder the parent folder
+   * @param path the path to the file
+   * @return the file
+   * @throws StudyStorageNotFoundException if the file is not found
+   */
+  StorageFile findFileByPath(StorageDriveFolder parentFolder, String path) throws StudyStorageNotFoundException;
+
+  /**
+   * Finds a file by its path in the file system, given a parent folder.
+   *
+   * @param drive the parent folder drive
+   * @param path the path to the file
+   * @return the file
+   * @throws StudyStorageNotFoundException if the file is not found
+   */
+  StorageFile findFileByPath(StorageDrive drive, String path) throws StudyStorageNotFoundException;
+
+  /**
+   * Uploads the given file to the provided path.
+   *
+   * @param folder the storage folder
+   * @param path the path to the folder to upload the file to
+   * @param file the file to upload
+   * @return the uploaded file object
+   * @throws StudyStorageException if the file cannot be uploaded
+   */
+  StorageFile saveFile(StorageDriveFolder folder, String path, File file) throws StudyStorageException;
+
+  /**
+   * Downloads the file at the provided path.
+   *
+   * @param folder the storage folder
+   * @param path the path to the object to download
+   * @return the downloaded file byte stream
+   * @throws StudyStorageException if the file cannot be downloaded
+   */
+  Resource fetchFile(StorageDriveFolder folder, String path) throws StudyStorageException;
+
+  /**
+   * Returns true if the file exists at the provided path.
+   *
+   * @param folder the parent storage folder
+   * @param path the path to the object to check
+   * @return true if the file exists
+   */
+  boolean fileExists(StorageDriveFolder folder, String path);
+
+  /**
+   * Returns true if the folder exists at the provided path.
+   *
+   * @param folder the storage folder
+   * @param path the path to the object to check
+   * @return true if the folder exists
+   */
+  boolean folderExists(StorageDriveFolder folder, String path);
 
 }

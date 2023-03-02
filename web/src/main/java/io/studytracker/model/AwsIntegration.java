@@ -48,12 +48,15 @@ public class AwsIntegration {
   private Organization organization;
 
   @Column(name = "name", nullable = false)
+  @Convert(converter = StringFieldEncryptor.class)
   private String name;
 
   @Column(name = "account_number")
+  @Convert(converter = StringFieldEncryptor.class)
   private String accountNumber;
 
   @Column(name = "region", nullable = false, updatable = false)
+  @Convert(converter = StringFieldEncryptor.class)
   private String region;
 
   @Column(name = "access_key_id", length = 1024)
