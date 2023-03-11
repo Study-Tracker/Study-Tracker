@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package io.studytracker.model;
+package io.studytracker.mapstruct.dto.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import lombok.Data;
 
 @Data
-public class AssayOptions {
+public class StorageDriveFolderDto {
 
-  private boolean useNotebook = true;
-  private String notebookTemplateId;
-  private boolean useGit = false;
-  private boolean useStorage = true;
-  private StorageDriveFolder parentFolder;
-  private List<StorageDriveFolder> additionalFolders = new ArrayList<>();
+  private Long id;
+  private Long storageDriveId;
+  private String path;
+  private String name;
+  private boolean browserRoot = false;
+  private boolean studyRoot = false;
+  private boolean writeEnabled = false;
+  private boolean deleteEnabled = false;
+  private Date createdAt;
+  private Date updatedAt;
 
 }

@@ -88,12 +88,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("conclusions"),
         @NamedAttributeNode("comments"),
         @NamedAttributeNode("studyRelationships"),
-        @NamedAttributeNode("storageFolders")
+        @NamedAttributeNode(value = "storageFolders", subgraph = "study-storage-folder-details")
       },
     subgraphs = {
           @NamedSubgraph(
               name = "keyword-details",
               attributeNodes = {@NamedAttributeNode("category")}
+          ),
+          @NamedSubgraph(
+              name = "study-storage-folder-details",
+              attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
           )
     }
   )
@@ -552,11 +556,26 @@ public class Study implements Model {
     this.storageFolders = fileStoreFolders;
   }
 
-  public void addFileStoreFolder(StudyStorageFolder folder) {
+  public void addStudyStorageFolder(StudyStorageFolder folder) {
     this.storageFolders.add(folder);
   }
 
-  public void removeFileStoreFolder(StudyStorageFolder folder) {
+  public void addStorageFolder(StorageDriveFolder storageDriveFolder) {
+    this.addStorageFolder(storageDriveFolder, false);
+  }
+
+  public void addStorageFolder(StorageDriveFolder folder, boolean isPrimary) {
+    if (isPrimary) {
+      this.storageFolders.forEach(f -> f.setPrimary(false));
+    }
+    StudyStorageFolder studyStorageFolder = new StudyStorageFolder();
+    studyStorageFolder.setStudy(this);
+    studyStorageFolder.setStorageDriveFolder(folder);
+    studyStorageFolder.setPrimary(isPrimary);
+    this.getStorageFolders().add(studyStorageFolder);
+  }
+
+  public void removeStudyStorageFolder(StudyStorageFolder folder) {
     this.storageFolders.remove(folder);
   }
 

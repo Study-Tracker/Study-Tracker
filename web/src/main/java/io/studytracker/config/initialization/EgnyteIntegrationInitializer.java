@@ -26,7 +26,6 @@ import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +103,6 @@ public class EgnyteIntegrationInitializer {
     }
   }
 
-  @PostConstruct
   @Transactional
   public void initializeIntegrations() throws InvalidConfigurationException {
 

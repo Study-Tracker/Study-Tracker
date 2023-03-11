@@ -18,7 +18,11 @@ package io.studytracker.storage;
 
 import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.repository.StorageDriveRepository;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +38,9 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class StudyFileStorageServiceLookup {
+public class StudyStorageServiceLookup {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StudyFileStorageServiceLookup.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(StudyStorageServiceLookup.class);
 
   @Autowired(required = false)
   private EgnyteStudyStorageService egnyteStudyStorageService;
@@ -46,6 +50,17 @@ public class StudyFileStorageServiceLookup {
 
   @Autowired(required = false)
   private LocalFileSystemStorageService localFileSystemStorageService;
+
+  @Autowired
+  private StorageDriveRepository storageDriveRepository;
+
+  public Optional<StudyStorageService> lookup(StorageDriveFolder folder) {
+    LOGGER.debug("Looking up StudyStorageService for storageDriveFolder: {}", folder);
+    StorageDrive drive = storageDriveRepository.findById(folder.getStorageDrive().getId())
+        .orElseThrow(() -> new RecordNotFoundException("StorageDrive not found for id: "
+            + folder.getStorageDrive().getId()));
+    return lookup(drive.getDriveType());
+  }
 
   public Optional<StudyStorageService> lookup(DriveType driveType) {
     LOGGER.debug("Looking up StudyStorageService for storageLocationType: {}", driveType);

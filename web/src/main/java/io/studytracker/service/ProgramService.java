@@ -85,7 +85,7 @@ public class ProgramService {
       try {
         StorageDriveFolder parentFolder = options.getParentFolder();
         StudyStorageService studyStorageService = storageDriveFolderService.lookupStudyStorageService(parentFolder);
-        StorageDriveFolder programFolder = studyStorageService.createFolder(parentFolder, program);
+        StorageDriveFolder programFolder = studyStorageService.createProgramFolder(parentFolder, program);
         program.addStorageFolder(programFolder, true);
       } catch (Exception e) {
         throw new StudyTrackerException(e);

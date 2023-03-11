@@ -22,7 +22,6 @@ import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.DuplicateRecordException;
-import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -30,20 +29,22 @@ import io.studytracker.git.GitRepository;
 import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyOptionAttributes;
 import io.studytracker.model.StudyOptions;
+import io.studytracker.model.StudyStorageFolder;
 import io.studytracker.model.User;
 import io.studytracker.repository.ELNFolderRepository;
-import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
+import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.net.URL;
@@ -76,13 +77,13 @@ public class StudyService {
 
   private NamingService namingService;
 
-  private FileStoreFolderRepository fileStoreFolderRepository;
-
   private ELNFolderRepository elnFolderRepository;
 
   private GitService gitService;
 
-  private StorageLocationService storageLocationService;
+  private StudyStorageServiceLookup storageServiceLookup;
+
+  private StorageDriveFolderService storageDriveFolderService;
 
   /**
    * Finds a single study, identified by its primary key ID
@@ -153,23 +154,23 @@ public class StudyService {
    * @param study study object
    * @return storage folder record
    */
-  private FileStoreFolder createDefaultStudyStorageFolder(Study study) {
+  private StudyStorageFolder createStudyStorageFolder(Study study, StorageDriveFolder parentFolder) {
     try {
-      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-      StudyStorageService storageService = storageLocationService.lookupStudyStorageService(location);
-      StorageFolder storageFolder = storageService.createFolder(location, study);
-      FileStoreFolder folder = new FileStoreFolder();
-      folder.setFileStorageLocation(location);
-      folder.setName(storageFolder.getName());
-      folder.setPath(storageFolder.getPath());
-      folder.setUrl(storageFolder.getUrl());
-      folder.setReferenceId(storageFolder.getFolderId());
-      return folder;
-//      return fileStoreFolderRepository.save(folder);
+      StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
+          .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
+              + parentFolder.getStorageDrive().getId()));
+      StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
+          .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
+              + parentFolder.getStorageDrive().getDriveType()));
+      StorageDriveFolder folder = storageService.createStudyFolder(parentFolder, study);
+      StudyStorageFolder studyFolder = new StudyStorageFolder();
+      studyFolder.setStorageDriveFolder(folder);
+      studyFolder.setStudy(study);
+      return studyFolder;
     } catch (Exception e) {
       e.printStackTrace();
       LOGGER.warn("Failed to create storage folder for study: " + study.getCode());
-      return null;
+      throw new StudyTrackerException(e);
     }
   }
 
@@ -187,7 +188,7 @@ public class StudyService {
       LOGGER.info(String.format("Legacy Study : %s", study.getCode()));
       if (study.getNotebookFolder().getUrl() != null) {
         elnFolder = study.getNotebookFolder();
-        elnFolder.setName(namingService.getStudyNotebookFolderName(study));
+        elnFolder.setName(NamingService.getStudyNotebookFolderName(study));
       } else {
         LOGGER.warn("No ELN URL set, so folder reference will not be created.");
       }
@@ -261,9 +262,9 @@ public class StudyService {
                     new RecordNotFoundException("Invalid program: " + study.getProgram().getId()));
 
     // Create the study storage folder
-    FileStoreFolder folder = this.createDefaultStudyStorageFolder(study);
-    study.setPrimaryStorageFolder(folder);
-    study.addFileStoreFolder(folder);
+    StudyStorageFolder folder = this.createStudyStorageFolder(study, options.getParentFolder());
+    folder.setPrimary(true);
+    study.addStudyStorageFolder(folder);
 
     // Create the ELN folder
     NotebookEntry studySummaryEntry = null;
@@ -319,24 +320,33 @@ public class StudyService {
       }
     }
 
-    // S3 folder
-    if (options.isUseS3() && options.getS3LocationId() != null) {
-      LOGGER.debug("Creating S3 folder for study: " + study.getCode());
-      try {
-        FileStorageLocation s3Location = storageLocationService.findById(options.getS3LocationId())
-            .orElseThrow(() -> new RecordNotFoundException("Invalid S3 location ID: "
-                + options.getS3LocationId()));
-        StudyStorageService s3Service = storageLocationService.lookupStudyStorageService(s3Location);
-        StorageFolder storageFolder = s3Service.createFolder(s3Location, study);
-        FileStoreFolder s3Folder = fileStoreFolderRepository
-            .save(FileStoreFolder.from(s3Location, storageFolder));
-        study.addFileStoreFolder(s3Folder);
-        studyRepository.save(study);
-      } catch (StudyStorageException e) {
-        e.printStackTrace();
-        LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
-      }
+    // Additional folders
+    for (StorageDriveFolder folderOption : options.getAdditionalFolders()) {
+      LOGGER.debug("Creating additional folder for study: " + folder.toString());
+      StudyStorageFolder additionalFolder =
+          this.createStudyStorageFolder(study, folderOption);
+      additionalFolder.setPrimary(false);
+      study.addStudyStorageFolder(additionalFolder);
     }
+
+
+//    if (options.isUseS3() && options.getS3LocationId() != null) {
+//      LOGGER.debug("Creating S3 folder for study: " + study.getCode());
+//      try {
+//        FileStorageLocation s3Location = storageLocationService.findById(options.getS3LocationId())
+//            .orElseThrow(() -> new RecordNotFoundException("Invalid S3 location ID: "
+//                + options.getS3LocationId()));
+//        StudyStorageService s3Service = storageLocationService.lookupStudyStorageService(s3Location);
+//        StorageFolder storageFolder = s3Service.createFolder(s3Location, study);
+//        FileStoreFolder s3Folder = fileStoreFolderRepository
+//            .save(FileStoreFolder.from(s3Location, storageFolder));
+//        study.addStudyStorageFolder(s3Folder);
+//        studyRepository.save(study);
+//      } catch (StudyStorageException e) {
+//        e.printStackTrace();
+//        LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
+//      }
+//    }
 
     // Add a links to extra resources
     if (studySummaryEntry != null) {
@@ -505,60 +515,61 @@ public class StudyService {
   @Transactional
   public void repairStorageFolder(Study study) {
 
+    // TODO
     // Get the location and storage service
-    FileStorageLocation location;
-    StudyStorageService studyStorageService;
-    try {
-      location = storageLocationService.findDefaultStudyLocation();
-      studyStorageService = storageLocationService.lookupStudyStorageService(location);
-    } catch (FileStorageException e) {
-      e.printStackTrace();
-      throw new StudyTrackerException("Could not find default storage location or service", e);
-    }
-
-    // Find or create the storage folder
-    StorageFolder folder;
-    try {
-      folder = studyStorageService.findFolder(location, study);
-    } catch (StudyStorageNotFoundException e) {
-      LOGGER.warn("Storage folder not found for study: " + study.getCode());
-      e.printStackTrace();
-      throw new StudyTrackerException(e);
-    }
-
-    // Check if a folder record exists in the database
-    List<FileStoreFolder> folders = fileStoreFolderRepository
-        .findByPath(location.getId(), folder.getPath());
-    FileStoreFolder fileStoreFolder = null;
-    if (!folders.isEmpty()) {
-      fileStoreFolder = folders.get(0);
-    }
-
-    // Study has no folder record associated
-    if (study.getPrimaryStorageFolder() == null) {
-      if (fileStoreFolder == null) {
-        LOGGER.info("Repairing study folder with no record.");
-        fileStoreFolder = FileStoreFolder.from(location, folder);
-      }
-      study.setPrimaryStorageFolder(fileStoreFolder);
-      if (study.getStorageFolders().stream().noneMatch(f -> (
-          f.getFileStorageLocation().getId().equals(location.getId())
-              && f.getPath().equals(folder.getPath())))) {
-        study.getStorageFolders().add(fileStoreFolder);
-      }
-      studyRepository.save(study);
-    }
-
-    // Study does have a folder record, but it is malformed
-    else {
-      LOGGER.info("Repairing malformed study folder record.");
-      FileStoreFolder f = fileStoreFolderRepository.getById(study.getPrimaryStorageFolder().getId());
-      f.setFileStorageLocation(location);
-      f.setName(folder.getName());
-      f.setPath(folder.getPath());
-      f.setUrl(folder.getUrl());
-      fileStoreFolderRepository.save(f);
-    }
+//    FileStorageLocation location;
+//    StudyStorageService studyStorageService;
+//    try {
+//      location = storageLocationService.findDefaultStudyLocation();
+//      studyStorageService = storageLocationService.lookupStudyStorageService(location);
+//    } catch (FileStorageException e) {
+//      e.printStackTrace();
+//      throw new StudyTrackerException("Could not find default storage location or service", e);
+//    }
+//
+//    // Find or create the storage folder
+//    StorageFolder folder;
+//    try {
+//      folder = studyStorageService.findFolder(location, study);
+//    } catch (StudyStorageNotFoundException e) {
+//      LOGGER.warn("Storage folder not found for study: " + study.getCode());
+//      e.printStackTrace();
+//      throw new StudyTrackerException(e);
+//    }
+//
+//    // Check if a folder record exists in the database
+//    List<FileStoreFolder> folders = fileStoreFolderRepository
+//        .findByPath(location.getId(), folder.getPath());
+//    FileStoreFolder fileStoreFolder = null;
+//    if (!folders.isEmpty()) {
+//      fileStoreFolder = folders.get(0);
+//    }
+//
+//    // Study has no folder record associated
+//    if (study.getPrimaryStorageFolder() == null) {
+//      if (fileStoreFolder == null) {
+//        LOGGER.info("Repairing study folder with no record.");
+//        fileStoreFolder = FileStoreFolder.from(location, folder);
+//      }
+//      study.setPrimaryStorageFolder(fileStoreFolder);
+//      if (study.getStorageFolders().stream().noneMatch(f -> (
+//          f.getFileStorageLocation().getId().equals(location.getId())
+//              && f.getPath().equals(folder.getPath())))) {
+//        study.getStorageFolders().add(fileStoreFolder);
+//      }
+//      studyRepository.save(study);
+//    }
+//
+//    // Study does have a folder record, but it is malformed
+//    else {
+//      LOGGER.info("Repairing malformed study folder record.");
+//      FileStoreFolder f = fileStoreFolderRepository.getById(study.getPrimaryStorageFolder().getId());
+//      f.setFileStorageLocation(location);
+//      f.setName(folder.getName());
+//      f.setPath(folder.getPath());
+//      f.setUrl(folder.getUrl());
+//      fileStoreFolderRepository.save(f);
+//    }
 
   }
 
@@ -602,9 +613,15 @@ public class StudyService {
   }
 
   @Autowired
-  public void setStorageLocationService(
-      StorageLocationService storageLocationService) {
-    this.storageLocationService = storageLocationService;
+  public void setStorageServiceLookup(
+      StudyStorageServiceLookup storageServiceLookup) {
+    this.storageServiceLookup = storageServiceLookup;
+  }
+
+  @Autowired
+  public void setStorageDriveFolderService(
+      StorageDriveFolderService storageDriveFolderService) {
+    this.storageDriveFolderService = storageDriveFolderService;
   }
 
   @Autowired(required = false)
@@ -617,10 +634,6 @@ public class StudyService {
     this.namingService = namingService;
   }
 
-  @Autowired
-  public void setFileStoreFolderRepository(FileStoreFolderRepository fileStoreFolderRepository) {
-    this.fileStoreFolderRepository = fileStoreFolderRepository;
-  }
 
   @Autowired
   public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {

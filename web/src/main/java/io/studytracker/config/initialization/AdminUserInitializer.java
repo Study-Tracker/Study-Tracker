@@ -21,7 +21,6 @@ import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.security.UserPasswordGenerator;
 import io.studytracker.service.UserService;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +46,9 @@ public class AdminUserInitializer {
 
   @Autowired private AdminProperties adminProperties;
 
-  @PostConstruct
-  public void initializeAdminUser() {
+  public User initializeAdminUser() {
     if (userService.count() > 0) {
-      return;
+      return null;
     }
     LOGGER.info("No users present in the Study Tracker database. Initializing admin user...");
     String password = adminProperties.getPassword() != null
@@ -65,11 +63,12 @@ public class AdminUserInitializer {
     user.setAdmin(true);
     user.setPassword(passwordEncoder.encode(password));
     user.setType(UserType.STANDARD_USER);
-    userService.create(user);
+    User created = userService.create(user);
     LOGGER.info(
         String.format(
             "Created admin user with username '%s' and password '%s'. You should change this "
                 + "password from the login page as soon as possible.",
             email, password));
+    return created;
   }
 }

@@ -17,7 +17,6 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.aws.AwsIntegrationService;
-import io.studytracker.aws.S3Service;
 import io.studytracker.config.properties.AWSProperties;
 import io.studytracker.config.properties.AWSProperties.S3Properties;
 import io.studytracker.config.properties.StudyTrackerProperties;
@@ -32,7 +31,6 @@ import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +57,6 @@ public class AwsIntegrationInitializer {
 
   @Autowired
   private OrganizationService organizationService;
-
-  @Autowired(required = false)
-  private S3Service s3Service;
 
   private AwsIntegration registerAwsIntegrationInstances(Organization organization) throws InvalidConfigurationException {
 
@@ -132,7 +127,7 @@ public class AwsIntegrationInitializer {
     if (s3Properties != null && StringUtils.hasText(s3Properties.getBuckets())) {
       for (String bucketName: s3Properties.getBuckets().split(",")) {
         if (StringUtils.hasText(bucketName)) {
-          if (!s3Service.bucketIsRegistered(bucketName)) {
+          if (!awsIntegrationService.bucketIsRegistered(awsIntegration, bucketName)) {
             LOGGER.info("Registering S3 bucket: " + bucketName);
             StorageDrive storageDrive = new StorageDrive();
             storageDrive.setOrganization(organization);
@@ -144,14 +139,13 @@ public class AwsIntegrationInitializer {
             bucket.setName(bucketName);
             bucket.setAwsIntegration(awsIntegration);
             bucket.setStorageDrive(storageDrive);
-            s3Service.registerBucket(bucket);
+            awsIntegrationService.registerBucket(bucket);
           }
         }
       }
     }
   }
 
-  @PostConstruct
   @Transactional
   public void initializeIntegrations() throws InvalidConfigurationException {
 
@@ -170,7 +164,7 @@ public class AwsIntegrationInitializer {
 
       // Register integration definitiions
       AwsIntegration awsIntegration = registerAwsIntegrationInstances(organization);
-      if (awsIntegration != null && s3Service != null) {
+      if (awsIntegration != null) {
         registerS3Buckets(awsIntegration, organization);
       }
 

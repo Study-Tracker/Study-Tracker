@@ -18,6 +18,7 @@ package io.studytracker.repository;
 
 import io.studytracker.model.AwsIntegration;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,5 +26,17 @@ public interface AwsIntegrationRepository extends JpaRepository<AwsIntegration, 
 
   @Query("SELECT a FROM AwsIntegration a WHERE a.organization.id = ?1")
   List<AwsIntegration> findByOrganizationId(Long organizationId);
+
+  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b WHERE b.id = ?1")
+  AwsIntegration findByBucketDriveId(Long bucketDriveId);
+
+  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b JOIN S3BucketFolder f WHERE f.id = ?1")
+  AwsIntegration findByBucketFolderId(Long folderId);
+
+  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b JOIN S3BucketFolder f JOIN StorageDriveFolder df WHERE df.id = ?1")
+  Optional<AwsIntegration> findByStorageDriveFolderId(Long folderId);
+
+  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b JOIN StorageDrive  d WHERE d.id = ?1")
+  Optional<AwsIntegration> findByStorageDriveId(Long driveId);
 
 }

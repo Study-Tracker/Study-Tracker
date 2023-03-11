@@ -70,6 +70,10 @@ public class Program implements Model {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "organization_id", nullable = false, updatable = false)
+  private Organization organization;
+
   @Column(name = "code", nullable = false, updatable = false)
   private String code;
 
@@ -131,6 +135,14 @@ public class Program implements Model {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public Organization getOrganization() {
+    return organization;
+  }
+
+  public void setOrganization(Organization organization) {
+    this.organization = organization;
   }
 
   public String getCode() {

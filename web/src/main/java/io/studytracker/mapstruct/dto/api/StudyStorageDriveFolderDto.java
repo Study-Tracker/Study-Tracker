@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package io.studytracker.aws;
+package io.studytracker.mapstruct.dto.api;
 
-public class AWSAttributes {
+import lombok.Data;
 
-  public static final String REGION = "_aws.region";
+@Data
+public class StudyStorageDriveFolderDto {
 
-  public static final String S3_BUCKET = "_aws.s3.bucket";
-  public static final String S3_PREFIX = "_aws.s3.prefix";
-  public static final String S3_REGION = "_aws.s3.region";
-  public static final String S3_KEY = "_aws.s3.key";
-  public static final String S3_ARN = "_aws.s3.arn";
-
-  public static final String EVENTBRIDGE_BUS = "_aws.eventbridge.bus";
-  public static final String EVENTBRIDGE_ARN = "_aws.eventbridge.arn";
-  public static final String EVENTBRIDGE_REGION = "_aws.eventbridge.region";
+  private Long id;
+  private Long storageDriveId;
+  private Long storageDriveFolderId;
+  private Long studyId;
+  private String name;
+  private String path;
+  private boolean primary;
+  private boolean writeEnabled;
+  private boolean deleteEnabled;
 
 }

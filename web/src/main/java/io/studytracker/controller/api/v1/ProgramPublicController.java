@@ -69,7 +69,6 @@ public class ProgramPublicController extends AbstractProgramController {
     ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
     Program program = this.createNewProgram(newProgram, options);
     ProgramDto created = this.getProgramMapper().toProgramDto(program);
-    LOGGER.info("Storage Folder: {} {} {}", program.getPrimaryStorageFolder().getId(), program.getPrimaryStorageFolder().getName(), program.getPrimaryStorageFolder().getPath());
     LOGGER.info("Created program {}", created);
     return new ResponseEntity<>(created, HttpStatus.CREATED);
   }

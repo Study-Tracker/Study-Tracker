@@ -17,23 +17,40 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.config.ConfigOrder;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.model.Organization;
+import io.studytracker.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("example")
-@Order(ConfigOrder.EXAMPLE_DATA_INIT)
-public class ExampleDataRunner implements ApplicationRunner {
+@Order(ConfigOrder.DATA_INIT)
+public class DefaultDataInitializer implements ApplicationRunner {
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDataInitializer.class);
+
+  @Autowired private AdminUserInitializer adminUserInitializer;
+  @Autowired private AssayTypeInitializer assayTypeInitializer;
+  @Autowired private DefaultOrganizationInitializer defaultOrganizationInitializer;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
-    exampleDataGenerator.populateDatabase();
+    LOGGER.info("Initializing default data...");
+
+    LOGGER.info("Initializing assay types...");
+    assayTypeInitializer.initializeAssayTypes();
+
+    LOGGER.info("Initializing admin user...");
+    User admin = adminUserInitializer.initializeAdminUser();
+
+    LOGGER.info("Initializing default organization...");
+    Organization organization = defaultOrganizationInitializer.initializeDefaultOrganization();
+
+    LOGGER.info("Default data initialized.");
+
   }
 }

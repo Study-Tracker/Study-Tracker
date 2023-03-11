@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package io.studytracker.model;
+package io.studytracker.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import lombok.Data;
+public class ConfigOrder {
 
-@Data
-public class AssayOptions {
-
-  private boolean useNotebook = true;
-  private String notebookTemplateId;
-  private boolean useGit = false;
-  private boolean useStorage = true;
-  private StorageDriveFolder parentFolder;
-  private List<StorageDriveFolder> additionalFolders = new ArrayList<>();
+  public static final int SERVICE_INIT = 0;
+  public static final int PROFILE_INIT = 100;
+  public static final int DATA_INIT = 200;
+  public static final int EXAMPLE_DATA_INIT = 500;
+  public static final int AFTER_INIT = 1000;
 
 }

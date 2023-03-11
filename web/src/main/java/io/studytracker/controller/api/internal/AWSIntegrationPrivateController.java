@@ -17,7 +17,6 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.aws.AwsIntegrationService;
-import io.studytracker.aws.S3Service;
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.AwsIntegrationFormDto;
@@ -53,9 +52,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AWSIntegrationPrivateController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AWSIntegrationPrivateController.class);
-
-  @Autowired(required = false)
-  private S3Service s3Service;
 
   @Autowired
   private AwsIntegrationService awsIntegrationService;
@@ -119,26 +115,33 @@ public class AWSIntegrationPrivateController {
   @GetMapping("/s3/available-buckets")
   public List<String> listAvailableBuckets() {
     LOGGER.debug("Listing available buckets");
-    return s3Service.listAvailableBuckets();
+    Organization organization = organizationService.getCurrentOrganization();
+    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
+    return awsIntegrationService.listAvailableBuckets(integration);
   }
 
   @GetMapping("/s3/buckets")
   public List<S3BucketDetailsDto> findRegisteredBuckets() {
     LOGGER.debug("Listing registered buckets");
-    return s3BucketMapper.toDto(s3Service.findRegisteredBuckets());
+    Organization organization = organizationService.getCurrentOrganization();
+    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
+    return s3BucketMapper.toDto(awsIntegrationService.findRegisteredBuckets(integration));
   }
 
   @PostMapping("/s3/buckets")
   public S3BucketDetailsDto registerBucket(@Valid @RequestBody S3BucketFormDto dto) {
     LOGGER.info("Registering S3 bucket {}", dto.getName());
     S3Bucket bucket = s3BucketMapper.fromFormDto(dto);
-    return s3BucketMapper.toDto(s3Service.registerBucket(bucket));
+    Organization organization = organizationService.getCurrentOrganization();
+    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
+    bucket.setAwsIntegration(integration);
+    return s3BucketMapper.toDto(awsIntegrationService.registerBucket(bucket));
   }
 
   @DeleteMapping("/s3/buckets/{id}")
   public HttpEntity<?> updateBucket(@PathVariable("id") Long id) {
     LOGGER.info("Unregistering S3 bucket {}", id);
-    s3Service.removeBucket(id);
+    awsIntegrationService.removeBucket(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

@@ -27,7 +27,6 @@ import org.mapstruct.Mapper;
 public interface S3BucketMapper {
 
   S3Bucket fromFormDto(S3BucketFormDto dto);
-
   S3BucketDetailsDto toDto(S3Bucket s3Bucket);
   List<S3BucketDetailsDto> toDto(List<S3Bucket> s3Buckets);
   Set<S3BucketDetailsDto> toDto(Set<S3Bucket> s3Buckets);

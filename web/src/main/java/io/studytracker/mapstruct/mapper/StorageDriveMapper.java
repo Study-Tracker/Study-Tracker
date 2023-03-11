@@ -19,6 +19,8 @@ package io.studytracker.mapstruct.mapper;
 import io.studytracker.mapstruct.dto.form.StorageDriveFormDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
 import io.studytracker.model.StorageDrive;
+import java.util.List;
+import java.util.Set;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
@@ -27,5 +29,7 @@ public interface StorageDriveMapper {
   StorageDrive fromFormDto(StorageDriveFormDto dto);
 
   StorageDriveDetailsDto toDetailsDto(StorageDrive storageDrive);
+  List<StorageDriveDetailsDto> toDetailsDto(List<StorageDrive> storageDrives);
+  Set<StorageDriveDetailsDto> toDetailsDto(Set<StorageDrive> storageDrives);
 
 }

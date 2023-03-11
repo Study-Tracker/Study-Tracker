@@ -18,6 +18,7 @@ package io.studytracker.repository;
 
 import io.studytracker.model.StorageDrive;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,6 +26,9 @@ public interface StorageDriveRepository extends JpaRepository<StorageDrive, Long
 
   @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1")
   List<StorageDrive> findByOrganization(Long organizationId);
+
+  @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1 AND sd.id = ?2")
+  Optional<StorageDrive> findByIdAndOrganizationId(Long id, Long organizationId);
 
   @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1 AND sd.driveType = ?2")
   List<StorageDrive> findByOrganizationAndDriveType(Long organizationId, StorageDrive.DriveType driveType);

@@ -101,7 +101,7 @@ public class NamingService {
    * @param study
    * @return
    */
-  public String getStudyStorageFolderName(Study study) {
+  public static String getStudyStorageFolderName(Study study) {
     return study.getCode() + " - " + study.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
   }
 
@@ -111,7 +111,7 @@ public class NamingService {
    * @param assay
    * @return
    */
-  public String getAssayStorageFolderName(Assay assay) {
+  public static String getAssayStorageFolderName(Assay assay) {
     return assay.getCode() + " - " + assay.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
   }
 
@@ -121,20 +121,16 @@ public class NamingService {
    * @param program
    * @return
    */
-  public String getProgramStorageFolderName(Program program) {
+  public static String getProgramStorageFolderName(Program program) {
     return program.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
   }
 
-  public String getStudyNotebookFolderName(Study study) {
+  public static String getStudyNotebookFolderName(Study study) {
     return study.getCode() + ": " + study.getName();
   }
 
-  public String getAssayNotebookFolderName(Assay assay) {
+  public static String getAssayNotebookFolderName(Assay assay) {
     return assay.getCode() + ": " + assay.getName();
-  }
-
-  public String getProgramNotebookFolderName(Program program) {
-    return program.getName();
   }
 
 }

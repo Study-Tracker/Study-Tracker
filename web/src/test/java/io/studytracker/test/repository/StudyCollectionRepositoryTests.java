@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,26 @@ package io.studytracker.test.repository;
 
 import io.studytracker.Application;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
+import io.studytracker.exception.StudyTrackerException;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyCollection;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.ELNFolderRepository;
-import io.studytracker.repository.FileStorageLocationRepository;
-import io.studytracker.repository.FileStoreFolderRepository;
+import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyCollectionRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,18 +60,17 @@ public class StudyCollectionRepositoryTests {
   @Autowired private UserRepository userRepository;
   @Autowired private ProgramRepository programRepository;
   @Autowired private ELNFolderRepository elnFolderRepository;
-  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StudyRepository studyRepository;
   @Autowired private StudyCollectionRepository studyCollectionRepository;
-
-  @Autowired private FileStorageLocationRepository fileStorageLocationRepository;
+  @Autowired private OrganizationRepository organizationRepository;
+  @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
 
   @Before
   public void doBefore() {
     studyCollectionRepository.deleteAll();
     studyRepository.deleteAll();
     programRepository.deleteAll();
-    fileStoreFolderRepository.deleteAll();
     elnFolderRepository.deleteAll();
     userRepository.deleteAll();
   }
@@ -86,25 +89,34 @@ public class StudyCollectionRepositoryTests {
     userRepository.save(user);
   }
 
+  private StorageDriveFolder createProgramFolder(Program program) {
+    try {
+      StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders()
+          .stream()
+          .min(Comparator.comparing(StorageDriveFolder::getId))
+          .orElseThrow(RecordNotFoundException::new);
+      StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
+          .orElseThrow(RecordNotFoundException::new);
+      return studyStorageService.createProgramFolder(rootFolder, program);
+    } catch (Exception ex) {
+      throw new StudyTrackerException(ex);
+    }
+  }
+
   private void createProgram() {
 
     User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
-    FileStorageLocation location = fileStorageLocationRepository.findAll().get(0);
+    Organization organization = organizationRepository.findAll().get(0);
 
     Program program = new Program();
+    program.setOrganization(organization);
     program.setActive(true);
     program.setCode("TST");
     program.setCreatedBy(user);
     program.setLastModifiedBy(user);
     program.setName("Test Program");
     program.addAttribute("key", "value");
-
-    FileStoreFolder folder = new FileStoreFolder();
-    folder.setPath("/path/to/test");
-    folder.setName("test");
-    folder.setUrl("http://test");
-    folder.setFileStorageLocation(location);
-    program.setPrimaryStorageFolder(folder);
+    program.addStorageFolder(createProgramFolder(program), true);
 
     programRepository.save(program);
   }

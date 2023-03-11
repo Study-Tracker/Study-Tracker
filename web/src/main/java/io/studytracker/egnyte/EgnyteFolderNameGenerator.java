@@ -21,27 +21,24 @@ import io.studytracker.model.Program;
 import io.studytracker.model.Study;
 import io.studytracker.service.NamingService;
 
-public class EgnyteFolderNamingService extends NamingService {
+public class EgnyteFolderNameGenerator {
 
-  @Override
-  public String getStudyStorageFolderName(Study study) {
-    return super.getStudyStorageFolderName(study)
+  public static String getStudyStorageFolderName(Study study) {
+    return NamingService.getStudyStorageFolderName(study)
         .replaceAll("_", " ")
         .replaceAll("\\s+", " ")
         .trim();
   }
 
-  @Override
-  public String getAssayStorageFolderName(Assay assay) {
-    return super.getAssayStorageFolderName(assay)
+  public static String getAssayStorageFolderName(Assay assay) {
+    return NamingService.getAssayStorageFolderName(assay)
         .replaceAll("_", " ")
         .replaceAll("\\s+", " ")
         .trim();
   }
 
-  @Override
-  public String getProgramStorageFolderName(Program program) {
-    return super.getProgramStorageFolderName(program)
+  public static String getProgramStorageFolderName(Program program) {
+    return NamingService.getProgramStorageFolderName(program)
         .replaceAll("_", " ")
         .replaceAll("\\s+", " ")
         .trim();

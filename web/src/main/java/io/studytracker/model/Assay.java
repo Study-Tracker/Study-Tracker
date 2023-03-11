@@ -412,11 +412,26 @@ public class Assay implements Model {
     this.storageFolders = fileStoreFolders;
   }
 
-  public void addFileStoreFolder(AssayStorageFolder folder) {
+  public void addStorageFolder(AssayStorageFolder folder) {
     this.storageFolders.add(folder);
   }
 
-  public void removeFileStoreFolder(AssayStorageFolder folder) {
+  public void addStorageFolder(StorageDriveFolder folder) {
+    addStorageFolder(folder, false);
+  }
+
+  public void addStorageFolder(StorageDriveFolder folder, boolean isPrimary) {
+    if (isPrimary) {
+      this.storageFolders.forEach(f -> f.setPrimary(false));
+    }
+    AssayStorageFolder assayStorageFolder = new AssayStorageFolder();
+    assayStorageFolder.setAssay(this);
+    assayStorageFolder.setStorageDriveFolder(folder);
+    assayStorageFolder.setPrimary(isPrimary);
+    this.getStorageFolders().add(assayStorageFolder);
+  }
+
+  public void removeStorageFolder(AssayStorageFolder folder) {
     this.storageFolders.remove(folder);
   }
 

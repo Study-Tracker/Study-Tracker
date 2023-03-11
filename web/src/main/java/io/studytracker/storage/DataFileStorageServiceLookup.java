@@ -49,12 +49,12 @@ public class DataFileStorageServiceLookup {
   public Optional<DataFileStorageService> lookup(StorageLocationType storageLocationType) {
     LOGGER.debug("Looking up DataFileStorageService for storageLocationType: {}", storageLocationType);
     switch (storageLocationType) {
-      case EGNYTE_API:
-        return Optional.ofNullable(egnyteApiDataFileStorageService);
-      case AWS_S3:
-        return Optional.ofNullable(s3DataFileStorageService);
-      case LOCAL_FILE_SYSTEM:
-        return Optional.ofNullable(localFileSystemStorageService);
+//      case EGNYTE_API:
+//        return Optional.ofNullable(egnyteApiDataFileStorageService);
+//      case AWS_S3:
+//        return Optional.ofNullable(s3DataFileStorageService);
+//      case LOCAL_FILE_SYSTEM:
+//        return Optional.ofNullable(localFileSystemStorageService);
       default:
         return Optional.empty();
     }

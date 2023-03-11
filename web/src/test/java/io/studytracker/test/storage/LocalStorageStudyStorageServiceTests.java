@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
-import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
@@ -31,11 +31,11 @@ import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
-import io.studytracker.service.StorageLocationService;
 import io.studytracker.storage.LocalFileSystemStorageService;
+import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.exception.StudyStorageDuplicateException;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.Collections;
 import java.util.Date;
@@ -76,8 +76,8 @@ public class LocalStorageStudyStorageServiceTests {
   @Autowired
   private ExampleDataGenerator exampleDataGenerator;
 
-  @Autowired
-  private StorageLocationService storageLocationService;
+  @Autowired private StudyStorageServiceLookup storageServiceLookup;
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
 
   @Before
   public void doBefore() {
@@ -110,30 +110,25 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
 
-    FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-    StorageFolder folder = null;
+    StorageDriveFolder programFolder = storageDriveFolderService.findByProgram(program).get(0);
+    Assert.assertNotNull(programFolder);
+    StorageDriveFolder folder = null;
     Exception exception = null;
+
     try {
-      folder = storageService.createFolder(location, study);
+      folder = storageService.createStudyFolder(programFolder, study);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
     }
 
-    if (exception != null) {
-      Assert.assertNull(folder);
-      Assert.assertTrue(exception instanceof StudyStorageDuplicateException);
-    } else {
-      Assert.assertNotNull(folder);
-      StorageFolder studyFolder = storageService.findFolder(location, study);
-      Assert.assertNotNull(studyFolder);
-      Assert.assertEquals(folder.getPath(), studyFolder.getPath());
-    }
-
-    exception = null;
+    Assert.assertNull(exception);
+    Assert.assertNotNull(folder);
+    Assert.assertNotNull(folder.getId());
     StorageFile file = null;
+
     try {
-      file = storageService.saveFile(location, TEST_FILE.getFile(), study);
+      file = storageService.saveFile(folder, folder.getPath(), TEST_FILE.getFile());
     } catch (Exception e) {
       exception = e;
     }
@@ -154,12 +149,16 @@ public class LocalStorageStudyStorageServiceTests {
     study.setProgram(program);
     study.setOwner(user);
     study.setCode("BAD-STUDY");
+    StorageDriveFolder programFolder = program.getStorageFolders().stream()
+        .filter(f -> f.isPrimary())
+        .findFirst()
+        .get()
+        .getStorageDriveFolder();
 
-    FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.findFolder(location, study);
+      folder = storageService.findFolderByPath(programFolder, "BAD-STUDY");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -198,8 +197,15 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertNotNull(study.getId());
     Assert.assertEquals("CPA-12345", study.getCode());
 
-    FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-    storageService.createFolder(location, study);
+    StorageDriveFolder programFolder = program.getStorageFolders().stream()
+        .filter(f -> f.isPrimary())
+        .findFirst()
+        .get()
+        .getStorageDriveFolder();
+    StorageDriveFolder studyFolder = storageService.createStudyFolder(programFolder, study);
+    Assert.assertNotNull(studyFolder.getId());
+    study.addStorageFolder(studyFolder, true);
+    studyRepository.save(study);
 
     Assay assay = new Assay();
     assay.setName("Test assay");
@@ -215,29 +221,21 @@ public class LocalStorageStudyStorageServiceTests {
     assayRepository.save(assay);
     Assert.assertNotNull(assay.getId());
 
-    StorageFolder folder = null;
+    StorageDriveFolder assayFolder = null;
     Exception exception = null;
     try {
-      folder = storageService.createFolder(location, assay);
+      assayFolder = storageService.createAssayFolder(studyFolder, assay);
     } catch (Exception e) {
       e.printStackTrace();
       exception = e;
     }
 
-    if (exception != null) {
-      Assert.assertNull(folder);
-      Assert.assertTrue(exception instanceof StudyStorageDuplicateException);
-    } else {
-      Assert.assertNotNull(folder);
-      StorageFolder assayFolder = storageService.findFolder(location, assay);
-      Assert.assertNotNull(assayFolder);
-      Assert.assertEquals(folder.getPath(), assayFolder.getPath());
-    }
-
-    exception = null;
+    Assert.assertNull(exception);
+    Assert.assertNotNull(assayFolder);
     StorageFile file = null;
+
     try {
-      file = storageService.saveFile(location, TEST_FILE.getFile(), assay);
+      file = storageService.saveFile(assayFolder, assayFolder.getPath(), TEST_FILE.getFile());
     } catch (Exception e) {
       exception = e;
     }
@@ -250,6 +248,11 @@ public class LocalStorageStudyStorageServiceTests {
   public void getInvalidAssayFolderTest() throws Exception {
 
     Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    StorageDriveFolder studyFolder = study.getStorageFolders().stream()
+        .filter(f -> f.isPrimary())
+        .findFirst()
+        .get()
+        .getStorageDriveFolder();
     AssayType assayType =
         assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
@@ -261,8 +264,7 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-      folder = storageService.findFolder(location, assay);
+      folder = storageService.findFolderByPath(studyFolder, "CPA-10001-XXXXX");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();

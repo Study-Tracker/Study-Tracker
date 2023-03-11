@@ -16,6 +16,7 @@
 
 package io.studytracker.storage;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class StorageUtils {
@@ -60,6 +61,11 @@ public class StorageUtils {
   public static String cleanInputPath(String path) {
     if (path == null) return null;
     return path.replaceAll("\\.\\.", ".");
+  }
+
+  public static String getFolderNameFromPath(String path) {
+    File file = new File(cleanInputPath(path));
+    return file.getName();
   }
 
 }

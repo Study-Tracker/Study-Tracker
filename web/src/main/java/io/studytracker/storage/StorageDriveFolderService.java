@@ -19,12 +19,14 @@ package io.studytracker.storage;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.StorageDriveFolderDetails;
 import io.studytracker.model.Study;
 import io.studytracker.repository.StorageDriveFolderDetailsOperations;
 import io.studytracker.repository.StorageDriveFolderRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +42,8 @@ public class StorageDriveFolderService {
 
   @Autowired private OrganizationService organizationService;
   @Autowired private StorageDriveFolderRepository folderRepository;
-  @Autowired private StudyFileStorageServiceLookup studyFileStorageServiceLookup;
+  @Autowired private StorageDriveRepository driveRepository;
+  @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
   @Autowired private StorageDriveRepositoryLookup storageDriveRepositoryLookup;
 
 
@@ -93,13 +96,13 @@ public class StorageDriveFolderService {
   }
 
   public StudyStorageService lookupStudyStorageService(StorageDriveFolder folder) {
-    return studyFileStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
+    return studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
         .orElseThrow(() -> new IllegalArgumentException("No storage service found for folder: "
         + folder.getId()));
   }
 
   public StudyStorageService lookupStudyStorageService(DriveType driveType) {
-    return studyFileStorageServiceLookup.lookup(driveType)
+    return studyStorageServiceLookup.lookup(driveType)
         .orElseThrow(() -> new IllegalArgumentException("No storage service found for drive type: "
             + driveType));
   }
@@ -111,6 +114,19 @@ public class StorageDriveFolderService {
          .orElseThrow(() -> new IllegalArgumentException("No folder details found for folder: " + folder.getId()));
   }
 
+  // Drives
+
+  public List<StorageDrive> findAllDrives() {
+    LOGGER.debug("Find all drives for organization");
+    Organization organization = organizationService.getCurrentOrganization();
+    return driveRepository.findByOrganization(organization.getId());
+  }
+
+  public Optional<StorageDrive> findDriveById(Long id) {
+    LOGGER.debug("Find drive by id: {}", id);
+    Organization organization = organizationService.getCurrentOrganization();
+    return driveRepository.findByIdAndOrganizationId(id, organization.getId());
+  }
 
 
 }

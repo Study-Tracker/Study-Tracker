@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ProgramPayloadDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
 import io.studytracker.model.Program;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
 import org.junit.Assert;
@@ -178,10 +179,14 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
 
     Program program = programRepository.findByName("Program X")
         .orElseThrow(RecordNotFoundException::new);
-    Assert.assertNotNull(program.getPrimaryStorageFolder());
-    System.out.println(program.getPrimaryStorageFolder().getPath());
-    System.out.println(program.getPrimaryStorageFolder().getName());
-    System.out.println(program.getPrimaryStorageFolder().getId());
+    Assert.assertFalse(program.getStorageFolders().isEmpty());
+    StorageDriveFolder folder = program.getStorageFolders().stream()
+        .findFirst()
+        .get()
+        .getStorageDriveFolder();
+    System.out.println(folder.getPath());
+    System.out.println(folder.getName());
+    System.out.println(folder.getId());
 
   }
 

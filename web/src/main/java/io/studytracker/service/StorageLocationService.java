@@ -31,19 +31,18 @@ import io.studytracker.storage.DataFileStorageService;
 import io.studytracker.storage.DataFileStorageServiceLookup;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageLocationType;
-import io.studytracker.storage.StudyFileStorageServiceLookup;
 import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Deprecated
-@Service
+//@Service
 public class StorageLocationService {
 
   public static final Logger LOGGER = LoggerFactory.getLogger(StorageLocationService.class);
@@ -55,7 +54,7 @@ public class StorageLocationService {
   private DataFileStorageServiceLookup dataFileStorageServiceLookup;
 
   @Autowired
-  private StudyFileStorageServiceLookup studyFileStorageServiceLookup;
+  private StudyStorageServiceLookup studyStorageServiceLookup;
 
   @Autowired
   private IntegrationInstanceRepository integrationInstanceRepository;
@@ -169,9 +168,10 @@ public class StorageLocationService {
   }
 
   public StudyStorageService lookupStudyStorageService(FileStorageLocation location) {
-    return studyFileStorageServiceLookup.lookup(location.getType())
-        .orElseThrow(() -> new IllegalArgumentException("No storage service found for type: "
-            + location.getType()));
+//    return studyFileStorageServiceLookup.lookup(location.getType())
+//        .orElseThrow(() -> new IllegalArgumentException("No storage service found for type: "
+//            + location.getType()));
+    return null;
   }
 
   public StudyStorageService lookupStudyStorageService(FileStoreFolder folder) {

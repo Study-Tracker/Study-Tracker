@@ -18,22 +18,14 @@ package io.studytracker.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import io.studytracker.aws.S3DataFileStorageService;
-import io.studytracker.aws.S3Service;
-import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.config.properties.EgnyteProperties;
-import io.studytracker.egnyte.EgnyteFolderNamingService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.rest.EgnyteObjectDeserializer;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.exception.InvalidConfigurationException;
-import io.studytracker.repository.AwsIntegrationRepository;
-import io.studytracker.repository.S3BucketRepository;
 import io.studytracker.storage.LocalFileSystemStorageService;
 import java.net.URL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -42,10 +34,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3ClientBuilder;
 
 @Configuration
 public class StorageServiceConfiguration {
@@ -64,11 +52,6 @@ public class StorageServiceConfiguration {
   @ConditionalOnProperty(name = "storage.mode", havingValue = "egnyte")
   @AutoConfigureBefore(StorageServiceConfiguration.class)
   public static class EgnyteServiceConfiguration {
-
-    @Bean
-    public EgnyteFolderNamingService egnyteFolderNamingService() {
-      return new EgnyteFolderNamingService();
-    }
 
     @Bean
     public ObjectMapper egnyteObjectMapper(EgnyteProperties egnyteProperties) throws Exception {
@@ -114,48 +97,7 @@ public class StorageServiceConfiguration {
       return new EgnyteStudyStorageService();
     }
 
-//    @Bean
-//    public EgnyteApiDataFileStorageService egnyteApiDataFileStorageService() {
-//      return new EgnyteApiDataFileStorageService();
-//    }
   }
 
-  @Configuration
-  @ConditionalOnProperty(name = "aws.region", havingValue = "")
-  public static class S3StorageServiceConfiguration {
-
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired(required = false)
-    private AwsCredentialsProvider credentialsProvider;
-
-    @Value("${aws.region}")
-    private Region region;
-
-    @Bean
-    public S3Client s3Client() {
-      S3ClientBuilder builder = S3Client.builder().region(region);
-      if (credentialsProvider != null) {
-        builder.credentialsProvider(credentialsProvider);
-      }
-      return builder.build();
-    }
-
-    @Bean
-    public S3Service s3Service(S3Client s3Client, AwsIntegrationRepository awsIntegrationRepository,
-        S3BucketRepository s3BucketRepository) {
-      return new S3Service(s3Client, s3BucketRepository, awsIntegrationRepository);
-    }
-
-    @Bean
-    public S3DataFileStorageService s3DataFileStorageService() {
-      return new S3DataFileStorageService(s3Client());
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "aws.s3.default-study-location", havingValue = "")
-    public S3StudyStorageService s3StudyFileStorageService() {
-      return new S3StudyStorageService();
-    }
-  }
 
 }

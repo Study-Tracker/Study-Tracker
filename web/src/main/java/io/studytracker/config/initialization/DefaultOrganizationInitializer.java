@@ -16,29 +16,31 @@
 
 package io.studytracker.config.initialization;
 
-import io.studytracker.model.AssayType;
-import io.studytracker.service.AssayTypeService;
+import io.studytracker.model.Organization;
+import io.studytracker.repository.OrganizationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AssayTypeInitializer {
+public class DefaultOrganizationInitializer {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AssayTypeInitializer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrganizationInitializer.class);
 
-  @Autowired private AssayTypeService assayTypeService;
+  @Autowired
+  private OrganizationRepository organizationRepository;
 
-  public void initializeAssayTypes() {
-    if (assayTypeService.count() > 0) {
-      return;
+  public Organization initializeDefaultOrganization() {
+    if (organizationRepository.count() > 0) {
+      return null;
     }
-    LOGGER.info("No assay types defined. Initializing base assay types...");
-    AssayType assayType = new AssayType();
-    assayType.setName("Generic");
-    assayType.setDescription("Generic assay type");
-    assayType.setActive(true);
-    assayTypeService.create(assayType);
+    LOGGER.info("No organizations defined. Initializing default organization...");
+    Organization organization = new Organization();
+    organization.setName("My Organization");
+    organization.setDescription("Default organization");
+    organization.setActive(true);
+    return organizationRepository.save(organization);
   }
+
 }

@@ -60,9 +60,6 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   private EgnyteClientOperations egnyteClient;
 
   @Autowired
-  private EgnyteFolderNamingService egnyteFolderNamingService;
-
-  @Autowired
   private EgnyteDriveRepository egnyteDriveRepository;
 
   @Autowired
@@ -88,7 +85,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
         path = path + "/";
       }
     } else {
-      path = rootPath + egnyteFolderNamingService.getProgramStorageFolderName(program) + "/";
+      path = rootPath + EgnyteFolderNameGenerator.getProgramStorageFolderName(program) + "/";
     }
     LOGGER.debug("Program folder path: " + path);
     return path;
@@ -107,7 +104,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     } else {
       path =
           this.getProgramFolderPath(study.getProgram(), rootPath)
-              + egnyteFolderNamingService.getStudyStorageFolderName(study)
+              + EgnyteFolderNameGenerator.getStudyStorageFolderName(study)
               + "/";
     }
     LOGGER.debug("Study folder path: " + path);
@@ -127,7 +124,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     } else {
       Study study = assay.getStudy();
       String studyPath = this.getStudyFolderPath(study, rootPath);
-      path = studyPath + egnyteFolderNamingService.getAssayStorageFolderName(assay) + "/";
+      path = studyPath + EgnyteFolderNameGenerator.getAssayStorageFolderName(assay) + "/";
     }
     LOGGER.debug("Assay folder path: " + path);
     return path;

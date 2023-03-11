@@ -27,7 +27,13 @@ public interface S3BucketRepository extends JpaRepository<S3Bucket, Long> {
   @Query("SELECT b FROM S3Bucket b WHERE b.awsIntegration.id = ?1 and b.name = ?2")
   Optional<S3Bucket> findByIntegrationAndName(Long integrationId, String name);
 
+  @Query("SELECT b FROM S3Bucket b JOIN S3BucketFolder bf WHERE bf.storageDriveFolder.id = ?1")
+  Optional<S3Bucket> findByStorageDriveFolderId(Long storageDriveFolderId);
+
   @Query("SELECT b FROM S3Bucket b WHERE b.awsIntegration.id = ?1")
   List<S3Bucket> findByAwsIntegrationId(Long integrationId);
+
+  @Query("SELECT b FROM S3Bucket b WHERE b.storageDrive.id = ?1")
+  Optional<S3Bucket> findByStorageDriveId(Long storageDriveId);
 
 }
