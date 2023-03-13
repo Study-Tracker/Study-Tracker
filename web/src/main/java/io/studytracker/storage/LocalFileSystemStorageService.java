@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.annotation.Transactional;
 
 public class LocalFileSystemStorageService implements StudyStorageService {
 
@@ -114,6 +115,7 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   }
 
   @Override
+  @Transactional
   public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
       throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for program: " + program.getName());
@@ -124,27 +126,29 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     }
 
     // Create the folder
-    String folderName = namingService.getProgramStorageFolderName(program);
+    String folderName = NamingService.getProgramStorageFolderName(program);
     StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(), folderName);
     return saveStorageFolderRecord(parentFolder, storageFolder);
 
   }
 
   @Override
+  @Transactional
   public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
       throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for study: " + study.getCode());
     StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(),
-        namingService.getStudyStorageFolderName(study));
+        NamingService.getStudyStorageFolderName(study));
     return saveStorageFolderRecord(parentFolder, storageFolder);
   }
 
   @Override
+  @Transactional
   public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
       throws StudyStorageException {
     LOGGER.info("Creating storage folder instance for assay: " + assay.getCode());
     StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(),
-        namingService.getAssayStorageFolderName(assay));
+        NamingService.getAssayStorageFolderName(assay));
     return saveStorageFolderRecord(parentFolder, storageFolder);
   }
 

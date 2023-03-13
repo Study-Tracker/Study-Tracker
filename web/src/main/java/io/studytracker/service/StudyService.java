@@ -156,7 +156,7 @@ public class StudyService {
    */
   private StudyStorageFolder createStudyStorageFolder(Study study, StorageDriveFolder parentFolder) {
     try {
-      StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
+      StorageDrive drive = storageDriveFolderService.findDriveByFolder(parentFolder)
           .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
               + parentFolder.getStorageDrive().getId()));
       StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
@@ -262,7 +262,16 @@ public class StudyService {
                     new RecordNotFoundException("Invalid program: " + study.getProgram().getId()));
 
     // Create the study storage folder
-    StudyStorageFolder folder = this.createStudyStorageFolder(study, options.getParentFolder());
+    StorageDriveFolder parentFolder = options.getParentFolder();
+    if (parentFolder == null) {
+      parentFolder = program.getStorageFolders().stream()
+          .filter(f -> f.isPrimary())
+          .findFirst()
+          .orElseThrow(() -> new RecordNotFoundException("No primary storage folder found for program: "
+              + program.getName()))
+          .getStorageDriveFolder();
+    }
+    StudyStorageFolder folder = this.createStudyStorageFolder(study, parentFolder);
     folder.setPrimary(true);
     study.addStudyStorageFolder(folder);
 

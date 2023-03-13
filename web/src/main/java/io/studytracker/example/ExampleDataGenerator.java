@@ -79,6 +79,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 public class ExampleDataGenerator {
 
@@ -232,6 +233,7 @@ public class ExampleDataGenerator {
     programs.add(program);
 
     program = new Program();
+    program.setOrganization(organization);
     program.setName("Preclinical Project B");
     program.setCode("PPB");
     program.setActive(true);
@@ -242,6 +244,7 @@ public class ExampleDataGenerator {
     programs.add(program);
 
     program = new Program();
+    program.setOrganization(organization);
     program.setName("Cancelled Program C");
     program.setCode("CPC");
     program.setActive(false);
@@ -252,6 +255,7 @@ public class ExampleDataGenerator {
     programs.add(program);
 
     program = new Program();
+    program.setOrganization(organization);
     program.setName("Target ID Project D");
     program.setCode("TID");
     program.setActive(true);
@@ -262,6 +266,7 @@ public class ExampleDataGenerator {
     programs.add(program);
 
     program = new Program();
+    program.setOrganization(organization);
     program.setName("Target ID Project E");
     program.setCode("TID");
     program.setActive(true);
@@ -775,6 +780,7 @@ public class ExampleDataGenerator {
 
   }
 
+  @Transactional
   public void clearDatabase() {
     LOGGER.info("Wiping database...");
     studyCollectionRepository.deleteAll();
@@ -795,7 +801,7 @@ public class ExampleDataGenerator {
     keywordCategoryRepository.deleteAll();
     programRepository.deleteAll();
     userRepository.deleteAll();
-    organizationRepository.deleteAll();
+//    organizationRepository.deleteAll();
   }
 
   public void populateDatabase() {

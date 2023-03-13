@@ -128,5 +128,10 @@ public class StorageDriveFolderService {
     return driveRepository.findByIdAndOrganizationId(id, organization.getId());
   }
 
+  public Optional<StorageDrive> findDriveByFolder(StorageDriveFolder folder) {
+    LOGGER.debug("Find drive by folder: {}", folder.getId());
+    Organization organization = organizationService.getCurrentOrganization();
+    return driveRepository.findByOrganizationAndStorageDriveFolder(organization.getId(), folder.getId());
+  }
 
 }

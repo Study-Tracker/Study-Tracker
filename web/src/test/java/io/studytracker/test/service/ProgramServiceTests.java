@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package io.studytracker.test.service;
 
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
+import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.service.ProgramService;
@@ -48,6 +50,8 @@ public class ProgramServiceTests {
   @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private OrganizationRepository organizationRepository;
 
   @Before
   public void doBefore() {
@@ -91,9 +95,12 @@ public class ProgramServiceTests {
 
   @Test
   public void createProgramTest() {
+    Organization organization = organizationRepository.findAll().get(0);
+    Assert.assertNotNull(organization);
     Assert.assertEquals(5, programRepository.count());
     User user = userRepository.findAll().get(0);
     Program program = new Program();
+    program.setOrganization(organization);
     program.setActive(true);
     program.setCode("TST");
     program.setName("Test Program");

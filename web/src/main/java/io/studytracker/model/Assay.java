@@ -77,7 +77,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode(value = "tasks", subgraph = "assay-task-details"),
         @NamedAttributeNode("users"),
         @NamedAttributeNode("study"),
-        @NamedAttributeNode("storageFolders")
+        @NamedAttributeNode(value = "storageFolders", subgraph = "assay-storage-folder-details")
       },
       subgraphs = {
         @NamedSubgraph(
@@ -89,7 +89,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
               @NamedAttributeNode("createdBy"),
               @NamedAttributeNode("lastModifiedBy"),
               @NamedAttributeNode("assignedTo")
-            })
+            }),
+        @NamedSubgraph(
+            name = "assay-storage-folder-details",
+            attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
+        )
       }),
   @NamedEntityGraph(
       name = "assay-with-parents",

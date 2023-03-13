@@ -36,6 +36,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -62,8 +63,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           @NamedAttributeNode("createdBy"),
           @NamedAttributeNode("lastModifiedBy"),
           @NamedAttributeNode("notebookFolder"),
-          @NamedAttributeNode("storageFolders")
-        }))
+          @NamedAttributeNode(value = "storageFolders", subgraph = "program-storage-folder-details")
+        },
+        subgraphs = {
+          @NamedSubgraph(
+              name = "program-storage-folder-details",
+              attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
+          )
+        }
+      ))
 public class Program implements Model {
 
   @Id
