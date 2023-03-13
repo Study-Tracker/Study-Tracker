@@ -18,10 +18,12 @@ package io.studytracker.egnyte;
 
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.EgnyteDrive;
+import io.studytracker.model.EgnyteDriveFolder;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.repository.EgnyteDriveFolderRepository;
 import io.studytracker.repository.EgnyteDriveRepository;
 import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -40,12 +42,15 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   private final EgnyteIntegrationRepository egnyteIntegrationRepository;
   private final EgnyteDriveRepository egnyteDriveRepository;
   private final StorageDriveRepository storageDriveRepository;
+  private final EgnyteDriveFolderRepository egnyteDriveFolderRepository;
 
   public EgnyteIntegrationService(EgnyteIntegrationRepository egnyteIntegrationRepository,
-      EgnyteDriveRepository egnyteDriveRepository, StorageDriveRepository storageDriveRepository) {
+      EgnyteDriveRepository egnyteDriveRepository, StorageDriveRepository storageDriveRepository,
+      EgnyteDriveFolderRepository egnyteDriveFolderRepository) {
     this.egnyteIntegrationRepository = egnyteIntegrationRepository;
     this.egnyteDriveRepository = egnyteDriveRepository;
     this.storageDriveRepository = storageDriveRepository;
+    this.egnyteDriveFolderRepository = egnyteDriveFolderRepository;
   }
 
 
@@ -116,6 +121,7 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     storageDrive.setDriveType(DriveType.EGNYTE);
     storageDrive.setDisplayName("Egnyte Shared Drive");
     storageDrive.setActive(true);
+    storageDrive.setRootPath("/Shared");
 
     EgnyteDrive drive = new EgnyteDrive();
     drive.setEgnyteIntegration(egnyteIntegration);
@@ -132,6 +138,7 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     StorageDrive d = storageDriveRepository.getById(storageDrive.getId());
     d.setActive(storageDrive.isActive());
     d.setDisplayName(storageDrive.getDisplayName());
+    d.setRootPath(storageDrive.getRootPath());
 
     EgnyteDrive e = egnyteDriveRepository.getById(drive.getId());
     e.setStorageDrive(d);
@@ -147,6 +154,12 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     s.setActive(false);
     e.setStorageDrive(s);
     egnyteDriveRepository.save(e);
+  }
+
+  // Folders
+
+  public EgnyteDriveFolder registerFolder(EgnyteDriveFolder folder) {
+    return egnyteDriveFolderRepository.save(folder);
   }
 
 }

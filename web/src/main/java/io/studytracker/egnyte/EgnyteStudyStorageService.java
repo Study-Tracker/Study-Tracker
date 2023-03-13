@@ -35,6 +35,7 @@ import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.repository.EgnyteDriveFolderRepository;
 import io.studytracker.repository.EgnyteDriveRepository;
+import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
@@ -63,7 +64,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   private EgnyteDriveRepository egnyteDriveRepository;
 
   @Autowired
-  private EgnyteIntegrationService egnyteIntegrationService;
+  private EgnyteIntegrationRepository egnyteIntegrationRepository;
 
   @Autowired
   private StorageDriveFolderService storageDriveFolderService;
@@ -162,7 +163,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   public StorageFolder findFolderByPath(StorageDrive drive, String path)
       throws StudyStorageNotFoundException {
     LOGGER.debug("Looking up folder by path: {}", path);
-    EgnyteIntegration integration = egnyteIntegrationService.findByStorageDrive(drive);
+    EgnyteIntegration integration = egnyteIntegrationRepository.findByStorageDriveId(drive.getId());
     try {
       EgnyteObject egnyteObject = egnyteClient.findObjectByPath(
           new URL(integration.getRootUrl()), path, integration.getApiToken());
@@ -190,7 +191,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   public StorageFile findFileByPath(StorageDrive drive, String path)
       throws StudyStorageNotFoundException {
     LOGGER.debug("Finding file by path: {}", path);
-    EgnyteIntegration integration = egnyteIntegrationService.findByStorageDrive(drive);
+    EgnyteIntegration integration = egnyteIntegrationRepository.findByStorageDriveId(drive.getId());
     try {
       EgnyteObject egnyteObject = egnyteClient.findObjectByPath(
           new URL(integration.getRootUrl()), path, integration.getApiToken());
@@ -211,8 +212,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   public StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name)
       throws StudyStorageException {
     LOGGER.info("Creating folder: {} in {}", name, path);
-    EgnyteIntegration integration = egnyteIntegrationService
-        .findByStorageDrive(parentFolder.getStorageDrive());
+    EgnyteIntegration integration = egnyteIntegrationRepository
+        .findByStorageDriveId(parentFolder.getStorageDrive().getId());
     try {
       if (!parentFolder.isWriteEnabled()) {
         throw new InsufficientPrivilegesException("Insufficient privileges to create folder");
@@ -241,8 +242,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throw new InvalidRequestException("Parent folder is not a study root folder.");
     }
 
-    EgnyteIntegration integration = egnyteIntegrationService
-        .findByStorageDrive(parentFolder.getStorageDrive());
+    EgnyteIntegration integration = egnyteIntegrationRepository
+        .findByStorageDriveId(parentFolder.getStorageDrive().getId());
     String path = getProgramFolderPath(program, parentFolder.getPath());
     StorageFolder storageFolder;
 
@@ -278,8 +279,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
       throws StudyStorageException {
 
-    EgnyteIntegration integration = egnyteIntegrationService
-        .findByStorageDrive(parentFolder.getStorageDrive());
+    EgnyteIntegration integration = egnyteIntegrationRepository
+        .findByStorageDriveId(parentFolder.getStorageDrive().getId());
     Program program = study.getProgram();
     String path = getStudyFolderPath(study, parentFolder.getPath());
     StorageFolder storageFolder;
@@ -324,8 +325,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
         String.format(
             "Creating folder for assay %s in study folder %s",
             assay.getCode(), study.getName() + " (" + study.getCode() + ")"));
-    EgnyteIntegration integration = egnyteIntegrationService
-        .findByStorageDrive(parentFolder.getStorageDrive());
+    EgnyteIntegration integration = egnyteIntegrationRepository
+        .findByStorageDriveId(parentFolder.getStorageDrive().getId());
     String path = getAssayFolderPath(assay, parentFolder.getPath());
     StorageFolder storageFolder;
 
@@ -359,8 +360,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   public StorageFile saveFile(StorageDriveFolder folder, String path, File file)
       throws StudyStorageException {
     LOGGER.info("Uploading file: {} to {}", file.getName(), path);
-    EgnyteIntegration integration = egnyteIntegrationService
-        .findByStorageDrive(folder.getStorageDrive());
+    EgnyteIntegration integration = egnyteIntegrationRepository
+        .findByStorageDriveId(folder.getStorageDrive().getId());
     try {
       if (!folder.isWriteEnabled()) {
         throw new InsufficientPrivilegesException("Insufficient privileges to write files.");
@@ -384,8 +385,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public boolean fileExists(StorageDriveFolder folder, String path) {
     LOGGER.debug("Checking if file exists: {}", path);
-    EgnyteIntegration integration = egnyteIntegrationService
-        .findByStorageDrive(folder.getStorageDrive());
+    EgnyteIntegration integration = egnyteIntegrationRepository
+        .findByStorageDriveId(folder.getStorageDrive().getId());
     try {
       EgnyteObject egnyteObject = egnyteClient.findObjectByPath(new URL(integration.getRootUrl()),
           path, integration.getApiToken());
@@ -402,8 +403,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public boolean folderExists(StorageDriveFolder folder, String path) {
     LOGGER.debug("Checking if folder exists: {}", path);
-    EgnyteIntegration integration = egnyteIntegrationService
-        .findByStorageDrive(folder.getStorageDrive());
+    EgnyteIntegration integration = egnyteIntegrationRepository
+        .findByStorageDriveId(folder.getStorageDrive().getId());
     try {
       EgnyteObject egnyteObject = egnyteClient.findObjectByPath(new URL(integration.getRootUrl()),
           path, integration.getApiToken());

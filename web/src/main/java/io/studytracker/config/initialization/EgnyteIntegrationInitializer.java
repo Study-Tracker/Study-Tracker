@@ -19,12 +19,16 @@ package io.studytracker.config.initialization;
 import io.studytracker.config.properties.EgnyteProperties;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.egnyte.EgnyteIntegrationService;
+import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.EgnyteDrive;
+import io.studytracker.model.EgnyteDriveFolder;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.service.OrganizationService;
+import io.studytracker.storage.StorageUtils;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +51,11 @@ public class EgnyteIntegrationInitializer {
   @Autowired
   private OrganizationService organizationService;
 
-  private EgnyteIntegration registerEgnyteIntegrations(Organization organization) throws InvalidConfigurationException {
+  @Autowired
+  private EgnyteStudyStorageService egnyteStudyStorageService;
+
+  private EgnyteIntegration registerEgnyteIntegrations(Organization organization)
+      throws InvalidConfigurationException {
 
     EgnyteIntegration egnyteIntegration = null;
     EgnyteProperties egnyteProperties = properties.getEgnyte();
@@ -95,12 +103,43 @@ public class EgnyteIntegrationInitializer {
 
   }
 
-  private void registerEgnyteDrives(EgnyteIntegration egnyteIntegration) {
-    List<EgnyteDrive> drives = egnyteIntegrationService.listIntegrationDrives(egnyteIntegration);
-    if (drives.size() == 0) {
-      LOGGER.info("Registering Egnyte drives for integration {}", egnyteIntegration.getTenantName());
-//      egnyteIntegrationService.registerDrives(egnyteIntegration);
+  private EgnyteDrive registerEgnyteDrives(EgnyteIntegration egnyteIntegration) {
+    EgnyteDrive defaultDrive = egnyteIntegrationService.listIntegrationDrives(egnyteIntegration)
+        .stream()
+        .filter(d -> d.getName().equals("Shared"))
+        .findFirst()
+        .orElseGet(null);
+    if (defaultDrive == null) {
+      LOGGER.info("Registering Egnyte default drive for integration {}", egnyteIntegration.getTenantName());
+      defaultDrive = egnyteIntegrationService.registerDefaultDrive(egnyteIntegration);
     }
+    return defaultDrive;
+  }
+
+  private void registerEgnyteFolders(EgnyteDrive egnyteDrive) {
+
+
+
+    EgnyteProperties egnyteProperties = properties.getEgnyte();
+    String rootPath = egnyteProperties.getRootPath();
+    String rootFolderName = StorageUtils.getFolderNameFromPath(rootPath);
+
+    StorageDriveFolder rootFolder = new StorageDriveFolder();
+    rootFolder.setStorageDrive(egnyteDrive.getStorageDrive());
+    rootFolder.setPath(rootPath);
+    rootFolder.setName(rootFolderName);
+    rootFolder.setBrowserRoot(true);
+    rootFolder.setStudyRoot(true);
+    rootFolder.setWriteEnabled(true);
+
+    EgnyteDriveFolder egnyteRootFolder = new EgnyteDriveFolder();
+    egnyteRootFolder.setEgnyteDrive(egnyteDrive);
+    egnyteRootFolder.setStorageDriveFolder(rootFolder);
+
+    egnyteIntegrationService.registerFolder(egnyteRootFolder);
+
+
+
   }
 
   @Transactional
@@ -121,6 +160,7 @@ public class EgnyteIntegrationInitializer {
       // Register Egnyte integration
       EgnyteIntegration egnyteIntegration = registerEgnyteIntegrations(organization);
       if (egnyteIntegration != null) {
+        EgnyteDrive drive = registerEgnyteDrives(egnyteIntegration);
 
       }
 
