@@ -17,9 +17,13 @@
 package io.studytracker.test.aws;
 
 import io.studytracker.Application;
+import io.studytracker.aws.AWSClientFactory;
 import io.studytracker.aws.S3Utils;
+import io.studytracker.model.AwsIntegration;
+import io.studytracker.repository.AwsIntegrationRepository;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +49,19 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @ActiveProfiles({"aws-test"})
 public class S3ClientTests {
 
+  @Autowired
+  private AwsIntegrationRepository awsIntegrationRepository;
+
   @Value("${aws.example-s3-bucket}")
   private String bucketName;
 
-  @Autowired(required = false)
   private S3Client s3Client;
+
+  @Before
+  public void init() {
+    AwsIntegration integration = awsIntegrationRepository.findAll().get(0);
+    s3Client = AWSClientFactory.createS3Client(integration);
+  }
 
   @Test
   public void pathBuilderTest() throws Exception {

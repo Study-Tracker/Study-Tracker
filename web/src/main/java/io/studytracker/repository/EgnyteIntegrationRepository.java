@@ -26,7 +26,7 @@ public interface EgnyteIntegrationRepository extends JpaRepository<EgnyteIntegra
   @Query("SELECT e FROM EgnyteIntegration e WHERE e.organization.id = ?1")
   List<EgnyteIntegration> findByOrganizationId(Long organizationId);
 
-  @Query("SELECT e FROM EgnyteIntegration e join EgnyteDrive ed join StorageDrive s WHERE s.id = ?1")
+  @Query("SELECT e FROM EgnyteIntegration e JOIN EgnyteDrive ed ON ed.egnyteIntegration.id = e.id WHERE ed.storageDrive.id = ?1")
   EgnyteIntegration findByStorageDriveId(Long storageDriveId);
 
 }

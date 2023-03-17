@@ -18,6 +18,7 @@ package io.studytracker.mapstruct.mapper;
 
 import io.studytracker.mapstruct.dto.api.AssayStorageDriveFolderDto;
 import io.studytracker.mapstruct.dto.api.ProgramStorageDriveFolderDto;
+import io.studytracker.mapstruct.dto.api.StorageDriveFolderDto;
 import io.studytracker.mapstruct.dto.api.StudyStorageDriveFolderDto;
 import io.studytracker.mapstruct.dto.response.AssayStorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.dto.response.ProgramStorageDriveFolderSummaryDto;
@@ -45,6 +46,10 @@ public interface StorageDriveFolderMapper {
   StorageDriveFolderSummaryDto toSummaryDto(StorageDriveFolder folder);
   List<StorageDriveFolderSummaryDto> toSummaryDto(List<StorageDriveFolder> folders);
   Set<StorageDriveFolderSummaryDto> toSummaryDto(Set<StorageDriveFolder> folders);
+
+  StorageDriveFolderDto toDto(StorageDriveFolder folder);
+  List<StorageDriveFolderDto> toDto(List<StorageDriveFolder> folders);
+  Set<StorageDriveFolderDto> toDto(Set<StorageDriveFolder> folders);
 
   // Program folder
 

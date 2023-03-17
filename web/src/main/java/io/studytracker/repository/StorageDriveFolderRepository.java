@@ -19,6 +19,8 @@ package io.studytracker.repository;
 import io.studytracker.model.StorageDriveFolder;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -29,6 +31,9 @@ public interface StorageDriveFolderRepository extends JpaRepository<StorageDrive
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1")
   List<StorageDriveFolder> findByOrganization(Long organizationId);
+
+  @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1")
+  Page<StorageDriveFolder> findByOrganization(Long organizationId, Pageable pageable);
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1 AND f.studyRoot = true")
   List<StorageDriveFolder> findStudyRootByOrganization(Long organizationId);

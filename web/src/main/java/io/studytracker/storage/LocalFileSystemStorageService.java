@@ -206,13 +206,7 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     return findFileByPath(parentFolder.getStorageDrive(), path);
   }
 
-  @Override
-  public StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name)
-      throws StudyStorageException {
-
-    LOGGER.info("Creating storage folder {} at path {} for location {}",
-        name, path, parentFolder.getName());
-    validatePath(parentFolder.getPath(), path);
+  private StorageFolder createFolder(String path, String name) throws StudyStorageException {
     Path newFolderPath = Paths.get(path).normalize().resolve(name);
     File newFolder = newFolderPath.toFile();
 
@@ -242,7 +236,24 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     folder.setName(newFolder.getName());
     folder.setPath(newFolderPath);
     return folder;
+  }
 
+  @Override
+  public StorageFolder createFolder(StorageDrive drive, String path, String name)
+      throws StudyStorageException {
+    LOGGER.info("Creating storage folder {} at path {} for drive {}",
+        name, path, drive.getDisplayName());
+    validatePath(drive.getRootPath(), path);
+    return this.createFolder(path, name);
+  }
+
+  @Override
+  public StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name)
+      throws StudyStorageException {
+    LOGGER.info("Creating storage folder {} at path {} for location {}",
+        name, path, parentFolder.getName());
+    validatePath(parentFolder.getPath(), path);
+    return this.createFolder(path, name);
   }
 
   @Override
@@ -264,6 +275,22 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     }
   }
 
+  private boolean fileExists(String path) {
+    Path filePath = Paths.get(path).normalize();
+    File file = filePath.toFile();
+    return file.exists() && file.isFile();
+  }
+
+  @Override
+  public boolean fileExists(StorageDrive drive, String path) {
+    try {
+      validatePath(drive.getRootPath(), path);
+    } catch (StudyStorageException e) {
+      return false;
+    }
+    return this.fileExists(path);
+  }
+
   @Override
   public boolean fileExists(StorageDriveFolder parentFolder, String path) {
     try {
@@ -271,9 +298,13 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     } catch (StudyStorageException e) {
       return false;
     }
+    return this.fileExists(path);
+  }
+
+  private boolean folderExists(String path) {
     Path filePath = Paths.get(path).normalize();
     File file = filePath.toFile();
-    return file.exists() && file.isFile();
+    return file.exists() && !file.isFile();
   }
 
   @Override
@@ -283,9 +314,17 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     } catch (StudyStorageException e) {
       return false;
     }
-    Path filePath = Paths.get(path).normalize();
-    File file = filePath.toFile();
-    return file.exists() && !file.isFile();
+    return this.folderExists(path);
+  }
+
+  @Override
+  public boolean folderExists(StorageDrive drive, String path) {
+    try {
+      validatePath(drive.getRootPath(), path);
+    } catch (StudyStorageException e) {
+      return false;
+    }
+    return this.folderExists(path);
   }
 
   private StorageFile saveFileToFolder(File file, StorageFolder folder) {

@@ -225,7 +225,7 @@ public class StudyService {
    * @param study new study
    */
   @Transactional
-  public void create(Study study, StudyOptions options) {
+  public Study create(Study study, StudyOptions options) {
 
     LOGGER.info("Attempting to create new study with name: {}  and options: {}" + study.getName(), options);
 
@@ -386,6 +386,9 @@ public class StudyService {
       }
     }
 
+    return studyRepository.findById(study.getId())
+        .orElseThrow(() -> new RecordNotFoundException("Failed to create study: " + study.getCode()));
+
   }
 
   /**
@@ -394,7 +397,7 @@ public class StudyService {
    * @param updated existing study
    */
   @Transactional
-  public void update(Study updated) {
+  public Study update(Study updated) {
     LOGGER.info("Attempting to update existing study with code: " + updated.getCode());
     Study study = studyRepository.getById(updated.getId());
 
@@ -422,6 +425,9 @@ public class StudyService {
     }
 
     studyRepository.save(study);
+
+    return studyRepository.findById(study.getId())
+        .orElseThrow(() -> new RecordNotFoundException("Failed to create study: " + study.getCode()));
   }
 
   /**

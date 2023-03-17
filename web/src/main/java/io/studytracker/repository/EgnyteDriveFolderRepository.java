@@ -17,14 +17,18 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.EgnyteDriveFolder;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface EgnyteDriveFolderRepository extends JpaRepository<EgnyteDriveFolder, Long>,
-    StorageDriveFolderDetailsOperations<EgnyteDriveFolder> {
+public interface EgnyteDriveFolderRepository extends StorageDriveFolderDetailsOperations<EgnyteDriveFolder> {
 
   @Override
   @Query("SELECT f FROM EgnyteDriveFolder f WHERE f.storageDriveFolder.id = ?1")
   Optional<EgnyteDriveFolder> findByStorageDriveFolderId(Long id);
+
+  @Override
+  @Query("SELECT f FROM EgnyteDriveFolder f JOIN EgnyteDrive d ON f.egnyteDrive.id = d.id WHERE d.storageDrive.id = ?1")
+  List<EgnyteDriveFolder> findByStorageDriveId(Long id);
+
 }

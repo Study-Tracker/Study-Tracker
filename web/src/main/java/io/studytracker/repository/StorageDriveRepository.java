@@ -27,7 +27,7 @@ public interface StorageDriveRepository extends JpaRepository<StorageDrive, Long
   @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1")
   List<StorageDrive> findByOrganization(Long organizationId);
 
-  @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1 AND sd.id = ?2")
+  @Query("SELECT sd FROM StorageDrive sd WHERE sd.id = ?1 and sd.organization.id = ?2")
   Optional<StorageDrive> findByIdAndOrganizationId(Long id, Long organizationId);
 
   @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1 AND sd.driveType = ?2")

@@ -277,6 +277,9 @@ public class EgnyteStudyStorageServiceTests {
       exception = e;
     }
     Assert.assertNull(exception);
+    Assert.assertNotNull(study.getId());
+
+    study = studyRepository.findByCode("CPA-12345").orElseThrow(RecordNotFoundException::new);
     StudyStorageFolder studyFolder = study.getStorageFolders().stream()
         .filter(sf -> sf.isPrimary())
         .findFirst()
@@ -305,6 +308,9 @@ public class EgnyteStudyStorageServiceTests {
       exception = e;
     }
     Assert.assertNull(exception);
+    Assert.assertNotNull(assay.getId());
+
+    assay = assayRepository.findByCode("CPA-12345-12345").orElseThrow(RecordNotFoundException::new);
     AssayStorageFolder assayStorageFolder = assay.getStorageFolders().stream()
         .filter(sf -> sf.isPrimary())
         .findFirst()

@@ -16,6 +16,8 @@
 
 package io.studytracker.example;
 
+import io.studytracker.config.initialization.DefaultDataInitializer;
+import io.studytracker.config.initialization.IntegrationInitializer;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -50,9 +52,11 @@ import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.AssayTypeTaskRepository;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.CommentRepository;
+import io.studytracker.repository.EgnyteDriveFolderRepository;
 import io.studytracker.repository.ExternalLinkRepository;
 import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.KeywordRepository;
+import io.studytracker.repository.LocalDriveFolderRepository;
 import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.ProgramRepository;
@@ -100,8 +104,16 @@ public class ExampleDataGenerator {
   public static final int CONCLUSIONS_COUNT = 1;
   public static final int EXTERNAL_LINK_COUNT = 1;
   public static final int STUDY_COLLECTION_COUNT = 2;
+  public static final int STUDY_ROOT_FOLDER_COUNT = 1;
+  public static final int BROWSER_ROOT_FOLDER_COUNT = 1;
+  public static final int STORAGE_DRIVE_COUNT = 1;
+  public static final int STORAGE_DRIVE_FOLDER_COUNT = STUDY_COUNT + PROGRAM_COUNT + ASSAY_COUNT + STUDY_ROOT_FOLDER_COUNT;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
+
+  @Autowired private DefaultDataInitializer defaultDataInitializer;
+
+  @Autowired private IntegrationInitializer integrationInitializer;
 
   @Autowired private OrganizationRepository organizationRepository;
   @Autowired private ProgramRepository programRepository;
@@ -144,6 +156,8 @@ public class ExampleDataGenerator {
 
   @Autowired private StorageDriveFolderService storageDriveFolderService;;
   @Autowired private StorageDriveFolderRepository storageDriveFolderRepository;
+  @Autowired private LocalDriveFolderRepository localDriveFolderRepository;
+  @Autowired private EgnyteDriveFolderRepository egnyteDriveFolderRepository;
 
   public List<Organization> generateExampleOrganizations() {
 
@@ -776,7 +790,7 @@ public class ExampleDataGenerator {
     collection.setStudies(studySet);
     collections.add(collection);
 
-    return collections;
+    return studyCollectionRepository.saveAll(collections);
 
   }
 
@@ -801,6 +815,9 @@ public class ExampleDataGenerator {
     keywordCategoryRepository.deleteAll();
     programRepository.deleteAll();
     userRepository.deleteAll();
+    localDriveFolderRepository.deleteAll();
+    egnyteDriveFolderRepository.deleteAll();
+    storageDriveFolderRepository.deleteAll();
 //    organizationRepository.deleteAll();
   }
 
@@ -809,6 +826,10 @@ public class ExampleDataGenerator {
 
       LOGGER.info("Preparing to populate database with example data...");
       this.clearDatabase();
+
+      LOGGER.info("Reinitializing integrations & drives...");
+      integrationInitializer.run(null);
+
       LOGGER.info("Inserting example data...");
 
       // Organizations

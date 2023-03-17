@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package io.studytracker.test.data;
+package io.studytracker.test.egnyte;
 
 import io.studytracker.Application;
+import io.studytracker.egnyte.EgnyteClientFactory;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
@@ -42,10 +43,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"egnyte-test"})
 public class EgnyteDataFileManagementTests {
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-  @Autowired
-  private EgnyteRestApiClient client;
-
   @Autowired
   private EgnyteStudyStorageService storageService;
 
@@ -58,11 +55,12 @@ public class EgnyteDataFileManagementTests {
   @Test
   public void getRootFolderTest() throws Exception {
     EgnyteIntegration integration = egnyteIntegrationRepository.findAll().get(0);
+    EgnyteRestApiClient client = EgnyteClientFactory.createRestApiClient(integration);
     EgnyteDrive drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
     String rootPath = drive.getStorageDrive().getRootPath();
     String token = integration.getApiToken();
     URL url = new URL(integration.getRootUrl());
-    EgnyteObject egnyteObject = client.findObjectByPath(url, rootPath, token);
+    EgnyteObject egnyteObject = client.findObjectByPath(rootPath);
     Assert.assertNotNull(egnyteObject);
     Assert.assertTrue(egnyteObject.isFolder());
     EgnyteFolder folder = (EgnyteFolder) egnyteObject;

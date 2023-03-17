@@ -21,9 +21,11 @@ import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
 import io.studytracker.model.Activity;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.User;
+import io.studytracker.service.OrganizationService;
 import io.studytracker.service.ProgramService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ public abstract class AbstractProgramController extends AbstractApiController {
 
   private ProgramService programService;
   private ProgramMapper programMapper;
+  private OrganizationService organizationService;
 
   /**
    * Creates a new program.
@@ -41,6 +44,10 @@ public abstract class AbstractProgramController extends AbstractApiController {
    */
   public Program createNewProgram(Program program, ProgramOptions options) {
 
+    // Get the current organization
+    Organization organization = organizationService.getCurrentOrganization();
+    program.setOrganization(organization);
+
     // Make sure the user has the necessary privileges to create a new program
     User user = this.getAuthenticatedUser();
     if (!user.isAdmin()) {
@@ -49,11 +56,11 @@ public abstract class AbstractProgramController extends AbstractApiController {
     }
 
     // Create the new program and publish the event
-    this.getProgramService().create(program, options);
-    Activity activity = ProgramActivityUtils.fromNewProgram(program, user);
+    Program created = this.getProgramService().create(program, options);
+    Activity activity = ProgramActivityUtils.fromNewProgram(created, user);
     this.logActivity(activity);
 
-    return program;
+    return created;
   }
 
   /**
@@ -126,4 +133,12 @@ public abstract class AbstractProgramController extends AbstractApiController {
     this.programMapper = programMapper;
   }
 
+  public OrganizationService getOrganizationService() {
+    return organizationService;
+  }
+
+  @Autowired
+  public void setOrganizationService(OrganizationService organizationService) {
+    this.organizationService = organizationService;
+  }
 }

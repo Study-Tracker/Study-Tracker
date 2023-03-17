@@ -26,11 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
-import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
-import io.studytracker.repository.StudyRepository;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.UserService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +47,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @ActiveProfiles({"web-test", "example"})
-public class StorageDriveFolderPrivateControllerTests {
+public class StorageDrivePrivateControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
@@ -56,7 +55,7 @@ public class StorageDriveFolderPrivateControllerTests {
 
   @Autowired private UserService userService;
 
-  @Autowired private StudyRepository studyRepository;
+  @Autowired private StorageDriveRepository storageDriveRepository;
 
   private String username;
 
@@ -67,62 +66,43 @@ public class StorageDriveFolderPrivateControllerTests {
   }
 
   @Test
-  public void findAllFoldersTest() throws Exception {
+  public void findAllDrivesTest() throws Exception {
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/api/internal/storage-drive-folders")
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/internal/storage-drives")
         .with(user(username))
         .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STORAGE_DRIVE_FOLDER_COUNT)))
+        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STORAGE_DRIVE_COUNT)))
+        .andExpect(jsonPath("$[0]", hasKey("id")))
+        .andExpect(jsonPath("$[0]", hasKey("organization")))
+        .andExpect(jsonPath("$[0].organization", hasKey("id")))
+        .andExpect(jsonPath("$[0]", hasKey("displayName")))
+        .andExpect(jsonPath("$[0]", hasKey("rootPath")))
+        .andExpect(jsonPath("$[0]", hasKey("driveType")))
         ;
-
-    mockMvc.perform(MockMvcRequestBuilders.get("/api/internal/storage-drive-folders?studyRoot=true")
-            .with(user(username))
-            .with(csrf()))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STUDY_ROOT_FOLDER_COUNT)))
-        .andExpect(jsonPath("$[0]", hasKey("studyRoot")))
-        .andExpect(jsonPath("$[0].studyRoot", is(true)))
-    ;
-
-    mockMvc.perform(MockMvcRequestBuilders.get("/api/internal/storage-drive-folders?browserRoot=true")
-            .with(user(username))
-            .with(csrf()))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.BROWSER_ROOT_FOLDER_COUNT)))
-        .andExpect(jsonPath("$[0]", hasKey("browserRoot")))
-        .andExpect(jsonPath("$[0].browserRoot", is(true)))
-    ;
 
   }
 
   @Test
   public void findByIdTest() throws Exception {
 
-    Study study = studyRepository.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
-    StorageDriveFolder folder = study.getStorageFolders()
-        .stream()
-        .filter(f -> f.isPrimary())
-        .findFirst()
-        .orElseThrow(RecordNotFoundException::new)
-        .getStorageDriveFolder();
+    StorageDrive drive = storageDriveRepository.findAll().get(0);
+    Assert.assertNotNull(drive);
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/api/internal/storage-drive-folders/" + folder.getId())
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/internal/storage-drives/" + drive.getId())
             .with(user(username))
             .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("id")))
-        .andExpect(jsonPath("$.id", is(folder.getId().intValue())))
-        .andExpect(jsonPath("$", hasKey("name")))
-        .andExpect(jsonPath("$.name", is(folder.getName())))
-        .andExpect(jsonPath("$", hasKey("path")))
-        .andExpect(jsonPath("$.path", is(folder.getPath())))
-        .andExpect(jsonPath("$", hasKey("studyRoot")))
-        .andExpect(jsonPath("$.studyRoot", is(false)))
+        .andExpect(jsonPath("$.id", is(drive.getId().intValue())))
+        .andExpect(jsonPath("$", hasKey("displayName")))
+        .andExpect(jsonPath("$.displayName", is(drive.getDisplayName())))
+        .andExpect(jsonPath("$", hasKey("rootPath")))
+        .andExpect(jsonPath("$.rootPath", is(drive.getRootPath())))
+        .andExpect(jsonPath("$", hasKey("driveType")))
+        .andExpect(jsonPath("$.driveType", is(drive.getDriveType().toString())))
         ;
   }
 

@@ -23,6 +23,7 @@ import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
@@ -154,11 +155,12 @@ public class LocalStorageStudyStorageServiceTests {
         .findFirst()
         .get()
         .getStorageDriveFolder();
-
+    StorageDrive drive = storageDriveFolderService.findDriveByFolder(programFolder)
+        .orElseThrow(RecordNotFoundException::new);
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.findFolderByPath(programFolder, "BAD-STUDY");
+      folder = storageService.findFolderByPath(drive, "BAD-STUDY");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -253,6 +255,8 @@ public class LocalStorageStudyStorageServiceTests {
         .findFirst()
         .get()
         .getStorageDriveFolder();
+    StorageDrive drive = storageDriveFolderService.findDriveByFolder(studyFolder)
+        .orElseThrow(RecordNotFoundException::new);
     AssayType assayType =
         assayTypeRepository.findByName("Generic").orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
@@ -264,7 +268,7 @@ public class LocalStorageStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.findFolderByPath(studyFolder, "CPA-10001-XXXXX");
+      folder = storageService.findFolderByPath(drive, "CPA-10001-XXXXX");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();

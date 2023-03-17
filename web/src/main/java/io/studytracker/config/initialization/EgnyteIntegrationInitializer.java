@@ -26,9 +26,13 @@ import io.studytracker.model.EgnyteDrive;
 import io.studytracker.model.EgnyteDriveFolder;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.service.OrganizationService;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageUtils;
+import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +57,9 @@ public class EgnyteIntegrationInitializer {
 
   @Autowired
   private EgnyteStudyStorageService egnyteStudyStorageService;
+
+  @Autowired
+  private StorageDriveFolderService storageDriveFolderService;
 
   private EgnyteIntegration registerEgnyteIntegrations(Organization organization)
       throws InvalidConfigurationException {
@@ -108,7 +115,7 @@ public class EgnyteIntegrationInitializer {
         .stream()
         .filter(d -> d.getName().equals("Shared"))
         .findFirst()
-        .orElseGet(null);
+        .orElse(null);
     if (defaultDrive == null) {
       LOGGER.info("Registering Egnyte default drive for integration {}", egnyteIntegration.getTenantName());
       defaultDrive = egnyteIntegrationService.registerDefaultDrive(egnyteIntegration);
@@ -118,27 +125,62 @@ public class EgnyteIntegrationInitializer {
 
   private void registerEgnyteFolders(EgnyteDrive egnyteDrive) {
 
+    // Does the drive already have a root folder?
+    boolean hasRoot = storageDriveFolderService.findStudyRootFolders().stream()
+        .anyMatch(f -> f.getStorageDrive().getDriveType().equals(DriveType.EGNYTE));
+    if (!hasRoot) {
 
+      EgnyteProperties egnyteProperties = properties.getEgnyte();
+      String rootPath = egnyteProperties.getRootPath();
+      String rootFolderName = StorageUtils.getFolderNameFromPath(rootPath);
 
-    EgnyteProperties egnyteProperties = properties.getEgnyte();
-    String rootPath = egnyteProperties.getRootPath();
-    String rootFolderName = StorageUtils.getFolderNameFromPath(rootPath);
+      // Does the folder exist already?
+      StorageFolder storageFolder = null;
+      boolean folderExists = egnyteStudyStorageService.folderExists(egnyteDrive.getStorageDrive(), rootPath);
+      // If yes, register it in the database
+      if (folderExists) {
+        try {
+          storageFolder = egnyteStudyStorageService.findFolderByPath(egnyteDrive.getStorageDrive(), rootPath);
+        } catch (StudyStorageNotFoundException e) {
+          e.printStackTrace();
+          LOGGER.error("Could not find folder {} in Egnyte drive {}", rootPath, egnyteDrive.getName());
+        }
+      }
+      // If not, create the folder
+      else {
+        try {
+          String rootFolder = StorageUtils.getFolderNameFromPath(rootPath);
+          String parentPath = StorageUtils.getParentPathFromPath(rootPath);
+          storageFolder = egnyteStudyStorageService.createFolder(egnyteDrive.getStorageDrive(), parentPath, rootFolder);
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOGGER.error("Could not create folder {} in Egnyte drive {}", rootPath, egnyteDrive.getName());
+        }
+      }
 
-    StorageDriveFolder rootFolder = new StorageDriveFolder();
-    rootFolder.setStorageDrive(egnyteDrive.getStorageDrive());
-    rootFolder.setPath(rootPath);
-    rootFolder.setName(rootFolderName);
-    rootFolder.setBrowserRoot(true);
-    rootFolder.setStudyRoot(true);
-    rootFolder.setWriteEnabled(true);
+      // Persist the record
+      if (storageFolder != null) {
+        StorageDriveFolder storageDriveFolder = new StorageDriveFolder();
+        storageDriveFolder.setStorageDrive(egnyteDrive.getStorageDrive());
+        storageDriveFolder.setName(storageFolder.getName());
+        storageDriveFolder.setPath(storageFolder.getPath());
+        storageDriveFolder.setBrowserRoot(true);
+        storageDriveFolder.setStudyRoot(true);
+        storageDriveFolder.setWriteEnabled(true);
+        storageDriveFolder.setDeleteEnabled(false);
 
-    EgnyteDriveFolder egnyteRootFolder = new EgnyteDriveFolder();
-    egnyteRootFolder.setEgnyteDrive(egnyteDrive);
-    egnyteRootFolder.setStorageDriveFolder(rootFolder);
+        EgnyteDriveFolder egnyteDriveFolder = new EgnyteDriveFolder();
+        egnyteDriveFolder.setEgnyteDrive(egnyteDrive);
+        egnyteDriveFolder.setStorageDriveFolder(storageDriveFolder);
+        egnyteDriveFolder.setFolderId(storageFolder.getFolderId());
+        egnyteDriveFolder.setWebUrl(storageFolder.getUrl());
 
-    egnyteIntegrationService.registerFolder(egnyteRootFolder);
+        storageDriveFolderService.registerFolder(egnyteDriveFolder, egnyteDrive.getStorageDrive());
+      } else {
+        LOGGER.warn("Could not register Egnyte root folder {} in drive {}", rootPath, egnyteDrive.getName());
+      }
 
-
+    }
 
   }
 
@@ -161,7 +203,8 @@ public class EgnyteIntegrationInitializer {
       EgnyteIntegration egnyteIntegration = registerEgnyteIntegrations(organization);
       if (egnyteIntegration != null) {
         EgnyteDrive drive = registerEgnyteDrives(egnyteIntegration);
-
+        registerEgnyteFolders(drive);
+        LOGGER.info("Egnyte integration initialized successfully.");
       }
 
     } catch (Exception e) {

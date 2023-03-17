@@ -16,23 +16,20 @@
 
 package io.studytracker.repository;
 
-import io.studytracker.model.LocalDrive;
-import java.util.ArrayList;
+import io.studytracker.model.StorageDriveDetails;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-public interface LocalDriveRepository extends StorageDriveDetailsOperations<LocalDrive> {
+@NoRepositoryBean
+public interface StorageDriveDetailsOperations<T extends StorageDriveDetails>
+    extends JpaRepository<T, Long> {
 
-  @Override
-  @Query("SELECT l FROM LocalDrive l WHERE l.organization.id = ?1")
-  List<LocalDrive> findByOrganizationId(Long organizationId);
+  List<T> findByIntegrationId(Long integrationId);
 
-  @Override
-  default List<LocalDrive> findByIntegrationId(Long integrationId) { return new ArrayList<>(); }
+  List<T> findByOrganizationId(Long organizationId);
 
-  @Override
-  @Query("SELECT l FROM LocalDrive l WHERE l.storageDrive.id = ?1")
-  Optional<LocalDrive> findByStorageDriveId(Long storageDriveId);
+  Optional<T> findByStorageDriveId(Long id);
 
 }

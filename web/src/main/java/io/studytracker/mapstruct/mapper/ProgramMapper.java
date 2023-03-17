@@ -59,11 +59,13 @@ public interface ProgramMapper {
   @Mapping(source = "lastModifiedBy.id", target = "lastModifiedBy")
   @Mapping(source = "notebookFolder.id", target = "notebookFolderId")
   @Mapping(source = "storageFolders", target = "storageFolders", qualifiedByName = "storageFolderToId")
+  @Mapping(source = "organization.id", target = "organizationId")
   ProgramDto toProgramDto(Program program);
 
   ProgramPayloadDto toProgramPayloadDto(Program program);
   Program fromProgramPayloadDto(ProgramPayloadDto dto);
 
+  @Mapping(target = "parentFolder.id", source = "parentFolderId")
   ProgramOptions optionsFromPayloadDto(ProgramPayloadDto dto);
 
   ProgramOptions optionsFromFormDto(ProgramFormDto dto);

@@ -84,6 +84,17 @@ public interface StudyStorageService {
   StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name) throws StudyStorageException;
 
   /**
+   * Creates a new folder at the given path.
+   *
+   * @param drive the storage drive
+   * @param path the path to the folder to create the new folder within
+   * @param name the name of the new folder
+   * @return the new folder
+   * @throws StudyStorageException if the folder cannot be created
+   */
+  StorageFolder createFolder(StorageDrive drive, String path, String name) throws StudyStorageException;
+
+  /**
    * Looks up a folder and its contents by path, given a parent folder.
    *
    * @param parentFolder the parent folder
@@ -154,6 +165,15 @@ public interface StudyStorageService {
   boolean fileExists(StorageDriveFolder folder, String path);
 
   /**
+   * Returns true if the file exists at the provided path.
+   *
+   * @param drive the parent storage drive
+   * @param path the path to the object to check
+   * @return true if the file exists
+   */
+  boolean fileExists(StorageDrive drive, String path);
+
+  /**
    * Returns true if the folder exists at the provided path.
    *
    * @param folder the storage folder
@@ -161,5 +181,14 @@ public interface StudyStorageService {
    * @return true if the folder exists
    */
   boolean folderExists(StorageDriveFolder folder, String path);
+
+  /**
+   * Returns true if the folder exists at the provided path.
+   *
+   * @param drive the storage drive
+   * @param path the path to the object to check
+   * @return true if the folder exists
+   */
+  boolean folderExists(StorageDrive drive, String path);
 
 }

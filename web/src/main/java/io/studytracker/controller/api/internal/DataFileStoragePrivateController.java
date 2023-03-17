@@ -29,9 +29,12 @@ import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +123,18 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     }
 
     // Upload to the cloud service
-    StorageFile storageFile = storageService.saveFile(folder, path, localPath.toFile());
+    File localFile = localPath.toFile();
+    StorageFile storageFile = storageService.saveFile(folder, path, localFile);
+
+    try {
+      if (localFile.exists()) {
+        FileUtils.forceDelete(localFile);
+      }
+    } catch (IOException e) {
+      LOGGER.warn("Unable to delete local file copy: " + file.getName());
+      e.printStackTrace();
+    }
+
     LOGGER.debug("Uploaded file: " + storageFile.toString());
     return new ResponseEntity<>(storageFile, HttpStatus.OK);
 

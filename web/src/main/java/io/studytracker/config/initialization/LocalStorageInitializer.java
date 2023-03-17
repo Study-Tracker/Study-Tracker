@@ -32,6 +32,7 @@ import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageUtils;
+import java.io.File;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,13 +75,25 @@ public class LocalStorageInitializer {
       LocalDrive localDrive;
       StorageDrive storageDrive;
 
-      // Check to see if the AWS integration is already registered
+      // Check to see if the organization is already registered
       try {
         organization = organizationService.getCurrentOrganization();
       } catch (RecordNotFoundException e) {
         e.printStackTrace();
         LOGGER.warn("No organization found. Skipping local storage initialization.");
         return;
+      }
+
+      // Make sure the local directory exists and is writable
+      File file = new File(storageProperties.getLocalDir());
+      if (!file.exists()) {
+        if (!file.mkdirs()) {
+          throw new InvalidConfigurationException("Unable to create local storage directory: "
+              + storageProperties.getLocalDir());
+        }
+      } else if (!file.canWrite()) {
+        throw new InvalidConfigurationException("Local storage directory is not writable: "
+            + storageProperties.getLocalDir());
       }
 
       Optional<LocalDrive> optional = localDriveRepository.findByOrganizationId(organization.getId())

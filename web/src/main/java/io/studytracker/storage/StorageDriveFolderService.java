@@ -21,9 +21,11 @@ import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveDetails;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.StorageDriveFolderDetails;
 import io.studytracker.model.Study;
+import io.studytracker.repository.StorageDriveDetailsOperations;
 import io.studytracker.repository.StorageDriveFolderDetailsOperations;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -33,8 +35,17 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service for {@link StorageDriveFolder} and {@link StorageDrive} entity records.
+ *
+ * @author Will Oemler
+ * @since 0.9.0
+ */
 @Service
 public class StorageDriveFolderService {
 
@@ -51,6 +62,12 @@ public class StorageDriveFolderService {
     LOGGER.debug("Find all drive folders for organization");
     Organization organization = organizationService.getCurrentOrganization();
     return folderRepository.findByOrganization(organization.getId());
+  }
+
+  public Page<StorageDriveFolder> findAll(Pageable pageable) {
+    LOGGER.debug("Find all drive folders for organization");
+    Organization organization = organizationService.getCurrentOrganization();
+    return folderRepository.findByOrganization(organization.getId(), pageable);
   }
 
   public List<StorageDriveFolder> findStudyRootFolders() {
@@ -96,7 +113,9 @@ public class StorageDriveFolderService {
   }
 
   public StudyStorageService lookupStudyStorageService(StorageDriveFolder folder) {
-    return studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
+    StorageDrive drive = this.findDriveByFolder(folder)
+        .orElseThrow(() -> new IllegalArgumentException("No drive found for folder: " + folder.getId()));
+    return studyStorageServiceLookup.lookup(drive.getDriveType())
         .orElseThrow(() -> new IllegalArgumentException("No storage service found for folder: "
         + folder.getId()));
   }
@@ -108,10 +127,28 @@ public class StorageDriveFolderService {
   }
 
   public StorageDriveFolderDetails lookupFolderDetails(StorageDriveFolder folder) {
-     StorageDriveFolderDetailsOperations<?> repository = storageDriveRepositoryLookup
+     StorageDriveFolderDetailsOperations repository = storageDriveRepositoryLookup
          .lookupFolderRepository(folder.getStorageDrive().getDriveType());
      return ((Optional<StorageDriveFolderDetails>) repository.findByStorageDriveFolderId(folder.getId()))
          .orElseThrow(() -> new IllegalArgumentException("No folder details found for folder: " + folder.getId()));
+  }
+
+  /**
+   * Given a fully-formed {@link StorageDriveFolderDetails} object and an existing folder, register
+   * it with the database.
+   *
+   * @param folderDetails
+   * @param drive
+   * @return
+   * @param <S>
+   */
+  @Transactional
+  public <S extends StorageDriveFolderDetails> S registerFolder(S folderDetails, StorageDrive drive) {
+    LOGGER.debug("Register folder: {}", folderDetails);
+    StorageDriveFolderDetailsOperations repository
+        = storageDriveRepositoryLookup
+        .lookupFolderRepository(drive.getDriveType());
+    return (S) repository.save(folderDetails);
   }
 
   // Drives
@@ -132,6 +169,26 @@ public class StorageDriveFolderService {
     LOGGER.debug("Find drive by folder: {}", folder.getId());
     Organization organization = organizationService.getCurrentOrganization();
     return driveRepository.findByOrganizationAndStorageDriveFolder(organization.getId(), folder.getId());
+  }
+
+  /**
+   * Given a fully-formed {@link StorageDriveDetails} object and an existing storage drive, save it
+   * to the appropriate repository.
+   *
+   * @param drive
+   * @return
+   * @param <S>
+   */
+  @Transactional
+  public <S extends StorageDriveDetails> S registerDrive(S drive) {
+    LOGGER.debug("Save drive: {}", drive);
+    Organization organization = organizationService.getCurrentOrganization();
+    if (!drive.getStorageDrive().getOrganization().getId().equals(organization.getId())) {
+      throw new IllegalArgumentException("Drive organization does not match current organization");
+    }
+    StorageDriveDetailsOperations repository = storageDriveRepositoryLookup
+        .lookupDriveRepository(drive.getDriveType());
+    return (S) repository.save(drive);
   }
 
 }

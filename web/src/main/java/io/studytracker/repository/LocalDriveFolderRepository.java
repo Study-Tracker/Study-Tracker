@@ -17,15 +17,18 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.LocalDriveFolder;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface LocalDriveFolderRepository
-    extends JpaRepository<LocalDriveFolder, Long>, StorageDriveFolderDetailsOperations<LocalDriveFolder> {
+public interface LocalDriveFolderRepository extends StorageDriveFolderDetailsOperations<LocalDriveFolder> {
 
   @Override
   @Query("SELECT f FROM LocalDriveFolder f WHERE f.storageDriveFolder.id = ?1")
   Optional<LocalDriveFolder> findByStorageDriveFolderId(Long id);
+
+  @Override
+  @Query("SELECT f FROM LocalDriveFolder f JOIN StorageDriveFolder df ON f.storageDriveFolder.id = df.id WHERE df.storageDrive.id = ?1")
+  List<LocalDriveFolder> findByStorageDriveId(Long id);
 
 }

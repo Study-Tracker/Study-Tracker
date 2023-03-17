@@ -18,6 +18,7 @@ package io.studytracker.storage;
 
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveDetails;
 import io.studytracker.model.StorageDriveFolderDetails;
 import io.studytracker.repository.EgnyteDriveFolderRepository;
 import io.studytracker.repository.EgnyteDriveRepository;
@@ -25,6 +26,7 @@ import io.studytracker.repository.LocalDriveFolderRepository;
 import io.studytracker.repository.LocalDriveRepository;
 import io.studytracker.repository.S3BucketFolderRepository;
 import io.studytracker.repository.S3BucketRepository;
+import io.studytracker.repository.StorageDriveDetailsOperations;
 import io.studytracker.repository.StorageDriveFolderDetailsOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,7 @@ public class StorageDriveRepositoryLookup {
     this.context = context;
   }
 
-  public Object lookupDriveRepository(DriveType driveType) {
+  public StorageDriveDetailsOperations<? extends StorageDriveDetails> lookupDriveRepository(DriveType driveType) {
     LOGGER.debug("Looking up drive repository for type: {}", driveType);
     switch (driveType) {
       case EGNYTE:

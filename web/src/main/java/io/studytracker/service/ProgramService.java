@@ -19,6 +19,7 @@ package io.studytracker.service;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.InvalidRequestException;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
@@ -81,19 +82,27 @@ public class ProgramService {
     LOGGER.info("Creating new program with name: " + program.getName());
 
     // Create the storage folder
-    if (options.isUseStorage() && options.getParentFolder() != null) {
+    if (options.isUseStorage() && options.getParentFolder() != null
+        && options.getParentFolder().getId() != null) {
+      LOGGER.info("Creating storage folder for program: " + program.getName());
       try {
-        StorageDriveFolder parentFolder = options.getParentFolder();
+        StorageDriveFolder parentFolder = storageDriveFolderService
+            .findById(options.getParentFolder().getId())
+            .orElseThrow(() -> new RecordNotFoundException(
+                "Parent folder not found: " + options.getParentFolder().getId()));
         StudyStorageService studyStorageService = storageDriveFolderService.lookupStudyStorageService(parentFolder);
         StorageDriveFolder programFolder = studyStorageService.createProgramFolder(parentFolder, program);
         program.addStorageFolder(programFolder, true);
       } catch (Exception e) {
         throw new StudyTrackerException(e);
       }
+    } else {
+      LOGGER.info("Not creating storage folder for program: " + program.getName());
     }
 
     // Create the notebook folder
     if (options.isUseNotebook() && notebookFolderService != null) {
+      LOGGER.info("Creating notebook folder for program: " + program.getName());
       try {
         NotebookFolder notebookFolder = notebookFolderService.createProgramFolder(program);
         LOGGER.debug("Created notebook folder: " + notebookFolder);
@@ -102,10 +111,13 @@ public class ProgramService {
         throw new StudyTrackerException(e);
       }
     } else {
+      LOGGER.info("Not creating notebook folder for program: " + program.getName());
       program.setNotebookFolder(null);
     }
 
-    Program created = programRepository.save(program);
+    programRepository.save(program);
+    Program created = programRepository.findById(program.getId())
+        .orElseThrow(InvalidRequestException::new);
 
     // Create the program Git group
     if (options.isUseGit() && gitService != null) {

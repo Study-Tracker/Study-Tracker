@@ -31,5 +31,6 @@ public class ProgramPayloadDto {
   private boolean active;
   private Long notebookFolderId;
   private Long storageFolderId;
+  private Long parentFolderId;
   private Map<String, String> attributes = new HashMap<>();
 }

@@ -27,6 +27,7 @@ import io.studytracker.model.Status;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyConclusions;
+import io.studytracker.model.StudyStorageFolder;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
@@ -460,4 +461,38 @@ public class StudyRepositoryTests {
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof LazyInitializationException);
   }
+
+  @Test
+  public void addStorageFolderTest() throws Exception {
+    newStudyTest();
+    Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(0, study.getStorageFolders().size());
+    List<StorageDriveFolder> studyFolders = storageDriveFolderService.findByStudy(study);
+    Assert.assertTrue(studyFolders.isEmpty());
+
+    List<StorageDriveFolder> programFolders = storageDriveFolderService.findByProgram(study.getProgram());
+    Assert.assertNotNull(programFolders);
+    Assert.assertFalse(programFolders.isEmpty());
+    Assert.assertEquals(1, programFolders.size());
+    StorageDriveFolder programFolder = programFolders.get(0);
+
+    StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(programFolder)
+        .orElseThrow(RecordNotFoundException::new);
+    StorageDriveFolder studyFolder = studyStorageService.createStudyFolder(programFolder, study);
+    Assert.assertNotNull(studyFolder);
+    Assert.assertNotNull(studyFolder.getId());
+    study.addStorageFolder(studyFolder, true);
+    studyRepository.save(study);
+
+    // you have to refetch the record to get updated child entities
+    study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+    StudyStorageFolder studyStorageFolder = study.getStorageFolders().stream().findFirst().get();
+    Assert.assertNotNull(studyStorageFolder);
+    Assert.assertNotNull(studyStorageFolder.getId());
+    Assert.assertEquals(1, study.getStorageFolders().size());
+    studyFolders = storageDriveFolderService.findByStudy(study);
+    Assert.assertFalse(studyFolders.isEmpty());
+
+  }
+
 }

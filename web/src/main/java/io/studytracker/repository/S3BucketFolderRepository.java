@@ -17,14 +17,17 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.S3BucketFolder;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface S3BucketFolderRepository
-    extends JpaRepository<S3BucketFolder, Long>, StorageDriveFolderDetailsOperations<S3BucketFolder> {
+public interface S3BucketFolderRepository extends StorageDriveFolderDetailsOperations<S3BucketFolder> {
 
   @Override
   @Query("SELECT f FROM S3BucketFolder f WHERE f.storageDriveFolder.id = ?1")
   Optional<S3BucketFolder> findByStorageDriveFolderId(Long id);
+
+  @Override
+  @Query("SELECT f FROM S3BucketFolder f JOIN S3Bucket b ON f.s3Bucket.id = b.id WHERE b.storageDrive.id = ?1")
+  List<S3BucketFolder> findByStorageDriveId(Long storageDriveId);
 }

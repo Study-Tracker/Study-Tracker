@@ -32,13 +32,13 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import org.springframework.boot.actuate.audit.listener.AuditListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "egnyte_drive_folders")
-@EntityListeners(AuditListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class EgnyteDriveFolder implements StorageDriveFolderDetails {
 
   @Id

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,11 +124,10 @@ public class StudyBasePrivateControllerTests {
   @Test
   public void createStudyTest() throws Exception {
 
-    Program program =
-        programRepository
-            .findByName("Clinical Program A")
-            .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
+    Program program = programRepository.findByName("Clinical Program A")
+        .orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com")
+        .orElseThrow(RecordNotFoundException::new);
 
     Study study = new Study();
     study.setStatus(Status.ACTIVE);
@@ -136,8 +135,6 @@ public class StudyBasePrivateControllerTests {
     study.setProgram(program);
     study.setDescription("This is a test");
     study.setLegacy(false);
-    //    study.setCreatedBy(user);
-    //    study.setLastModifiedBy(user);
     study.setStartDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
@@ -147,7 +144,7 @@ public class StudyBasePrivateControllerTests {
             post("/api/internal/study/")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(study)))
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(study))))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
@@ -179,7 +176,7 @@ public class StudyBasePrivateControllerTests {
         .perform(
             post("/api/internal/study/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study)))
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(study)))
                 .with(user(user.getEmail())).with(csrf()))
         .andExpect(status().isBadRequest());
   }
@@ -190,7 +187,7 @@ public class StudyBasePrivateControllerTests {
         .perform(
             post("/api/internal/study/").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(new Study())))
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(new Study()))))
         .andExpect(status().is3xxRedirection());
   }
 
@@ -211,7 +208,7 @@ public class StudyBasePrivateControllerTests {
             put("/api/internal/study/CPA-XXXXX")
                 .with(user(study.getOwner().getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(study))))
         .andExpect(status().isNotFound());
 
     mockMvc
@@ -219,7 +216,7 @@ public class StudyBasePrivateControllerTests {
             put("/api/internal/study/CPA-10001")
                 .with(user(study.getOwner().getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(study))))
         .andExpect(status().isOk());
   }
 
@@ -237,7 +234,7 @@ public class StudyBasePrivateControllerTests {
         .perform(
             put("/api/internal/study/CPA-10001").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toStudyDetails(study))))
+                .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(study))))
         .andExpect(status().is3xxRedirection());
   }
 

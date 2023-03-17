@@ -18,7 +18,6 @@ package io.studytracker.egnyte;
 
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.EgnyteDrive;
-import io.studytracker.model.EgnyteDriveFolder;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
@@ -87,11 +86,13 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
 
   @Override
   public boolean validate(EgnyteIntegration instance) {
+    // TODO
     return false;
   }
 
   @Override
   public boolean test(EgnyteIntegration instance) {
+    // TODO
     return false;
   }
 
@@ -154,12 +155,6 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     s.setActive(false);
     e.setStorageDrive(s);
     egnyteDriveRepository.save(e);
-  }
-
-  // Folders
-
-  public EgnyteDriveFolder registerFolder(EgnyteDriveFolder folder) {
-    return egnyteDriveFolderRepository.save(folder);
   }
 
 }

@@ -68,4 +68,9 @@ public class StorageUtils {
     return file.getName();
   }
 
+  public static String getParentPathFromPath(String path) {
+    File file = new File(cleanInputPath(path));
+    return file.getParent();
+  }
+
 }

@@ -36,10 +36,13 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ProgramPayloadDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
+import io.studytracker.service.OrganizationService;
+import io.studytracker.storage.StorageDriveFolderService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,10 +69,16 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
   private ProgramRepository programRepository;
 
   @Autowired
+  private OrganizationService organizationService;
+
+  @Autowired
   private ObjectMapper objectMapper;
 
   @Autowired
   private ProgramMapper programMapper;
+
+  @Autowired
+  private StorageDriveFolderService storageDriveFolderService;
 
   @Test
   public void findAllTest() throws Exception {
@@ -139,11 +148,14 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .filter(u -> !u.isAdmin())
         .findFirst()
         .get();
+    Organization organization = organizationService.getCurrentOrganization();
+    StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders().get(0);
 
     ProgramPayloadDto dto = new ProgramPayloadDto();
     dto.setName("Program X");
     dto.setCode("PX");
     dto.setActive(true);
+    dto.setParentFolderId(rootFolder.getId());
 
     mockMvc
         .perform(
@@ -164,6 +176,8 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
+        .andExpect(jsonPath("$", hasKey("organizationId")))
+        .andExpect(jsonPath("$.organizationId", is(organization.getId().intValue())))
         .andExpect(jsonPath("$", hasKey("name")))
         .andExpect(jsonPath("$.name", is("Program X")))
         .andExpect(jsonPath("$", hasKey("createdBy")))
@@ -174,8 +188,9 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$.createdAt", not(nullValue())))
         .andExpect(jsonPath("$", hasKey("updatedAt")))
         .andExpect(jsonPath("$.updatedAt", not(nullValue())))
-        .andExpect(jsonPath("$", hasKey("storageFolderId")))
-        .andExpect(jsonPath("$.storageFolderId", not(nullValue())));
+        .andExpect(jsonPath("$", hasKey("storageFolders")))
+        .andExpect(jsonPath("$.storageFolders", not(empty())))
+        ;
 
     Program program = programRepository.findByName("Program X")
         .orElseThrow(RecordNotFoundException::new);

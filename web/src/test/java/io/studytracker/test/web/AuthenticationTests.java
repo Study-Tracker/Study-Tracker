@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
@@ -84,6 +85,8 @@ public class AuthenticationTests {
   @Autowired private ExampleDataGenerator exampleDataGenerator;
 
   @Autowired private PasswordEncoder passwordEncoder;
+
+  @Autowired private StudyMapper studyMapper;
 
   @MockBean private EmailService emailService;
 
@@ -156,7 +159,7 @@ public class AuthenticationTests {
             MockMvcRequestBuilders.post("/api/internal/study")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(study)))
+                .content(objectMapper.writeValueAsBytes(studyMapper.toStudyForm(study))))
         .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
   }
 
@@ -187,7 +190,7 @@ public class AuthenticationTests {
                 .with(user(user.getEmail()))
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(study)))
+                .content(objectMapper.writeValueAsBytes(studyMapper.toStudyForm(study))))
         .andExpect(MockMvcResultMatchers.status().isCreated());
   }
 

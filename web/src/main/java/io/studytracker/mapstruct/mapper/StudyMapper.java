@@ -39,6 +39,7 @@ import org.mapstruct.Named;
 public interface StudyMapper {
 
   Study fromStudyForm(StudyFormDto dto);
+  StudyFormDto toStudyForm(Study study);
 
   Study fromStudyDetails(StudyDetailsDto dto);
 

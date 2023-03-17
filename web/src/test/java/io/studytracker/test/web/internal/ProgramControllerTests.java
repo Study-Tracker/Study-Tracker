@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,12 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.service.OrganizationService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,6 +74,8 @@ public class ProgramControllerTests {
   @Autowired private ObjectMapper objectMapper;
 
   @Autowired private ProgramMapper mapper;
+
+  @Autowired private OrganizationService organizationService;
 
   private String username;
 
@@ -129,18 +133,20 @@ public class ProgramControllerTests {
   public void createProgramTest() throws Exception {
 
     User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
+    Organization organization = organizationService.getCurrentOrganization();
 
     Program program = new Program();
     program.setName("Program X");
     program.setCode("PX");
     program.setActive(true);
+    program.setOrganization(organization);
 
     mockMvc
         .perform(
             post("/api/internal/program/")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(mapper.toProgramDetails(program))))
+                .content(objectMapper.writeValueAsBytes(mapper.toProgramFormDto(program))))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
@@ -202,7 +208,7 @@ public class ProgramControllerTests {
             put("/api/internal/program/" + program.getId())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(program)))
+                .content(objectMapper.writeValueAsBytes(mapper.toProgramFormDto(program))))
         .andExpect(status().is3xxRedirection());
   }
 

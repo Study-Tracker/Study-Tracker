@@ -25,6 +25,7 @@ import io.studytracker.egnyte.exception.EgnyteException;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.InvalidRequestException;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.EgnyteDrive;
 import io.studytracker.model.EgnyteDriveFolder;
@@ -45,20 +46,17 @@ import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EgnyteStudyStorageService implements StudyStorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EgnyteStudyStorageService.class);
-
-  @Autowired
-  private EgnyteClientOperations egnyteClient;
 
   @Autowired
   private EgnyteDriveRepository egnyteDriveRepository;
@@ -86,6 +84,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
         path = path + "/";
       }
     } else {
+      if (!rootPath.endsWith("/")) {
+        rootPath = rootPath + "/";
+      }
       path = rootPath + EgnyteFolderNameGenerator.getProgramStorageFolderName(program) + "/";
     }
     LOGGER.debug("Program folder path: " + path);
@@ -156,7 +157,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFolder findFolderByPath(StorageDriveFolder parentFolder, String path)
       throws StudyStorageNotFoundException {
-    return this.findFolderByPath(parentFolder.getStorageDrive(), path);
+    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
+        .orElseThrow(() -> new StudyStorageNotFoundException("Drive not found: " + parentFolder.getStorageDrive().getId()));
+    return this.findFolderByPath(drive, path);
   }
 
   @Override
@@ -164,9 +167,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throws StudyStorageNotFoundException {
     LOGGER.debug("Looking up folder by path: {}", path);
     EgnyteIntegration integration = egnyteIntegrationRepository.findByStorageDriveId(drive.getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     try {
-      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(
-          new URL(integration.getRootUrl()), path, integration.getApiToken());
+      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(path);
       if (egnyteObject.isFolder()) {
         EgnyteFolder folder = (EgnyteFolder) egnyteObject;
         return EgnyteUtils.convertEgnyteFolderWithContents(folder, integration.getRootUrl(),
@@ -174,7 +177,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       } else {
         throw new EgnyteException("Object is not a folder: " + path);
       }
-    } catch (EgnyteException | MalformedURLException e) {
+    } catch (EgnyteException e) {
       e.printStackTrace();
       LOGGER.error("Failed to lookup folder by path: {}", path, e);
       throw new StudyStorageNotFoundException("Failed to lookup folder by path: " + path, e);
@@ -184,7 +187,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFile findFileByPath(StorageDriveFolder parentFolder, String path)
       throws StudyStorageNotFoundException {
-    return this.findFileByPath(parentFolder.getStorageDrive(), path);
+    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
+        .orElseThrow(() -> new StudyStorageNotFoundException("Drive not found: " + parentFolder.getStorageDrive().getId()));
+    return this.findFileByPath(drive, path);
   }
 
   @Override
@@ -192,16 +197,16 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throws StudyStorageNotFoundException {
     LOGGER.debug("Finding file by path: {}", path);
     EgnyteIntegration integration = egnyteIntegrationRepository.findByStorageDriveId(drive.getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     try {
-      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(
-          new URL(integration.getRootUrl()), path, integration.getApiToken());
+      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(path);
       if (!egnyteObject.isFolder()) {
         EgnyteFile file = (EgnyteFile) egnyteObject;
         return EgnyteUtils.convertEgnyteFile(file, integration.getRootUrl());
       } else {
         throw new EgnyteException("Object is not a file: " + path);
       }
-    } catch (EgnyteException | MalformedURLException e) {
+    } catch (EgnyteException e) {
       e.printStackTrace();
       LOGGER.error("Error while finding file by path", e);
       throw new StudyStorageNotFoundException("Error while finding file by path", e);
@@ -214,6 +219,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     LOGGER.info("Creating folder: {} in {}", name, path);
     EgnyteIntegration integration = egnyteIntegrationRepository
         .findByStorageDriveId(parentFolder.getStorageDrive().getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     try {
       if (!parentFolder.isWriteEnabled()) {
         throw new InsufficientPrivilegesException("Insufficient privileges to create folder");
@@ -221,8 +227,23 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       if (!EgnyteUtils.directoryIsSubfolderOf(parentFolder.getPath(), path)) {
         throw new InvalidRequestException("Requested path is not a subfolder of parent folder");
       }
-      EgnyteFolder folder = egnyteClient.createFolder(new URL(integration.getRootUrl()),
-          StorageUtils.joinPath(path, name), integration.getApiToken());
+      EgnyteFolder folder = egnyteClient.createFolder(StorageUtils.joinPath(path, name));
+      return EgnyteUtils.convertEgnyteFolder(folder, integration.getRootUrl());
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.error("Error while creating folder", e);
+      throw new StudyStorageException("Error while creating folder", e);
+    }
+  }
+
+  @Override
+  public StorageFolder createFolder(StorageDrive drive, String path, String name)
+      throws StudyStorageException {
+    LOGGER.info("Creating folder: {} in {}", name, path);
+    EgnyteIntegration integration = egnyteIntegrationRepository.findByStorageDriveId(drive.getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
+    try {
+      EgnyteFolder folder = egnyteClient.createFolder(StorageUtils.joinPath(path, name));
       return EgnyteUtils.convertEgnyteFolder(folder, integration.getRootUrl());
     } catch (Exception e) {
       e.printStackTrace();
@@ -244,13 +265,13 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
     EgnyteIntegration integration = egnyteIntegrationRepository
         .findByStorageDriveId(parentFolder.getStorageDrive().getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     String path = getProgramFolderPath(program, parentFolder.getPath());
     StorageFolder storageFolder;
 
     // Try to create the folder
     try {
-      EgnyteFolder egnyteFolder = egnyteClient.createFolder(new URL(integration.getRootUrl()),
-          path, integration.getApiToken());
+      EgnyteFolder egnyteFolder = egnyteClient.createFolder(path);
       storageFolder = this.convertFolder(egnyteFolder, integration.getRootUrl());
     }
 
@@ -266,7 +287,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     }
 
     // Throw remaining exceptions
-    catch (EgnyteException | MalformedURLException e) {
+    catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
 
@@ -281,6 +302,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
     EgnyteIntegration integration = egnyteIntegrationRepository
         .findByStorageDriveId(parentFolder.getStorageDrive().getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     Program program = study.getProgram();
     String path = getStudyFolderPath(study, parentFolder.getPath());
     StorageFolder storageFolder;
@@ -291,8 +313,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
     // Trey to create the folder
     try {
-      EgnyteFolder egnyteFolder = egnyteClient.createFolder(new URL(integration.getRootUrl()), path,
-          integration.getApiToken());
+      EgnyteFolder egnyteFolder = egnyteClient.createFolder(path);
       storageFolder = this.convertFolder(egnyteFolder, integration.getRootUrl());
     }
 
@@ -307,7 +328,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     }
 
     // Throw any remaining exceptions
-    catch (EgnyteException | MalformedURLException e) {
+    catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
 
@@ -327,13 +348,13 @@ public class EgnyteStudyStorageService implements StudyStorageService {
             assay.getCode(), study.getName() + " (" + study.getCode() + ")"));
     EgnyteIntegration integration = egnyteIntegrationRepository
         .findByStorageDriveId(parentFolder.getStorageDrive().getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     String path = getAssayFolderPath(assay, parentFolder.getPath());
     StorageFolder storageFolder;
 
     // Try to create the folder
     try {
-      EgnyteFolder egnyteFolder = egnyteClient.createFolder(new URL(integration.getRootUrl()), path,
-          integration.getApiToken());
+      EgnyteFolder egnyteFolder = egnyteClient.createFolder(path);
       storageFolder = this.convertFolder(egnyteFolder, integration.getRootUrl());
     }
 
@@ -348,7 +369,7 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     }
 
     // throw any remaining exceptions
-    catch (EgnyteException | MalformedURLException e) {
+    catch (EgnyteException e) {
       throw new StudyStorageException(e);
     }
 
@@ -362,14 +383,14 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     LOGGER.info("Uploading file: {} to {}", file.getName(), path);
     EgnyteIntegration integration = egnyteIntegrationRepository
         .findByStorageDriveId(folder.getStorageDrive().getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     try {
       if (!folder.isWriteEnabled()) {
         throw new InsufficientPrivilegesException("Insufficient privileges to write files.");
       }
-      EgnyteFile egnyteFile = egnyteClient.uploadFile(new URL(integration.getRootUrl()), file, path,
-          integration.getApiToken());
+      EgnyteFile egnyteFile = egnyteClient.uploadFile(file, path);
       return EgnyteUtils.convertEgnyteFile(egnyteFile, integration.getRootUrl());
-    } catch (EgnyteException | MalformedURLException e) {
+    } catch (EgnyteException e) {
       e.printStackTrace();
       LOGGER.error("Error while uploading file", e);
       throw new StudyStorageException("Error while uploading file", e);
@@ -383,15 +404,15 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public boolean fileExists(StorageDriveFolder folder, String path) {
+  public boolean fileExists(StorageDrive drive, String path) {
     LOGGER.debug("Checking if file exists: {}", path);
     EgnyteIntegration integration = egnyteIntegrationRepository
-        .findByStorageDriveId(folder.getStorageDrive().getId());
+        .findByStorageDriveId(drive.getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     try {
-      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(new URL(integration.getRootUrl()),
-          path, integration.getApiToken());
+      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(path);
       return !egnyteObject.isFolder();
-    } catch (EgnyteException | MalformedURLException e) {
+    } catch (EgnyteException e) {
       if (!(e.getCause() instanceof ObjectNotFoundException)) {
         e.printStackTrace();
         LOGGER.error("Error while checking if file exists", e);
@@ -401,21 +422,35 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public boolean folderExists(StorageDriveFolder folder, String path) {
+  public boolean fileExists(StorageDriveFolder folder, String path) {
+    StorageDrive drive = storageDriveFolderService.findDriveById(folder.getStorageDrive().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Drive not found: " + folder.getStorageDrive().getId()));
+    return this.fileExists(drive, path);
+  }
+
+  @Override
+  public boolean folderExists(StorageDrive drive, String path) {
     LOGGER.debug("Checking if folder exists: {}", path);
     EgnyteIntegration integration = egnyteIntegrationRepository
-        .findByStorageDriveId(folder.getStorageDrive().getId());
+        .findByStorageDriveId(drive.getId());
+    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     try {
-      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(new URL(integration.getRootUrl()),
-          path, integration.getApiToken());
+      EgnyteObject egnyteObject = egnyteClient.findObjectByPath(path);
       return egnyteObject.isFolder();
-    } catch (EgnyteException | MalformedURLException e) {
+    } catch (EgnyteException e) {
       if (!(e.getCause() instanceof ObjectNotFoundException)) {
         e.printStackTrace();
         LOGGER.error("Error while checking if folder exists", e);
       }
       return false;
     }
+  }
+
+  @Override
+  public boolean folderExists(StorageDriveFolder folder, String path) {
+    StorageDrive drive = storageDriveFolderService.findDriveById(folder.getStorageDrive().getId())
+        .orElseThrow(() -> new RecordNotFoundException("Drive not found: " + folder.getStorageDrive().getId()));
+    return this.folderExists(drive, path);
   }
 
   /**
