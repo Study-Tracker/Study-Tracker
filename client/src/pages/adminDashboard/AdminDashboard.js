@@ -35,7 +35,7 @@ import EgnyteIntegrationSettings
   from "./egnyteIntegrationSettings/EgnyteIntegrationSettings";
 import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
 import StorageFolderSettings
-  from "./storageLocationSettings/StorageFolderSettings";
+  from "./storageFolderSettings/StorageFolderSettings";
 
 const settings = {
   "users": {
@@ -62,10 +62,10 @@ const settings = {
     label: "Programs",
     tag: ProgramSettings
   },
-  "storage-locations": {
-    id: "storage-locations",
+  "storage-folders": {
+    id: "storage-folders",
     category: "site-settings",
-    label: "Storage Locations",
+    label: "Storage Folders",
     tag: StorageFolderSettings
   },
 

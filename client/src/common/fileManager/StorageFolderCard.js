@@ -16,44 +16,51 @@
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheckCircle, faHardDrive} from "@fortawesome/free-regular-svg-icons";
-import DriveStatusBadge from "./DriveStatusBadge";
-import {faCancel} from "@fortawesome/free-solid-svg-icons";
+import {faFolder,} from "@fortawesome/free-regular-svg-icons";
+import {FolderPermissionsBadges, FolderRootBadges} from "./folderBadges";
 import React from "react";
+import PropTypes from "prop-types";
 
 const StorageFolderCard = ({folder}) => {
 
   return (
       <Card className={"mt-3"}>
-        <Card.Header>
-          <Card.Title tag={"h5"} className={"mb-0"}>
-            Egnyte drives
-          </Card.Title>
-        </Card.Header>
         <Card.Body>
           <Row>
 
             <Col xs={1} className={"d-flex align-items-center"}>
-              <FontAwesomeIcon icon={faHardDrive} size={"2x"} className={"text-secondary"}/>
+              <FontAwesomeIcon icon={faFolder} size={"2x"} className={"text-secondary"}/>
             </Col>
 
-            <Col xs={7} className={"d-flex align-items-center"}>
+            <Col xs={5} className={"d-flex align-items-start"}>
               <div>
-                            <span className={"fw-bolder text-lg"}>
-                              {drive.storageDrive.displayName}
-                            </span>
+                <span className={"fw-bolder text-lg"}>
+                  {folder.name}
+                </span>
                 <br/>
                 <span className={"text-muted"}>
-                              {drive.storageDrive.rootPath}
-                            </span>
+                  {folder.path}
+                </span>
+                <br />
+                <span className={"text-muted"}>
+                  {folder.storageDrive.driveType}: {folder.storageDrive.displayName}
+                </span>
               </div>
             </Col>
 
-            <Col xs={2} className={"d-flex align-items-center"}>
+            <Col xs={2} className={"d-flex align-items-start"}>
               <div>
-                <span className="text-muted">Status</span>
+                <span className="text-muted">Permissions</span>
                 <br />
-                <DriveStatusBadge active={drive.storageDrive.active} />
+                <FolderPermissionsBadges folder={folder} />
+              </div>
+            </Col>
+
+            <Col xs={2} className={"d-flex align-items-start"}>
+              <div>
+                <span className="text-muted">Root</span>
+                <br />
+                <FolderRootBadges folder={folder} />
               </div>
             </Col>
 
@@ -63,24 +70,6 @@ const StorageFolderCard = ({folder}) => {
                   Actions
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-
-                  {
-                      drive.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
-                            <FontAwesomeIcon icon={faCancel} className={"me-1"} />
-                            Set Inactive
-                          </Dropdown.Item>
-                      )
-                  }
-
-                  {
-                      !drive.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
-                            <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
-                            Set Active
-                          </Dropdown.Item>
-                      )
-                  }
 
                 </Dropdown.Menu>
               </Dropdown>
@@ -92,3 +81,9 @@ const StorageFolderCard = ({folder}) => {
   )
 
 }
+
+StorageFolderCard.propTypes = {
+  folder: PropTypes.object.isRequired
+}
+
+export default StorageFolderCard;

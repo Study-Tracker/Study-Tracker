@@ -20,9 +20,9 @@ import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheckCircle, faHardDrive} from "@fortawesome/free-regular-svg-icons";
-import DriveStatusBadge from "../../../common/fileManager/DriveStatusBadge";
+import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
 import {faCancel} from "@fortawesome/free-solid-svg-icons";
-import EgnyteIntegrationDetailsCard from "./EgnyteIntegrationSetupCard";
+import EgnyteIntegrationDetailsCard from "./EgnyteIntegrationDetailsCard";
 import EgnyteIntegrationSetupCard from "./EgnyteIntegrationSetupCard";
 
 const EgnyteIntegrationSettings = () => {
@@ -68,7 +68,7 @@ const EgnyteIntegrationSettings = () => {
       <>
 
         {
-          !!settings
+          settings
               ? <EgnyteIntegrationDetailsCard settings={settings} />
               : <EgnyteIntegrationSetupCard />
         }
@@ -117,7 +117,7 @@ const EgnyteIntegrationSettings = () => {
                             <Dropdown.Menu>
 
                               {
-                                  drive.active && (
+                                  drive.storageDrive.active && (
                                       <Dropdown.Item onClick={() => console.log("Click")}>
                                         <FontAwesomeIcon icon={faCancel} className={"me-1"} />
                                         Set Inactive
@@ -126,7 +126,7 @@ const EgnyteIntegrationSettings = () => {
                               }
 
                               {
-                                  !drive.active && (
+                                  !drive.storageDrive.active && (
                                       <Dropdown.Item onClick={() => console.log("Click")}>
                                         <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
                                         Set Active

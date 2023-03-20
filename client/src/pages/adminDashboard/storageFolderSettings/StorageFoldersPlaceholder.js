@@ -15,23 +15,25 @@
  */
 
 import {Button, Card, Col, Row} from "react-bootstrap";
-import React from "react";
-import PropTypes from "prop-types";
 
-const EgnyteIntegrationSetupCard = ({}) => {
+const StorageFoldersPlaceholder = ({handleClick}) => {
   return (
-      <Card className="illustration">
-        <Card.Header>
-          <Card.Title tag={"h5"} className={"mb-0"}>
-            Egnyte integration is <span className={"text-secondary"}>DISABLED</span>
-          </Card.Title>
-        </Card.Header>
+      <Card className="illustration-light flex-fill">
         <Card.Body>
           <Row>
-            <Col className={"text-center"}>
-              <Button size="lg" color={"primary"} onClick={() => console.log("Click")}>
-                Register Egnyte Integration
-              </Button>
+            <Col sm={12} className={"d-flex justify-content-center"}>
+              <div className={"text-center"}>
+                <h1 className="display-6 illustration-text text-center mb-4">No root folders</h1>
+                <p className="text-lg">
+                  <Button
+                      color={"primary"}
+                      onClick={handleClick}
+                      className={"ps-5 pe-5"}
+                  >
+                    Add a root folder
+                  </Button>
+                </p>
+              </div>
             </Col>
           </Row>
         </Card.Body>
@@ -39,8 +41,4 @@ const EgnyteIntegrationSetupCard = ({}) => {
   )
 }
 
-EgnyteIntegrationSetupCard.propTypes = {
-  settings: PropTypes.object.isRequired
-}
-
-export default EgnyteIntegrationSetupCard;
+export default StorageFoldersPlaceholder;

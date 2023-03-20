@@ -101,6 +101,7 @@ public class EgnyteIntegrationInitializer {
         newIntegration.setRootUrl("https://" + egnyteProperties.getTenantName() + ".egnyte.com");
         newIntegration.setApiToken(egnyteProperties.getApiToken());
         newIntegration.setQps(egnyteProperties.getQps());
+        newIntegration.setActive(true);
         egnyteIntegration = egnyteIntegrationService.register(newIntegration);
       }
 

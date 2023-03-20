@@ -23,6 +23,7 @@ import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.storage.StorageDriveFolderService;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,8 @@ public class StorageDriveFolderPrivateController {
   @GetMapping("")
   public List<StorageDriveFolderSummaryDto> findFolders(
       @RequestParam(name = "studyRoot",  required = false) boolean studyRoot,
-      @RequestParam(name = "browserRoot",  required = false) boolean browserRoot
+      @RequestParam(name = "browserRoot",  required = false) boolean browserRoot,
+      @RequestParam(name = "root", required = false) boolean root
   ) {
     LOGGER.debug("Fetching all storage drive folders for organization");
     List<StorageDriveFolder> folders;
@@ -58,6 +60,10 @@ public class StorageDriveFolderPrivateController {
       folders = storageDriveFolderService.findStudyRootFolders();
     } else if (browserRoot) {
       folders = storageDriveFolderService.findBrowserRootFolders();
+    } else if (root) {
+      folders = storageDriveFolderService.findAll().stream()
+          .filter(f -> f.isBrowserRoot() || f.isStudyRoot())
+          .collect(Collectors.toList());
     } else {
       folders = storageDriveFolderService.findAll();
     }

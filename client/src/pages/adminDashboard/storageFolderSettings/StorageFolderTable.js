@@ -27,7 +27,7 @@ import {
   faEdit,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
-import DriveStatusBadge from "../../../common/fileManager/DriveStatusBadge";
+import DriveStatusBadge from "../../../common/fileManager/folderBadges";
 
 const StorageFolderTable = ({
   folders,

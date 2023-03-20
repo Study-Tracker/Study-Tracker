@@ -17,6 +17,7 @@
 import {Card, Col, Row} from "react-bootstrap";
 import React from "react";
 import PropTypes from "prop-types";
+import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
 
 const EgnyteIntegrationDetailsCard = ({settings}) => {
   return (
@@ -47,6 +48,13 @@ const EgnyteIntegrationDetailsCard = ({settings}) => {
             <Col md={6}>
               <h6 className="details-label">API QPS</h6>
               <p>{settings.qps}</p>
+            </Col>
+
+            <Col md={6}>
+              <h6 className="details-label">Status</h6>
+              <p>
+                <DriveStatusBadge active={settings.active} />
+              </p>
             </Col>
 
           </Row>

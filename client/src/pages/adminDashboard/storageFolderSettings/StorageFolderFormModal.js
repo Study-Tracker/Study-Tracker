@@ -17,7 +17,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {Button, Col, Form, Modal, Row} from 'react-bootstrap'
 import PropTypes from "prop-types";
-import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
@@ -58,14 +57,7 @@ const StorageFolderFormModal = ({
   }
 
   useEffect(() => {
-    axios.get("/api/internal/integrations")
-    .then(response => {
-      setIntegrations(response.data);
-    })
-    .catch(e => {
-      console.error(e);
-      notyf.open({message: 'Failed to load available integration instances.', type: 'error'});
-    })
+
   }, [])
 
   let storageServiceOptions = [];
@@ -86,7 +78,7 @@ const StorageFolderFormModal = ({
 
   return (
       <Formik
-          initialValues={selectedLocation || locationDefault}
+          initialValues={selectedFolder || locationDefault}
           onSubmit={handleFormSubmit}
           validationSchema={locationSchema}
           innerRef={formikRef}

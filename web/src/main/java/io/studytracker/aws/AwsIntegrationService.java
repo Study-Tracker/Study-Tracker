@@ -127,7 +127,7 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   public S3Bucket registerBucket(S3Bucket bucket) {
     LOGGER.info("Registering bucket {}", bucket.getName());
     if (!this.bucketExists(bucket.getAwsIntegration(), bucket.getName())) {
-      throw new IllegalArgumentException("Bucket does not exist");
+      throw new IllegalArgumentException("Bucket does not exist: " + bucket.getName());
     }
     return s3BucketRepository.save(bucket);
   }

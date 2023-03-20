@@ -17,9 +17,10 @@
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheckCircle, faHardDrive} from "@fortawesome/free-regular-svg-icons";
-import DriveStatusBadge from "./DriveStatusBadge";
+import DriveStatusBadge from "./folderBadges";
 import {faCancel} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
+import PropTypes from "prop-types";
 
 const StorageDriveCard = ({drive}) => {
 
@@ -95,3 +96,9 @@ const StorageDriveCard = ({drive}) => {
   )
 
 }
+
+StorageDriveCard.propTypes = {
+  drive: PropTypes.object.isRequired
+}
+
+export default StorageDriveCard;

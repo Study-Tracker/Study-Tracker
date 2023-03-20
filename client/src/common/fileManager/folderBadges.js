@@ -18,7 +18,7 @@ import {Badge} from "react-bootstrap";
 import React from "react";
 import PropTypes from "prop-types";
 
-const DriveStatusBadge = ({active}) => {
+export const DriveStatusBadge = ({active}) => {
   return active
       ? <Badge className="me-2" bg="success">Active</Badge>
       : <Badge className="me-2" bg="danger">Inactive</Badge>
@@ -28,4 +28,29 @@ DriveStatusBadge.propTypes = {
   active: PropTypes.bool.isRequired
 }
 
-export default DriveStatusBadge;
+export const FolderRootBadges = ({folder}) => {
+  return (
+      <>
+        {folder.studyRoot && <Badge className="me-2" bg="primary">Study Root</Badge>}
+        {folder.browserRoot && <Badge className="me-2" bg="info">Browser Root</Badge>}
+      </>
+  )
+}
+
+FolderRootBadges.propTypes = {
+  folder: PropTypes.object.isRequired
+}
+
+export const FolderPermissionsBadges = ({folder}) => {
+  return (
+      <>
+        <Badge className="me-2" bg="primary">Read</Badge>
+        {folder.writeEnabled && <Badge className="me-2" bg="info">Write</Badge>}
+        {folder.deleteEnabled && <Badge className="me-2" bg="danger">Delete</Badge>}
+      </>
+  )
+}
+
+FolderPermissionsBadges.propTypes = {
+  folder: PropTypes.object.isRequired
+}
