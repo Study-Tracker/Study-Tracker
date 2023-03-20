@@ -20,33 +20,32 @@ import {Button, Card, Col, Row} from "react-bootstrap";
 import {FolderPlus} from "react-feather";
 import {SettingsLoadingMessage} from "../../../common/loading";
 import {SettingsErrorMessage} from "../../../common/errors";
-import StorageLocationTable from "./StorageLocationTable";
-import StorageLocationFormModal
-  from "../../../common/modals/StorageLocationFormModal";
+import StorageFolderTable from "./StorageFolderTable";
+import StorageFolderFormModal from "./StorageFolderFormModal";
 import NotyfContext from "../../../context/NotyfContext";
 
-const StorageLocationSettings = () => {
+const StorageFolderSettings = () => {
 
   const notyf = useContext(NotyfContext);
 
-  const [locations, setLocations] = useState([]);
+  const [folders, setFolders] = useState([]);
   const [loadCounter, setLoadCounter] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedFolder, setSelectedFolder] = useState(null);
   const formikRef = useRef();
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get("/api/internal/storage-locations")
+    axios.get("/api/internal/storage-drive-folders/")
     .then(response => {
-      setLocations(response.data);
+      setFolders(response.data);
     })
     .catch(e => {
       console.error(e);
       setError(e)
-      notyf.open({message: 'Failed to load available storage locations.', type: 'error'});
+      notyf.open({message: 'Failed to load available storage folders.', type: 'error'});
     })
     .finally(() => {
       setIsLoading(false);
@@ -54,10 +53,10 @@ const StorageLocationSettings = () => {
   }, [loadCounter]);
 
   const handleSubmitForm = (values, {setSubmitting, resetForm}) => {
-    const url = selectedLocation
-        ? "/api/internal/storage-locations/" + selectedLocation.id
-        : "/api/internal/storage-locations";
-    const method = selectedLocation ? "PUT" : "POST";
+    const url = selectedFolder
+        ? "/api/internal/storage-drive-folders/" + selectedFolder.id
+        : "/api/internal/storage-drive-folders/";
+    const method = selectedFolder ? "PUT" : "POST";
     axios({
       method: method,
       url: url,
@@ -67,7 +66,7 @@ const StorageLocationSettings = () => {
       },
     })
     .then(response => {
-      notyf.open({message: 'Storage location saved.', type: 'success'});
+      notyf.open({message: 'Storage folder saved.', type: 'success'});
       resetForm();
       setShowModal(false);
     })
@@ -85,24 +84,20 @@ const StorageLocationSettings = () => {
     })
   }
 
-  const handleLocationEdit = (location) => {
-    console.debug("Edit location: ", location);
+  const handleFolderEdit = (folder) => {
+    console.debug("Edit folder: ", folder);
     formikRef.current?.resetForm();
-    setSelectedLocation(location);
+    setSelectedFolder(folder);
     setShowModal(true);
-  }
-
-  const handleLocationActiveToggle = (location, active) => {
-
   }
 
   let content = '';
   if (isLoading) content = <SettingsLoadingMessage />;
   else if (error) content = <SettingsErrorMessage />;
-  else content = <StorageLocationTable
-          locations={locations}
-          handleLocationEdit={handleLocationEdit}
-          handleToggleLocationActive={handleLocationActiveToggle}
+  else content = <StorageFolderTable
+          folders={folders}
+          handleFolderEdit={handleFolderEdit()}
+          handleToggleFolderActive={null}
       />;
 
   return (
@@ -110,17 +105,17 @@ const StorageLocationSettings = () => {
 
         <Card.Header>
           <Card.Title tag={"h5"}>
-            Storage Locations
+            Storage Folders
             <span className="float-end">
               <Button
                   variant={"primary"}
                   onClick={() => {
                     formikRef.current?.resetForm();
-                    setSelectedLocation(null);
+                    setSelectedFolder(null);
                     setShowModal(true);
                   }}
               >
-                Add Location
+                Add Folder
                 &nbsp;
                 <FolderPlus className="feather align-middle ms-2 mb-1"/>
               </Button>
@@ -133,11 +128,11 @@ const StorageLocationSettings = () => {
           <Row>
             <Col>
               <div className="info-alert">
-                Storage locations are folders in local file systems or cloud services that Study Tracker
-                users can use to store their data. A default storage location will be created on
+                Root folders are folders in local file systems or cloud services that Study Tracker
+                users can use to store their data. A root study folder will be created on
                 application startup, dependent on the <code>storage.mode</code> setting used, which
                 will determine where program, study, and assay folders are created by default. You
-                can add additional storage locations here from the available configured storage systems.
+                can add additional root folders here from the available configured storage systems.
               </div>
             </Col>
           </Row>
@@ -148,10 +143,10 @@ const StorageLocationSettings = () => {
             </Col>
           </Row>
 
-          <StorageLocationFormModal
+          <StorageFolderFormModal
               isOpen={showModal} 
               setIsOpen={setShowModal}
-              selectedLocation={selectedLocation}
+              selectedLocation={selectedFolder}
               handleFormSubmit={handleSubmitForm}
               formikRef={formikRef}
           />
@@ -163,4 +158,4 @@ const StorageLocationSettings = () => {
 
 }
 
-export default StorageLocationSettings;
+export default StorageFolderSettings;

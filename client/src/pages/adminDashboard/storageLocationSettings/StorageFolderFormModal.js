@@ -18,16 +18,16 @@ import React, {useContext, useEffect, useState} from "react";
 import {Button, Col, Form, Modal, Row} from 'react-bootstrap'
 import PropTypes from "prop-types";
 import axios from "axios";
-import NotyfContext from "../../context/NotyfContext";
+import NotyfContext from "../../../context/NotyfContext";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import Select from "react-select";
-import {FormGroup} from "../forms/common";
+import {FormGroup} from "../../../common/forms/common";
 
-const StorageLocationFormModal = ({
+const StorageFolderFormModal = ({
   isOpen,
   setIsOpen,
-  selectedLocation,
+  selectedFolder,
   handleFormSubmit,
   formikRef
 }) => {
@@ -258,12 +258,12 @@ const StorageLocationFormModal = ({
   );
 }
 
-StorageLocationFormModal.propTypes = {
+StorageFolderFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
-  selectedLocation: PropTypes.object,
+  selectedFolder: PropTypes.object,
   handleFormSubmit: PropTypes.func.isRequired,
   formikRef: PropTypes.object.isRequired
 }
 
-export default StorageLocationFormModal;
+export default StorageFolderFormModal;

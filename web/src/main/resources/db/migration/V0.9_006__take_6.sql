@@ -14,6 +14,18 @@ CREATE TABLE aws_integrations
     CONSTRAINT pk_aws_integrations PRIMARY KEY (id)
 );
 
+CREATE TABLE egnyte_drive_folders
+(
+    id                      BIGINT                      NOT NULL,
+    storage_drive_folder_id BIGINT                      NOT NULL,
+    egnyte_drive_id         BIGINT                      NOT NULL,
+    folder_id               VARCHAR(255)                NOT NULL,
+    web_url                 VARCHAR(255),
+    created_at              TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at              TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    CONSTRAINT pk_egnyte_drive_folders PRIMARY KEY (id)
+);
+
 CREATE TABLE egnyte_drives
 (
     id                    BIGINT                      NOT NULL,
@@ -122,8 +134,65 @@ CREATE TABLE storage_drives
     CONSTRAINT pk_storage_drives PRIMARY KEY (id)
 );
 
+ALTER TABLE assay_storage_folders
+    ADD id BIGINT;
+
+ALTER TABLE assay_storage_folders
+    ADD is_primary BOOLEAN;
+
+ALTER TABLE assay_storage_folders
+    ADD storage_drive_folder_id BIGINT;
+
+ALTER TABLE program_storage_folders
+    ADD id BIGINT;
+
+ALTER TABLE program_storage_folders
+    ADD is_primary BOOLEAN;
+
+ALTER TABLE program_storage_folders
+    ADD storage_drive_folder_id BIGINT;
+
+ALTER TABLE study_storage_folders
+    ADD id BIGINT;
+
+ALTER TABLE study_storage_folders
+    ADD is_primary BOOLEAN;
+
+ALTER TABLE study_storage_folders
+    ADD storage_drive_folder_id BIGINT;
+
+ALTER TABLE assay_storage_folders
+    ALTER COLUMN is_primary SET NOT NULL;
+
+ALTER TABLE program_storage_folders
+    ALTER COLUMN is_primary SET NOT NULL;
+
+ALTER TABLE study_storage_folders
+    ALTER COLUMN is_primary SET NOT NULL;
+
+ALTER TABLE programs
+    ADD organization_id BIGINT;
+
+ALTER TABLE programs
+    ALTER COLUMN organization_id SET NOT NULL;
+
+ALTER TABLE assay_storage_folders
+    ALTER COLUMN storage_drive_folder_id SET NOT NULL;
+
+ALTER TABLE program_storage_folders
+    ALTER COLUMN storage_drive_folder_id SET NOT NULL;
+
+ALTER TABLE study_storage_folders
+    ALTER COLUMN storage_drive_folder_id SET NOT NULL;
+
 ALTER TABLE organizations
     ADD CONSTRAINT uc_organizations_name UNIQUE (name);
+
+ALTER TABLE program_storage_folders
+    ADD CONSTRAINT uk_program_storage_folder UNIQUE (program_id, storage_drive_folder_id);
+
+ALTER TABLE assay_storage_folders
+    ADD CONSTRAINT uq_assay_storage_folders UNIQUE (storage_drive_folder_id, assay_id);
 
 ALTER TABLE egnyte_drives
     ADD CONSTRAINT uq_egnyte_drives UNIQUE (egnyte_integration_id, name);
@@ -140,6 +209,12 @@ ALTER TABLE s3_buckets
 ALTER TABLE storage_drives
     ADD CONSTRAINT uq_storage_drives UNIQUE (organization_id, display_name);
 
+ALTER TABLE study_storage_folders
+    ADD CONSTRAINT uq_study_storage_folders UNIQUE (storage_drive_folder_id, study_id);
+
+ALTER TABLE assay_storage_folders
+    ADD CONSTRAINT FK_ASSAY_STORAGE_FOLDERS_ON_STORAGE_DRIVE_FOLDER FOREIGN KEY (storage_drive_folder_id) REFERENCES storage_drive_folders (id);
+
 ALTER TABLE aws_integrations
     ADD CONSTRAINT FK_AWS_INTEGRATIONS_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organizations (id);
 
@@ -148,6 +223,12 @@ ALTER TABLE egnyte_drives
 
 ALTER TABLE egnyte_drives
     ADD CONSTRAINT FK_EGNYTE_DRIVES_ON_STORAGE_DRIVE FOREIGN KEY (storage_drive_id) REFERENCES storage_drives (id);
+
+ALTER TABLE egnyte_drive_folders
+    ADD CONSTRAINT FK_EGNYTE_DRIVE_FOLDERS_ON_EGNYTE_DRIVE FOREIGN KEY (egnyte_drive_id) REFERENCES egnyte_drives (id);
+
+ALTER TABLE egnyte_drive_folders
+    ADD CONSTRAINT FK_EGNYTE_DRIVE_FOLDERS_ON_STORAGE_DRIVE_FOLDER FOREIGN KEY (storage_drive_folder_id) REFERENCES storage_drive_folders (id);
 
 ALTER TABLE egnyte_integrations
     ADD CONSTRAINT FK_EGNYTE_INTEGRATIONS_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organizations (id);
@@ -163,6 +244,12 @@ ALTER TABLE local_drive_folders
 
 ALTER TABLE local_drive_folders
     ADD CONSTRAINT FK_LOCAL_DRIVE_FOLDERS_ON_STORAGE_DRIVE_FOLDER FOREIGN KEY (storage_drive_folder_id) REFERENCES storage_drive_folders (id);
+
+ALTER TABLE programs
+    ADD CONSTRAINT FK_PROGRAMS_ON_ORGANIZATION FOREIGN KEY (organization_id) REFERENCES organizations (id);
+
+ALTER TABLE program_storage_folders
+    ADD CONSTRAINT FK_PROGRAM_STORAGE_FOLDERS_ON_STORAGE_DRIVE_FOLDER FOREIGN KEY (storage_drive_folder_id) REFERENCES storage_drive_folders (id);
 
 ALTER TABLE s3_buckets
     ADD CONSTRAINT FK_S3_BUCKETS_ON_AWS_INTEGRATION FOREIGN KEY (aws_integration_id) REFERENCES aws_integrations (id);
@@ -182,67 +269,50 @@ ALTER TABLE storage_drives
 ALTER TABLE storage_drive_folders
     ADD CONSTRAINT FK_STORAGE_DRIVE_FOLDERS_ON_STORAGE_DRIVE FOREIGN KEY (storage_drive_id) REFERENCES storage_drives (id);
 
--- Add default organization
-INSERT INTO organizations (id, name, description, active, created_at, updated_at)
-VALUES (nextval('hibernate_sequence'), 'My Organization', 'Default organization', true, now(), now());
+ALTER TABLE study_storage_folders
+    ADD CONSTRAINT FK_STUDY_STORAGE_FOLDERS_ON_STORAGE_DRIVE_FOLDER FOREIGN KEY (storage_drive_folder_id) REFERENCES storage_drive_folders (id);
 
+ALTER TABLE assays
+    DROP CONSTRAINT fk_assays_on_storage_folder;
 
--- Add AWS integration and buckets
-insert into aws_integrations (id, name, region, organization_id, active, use_iam, created_at, updated_at)
-select nextval('hibernate_sequence'), 'Default AWS Integration', 'us-east-1', (select max(id) from organizations), false, false, now(), now()
-where exists(
-  select i.id
-  from integration_instances i
-           join integration_definitions d on i.integration_definition_id = d.id
-  where d.type = 'AWS_S3'
-);
+ALTER TABLE assay_storage_folders
+    DROP CONSTRAINT fk_assstofol_on_file_store_folder;
 
-insert into storage_drives (id, organization_id, display_name, drive_type, root_path, active, created_at, updated_at)
-select nextval('hibernate_sequence'), (select max(id) from organizations), concat('S3: ', regexp_replace(i.name, 'aws-s3-', '')) as display_name, 'S3', '', i.active as active, i.created_at, i.updated_at
-from integration_instances i
- join integration_definitions d on i.integration_definition_id = d.id
-where d.type = 'AWS_S3'
-;
+ALTER TABLE programs
+    DROP CONSTRAINT fk_programs_on_storage_folder;
 
-insert into s3_buckets (id, aws_integration_id, storage_drive_id, name, created_at, updated_at)
-select nextval('hibernate_sequence'), (select max(id) from aws_integrations), s.id, regexp_replace(s.display_name, 'S3: ', ''), s.created_at, s.updated_at
-from storage_drives s
-where s.drive_type = 'S3'
-;
+ALTER TABLE program_storage_folders
+    DROP CONSTRAINT fk_prostofol_on_file_store_folder;
 
--- Add Egnyte integrations and drives
-insert into egnyte_integrations (id, organization_id, tenant_name, root_url, api_token, qps, active, created_at, updated_at)
-select nextval('hibernate_sequence'), (select max(id) from organizations), 'PLACEHOLDER', 'PLACEHOLDER', 'PLACEHOLDER', 1, false, now(), now()
-where exists(
-  select i.id
-  from integration_instances i
-           join integration_definitions d on i.integration_definition_id = d.id
-  where d.type = 'EGNYTE'
-);
+ALTER TABLE studies
+    DROP CONSTRAINT fk_studies_on_storage_folder;
 
-insert into storage_drives (id, organization_id, display_name, drive_type, root_path, active, created_at, updated_at)
-select nextval('hibernate_sequence'), (select max(id) from organizations), 'Egnyte Shared Drive', 'EGNYTE', '/Shared', i.active as active, i.created_at, i.updated_at
-from integration_instances i
- join integration_definitions d on i.integration_definition_id = d.id
-where d.type = 'EGNYTE'
-;
+ALTER TABLE study_storage_folders
+    DROP CONSTRAINT fk_stustofol_on_file_store_folder;
 
-insert into egnyte_drives (id, storage_drive_id, egnyte_integration_id, name, created_at, updated_at)
-select nextval('hibernate_sequence'), s.id, (select max(id) from egnyte_integrations), 'Shared', s.created_at, s.updated_at
-from storage_drives s
-where s.drive_type = 'EGNYTE'
-;
+ALTER TABLE assay_storage_folders
+    DROP COLUMN storage_folder_id;
 
--- Add local drives
-insert into storage_drives (id, organization_id, display_name, drive_type, root_path, active, created_at, updated_at)
-select nextval('hibernate_sequence'), (select max(id) from organizations), 'Local Drive', 'LOCAL', 'PLACEHOLDER', i.active, i.created_at, i.updated_at
-from integration_instances i
- join integration_definitions d on i.integration_definition_id = d.id
-where d.type = 'LOCAL_FILE_SYSTEM'
-;
+ALTER TABLE program_storage_folders
+    DROP COLUMN storage_folder_id;
 
-insert into local_drives (id, storage_drive_id, organization_id, name, created_at, updated_at)
-select nextval('hibernate_sequence'), s.id, (select max(id) from organizations), 'Local Drive', s.created_at, s.updated_at
-from storage_drives s
-where s.drive_type = 'LOCAL'
-;
+ALTER TABLE study_storage_folders
+    DROP COLUMN storage_folder_id;
+
+ALTER TABLE assays
+    DROP COLUMN storage_folder_id;
+
+ALTER TABLE programs
+    DROP COLUMN storage_folder_id;
+
+ALTER TABLE studies
+    DROP COLUMN storage_folder_id;
+
+ALTER TABLE assay_storage_folders
+    ADD CONSTRAINT pk_assay_storage_folders PRIMARY KEY (id);
+
+ALTER TABLE program_storage_folders
+    ADD CONSTRAINT pk_program_storage_folders PRIMARY KEY (id);
+
+ALTER TABLE study_storage_folders
+    ADD CONSTRAINT pk_study_storage_folders PRIMARY KEY (id);

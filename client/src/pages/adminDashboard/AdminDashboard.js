@@ -31,10 +31,11 @@ import ProgramSettings from "./ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
 import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
 import BenchlingIntegrationSettings from "./BenchlingIntegrationSettings";
-import EgnyteIntegrationSettings from "./EgnyteIntegrationSettings";
+import EgnyteIntegrationSettings
+  from "./egnyteIntegrationSettings/EgnyteIntegrationSettings";
 import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
-import StorageLocationSettings
-  from "./storageLocationSettings/StorageLocationSettings";
+import StorageFolderSettings
+  from "./storageLocationSettings/StorageFolderSettings";
 
 const settings = {
   "users": {
@@ -65,7 +66,7 @@ const settings = {
     id: "storage-locations",
     category: "site-settings",
     label: "Storage Locations",
-    tag: StorageLocationSettings
+    tag: StorageFolderSettings
   },
 
   // Integrations

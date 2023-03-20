@@ -27,16 +27,17 @@ import {
   faEdit,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
+import DriveStatusBadge from "../../../common/fileManager/DriveStatusBadge";
 
-const StorageLocationTable = ({
-  locations,
-  handleLocationEdit,
-  handleToggleLocationActive
+const StorageFolderTable = ({
+  folders,
+  handleFolderEdit,
+  handleToggleFolderActive
 }) => {
 
   const columns = [
     {
-      dataField: "displayName",
+      dataField: "name",
       text: "Name",
       sort: true
     },
@@ -44,13 +45,15 @@ const StorageLocationTable = ({
       dataField: "type",
       text: "Type",
       formatter: (c, d) => {
-        switch (d.type) {
-          case "LOCAL_FILE_SYSTEM":
+        switch (d.storageDrive.driveType) {
+          case "LOCAL":
             return "Local File System";
-          case "AWS_S3":
+          case "S3":
             return "Amazon S3";
-          case "EGNYTE_API":
+          case "EGNYTE":
             return "Egnyte API";
+          case "ONEDRIVE":
+            return "Microsoft OneDrive";
           default:
             return d.type;
         }
@@ -72,13 +75,7 @@ const StorageLocationTable = ({
       dataField: "active",
       text: "Status",
       sort: true,
-      formatter: (c, d, i, x) => {
-        if (d.active) {
-          return <Badge bg="success">Active</Badge>
-        } else {
-          return <Badge bg="danger">Inactive</Badge>
-        }
-      }
+      formatter: (c, d, i, x) => <DriveStatusBadge active={d.active} />
     },
     {
       dataField: "permissions",
@@ -100,14 +97,6 @@ const StorageLocationTable = ({
         return d.defaultStudyLocation ? <CheckCircle className={"text-success"} /> : "";
       }
     },
-    // {
-    //   dataField: "defaultDataLocation",
-    //   text: "Data Default",
-    //   sort: false,
-    //   formatter: (c, d, i, x) => {
-    //     return d.defaultDataLocation ? <CheckCircle className={"text-success"} /> : "";
-    //   }
-    // },
     {
       dataField: "controls",
       text: "",
@@ -199,8 +188,8 @@ const StorageLocationTable = ({
 
 }
 
-StorageLocationTable.propTypes = {
+StorageFolderTable.propTypes = {
   locations: PropTypes.array.isRequired
 }
 
-export default StorageLocationTable;
+export default StorageFolderTable;
