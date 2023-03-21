@@ -23,8 +23,6 @@ import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.IntegrationInstance;
 import io.studytracker.model.Organization;
 import io.studytracker.model.S3Bucket;
 import io.studytracker.model.StorageDrive;
@@ -70,8 +68,16 @@ public class AwsIntegrationInitializer {
 
       // If yes, update the record
       if (integrations.size() > 0) {
-        LOGGER.info("Updating AWS integration for organization {}", organization.getName());
+
+        // Has the record already been updated?
         AwsIntegration existing = integrations.get(0);
+        if (existing.getCreatedAt().equals(existing.getUpdatedAt())) {
+          LOGGER.info("AWS integration for organization {} has already been initialized.", organization.getName());
+          return existing;
+        }
+
+        // If not, update the record
+        LOGGER.info("Updating AWS integration for organization {}", organization.getName());
         if (StringUtils.hasText(awsProperties.getAccessKeyId())
             && StringUtils.hasText(awsProperties.getSecretAccessKey())) {
           existing.setAccessKeyId(awsProperties.getAccessKeyId());
@@ -82,7 +88,9 @@ public class AwsIntegrationInitializer {
           existing.setSecretAccessKey(null);
           existing.setUseIam(true);
         }
+
         awsIntegration = awsIntegrationService.update(existing);
+
       }
       // If no, create a new record
       else {
@@ -91,6 +99,7 @@ public class AwsIntegrationInitializer {
         newIntegration.setName("Default AWS Integration");
         newIntegration.setOrganization(organization);
         newIntegration.setRegion(awsProperties.getRegion());
+        newIntegration.setActive(true);
         if (StringUtils.hasText(awsProperties.getAccessKeyId())
             && StringUtils.hasText(awsProperties.getSecretAccessKey())) {
           newIntegration.setAccessKeyId(awsProperties.getAccessKeyId());
@@ -111,8 +120,8 @@ public class AwsIntegrationInitializer {
   }
 
   /**
-   * Registers an {@link IntegrationInstance} for AWS S2 instances, if they are being used, as
-   *   well as {@link FileStorageLocation} instances for each provided bucket.
+   * Registers an {@link S3Bucket} object for AWS S3 instances, if they are being used, as
+   *   well as {@link StorageDrive} instances for each provided bucket.
    *
    * @throws InvalidConfigurationException if required environment variables are missing
    */

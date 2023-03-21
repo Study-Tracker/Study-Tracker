@@ -124,6 +124,7 @@ const StorageFolderSettings = () => {
 
           <Col>
             <div className="d-flex justify-content-end">
+
               <span>
                 <Dropdown className="me-1 mb-1">
                   <Dropdown.Toggle variant={"outline-info"}>
@@ -147,6 +148,7 @@ const StorageFolderSettings = () => {
                   </Dropdown.Menu>
                 </Dropdown>
               </span>
+
               <span>
                 <Button
                     variant={"primary"}
@@ -156,10 +158,11 @@ const StorageFolderSettings = () => {
                       setShowModal(true);
                     }}
                 >
-                  <FolderPlus className="feather align-middle ms-2 mb-1"/>
+                  <FolderPlus className="feather align-middle me-2 mb-1"/>
                   Add Folder
                 </Button>
               </span>
+
             </div>
           </Col>
         </Row>

@@ -20,14 +20,11 @@ import io.studytracker.aws.AwsIntegrationService;
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.AwsIntegrationFormDto;
-import io.studytracker.mapstruct.dto.form.S3BucketFormDto;
 import io.studytracker.mapstruct.dto.response.AwsIntegrationDetailsDto;
-import io.studytracker.mapstruct.dto.response.S3BucketDetailsDto;
 import io.studytracker.mapstruct.mapper.AwsIntegrationMapper;
 import io.studytracker.mapstruct.mapper.S3BucketMapper;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Organization;
-import io.studytracker.model.S3Bucket;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,9 +42,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("/api/internal/aws")
+@RestController
+@RequestMapping("/api/internal/integrations/aws")
 public class AWSIntegrationPrivateController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AWSIntegrationPrivateController.class);
@@ -65,19 +62,19 @@ public class AWSIntegrationPrivateController {
   @Autowired
   private S3BucketMapper s3BucketMapper;
 
-  @GetMapping("/integrations")
+  @GetMapping("")
   public List<AwsIntegrationDetailsDto> fetchAwsIntegrations() {
     LOGGER.debug("Fetching AWS integrations");
     Organization organization = organizationService.getCurrentOrganization();
     return awsIntegrationMapper.toDetailsDto(awsIntegrationService.findByOrganization(organization));
   }
 
-  @PostMapping("/integrations")
+  @PostMapping("")
   public HttpEntity<AwsIntegrationDetailsDto> registerIntegration(@Valid @RequestBody AwsIntegrationFormDto dto) {
     LOGGER.info("Registering AWS integration for organization: {}", dto.getName());
     AwsIntegration integration = awsIntegrationMapper.fromFormDto(dto);
     Organization organization = organizationService.getCurrentOrganization();
-    if (organization.getId() != dto.getOrganizationId()) {
+    if (!organization.getId().equals(dto.getOrganizationId())) {
       throw new InvalidRequestException("Organization ID mismatch");
     }
     integration.setOrganization(organization);
@@ -85,13 +82,13 @@ public class AWSIntegrationPrivateController {
     return new ResponseEntity<>(awsIntegrationMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
 
-  @PutMapping("/integrations/{id}")
+  @PutMapping("/{id}")
   public HttpEntity<AwsIntegrationDetailsDto> registerIntegration(@PathVariable("id") Long id,
       @Valid @RequestBody AwsIntegrationFormDto dto) {
     LOGGER.info("Updating AWS integration {} for organization: {}", id, dto.getName());
     AwsIntegration integration = awsIntegrationMapper.fromFormDto(dto);
     Organization organization = organizationService.getCurrentOrganization();
-    if (organization.getId() != dto.getOrganizationId()) {
+    if (!organization.getId().equals(dto.getOrganizationId())) {
       throw new InvalidRequestException("Organization ID mismatch");
     }
     integration.setOrganization(organization);
@@ -99,7 +96,7 @@ public class AWSIntegrationPrivateController {
     return new ResponseEntity<>(awsIntegrationMapper.toDetailsDto(updated), HttpStatus.OK);
   }
 
-  @DeleteMapping("/integrations/{id}")
+  @DeleteMapping("/{id}")
   public HttpEntity<?> deleteIntegration(@PathVariable("id") Long id) {
     LOGGER.info("Deleting AWS integration {}", id);
     Optional<AwsIntegration> optional = awsIntegrationService.findById(id);
@@ -107,41 +104,6 @@ public class AWSIntegrationPrivateController {
       throw new RecordNotFoundException("AWS integration not found");
     }
     awsIntegrationService.remove(optional.get());
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
-  // S3
-
-  @GetMapping("/s3/available-buckets")
-  public List<String> listAvailableBuckets() {
-    LOGGER.debug("Listing available buckets");
-    Organization organization = organizationService.getCurrentOrganization();
-    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
-    return awsIntegrationService.listAvailableBuckets(integration);
-  }
-
-  @GetMapping("/s3/buckets")
-  public List<S3BucketDetailsDto> findRegisteredBuckets() {
-    LOGGER.debug("Listing registered buckets");
-    Organization organization = organizationService.getCurrentOrganization();
-    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
-    return s3BucketMapper.toDto(awsIntegrationService.findRegisteredBuckets(integration));
-  }
-
-  @PostMapping("/s3/buckets")
-  public S3BucketDetailsDto registerBucket(@Valid @RequestBody S3BucketFormDto dto) {
-    LOGGER.info("Registering S3 bucket {}", dto.getName());
-    S3Bucket bucket = s3BucketMapper.fromFormDto(dto);
-    Organization organization = organizationService.getCurrentOrganization();
-    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
-    bucket.setAwsIntegration(integration);
-    return s3BucketMapper.toDto(awsIntegrationService.registerBucket(bucket));
-  }
-
-  @DeleteMapping("/s3/buckets/{id}")
-  public HttpEntity<?> updateBucket(@PathVariable("id") Long id) {
-    LOGGER.info("Unregistering S3 bucket {}", id);
-    awsIntegrationService.removeBucket(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

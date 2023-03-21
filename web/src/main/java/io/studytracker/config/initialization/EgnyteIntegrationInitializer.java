@@ -76,8 +76,16 @@ public class EgnyteIntegrationInitializer {
 
       // If yes, update the record
       if (integrations.size() > 0) {
-        LOGGER.info("Updating Egnyte integration for organization {}", organization.getName());
+
+        // Check to see if the integration is already active and updated
         EgnyteIntegration existing = integrations.get(0);
+        if (existing.getCreatedAt().equals(existing.getUpdatedAt())) {
+          LOGGER.info("Egnyte integration for organization {} is already active", organization.getName());
+          return existing;
+        }
+
+        // If not, update the record
+        LOGGER.info("Updating Egnyte integration for organization {}", organization.getName());
         existing.setTenantName(egnyteProperties.getTenantName());
         existing.setApiToken(egnyteProperties.getApiToken());
         if (StringUtils.hasText(egnyteProperties.getRootUrl())) {
@@ -92,6 +100,7 @@ public class EgnyteIntegrationInitializer {
         }
         egnyteIntegration = egnyteIntegrationService.update(existing);
       }
+
       // If no, create a new integration
       else {
         LOGGER.info("Creating new Egnyte integration for organization {}", organization.getName());

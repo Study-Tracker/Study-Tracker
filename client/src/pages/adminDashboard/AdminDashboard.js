@@ -36,6 +36,7 @@ import EgnyteIntegrationSettings
 import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
 import StorageFolderSettings
   from "./storageFolderSettings/StorageFolderSettings";
+import AWSIntegrationSettings from "./AWSSettings/AWSIntegrationSettings";
 
 const settings = {
   "users": {
@@ -70,6 +71,12 @@ const settings = {
   },
 
   // Integrations
+  "aws": {
+    id: "aws",
+    category: "integrations",
+    label: "Amazon Web Services",
+    tag: AWSIntegrationSettings
+  },
   "benchling": {
     id: "benchling",
     category: "integrations",
