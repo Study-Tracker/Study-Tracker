@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect, useState} from "react";
+import React from "react";
 import {Button, Col, Form, Modal, Row} from 'react-bootstrap'
 import PropTypes from "prop-types";
-import NotyfContext from "../../../context/NotyfContext";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import Select from "react-select";
@@ -27,60 +26,45 @@ const StorageFolderFormModal = ({
   isOpen,
   setIsOpen,
   selectedFolder,
+  drives,
   handleFormSubmit,
   formikRef
 }) => {
 
-  const notyf = useContext(NotyfContext);
-  const [integrations, setIntegrations] = useState([]);
+  const [selectedDrive, setSelectedDrive] = React.useState(null);
 
-  const locationSchema = yup.object().shape({
-    integrationInstance: yup.object()
-      .required("Integration instance is required"),
-    displayName: yup.string()
-      .required("Display name is required")
-      .max(255, "Display name must be less than 255 characters"),
-    rootFolderPath: yup.string()
-      .max(1024, "Root folder path must be less than 1024 characters"),
-    permissions: yup.string()
-      .required("Storage permissions are required."),
+  const folderSchema = yup.object().shape({
+    storageDriveId: yup.number()
+      .required("Storage drive is required"),
+    path: yup.string()
+      .required("Folder path is required"),
+    browserRoot: yup.boolean(),
+    studyRoot: yup.boolean(),
+    writeEnabled: yup.boolean(),
+    deleteEnabled: yup.boolean(),
   });
 
-  const locationDefault = {
-    integrationInstance: null,
-    displayName: "",
-    rootFolderPath: "",
-    permissions: "READ_WRITE",
-    defaultStudyLocation: false,
-    defaultDataLocation: false,
-    active: true
+  const folderDefault = {
+    storageDriveId: null,
+    path: null,
+    browserRoot: true,
+    studyRoot: false,
+    writeEnabled: true,
+    deleteEnabled: false
   }
 
-  useEffect(() => {
-
-  }, [])
-
-  let storageServiceOptions = [];
-  integrations.forEach(integration => {
-    if (["EGNYTE", "AWS_S3", "LOCAL_FILE_SYSTEM"].indexOf(integration.definition.type) > -1) {
-      storageServiceOptions.push({
-        value: integration.id,
-        label: integration.name
-      });
+  const driveOptions = drives ? drives.map(drive => {
+    return {
+      value: drive.id,
+      label: drive.displayName
     }
-  });
-
-  const permissionsOptions = [
-    {value: "READ_WRITE", label: "Read/Write"},
-    {value: "READ_ONLY", label: "Read Only"},
-    // {value: "READ_WRITE_DELETE", label: "Read/Write/Delete"}
-  ]
+  }) : [];
 
   return (
       <Formik
-          initialValues={selectedFolder || locationDefault}
+          initialValues={selectedFolder || folderDefault}
           onSubmit={handleFormSubmit}
-          validationSchema={locationSchema}
+          validationSchema={folderSchema}
           innerRef={formikRef}
           enableReinitialize={true}
       >
@@ -95,7 +79,7 @@ const StorageFolderFormModal = ({
         }) => (
             <Modal show={isOpen} onHide={() => setIsOpen(false)}>
               <Modal.Header closeButton>
-                Add File Storage Location
+                Add Root Storage Folder
               </Modal.Header>
               <Modal.Body className={"mb-3"}>
                 <FormikForm>
@@ -103,22 +87,27 @@ const StorageFolderFormModal = ({
                   <Row>
                     <Col>
                       <FormGroup>
-                        <Form.Label>Storage Service *</Form.Label>
+                        <Form.Label>Storage Drive *</Form.Label>
                         <Select
-                            name={"integrationInstanceId"}
-                            className={"react-select-container " + (errors.integrationInstanceId && touched.integrationInstanceId ? "is-invalid" : "")}
+                            name={"storageDriveId"}
+                            className={"react-select-container " + (errors.storageDriveId && touched.storageDriveId ? "is-invalid" : "")}
                             classNamePrefix="react-select"
-                            invalid={errors.integrationInstanceId && touched.integrationInstanceId}
-                            defaultValue={values.integrationInstanceId ? storageServiceOptions.find(option => option.value === values.integrationInstanceId) : null}
+                            invalid={errors.storageDriveId && touched.storageDriveId}
+                            defaultValue={values.storageDriveId ? driveOptions.find(option => option.value === values.storageDriveId) : null}
                             isDisabled={!!values.id}
-                            options={storageServiceOptions}
-                            onChange={selected => setFieldValue("integrationInstance", integrations.filter(d => d.id === selected.value)[0])}
+                            options={driveOptions}
+                            onChange={selected => {
+                              const drive = drives.find(d => d.id === selected.value);
+                              setSelectedDrive(drive);
+                              setFieldValue("storageDriveId", drive.id);
+                              setFieldValue("path", drive.rootPath);
+                            }}
                         />
                         <Form.Control.Feedback type={"invalid"}>
-                          You must select a storage service.
+                          You must select a storage drive.
                         </Form.Control.Feedback>
                         <Form.Text>
-                          Select a storage service to use for this location.
+                          Select a storage drive to use for this root folder.
                         </Form.Text>
                       </FormGroup>
                     </Col>
@@ -127,59 +116,25 @@ const StorageFolderFormModal = ({
                   <Row>
                     <Col>
                       <FormGroup>
-                        <Form.Label>Name *</Form.Label>
+                        <Form.Label>Folder Path *</Form.Label>
                         <Form.Control
                           type={"text"}
-                          name={"displayName"}
-                          isInvalid={errors.displayName && touched.displayName}
-                          value={values.displayName}
-                          onChange={handleChange}
+                          name={"path"}
+                          isInvalid={errors.path && touched.path}
+                          value={values.path}
+                          onChange={e => {
+                            let path = e.target.value;
+                            if (selectedDrive && !path.startsWith(selectedDrive.rootPath)) {
+                              path = selectedDrive.rootPath;
+                            }
+                            setFieldValue("path", path);
+                          }}
                         />
                         <Form.Control.Feedback type={"invalid"}>
-                          {errors.displayName}
-                        </Form.Control.Feedback>
-                      </FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col>
-                      <FormGroup>
-                        <Form.Label>Folder Path</Form.Label>
-                        <Form.Control
-                            type={"text"}
-                            name={"rootFolderPath"}
-                            isInvalid={errors.rootFolderPath && touched.rootFolderPath}
-                            value={values.rootFolderPath}
-                            onChange={handleChange}
-                        />
-                        <Form.Control.Feedback type={"invalid"}>
-                          {errors.rootFolderPath}
+                          {errors.path}
                         </Form.Control.Feedback>
                         <Form.Text>
-                          Provide the full, absolute path to the folder where files will be stored.
-                          If left blank, the root folder will be used.
-                        </Form.Text>
-                      </FormGroup>
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col>
-                      <FormGroup>
-                        <Form.Label>Permissions</Form.Label>
-                        <Select
-                            name={"permissions"}
-                            className={"react-select-container " + (errors.permissions && touched.permissions ? "is-invalid" : "")}
-                            classNamePrefix="react-select"
-                            invalid={errors.permissions && touched.permissions}
-                            defaultValue={values.permissions ? permissionsOptions.find(option => option.value === values.permissions) : null}
-                            isDisabled={!!values.id}
-                            options={permissionsOptions}
-                            onChange={selected => setFieldValue("permissions", selected.value)}
-                        />
-                        <Form.Text>
-                          Select the access permissions for this location.
+                          Enter the full path to the folder on the storage drive. If the folder does not exist, it will be created.
                         </Form.Text>
                       </FormGroup>
                     </Col>
@@ -190,9 +145,9 @@ const StorageFolderFormModal = ({
                       <FormGroup>
                         <Form.Check
                             type={"switch"}
-                            label={"Active"}
-                            onChange={(e) => setFieldValue("active", e.target.checked)}
-                            defaultChecked={values.active}
+                            label={"Browser root"}
+                            onChange={(e) => setFieldValue("browserRoot", e.target.checked)}
+                            defaultChecked={values.browserRoot}
                         />
                       </FormGroup>
                     </Col>
@@ -203,26 +158,39 @@ const StorageFolderFormModal = ({
                       <FormGroup>
                         <Form.Check
                             type={"switch"}
-                            label={"Default study storage location"}
-                            onChange={(e) => setFieldValue("defaultStudyLocation", e.target.checked)}
-                            defaultChecked={values.defaultStudyLocation}
+                            label={"Study root"}
+                            onChange={(e) => setFieldValue("studyRoot", e.target.checked)}
+                            defaultChecked={values.studyRoot}
                         />
                       </FormGroup>
                     </Col>
                   </Row>
 
-                  {/*<Row>*/}
-                  {/*  <Col>*/}
-                  {/*    <FormGroup>*/}
-                  {/*      <Form.Check*/}
-                  {/*          type={"switch"}*/}
-                  {/*          label={"Default data storage location"}*/}
-                  {/*          onChange={(e) => setFieldValue("defaultDataLocation", e.target.checked)}*/}
-                  {/*          defaultChecked={values.defaultDataLocation}*/}
-                  {/*      />*/}
-                  {/*    </FormGroup>*/}
-                  {/*  </Col>*/}
-                  {/*</Row>*/}
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Form.Check
+                            type={"switch"}
+                            label={"Write enabled"}
+                            onChange={(e) => setFieldValue("writeEnabled", e.target.checked)}
+                            defaultChecked={values.writeEnabled}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Form.Check
+                            type={"switch"}
+                            label={"Delete enabled"}
+                            onChange={(e) => setFieldValue("deleteEnabled", e.target.checked)}
+                            defaultChecked={values.deleteEnabled}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
 
                 </FormikForm>
               </Modal.Body>
@@ -254,6 +222,7 @@ StorageFolderFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object,
+  drives: PropTypes.array.isRequired,
   handleFormSubmit: PropTypes.func.isRequired,
   formikRef: PropTypes.object.isRequired
 }

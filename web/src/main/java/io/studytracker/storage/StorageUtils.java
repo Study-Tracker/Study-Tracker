@@ -73,4 +73,10 @@ public class StorageUtils {
     return file.getParent();
   }
 
+  public static boolean pathIsChildOf(String parentPath, String childPath) {
+    if (childPath == null || parentPath == null) return false;
+    if (childPath.equals(parentPath)) return true;
+    return parentPath.endsWith(childPath);
+  }
+
 }

@@ -20,6 +20,7 @@ import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.StorageDriveFolderDetails;
 import io.studytracker.model.Study;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
@@ -190,5 +191,27 @@ public interface StudyStorageService {
    * @return true if the folder exists
    */
   boolean folderExists(StorageDrive drive, String path);
+
+  /**
+   * Persists a {@link StorageDriveFolder} and accompanying {@link StorageDriveFolderDetails}
+   * details record for the provided {@link StorageFolder} in the database. The optional
+   * {@link StorageDriveFolder} parameter can be used to specify additional options for the folder.
+   *
+   * @param drive
+   * @param storageFolder
+   * @param folderOptions
+   * @return
+   */
+  StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder, StorageDriveFolder folderOptions);
+
+  /**
+   * Persists a {@link StorageDriveFolder} and accompanying {@link StorageDriveFolderDetails}
+   * details record for the provided {@link StorageFolder} in the database.
+   *
+   * @param drive
+   * @param storageFolder
+   * @return
+   */
+  StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder);
 
 }

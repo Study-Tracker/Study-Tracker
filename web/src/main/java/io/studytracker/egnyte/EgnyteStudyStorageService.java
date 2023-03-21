@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EgnyteStudyStorageService implements StudyStorageService {
@@ -291,8 +292,11 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throw new StudyStorageException(e);
     }
 
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+
     // Save the records in the database
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
 
   }
 
@@ -332,8 +336,11 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throw new StudyStorageException(e);
     }
 
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+
     // Save the records in the database
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
 
   }
 
@@ -373,7 +380,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throw new StudyStorageException(e);
     }
 
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
 
   }
 
@@ -453,17 +463,11 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     return this.folderExists(drive, path);
   }
 
-  /**
-   * Persists {@link StorageDriveFolder} and {@link EgnyteDriveFolder} records, given a parent
-   *  folder and a {@link StorageFolder} object;
-   *
-   * @param parentFolder parent folder
-   * @param storageFolder storage folder
-   * @return persisted storage drive folder
-   */
-  private StorageDriveFolder saveStorageFolderRecord(StorageDriveFolder parentFolder, StorageFolder storageFolder) {
+  @Override
+  @Transactional
+  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder,
+      StorageDriveFolder folderOptions) {
 
-    StorageDrive drive = parentFolder.getStorageDrive();
     Optional<EgnyteDrive> optional = egnyteDriveRepository.findByStorageDriveId(drive.getId());
     if (optional.isEmpty()) {
       throw new InvalidRequestException("Egnyte drive not found.");
@@ -474,10 +478,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     storageDriveFolder.setStorageDrive(drive);
     storageDriveFolder.setName(storageFolder.getName());
     storageDriveFolder.setPath(storageFolder.getPath());
-    storageDriveFolder.setBrowserRoot(false);
-    storageDriveFolder.setDeleteEnabled(false);
-    storageDriveFolder.setStudyRoot(false);
-    storageDriveFolder.setWriteEnabled(true);
+    storageDriveFolder.setBrowserRoot(folderOptions.isBrowserRoot());
+    storageDriveFolder.setDeleteEnabled(folderOptions.isDeleteEnabled());
+    storageDriveFolder.setStudyRoot(folderOptions.isStudyRoot());
+    storageDriveFolder.setWriteEnabled(folderOptions.isWriteEnabled());
 
     EgnyteDriveFolder egnyteDriveFolder = new EgnyteDriveFolder();
     egnyteDriveFolder.setEgnyteDrive(egnyteDrive);
@@ -487,6 +491,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
     egnyteDriveFolderRepository.save(egnyteDriveFolder);
     return egnyteDriveFolder.getStorageDriveFolder();
+  }
+
+  @Override public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
+    return this.saveStorageFolderRecord(drive, storageFolder, new StorageDriveFolder());
   }
 
 }

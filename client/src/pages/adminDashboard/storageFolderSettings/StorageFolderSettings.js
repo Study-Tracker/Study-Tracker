@@ -126,7 +126,7 @@ const StorageFolderSettings = () => {
             <div className="d-flex justify-content-end">
 
               <span>
-                <Dropdown className="me-1 mb-1">
+                <Dropdown className="me-2 mb-1">
                   <Dropdown.Toggle variant={"outline-info"}>
                     <FontAwesomeIcon icon={faFilter} className={"me-2"}/>
                     Filter
@@ -222,7 +222,8 @@ const StorageFolderSettings = () => {
         <StorageFolderFormModal
             isOpen={showModal}
             setIsOpen={setShowModal}
-            selectedLocation={selectedFolder}
+            selectedFolder={selectedFolder}
+            drives={drives}
             handleFormSubmit={handleSubmitForm}
             formikRef={formikRef}
         />

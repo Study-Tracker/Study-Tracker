@@ -185,7 +185,8 @@ public class EgnyteIntegrationInitializer {
         egnyteDriveFolder.setFolderId(storageFolder.getFolderId());
         egnyteDriveFolder.setWebUrl(storageFolder.getUrl());
 
-        storageDriveFolderService.registerFolder(egnyteDriveFolder, egnyteDrive.getStorageDrive());
+        storageDriveFolderService.registerFolderDetails(
+            egnyteDriveFolder, egnyteDrive.getStorageDrive());
       } else {
         LOGGER.warn("Could not register Egnyte root folder {} in drive {}", rootPath, egnyteDrive.getName());
       }

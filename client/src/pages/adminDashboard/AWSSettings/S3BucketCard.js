@@ -39,11 +39,7 @@ const S3BucketCard = ({bucket}) => {
                 </span>
                 <br />
                 <span className={"text-muted"}>
-                  <code>s3://{bucket.name}</code>
-                </span>
-                <br/>
-                <span className={"text-muted"}>
-                  Root path: /{bucket.storageDrive.rootPath}
+                  <code>s3://{bucket.name}/{bucket.storageDrive.rootPath}</code>
                 </span>
               </div>
             </Col>

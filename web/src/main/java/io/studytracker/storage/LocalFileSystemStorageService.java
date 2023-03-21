@@ -128,7 +128,9 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     // Create the folder
     String folderName = NamingService.getProgramStorageFolderName(program);
     StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(), folderName);
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
 
   }
 
@@ -139,7 +141,9 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     LOGGER.info("Creating storage folder instance for study: " + study.getCode());
     StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(),
         NamingService.getStudyStorageFolderName(study));
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
   @Override
@@ -149,7 +153,9 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     LOGGER.info("Creating storage folder instance for assay: " + assay.getCode());
     StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(),
         NamingService.getAssayStorageFolderName(assay));
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
   @Override
@@ -355,9 +361,11 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     }
   }
 
-  private StorageDriveFolder saveStorageFolderRecord(StorageDriveFolder parentFolder, StorageFolder storageFolder) {
+  @Override
+  @Transactional
+  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder,
+      StorageDriveFolder options) {
 
-    StorageDrive drive = parentFolder.getStorageDrive();
     Optional<LocalDrive> optional = localDriveRepository.findByStorageDriveId(drive.getId());
     if (optional.isEmpty()) {
       throw new InvalidRequestException("Egnyte drive not found.");
@@ -368,10 +376,10 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     storageDriveFolder.setStorageDrive(drive);
     storageDriveFolder.setName(storageFolder.getName());
     storageDriveFolder.setPath(storageFolder.getPath());
-    storageDriveFolder.setBrowserRoot(false);
-    storageDriveFolder.setDeleteEnabled(false);
-    storageDriveFolder.setStudyRoot(false);
-    storageDriveFolder.setWriteEnabled(true);
+    storageDriveFolder.setBrowserRoot(options.isBrowserRoot());
+    storageDriveFolder.setDeleteEnabled(options.isDeleteEnabled());
+    storageDriveFolder.setStudyRoot(options.isStudyRoot());
+    storageDriveFolder.setWriteEnabled(options.isWriteEnabled());
 
     LocalDriveFolder localDriveFolder = new LocalDriveFolder();
     localDriveFolder.setLocalDrive(localDrive);
@@ -379,6 +387,11 @@ public class LocalFileSystemStorageService implements StudyStorageService {
 
     localDriveFolderRepository.save(localDriveFolder);
     return localDriveFolder.getStorageDriveFolder();
+  }
+
+  @Override
+  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
+    return this.saveStorageFolderRecord(drive, storageFolder, new StorageDriveFolder());
   }
 
 }

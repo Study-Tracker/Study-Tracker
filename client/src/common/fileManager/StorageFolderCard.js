@@ -39,7 +39,7 @@ const StorageFolderCard = ({folder}) => {
                 </span>
                 <br/>
                 <span className={"text-muted"}>
-                  {folder.path}
+                  <code>{folder.path}</code>
                 </span>
                 <br />
                 <span className={"text-muted"}>

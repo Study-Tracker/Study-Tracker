@@ -30,6 +30,8 @@ import io.studytracker.repository.StorageDriveFolderDetailsOperations;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
+import io.studytracker.storage.exception.StudyStorageException;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -143,12 +145,58 @@ public class StorageDriveFolderService {
    * @param <S>
    */
   @Transactional
-  public <S extends StorageDriveFolderDetails> S registerFolder(S folderDetails, StorageDrive drive) {
+  public <S extends StorageDriveFolderDetails> S registerFolderDetails(S folderDetails, StorageDrive drive) {
     LOGGER.debug("Register folder: {}", folderDetails);
     StorageDriveFolderDetailsOperations repository
         = storageDriveRepositoryLookup
         .lookupFolderRepository(drive.getDriveType());
     return (S) repository.save(folderDetails);
+  }
+
+  /**
+   * Registers a {@link StorageDriveFolder} and {@link StorageDriveFolderDetails} instance in the
+   *  database for the requested folder. If the folder does not exist in the provided
+   *  {@link StorageDrive}, it will be created.
+   *
+   * @param folder folder to register
+   * @param drive drive containing the folder
+   * @return registered folder record
+   */
+  @Transactional
+  public StorageDriveFolder registerFolder(StorageDriveFolder folder, StorageDrive drive) {
+
+    String path = StorageUtils.cleanInputPath(folder.getPath());
+    String folderName = folder.getName();
+
+    // Check that the requested folder is within the drive root path
+    if (!path.startsWith(drive.getRootPath())) {
+      throw new IllegalArgumentException("Folder path must be within drive root path");
+    }
+
+    // Ensure that the path ends with the folder name
+    if (!path.endsWith(folderName)) {
+      File file = new File(path, folderName);
+      path = file.getPath();
+    }
+    LOGGER.info("Registering folder {} in drive {}", path, drive.getDisplayName());
+    StudyStorageService storageService = this.lookupStudyStorageService(drive.getDriveType());
+
+    // Create or fetch the folder record
+    StorageFolder storageFolder;
+    try {
+      if (storageService.folderExists(drive, path)) {
+        LOGGER.info("Folder {} already exists in drive {}", path, drive.getDisplayName());
+        storageFolder = storageService.findFolderByPath(drive, path);
+      } else {
+        LOGGER.info("Creating folder {} in drive {}", folder.getPath(), drive.getDisplayName());
+        storageFolder = storageService.createFolder(drive, StorageUtils.getParentPathFromPath(path), folderName);
+      }
+    } catch (StudyStorageException e) {
+      e.printStackTrace();
+      throw new IllegalArgumentException("Unable to create folder: " + path, e);
+    }
+
+    return storageService.saveStorageFolderRecord(drive, storageFolder, folder);
   }
 
   // Drives

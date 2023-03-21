@@ -16,22 +16,29 @@
 
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,6 +86,19 @@ public class StorageDriveFolderPrivateController {
     } else {
       return ResponseEntity.notFound().build();
     }
+  }
+
+  @PostMapping("")
+  public HttpEntity<StorageDriveFolderDetailsDto> createFolder(@Valid @RequestBody StorageDriveFolderFormDto dto) {
+    LOGGER.debug("Creating new storage drive folder: {}", dto);
+    StorageDriveFolder folder = mapper.fromFormDto(dto);
+    StorageDrive drive = storageDriveFolderService.findDriveById(dto.getStorageDriveId())
+        .orElseThrow(() -> new IllegalArgumentException("Storage drive not found"));
+    if (!StringUtils.hasText(folder.getName())) {
+      folder.setName(StorageUtils.getFolderNameFromPath(folder.getPath()));
+    }
+    StorageDriveFolder saved = storageDriveFolderService.registerFolder(folder, drive);
+    return new ResponseEntity<>(mapper.toDetailsDto(saved), HttpStatus.CREATED);
   }
 
 }

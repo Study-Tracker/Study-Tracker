@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -78,7 +79,9 @@ public class S3StudyStorageService implements StudyStorageService {
     LOGGER.info("Creating program folder: '{}' in bucket '{}'", program.getName(), parentFolder.getName());
     String folderName = S3Utils.generateProgramFolderName(program);
     StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
   @Override
@@ -87,7 +90,9 @@ public class S3StudyStorageService implements StudyStorageService {
     LOGGER.info("Creating study folder: '{}' in bucket '{}'", study.getName(), parentFolder.getName());
     String folderName = S3Utils.generateStudyFolderName(study);
     StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
   @Override
@@ -96,7 +101,9 @@ public class S3StudyStorageService implements StudyStorageService {
     LOGGER.info("Creating assay folder: '{}' in bucket '{}'", assay.getName(), parentFolder.getName());
     String folderName = S3Utils.generateAssayFolderName(assay);
     StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    return saveStorageFolderRecord(parentFolder, storageFolder);
+    StorageDriveFolder options = new StorageDriveFolder();
+    options.setWriteEnabled(true);
+    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
   @Override
@@ -373,9 +380,11 @@ public class S3StudyStorageService implements StudyStorageService {
     return this.folderExists(folder.getStorageDrive(), path);
   }
 
-  private StorageDriveFolder saveStorageFolderRecord(StorageDriveFolder parentFolder, StorageFolder storageFolder) {
+  @Override
+  @Transactional
+  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder,
+      StorageDriveFolder options) {
 
-    StorageDrive drive = parentFolder.getStorageDrive();
     Optional<S3Bucket> optional = s3BucketRepository.findByStorageDriveId(drive.getId());
     if (optional.isEmpty()) {
       throw new InvalidRequestException("Egnyte drive not found.");
@@ -386,10 +395,10 @@ public class S3StudyStorageService implements StudyStorageService {
     storageDriveFolder.setStorageDrive(drive);
     storageDriveFolder.setName(storageFolder.getName());
     storageDriveFolder.setPath(storageFolder.getPath());
-    storageDriveFolder.setBrowserRoot(false);
-    storageDriveFolder.setDeleteEnabled(false);
-    storageDriveFolder.setStudyRoot(false);
-    storageDriveFolder.setWriteEnabled(true);
+    storageDriveFolder.setBrowserRoot(options.isBrowserRoot());
+    storageDriveFolder.setDeleteEnabled(options.isDeleteEnabled());
+    storageDriveFolder.setStudyRoot(options.isStudyRoot());
+    storageDriveFolder.setWriteEnabled(options.isWriteEnabled());
 
     S3BucketFolder bucketFolder = new S3BucketFolder();
     bucketFolder.setS3Bucket(bucket);
@@ -398,6 +407,10 @@ public class S3StudyStorageService implements StudyStorageService {
 
     s3BucketFolderRepository.save(bucketFolder);
     return bucketFolder.getStorageDriveFolder();
+  }
+
+  @Override public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
+    return this.saveStorageFolderRecord(drive, storageFolder, new StorageDriveFolder());
   }
 
 }
