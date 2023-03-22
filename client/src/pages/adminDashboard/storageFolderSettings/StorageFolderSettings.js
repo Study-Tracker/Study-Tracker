@@ -32,7 +32,6 @@ const StorageFolderSettings = () => {
   const notyf = useContext(NotyfContext);
 
   const [folders, setFolders] = useState(null);
-  const [drives, setDrives] = useState(null);
   const [loadCounter, setLoadCounter] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,23 +41,10 @@ const StorageFolderSettings = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get("/api/internal/storage-drives")
-    .then(response => {
-      const d = response.data
-      console.debug("Storage drives", d);
-      axios.get("/api/internal/storage-drive-folders?root=true")
-      .then(async response => {
-        const r = await response.data;
-        console.debug("Storage folders", r);
-        let fs = [];
-        await r.forEach(folder => {
-          let f = folder;
-          f.storageDrive = d.find(d => d.id === folder.storageDriveId);
-          fs.push(f);
-        });
-        setDrives(d);
-        setFolders(fs);
-      })
+    axios.get("/api/internal/storage-drive-folders?root=true")
+    .then(async response => {
+      console.debug("Storage folders", response.data);
+      setFolders(response.data);
     })
     .catch(e => {
       console.error(e);
@@ -223,7 +209,6 @@ const StorageFolderSettings = () => {
             isOpen={showModal}
             setIsOpen={setShowModal}
             selectedFolder={selectedFolder}
-            drives={drives}
             handleFormSubmit={handleSubmitForm}
             formikRef={formikRef}
         />

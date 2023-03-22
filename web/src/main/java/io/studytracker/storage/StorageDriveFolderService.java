@@ -31,7 +31,6 @@ import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.exception.StudyStorageException;
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -166,18 +165,13 @@ public class StorageDriveFolderService {
   public StorageDriveFolder registerFolder(StorageDriveFolder folder, StorageDrive drive) {
 
     String path = StorageUtils.cleanInputPath(folder.getPath());
-    String folderName = folder.getName();
+    String folderName = StorageUtils.getFolderNameFromPath(path);
 
     // Check that the requested folder is within the drive root path
     if (!path.startsWith(drive.getRootPath())) {
       throw new IllegalArgumentException("Folder path must be within drive root path");
     }
 
-    // Ensure that the path ends with the folder name
-    if (!path.endsWith(folderName)) {
-      File file = new File(path, folderName);
-      path = file.getPath();
-    }
     LOGGER.info("Registering folder {} in drive {}", path, drive.getDisplayName());
     StudyStorageService storageService = this.lookupStudyStorageService(drive.getDriveType());
 
@@ -196,7 +190,7 @@ public class StorageDriveFolderService {
       throw new IllegalArgumentException("Unable to create folder: " + path, e);
     }
 
-    return storageService.saveStorageFolderRecord(drive, storageFolder, folder);
+    return storageService.saveStorageFolderRecord(drive, storageFolder, folder); //TODO set folder name in record
   }
 
   // Drives

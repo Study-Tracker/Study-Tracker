@@ -18,7 +18,6 @@ package io.studytracker.controller.api.internal;
 
 import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveFolderDetailsDto;
-import io.studytracker.mapstruct.dto.response.StorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
@@ -56,7 +55,7 @@ public class StorageDriveFolderPrivateController {
   private StorageDriveFolderService storageDriveFolderService;
 
   @GetMapping("")
-  public List<StorageDriveFolderSummaryDto> findFolders(
+  public List<StorageDriveFolderDetailsDto> findFolders(
       @RequestParam(name = "studyRoot",  required = false) boolean studyRoot,
       @RequestParam(name = "browserRoot",  required = false) boolean browserRoot,
       @RequestParam(name = "root", required = false) boolean root
@@ -74,7 +73,7 @@ public class StorageDriveFolderPrivateController {
     } else {
       folders = storageDriveFolderService.findAll();
     }
-    return mapper.toSummaryDto(folders);
+    return mapper.toDetailsDto(folders);
   }
 
   @GetMapping("/{id}")

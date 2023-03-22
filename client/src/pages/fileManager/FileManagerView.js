@@ -25,7 +25,7 @@ const FileManagerView = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const path = searchParams.has("path") ? searchParams.get('path') : null;
-  const locationId = searchParams.has("locationId") ? searchParams.get('locationId') : null;
+  const rootFolderId = searchParams.has("rootFolderId") ? searchParams.get('rootFolderId') : null;
 
   return (
       <>
@@ -34,7 +34,7 @@ const FileManagerView = () => {
           <div className="main">
             <NavBar />
             <div className="content">
-              <FileManager path={path} locationId={locationId} />
+              <FileManager path={path} rootFolderId={rootFolderId} />
             </div>
             <Footer/>
           </div>

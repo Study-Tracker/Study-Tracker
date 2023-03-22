@@ -24,24 +24,24 @@ import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import {useSearchParams} from "react-router-dom";
 
-const FileManager = ({path, locationId}) => {
+const FileManager = ({path, rootFolderId}) => {
 
   const notyf = useContext(NotyfContext);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [locations, setLocations] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [rootFolders, setRootFolders] = useState([]);
+  const [selectedRootFolder, setSelectedRootFolder] = useState(null);
 
-  const handleLocationSelect = (location) => {
-    setSelectedLocation(location);
-    setSearchParams({locationId: location.id});
+  const handleRootFolderSelect = (rootFolder) => {
+    setSelectedRootFolder(rootFolder);
+    setSearchParams({rootFolderId: rootFolder.id});
   }
 
   useEffect(() => {
-    axios.get("/api/internal/data-files/locations")
+    axios.get("/api/internal/storage-drive-folders?browserRoot=true")
     .then(response => {
-      setLocations(response.data);
-      if (locationId) {
-        setSelectedLocation(response.data.find(dataSource => dataSource.id === parseInt(locationId, 10)));
+      setRootFolders(response.data);
+      if (rootFolderId) {
+        setSelectedRootFolder(response.data.find(dataSource => dataSource.id === parseInt(rootFolderId, 10)));
       }
     })
     .catch(error => {
@@ -64,17 +64,17 @@ const FileManager = ({path, locationId}) => {
           <Col xs="4" md="3">
 
             <FileManagerMenu
-                locations={locations}
-                handleLocationSelect={handleLocationSelect}
-                selectedLocation={selectedLocation}
+                rootFolders={rootFolders}
+                handleFolderSelect={handleRootFolderSelect}
+                selectedRootFolder={selectedRootFolder}
             />
 
           </Col>
 
           <Col xs="8" md="9">
             {
-              selectedLocation
-                  ? <FileManagerContent location={selectedLocation} path={path} />
+              selectedRootFolder
+                  ? <FileManagerContent rootFolder={selectedRootFolder} path={path} />
                   : <FileManagerContentPlaceholder />
             }
 

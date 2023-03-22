@@ -21,44 +21,57 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface StorageDriveFolderRepository extends JpaRepository<StorageDriveFolder, Long> {
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.id = ?1")
+  @EntityGraph("storage-drive-folder-details")
   List<StorageDriveFolder> findByStorageDriveId(Long storageDriveId);
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1")
+  @EntityGraph("storage-drive-folder-details")
   List<StorageDriveFolder> findByOrganization(Long organizationId);
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1")
+  @EntityGraph("storage-drive-folder-details")
   Page<StorageDriveFolder> findByOrganization(Long organizationId, Pageable pageable);
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1 AND f.studyRoot = true")
+  @EntityGraph("storage-drive-folder-details")
   List<StorageDriveFolder> findStudyRootByOrganization(Long organizationId);
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1 AND f.browserRoot = true")
+  @EntityGraph("storage-drive-folder-details")
   List<StorageDriveFolder> findBrowserRootByOrganization(Long organizationId);
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.id = ?1 AND f.storageDrive.organization.id = ?2")
+  @EntityGraph("storage-drive-folder-details")
   Optional<StorageDriveFolder> findByIdAndOrganization(Long id, Long organizationId);
 
+  @EntityGraph("storage-drive-folder-details")
   @Query("SELECT distinct f FROM ProgramStorageFolder pf JOIN StorageDriveFolder f ON pf.storageDriveFolder.id = f.id WHERE pf.program.id = ?1")
   List<StorageDriveFolder> findByProgramId(Long programId);
 
+  @EntityGraph("storage-drive-folder-details")
   @Query("SELECT distinct f FROM StorageDriveFolder f JOIN ProgramStorageFolder pf ON f.id = pf.storageDriveFolder.id WHERE pf.primary = true and pf.program.id = ?1")
   Optional<StorageDriveFolder> findPrimaryByProgramId(Long programId);
 
+  @EntityGraph("storage-drive-folder-details")
   @Query("SELECT distinct f FROM StudyStorageFolder pf JOIN StorageDriveFolder f ON pf.storageDriveFolder.id = f.id WHERE pf.study.id = ?1")
   List<StorageDriveFolder> findByStudyId(Long programId);
 
+  @EntityGraph("storage-drive-folder-details")
   @Query("SELECT distinct f FROM StorageDriveFolder f JOIN StudyStorageFolder pf ON f.id = pf.storageDriveFolder.id WHERE pf.primary = true and pf.study.id = ?1")
   Optional<StorageDriveFolder> findPrimaryByStudyId(Long programId);
 
+  @EntityGraph("storage-drive-folder-details")
   @Query("SELECT distinct f FROM AssayStorageFolder pf JOIN StorageDriveFolder f ON pf.storageDriveFolder.id = f.id WHERE pf.assay.id = ?1")
   List<StorageDriveFolder> findByAssayId(Long programId);
 
+  @EntityGraph("storage-drive-folder-details")
   @Query("SELECT distinct f FROM StorageDriveFolder f JOIN AssayStorageFolder pf ON f.id = pf.storageDriveFolder.id WHERE pf.primary = true and pf.assay.id = ?1")
   Optional<StorageDriveFolder> findPrimaryByAssayId(Long programId);
 

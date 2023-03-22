@@ -14,30 +14,48 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useContext, useEffect} from "react";
 import {Button, Col, Form, Modal, Row} from 'react-bootstrap'
 import PropTypes from "prop-types";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import Select from "react-select";
 import {FormGroup} from "../../../common/forms/common";
+import axios from "axios";
+import NotyfContext from "../../../context/NotyfContext";
 
 const StorageFolderFormModal = ({
   isOpen,
   setIsOpen,
   selectedFolder,
-  drives,
   handleFormSubmit,
   formikRef
 }) => {
 
   const [selectedDrive, setSelectedDrive] = React.useState(null);
+  const [drives, setDrives] = React.useState([]);
+  const notyf = useContext(NotyfContext);
+
+  useEffect(() => {
+    axios.get("/api/internal/storage-drives")
+    .then(response => {
+      console.debug("Storage drives", response.data);
+      setDrives(response.data);
+    })
+    .catch(e => {
+      console.error(e);
+      notyf.open({message: 'Failed to load available storage drives.', type: 'error'});
+    });
+  }, []);
 
   const folderSchema = yup.object().shape({
     storageDriveId: yup.number()
       .required("Storage drive is required"),
     path: yup.string()
       .required("Folder path is required"),
+    name: yup.string()
+      .required("Folder path is required")
+      .max(255, "Folder name must be less than 255 characters"),
     browserRoot: yup.boolean(),
     studyRoot: yup.boolean(),
     writeEnabled: yup.boolean(),
@@ -47,18 +65,19 @@ const StorageFolderFormModal = ({
   const folderDefault = {
     storageDriveId: null,
     path: null,
+    name: null,
     browserRoot: true,
     studyRoot: false,
     writeEnabled: true,
     deleteEnabled: false
   }
 
-  const driveOptions = drives ? drives.map(drive => {
+  const driveOptions = drives.map(drive => {
     return {
       value: drive.id,
       label: drive.displayName
     }
-  }) : [];
+  });
 
   return (
       <Formik
@@ -129,6 +148,33 @@ const StorageFolderFormModal = ({
                             }
                             setFieldValue("path", path);
                           }}
+                        />
+                        <Form.Control.Feedback type={"invalid"}>
+                          {errors.path}
+                        </Form.Control.Feedback>
+                        <Form.Text>
+                          Enter the full path to the folder on the storage drive. If the folder does not exist, it will be created.
+                        </Form.Text>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Form.Label>Label *</Form.Label>
+                        <Form.Control
+                            type={"text"}
+                            name={"path"}
+                            isInvalid={errors.path && touched.path}
+                            value={values.path}
+                            onChange={e => {
+                              let path = e.target.value;
+                              if (selectedDrive && !path.startsWith(selectedDrive.rootPath)) {
+                                path = selectedDrive.rootPath;
+                              }
+                              setFieldValue("path", path);
+                            }}
                         />
                         <Form.Control.Feedback type={"invalid"}>
                           {errors.path}
