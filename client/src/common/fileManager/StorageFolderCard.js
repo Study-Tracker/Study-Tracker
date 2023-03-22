@@ -43,7 +43,7 @@ const StorageFolderCard = ({folder}) => {
                 </span>
                 <br />
                 <span className={"text-muted"}>
-                  {folder.storageDrive.driveType}: {folder.storageDrive.displayName}
+                  <strong>{folder.storageDrive.driveType}</strong>: {folder.storageDrive.displayName}
                 </span>
               </div>
             </Col>

@@ -40,6 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * Service for {@link StorageDriveFolder} and {@link StorageDrive} entity records.
@@ -165,7 +166,10 @@ public class StorageDriveFolderService {
   public StorageDriveFolder registerFolder(StorageDriveFolder folder, StorageDrive drive) {
 
     String path = StorageUtils.cleanInputPath(folder.getPath());
-    String folderName = StorageUtils.getFolderNameFromPath(path);
+    String folderName = folder.getName();
+    if (!StringUtils.hasText(folderName)) {
+      folderName = StorageUtils.getFolderNameFromPath(folder.getPath());
+    }
 
     // Check that the requested folder is within the drive root path
     if (!path.startsWith(drive.getRootPath())) {

@@ -49,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 public class LocalFileSystemStorageService implements StudyStorageService {
 
@@ -371,10 +372,12 @@ public class LocalFileSystemStorageService implements StudyStorageService {
       throw new InvalidRequestException("Egnyte drive not found.");
     }
     LocalDrive localDrive = optional.get();
+    String folderName = StringUtils.hasText(options.getName()) ? options.getName()
+        : storageFolder.getName();
 
     StorageDriveFolder storageDriveFolder = new StorageDriveFolder();
     storageDriveFolder.setStorageDrive(drive);
-    storageDriveFolder.setName(storageFolder.getName());
+    storageDriveFolder.setName(folderName);
     storageDriveFolder.setPath(storageFolder.getPath());
     storageDriveFolder.setBrowserRoot(options.isBrowserRoot());
     storageDriveFolder.setDeleteEnabled(options.isDeleteEnabled());

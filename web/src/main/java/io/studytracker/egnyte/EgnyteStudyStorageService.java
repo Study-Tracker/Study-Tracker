@@ -53,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class EgnyteStudyStorageService implements StudyStorageService {
@@ -473,10 +474,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       throw new InvalidRequestException("Egnyte drive not found.");
     }
     EgnyteDrive egnyteDrive = optional.get();
+    String folderName = StringUtils.hasText(folderOptions.getName()) ? folderOptions.getName()
+        : storageFolder.getName();
 
     StorageDriveFolder storageDriveFolder = new StorageDriveFolder();
     storageDriveFolder.setStorageDrive(drive);
-    storageDriveFolder.setName(storageFolder.getName());
+    storageDriveFolder.setName(folderName);
     storageDriveFolder.setPath(storageFolder.getPath());
     storageDriveFolder.setBrowserRoot(folderOptions.isBrowserRoot());
     storageDriveFolder.setDeleteEnabled(folderOptions.isDeleteEnabled());

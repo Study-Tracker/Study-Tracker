@@ -22,7 +22,6 @@ import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.storage.StorageDriveFolderService;
-import io.studytracker.storage.StorageUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -93,9 +91,6 @@ public class StorageDriveFolderPrivateController {
     StorageDriveFolder folder = mapper.fromFormDto(dto);
     StorageDrive drive = storageDriveFolderService.findDriveById(dto.getStorageDriveId())
         .orElseThrow(() -> new IllegalArgumentException("Storage drive not found"));
-    if (!StringUtils.hasText(folder.getName())) {
-      folder.setName(StorageUtils.getFolderNameFromPath(folder.getPath()));
-    }
     StorageDriveFolder saved = storageDriveFolderService.registerFolder(folder, drive);
     return new ResponseEntity<>(mapper.toDetailsDto(saved), HttpStatus.CREATED);
   }

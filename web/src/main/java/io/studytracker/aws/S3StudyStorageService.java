@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -66,8 +67,8 @@ public class S3StudyStorageService implements StudyStorageService {
 
   private S3Client getClientFromDrive(StorageDrive drive) {
     AwsIntegration integration = integrationRepository
-        .findByStorageDriveFolderId(drive.getId())
-        .orElseThrow(() -> new RecordNotFoundException("Storage folder " + drive.getId()
+        .findByStorageDriveId(drive.getId())
+        .orElseThrow(() -> new RecordNotFoundException("Storage drive " + drive.getId()
             + " not associated with AWS integration"));
     return AWSClientFactory.createS3Client(integration);
 
@@ -387,13 +388,14 @@ public class S3StudyStorageService implements StudyStorageService {
 
     Optional<S3Bucket> optional = s3BucketRepository.findByStorageDriveId(drive.getId());
     if (optional.isEmpty()) {
-      throw new InvalidRequestException("Egnyte drive not found.");
+      throw new InvalidRequestException("S3 bucket not found: " + drive.getId());
     }
     S3Bucket bucket = optional.get();
+    String folderName = StringUtils.hasText(options.getName()) ? options.getName() : storageFolder.getName();
 
     StorageDriveFolder storageDriveFolder = new StorageDriveFolder();
     storageDriveFolder.setStorageDrive(drive);
-    storageDriveFolder.setName(storageFolder.getName());
+    storageDriveFolder.setName(folderName);
     storageDriveFolder.setPath(storageFolder.getPath());
     storageDriveFolder.setBrowserRoot(options.isBrowserRoot());
     storageDriveFolder.setDeleteEnabled(options.isDeleteEnabled());

@@ -165,22 +165,16 @@ const StorageFolderFormModal = ({
                         <Form.Label>Label *</Form.Label>
                         <Form.Control
                             type={"text"}
-                            name={"path"}
-                            isInvalid={errors.path && touched.path}
-                            value={values.path}
-                            onChange={e => {
-                              let path = e.target.value;
-                              if (selectedDrive && !path.startsWith(selectedDrive.rootPath)) {
-                                path = selectedDrive.rootPath;
-                              }
-                              setFieldValue("path", path);
-                            }}
+                            name={"name"}
+                            isInvalid={errors.name && touched.name}
+                            value={values.name}
+                            onChange={handleChange}
                         />
                         <Form.Control.Feedback type={"invalid"}>
-                          {errors.path}
+                          {errors.name}
                         </Form.Control.Feedback>
                         <Form.Text>
-                          Enter the full path to the folder on the storage drive. If the folder does not exist, it will be created.
+                          Provide a display name for this folder.
                         </Form.Text>
                       </FormGroup>
                     </Col>

@@ -30,13 +30,23 @@ public interface AwsIntegrationRepository extends JpaRepository<AwsIntegration, 
   @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b WHERE b.id = ?1")
   AwsIntegration findByBucketDriveId(Long bucketDriveId);
 
-  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b JOIN S3BucketFolder f WHERE f.id = ?1")
+  @Query("SELECT a FROM AwsIntegration a "
+      + " JOIN S3Bucket b ON b.awsIntegration.id = a.id "
+      + " JOIN S3BucketFolder f ON f.s3Bucket.id = b.id "
+      + " WHERE f.id = ?1")
   AwsIntegration findByBucketFolderId(Long folderId);
 
-  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b JOIN S3BucketFolder f JOIN StorageDriveFolder df WHERE df.id = ?1")
+  @Query("SELECT a FROM AwsIntegration a "
+      + " JOIN S3Bucket b ON a.id = b.awsIntegration.id "
+      + " JOIN StorageDrive d ON b.storageDrive.id = d.id "
+      + " JOIN StorageDriveFolder df ON d.id = df.storageDrive.id "
+      + " WHERE df.id = ?1")
   Optional<AwsIntegration> findByStorageDriveFolderId(Long folderId);
 
-  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b JOIN StorageDrive  d WHERE d.id = ?1")
+  @Query("SELECT a FROM AwsIntegration a "
+      + " JOIN S3Bucket b ON b.awsIntegration.id = a.id "
+      + " JOIN StorageDrive d ON b.storageDrive.id = d.id "
+      + " WHERE d.id = ?1")
   Optional<AwsIntegration> findByStorageDriveId(Long driveId);
 
 }
