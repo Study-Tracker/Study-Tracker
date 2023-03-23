@@ -56,6 +56,8 @@ public interface StorageDriveFolderMapper {
 
   // Program folder
 
+  @Mapping(target = "id", source = "storageDriveFolder.id")
+  @Mapping(target = "programStorageFolderId", source = "id")
   @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
   @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
   @Mapping(target = "programId", source = "program.id")
@@ -80,6 +82,8 @@ public interface StorageDriveFolderMapper {
 
   // Study folder
 
+  @Mapping(target = "id", source = "storageDriveFolder.id")
+  @Mapping(target = "studyStorageFolderId", source = "id")
   @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
   @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
   @Mapping(target = "studyId", source = "study.id")
@@ -104,6 +108,8 @@ public interface StorageDriveFolderMapper {
 
   // Assay folder
 
+  @Mapping(target = "id", source = "storageDriveFolder.id")
+  @Mapping(target = "assayStorageFolderId", source = "id")
   @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
   @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
   @Mapping(target = "assayId", source = "assay.id")

@@ -37,8 +37,10 @@ public class OrganizationService {
 
   public Organization getCurrentOrganization() throws RecordNotFoundException {
     LOGGER.debug("Finding current organization");
-    return organizationRepository.findAll().stream().findFirst()
+    Organization organization = organizationRepository.findAll().stream().findFirst()
         .orElseThrow(() -> new RecordNotFoundException("Organization not found"));
+    LOGGER.debug("Current organization: id={} name={}", organization.getId(), organization.getName());
+    return organization;
   }
 
   @Transactional

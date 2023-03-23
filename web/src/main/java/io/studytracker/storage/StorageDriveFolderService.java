@@ -85,8 +85,8 @@ public class StorageDriveFolderService {
   }
 
   public Optional<StorageDriveFolder> findById(Long id) {
-    LOGGER.debug("Find drive folder by id: {}", id);
     Organization organization = organizationService.getCurrentOrganization();
+    LOGGER.debug("Find drive folder by id {} for organization {}", id, organization.getId());
     return folderRepository.findByIdAndOrganization(id, organization.getId());
   }
 
@@ -194,7 +194,7 @@ public class StorageDriveFolderService {
       throw new IllegalArgumentException("Unable to create folder: " + path, e);
     }
 
-    return storageService.saveStorageFolderRecord(drive, storageFolder, folder); //TODO set folder name in record
+    return storageService.saveStorageFolderRecord(drive, storageFolder, folder);
   }
 
   // Drives

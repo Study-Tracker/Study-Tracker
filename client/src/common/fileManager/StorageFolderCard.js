@@ -20,8 +20,12 @@ import {faFolder,} from "@fortawesome/free-regular-svg-icons";
 import {FolderPermissionsBadges, FolderRootBadges} from "./folderBadges";
 import React from "react";
 import PropTypes from "prop-types";
+import {faEdit} from "@fortawesome/free-solid-svg-icons";
 
-const StorageFolderCard = ({folder}) => {
+const StorageFolderCard = ({
+    folder,
+    handleFolderEdit,
+}) => {
 
   return (
       <Card className={"mt-3"}>
@@ -71,6 +75,11 @@ const StorageFolderCard = ({folder}) => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
 
+                  <Dropdown.Item onClick={() => handleFolderEdit(folder)}>
+                    <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
+                    Edit
+                  </Dropdown.Item>
+
                 </Dropdown.Menu>
               </Dropdown>
             </Col>
@@ -83,7 +92,8 @@ const StorageFolderCard = ({folder}) => {
 }
 
 StorageFolderCard.propTypes = {
-  folder: PropTypes.object.isRequired
+  folder: PropTypes.object.isRequired,
+  handleFolderEdit: PropTypes.func.isRequired,
 }
 
 export default StorageFolderCard;

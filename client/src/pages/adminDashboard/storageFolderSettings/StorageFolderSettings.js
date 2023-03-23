@@ -184,7 +184,10 @@ const StorageFolderSettings = () => {
                 folders.map((folder, index) => (
                     <Row>
                       <Col>
-                        <StorageFolderCard folder={folder} />
+                        <StorageFolderCard
+                            folder={folder}
+                            handleFolderEdit={handleFolderEdit}
+                        />
                       </Col>
                     </Row>
                 )

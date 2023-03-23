@@ -21,24 +21,21 @@ import {getDataSourceIcon} from "./fileManagerUtils";
 
 const StudyFileManagerMenu = ({
   folders,
-  locations,
   handleFolderSelect,
   selectedFolder
 }) => {
 
-  console.debug("Locations", locations);
+  console.debug("Study folders", folders);
 
   const renderMenu = () => {
     return folders
     .sort((a, b) => {
-      if (a.primary) return -1;
-      else if (b.primary) return 1;
+      if (a.name > b.name) return -1;
+      else if (b.name > a.name) return 1;
       else return 0;
     })
     .map(f => {
       console.debug("Rendering menu folder: ", f);
-      const l = locations.find(l => l.id === f.fileStorageLocationId);
-      console.debug("Found location: ", l);
       return (
           <ListGroup.Item
               action
@@ -46,9 +43,8 @@ const StudyFileManagerMenu = ({
               active={selectedFolder ? selectedFolder.id === f.id : false}
               onClick={() => handleFolderSelect(f)}
           >
-            {getDataSourceIcon(l)}
-            {/*{getDataSourceLabel(l)}: {f.name} {f.primary ? "(default)" : ""}*/}
-            <span className="fw-bolder me-2">{l && l.displayName}:</span>
+            {getDataSourceIcon(f.storageDrive.driveType)}
+            <span className="fw-bolder me-2">{f.storageDrive.driveType}:</span>
             {f.name}
             {f.primary && <span className="badge bg-info ms-2">default</span>}
           </ListGroup.Item>
@@ -76,7 +72,6 @@ const StudyFileManagerMenu = ({
 
 StudyFileManagerMenu.propTypes = {
   folders: PropTypes.array.isRequired,
-  locations: PropTypes.array.isRequired,
   handleFolderSelect: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object
 }

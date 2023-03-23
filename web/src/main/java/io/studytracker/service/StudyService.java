@@ -16,6 +16,8 @@
 
 package io.studytracker.service;
 
+import io.studytracker.aws.S3StudyStorageService;
+import io.studytracker.aws.S3Utils;
 import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
@@ -339,23 +341,55 @@ public class StudyService {
     }
 
 
-//    if (options.isUseS3() && options.getS3LocationId() != null) {
-//      LOGGER.debug("Creating S3 folder for study: " + study.getCode());
-//      try {
-//        FileStorageLocation s3Location = storageLocationService.findById(options.getS3LocationId())
-//            .orElseThrow(() -> new RecordNotFoundException("Invalid S3 location ID: "
-//                + options.getS3LocationId()));
-//        StudyStorageService s3Service = storageLocationService.lookupStudyStorageService(s3Location);
-//        StorageFolder storageFolder = s3Service.createFolder(s3Location, study);
-//        FileStoreFolder s3Folder = fileStoreFolderRepository
-//            .save(FileStoreFolder.from(s3Location, storageFolder));
-//        study.addStudyStorageFolder(s3Folder);
-//        studyRepository.save(study);
-//      } catch (StudyStorageException e) {
-//        e.printStackTrace();
-//        LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
-//      }
-//    }
+    // S3
+    if (options.isUseS3() && options.getS3FolderId() != null) {
+      LOGGER.debug("Creating S3 folder for study: " + study.getCode());
+      try {
+
+        // Get the requested root folder & drive
+        StorageDriveFolder s3RootFolder = storageDriveFolderService.findById(options.getS3FolderId())
+            .orElseThrow(() -> new StudyStorageException("Invalid S3 folder ID: "
+                + options.getS3FolderId()));
+        if (!s3RootFolder.isStudyRoot()) {
+          throw new StudyStorageException("S3 folder is not a study root folder: "
+              + s3RootFolder.getName());
+        }
+        StorageDrive s3Drive = storageDriveFolderService.findDriveByFolder(s3RootFolder)
+            .orElseThrow(() -> new StudyStorageException("Invalid S3 folder ID: "
+                + options.getS3FolderId()));
+
+        // Get the storage service
+        S3StudyStorageService s3Service = (S3StudyStorageService) storageDriveFolderService
+            .lookupStudyStorageService(s3RootFolder);
+
+        // Make sure the program folder exists. If not, create it.
+        StorageDriveFolder programs3Folder;
+        Optional<StorageDriveFolder> optional = storageDriveFolderService.findByProgram(program).stream()
+            .filter(f -> f.getStorageDrive().getId().equals(s3Drive.getId()))
+            .findFirst();
+        if (optional.isPresent()) {
+          programs3Folder = optional.get();
+        } else {
+          String programFolderPath = S3Utils.joinS3Path(s3RootFolder.getPath(), S3Utils.generateProgramFolderName(program));
+          StorageDriveFolder programFolder = new StorageDriveFolder();
+          programFolder.setPath(programFolderPath);
+          programFolder.setName("Program " + program.getName() + " S3 Folder");
+          programFolder.setStorageDrive(s3Drive);
+          programFolder.setWriteEnabled(true);
+          programs3Folder = storageDriveFolderService.registerFolder(programFolder, s3Drive);
+          program.addStorageFolder(programs3Folder);
+          programRepository.save(program);
+        }
+
+        // Create the study S3 folder
+        StorageDriveFolder studyS3Folder = s3Service.createStudyFolder(programs3Folder, study);
+        study.addStorageFolder(studyS3Folder);
+        studyRepository.save(study);
+      } catch (StudyStorageException e) {
+        e.printStackTrace();
+        LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
+      }
+    }
 
     // Add a links to extra resources
     if (studySummaryEntry != null) {

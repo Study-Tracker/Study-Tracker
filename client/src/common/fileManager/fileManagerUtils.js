@@ -19,24 +19,23 @@ import {faFolder, faServer} from "@fortawesome/free-solid-svg-icons";
 import {faAws} from "@fortawesome/free-brands-svg-icons";
 import React from "react";
 
-export const getDataSourceIcon = (location) => {
-  if (!location) return <FontAwesomeIcon icon={faFolder} className={"me-2"} />;
-  switch (location.type) {
-    case "EGNYTE_API":
+export const getDataSourceIcon = (driveType) => {
+  switch (driveType) {
+    case "EGNYTE":
       return <FontAwesomeIcon icon={faServer} className={"me-2"} />
-    case "AWS_S3":
+    case "S3":
       return <FontAwesomeIcon icon={faAws} className={"me-2"} />
     default:
       return <FontAwesomeIcon icon={faFolder} className={"me-2"} />
   }
 }
 
-export const getDataSourceLabel = (location) => {
-  if (!location) return "";
-  switch (location.type) {
-    case "EGNYTE_API":
+export const getDataSourceLabel = (driveType) => {
+  if (!driveType) return "";
+  switch (driveType) {
+    case "EGNYTE":
       return "Egnyte";
-    case "AWS_S3":
+    case "S3":
       return "Amazon S3";
     default:
       return "Local";

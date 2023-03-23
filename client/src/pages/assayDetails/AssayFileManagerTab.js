@@ -29,25 +29,24 @@ const AssayFileManagerTab = ({assay}) => {
 
   const notyf = useContext(NotyfContext);
   const [folders, setFolders] = useState([]);
-  const [locations, setLocations] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState(null);
 
   const handleFolderSelect = (folder) => {
     setSelectedFolder(folder);
-    const location = locations.find(location => location.id === folder.fileStorageLocationId);
-    setSelectedLocation(location);
     console.debug("Selected folder", folder);
-    console.debug("Selected location", location);
   }
 
   useEffect(() => {
     axios.get("/api/internal/assay/" + assay.id + "/storage")
     .then(response => {
-      setFolders(response.data);
-      axios.get("/api/internal/data-files/locations")
-      .then(response2 => {
-        setLocations(response2.data);
+      const folders = response.data;
+      axios.get("/api/internal/storage-drives")
+      .then(async response2 => {
+        await folders.forEach(f => {
+          f.storageDrive = response2.data.find(l => l.id === f.storageDriveId);
+        })
+        setFolders(folders);
+        setSelectedFolder(folders.find(f => f.primary));
       });
     })
     .catch(error => {
@@ -65,7 +64,6 @@ const AssayFileManagerTab = ({assay}) => {
 
             <StudyFileManagerMenu
                 folders={folders}
-                locations={locations}
                 handleFolderSelect={handleFolderSelect}
                 selectedFolder={selectedFolder}
             />
@@ -74,8 +72,8 @@ const AssayFileManagerTab = ({assay}) => {
 
           <Col xs="8" md="9">
             {
-              selectedFolder && selectedLocation
-                  ? <FileManagerContent location={selectedLocation} path={selectedFolder.path} />
+              selectedFolder
+                  ? <FileManagerContent rootFolder={selectedFolder} path={selectedFolder.path} />
                   : <FileManagerContentPlaceholder />
             }
 

@@ -72,6 +72,7 @@ const StudyForm = ({
     useGit: false,
     useStorage: true,
     useS3: false,
+    s3FolderId: null,
   };
 
   const studySchema = yup.object().shape({
@@ -446,6 +447,7 @@ const StudyForm = ({
                             onChange={(key, value) => setFieldValue(key, value)}
                             isActive={values.useS3}
                             selectedProgram={values.program}
+                            errors={errors}
                         />
                     ) : ''
 

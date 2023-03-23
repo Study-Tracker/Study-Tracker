@@ -22,6 +22,7 @@ import lombok.Data;
 public class StudyStorageDriveFolderSummaryDto {
 
   private Long id;
+  private Long studyStorageFolderId;
   private Long storageDriveId;
   private Long storageDriveFolderId;
   private Long studyId;

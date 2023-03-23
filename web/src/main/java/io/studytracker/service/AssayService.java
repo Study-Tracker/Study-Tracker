@@ -241,41 +241,54 @@ public class AssayService {
                 () ->
                     new RecordNotFoundException("Cannot find study: " + assay.getStudy().getId()));
 
-    // Manage assay storage
-    if (options.isUseStorage() && options.getParentFolder() != null) {
+    // Get the parent storage folder
+    Long parentFolderId;
+    if (options.getParentFolder() == null) {
+      parentFolderId = study.getStorageFolders().stream()
+          .filter(f -> f.isPrimary())
+          .findFirst()
+          .orElseThrow(() -> new RecordNotFoundException("No primary storage folder found for program: "
+              + study.getName()))
+          .getStorageDriveFolder()
+          .getId();
+    } else {
+      parentFolderId = options.getParentFolder().getId();
+    }
+    final StorageDriveFolder parentFolder = storageDriveFolderService.findById(parentFolderId)
+        .orElseThrow(() -> new RecordNotFoundException("No storage folder found for id: "
+            + parentFolderId));
 
-      // Create default storage folder
-      AssayStorageFolder folder = createAssayStorageFolder(assay, options.getParentFolder());
-      folder.setPrimary(true);
-      assay.addStorageFolder(folder);
-      StorageDriveFolder parentFolder = options.getParentFolder();
 
-      try {
-        StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-            .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
-                + parentFolder.getStorageDrive().getId()));
-        StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
-            .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
-                + parentFolder.getStorageDrive().getDriveType()));
+    // Create default storage folder
+    AssayStorageFolder folder = createAssayStorageFolder(assay, parentFolder);
+    folder.setPrimary(true);
+    assay.addStorageFolder(folder);
 
-        // Move uploaded files to new folder
-        for (AssayTypeField field : assay.getAssayType().getFields()) {
-          if (field.getType().equals(CustomEntityFieldType.FILE)
-              && assay.getFields().containsKey(field.getFieldName())
-              && assay.getFields().get(field.getFieldName()) != null) {
-              String localPath = StorageUtils.cleanInputPath(
-                  assay.getFields().get(field.getFieldName()).toString());
-              StorageFile movedFile = storageService
-                  .saveFile(folder.getStorageDriveFolder(), folder.getStorageDriveFolder().getPath(),
-                      new File(localPath));
-              assay.getFields().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
-          }
+    // Handle attached files
+    try {
+      StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
+          .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
+              + parentFolder.getStorageDrive().getId()));
+      StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
+          .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
+              + parentFolder.getStorageDrive().getDriveType()));
+
+      // Move uploaded files to new folder
+      for (AssayTypeField field : assay.getAssayType().getFields()) {
+        if (field.getType().equals(CustomEntityFieldType.FILE)
+            && assay.getFields().containsKey(field.getFieldName())
+            && assay.getFields().get(field.getFieldName()) != null) {
+            String localPath = StorageUtils.cleanInputPath(
+                assay.getFields().get(field.getFieldName()).toString());
+            StorageFile movedFile = storageService
+                .saveFile(folder.getStorageDriveFolder(), folder.getStorageDriveFolder().getPath(),
+                    new File(localPath));
+            assay.getFields().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
         }
-      } catch (Exception e) {
-        e.printStackTrace();
-        LOGGER.warn("Failed to move file for assay: " + assay.getCode());
       }
-
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.warn("Failed to move file for assay: " + assay.getCode());
     }
 
     // Create the ELN folder

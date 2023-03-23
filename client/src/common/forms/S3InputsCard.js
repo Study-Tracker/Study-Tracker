@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Col, Form, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import FeatureToggleCard from "./FeatureToggleCard";
@@ -22,17 +22,19 @@ import axios from "axios";
 import {S3_STORAGE_TYPE} from "../../config/storageConstants";
 import {FormGroup} from "./common";
 import Select from "react-select";
+import NotyfContext from "../../context/NotyfContext";
 
 const S3InputsCard = ({
     isActive,
     onChange,
-    selectedProgram
+    selectedProgram,
+    errors
 }) => {
 
   console.debug("Program: ", selectedProgram);
   const [rootFolders, setRootFolders] = useState([]);
-  const [error, setError] = useState(null);
   const [selectedBucket, setSelectedBucket] = useState(null);
+  const notyf = useContext(NotyfContext);
 
   useEffect(() => {
     axios.get("/api/internal/storage-drive-folders?studyRoot=true")
@@ -43,7 +45,10 @@ const S3InputsCard = ({
     })
     .catch(error => {
       console.error(error);
-      setError(error);
+      notyf.open({
+        type: "error",
+        message: "Error loading S3 buckets"
+      })
     })
   }, []);
 
@@ -83,7 +88,7 @@ const S3InputsCard = ({
         <Row>
           <Col md={6} className={"mb-3"}>
             <FormGroup>
-              <Form.Label>Parent Folder *</Form.Label>
+              <Form.Label>S3 Bucket *</Form.Label>
               <Select
                   className="react-select-container"
                   classNamePrefix="react-select"
@@ -97,14 +102,15 @@ const S3InputsCard = ({
                   }
                   name="parentFolder"
                   onChange={(selected) => {
-                    setFieldValue("parentFolder", selected.value);
+                    setSelectedBucket(selected.value);
+                    onChange("s3FolderId", selected.value.id);
                   }}
               />
               <Form.Control.Feedback type={"invalid"}>
-                {errors.parentFolder}
+                {errors.s3FolderId}
               </Form.Control.Feedback>
               <Form.Text>
-                Select the parent folder to create the study storage folder in.
+                Select the S3 bucket to create the study storage folder in.
               </Form.Text>
             </FormGroup>
           </Col>

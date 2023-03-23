@@ -28,7 +28,7 @@ public class StudyOptions {
   private boolean useGit = false;
   private boolean useStorage = true;
   private boolean useS3 = false;
-  private Long s3LocationId;
+  private Long s3FolderId;
   private StorageDriveFolder parentFolder;
   private List<StorageDriveFolder> additionalFolders = new ArrayList<>();
 
