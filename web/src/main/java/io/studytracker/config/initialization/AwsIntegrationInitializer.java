@@ -177,6 +177,15 @@ public class AwsIntegrationInitializer {
 
   private void registerRootFolders(List<S3Bucket> buckets) throws InvalidConfigurationException {
 
+    String defaultStudyBucket = null;
+    String defaultStudyPath = null;
+    if (StringUtils.hasText(properties.getAws().getS3().getDefaultStudyLocation())) {
+      String defaultStudyLocation = properties.getAws().getS3().getDefaultStudyLocation();
+      String[] bits = defaultStudyLocation.split("/", 2);
+      defaultStudyBucket = bits[0];
+      defaultStudyPath = bits.length > 1 ? bits[1] : "";
+    }
+
     for (S3Bucket b: buckets) {
 
       S3Bucket bucket = s3BucketRepository.findById(b.getId())
@@ -208,6 +217,24 @@ public class AwsIntegrationInitializer {
         bucketFolder.setKey("");
 
         s3BucketFolderRepository.save(bucketFolder);
+
+        if (bucket.getName().equals(defaultStudyBucket)) {
+
+          StorageDriveFolder studyRootFolder = new StorageDriveFolder();
+          studyRootFolder.setStudyRoot(true);
+          studyRootFolder.setBrowserRoot(true);
+          studyRootFolder.setWriteEnabled(true);
+          studyRootFolder.setName(drive.getDisplayName() + " Root Folder");
+          studyRootFolder.setStorageDrive(drive);
+          studyRootFolder.setPath(defaultStudyPath);
+
+          S3BucketFolder studyBucketFolder = new S3BucketFolder();
+          studyBucketFolder.setS3Bucket(bucket);
+          studyBucketFolder.setStorageDriveFolder(studyRootFolder);
+          studyBucketFolder.setKey("");
+
+          s3BucketFolderRepository.save(studyBucketFolder);
+        }
 
       } else {
         LOGGER.info("Root folder for bucket {} has already been registered.", bucket.getName());

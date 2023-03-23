@@ -19,9 +19,11 @@ package io.studytracker.controller.api.internal;
 import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
 import io.studytracker.mapstruct.mapper.StorageDriveMapper;
 import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.storage.StorageDriveFolderService;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,9 +49,18 @@ public class StorageDrivePrivateController {
   private StorageDriveFolderService storageDriveFolderService;
 
   @GetMapping("")
-  public List<StorageDriveDetailsDto> findDrives() {
+  public List<StorageDriveDetailsDto> findDrives(
+      @RequestParam(name = "driveType", required = false) DriveType driveType) {
     LOGGER.debug("Fetching all storage drives for organization");
-    List<StorageDrive> drives = storageDriveFolderService.findAllDrives();
+    List<StorageDrive> drives;
+    if (driveType != null) {
+      drives = storageDriveFolderService.findAllDrives()
+          .stream()
+          .filter(d -> d.getDriveType().equals(driveType))
+          .collect(Collectors.toList());
+    } else {
+      drives = storageDriveFolderService.findAllDrives();
+    }
     return mapper.toDetailsDto(drives);
   }
 

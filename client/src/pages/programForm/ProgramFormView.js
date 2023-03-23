@@ -33,6 +33,7 @@ const ProgramFormView = () => {
   const [programs, setPrograms] = useState(null);
   const [error, setError] = useState(null);
   const [elnProjects, setElnProjects] = useState(null);
+  const [rootFolders, setRootFolders] = useState([]);
   
   useEffect(() => {
 
@@ -75,6 +76,15 @@ const ProgramFormView = () => {
       setError(error);
     });
 
+    axios.get("/api/internal/storage-drive-folders?studyRoot=true")
+    .then(response => {
+      setRootFolders(response.data);
+    })
+    .catch(error => {
+      console.error("Error loading root folders", error);
+      setError(error);
+    });
+
   }, [programId, features]);
 
   let content = <LoadingMessage/>;
@@ -87,6 +97,7 @@ const ProgramFormView = () => {
         user={user}
         features={features}
         elnProjects={elnProjects}
+        rootFolders={rootFolders}
     />;
   }
   return (

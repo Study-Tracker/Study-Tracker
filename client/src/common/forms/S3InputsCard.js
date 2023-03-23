@@ -15,11 +15,13 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Col, Row} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import FeatureToggleCard from "./FeatureToggleCard";
 import axios from "axios";
 import {S3_STORAGE_TYPE} from "../../config/storageConstants";
+import {FormGroup} from "./common";
+import Select from "react-select";
 
 const S3InputsCard = ({
     isActive,
@@ -28,21 +30,16 @@ const S3InputsCard = ({
 }) => {
 
   console.debug("Program: ", selectedProgram);
-  const [locations, setLocations] = useState([]);
+  const [rootFolders, setRootFolders] = useState([]);
   const [error, setError] = useState(null);
   const [selectedBucket, setSelectedBucket] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/internal/storage-locations")
+    axios.get("/api/internal/storage-drive-folders?studyRoot=true")
     .then(response => {
-      const bucketLocations = response.data
-        .filter(location => location.active && location.type === S3_STORAGE_TYPE);
-      setLocations(bucketLocations);
-      const defaultLocation = bucketLocations.find(location => location.defaultStudyLocation === true);
-      if (!!defaultLocation) {
-        setSelectedBucket(defaultLocation);
-        onChange("s3LocationId", defaultLocation.id);
-      }
+      const bucketRootFolders = response.data
+        .filter(f => f.storageDrive.active && f.storageDrive.driveType === S3_STORAGE_TYPE);
+      setRootFolders(bucketRootFolders);
     })
     .catch(error => {
       console.error(error);
@@ -80,6 +77,36 @@ const S3InputsCard = ({
             <p className={"text-lg"}>
               <code>{bucketPath}</code>
             </p>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={6} className={"mb-3"}>
+            <FormGroup>
+              <Form.Label>Parent Folder *</Form.Label>
+              <Select
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  options={
+                    rootFolders
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map(p => ({
+                      label: p.storageDrive.driveType + ": " + p.name,
+                      value: p
+                    }))
+                  }
+                  name="parentFolder"
+                  onChange={(selected) => {
+                    setFieldValue("parentFolder", selected.value);
+                  }}
+              />
+              <Form.Control.Feedback type={"invalid"}>
+                {errors.parentFolder}
+              </Form.Control.Feedback>
+              <Form.Text>
+                Select the parent folder to create the study storage folder in.
+              </Form.Text>
+            </FormGroup>
           </Col>
         </Row>
 
