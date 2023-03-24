@@ -39,9 +39,18 @@ const S3InputsCard = ({
   useEffect(() => {
     axios.get("/api/internal/storage-drive-folders?studyRoot=true")
     .then(response => {
-      const bucketRootFolders = response.data
-        .filter(f => f.storageDrive.active && f.storageDrive.driveType === S3_STORAGE_TYPE);
-      setRootFolders(bucketRootFolders);
+      let folders = response.data;
+      axios.get("/api/internal/s3-buckets")
+      .then(async response2 => {
+
+        const bucketRootFolders = folders
+        .filter(f => f.storageDrive.active && f.storageDrive.driveType
+            === S3_STORAGE_TYPE);
+        await bucketRootFolders.forEach(f => {
+          f.bucket = response2.data.find(b => b.storageDrive.id === f.storageDrive.id);
+        });
+        setRootFolders(bucketRootFolders);
+      })
     })
     .catch(error => {
       console.error(error);
@@ -53,13 +62,6 @@ const S3InputsCard = ({
   }, []);
 
   console.debug("Selected Bucket", selectedBucket);
-  let bucketPath = selectedBucket ? selectedBucket.name + "/" + selectedBucket.rootFolderPath : "";
-  if (!!bucketPath && !bucketPath.endsWith("/")) {
-    bucketPath += "/";
-  }
-  if (selectedProgram) {
-    bucketPath += selectedProgram.name;
-  }
 
   return (
       <FeatureToggleCard
@@ -75,17 +77,7 @@ const S3InputsCard = ({
       >
 
         <Row>
-          <Col md={12}>
-            <p>
-              A folder will be created for your study in the S3 bucket:
-            </p>
-            <p className={"text-lg"}>
-              <code>{bucketPath}</code>
-            </p>
-          </Col>
-        </Row>
 
-        <Row>
           <Col md={6} className={"mb-3"}>
             <FormGroup>
               <Form.Label>S3 Bucket *</Form.Label>
@@ -114,6 +106,28 @@ const S3InputsCard = ({
               </Form.Text>
             </FormGroup>
           </Col>
+
+          {
+              selectedBucket && (
+                  <Col md={6}>
+                    <p>
+                      A folder will be created for your study in the S3 bucket:
+                    </p>
+                    <p className={"text-lg"}>
+                      <code>
+                        {
+                            "s3://"
+                            + selectedBucket.bucket.name
+                            + "/"
+                            + selectedBucket.path
+                            + (selectedProgram ? selectedProgram.name : "")
+                        }
+                      </code>
+                    </p>
+                  </Col>
+              )
+          }
+
         </Row>
 
       </FeatureToggleCard>

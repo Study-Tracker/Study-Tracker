@@ -52,7 +52,7 @@ public interface StorageDriveFolderRepository extends JpaRepository<StorageDrive
   Optional<StorageDriveFolder> findByIdAndOrganization(Long id, Long organizationId);
 
   @EntityGraph("storage-drive-folder-details")
-  @Query("SELECT distinct f FROM ProgramStorageFolder pf JOIN StorageDriveFolder f ON pf.storageDriveFolder.id = f.id WHERE pf.program.id = ?1")
+  @Query("SELECT distinct f FROM StorageDriveFolder f JOIN ProgramStorageFolder pf ON pf.storageDriveFolder.id = f.id WHERE pf.program.id = ?1")
   List<StorageDriveFolder> findByProgramId(Long programId);
 
   @EntityGraph("storage-drive-folder-details")

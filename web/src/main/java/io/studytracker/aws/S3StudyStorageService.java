@@ -179,11 +179,11 @@ public class S3StudyStorageService implements StudyStorageService {
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
           .bucket(bucket.getName())
-          .prefix(path)
+          .prefix(fullPath)
           .delimiter("/")
           .build();
       ListObjectsV2Response response = client.listObjectsV2(request);
-      return S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents(),
+      return S3Utils.convertS3ObjectsToStorageFolderWithContents(fullPath, response.contents(),
           response.commonPrefixes());
     } catch (AwsServiceException e) {
       e.printStackTrace();

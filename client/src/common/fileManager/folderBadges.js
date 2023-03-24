@@ -31,8 +31,8 @@ DriveStatusBadge.propTypes = {
 export const FolderRootBadges = ({folder}) => {
   return (
       <>
-        {folder.studyRoot && <Badge className="me-2" bg="primary">Study Root</Badge>}
-        {folder.browserRoot && <Badge className="me-2" bg="info">Browser Root</Badge>}
+        {folder.studyRoot && <Badge className="me-2" bg="success">Study Root</Badge>}
+        {folder.browserRoot && <Badge className="me-2" bg="primary">Browser Root</Badge>}
       </>
   )
 }
@@ -44,8 +44,8 @@ FolderRootBadges.propTypes = {
 export const FolderPermissionsBadges = ({folder}) => {
   return (
       <>
-        <Badge className="me-2" bg="primary">Read</Badge>
-        {folder.writeEnabled && <Badge className="me-2" bg="info">Write</Badge>}
+        <Badge className="me-2" bg="info">Read</Badge>
+        {folder.writeEnabled && <Badge className="me-2" bg="warning">Write</Badge>}
         {folder.deleteEnabled && <Badge className="me-2" bg="danger">Delete</Badge>}
       </>
   )

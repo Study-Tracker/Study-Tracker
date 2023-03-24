@@ -23,6 +23,8 @@ import Select from "react-select";
 import {FormGroup} from "../../../common/forms/common";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
+import FormikFormErrorNotification
+  from "../../../common/forms/FormikFormErrorNotification";
 
 const StorageFolderFormModal = ({
   isOpen,
@@ -81,7 +83,11 @@ const StorageFolderFormModal = ({
 
   return (
       <Formik
-          initialValues={selectedFolder || folderDefault}
+          initialValues={
+            selectedFolder
+              ? {...selectedFolder, storageDriveId: selectedFolder.storageDrive.id }
+              : folderDefault
+          }
           onSubmit={handleFormSubmit}
           validationSchema={folderSchema}
           innerRef={formikRef}
@@ -103,6 +109,8 @@ const StorageFolderFormModal = ({
               <Modal.Body className={"mb-3"}>
                 <FormikForm>
 
+                  <FormikFormErrorNotification />
+
                   <Row>
                     <Col>
                       <FormGroup>
@@ -112,7 +120,7 @@ const StorageFolderFormModal = ({
                             className={"react-select-container " + (errors.storageDriveId && touched.storageDriveId ? "is-invalid" : "")}
                             classNamePrefix="react-select"
                             invalid={errors.storageDriveId && touched.storageDriveId}
-                            defaultValue={values.storageDriveId ? driveOptions.find(option => option.value === values.storageDriveId) : null}
+                            defaultValue={values.id ? driveOptions.find(option => option.value === values.storageDrive.id) : null}
                             isDisabled={!!values.id}
                             options={driveOptions}
                             onChange={selected => {
@@ -140,6 +148,7 @@ const StorageFolderFormModal = ({
                           type={"text"}
                           name={"path"}
                           isInvalid={errors.path && touched.path}
+                          disabled={!!values.id}
                           value={values.path}
                           onChange={e => {
                             let path = e.target.value;
@@ -262,7 +271,6 @@ StorageFolderFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object,
-  drives: PropTypes.array.isRequired,
   handleFormSubmit: PropTypes.func.isRequired,
   formikRef: PropTypes.object.isRequired
 }

@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,6 +94,14 @@ public class StorageDriveFolderPrivateController {
         .orElseThrow(() -> new IllegalArgumentException("Storage drive not found"));
     StorageDriveFolder saved = storageDriveFolderService.registerFolder(folder, drive);
     return new ResponseEntity<>(mapper.toDetailsDto(saved), HttpStatus.CREATED);
+  }
+
+  @PutMapping("/{id}")
+  public HttpEntity<StorageDriveFolderDetailsDto> updateFolder(@Valid @RequestBody StorageDriveFolderFormDto dto) {
+    LOGGER.debug("Updating storage drive folder: {}", dto);
+    StorageDriveFolder folder = mapper.fromFormDto(dto);
+    StorageDriveFolder saved = storageDriveFolderService.updateFolder(folder);
+    return new ResponseEntity<>(mapper.toDetailsDto(saved), HttpStatus.OK);
   }
 
 }

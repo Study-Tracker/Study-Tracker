@@ -27,7 +27,7 @@ public interface AwsIntegrationRepository extends JpaRepository<AwsIntegration, 
   @Query("SELECT a FROM AwsIntegration a WHERE a.organization.id = ?1")
   List<AwsIntegration> findByOrganizationId(Long organizationId);
 
-  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b WHERE b.id = ?1")
+  @Query("SELECT a FROM AwsIntegration a JOIN S3Bucket b ON a.id = b.awsIntegration.id WHERE b.id = ?1")
   AwsIntegration findByBucketDriveId(Long bucketDriveId);
 
   @Query("SELECT a FROM AwsIntegration a "

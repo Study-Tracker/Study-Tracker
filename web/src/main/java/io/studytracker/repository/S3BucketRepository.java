@@ -26,7 +26,7 @@ public interface S3BucketRepository extends StorageDriveDetailsOperations<S3Buck
   @Query("SELECT b FROM S3Bucket b WHERE b.awsIntegration.id = ?1 and b.name = ?2")
   Optional<S3Bucket> findByIntegrationAndName(Long integrationId, String name);
 
-  @Query("SELECT b FROM S3Bucket b JOIN S3BucketFolder bf WHERE bf.storageDriveFolder.id = ?1")
+  @Query("SELECT b FROM S3Bucket b JOIN S3BucketFolder bf ON b.id = bf.s3Bucket.id WHERE bf.storageDriveFolder.id = ?1")
   Optional<S3Bucket> findByStorageDriveFolderId(Long storageDriveFolderId);
 
   @Query("SELECT b FROM S3Bucket b WHERE b.awsIntegration.id = ?1")

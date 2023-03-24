@@ -116,7 +116,7 @@ const Sidebar = props => {
                 </a>
               </li>
 
-              <li className="sidebar-header">Data Management</li>
+              {/*<li className="sidebar-header">Data Management</li>*/}
 
               <li className={"sidebar-item"}>
                 <a className={"sidebar-link " + isActive(

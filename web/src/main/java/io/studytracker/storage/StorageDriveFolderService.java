@@ -197,6 +197,17 @@ public class StorageDriveFolderService {
     return storageService.saveStorageFolderRecord(drive, storageFolder, folder);
   }
 
+  public StorageDriveFolder updateFolder(StorageDriveFolder folder) {
+    LOGGER.debug("Updating folder: {}", folder);
+    StorageDriveFolder f = folderRepository.getById(folder.getId());
+        f.setName(folder.getName());
+    f.setStudyRoot(folder.isStudyRoot());
+    f.setBrowserRoot(folder.isBrowserRoot());
+    f.setWriteEnabled(folder.isWriteEnabled());
+    f.setDeleteEnabled(folder.isDeleteEnabled());
+    return folderRepository.save(f);
+  }
+
   // Drives
 
   public List<StorageDrive> findAllDrives() {
