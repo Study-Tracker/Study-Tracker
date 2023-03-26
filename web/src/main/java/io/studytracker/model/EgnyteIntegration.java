@@ -56,7 +56,7 @@ public class EgnyteIntegration {
   @Column(name = "root_url", nullable = false)
   private String rootUrl;
 
-  @Column(name = "api_token", nullable = false, length = 1024)
+  @Column(name = "api_token", length = 1024)
   @Convert(converter = StringFieldEncryptor.class)
   private String apiToken;
 

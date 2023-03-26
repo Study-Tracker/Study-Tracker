@@ -86,7 +86,7 @@ public class AwsIntegrationInitializer {
 
         // Has the record already been updated?
         AwsIntegration existing = integrations.get(0);
-        if (existing.getCreatedAt().equals(existing.getUpdatedAt())) {
+        if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
           LOGGER.info("AWS integration for organization {} has already been initialized.", organization.getName());
           return existing;
         }
@@ -142,7 +142,7 @@ public class AwsIntegrationInitializer {
    */
   private List<S3Bucket> registerS3Buckets(AwsIntegration awsIntegration, Organization organization) throws InvalidConfigurationException {
 
-    if (awsIntegration == null) {
+    if (awsIntegration == null || awsIntegration.getId() == null) {
       LOGGER.warn("AWS integration is not configured. Skipping S3 bucket registration.");
       return null;
     }

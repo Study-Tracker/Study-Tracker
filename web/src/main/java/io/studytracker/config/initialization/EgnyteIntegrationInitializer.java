@@ -79,7 +79,7 @@ public class EgnyteIntegrationInitializer {
 
         // Check to see if the integration is already active and updated
         EgnyteIntegration existing = integrations.get(0);
-        if (existing.getCreatedAt().equals(existing.getUpdatedAt())) {
+        if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
           LOGGER.info("Egnyte integration for organization {} is already active", organization.getName());
           return existing;
         }
