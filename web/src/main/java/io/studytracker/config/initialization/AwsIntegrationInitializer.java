@@ -264,7 +264,9 @@ public class AwsIntegrationInitializer {
       AwsIntegration awsIntegration = registerAwsIntegrationInstances(organization);
       if (awsIntegration != null) {
         List<S3Bucket> buckets = registerS3Buckets(awsIntegration, organization);
-        registerRootFolders(buckets);
+        if (buckets != null) {
+          registerRootFolders(buckets);
+        }
       }
 
     } catch (Exception e) {

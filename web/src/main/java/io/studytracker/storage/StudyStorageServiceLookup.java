@@ -22,6 +22,7 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.msgraph.OneDriveStorageService;
 import io.studytracker.repository.StorageDriveRepository;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -51,6 +52,9 @@ public class StudyStorageServiceLookup {
   @Autowired(required = false)
   private LocalFileSystemStorageService localFileSystemStorageService;
 
+  @Autowired(required = false)
+  private OneDriveStorageService oneDriveStorageService;
+
   @Autowired
   private StorageDriveRepository storageDriveRepository;
 
@@ -71,6 +75,8 @@ public class StudyStorageServiceLookup {
         return Optional.ofNullable(s3StudyStorageService);
       case LOCAL:
         return Optional.ofNullable(localFileSystemStorageService);
+      case ONEDRIVE:
+        return Optional.ofNullable(oneDriveStorageService);
       default:
         return Optional.empty();
     }

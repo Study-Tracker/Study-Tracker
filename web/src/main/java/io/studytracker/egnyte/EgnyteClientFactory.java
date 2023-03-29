@@ -22,6 +22,9 @@ import io.studytracker.model.EgnyteIntegration;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+/**
+ * Factory class for creating {@link EgnyteRestApiClient} instances.
+ */
 public class EgnyteClientFactory {
 
   public static class EgnyteRestApiClientBuilder {

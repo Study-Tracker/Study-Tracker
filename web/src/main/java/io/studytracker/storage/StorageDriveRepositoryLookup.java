@@ -24,6 +24,8 @@ import io.studytracker.repository.EgnyteDriveFolderRepository;
 import io.studytracker.repository.EgnyteDriveRepository;
 import io.studytracker.repository.LocalDriveFolderRepository;
 import io.studytracker.repository.LocalDriveRepository;
+import io.studytracker.repository.OneDriveDriveRepository;
+import io.studytracker.repository.OneDriveFolderRepository;
 import io.studytracker.repository.S3BucketFolderRepository;
 import io.studytracker.repository.S3BucketRepository;
 import io.studytracker.repository.StorageDriveDetailsOperations;
@@ -61,6 +63,8 @@ public class StorageDriveRepositoryLookup {
         return context.getBean(S3BucketRepository.class);
       case LOCAL:
         return context.getBean(LocalDriveRepository.class);
+      case ONEDRIVE:
+        return context.getBean(OneDriveDriveRepository.class);
       default:
         throw new InvalidRequestException("Invalid drive type: " + driveType);
     }
@@ -75,6 +79,8 @@ public class StorageDriveRepositoryLookup {
         return context.getBean(S3BucketFolderRepository.class);
       case LOCAL:
         return context.getBean(LocalDriveFolderRepository.class);
+      case ONEDRIVE:
+        return context.getBean(OneDriveFolderRepository.class);
       default:
         throw new InvalidRequestException("Invalid drive type: " + driveType);
     }
