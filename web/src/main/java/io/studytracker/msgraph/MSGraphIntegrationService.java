@@ -78,7 +78,10 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     Organization organization = organizationService.getCurrentOrganization();
     instance.setOrganization(organization);
     if (!validate(instance)) {
-      throw new IllegalArgumentException("MSGraphIntegration validation failed");
+      throw new IllegalArgumentException("One or more required fields are missing.");
+    }
+    if (!test(instance)) {
+      throw new IllegalArgumentException("Failed to connect to Graph API with the provided credentials.");
     }
     instance.setActive(true);
     return integrationRepository.save(instance);
@@ -87,6 +90,12 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
   @Override
   public MSGraphIntegration update(MSGraphIntegration instance) {
     LOGGER.info("Updating MSGraphIntegration: {}", instance.getId());
+    if (!validate(instance)) {
+      throw new IllegalArgumentException("One or more required fields are missing.");
+    }
+    if (!test(instance)) {
+      throw new IllegalArgumentException("Failed to connect to Graph API with the provided credentials.");
+    }
     MSGraphIntegration i = integrationRepository.getById(instance.getId());
     i.setTenantId(instance.getTenantId());
     i.setClientId(instance.getClientId());
@@ -110,10 +119,11 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
   @Override
   public boolean test(MSGraphIntegration instance) {
+    LOGGER.info("Testing MSGraphIntegration: {}", instance.getTenantId());
     try {
       GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(instance);
       SiteCollectionPage page = client.sites().buildRequest().get();
-      if (page.getCurrentPage().size() > 0) {
+      if (page != null && page.getCurrentPage().size() > 0) {
         LOGGER.info("MSGraphIntegration test successful");
         return true;
       } else {
@@ -178,7 +188,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     }
     site.setMsgraphIntegration(integration);
     site.setUrl(s.webUrl);
-    site.setName(s.name);
+    if (!StringUtils.hasText(site.getName())) site.setName(s.name);
     site.setSiteId(s.id);
     site.setActive(true);
     return sharePointSiteRepository.save(site);
@@ -235,7 +245,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       storageDrive.setDriveType(DriveType.ONEDRIVE);
       storageDrive.setRootPath("/");
       storageDrive.setOrganization(organization);
-      storageDrive.setDisplayName("SharePoint Site Drive: " + drive.name);
+      storageDrive.setDisplayName("SharePoint Site Drive: " + site.getName());
       storageDrive.setActive(true);
 
       OneDriveDrive oneDriveDrive = new OneDriveDrive();

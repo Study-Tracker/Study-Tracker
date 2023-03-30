@@ -54,10 +54,9 @@ public class OneDriveUtils {
     String path;
     if (item.parentReference == null) {
       return null;
-    } else if (item.parentReference.path == null) {
-      path = "/";
+    } else if (item.parentReference.path == null && item.parentReference.name == null) {
+      return "/";
     } else {
-      System.out.println(item.parentReference.path);
       String[] bits = item.parentReference.path.split("root:");
       if (bits.length > 1) {
         path = bits[1];

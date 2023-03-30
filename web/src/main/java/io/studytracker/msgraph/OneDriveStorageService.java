@@ -52,6 +52,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class OneDriveStorageService implements StudyStorageService {
@@ -228,6 +229,8 @@ public class OneDriveStorageService implements StudyStorageService {
     try {
       folderItem = client.drives(oneDriveDrive.getDriveId()).root().itemWithPath(path)
           .buildRequest().get();
+      LOGGER.debug("Found drive folder item: id={}  name={}  path={}", folderItem.id, folderItem.name,
+          folderItem.parentReference != null ? folderItem.parentReference.path : "");
     } catch (Exception e) {
       LOGGER.warn("Folder not found: " + path);
     }
@@ -252,7 +255,9 @@ public class OneDriveStorageService implements StudyStorageService {
       }
     }
 
-    return OneDriveUtils.convertDriveItemFolderWithChildren(folderItem, children);
+    StorageFolder folder = OneDriveUtils.convertDriveItemFolderWithChildren(folderItem, children);
+    LOGGER.debug("Found folder: {}", folder);
+    return folder;
   }
 
   @Override
@@ -287,7 +292,9 @@ public class OneDriveStorageService implements StudyStorageService {
       throw new StudyStorageNotFoundException(
           "No file found for path: " + path + " in drive with id: " + drive.getId());
     }
-    return OneDriveUtils.convertDriveItemFile(fileItem);
+    StorageFile file = OneDriveUtils.convertDriveItemFile(fileItem);
+    LOGGER.debug("Found file: {}", file);
+    return file;
   }
 
   @Override
@@ -398,10 +405,17 @@ public class OneDriveStorageService implements StudyStorageService {
   @Override
   public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder,
       StorageDriveFolder folderOptions) {
+
+    String folderName = StringUtils.hasText(folderOptions.getName())
+        ? folderOptions.getName() : storageFolder.getName();
+
+    LOGGER.info("Saving folder record for OneDrive folder {} at path {}",
+        folderName, storageFolder.getPath());
+
     StorageDriveFolder newFolder = new StorageDriveFolder();
     newFolder.setStorageDrive(drive);
     newFolder.setPath(storageFolder.getPath());
-    newFolder.setName(storageFolder.getName());
+    newFolder.setName(folderName);
     newFolder.setStudyRoot(folderOptions.isStudyRoot());
     newFolder.setBrowserRoot(folderOptions.isBrowserRoot());
     newFolder.setWriteEnabled(folderOptions.isWriteEnabled());

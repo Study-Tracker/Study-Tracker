@@ -169,7 +169,9 @@ public class StorageDriveFolderService {
     String folderName = folder.getName();
     if (!StringUtils.hasText(folderName)) {
       folderName = StorageUtils.getFolderNameFromPath(folder.getPath());
+      folder.setName(folderName);
     }
+    LOGGER.info("Registering folder {} at path {} in drive {}", folderName, path, drive.getDisplayName());
 
     // Check that the requested folder is within the drive root path
     if (!path.startsWith(drive.getRootPath())) {

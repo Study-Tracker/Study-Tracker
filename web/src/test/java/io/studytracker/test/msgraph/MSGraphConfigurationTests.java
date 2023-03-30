@@ -182,7 +182,15 @@ public class MSGraphConfigurationTests {
 
     DriveItem driveRootFolder = graphClient.drives(drive.id).root().itemWithPath("/").buildRequest().get();
     Assert.assertNotNull(driveRootFolder);
+    System.out.println("Root folder...");
     System.out.println("Name: " + driveRootFolder.name + "  ID: " + driveRootFolder.id + "  URL: " + driveRootFolder.webUrl);
+    System.out.println("Path: " + driveRootFolder.parentReference.path + "  ID: " + driveRootFolder.parentReference.id + "  Has Parent: " + (driveRootFolder.parentReference != null ? "True":"False"));
+
+    driveRootFolder = graphClient.drives(drive.id).root().itemWithPath("/Project A").buildRequest().get();
+    Assert.assertNotNull(driveRootFolder);
+    System.out.println("Project A folder...");
+    System.out.println("Name: " + driveRootFolder.name + "  ID: " + driveRootFolder.id + "  URL: " + driveRootFolder.webUrl);
+    System.out.println("Path: " + driveRootFolder.parentReference.path + "  ID: " + driveRootFolder.parentReference.id);
 
     Exception exception = null;
     DriveItem badFolder = null;

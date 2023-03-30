@@ -34,6 +34,7 @@ import io.studytracker.msgraph.MSGraphIntegrationService;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +50,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -118,7 +121,9 @@ public class MSGraphIntegrationPrivateController {
 
   @GetMapping("/{id}/sharepoint/available")
   public List<SharePointSiteDetailsDto> getAvailableSharepointSites(
-      @PathVariable("id") Long integrationId) {
+      @PathVariable("id") Long integrationId,
+      @RequestParam(value = "q", required = false) String query
+  ) {
     LOGGER.debug("Fetching available Sharepoint sites for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
@@ -127,6 +132,11 @@ public class MSGraphIntegrationPrivateController {
       throw new InvalidRequestException("MS Graph integration does not belong to current organization");
     }
     List<SharePointSite> sites = msGraphIntegrationService.listAvailableSharepointSites(integration);
+    if (StringUtils.hasText(query)) {
+      sites = sites.stream()
+          .filter(site -> site.getName().toLowerCase().contains(query.toLowerCase()))
+          .collect(Collectors.toList());
+    }
     return sharePointSiteMapper.toDetailsDto(sites);
   }
 
@@ -154,10 +164,11 @@ public class MSGraphIntegrationPrivateController {
     if (!integration.getOrganization().getId().equals(organization.getId())) {
       throw new InvalidRequestException("MS Graph integration does not belong to current organization");
     }
-    SharePointSite site = msGraphIntegrationService
-        .registerSharePointSite(sharePointSiteMapper.fromFormDto(dto));
-    msGraphIntegrationService.registerSharePointDrives(site);
-    return new ResponseEntity<>(sharePointSiteMapper.toDetailsDto(site), HttpStatus.CREATED);
+    SharePointSite site = sharePointSiteMapper.fromFormDto(dto);
+    site.setMsgraphIntegration(integration);
+    SharePointSite created = msGraphIntegrationService.registerSharePointSite(site);
+    msGraphIntegrationService.registerSharePointDrives(created);
+    return new ResponseEntity<>(sharePointSiteMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}/sharepoint/sites/{siteId}")

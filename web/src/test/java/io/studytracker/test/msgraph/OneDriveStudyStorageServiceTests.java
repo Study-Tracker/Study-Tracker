@@ -213,6 +213,16 @@ public class OneDriveStudyStorageServiceTests {
     Exception exception = null;
 
     try {
+      folder = storageService.findFolderByPath(oneDriveDrive.getStorageDrive(), "/");
+    } catch (Exception e) {
+      exception = e;
+    }
+    Assert.assertNull(exception);
+    Assert.assertNotNull(folder);
+    Assert.assertEquals("/", folder.getPath());
+    Assert.assertEquals("root", folder.getName());
+
+    try {
       folder = storageService.findFolderByPath(oneDriveDrive.getStorageDrive(), "/Project A");
     } catch (Exception e) {
       exception = e;

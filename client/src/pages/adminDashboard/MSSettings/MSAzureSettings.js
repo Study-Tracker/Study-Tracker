@@ -20,6 +20,12 @@ import axios from "axios";
 import {Button, Card, Col, Row} from "react-bootstrap";
 import GraphSettingsDetailsCard from "./GraphSettingsDetailsCard";
 import MSGraphIntegrationFormModal from "./MSGraphIntegrationFormModal";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEdit} from "@fortawesome/free-regular-svg-icons";
+import SharePointSiteCard from "./SharePointSiteCard";
+import SharePointSiteFormModal from "./SharePointSiteFormModal";
+import OneDriveDriveCard from "./OneDriveDriveCard";
+import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 const MSAzureSettings = () => {
 
@@ -29,8 +35,10 @@ const MSAzureSettings = () => {
   const [loadCount, setLoadCount] = useState(0);
   const [integrationModalIsOpen, setIntegrationModalIsOpen] = useState(false);
   const [sharePointSiteModalIsOpen, setSharePointSiteModalIsOpen] = useState(false);
+  const [oneDriveDriveModalIsOpen, setOneDriveDriveModalIsOpen] = useState(false);
   const notyf = useContext(NotyfContext);
-  const formikRef = useRef();
+  const integrationFormikRef = useRef();
+  const siteFormikRef = useRef();
 
   useEffect(() => {
 
@@ -80,7 +88,37 @@ const MSAzureSettings = () => {
       console.error(error);
       notyf.open({
         type: "error",
-        message: "Failed to save Microsoft Azure integration settings"
+        message: "Failed to save Microsoft Azure integration settings: " + error.response.data.message
+      });
+    })
+    .finally(() => {
+      setSubmitting(false);
+    });
+  }
+
+  const handleSharePointSiteFormSubmit = (values, {setSubmitting, resetForm}) => {
+    const url = "/api/internal/integrations/msgraph/" + settings.id + "/sharepoint/sites/" + (values.id || '');
+    const method = values.id ? 'PUT' : 'POST';
+    axios({
+      url: url,
+      method: method,
+      data: values,
+      headers: {"Content-Type": "application/json"}
+    })
+    .then(response => {
+      setLoadCount(loadCount + 1);
+      setSharePointSiteModalIsOpen(false);
+      resetForm();
+      notyf.open({
+        type: "success",
+        message: "SharePoint site saved"
+      });
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to save SharePoint site"
       });
     })
     .finally(() => {
@@ -91,20 +129,40 @@ const MSAzureSettings = () => {
   return (
       <>
 
-        <Row className={"mb-3 justify-content-around"}>
-          <Col>
-            <h3>
-              Microsoft Azure integration is
-              &nbsp;
-              {
-                settings && settings.active ? (
-                    <span className={"text-success"}>ENABLED</span>
-                ) : (
-                    <span className={"text-secondary"}>DISABLED</span>
-                )
-              }
-            </h3>
-          </Col>
+        <Row className={"mb-3"}>
+            {
+              settings && settings.active ? (
+                    <Col className={"d-flex justify-content-between"}>
+                      <div>
+                        <h3>
+                          Microsoft Azure integration is
+                          &nbsp;
+                          <span className={"text-success"}>ENABLED</span>
+                        </h3>
+                      </div>
+                      <div>
+                        <Button
+                          variant={"outline-warning"}
+                          onClick={() => {
+                            integrationFormikRef.current.setValues(settings);
+                            setIntegrationModalIsOpen(true);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faEdit} className={"me-2"} />
+                          Edit Registration
+                        </Button>
+                      </div>
+                    </Col>
+              ) : (
+                  <Col className={"d-flex justify-content-between"}>
+                    <h3>
+                      Microsoft Azure integration is
+                      &nbsp;
+                      <span className={"text-muted"}>DISABLED</span>
+                    </h3>
+                  </Col>
+              )
+            }
         </Row>
 
         <Row>
@@ -115,6 +173,15 @@ const MSAzureSettings = () => {
               ) : (
                   <Card className="illustration">
                     <Card.Body>
+                      <Row>
+                        <Col>
+                          <p>
+                            Connect Study Tracker with Microsoft 365 services to enable file management in SharePoint and OneDrive.
+                            Study Tracker uses Microsoft Graph API to access your files. To start, register a new API application
+                            in Azure Active Directory, generate and an API key, and then provide the client details below.
+                          </p>
+                        </Col>
+                      </Row>
                       <Row>
                         <Col className={"text-center"}>
                           <Button
@@ -133,21 +200,108 @@ const MSAzureSettings = () => {
           </Col>
         </Row>
 
+        {/* SharePoint Sites */}
         {
           settings && settings.active && (
-                <Row className={"mb-3 justify-content-around"}>
-                  <Col>
-                    <h4>SharePoint Sites</h4>
-                  </Col>
-                  <Col>
-                    <Button
-                      color={"primary"}
-                      onClick={() => setSharePointSiteModalIsOpen(true)}
-                    >
-                      Add SharePoint Site
-                    </Button>
+
+              <>
+
+                <Row className={"mt-2"}>
+                  <Col className={"d-flex justify-content-between"}>
+                    <div>
+                      <h4>SharePoint Sites</h4>
+                    </div>
+                    <div>
+                      <Button
+                          variant={"primary"}
+                          onClick={() => setSharePointSiteModalIsOpen(true)}
+                      >
+                        <FontAwesomeIcon icon={faPlus} className={"me-2"} />
+                        Add SharePoint Site
+                      </Button>
+                    </div>
                   </Col>
                 </Row>
+
+                {
+                  sites && sites.length > 0 ? sites.map(site => {
+                    return (
+                      <Row>
+                        <Col>
+                          <SharePointSiteCard site={site} />
+                        </Col>
+                      </Row>
+                    );
+                  }) : (
+                      <Card className="illustration mt-2">
+                        <Card.Body>
+                          <Row>
+                            <Col className={"text-center p-3"}>
+                              <h5>No sites have been registered.</h5>
+                              <p>
+                                Add SharePoint sites to connect them and their OneDrive folders to Study Tracker.
+                                You can add as many sites as you like.
+                              </p>
+                            </Col>
+                          </Row>
+                        </Card.Body>
+                      </Card>
+                  )
+                }
+
+              </>
+          )
+        }
+
+        {/* OneDrive */}
+        {
+          settings && settings.active && (
+                <>
+
+                  <Row className={"mt-2"}>
+                    <Col className={"d-flex justify-content-between"}>
+                      <div>
+                        <h4>OneDrive Drives</h4>
+                      </div>
+                      <div>
+                        <Button
+                            variant={"primary"}
+                            onClick={() => setOneDriveDriveModalIsOpen(true)}
+                        >
+                          <FontAwesomeIcon icon={faPlus} className={"me-2"} />
+                          Add OneDrive Drive
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+
+                  {
+                    drives && drives.length > 0 ? drives.map(drive => {
+                      return (
+                          <Row>
+                            <Col>
+                              <OneDriveDriveCard drive={drive} />
+                            </Col>
+                          </Row>
+                      );
+                    }) : (
+                        <Card className="illustration mt-2">
+                          <Card.Body>
+                            <Row>
+                              <Col className={"text-center p-3"}>
+                                <h5>No drives have been registered.</h5>
+                                <p>
+                                  Add OneDrive drives by registering SharePoint sites. The drives will be added as
+                                  storage locations, which can be used for study or data file management.
+                                </p>
+                              </Col>
+                            </Row>
+                          </Card.Body>
+                        </Card>
+                    )
+                  }
+
+                </>
           )
         }
 
@@ -155,7 +309,15 @@ const MSAzureSettings = () => {
             isOpen={integrationModalIsOpen}
             setIsOpen={setIntegrationModalIsOpen}
             handleFormSubmit={handleIntegrationFormSubmit}
-            formikRef={formikRef}
+            formikRef={integrationFormikRef}
+        />
+
+        <SharePointSiteFormModal
+            isOpen={sharePointSiteModalIsOpen}
+            setIsOpen={setSharePointSiteModalIsOpen}
+            handleFormSubmit={handleSharePointSiteFormSubmit}
+            formikRef={siteFormikRef}
+            integration={settings}
         />
 
       </>

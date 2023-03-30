@@ -15,56 +15,40 @@
  */
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFolder,} from "@fortawesome/free-regular-svg-icons";
-import {FolderPermissionsBadges, FolderRootBadges} from "./folderBadges";
 import React from "react";
 import PropTypes from "prop-types";
-import {faEdit} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheckCircle} from "@fortawesome/free-regular-svg-icons";
+import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
+import {faCancel, faSitemap} from "@fortawesome/free-solid-svg-icons";
 
-const StorageFolderCard = ({
-    folder,
-    handleFolderEdit,
-}) => {
-
+const SharePointSiteCard = ({site}) => {
   return (
       <Card>
         <Card.Body>
           <Row>
 
             <Col xs={1} className={"d-flex align-items-center"}>
-              <FontAwesomeIcon icon={faFolder} size={"2x"} className={"text-secondary"}/>
+              <FontAwesomeIcon icon={faSitemap} size={"2x"} className={"text-secondary"}/>
             </Col>
 
-            <Col xs={5} className={"d-flex align-items-start"}>
+            <Col xs={7} className={"d-flex align-items-center"}>
               <div>
                 <span className={"fw-bolder text-lg"}>
-                  {folder.name}
-                </span>
-                <br/>
-                <span className={"text-muted"}>
-                  <code>{folder.path}</code>
+                  <a href={site.url} target={"_blank"}>{site.name}</a>
                 </span>
                 <br />
                 <span className={"text-muted"}>
-                  <strong>{folder.storageDrive.driveType}</strong>: {folder.storageDrive.displayName}
+                  Site ID: <code>{site.siteId}</code>
                 </span>
               </div>
             </Col>
 
-            <Col xs={2} className={"d-flex align-items-start"}>
+            <Col xs={2} className={"d-flex align-items-center"}>
               <div>
-                <span className="text-muted">Permissions</span>
+                <span className="text-muted">Status</span>
                 <br />
-                <FolderPermissionsBadges folder={folder} />
-              </div>
-            </Col>
-
-            <Col xs={2} className={"d-flex align-items-start"}>
-              <div>
-                <span className="text-muted">Attributes</span>
-                <br />
-                <FolderRootBadges folder={folder} />
+                <DriveStatusBadge active={site.active} />
               </div>
             </Col>
 
@@ -75,10 +59,23 @@ const StorageFolderCard = ({
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
 
-                  <Dropdown.Item onClick={() => handleFolderEdit(folder)}>
-                    <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
-                    Edit
-                  </Dropdown.Item>
+                  {
+                      site.active && (
+                          <Dropdown.Item onClick={() => console.log("Click")}>
+                            <FontAwesomeIcon icon={faCancel} className={"me-1"} />
+                            Set Inactive
+                          </Dropdown.Item>
+                      )
+                  }
+
+                  {
+                      !site.active && (
+                          <Dropdown.Item onClick={() => console.log("Click")}>
+                            <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
+                            Set Active
+                          </Dropdown.Item>
+                      )
+                  }
 
                 </Dropdown.Menu>
               </Dropdown>
@@ -88,12 +85,10 @@ const StorageFolderCard = ({
         </Card.Body>
       </Card>
   )
-
 }
 
-StorageFolderCard.propTypes = {
-  folder: PropTypes.object.isRequired,
-  handleFolderEdit: PropTypes.func.isRequired,
+SharePointSiteCard.propTypes = {
+  site: PropTypes.object.isRequired
 }
 
-export default StorageFolderCard;
+export default SharePointSiteCard;
