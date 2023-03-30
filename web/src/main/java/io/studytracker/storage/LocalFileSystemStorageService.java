@@ -334,10 +334,6 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     return this.folderExists(path);
   }
 
-  private StorageFile saveFileToFolder(File file, StorageFolder folder) {
-    return saveFileToPath(file, Paths.get(folder.getPath()));
-  }
-
   private StorageFile saveFileToPath(File file, Path path) {
     String fileName = FilenameUtils.getName(file.getName());
     Path cleanPath = path.normalize();

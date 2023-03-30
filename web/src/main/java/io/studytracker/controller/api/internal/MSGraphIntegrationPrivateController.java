@@ -184,7 +184,7 @@ public class MSGraphIntegrationPrivateController {
     if (!integration.getOrganization().getId().equals(organization.getId())) {
       throw new InvalidRequestException("MS Graph integration does not belong to current organization");
     }
-    SharePointSite site = msGraphIntegrationService.findSharePointSiteById(siteId)
+    msGraphIntegrationService.findSharePointSiteById(siteId)
         .orElseThrow(() -> new RecordNotFoundException("Sharepoint site not found"));
     SharePointSite updated = msGraphIntegrationService.updateSharePointSite(
         sharePointSiteMapper.fromFormDto(dto));

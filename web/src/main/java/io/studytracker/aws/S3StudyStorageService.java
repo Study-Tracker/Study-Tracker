@@ -198,19 +198,23 @@ public class S3StudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder findFolderByPath(StorageDrive drive, String path)
+  public StorageFolder findFolderByPath(StorageDrive drive, String rawPath)
       throws StudyStorageNotFoundException {
+
+    // Clean the path input
+    String path;
+    if (!rawPath.trim().equals("") && !rawPath.endsWith("/")) {
+      path = rawPath + "/";
+    } else {
+      path = rawPath;
+    }
+
     LOGGER.debug("Looking up folder by path: {}", path);
 
     S3Client client = getClientFromDrive(drive);
     S3Bucket bucket = s3BucketRepository.findByStorageDriveId(drive.getId())
         .orElseThrow(() -> new RecordNotFoundException("Storage folder " + drive.getId()
             + " not associated with S3 bucket"));
-
-    // Clean the path input
-    if (!path.trim().equals("") && !path.endsWith("/")) {
-      path += "/";
-    }
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()

@@ -35,7 +35,7 @@ const SharePointSiteCard = ({site}) => {
             <Col xs={7} className={"d-flex align-items-center"}>
               <div>
                 <span className={"fw-bolder text-lg"}>
-                  <a href={site.url} target={"_blank"}>{site.name}</a>
+                  <a href={site.url} target={"_blank"} rel="noopener noreferrer">{site.name}</a>
                 </span>
                 <br />
                 <span className={"text-muted"}>

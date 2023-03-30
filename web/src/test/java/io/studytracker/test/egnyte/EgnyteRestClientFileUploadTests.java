@@ -69,7 +69,6 @@ public class EgnyteRestClientFileUploadTests {
     String egnyteRoot = env.getRequiredProperty("egnyte.root-path") + "/TestUpload";
     File file = EXAMPLE_FILE.getFile();
     Exception exception = null;
-    URL url = new URL(rootUrl);
     try {
       client.uploadFile(file, egnyteRoot);
       EgnyteObject egnyteObject = client.findObjectByPath(egnyteRoot + "/upload-test.txt");

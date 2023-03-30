@@ -35,7 +35,7 @@ const OneDriveDriveCard = ({drive}) => {
             <Col xs={7} className={"d-flex align-items-center"}>
               <div>
                 <span className={"fw-bolder text-lg"}>
-                  <a href={drive.webUrl} target={"_blank"}>{drive.storageDrive.displayName}</a>
+                  <a href={drive.webUrl} target={"_blank"} rel="noopener noreferrer">{drive.storageDrive.displayName}</a>
                 </span>
                 <br />
                 <span className={"text-muted"}>

@@ -142,7 +142,6 @@ public class EgnyteIntegrationInitializer {
 
       EgnyteProperties egnyteProperties = properties.getEgnyte();
       String rootPath = egnyteProperties.getRootPath();
-      String rootFolderName = StorageUtils.getFolderNameFromPath(rootPath);
 
       // Does the folder exist already?
       StorageFolder storageFolder = null;

@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
+## [0.9.0] - 2023-04-01
+
+### Added
+- Added support for Microsoft 365 cloud services: SharePoint and OneDrive. OneDrive drives can be used for file storage, and SharePoint sites can be used for registering drives.
+
+### Changed
+- Begun overhaul of how Study Tracker manages external service integrations. This will allow for easier configuration of integrations, which can now be managed from the front-end of the application, without the need to restart the app.
+- Also overhauled how storage folder records are managed on the back-end, allowing for more flexible folder management across multiple file storage services.
+
 ## [0.8.2] - 2023-03-01
 
 ### Fixed

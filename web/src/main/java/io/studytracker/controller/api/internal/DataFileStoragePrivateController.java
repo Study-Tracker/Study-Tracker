@@ -77,15 +77,15 @@ public class DataFileStoragePrivateController extends AbstractApiController {
 
   @GetMapping("")
   public StorageFolder getDataStorageFolder(
-      @RequestParam(name = "path") String path,
+      @RequestParam(name = "path") String rawPath,
       @RequestParam(name = "folderId") Long folderId
   ) throws FileStorageException {
-    LOGGER.debug("Getting data storage folder: {}: {}", folderId, path);
+    LOGGER.debug("Getting data storage folder: {}: {}", folderId, rawPath);
     StorageDriveFolder folder = storageDriveFolderService.findById(folderId)
         .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
     StudyStorageService storageService = studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
         .orElseThrow(() -> new FileStorageException("File storage service not found"));
-    if (path == null) path = folder.getPath();
+    String path = rawPath != null ? rawPath : folder.getPath();
     try {
       return storageService.findFolderByPath(folder, path);
     } catch (Exception e) {

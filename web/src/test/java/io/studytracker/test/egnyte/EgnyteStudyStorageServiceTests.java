@@ -88,21 +88,18 @@ public class EgnyteStudyStorageServiceTests {
   @Autowired private EgnyteDriveRepository egnyteDriveRepository;
   @Autowired private StorageDriveFolderService storageDriveFolderService;
 
-  private Organization organization;
-  private EgnyteIntegration integration;
-  private EgnyteDrive drive;
-
-
   @Before
   public void doBefore() throws Exception {
     exampleDataGenerator.populateDatabase();
-    organization = organizationService.getCurrentOrganization();
-    integration = egnyteIntegrationService.findByOrganization(organization).get(0);
-    drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
   }
 
   @Test
   public void folderPathNameTest() {
+
+    Organization organization = organizationService.getCurrentOrganization();
+    EgnyteIntegration integration = egnyteIntegrationService.findByOrganization(organization).get(0);
+    EgnyteDrive drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
+
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();

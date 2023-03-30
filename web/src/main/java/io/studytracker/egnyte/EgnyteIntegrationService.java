@@ -22,7 +22,6 @@ import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.repository.EgnyteDriveFolderRepository;
 import io.studytracker.repository.EgnyteDriveRepository;
 import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -41,15 +40,12 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   private final EgnyteIntegrationRepository egnyteIntegrationRepository;
   private final EgnyteDriveRepository egnyteDriveRepository;
   private final StorageDriveRepository storageDriveRepository;
-  private final EgnyteDriveFolderRepository egnyteDriveFolderRepository;
 
   public EgnyteIntegrationService(EgnyteIntegrationRepository egnyteIntegrationRepository,
-      EgnyteDriveRepository egnyteDriveRepository, StorageDriveRepository storageDriveRepository,
-      EgnyteDriveFolderRepository egnyteDriveFolderRepository) {
+      EgnyteDriveRepository egnyteDriveRepository, StorageDriveRepository storageDriveRepository) {
     this.egnyteIntegrationRepository = egnyteIntegrationRepository;
     this.egnyteDriveRepository = egnyteDriveRepository;
     this.storageDriveRepository = storageDriveRepository;
-    this.egnyteDriveFolderRepository = egnyteDriveFolderRepository;
   }
 
 

@@ -39,7 +39,7 @@ const EgnyteIntegrationDetailsCard = ({settings}) => {
             <Col md={6}>
               <h6 className="details-label">Tenant URL</h6>
               <p>
-                <a href={settings.rootUrl} target="_blank">
+                <a href={settings.rootUrl} target="_blank" rel="noopener noreferrer">
                   {settings.rootUrl}
                 </a>
               </p>

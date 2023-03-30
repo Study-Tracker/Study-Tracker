@@ -153,21 +153,19 @@ public class AwsIntegrationInitializer {
     if (s3Properties != null && StringUtils.hasText(s3Properties.getBuckets())) {
       buckets = new ArrayList<>();
       for (String bucketName: s3Properties.getBuckets().split(",")) {
-        if (StringUtils.hasText(bucketName)) {
-          if (!awsIntegrationService.bucketIsRegistered(awsIntegration, bucketName)) {
-            LOGGER.info("Registering S3 bucket: " + bucketName);
-            StorageDrive storageDrive = new StorageDrive();
-            storageDrive.setOrganization(organization);
-            storageDrive.setActive(true);
-            storageDrive.setDisplayName("S3: " + bucketName);
-            storageDrive.setDriveType(DriveType.S3);
-            storageDrive.setRootPath("");
-            S3Bucket bucket = new S3Bucket();
-            bucket.setName(bucketName);
-            bucket.setAwsIntegration(awsIntegration);
-            bucket.setStorageDrive(storageDrive);
-            buckets.add(awsIntegrationService.registerBucket(bucket));
-          }
+        if (StringUtils.hasText(bucketName) && !awsIntegrationService.bucketIsRegistered(awsIntegration, bucketName)) {
+          LOGGER.info("Registering S3 bucket: " + bucketName);
+          StorageDrive storageDrive = new StorageDrive();
+          storageDrive.setOrganization(organization);
+          storageDrive.setActive(true);
+          storageDrive.setDisplayName("S3: " + bucketName);
+          storageDrive.setDriveType(DriveType.S3);
+          storageDrive.setRootPath("");
+          S3Bucket bucket = new S3Bucket();
+          bucket.setName(bucketName);
+          bucket.setAwsIntegration(awsIntegration);
+          bucket.setStorageDrive(storageDrive);
+          buckets.add(awsIntegrationService.registerBucket(bucket));
         }
       }
     }

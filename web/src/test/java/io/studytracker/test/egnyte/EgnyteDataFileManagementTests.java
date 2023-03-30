@@ -28,7 +28,6 @@ import io.studytracker.repository.EgnyteDriveRepository;
 import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
-import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,8 +57,6 @@ public class EgnyteDataFileManagementTests {
     EgnyteRestApiClient client = EgnyteClientFactory.createRestApiClient(integration);
     EgnyteDrive drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
     String rootPath = drive.getStorageDrive().getRootPath();
-    String token = integration.getApiToken();
-    URL url = new URL(integration.getRootUrl());
     EgnyteObject egnyteObject = client.findObjectByPath(rootPath);
     Assert.assertNotNull(egnyteObject);
     Assert.assertTrue(egnyteObject.isFolder());

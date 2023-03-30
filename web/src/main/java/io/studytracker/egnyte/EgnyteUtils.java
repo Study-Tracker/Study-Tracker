@@ -89,12 +89,13 @@ public class EgnyteUtils {
    * @return the URL
    */
   private static String buildFileUrl(String rootUrl, EgnyteFile egnyteFile) {
-    String url = rootUrl.toString();
-    if (url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
+    String url;
+    if (rootUrl.endsWith("/")) {
+      url = rootUrl.substring(0, rootUrl.length() - 1);
+    } else {
+      url = rootUrl;
     }
-    url = url + "/navigate/file/" + egnyteFile.getGroupId();
-    return url;
+    return url + "/navigate/file/" + egnyteFile.getGroupId();
   }
 
   private static String buildFolderUrl(String rootUrl, String folderId) {

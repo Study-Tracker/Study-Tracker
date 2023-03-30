@@ -23,7 +23,6 @@ import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
-import java.net.URL;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,7 +100,6 @@ public class EgnyteRestClientFolderBrowsingTests {
 
   @Test
   public void subfolderNavigationTest() throws Exception {
-    URL url = new URL(rootUrl);
     EgnyteObject egnyteObject = client.findObjectByPath(EGNYTE_ROOT);
     Assert.assertTrue(egnyteObject.isFolder());
     EgnyteFolder folder = (EgnyteFolder) egnyteObject;

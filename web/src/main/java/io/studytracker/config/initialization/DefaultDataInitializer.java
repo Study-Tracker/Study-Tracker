@@ -46,9 +46,11 @@ public class DefaultDataInitializer implements ApplicationRunner {
 
     LOGGER.info("Initializing admin user...");
     User admin = adminUserInitializer.initializeAdminUser();
+    LOGGER.info("Admin user initialized: {}", admin.getEmail());
 
     LOGGER.info("Initializing default organization...");
     Organization organization = defaultOrganizationInitializer.initializeDefaultOrganization();
+    LOGGER.info("Default organization initialized: {}", organization.getName());
 
     LOGGER.info("Default data initialized.");
 
