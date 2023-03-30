@@ -37,6 +37,7 @@ import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
 import StorageFolderSettings
   from "./storageFolderSettings/StorageFolderSettings";
 import AWSIntegrationSettings from "./AWSSettings/AWSIntegrationSettings";
+import MSAzureSettings from "./MSSettings/MSAzureSettings";
 
 const settings = {
   "users": {
@@ -76,6 +77,12 @@ const settings = {
     category: "integrations",
     label: "Amazon Web Services",
     tag: AWSIntegrationSettings
+  },
+  "azure": {
+    id: "azure",
+    category: "integrations",
+    label: "Microsoft Azure",
+    tag: MSAzureSettings
   },
   "benchling": {
     id: "benchling",

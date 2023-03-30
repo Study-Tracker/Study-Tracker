@@ -166,6 +166,8 @@ public class OneDriveStudyStorageServiceTests {
     userRepository.save(user);
 
     MSGraphIntegration integration = new MSGraphIntegration();
+    integration.setName("Azure");
+    integration.setDomain("myorg.onmicrosoft.com");
     integration.setClientId(clientId);
     integration.setOrganization(organization);
     integration.setClientSecret(secret);

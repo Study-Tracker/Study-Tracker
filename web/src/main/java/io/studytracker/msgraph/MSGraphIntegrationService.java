@@ -161,6 +161,11 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     return sites;
   }
 
+  public Optional<SharePointSite> findSharePointSiteById(Long id) {
+    LOGGER.debug("Finding SharePoint site by id: {}", id);
+    return sharePointSiteRepository.findById(id);
+  }
+
   public SharePointSite registerSharePointSite(SharePointSite site) {
     LOGGER.info("Registering SharePoint site: {}", site.getSiteId());
     Organization organization = organizationService.getCurrentOrganization();

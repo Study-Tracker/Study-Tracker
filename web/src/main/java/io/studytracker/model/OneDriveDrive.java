@@ -17,6 +17,7 @@
 package io.studytracker.model;
 
 import io.studytracker.model.StorageDrive.DriveType;
+import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +30,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -56,6 +61,16 @@ public class OneDriveDrive implements StorageDriveDetails {
 
   @Column(name = "web_url", nullable = false, updatable = false)
   private String webUrl;
+
+  @CreatedDate
+  @Column(name = "created_at", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createdAt;
+
+  @LastModifiedDate
+  @Column(name = "updated_at")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date updatedAt;
 
   @Override
   public Long getId() {
@@ -110,5 +125,21 @@ public class OneDriveDrive implements StorageDriveDetails {
   @Override
   public DriveType getDriveType() {
     return DriveType.ONEDRIVE;
+  }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Date getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Date updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }

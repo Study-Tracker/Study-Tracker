@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -27,6 +28,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -42,6 +47,12 @@ public class MSGraphIntegration {
   @JoinColumn(name = "organization_id", nullable = false)
   private Organization organization;
 
+  @Column(name = "name", nullable = false)
+  private String name;
+
+  @Column(name = "domain")
+  private String domain;
+
   @Column(name = "tenant_id", nullable = false)
   private String tenantId;
 
@@ -55,6 +66,16 @@ public class MSGraphIntegration {
 
   @Column(name = "active", nullable = false)
   private boolean active;
+
+  @CreatedDate
+  @Column(name = "created_at", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createdAt;
+
+  @LastModifiedDate
+  @Column(name = "updated_at")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date updatedAt;
 
   public Long getId() {
     return id;
@@ -70,6 +91,22 @@ public class MSGraphIntegration {
 
   public void setOrganization(Organization organization) {
     this.organization = organization;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDomain() {
+    return domain;
+  }
+
+  public void setDomain(String domain) {
+    this.domain = domain;
   }
 
   public String getTenantId() {
@@ -102,5 +139,21 @@ public class MSGraphIntegration {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Date getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Date updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }

@@ -91,6 +91,8 @@ public class MSGraphIntegrationServiceTests {
     Assert.assertNotNull(organization);
 
     MSGraphIntegration integration = new MSGraphIntegration();
+    integration.setName("Azure");
+    integration.setDomain("myorg.onmicrosoft.com");
     integration.setActive(true);
     integration.setOrganization(organization);
     integration.setTenantId(tenantId);
@@ -123,6 +125,8 @@ public class MSGraphIntegrationServiceTests {
     Assert.assertNotNull(organization);
 
     MSGraphIntegration integration = new MSGraphIntegration();
+    integration.setName("Azure");
+    integration.setDomain("myorg.onmicrosoft.com");
     integration.setActive(true);
     integration.setOrganization(organization);
 //    integration.setTenantId(tenantId);
