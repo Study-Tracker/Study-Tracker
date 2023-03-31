@@ -17,8 +17,6 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.config.ConfigOrder;
-import io.studytracker.model.Organization;
-import io.studytracker.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +43,10 @@ public class DefaultDataInitializer implements ApplicationRunner {
     assayTypeInitializer.initializeAssayTypes();
 
     LOGGER.info("Initializing admin user...");
-    User admin = adminUserInitializer.initializeAdminUser();
-    LOGGER.info("Admin user initialized: {}", admin.getEmail());
+    adminUserInitializer.initializeAdminUser();
 
     LOGGER.info("Initializing default organization...");
-    Organization organization = defaultOrganizationInitializer.initializeDefaultOrganization();
-    LOGGER.info("Default organization initialized: {}", organization.getName());
+    defaultOrganizationInitializer.initializeDefaultOrganization();
 
     LOGGER.info("Default data initialized.");
 

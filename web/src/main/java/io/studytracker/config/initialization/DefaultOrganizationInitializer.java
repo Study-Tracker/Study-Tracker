@@ -33,6 +33,7 @@ public class DefaultOrganizationInitializer {
 
   public Organization initializeDefaultOrganization() {
     if (organizationRepository.count() > 0) {
+      LOGGER.info("Organizations already defined. Skipping default organization initialization.");
       return null;
     }
     LOGGER.info("No organizations defined. Initializing default organization...");

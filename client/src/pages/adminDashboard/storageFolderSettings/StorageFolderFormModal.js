@@ -54,7 +54,7 @@ const StorageFolderFormModal = ({
     storageDriveId: yup.number()
       .required("Storage drive is required"),
     path: yup.string()
-      .required("Folder path is required"),
+      .max(1024, "Folder path must be less than 1024 characters"),
     name: yup.string()
       .required("Folder path is required")
       .max(255, "Folder name must be less than 255 characters"),

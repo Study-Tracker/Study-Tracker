@@ -206,7 +206,7 @@ const MSAzureSettings = () => {
 
               <>
 
-                <Row className={"mt-2"}>
+                <Row className={"mb-3"}>
                   <Col className={"d-flex justify-content-between"}>
                     <div>
                       <h4>SharePoint Sites</h4>
@@ -258,7 +258,7 @@ const MSAzureSettings = () => {
           settings && settings.active && (
                 <>
 
-                  <Row className={"mt-2"}>
+                  <Row className={"mb-3"}>
                     <Col className={"d-flex justify-content-between"}>
                       <div>
                         <h4>OneDrive Drives</h4>

@@ -48,6 +48,7 @@ public class AdminUserInitializer {
 
   public User initializeAdminUser() {
     if (userService.count() > 0) {
+      LOGGER.info("Admin user not created, as users already exist in the database.");
       return null;
     }
     LOGGER.info("No users present in the Study Tracker database. Initializing admin user...");

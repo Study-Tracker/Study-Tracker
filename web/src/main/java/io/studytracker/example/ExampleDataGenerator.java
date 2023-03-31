@@ -840,7 +840,7 @@ public class ExampleDataGenerator {
       List<User> users = generateExampleUsers();
 
       // Programs
-      List<Program> programs = programRepository.saveAll(generateExamplePrograms(organization, users));
+      programRepository.saveAll(generateExamplePrograms(organization, users));
 
       // Assay types
       generateExampleAssayTypes();
@@ -850,7 +850,7 @@ public class ExampleDataGenerator {
       generateExampleKeywords(categories);
 
       // Collaborators
-      List<Collaborator> collaborators = generateExampleCollaborators();
+      generateExampleCollaborators();
 
       // Studies
       generateExampleStudies();
