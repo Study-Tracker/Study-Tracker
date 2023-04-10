@@ -22,7 +22,7 @@ const KeywordBadges = ({keywords}) => {
 
   const badges = keywords.map((keyword, i) => {
     return (
-        <Badge key={i} bg={"info"} className={"me-2 keyword-badge"}>
+        <Badge key={i} bg={"info"} className={"me-2 mb-2 keyword-badge"}>
           {keyword.category.name}: {keyword.keyword}
         </Badge>
     )

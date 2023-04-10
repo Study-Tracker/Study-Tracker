@@ -93,6 +93,8 @@ const PrimaryStorageFolderWidget = ({record}) => {
       .finally(() => {
         setIsLoading(false);
       });
+    } else {
+      setIsLoading(false);
     }
   }, [record]);
 
@@ -115,7 +117,7 @@ const PrimaryStorageFolderWidget = ({record}) => {
                     disabled={isSubmitting || isRepaird}
                 >
                   <FontAwesomeIcon icon={faRefresh} className={"me-2"} />
-                  {isSubmitting ? "Repairing folder..." : "Repair folder"}
+                  {isSubmitting ? "Creating folder..." : "Create folder"}
                 </Button>
             )}
         />

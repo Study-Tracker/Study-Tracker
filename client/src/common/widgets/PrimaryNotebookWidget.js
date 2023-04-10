@@ -81,7 +81,7 @@ const PrimaryNotebookWidget = ({record}) => {
     return (
         <IllustrationWidget
             image={"/static/images/clip/information-flow-yellow.png"}
-            header={"No primary storage notebook found"}
+            header={"No ELN folder found"}
             color={"warning"}
             body={(
                 <Button
@@ -90,49 +90,13 @@ const PrimaryNotebookWidget = ({record}) => {
                     disabled={isSubmitting || isRepaird}
                 >
                   <FontAwesomeIcon icon={faRefresh} className={"me-2"} />
-                  {isSubmitting ? "Repairing notebook..." : "Repair notebook"}
+                  {isSubmitting ? "Creating notebook..." : "Create notebook"}
                 </Button>
             )}
         />
     );
   } else {
     return (
-        // <IllustrationWidget
-        //     image={"/static/images/clip/lab-analyst.png"}
-        //     header={"Electronic Laboratory Notebook"}
-        //     body={(
-        //         <>
-        //
-        //           <Button
-        //               variant={"primary"}
-        //               onClick={() => {
-        //                 navigate("#notebook");
-        //                 // navigate(0);
-        //               }}
-        //               className={"mb-2"}
-        //           >
-        //             Browse contents
-        //           </Button>
-        //
-        //           {
-        //             notebook && !!notebook.url ? (
-        //                 <>
-        //                   <br />
-        //                   <Button
-        //                       variant={"info"}
-        //                       href={notebook.url}
-        //                       target={"_blank"}
-        //                   >
-        //                     View on web
-        //                   </Button>
-        //                 </>
-        //             ) : ""
-        //           }
-        //
-        //         </>
-        //     )}
-        //     color={"primary"}
-        // />
         <IconWidget
             icon={faBook}
             header={"Electronic Laboratory Notebook"}
