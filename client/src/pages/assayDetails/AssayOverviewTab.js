@@ -21,10 +21,11 @@ import TeamMembers from "../../common/detailsPage/TeamMembers";
 import AssayQuickActionsWidget
   from "../../common/widgets/AssayQuickActionsWidget";
 import SummaryTimelineCard from "../../common/detailsPage/SummaryTimelineCard";
-import {RepairableStorageFolderButton} from "../../common/files";
-import {RepairableNotebookFolderButton} from "../../common/eln";
 import AssayFieldDataTable from "./AssayFieldDataTable";
 import AssayTasksWidget from "./AssayTasksWidget";
+import PrimaryStorageFolderWidget
+  from "../../common/widgets/PrimaryStorageFolderWidget";
+import PrimaryNotebookWidget from "../../common/widgets/PrimaryNotebookWidget";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -120,12 +121,22 @@ const AssayOverviewTab = ({
           }
 
           <Row>
+
+            <Col xs={12} sm={6} className="d-flex">
+              <PrimaryStorageFolderWidget record={assay} />
+            </Col>
+
+            <Col xs={12} sm={6} className="d-flex">
+              <PrimaryNotebookWidget record={assay} />
+            </Col>
+
             <Col xs={12} sm={6} className="d-flex">
               <AssayTasksWidget
                   tasks={assay.tasks}
                   handleClick={() => handleTabSelect("tasks")}
               />
             </Col>
+
           </Row>
 
         </Col>
@@ -135,39 +146,6 @@ const AssayOverviewTab = ({
           <AssayQuickActionsWidget assay={assay} />
 
           <SummaryTimelineCard assay={assay} />
-
-          {/*Workspaces Card*/}
-          <Card>
-            <Card.Body>
-              <Row>
-                <Col xs={12}>
-
-                  <Card.Title>Workspaces</Card.Title>
-
-                  <div className={"d-flex flex-column align-items-center"}>
-
-                    <RepairableStorageFolderButton
-                        folder={assay.primaryStorageFolder}
-                        repairUrl={"/api/internal/assay/" + assay.id + "/storage/repair"}
-                    />
-
-                    {
-                      features
-                      && features.notebook
-                      && features.notebook.isEnabled ? (
-                          <RepairableNotebookFolderButton
-                              folder={assay.notebookFolder}
-                              repairUrl={"/api/internal/assay/" + assay.id + "/notebook/repair"}
-                          />
-                      ) : ""
-                    }
-
-                  </div>
-
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
 
         </Col>
 

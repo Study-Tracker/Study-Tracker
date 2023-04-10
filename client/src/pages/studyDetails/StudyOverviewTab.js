@@ -21,12 +21,13 @@ import Collaborator from "./Collaborator";
 import ExternalLinks from "../../common/externalLinks";
 import StudyRelationships from "../../common/studyRelationships";
 import StudySummaryTimelineCard from "./StudySummaryTimelineCard";
-import {RepairableStorageFolderButton} from "../../common/files";
-import {RepairableNotebookFolderButton} from "../../common/eln";
 import React from "react";
 import PropTypes from "prop-types";
 import StudyQuickActionsWidget
   from "../../common/widgets/StudyQuickActionsWidget";
+import PrimaryStorageFolderWidget
+  from "../../common/widgets/PrimaryStorageFolderWidget";
+import PrimaryNotebookWidget from "../../common/widgets/PrimaryNotebookWidget";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -44,121 +45,145 @@ const StudyOverviewTab = ({
 
         <Col md={8}>
 
-          {/*Summary Card*/}
-          <Card className="details-card">
-            <Card.Body>
+          <Row>
 
-              <Row>
+            <Col xs={12}>
 
-                <Col xs={12}>
-                  <div className={"card-title h5"}>Summary</div>
-                </Col>
+              {/*Summary Card*/}
+              <Card className="details-card">
+                <Card.Body>
 
-                <Col md={12}>
-                  <div dangerouslySetInnerHTML={createMarkup(study.description)}/>
-                  <KeywordBadges keywords={study.keywords} />
-                </Col>
+                  <Row>
 
-              </Row>
+                    <Col xs={12}>
+                      <div className={"card-title h5"}>Summary</div>
+                    </Col>
 
-              <Row>
+                    <Col md={12}>
+                      <div dangerouslySetInnerHTML={createMarkup(study.description)}/>
+                      <KeywordBadges keywords={study.keywords} />
+                    </Col>
 
-                <Col sm={4}>
-                  <h6 className="details-label">Program</h6>
-                  <p>{study.program.name}</p>
-                </Col>
+                  </Row>
 
-                <Col sm={4}>
-                  <h6 className="details-label">Code</h6>
-                  <p>{study.code}</p>
-                </Col>
+                  <Row>
 
-                {
-                    study.externalCode && (
-                        <Col sm={4}>
-                          <h6 className="details-label">External Code</h6>
-                          <p>{study.externalCode}</p>
-                        </Col>
-                    )
-                }
+                    <Col sm={4}>
+                      <h6 className="details-label">Program</h6>
+                      <p>{study.program.name}</p>
+                    </Col>
 
-              </Row>
+                    <Col sm={4}>
+                      <h6 className="details-label">Code</h6>
+                      <p>{study.code}</p>
+                    </Col>
 
-              <Row>
+                    {
+                        study.externalCode && (
+                            <Col sm={4}>
+                              <h6 className="details-label">External Code</h6>
+                              <p>{study.externalCode}</p>
+                            </Col>
+                        )
+                    }
 
-                <Col sm={4}>
-                  <h6 className="details-label">Created</h6>
-                  <p>{new Date(study.createdAt).toLocaleString()}</p>
-                </Col>
+                  </Row>
 
-                <Col sm={4}>
-                  <h6 className="details-label">Start Date</h6>
-                  <p>{new Date(study.startDate).toLocaleString()}</p>
-                </Col>
+                  <Row>
 
-                {
-                  !!study.endDate
-                      ? (
-                          <Col sm={4}>
-                            <h6 className="details-label">End Date</h6>
-                            <p>{new Date(study.endDate).toLocaleString()}</p>
-                          </Col>
-                      ) : ""
-                }
+                    <Col sm={4}>
+                      <h6 className="details-label">Created</h6>
+                      <p>{new Date(study.createdAt).toLocaleString()}</p>
+                    </Col>
 
-                <Col md={12}>
-                  <h6 className="details-label">Study Team</h6>
-                  <TeamMembers owner={study.owner} users={study.users} />
-                </Col>
+                    <Col sm={4}>
+                      <h6 className="details-label">Start Date</h6>
+                      <p>{new Date(study.startDate).toLocaleString()}</p>
+                    </Col>
 
-              </Row>
+                    {
+                      !!study.endDate
+                          ? (
+                              <Col sm={4}>
+                                <h6 className="details-label">End Date</h6>
+                                <p>{new Date(study.endDate).toLocaleString()}</p>
+                              </Col>
+                          ) : ""
+                    }
 
-              {
-                  study.collaborator && (
-                      <Row>
-                        <Col xs={12}>
-                          <Collaborator
-                              collaborator={study.collaborator}
-                              externalCode={study.externalCode}
-                          />
-                        </Col>
-                      </Row>
-                  )
-              }
+                    <Col md={12}>
+                      <h6 className="details-label">Study Team</h6>
+                      <TeamMembers owner={study.owner} users={study.users} />
+                    </Col>
 
-            </Card.Body>
+                  </Row>
 
-          </Card> {/* End Summary Card */}
+                  {
+                      study.collaborator && (
+                          <Row>
+                            <Col xs={12}>
+                              <Collaborator
+                                  collaborator={study.collaborator}
+                                  externalCode={study.externalCode}
+                              />
+                            </Col>
+                          </Row>
+                      )
+                  }
 
-          {/*External links Card*/}
-          <Card>
-            <Card.Body>
-              <Row>
-                <Col xs={12}>
-                  <ExternalLinks
-                      links={study.externalLinks || []}
-                      studyCode={study.code}
-                      user={user}
-                  />
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card> {/* End External Links Card */}
+                </Card.Body>
 
-          {/*Study relationships card*/}
-          <Card>
-            <Card.Body>
-              <Row>
-                <Col xs={12}>
-                  <StudyRelationships
-                      relationships={study.studyRelationships}
-                      studyCode={study.code}
-                      user={user}
-                  />
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card> {/* End Study Relationships Card */}
+              </Card> {/* End Summary Card */}
+
+            </Col>
+
+            <Col sm={6} className={"d-flex"}>
+              <PrimaryStorageFolderWidget record={study} />
+            </Col>
+
+            <Col sm={6} className={"d-flex"}>
+              <PrimaryNotebookWidget record={study} />
+            </Col>
+
+            <Col xs={12}>
+
+              {/*External links Card*/}
+              <Card>
+                <Card.Body>
+                  <Row>
+                    <Col xs={12}>
+                      <ExternalLinks
+                          links={study.externalLinks || []}
+                          studyCode={study.code}
+                          user={user}
+                      />
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card> {/* End External Links Card */}
+
+            </Col>
+
+            <Col xs={12}>
+
+              {/*Study relationships card*/}
+              <Card>
+                <Card.Body>
+                  <Row>
+                    <Col xs={12}>
+                      <StudyRelationships
+                          relationships={study.studyRelationships}
+                          studyCode={study.code}
+                          user={user}
+                      />
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card> {/* End Study Relationships Card */}
+
+            </Col>
+
+          </Row>
 
         </Col>
 
@@ -170,39 +195,6 @@ const StudyOverviewTab = ({
           />
 
           <StudySummaryTimelineCard study={study} />
-
-          {/*Workspaces Card*/}
-          <Card>
-            <Card.Body>
-              <Row>
-                <Col xs={12}>
-
-                  <Card.Title>Workspaces</Card.Title>
-
-                  <div className={"d-flex flex-column align-items-center"}>
-
-                    <RepairableStorageFolderButton
-                        folder={study.primaryStorageFolder}
-                        repairUrl={"/api/internal/study/" + study.id + "/storage/repair"}
-                    />
-
-                    {
-                      features
-                      && features.notebook
-                      && features.notebook.isEnabled ? (
-                          <RepairableNotebookFolderButton
-                              folder={study.notebookFolder}
-                              repairUrl={"/api/internal/study/" + study.id + "/notebook/repair"}
-                          />
-                      ) : ""
-                    }
-
-                  </div>
-
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
 
         </Col>
 

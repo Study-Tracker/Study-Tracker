@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Card, Col, Row} from "react-bootstrap";
+import {Card, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import React from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-const IllustrationWidget = ({header, body, image, color}) => {
+const IconWidget = ({header, body, icon, color}) => {
 
   let colorClass = "illustration";
   if (color === "dark") colorClass = "illustration-dark";
@@ -30,24 +31,20 @@ const IllustrationWidget = ({header, body, image, color}) => {
         <Card.Body className="p-0 d-flex flex-fill">
           <Row className="g-0 w-100">
 
-            <Col xs={6}>
-              <div className="illustration-text p-3 m-1">
-                <h4 className="illustration-text">
+            <div className={"col ps-3 pt-3 pb-3 pe-1 m-1"}>
+              <div className="illustration-text flex-column">
+                <h4 className="illustration-text mb-2">
                   {header}
                 </h4>
                 <p className="mb-0">
                   {body}
                 </p>
               </div>
-            </Col>
+            </div>
 
-            <Col xs={6} className="align-self-end text-end">
-              <img
-                  src={image}
-                  className="img-fluid illustration-img"
-                  alt={header}
-              />
-            </Col>
+            <div className={"col-auto d-flex align-items-center illustration-text-light ps-1 pt-3 pb-3 pe-3 m-1"}>
+              <FontAwesomeIcon icon={icon} size={"6x"} />
+            </div>
 
           </Row>
         </Card.Body>
@@ -55,11 +52,11 @@ const IllustrationWidget = ({header, body, image, color}) => {
   )
 }
 
-IllustrationWidget.propTypes = {
+IconWidget.propTypes = {
   header: PropTypes.string.isRequired,
   body: PropTypes.any,
-  image: PropTypes.string.isRequired,
+  icon: PropTypes.any.isRequired,
   color: PropTypes.string
 }
 
-export default IllustrationWidget;
+export default IconWidget;

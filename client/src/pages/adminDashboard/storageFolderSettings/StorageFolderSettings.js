@@ -26,6 +26,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import StorageFolderCard from "../../../common/fileManager/StorageFolderCard";
 import StorageFoldersPlaceholder from "./StorageFoldersPlaceholder";
 import {faFilter} from "@fortawesome/free-solid-svg-icons";
+import swal from "sweetalert";
 
 const StorageFolderSettings = () => {
 
@@ -37,7 +38,14 @@ const StorageFolderSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
+  const [filter, setFilter] = useState("SHOW_ALL");
   const formikRef = useRef();
+
+  const filterLabels = {
+    SHOW_ALL: "Show All",
+    STUDY_ROOT: "Study Root Only",
+    BROWSER_ROOT: "Browser Root Only"
+  }
 
   useEffect(() => {
     setIsLoading(true);
@@ -95,8 +103,33 @@ const StorageFolderSettings = () => {
     setShowModal(true);
   }
 
+  const handleFolderDelete = (folder) => {
+    swal({
+      title: "Are you sure you want to delete this folder?",
+      text: "Removing root folders will not delete the folder in the file system or "
+          + "affect any subfolders created from this folder. You can re-register this "
+          + "folder at any time to continue using the existing folder in the file system.",
+      icon: "warning",
+      buttons: true
+    })
+    .then(val => {
+      if (val) {
+        axios.delete("/api/internal/storage-drive-folders/" + folder.id)
+        .then(response => {
+          setLoadCounter(loadCounter + 1);
+          notyf.open({message: 'Storage folder deleted.', type: 'success'})
+        })
+        .catch(error => {
+          console.error(error);
+          notyf.open({message: 'Failed to delete storage folder.', type: 'error'});
+        })
+      }
+    });
+  }
+
   const handleFilterChange = (filter) => {
     console.debug("Filter change: ", filter);
+    setFilter(filter);
   }
 
   return (
@@ -115,20 +148,20 @@ const StorageFolderSettings = () => {
                 <Dropdown className="me-2 mb-1">
                   <Dropdown.Toggle variant={"outline-info"}>
                     <FontAwesomeIcon icon={faFilter} className={"me-2"}/>
-                    Filter
+                    {filterLabels[filter]}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
 
                     <Dropdown.Item onClick={() => handleFilterChange("SHOW_ALL")}>
-                      Show All
+                      {filterLabels["SHOW_ALL"]}
                     </Dropdown.Item>
 
                     <Dropdown.Item onClick={() => handleFilterChange("STUDY_ROOT")}>
-                      Study Root Only
+                      {filterLabels["STUDY_ROOT"]}
                     </Dropdown.Item>
 
                     <Dropdown.Item onClick={() => handleFilterChange("BROWSER_ROOT")}>
-                      Browser Root Only
+                      {filterLabels["BROWSER_ROOT"]}
                     </Dropdown.Item>
 
                   </Dropdown.Menu>
@@ -181,12 +214,23 @@ const StorageFolderSettings = () => {
 
         {
             folders && folders.length > 0 && (
-                folders.map((folder, index) => (
-                    <Row>
+                folders
+                .filter(folder => {
+                  if (filter === "SHOW_ALL") {
+                    return true;
+                  } else if (filter === "STUDY_ROOT") {
+                    return folder.studyRoot;
+                  } else {
+                    return folder.browserRoot;
+                  }
+                })
+                .map((folder, index) => (
+                    <Row key={"storage-folder-card-" + index}>
                       <Col>
                         <StorageFolderCard
                             folder={folder}
                             handleFolderEdit={handleFolderEdit}
+                            handleFolderDelete={handleFolderDelete}
                         />
                       </Col>
                     </Row>

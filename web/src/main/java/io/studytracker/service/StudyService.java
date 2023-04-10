@@ -45,6 +45,7 @@ import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageException;
@@ -320,15 +321,8 @@ public class StudyService {
     }
 
     // Git repository
-    GitRepository gitRepository = null;
     if (gitService != null && options.isUseGit()) {
-      LOGGER.debug("Creating Git repository for study: " + study.getName());
-      try {
-        gitRepository = gitService.createStudyRepository(study);
-      } catch (Exception e) {
-        e.printStackTrace();
-        LOGGER.warn("Failed to create Git repository for study: " + study.getCode());
-      }
+      addGitRepository(study);
     }
 
     // Additional folders
@@ -343,86 +337,96 @@ public class StudyService {
 
     // S3
     if (options.isUseS3() && options.getS3FolderId() != null) {
-      LOGGER.debug("Creating S3 folder for study: " + study.getCode());
-      try {
-
-        // Get the requested root folder & drive
-        StorageDriveFolder s3RootFolder = storageDriveFolderService.findById(options.getS3FolderId())
-            .orElseThrow(() -> new StudyStorageException("Invalid S3 folder ID: "
-                + options.getS3FolderId()));
-        if (!s3RootFolder.isStudyRoot()) {
-          throw new StudyStorageException("S3 folder is not a study root folder: "
-              + s3RootFolder.getName());
-        }
-        StorageDrive s3Drive = storageDriveFolderService.findDriveByFolder(s3RootFolder)
-            .orElseThrow(() -> new StudyStorageException("Invalid S3 folder ID: "
-                + options.getS3FolderId()));
-
-        // Get the storage service
-        S3StudyStorageService s3Service = (S3StudyStorageService) storageDriveFolderService
-            .lookupStudyStorageService(s3RootFolder);
-
-        // Make sure the program folder exists. If not, create it.
-        StorageDriveFolder programs3Folder;
-        Optional<StorageDriveFolder> optional = storageDriveFolderService.findByProgram(program).stream()
-            .filter(f -> f.getStorageDrive().getId().equals(s3Drive.getId()))
-            .findFirst();
-        if (optional.isPresent()) {
-          programs3Folder = optional.get();
-        } else {
-          String programFolderPath = S3Utils.joinS3Path(s3RootFolder.getPath(), S3Utils.generateProgramFolderName(program));
-          StorageDriveFolder programFolder = new StorageDriveFolder();
-          programFolder.setPath(programFolderPath);
-          programFolder.setName("Program " + program.getName() + " S3 Folder");
-          programFolder.setStorageDrive(s3Drive);
-          programFolder.setWriteEnabled(true);
-          programs3Folder = storageDriveFolderService.registerFolder(programFolder, s3Drive);
-          program.addStorageFolder(programs3Folder);
-          programRepository.save(program);
-        }
-
-        // Create the study S3 folder
-        StorageDriveFolder studyS3Folder = s3Service.createStudyFolder(programs3Folder, study);
-        study.addStorageFolder(studyS3Folder);
-        studyRepository.save(study);
-      } catch (StudyStorageException e) {
-        e.printStackTrace();
-        LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
-      }
+      addS3BucketFolder(study, program, options);
     }
 
     // Add a links to extra resources
     if (studySummaryEntry != null) {
-      try {
-        ExternalLink entryLink = new ExternalLink();
-        entryLink.setStudy(study);
-        entryLink.setLabel("Summary ELN Entry");
-        entryLink.setUrl(new URL(studySummaryEntry.getUrl()));
-        study.addExternalLink(entryLink);
-        studyRepository.save(study);
-      } catch (Exception e) {
-        e.printStackTrace();
-        LOGGER.warn("Failed to create link to ELN entry.");
-      }
-    }
-
-    if (gitRepository != null) {
-      try {
-        ExternalLink entryLink = new ExternalLink();
-        entryLink.setStudy(study);
-        entryLink.setLabel("Git Repository");
-        entryLink.setUrl(new URL(gitRepository.getWebUrl()));
-        study.addExternalLink(entryLink);
-        studyRepository.save(study);
-      } catch (Exception e) {
-        e.printStackTrace();
-        LOGGER.warn("Failed to create link to Git repository.");
-      }
+      addSummaryNotebookEntryLink(study, studySummaryEntry);
     }
 
     return studyRepository.findById(study.getId())
         .orElseThrow(() -> new RecordNotFoundException("Failed to create study: " + study.getCode()));
 
+  }
+
+  private void addS3BucketFolder(Study study, Program program, StudyOptions options) {
+    LOGGER.debug("Creating S3 folder for study: " + study.getCode());
+    try {
+
+      // Get the requested root folder & drive
+      StorageDriveFolder s3RootFolder = storageDriveFolderService.findById(options.getS3FolderId())
+          .orElseThrow(() -> new StudyStorageException("Invalid S3 folder ID: "
+              + options.getS3FolderId()));
+      if (!s3RootFolder.isStudyRoot()) {
+        throw new StudyStorageException("S3 folder is not a study root folder: "
+            + s3RootFolder.getName());
+      }
+      StorageDrive s3Drive = storageDriveFolderService.findDriveByFolder(s3RootFolder)
+          .orElseThrow(() -> new StudyStorageException("Invalid S3 folder ID: "
+              + options.getS3FolderId()));
+
+      // Get the storage service
+      S3StudyStorageService s3Service = (S3StudyStorageService) storageDriveFolderService
+          .lookupStudyStorageService(s3RootFolder);
+
+      // Make sure the program folder exists. If not, create it.
+      StorageDriveFolder programs3Folder;
+      Optional<StorageDriveFolder> optional = storageDriveFolderService.findByProgram(program).stream()
+          .filter(f -> f.getStorageDrive().getId().equals(s3Drive.getId()))
+          .findFirst();
+      if (optional.isPresent()) {
+        programs3Folder = optional.get();
+      } else {
+        String programFolderPath = S3Utils.joinS3Path(s3RootFolder.getPath(), S3Utils.generateProgramFolderName(program));
+        StorageDriveFolder programFolder = new StorageDriveFolder();
+        programFolder.setPath(programFolderPath);
+        programFolder.setName("Program " + program.getName() + " S3 Folder");
+        programFolder.setStorageDrive(s3Drive);
+        programFolder.setWriteEnabled(true);
+        programs3Folder = storageDriveFolderService.registerFolder(programFolder, s3Drive);
+        program.addStorageFolder(programs3Folder);
+        programRepository.save(program);
+      }
+
+      // Create the study S3 folder
+      StorageDriveFolder studyS3Folder = s3Service.createStudyFolder(programs3Folder, study);
+      study.addStorageFolder(studyS3Folder);
+      studyRepository.save(study);
+    } catch (StudyStorageException e) {
+      e.printStackTrace();
+      LOGGER.error("Failed to create S3 folder for study: " + study.getCode(), e);
+    }
+  }
+
+  private void addSummaryNotebookEntryLink(Study study, NotebookEntry entry) {
+    try {
+      ExternalLink entryLink = new ExternalLink();
+      entryLink.setStudy(study);
+      entryLink.setLabel("Summary ELN Entry");
+      entryLink.setUrl(new URL(entry.getUrl()));
+      study.addExternalLink(entryLink);
+      studyRepository.save(study);
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.warn("Failed to create link to ELN entry.");
+    }
+  }
+
+  private void addGitRepository(Study study) {
+    LOGGER.debug("Creating Git repository for study: " + study.getName());
+    try {
+      GitRepository repository = gitService.createStudyRepository(study);
+      ExternalLink entryLink = new ExternalLink();
+      entryLink.setStudy(study);
+      entryLink.setLabel("Git Repository");
+      entryLink.setUrl(new URL(repository.getWebUrl()));
+      study.addExternalLink(entryLink);
+      studyRepository.save(study);
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.warn("Failed to create Git repository for study: " + study.getCode());
+    }
   }
 
   /**
@@ -564,61 +568,61 @@ public class StudyService {
   @Transactional
   public void repairStorageFolder(Study study) {
 
-    // TODO
-    // Get the location and storage service
-//    FileStorageLocation location;
-//    StudyStorageService studyStorageService;
-//    try {
-//      location = storageLocationService.findDefaultStudyLocation();
-//      studyStorageService = storageLocationService.lookupStudyStorageService(location);
-//    } catch (FileStorageException e) {
-//      e.printStackTrace();
-//      throw new StudyTrackerException("Could not find default storage location or service", e);
-//    }
-//
-//    // Find or create the storage folder
-//    StorageFolder folder;
-//    try {
-//      folder = studyStorageService.findFolder(location, study);
-//    } catch (StudyStorageNotFoundException e) {
-//      LOGGER.warn("Storage folder not found for study: " + study.getCode());
-//      e.printStackTrace();
-//      throw new StudyTrackerException(e);
-//    }
-//
-//    // Check if a folder record exists in the database
-//    List<FileStoreFolder> folders = fileStoreFolderRepository
-//        .findByPath(location.getId(), folder.getPath());
-//    FileStoreFolder fileStoreFolder = null;
-//    if (!folders.isEmpty()) {
-//      fileStoreFolder = folders.get(0);
-//    }
-//
-//    // Study has no folder record associated
-//    if (study.getPrimaryStorageFolder() == null) {
-//      if (fileStoreFolder == null) {
-//        LOGGER.info("Repairing study folder with no record.");
-//        fileStoreFolder = FileStoreFolder.from(location, folder);
-//      }
-//      study.setPrimaryStorageFolder(fileStoreFolder);
-//      if (study.getStorageFolders().stream().noneMatch(f -> (
-//          f.getFileStorageLocation().getId().equals(location.getId())
-//              && f.getPath().equals(folder.getPath())))) {
-//        study.getStorageFolders().add(fileStoreFolder);
-//      }
-//      studyRepository.save(study);
-//    }
-//
-//    // Study does have a folder record, but it is malformed
-//    else {
-//      LOGGER.info("Repairing malformed study folder record.");
-//      FileStoreFolder f = fileStoreFolderRepository.getById(study.getPrimaryStorageFolder().getId());
-//      f.setFileStorageLocation(location);
-//      f.setName(folder.getName());
-//      f.setPath(folder.getPath());
-//      f.setUrl(folder.getUrl());
-//      fileStoreFolderRepository.save(f);
-//    }
+    LOGGER.info("Attempting to repair primary storage folder for study: " + study.getCode());
+
+    StorageDrive drive;
+    StorageDriveFolder folder;
+    Optional<StorageDriveFolder> optional = storageDriveFolderService.findPrimaryStudyFolder(study);
+
+    // If the study already has a primary storage folder record...
+    if (optional.isPresent()) {
+      folder = optional.get();
+      drive = storageDriveFolderService.findDriveById(folder.getStorageDrive().getId())
+          .orElseThrow(() -> new RecordNotFoundException("Could not find storage drive with ID: "
+              + folder.getStorageDrive().getId()));
+      StudyStorageService storageService = storageDriveFolderService
+          .lookupStudyStorageService(folder.getStorageDrive().getDriveType());
+
+      // If the folder exists, do nothing
+      if (storageService.folderExists(drive, folder.getPath())) {
+        LOGGER.warn("Primary storage folder for study: " + study.getCode()
+            + " already exists and is valid. No action taken.");
+        return;
+      }
+
+      // If no, create the folder for the existing registered path
+      else {
+        String folderPath = StorageUtils.getParentPathFromPath(folder.getPath());
+        try {
+          StorageFolder storageFolder = storageService.createFolder(drive, folderPath, folder.getName());
+          LOGGER.info("Created primary storage folder for study: " + study.getCode()
+              + " at path: " + storageFolder.getPath());
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new StudyTrackerException("Could not create storage folder for study: "
+              + study.getCode() + " at path: " + folderPath, e);
+        }
+      }
+
+    }
+
+    // If no primary folder record exists, create one
+    else {
+
+      Program program = programRepository.findById(study.getProgram().getId())
+          .orElseThrow(() -> new RecordNotFoundException("Could not find program with ID: "
+              + study.getProgram().getId()));
+      StorageDriveFolder parentFolder = storageDriveFolderService
+          .findPrimaryProgramFolder(program)
+          .orElseThrow(() -> new RecordNotFoundException("Could not find primary program folder : "
+              + study.getCode()));
+      StudyStorageFolder studyStorageFolder = this.createStudyStorageFolder(study, parentFolder);
+      studyStorageFolder.setPrimary(true);
+      study.addStudyStorageFolder(studyStorageFolder);
+      studyRepository.save(study);
+      LOGGER.info("Created primary storage folder for study: " + study.getCode()
+          + " at path: " + studyStorageFolder.getStorageDriveFolder().getPath());
+    }
 
   }
 

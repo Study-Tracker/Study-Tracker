@@ -22,14 +22,15 @@ import lombok.Data;
 public class StudyStorageDriveFolderSummaryDto {
 
   private Long id;
-  private Long studyStorageFolderId;
-  private Long storageDriveId;
-  private Long storageDriveFolderId;
-  private Long studyId;
-  private String name;
-  private String path;
+  private StorageDriveFolderDetailsDto storageDriveFolder;
+//  private Long studyStorageFolderId;
+//  private Long storageDriveId;
+//  private Long storageDriveFolderId;
+//  private Long studyId;
+//  private String name;
+//  private String path;
   private boolean primary;
-  private boolean writeEnabled;
-  private boolean deleteEnabled;
+//  private boolean writeEnabled;
+//  private boolean deleteEnabled;
 
 }

@@ -57,46 +57,6 @@ public class StudyStoragePrivateController extends AbstractStudyController {
     return storageDriveFolderMapper.toStudyFolderSummaryDto(studyStorageFolders);
   }
 
-//  @GetMapping("/{folderId}/contents")
-//  public StorageFolder getStudyStorageFolder(@PathVariable("studyId") String studyId,
-//      @PathVariable("folderId") Long folderId)
-//      throws Exception {
-//    LOGGER.info("Fetching storage folder for study: " + studyId);
-//    Study study = getStudyFromIdentifier(studyId);
-//
-//    FileStorageLocation location = storageLocationService.findByFileStoreFolderId(folderId);
-//    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-//    return studyStorageService.findFolder(location, study);
-//  }
-//
-//  @PostMapping("")
-//  public HttpEntity<StorageFile> uploadStudyFile(
-//      @PathVariable("studyId") String studyId,
-//      @RequestParam("file") MultipartFile file
-//  ) throws Exception {
-//    LOGGER.info("Uploaded file: " + file.getOriginalFilename());
-//    Study study = getStudyFromIdentifier(studyId);
-//    Path path;
-//    try {
-//      path = fileStorageService.store(file);
-//      LOGGER.info(path.toString());
-//    } catch (FileStorageException e) {
-//      e.printStackTrace();
-//      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-//    FileStorageLocation location = storageLocationService.findByFileStoreFolder(study.getPrimaryStorageFolder());
-//    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-//    StorageFile storageFile = studyStorageService.saveFile(location, path.toFile(), study);
-//
-//    // Publish events
-//    Activity activity =
-//        StudyActivityUtils.fromFileUpload(study, this.getAuthenticatedUser(), storageFile);
-//    getActivityService().create(activity);
-//    getEventsService().dispatchEvent(activity);
-//
-//    return new ResponseEntity<>(storageFile, HttpStatus.CREATED);
-//  }
-
   @PostMapping("/repair")
   public HttpEntity<?> repairStorageFolder(@PathVariable("studyId") String studyId) {
     LOGGER.info("Repairing storage folder for study: " + studyId);

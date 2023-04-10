@@ -30,8 +30,8 @@ const StudyFileManagerMenu = ({
   const renderMenu = () => {
     return folders
     .sort((a, b) => {
-      if (a.name > b.name) return -1;
-      else if (b.name > a.name) return 1;
+      if (a.storageDriveFolder.name > b.storageDriveFolder.name) return -1;
+      else if (b.storageDriveFolder.name > a.storageDriveFolder.name) return 1;
       else return 0;
     })
     .map(f => {
@@ -40,12 +40,12 @@ const StudyFileManagerMenu = ({
           <ListGroup.Item
               action
               key={f.id}
-              active={selectedFolder ? selectedFolder.id === f.id : false}
-              onClick={() => handleFolderSelect(f)}
+              active={selectedFolder ? selectedFolder.id === f.storageDriveFolder.id : false}
+              onClick={() => handleFolderSelect(f.storageDriveFolder)}
           >
-            {getDataSourceIcon(f.storageDrive.driveType)}
-            <span className="fw-bolder me-2">{f.storageDrive.driveType}:</span>
-            {f.name}
+            {getDataSourceIcon(f.storageDriveFolder.storageDrive.driveType)}
+            <span className="fw-bolder me-2">{f.storageDriveFolder.storageDrive.driveType}:</span>
+            {f.storageDriveFolder.name}
             {f.primary && <span className="badge bg-info ms-2">default</span>}
           </ListGroup.Item>
       )

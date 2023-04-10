@@ -16,6 +16,7 @@
 
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveFolderDetailsDto;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -102,6 +104,15 @@ public class StorageDriveFolderPrivateController {
     StorageDriveFolder folder = mapper.fromFormDto(dto);
     StorageDriveFolder saved = storageDriveFolderService.updateFolder(folder);
     return new ResponseEntity<>(mapper.toDetailsDto(saved), HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{id}")
+  public HttpEntity<?> deleteStorageFolder(@PathVariable("id") Long id) {
+    LOGGER.debug("Deleting storage drive folder with id: {}", id);
+    StorageDriveFolder folder = storageDriveFolderService.findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Storage drive folder not found"));
+    storageDriveFolderService.deleteFolder(folder);
+    return ResponseEntity.noContent().build();
   }
 
 }

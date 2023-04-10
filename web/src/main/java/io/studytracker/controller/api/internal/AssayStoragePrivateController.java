@@ -56,43 +56,6 @@ public class AssayStoragePrivateController extends AbstractAssayController {
     return mapper.toAssayFolderSummaryDto(assayStorageFolders);
   }
 
-//  @GetMapping("/{folderId}/contents")
-//  public StorageFolder getStorageFolderContents(@PathVariable("assayId") String assayId) throws Exception {
-//    LOGGER.info("Fetching storage folder for assay: " + assayId);
-//    Assay assay = getAssayFromIdentifier(assayId);
-//    FileStorageLocation location = storageLocationService.findByFileStoreFolder(assay.getPrimaryStorageFolder());
-//    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-//    return studyStorageService.findFolder(location, assay);
-//  }
-//
-//  @PostMapping("")
-//  public HttpEntity<StorageFile> uploadFile(
-//      @PathVariable("assayId") String assayId,
-//      @RequestParam("file") MultipartFile file
-//  ) throws Exception {
-//    LOGGER.info("Uploaded file: " + file.getOriginalFilename());
-//    Assay assay = getAssayFromIdentifier(assayId);
-//    Path path;
-//    try {
-//      path = fileStorageService.store(file);
-//      LOGGER.info(path.toString());
-//    } catch (FileStorageException e) {
-//      e.printStackTrace();
-//      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-//    FileStorageLocation location = storageLocationService.findByFileStoreFolder(assay.getPrimaryStorageFolder());
-//    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-//    StorageFile storageFile = studyStorageService.saveFile(location, path.toFile(), assay);
-//
-//    // Publish events
-//    Activity activity =
-//        AssayActivityUtils.fromFileUpload(assay, this.getAuthenticatedUser(), storageFile);
-//    getActivityService().create(activity);
-//    getEventsService().dispatchEvent(activity);
-//
-//    return new ResponseEntity<>(storageFile, HttpStatus.CREATED);
-//  }
-
   @PostMapping("/repair")
   public HttpEntity<?> repairStorageFolder(@PathVariable("assayId") String assayId) {
     LOGGER.info("Repairing storage folder for assay: " + assayId);

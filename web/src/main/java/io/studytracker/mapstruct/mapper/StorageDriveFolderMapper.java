@@ -56,15 +56,15 @@ public interface StorageDriveFolderMapper {
 
   // Program folder
 
-  @Mapping(target = "id", source = "storageDriveFolder.id")
-  @Mapping(target = "programStorageFolderId", source = "id")
-  @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
-  @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
-  @Mapping(target = "programId", source = "program.id")
-  @Mapping(target = "name", source = "storageDriveFolder.name")
-  @Mapping(target = "path", source = "storageDriveFolder.path")
-  @Mapping(target = "writeEnabled", source = "storageDriveFolder.writeEnabled")
-  @Mapping(target = "deleteEnabled", source = "storageDriveFolder.name")
+//  @Mapping(target = "id", source = "storageDriveFolder.id")
+//  @Mapping(target = "programStorageFolderId", source = "id")
+//  @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
+//  @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
+//  @Mapping(target = "programId", source = "program.id")
+//  @Mapping(target = "name", source = "storageDriveFolder.name")
+//  @Mapping(target = "path", source = "storageDriveFolder.path")
+//  @Mapping(target = "writeEnabled", source = "storageDriveFolder.writeEnabled")
+//  @Mapping(target = "deleteEnabled", source = "storageDriveFolder.name")
   ProgramStorageDriveFolderSummaryDto toProgramFolderSummaryDto(ProgramStorageFolder folder);
   List<ProgramStorageDriveFolderSummaryDto> toProgramFolderSummaryDto(List<ProgramStorageFolder> folders);
   Set<ProgramStorageDriveFolderSummaryDto> toProgramFolderSummaryDto(Set<ProgramStorageFolder> folders);
@@ -82,15 +82,15 @@ public interface StorageDriveFolderMapper {
 
   // Study folder
 
-  @Mapping(target = "id", source = "storageDriveFolder.id")
-  @Mapping(target = "studyStorageFolderId", source = "id")
-  @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
-  @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
-  @Mapping(target = "studyId", source = "study.id")
-  @Mapping(target = "name", source = "storageDriveFolder.name")
-  @Mapping(target = "path", source = "storageDriveFolder.path")
-  @Mapping(target = "writeEnabled", source = "storageDriveFolder.writeEnabled")
-  @Mapping(target = "deleteEnabled", source = "storageDriveFolder.name")
+//  @Mapping(target = "id", source = "storageDriveFolder.id")
+//  @Mapping(target = "studyStorageFolderId", source = "id")
+//  @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
+//  @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
+//  @Mapping(target = "studyId", source = "study.id")
+//  @Mapping(target = "name", source = "storageDriveFolder.name")
+//  @Mapping(target = "path", source = "storageDriveFolder.path")
+//  @Mapping(target = "writeEnabled", source = "storageDriveFolder.writeEnabled")
+//  @Mapping(target = "deleteEnabled", source = "storageDriveFolder.name")
   StudyStorageDriveFolderSummaryDto toStudyFolderSummaryDto(StudyStorageFolder folder);
   List<StudyStorageDriveFolderSummaryDto> toStudyFolderSummaryDto(List<StudyStorageFolder> folders);
   Set<StudyStorageDriveFolderSummaryDto> toStudyFolderSummaryDto(Set<StudyStorageFolder> folders);
@@ -108,15 +108,15 @@ public interface StorageDriveFolderMapper {
 
   // Assay folder
 
-  @Mapping(target = "id", source = "storageDriveFolder.id")
-  @Mapping(target = "assayStorageFolderId", source = "id")
-  @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
-  @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
-  @Mapping(target = "assayId", source = "assay.id")
-  @Mapping(target = "name", source = "storageDriveFolder.name")
-  @Mapping(target = "path", source = "storageDriveFolder.path")
-  @Mapping(target = "writeEnabled", source = "storageDriveFolder.writeEnabled")
-  @Mapping(target = "deleteEnabled", source = "storageDriveFolder.name")
+//  @Mapping(target = "id", source = "storageDriveFolder.id")
+//  @Mapping(target = "assayStorageFolderId", source = "id")
+//  @Mapping(target = "storageDriveId", source = "storageDriveFolder.storageDrive.id")
+//  @Mapping(target = "storageDriveFolderId", source = "storageDriveFolder.id")
+//  @Mapping(target = "assayId", source = "assay.id")
+//  @Mapping(target = "name", source = "storageDriveFolder.name")
+//  @Mapping(target = "path", source = "storageDriveFolder.path")
+//  @Mapping(target = "writeEnabled", source = "storageDriveFolder.writeEnabled")
+//  @Mapping(target = "deleteEnabled", source = "storageDriveFolder.name")
   AssayStorageDriveFolderSummaryDto toAssayFolderSummaryDto(AssayStorageFolder folder);
   List<AssayStorageDriveFolderSummaryDto> toAssayFolderSummaryDto(List<AssayStorageFolder> folders);
   Set<AssayStorageDriveFolderSummaryDto> toAssayFolderSummaryDto(Set<AssayStorageFolder> folders);

@@ -50,6 +50,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -74,6 +75,30 @@ public class DataFileStoragePrivateController extends AbstractApiController {
 
   @Autowired
   private StorageDriveFolderMapper folderMapper;
+
+  @RequestMapping(value ="", method = RequestMethod.HEAD)
+  public HttpEntity<?> checkFolder(
+      @RequestParam(name = "path") String rawPath,
+      @RequestParam(name = "folderId") Long folderId
+  ) throws FileStorageException {
+    LOGGER.debug("Checking for storage folder: {}: {}", folderId, rawPath);
+    StorageDriveFolder folder = storageDriveFolderService.findById(folderId)
+        .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
+    StudyStorageService storageService = studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
+    String path = rawPath != null ? rawPath : folder.getPath();
+    try {
+      boolean exists = storageService.folderExists(folder, path);
+      if (exists) {
+        return new ResponseEntity<>(HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   @GetMapping("")
   public StorageFolder getDataStorageFolder(

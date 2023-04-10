@@ -199,6 +199,7 @@ public class StorageDriveFolderService {
     return storageService.saveStorageFolderRecord(drive, storageFolder, folder);
   }
 
+  @Transactional
   public StorageDriveFolder updateFolder(StorageDriveFolder folder) {
     LOGGER.debug("Updating folder: {}", folder);
     StorageDriveFolder f = folderRepository.getById(folder.getId());
@@ -208,6 +209,17 @@ public class StorageDriveFolderService {
     f.setWriteEnabled(folder.isWriteEnabled());
     f.setDeleteEnabled(folder.isDeleteEnabled());
     return folderRepository.save(f);
+  }
+
+  @Transactional
+  public void deleteFolder(StorageDriveFolder folder) {
+    LOGGER.info("Deleting folder: {} {}", folder.getId(), folder.getPath());
+    StorageDriveFolderDetailsOperations<?> repository = storageDriveRepositoryLookup
+        .lookupFolderRepository(folder.getStorageDrive().getDriveType());
+    StorageDriveFolderDetails details = repository.findByStorageDriveFolderId(folder.getId())
+        .orElseThrow(() -> new IllegalArgumentException("No folder details found for folder: "
+            + folder.getId()));
+    repository.deleteById(details.getId());
   }
 
   // Drives

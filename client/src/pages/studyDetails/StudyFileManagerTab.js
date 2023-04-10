@@ -39,21 +39,29 @@ const StudyFileManagerTab = ({study}) => {
   useEffect(() => {
     axios.get("/api/internal/study/" + study.id + "/storage")
     .then(response => {
-      const folders = response.data;
-      axios.get("/api/internal/storage-drives")
-      .then(async response2 => {
-        await folders.forEach(f => {
-          f.storageDrive = response2.data.find(l => l.id === f.storageDriveId);
-        })
-        setFolders(folders);
-        setSelectedFolder(folders.find(f => f.primary));
-      });
+      setFolders(response.data);
+      const defaultFolder = response.data.find(f => f.primary);
+      setSelectedFolder(defaultFolder ? defaultFolder.storageDriveFolder : null);
     })
     .catch(error => {
       console.error(error);
       notyf.open({message: "Failed to load data sources", type: "error"});
     });
   }, []);
+
+  const repairFolder = () => {
+    axios.post("/api/internal/study/" + study.id + "/storage/repair")
+    .then(response => {
+      notyf.open({message: "Study folder repaired", type: "success"});
+      const s = selectedFolder;
+      setSelectedFolder(null);
+      setSelectedFolder(s);
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({message: "Failed to repair study folder", type: "error"});
+    });
+  }
 
   return (
       <Container fluid className="animated fadeIn">
@@ -73,7 +81,11 @@ const StudyFileManagerTab = ({study}) => {
           <Col xs="8" md="9">
             {
               selectedFolder
-                  ? <FileManagerContent rootFolder={selectedFolder} path={selectedFolder.path} />
+                  ? <FileManagerContent
+                      rootFolder={selectedFolder}
+                      path={selectedFolder.path}
+                      handleRepairFolder={repairFolder}
+                    />
                   : <FileManagerContentPlaceholder />
             }
 
