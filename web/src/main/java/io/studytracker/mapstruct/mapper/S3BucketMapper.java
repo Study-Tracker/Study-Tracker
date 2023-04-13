@@ -22,10 +22,13 @@ import io.studytracker.model.S3Bucket;
 import java.util.List;
 import java.util.Set;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface S3BucketMapper {
 
+  @Mapping(target = "name", source = "dto.bucketName")
+  @Mapping(target = "storageDrive.displayName", source = "dto.displayName")
   S3Bucket fromFormDto(S3BucketFormDto dto);
   S3BucketDetailsDto toDto(S3Bucket s3Bucket);
   List<S3BucketDetailsDto> toDto(List<S3Bucket> s3Buckets);

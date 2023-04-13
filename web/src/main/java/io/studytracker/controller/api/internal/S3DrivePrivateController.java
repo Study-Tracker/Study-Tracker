@@ -34,10 +34,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -55,14 +58,6 @@ public class S3DrivePrivateController {
   @Autowired
   private S3BucketMapper s3BucketMapper;
 
-//  @GetMapping("")
-//  public List<String> listAvailableBuckets() {
-//    LOGGER.debug("Listing available buckets");
-//    Organization organization = organizationService.getCurrentOrganization();
-//    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
-//    return awsIntegrationService.listAvailableBuckets(integration);
-//  }
-
   @GetMapping("")
   public List<S3BucketDetailsDto> findRegisteredBuckets() {
     LOGGER.debug("Listing registered buckets");
@@ -73,26 +68,38 @@ public class S3DrivePrivateController {
 
   @PostMapping("")
   public HttpEntity<S3BucketDetailsDto> registerBucket(@Valid @RequestBody S3BucketFormDto dto) {
-    LOGGER.info("Registering S3 bucket {}", dto.getName());
+    LOGGER.info("Registering S3 bucket {}", dto.getBucketName());
     S3Bucket bucket = s3BucketMapper.fromFormDto(dto);
     Organization organization = organizationService.getCurrentOrganization();
     AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
     bucket.setAwsIntegration(integration);
+    bucket.getStorageDrive().setOrganization(organization);
+    bucket.getStorageDrive().setRootPath("");
     S3Bucket created = awsIntegrationService.registerBucket(bucket);
     return new ResponseEntity<>(s3BucketMapper.toDto(created), HttpStatus.CREATED);
   }
 
-//  @PutMapping("/{id}")
-//  public HttpEntity<S3BucketDetailsDto> updateBucket(@PathVariable("id") Long id, @Valid @RequestBody S3BucketFormDto dto) {
-//    LOGGER.info("Updating S3 bucket {}", id);
-//    S3Bucket bucket = s3BucketMapper.fromFormDto(dto);
-//    bucket.setId(id);
-//    S3Bucket updated = awsIntegrationService.updateBucket(bucket);
-//    return new ResponseEntity<>(s3BucketMapper.toDto(updated), HttpStatus.OK);
-//  }
+  @PutMapping("/{id}")
+  public HttpEntity<S3BucketDetailsDto> updateBucket(@PathVariable("id") Long id, @Valid @RequestBody S3BucketFormDto dto) {
+    LOGGER.info("Updating S3 bucket {}", id);
+    S3Bucket bucket = s3BucketMapper.fromFormDto(dto);
+    bucket.setId(id);
+    S3Bucket updated = awsIntegrationService.updateBucket(bucket);
+    return new ResponseEntity<>(s3BucketMapper.toDto(updated), HttpStatus.OK);
+  }
+
+  @PatchMapping("/{id}")
+  public HttpEntity<?> updateBucketStatus(@PathVariable("id") Long bucketId,
+      @RequestParam("active") boolean active) {
+    LOGGER.info("Updating S3 bucket status {}", active);
+    S3Bucket bucket = awsIntegrationService.findBucketById(bucketId)
+            .orElseThrow(() -> new IllegalArgumentException("Bucket not found"));
+    awsIntegrationService.updateBucketStatus(bucket, active);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
 
   @DeleteMapping("/{id}")
-  public HttpEntity<?> updateBucket(@PathVariable("id") Long id) {
+  public HttpEntity<?> removeBucket(@PathVariable("id") Long id) {
     LOGGER.info("Unregistering S3 bucket {}", id);
     awsIntegrationService.removeBucket(id);
     return new ResponseEntity<>(HttpStatus.OK);

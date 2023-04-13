@@ -16,8 +16,9 @@
 
 import {Button, Card, Col, Row} from "react-bootstrap";
 import React from "react";
+import PropTypes from "prop-types";
 
-const AWSIntegrationSetupCard = ({}) => {
+const AWSIntegrationSetupCard = ({handleClick}) => {
   return (
       <Card className="illustration">
         <Card.Header>
@@ -27,8 +28,19 @@ const AWSIntegrationSetupCard = ({}) => {
         </Card.Header>
         <Card.Body>
           <Row>
+            <Col>
+              <p>
+                Connect Study Tracker with Amazon Web Services to enable file
+                management in S3 and event publishing in EventBridge. Study
+                Tracker uses the AWS SDK to communicate with services and can
+                authenticate using either a secret access key or IAM (when running
+                on an EC2 instance).
+              </p>
+            </Col>
+          </Row>
+          <Row>
             <Col className={"text-center"}>
-              <Button size="lg" color={"primary"} onClick={() => console.log("Click")}>
+              <Button size="lg" color={"primary"} onClick={handleClick}>
                 Register AWS Integration
               </Button>
             </Col>
@@ -39,7 +51,7 @@ const AWSIntegrationSetupCard = ({}) => {
 }
 
 AWSIntegrationSetupCard.propTypes = {
-
+  handleClick: PropTypes.func.isRequired
 }
 
 export default AWSIntegrationSetupCard;

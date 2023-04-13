@@ -264,13 +264,13 @@ const MSAzureSettings = () => {
                         <h4>OneDrive Drives</h4>
                       </div>
                       <div>
-                        <Button
-                            variant={"primary"}
-                            onClick={() => setOneDriveDriveModalIsOpen(true)}
-                        >
-                          <FontAwesomeIcon icon={faPlus} className={"me-2"} />
-                          Add OneDrive Drive
-                        </Button>
+                        {/*<Button*/}
+                        {/*    variant={"primary"}*/}
+                        {/*    onClick={() => setOneDriveDriveModalIsOpen(true)}*/}
+                        {/*>*/}
+                        {/*  <FontAwesomeIcon icon={faPlus} className={"me-2"} />*/}
+                        {/*  Add OneDrive Drive*/}
+                        {/*</Button>*/}
                       </div>
                     </Col>
                   </Row>

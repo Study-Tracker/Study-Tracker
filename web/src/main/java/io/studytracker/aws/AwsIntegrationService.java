@@ -20,6 +20,7 @@ import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.S3Bucket;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.S3BucketRepository;
 import java.util.List;
@@ -29,8 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 
 @Service
 public class AwsIntegrationService implements IntegrationService<AwsIntegration> {
@@ -61,6 +64,13 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   @Override
   public AwsIntegration register(AwsIntegration awsIntegration) {
     LOGGER.info("Creating AWS integration: {}", awsIntegration);
+    if (!validate(awsIntegration)) {
+      throw new IllegalArgumentException("One or more required fields are missing.");
+    }
+    if (!test(awsIntegration)) {
+      throw new IllegalArgumentException("Failed to connect to AWS with the provided credentials.");
+    }
+    awsIntegration.setActive(true);
     return awsIntegrationRepository.save(awsIntegration);
   }
 
@@ -68,6 +78,12 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   @Override
   public AwsIntegration update(AwsIntegration awsIntegration) {
     LOGGER.info("Updating AWS integration: {}", awsIntegration);
+    if (!validate(awsIntegration)) {
+      throw new IllegalArgumentException("One or more required fields are missing.");
+    }
+    if (!test(awsIntegration)) {
+      throw new IllegalArgumentException("Failed to connect to AWS with the provided credentials.");
+    }
     AwsIntegration i = awsIntegrationRepository.getById(awsIntegration.getId());
     i.setName(awsIntegration.getName());
     i.setAccountNumber(awsIntegration.getAccountNumber());
@@ -93,12 +109,25 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
 
   @Override
   public boolean validate(AwsIntegration instance) {
-    return false;
+    if (!StringUtils.hasText(instance.getName())) return false;
+    if (!StringUtils.hasText(instance.getRegion())) return false;
+    if (!instance.isUseIam()) {
+      if (!StringUtils.hasText(instance.getAccessKeyId())) return false;
+      if (!StringUtils.hasText(instance.getSecretAccessKey())) return false;
+    }
+    return true;
   }
 
   @Override
   public boolean test(AwsIntegration instance) {
-    return false;
+    try {
+      S3Client s3Client = AWSClientFactory.createS3Client(instance);
+      ListBucketsResponse response = s3Client.listBuckets();
+      return response.buckets() != null;
+    } catch (Exception e) {
+      LOGGER.error("Failed to connect to AWS S3 with the provided credentials.", e);
+      return false;
+    }
   }
 
   // S3
@@ -123,13 +152,35 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
     return s3BucketRepository.findByIntegrationAndName(integration.getId(), bucketName).isPresent();
   }
 
+  public Optional<S3Bucket> findBucketById(Long id) {
+    return s3BucketRepository.findById(id);
+  }
+
   @Transactional
   public S3Bucket registerBucket(S3Bucket bucket) {
     LOGGER.info("Registering bucket {}", bucket.getName());
+    bucket.getStorageDrive().setActive(true);
+    bucket.getStorageDrive().setDriveType(DriveType.S3);
     if (!this.bucketExists(bucket.getAwsIntegration(), bucket.getName())) {
       throw new IllegalArgumentException("Bucket does not exist: " + bucket.getName());
     }
     return s3BucketRepository.save(bucket);
+  }
+
+  @Transactional
+  public S3Bucket updateBucket(S3Bucket bucket) {
+    LOGGER.info("Updating bucket {}", bucket.getName());
+    S3Bucket b = s3BucketRepository.getById(bucket.getId());
+    b.getStorageDrive().setDisplayName(bucket.getStorageDrive().getDisplayName());
+    b.getStorageDrive().setActive(bucket.getStorageDrive().isActive());
+    return s3BucketRepository.save(b);
+  }
+
+  @Transactional
+  public void updateBucketStatus(S3Bucket bucket, boolean active) {
+    S3Bucket b = s3BucketRepository.getById(bucket.getId());
+    b.getStorageDrive().setActive(active);
+    s3BucketRepository.save(b);
   }
 
   @Transactional

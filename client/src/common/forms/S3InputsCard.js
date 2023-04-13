@@ -40,7 +40,7 @@ const S3InputsCard = ({
     axios.get("/api/internal/storage-drive-folders?studyRoot=true")
     .then(response => {
       let folders = response.data;
-      axios.get("/api/internal/s3-buckets")
+      axios.get("/api/internal/drives/s3")
       .then(async response2 => {
 
         const bucketRootFolders = folders

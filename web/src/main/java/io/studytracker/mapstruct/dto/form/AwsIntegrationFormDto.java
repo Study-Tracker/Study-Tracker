@@ -16,15 +16,15 @@
 
 package io.studytracker.mapstruct.dto.form;
 
+import io.studytracker.mapstruct.dto.response.OrganizationDetailsDto;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class AwsIntegrationFormDto {
 
   private Long id;
-  private @NotNull Long organizationId;
+  private OrganizationDetailsDto organization;
   private @NotEmpty String name;
   private String accountNumber;
   private @NotEmpty String region;

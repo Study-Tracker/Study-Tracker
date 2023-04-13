@@ -23,34 +23,34 @@ import FormikFormErrorNotification
   from "../../../common/forms/FormikFormErrorNotification";
 import {FormGroup} from "../../../common/forms/common";
 
-const MSGraphIntegrationFormModal = ({
+const AWSIntegrationFormModal = ({
     isOpen,
     setIsOpen,
-    selectedIntegration,
     handleFormSubmit,
+    selectedIntegration,
     formikRef
 }) => {
 
   const integrationSchema = yup.object().shape({
     name: yup.string()
       .required("Name is required"),
-    domain: yup.string()
+    accountNumber: yup.string()
       .nullable(),
-    tenantId: yup.string()
-      .required("Tenant ID is required"),
-    clientId: yup.string()
-      .required("Client ID is required"),
-    clientSecret: yup.string()
-      .required("Client Secret is required"),
+    region: yup.string()
+      .required("Region is required"),
+    accessKeyId: yup.string(),
+    secretAccessKey: yup.string(),
+    useIam: yup.boolean(),
     active: yup.boolean()
   });
 
   const integrationDefault = {
-    name: "Microsoft Azure",
-    domain: null,
-    tenantId: null,
-    clientId: null,
-    clientSecret: null,
+    name: "Amazon Web Services",
+    accountNumber: null,
+    region: null,
+    accessKeyId: null,
+    secretAccessKey: null,
+    useIam: false,
     active: true
   }
 
@@ -73,7 +73,7 @@ const MSGraphIntegrationFormModal = ({
         }) => (
             <Modal show={isOpen} onHide={() => setIsOpen(false)}>
               <Modal.Header closeButton>
-                Register Microsoft Azure Integration
+                Register Amazon Web Services Integration
               </Modal.Header>
               <Modal.Body className={"mb-3"}>
                 <FormikForm autoComplete={"off"}>
@@ -95,7 +95,7 @@ const MSGraphIntegrationFormModal = ({
                           {errors.name}
                         </Form.Control.Feedback>
                         <Form.Text>
-                          Provide a name for your Azure tenant.
+                          Provide a name for your AWS tenant.
                         </Form.Text>
                       </FormGroup>
                     </Col>
@@ -104,19 +104,19 @@ const MSGraphIntegrationFormModal = ({
                   <Row>
                     <Col>
                       <FormGroup>
-                        <Form.Label>Domain</Form.Label>
+                        <Form.Label>Account Number</Form.Label>
                         <Form.Control
                             type={"text"}
-                            name={"domain"}
-                            isInvalid={errors.domain && touched.domain}
-                            value={values.domain}
+                            name={"accountNumber"}
+                            isInvalid={errors.accountNumber && touched.accountNumber}
+                            value={values.accountNumber}
                             onChange={handleChange}
                         />
                         <Form.Control.Feedback type={"invalid"}>
-                          {errors.domain}
+                          {errors.accountNumber}
                         </Form.Control.Feedback>
                         <Form.Text>
-                          Your Azure tenant domain. eg. <code>contoso.onmicrosoft.com</code>
+                          Your AWS account number. This is used for identifying your account.
                         </Form.Text>
                       </FormGroup>
                     </Col>
@@ -125,16 +125,16 @@ const MSGraphIntegrationFormModal = ({
                   <Row>
                     <Col>
                       <FormGroup>
-                        <Form.Label>Tenant ID *</Form.Label>
+                        <Form.Label>Region *</Form.Label>
                         <Form.Control
                             type={"text"}
-                            name={"tenantId"}
-                            isInvalid={errors.tenantId && touched.tenantId}
-                            value={values.tenantId}
+                            name={"region"}
+                            isInvalid={errors.region && touched.region}
+                            value={values.region}
                             onChange={handleChange}
                         />
                         <Form.Control.Feedback type={"invalid"}>
-                          {errors.tenantId}
+                          {errors.region}
                         </Form.Control.Feedback>
                       </FormGroup>
                     </Col>
@@ -143,17 +143,29 @@ const MSGraphIntegrationFormModal = ({
                   <Row>
                     <Col>
                       <FormGroup>
-                        <Form.Label>Client ID *</Form.Label>
+                        <Form.Label>Access Key ID</Form.Label>
                         <Form.Control
                             type={"text"}
-                            name={"clientId"}
-                            isInvalid={errors.clientId && touched.clientId}
-                            value={values.clientId}
+                            name={"accessKeyId"}
+                            isInvalid={errors.accessKeyId && touched.accessKeyId}
+                            value={values.accessKeyId}
                             onChange={handleChange}
+                            disabled={values.useIam}
                         />
                         <Form.Control.Feedback type={"invalid"}>
-                          {errors.clientId}
+                          {errors.accessKeyId}
                         </Form.Control.Feedback>
+                        {
+                            values.id && (
+                                <Form.Text className={"text-danger"}>
+                                  Please reenter your access key ID.<br/>
+                                </Form.Text>
+                            )
+                        }
+                        <Form.Text>
+                          Your AWS access key ID. This is used for authenticating
+                          your account when IAM is not used.
+                        </Form.Text>
                       </FormGroup>
                     </Col>
                   </Row>
@@ -161,17 +173,47 @@ const MSGraphIntegrationFormModal = ({
                   <Row>
                     <Col>
                       <FormGroup>
-                        <Form.Label>Client Secret *</Form.Label>
+                        <Form.Label>Secret Access Key</Form.Label>
                         <Form.Control
-                            type={"text"}
-                            name={"clientSecret"}
-                            isInvalid={errors.clientSecret && touched.clientSecret}
-                            value={values.clientSecret}
+                            type={"password"}
+                            name={"secretAccessKey"}
+                            isInvalid={errors.secretAccessKey && touched.secretAccessKey}
+                            value={values.secretAccessKey}
                             onChange={handleChange}
+                            disabled={values.useIam}
                         />
                         <Form.Control.Feedback type={"invalid"}>
-                          {errors.clientSecret}
+                          {errors.secretAccessKey}
                         </Form.Control.Feedback>
+                        {
+                          values.id && (
+                                <Form.Text className={"text-danger"}>
+                                  Please reenter your secret access key.<br />
+                                </Form.Text>
+                          )
+                        }
+                        <Form.Text>
+                          Your AWS secret access key. This is used for authenticating
+                          your account when IAM is not used.
+                        </Form.Text>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Form.Check
+                            type={"switch"}
+                            label={"Use IAM for authentication"}
+                            onChange={(e) => setFieldValue("useIam", e.target.checked)}
+                            defaultChecked={values.useIam}
+                        />
+                        <Form.Text>
+                          Use IAM for authentication. If this is checked, the
+                          Study Tracker will use the IAM role attached to the
+                          EC2 instance to authenticate with AWS.
+                        </Form.Text>
                       </FormGroup>
                     </Col>
                   </Row>
@@ -200,12 +242,12 @@ const MSGraphIntegrationFormModal = ({
 
 }
 
-MSGraphIntegrationFormModal.propTypes = {
+AWSIntegrationFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
-  selectedIntegration: PropTypes.object,
   handleFormSubmit: PropTypes.func.isRequired,
-  formikRef: PropTypes.object.isRequired
+  formikRef: PropTypes.object.isRequired,
+  selectedIntegration: PropTypes.object
 }
 
-export default MSGraphIntegrationFormModal;
+export default AWSIntegrationFormModal;

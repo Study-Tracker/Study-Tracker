@@ -20,9 +20,10 @@ import PropTypes from "prop-types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheckCircle} from "@fortawesome/free-regular-svg-icons";
 import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
-import {faBucket, faCancel} from "@fortawesome/free-solid-svg-icons";
+import {faBucket, faCancel, faGears} from "@fortawesome/free-solid-svg-icons";
 
-const S3BucketCard = ({bucket}) => {
+const S3BucketCard = ({bucket, handleStatusUpdate}) => {
+
   return (
       <Card className={"mt-3"}>
         <Card.Body>
@@ -55,22 +56,18 @@ const S3BucketCard = ({bucket}) => {
             <Col xs={2} className={"d-flex align-items-center"}>
               <Dropdown>
                 <Dropdown.Toggle variant="outline-primary">
-                  Actions
+                  <FontAwesomeIcon icon={faGears} className={"me-1"} />
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
 
                   {
-                      bucket.storageDrive.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
+                      bucket.storageDrive.active ? (
+                          <Dropdown.Item onClick={() => handleStatusUpdate(bucket.id, false)}>
                             <FontAwesomeIcon icon={faCancel} className={"me-1"} />
                             Set Inactive
                           </Dropdown.Item>
-                      )
-                  }
-
-                  {
-                      !bucket.storageDrive.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
+                      ) : (
+                          <Dropdown.Item onClick={() => handleStatusUpdate(bucket.id, true)}>
                             <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
                             Set Active
                           </Dropdown.Item>

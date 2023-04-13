@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.io.FileUtils;
@@ -144,8 +145,9 @@ public class MSGraphConfigurationTests {
         sitePage = sitePage.getNextPage().buildRequest().get();
       }
     }
-    for (Site site: siteList) {
-      System.out.println("Site: " + site.displayName + "  ID: " + site.id + "  URL: " + site.webUrl);
+    for (Site site : siteList) {
+      System.out.println(
+          "Site: " + site.displayName + "  ID: " + site.id + "  URL: " + site.webUrl);
     }
 
     // Get the Study Tracker site
@@ -157,12 +159,24 @@ public class MSGraphConfigurationTests {
     Assert.assertEquals("Study Tracker Development", site.displayName);
     Assert.assertNotNull(site.id);
     System.out.println("Site: " + site.displayName
-            + " \nID: " + site.id
-            + " \nURL: " + site.webUrl
-            + " \nName: " + site.name
-            + " \nRoot: " + site.root.oDataType
-            + " \nDescription: " + site.description
+        + " \nID: " + site.id
+        + " \nURL: " + site.webUrl
+        + " \nName: " + site.name
+        + " \nRoot: " + site.root.oDataType
+        + " \nDescription: " + site.description
     );
+
+  }
+
+  @Test
+  public void findSharepointSiteDrivesTest() throws Exception {
+
+    GraphServiceClient graphClient = buildCLient();
+    SiteCollectionPage sitePage = graphClient.sites().buildRequest().get();
+    Site site = sitePage.getCurrentPage().stream()
+        .filter(s -> s.displayName != null && s.displayName.equals("Study Tracker Development"))
+        .findFirst()
+        .orElse(null);
 
     // Get the Study Tracker site drives
     DriveCollectionPage page = graphClient.sites(site.id).drives().buildRequest().get();
@@ -218,7 +232,10 @@ public class MSGraphConfigurationTests {
     }
     Assert.assertFalse(driveItems.isEmpty());
     for (DriveItem item: driveItems) {
-      System.out.println("ID: " + item.id + "  Name: " + item.name + "  URL: " + item.webUrl);
+      System.out.println("ID: " + item.id
+          + "  Name: " + item.name
+          + "  URL: " + item.webUrl
+          + "  Last Modified: " + new Date(item.lastModifiedDateTime.toInstant().toEpochMilli()));
     }
 
   }

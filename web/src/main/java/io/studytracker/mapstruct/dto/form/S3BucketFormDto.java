@@ -17,14 +17,15 @@
 package io.studytracker.mapstruct.dto.form;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class S3BucketFormDto {
 
   private Long id;
-  private @NotNull Long awsIntegrationId;
-  private @NotEmpty String name;
+  private Long awsIntegrationId;
+  private @NotEmpty String displayName;
+  private @NotEmpty String bucketName;
+  private boolean active;
 
 }

@@ -74,10 +74,12 @@ const StorageFolderFormModal = ({
     deleteEnabled: false
   }
 
-  const driveOptions = drives.map(drive => {
+  const driveOptions = drives
+  .filter(drive => drive.active)
+  .map(drive => {
     return {
       value: drive.id,
-      label: drive.displayName
+      label: drive.displayName + " (" + drive.driveType + ")"
     }
   });
 

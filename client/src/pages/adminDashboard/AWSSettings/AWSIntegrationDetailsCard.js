@@ -21,11 +21,6 @@ import PropTypes from "prop-types";
 const AWSIntegrationDetailsCard = ({settings}) => {
   return (
       <Card>
-        <Card.Header>
-          <Card.Title tag={"h5"} className={"mb-0"}>
-            AWS integration is <span className={"text-success"}>ENABLED</span>
-          </Card.Title>
-        </Card.Header>
         <Card.Body>
 
           <Row>
@@ -52,8 +47,19 @@ const AWSIntegrationDetailsCard = ({settings}) => {
               <p>
                 {
                   settings.useIam
-                      ? <Badge color={"info"}>IAM</Badge>
-                      : <Badge color={"warning"}>Access Key</Badge>
+                      ? <Badge bg={"info"}>IAM</Badge>
+                      : <Badge bg={"warning"}>Access Key</Badge>
+                }
+              </p>
+            </Col>
+
+            <Col md={6}>
+              <h6 className="details-label">Status</h6>
+              <p>
+                {
+                  settings.active
+                      ? <Badge bg={"success"}>Active</Badge>
+                      : <Badge bg={"danger"}>Inactive</Badge>
                 }
               </p>
             </Col>

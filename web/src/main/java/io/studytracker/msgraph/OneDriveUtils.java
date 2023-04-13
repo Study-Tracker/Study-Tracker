@@ -79,7 +79,7 @@ public class OneDriveUtils {
     folder.setPath(getPathFromDriveItem(driveItem));
     folder.setUrl(driveItem.webUrl);
     folder.setFolderId(driveItem.id);
-    folder.setLastModified(new Date(driveItem.lastModifiedDateTime.toEpochSecond()));
+    folder.setLastModified(new Date(driveItem.lastModifiedDateTime.toInstant().toEpochMilli()));
     folder.setTotalSize(driveItem.size);
     folder.setDownloadable(false);
     return folder;
@@ -91,7 +91,7 @@ public class OneDriveUtils {
     file.setPath(getPathFromDriveItem(driveItem));
     file.setUrl(driveItem.webUrl);
     file.setFileId(driveItem.id);
-    file.setLastModified(new Date(driveItem.lastModifiedDateTime.toEpochSecond()));
+    file.setLastModified(new Date(driveItem.lastModifiedDateTime.toInstant().toEpochMilli()));
     file.setSize(driveItem.size);
     file.setDownloadable(true);
     return file;
