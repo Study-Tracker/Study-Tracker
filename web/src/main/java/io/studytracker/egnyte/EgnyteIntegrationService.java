@@ -16,6 +16,8 @@
 
 package io.studytracker.egnyte;
 
+import io.studytracker.egnyte.entity.EgnyteObject;
+import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.EgnyteDrive;
 import io.studytracker.model.EgnyteIntegration;
@@ -31,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegration> {
@@ -49,12 +52,12 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   }
 
 
-    @Override
-    public Optional<EgnyteIntegration> findById(Long id) {
-      return egnyteIntegrationRepository.findById(id);
-    }
+  @Override
+  public Optional<EgnyteIntegration> findById(Long id) {
+    return egnyteIntegrationRepository.findById(id);
+  }
 
-    @Override
+  @Override
   public List<EgnyteIntegration> findByOrganization(Organization organization) {
     LOGGER.debug("Finding Egnyte integrations for organization: {}", organization.getName());
     return egnyteIntegrationRepository.findByOrganizationId(organization.getId());
@@ -64,6 +67,13 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   @Transactional
   public EgnyteIntegration register(EgnyteIntegration egnyteIntegration) {
     LOGGER.info("Creating Egnyte integration: {}", egnyteIntegration);
+    if (!validate(egnyteIntegration)) {
+      throw new IllegalArgumentException("One or more required fields are missing.");
+    }
+    if (!test(egnyteIntegration)) {
+      throw new IllegalArgumentException("Failed to connect to Egnyte with the provided credentials.");
+    }
+    egnyteIntegration.setActive(true);
     return egnyteIntegrationRepository.save(egnyteIntegration);
   }
 
@@ -71,6 +81,12 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   @Transactional
   public EgnyteIntegration update(EgnyteIntegration egnyteIntegration) {
     LOGGER.info("Updating Egnyte integration: {}", egnyteIntegration);
+    if (!validate(egnyteIntegration)) {
+      throw new IllegalArgumentException("One or more required fields are missing.");
+    }
+    if (!test(egnyteIntegration)) {
+      throw new IllegalArgumentException("Failed to connect to Egnyte with the provided credentials.");
+    }
     EgnyteIntegration i = egnyteIntegrationRepository.getById(egnyteIntegration.getId());
     i.setTenantName(egnyteIntegration.getTenantName());
     i.setRootUrl(egnyteIntegration.getRootUrl());
@@ -82,14 +98,21 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
 
   @Override
   public boolean validate(EgnyteIntegration instance) {
-    // TODO
-    return false;
+    return StringUtils.hasText(instance.getTenantName())
+        && StringUtils.hasText(instance.getApiToken())
+        && StringUtils.hasText(instance.getRootUrl());
   }
 
   @Override
   public boolean test(EgnyteIntegration instance) {
-    // TODO
-    return false;
+    EgnyteRestApiClient client = EgnyteClientFactory.createRestApiClient(instance);
+    try {
+      EgnyteObject object = client.findObjectByPath("/Shared");
+      return object != null && object.isFolder();
+    } catch (Exception e) {
+      LOGGER.error("Egnyte integration test failed", e);
+      return false;
+    }
   }
 
   @Override
@@ -111,6 +134,11 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     return egnyteDriveRepository.findByIntegrationId(egnyteIntegration.getId());
   }
 
+  public Optional<EgnyteDrive> findDriveById(Long egnyteDriveId) {
+    return egnyteDriveRepository.findById(egnyteDriveId);
+  }
+
+  @Transactional
   public EgnyteDrive registerDefaultDrive(EgnyteIntegration egnyteIntegration) {
 
     StorageDrive storageDrive = new StorageDrive();
@@ -129,6 +157,7 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
 
   }
 
+  @Transactional
   public EgnyteDrive updateDrive(EgnyteDrive drive) {
 
     StorageDrive storageDrive = drive.getStorageDrive();
@@ -145,6 +174,15 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
 
   }
 
+  @Transactional
+  public void updateDriveStatus(EgnyteDrive drive, boolean active) {
+    StorageDrive storageDrive = drive.getStorageDrive();
+    StorageDrive d = storageDriveRepository.getById(storageDrive.getId());
+    d.setActive(active);
+    storageDriveRepository.save(d);
+  }
+
+  @Transactional
   public void removeDrive(Long id) {
     EgnyteDrive e = egnyteDriveRepository.getById(id);
     StorageDrive s = e.getStorageDrive();

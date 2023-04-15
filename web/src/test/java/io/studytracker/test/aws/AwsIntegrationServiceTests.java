@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,8 +41,19 @@ public class AwsIntegrationServiceTests {
 
   @Autowired private AwsIntegrationService awsIntegrationService;
   @Autowired private AwsIntegrationRepository awsIntegrationRepository;
-
   @Autowired private OrganizationService organizationService;
+
+  @Value("${aws.access-key-id}")
+  private String accessKeyId;
+
+  @Value("${aws.secret-access-key}")
+  private String secretAccessKey;
+
+  @Value("${aws.region}")
+  private String region;
+
+  @Value("${aws.example-s3-bucket}")
+  private String s3BucketName;
 
   @Test
   public void configTest() {
@@ -55,6 +67,36 @@ public class AwsIntegrationServiceTests {
     Assert.assertNotNull(integration.getAccessKeyId());
     Assert.assertNotNull(integration.getSecretAccessKey());
     Assert.assertFalse(integration.isUseIam());
+  }
+
+  @Test
+  public void integrationValidationTest() throws Exception {
+    Organization organization = organizationService.getCurrentOrganization();
+    AwsIntegration integration = new AwsIntegration();
+    integration.setAccessKeyId(accessKeyId);
+    integration.setRegion(region);
+    integration.setUseIam(false);
+    integration.setOrganization(organization);
+    integration.setName("Test Integration");
+    integration.setAccountNumber("123456789012");
+    Assert.assertFalse(awsIntegrationService.validate(integration));
+    integration.setSecretAccessKey(secretAccessKey);
+    Assert.assertTrue(awsIntegrationService.validate(integration));
+  }
+
+  @Test
+  public void integrationTestTest() throws Exception {
+    Organization organization = organizationService.getCurrentOrganization();
+    AwsIntegration integration = new AwsIntegration();
+    integration.setAccessKeyId(accessKeyId);
+    integration.setRegion(region);
+    integration.setUseIam(false);
+    integration.setOrganization(organization);
+    integration.setName("Test Integration");
+    integration.setAccountNumber("123456789012");
+    Assert.assertFalse(awsIntegrationService.test(integration));
+    integration.setSecretAccessKey(secretAccessKey);
+    Assert.assertTrue(awsIntegrationService.test(integration));
   }
 
 }

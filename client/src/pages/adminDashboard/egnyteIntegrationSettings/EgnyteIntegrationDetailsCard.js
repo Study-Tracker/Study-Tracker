@@ -22,11 +22,6 @@ import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
 const EgnyteIntegrationDetailsCard = ({settings}) => {
   return (
       <Card>
-        <Card.Header>
-          <Card.Title tag={"h5"} className={"mb-0"}>
-            Egnyte integration is <span className={"text-success"}>ENABLED</span>
-          </Card.Title>
-        </Card.Header>
         <Card.Body>
 
           <Row>

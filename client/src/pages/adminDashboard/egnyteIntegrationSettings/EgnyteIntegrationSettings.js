@@ -15,22 +15,29 @@
  */
 
 import React, {useContext, useEffect, useState} from "react";
-import {Card, Col, Dropdown, Row} from "react-bootstrap";
+import {Col, Dropdown, Row} from "react-bootstrap";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheckCircle, faHardDrive} from "@fortawesome/free-regular-svg-icons";
-import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
-import {faCancel} from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+  faCircleXmark,
+  faEdit
+} from "@fortawesome/free-regular-svg-icons";
+import {faGears, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import EgnyteIntegrationDetailsCard from "./EgnyteIntegrationDetailsCard";
 import EgnyteIntegrationSetupCard from "./EgnyteIntegrationSetupCard";
+import EgnyteDriveCard from "./EgnyteDriveCard";
+import EgnyteIntegrationFormModal from "./EgnyteIntegrationFormModal";
 
 const EgnyteIntegrationSettings = () => {
 
   const [settings, setSettings] = useState(null);
   const [drives, setDrives] = useState([]);
+  const [integrationModalIsOpen, setIntegrationModalIsOpen] = useState(false);
   const [loadCount, setLoadCount] = useState(0);
   const notyf = useContext(NotyfContext);
+  const integrationFormikRef = React.createRef();
 
   useEffect(() => {
     axios.get("/api/internal/integrations/egnyte/")
@@ -64,86 +71,184 @@ const EgnyteIntegrationSettings = () => {
     });
   }, [loadCount]);
 
+  const handleIntegrationFormSubmit = (values, {setSubmitting, resetForm}) => {
+    console.debug("Saving Egnyte integration settings", values);
+    const url = "/api/internal/integrations/egnyte/" + (values.id || '');
+    const method = values.id ? 'PUT' : 'POST';
+    axios({
+      url: url,
+      method: method,
+      data: values,
+      headers: {"Content-Type": "application/json"}
+    })
+    .then(response => {
+      setLoadCount(loadCount + 1);
+      setIntegrationModalIsOpen(false);
+      resetForm();
+      notyf.open({
+        type: "success",
+        message: "Egnyte integration settings saved"
+      });
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to save Egnyte integration settings: " + error.response.data.message
+      });
+    })
+    .finally(() => {
+      setSubmitting(false);
+    });
+  }
+
+  const handleStatusToggle = (active) => {
+    axios.patch("/api/internal/integrations/egnyte/" + settings.id + "?active=" + active)
+    .then(response => {
+      setLoadCount(loadCount + 1);
+      notyf.open({
+        type: "success",
+        message: "Egnyte integration settings saved"
+      });
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to save Egnyte integration settings: " + error.response.data.message
+      });
+    });
+  }
+
+  const handleDriveStatusUpdate = (id, active) => {
+    axios.patch("/api/internal/drives/egnyte/" + id + "?active=" + active)
+    .then(response => {
+      setLoadCount(loadCount + 1);
+      notyf.open({
+        type: "success",
+        message: "Egnyte drive status updated"
+      });
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to update Egnyte drive status: " + error.response.data.message
+      });
+    });
+  }
+
   return (
       <>
+
+        <Row className={"mb-3"}>
+          <Col className={"d-flex justify-content-between"}>
+
+            <div>
+              {
+                settings && settings.active ? (
+                    <h3>
+                      Egnyte integration is
+                      &nbsp;
+                      <span className={"text-success"}>ENABLED</span>
+                    </h3>
+                ) : (
+                    <h3>
+                      Egnyte integration is
+                      &nbsp;
+                      <span className={"text-muted"}>DISABLED</span>
+                    </h3>
+                )
+              }
+            </div>
+
+            <div>
+              <Dropdown>
+
+                <Dropdown.Toggle variant={"primary"} id="dropdown-basic">
+                  <FontAwesomeIcon icon={faGears} className={"me-2"} />
+                  Settings
+                  &nbsp;&nbsp;
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+
+                  {
+                    settings ? (
+                        <Dropdown.Item onClick={() => {
+                          integrationFormikRef.current.setValues(settings);
+                          setIntegrationModalIsOpen(true);
+                        }}>
+                          <FontAwesomeIcon icon={faEdit} className={"me-2"} />
+                          Edit Registration
+                        </Dropdown.Item>
+                    ) : (
+                        <Dropdown.Item onClick={() => {
+                          setIntegrationModalIsOpen(true);
+                        }}>
+                          <FontAwesomeIcon icon={faPlusCircle} className={"me-2"} />
+                          Add Registration
+                        </Dropdown.Item>
+                    )
+                  }
+
+                  {
+                    settings && settings.active ? (
+                        <Dropdown.Item onClick={() => handleStatusToggle(false)}>
+                          <FontAwesomeIcon icon={faCircleXmark} className={"me-2"} />
+                          Disable Integration
+                        </Dropdown.Item>
+                    ) : (
+                        <Dropdown.Item onClick={() => handleStatusToggle(true)}>
+                          <FontAwesomeIcon icon={faCheckCircle} className={"me-2"} />
+                          Re-enable Integration
+                        </Dropdown.Item>
+                    )
+                  }
+
+                </Dropdown.Menu>
+
+              </Dropdown>
+            </div>
+
+          </Col>
+        </Row>
 
         {
           settings
               ? <EgnyteIntegrationDetailsCard settings={settings} />
-              : <EgnyteIntegrationSetupCard />
+              : <EgnyteIntegrationSetupCard handleClick={() => setIntegrationModalIsOpen(true)} />
+        }
+
+        {
+            settings && (
+                <Row className={"mb-3"}>
+                  <Col className={"d-flex justify-content-between"}>
+                    <div>
+                      <h4>Egnyte Drives</h4>
+                    </div>
+                  </Col>
+                </Row>
+            )
         }
 
         {
           drives.length > 0 && (
               drives.map(drive => (
-                  <Card className={"mt-3"}>
-                    <Card.Header>
-                      <Card.Title tag={"h5"} className={"mb-0"}>
-                        Egnyte drives
-                      </Card.Title>
-                    </Card.Header>
-                    <Card.Body>
-                      <Row>
-
-                        <Col xs={1} className={"d-flex align-items-center"}>
-                          <FontAwesomeIcon icon={faHardDrive} size={"2x"} className={"text-secondary"}/>
-                        </Col>
-
-                        <Col xs={7} className={"d-flex align-items-center"}>
-                          <div>
-                            <span className={"fw-bolder text-lg"}>
-                              {drive.storageDrive.displayName}
-                            </span>
-                            <br/>
-                            <span className={"text-muted"}>
-                              {drive.storageDrive.rootPath}
-                            </span>
-                          </div>
-                        </Col>
-
-                        <Col xs={2} className={"d-flex align-items-center"}>
-                          <div>
-                            <span className="text-muted">Status</span>
-                            <br />
-                            <DriveStatusBadge active={drive.storageDrive.active} />
-                          </div>
-                        </Col>
-
-                        <Col xs={2} className={"d-flex align-items-center"}>
-                          <Dropdown>
-                            <Dropdown.Toggle variant="outline-primary">
-                              Actions
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-
-                              {
-                                  drive.storageDrive.active && (
-                                      <Dropdown.Item onClick={() => console.log("Click")}>
-                                        <FontAwesomeIcon icon={faCancel} className={"me-1"} />
-                                        Set Inactive
-                                      </Dropdown.Item>
-                                  )
-                              }
-
-                              {
-                                  !drive.storageDrive.active && (
-                                      <Dropdown.Item onClick={() => console.log("Click")}>
-                                        <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
-                                        Set Active
-                                      </Dropdown.Item>
-                                  )
-                              }
-
-                            </Dropdown.Menu>
-                          </Dropdown>
-                        </Col>
-
-                      </Row>
-                    </Card.Body>
-                  </Card>
-              ))
-          )
+                  <EgnyteDriveCard
+                      drive={drive}
+                      handleDriveStatusChange={handleDriveStatusUpdate}
+                  />
+              )
+          ))
         }
+
+        <EgnyteIntegrationFormModal
+            isOpen={integrationModalIsOpen}
+            setIsOpen={setIntegrationModalIsOpen}
+            handleFormSubmit={handleIntegrationFormSubmit}
+            formikRef={integrationFormikRef}
+        />
 
       </>
   )

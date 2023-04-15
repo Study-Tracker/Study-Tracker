@@ -18,7 +18,7 @@ import {Button, Card, Col, Row} from "react-bootstrap";
 import React from "react";
 import PropTypes from "prop-types";
 
-const EgnyteIntegrationSetupCard = ({}) => {
+const EgnyteIntegrationSetupCard = ({handleClick}) => {
   return (
       <Card className="illustration">
         <Card.Header>
@@ -29,7 +29,7 @@ const EgnyteIntegrationSetupCard = ({}) => {
         <Card.Body>
           <Row>
             <Col className={"text-center"}>
-              <Button size="lg" color={"primary"} onClick={() => console.log("Click")}>
+              <Button size="lg" color={"primary"} onClick={handleClick}>
                 Register Egnyte Integration
               </Button>
             </Col>
@@ -40,7 +40,7 @@ const EgnyteIntegrationSetupCard = ({}) => {
 }
 
 EgnyteIntegrationSetupCard.propTypes = {
-  settings: PropTypes.object.isRequired
+  handleClick: PropTypes.func.isRequired
 }
 
 export default EgnyteIntegrationSetupCard;
