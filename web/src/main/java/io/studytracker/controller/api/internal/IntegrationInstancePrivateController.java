@@ -38,10 +38,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
+@Deprecated
 @RequestMapping("/api/internal/integrations")
-@RestController
+//@RestController
 public class IntegrationInstancePrivateController extends AbstractApiController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationInstancePrivateController.class);

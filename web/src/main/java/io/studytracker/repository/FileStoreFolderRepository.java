@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+@Deprecated
 public interface FileStoreFolderRepository extends JpaRepository<FileStoreFolder, Long> {
 
   @Query("select f from FileStoreFolder  f where f.fileStorageLocation.id = ?1 and f.path = ?2")

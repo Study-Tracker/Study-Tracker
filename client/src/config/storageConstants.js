@@ -15,4 +15,4 @@
  */
 
 
-export const S3_STORAGE_TYPE = 'AWS_S3';
+export const S3_STORAGE_TYPE = 'S3';

@@ -26,12 +26,12 @@ import FileManagerUploadModal from "./FileManagerUploadModal";
 import FileManagerNewFolderModal from "./FileManagerNewFolderModal";
 import React, {useContext, useEffect, useState} from "react";
 import axios from "axios";
-import ErrorMessage from "../structure/ErrorMessage";
 import FileManagerTable from "./FileManagerTable";
 import {useSearchParams} from "react-router-dom";
 import NotyfContext from "../../context/NotyfContext";
 import {LoadingMessageCard} from "../loading";
 import PropTypes from "prop-types";
+import FileManagerContentError from "./FileManagerContentError";
 
 const FolderSizeBadge = ({folder}) => {
   let count = 0;
@@ -55,16 +55,20 @@ const pathIsChild = (path, parent) => {
   return path.indexOf(parent) > -1;
 }
 
-const FileManagerContent = ({location, path}) => {
+const FileManagerContent = ({
+    rootFolder,
+    path,
+    handleRepairFolder
+}) => {
 
-  console.debug("Selected data source: ", location);
+  console.debug("Selected data source: ", rootFolder);
   console.debug("Selected path: ", path);
 
   const notyf = useContext(NotyfContext);
 
-  const [rootPath, setRootPath] = useState(path || location.rootFolderPath);
+  const [rootPath, setRootPath] = useState(path || rootFolder.path);
   const [folder, setFolder] = useState(null);
-  const [currentPath, setCurrentPath] = useState(path || location.rootFolderPath);
+  const [currentPath, setCurrentPath] = useState(path || rootFolder.path);
   const [history, setHistory] = useState([]);
   const [refreshCount, setRefreshCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,11 +83,11 @@ const FileManagerContent = ({location, path}) => {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    setRootPath(path || location.rootFolderPath);
+    setRootPath(path || rootFolder.path);
     axios.get("/api/internal/data-files", {
       params: {
         path: currentPath,
-        locationId: location.id
+        folderId: rootFolder.id
       }
     })
     .then(response => {
@@ -101,10 +105,10 @@ const FileManagerContent = ({location, path}) => {
 
   // Reset the component on data source change
   useEffect(() => {
-    setCurrentPath(path || location.rootFolderPath);
+    setCurrentPath(path || rootFolder.path);
     setHistory([]);
-    setRefreshCount(refreshCount + 1);
-  }, [location]);
+    // setRefreshCount(refreshCount + 1);
+  }, [rootFolder]);
 
   /**
    * Loads the folder from the selected path and refreshes the UI.
@@ -138,7 +142,7 @@ const FileManagerContent = ({location, path}) => {
    */
   const handleCreateFolder = (values, {setSubmitting, resetForm}) => {
     const data = new FormData();
-    data.append("locationId", location.id);
+    data.append("folderId", rootFolder.id);
     data.append("path", currentPath);
     data.append("folderName", values.folderName);
     axios.post("/api/internal/data-files/create-folder", data)
@@ -161,13 +165,21 @@ const FileManagerContent = ({location, path}) => {
 
   let content = <LoadingMessageCard />;
   if (!isLoading && error) {
-    content = <ErrorMessage />;
+    console.debug("Error: ", error);
+    content = (
+        <FileManagerContentError
+          error={error}
+          handleRepairFolder={handleRepairFolder}
+        />
+    );
   } else if (!isLoading && folder) {
-    content = <FileManagerTable
-        folder={folder}
-        handlePathChange={handlePathUpdate}
-        dataSource={location}
-    />;
+    content = (
+        <FileManagerTable
+          folder={folder}
+          handlePathChange={handlePathUpdate}
+          dataSource={rootFolder}
+        />
+    );
   }
 
   return (
@@ -248,7 +260,7 @@ const FileManagerContent = ({location, path}) => {
               setModalIsOpen={setUploadModalIsOpen}
               handleSuccess={handleUploadSuccess}
               path={currentPath}
-              locationId={location.id}
+              folderId={rootFolder.id}
           />
 
           <FileManagerNewFolderModal
@@ -324,8 +336,9 @@ const FileManagerContent = ({location, path}) => {
 }
 
 FileManagerContent.propTypes = {
-  location: PropTypes.object.isRequired,
+  rootFolder: PropTypes.object.isRequired,
   path: PropTypes.string.isRequired,
+  handleRepairFolder: PropTypes.func,
 }
 
 export default FileManagerContent;

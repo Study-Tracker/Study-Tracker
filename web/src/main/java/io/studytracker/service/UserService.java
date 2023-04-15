@@ -85,12 +85,12 @@ public class UserService {
   }
 
   @Transactional
-  public void create(User user) {
-    userRepository.save(user);
+  public User create(User user) {
+    return userRepository.save(user);
   }
 
   @Transactional
-  public void update(User user) {
+  public User update(User user) {
     User u = userRepository.getById(user.getId());
     u.setDisplayName(user.getDisplayName());
     u.setEmail(user.getEmail());
@@ -100,7 +100,7 @@ public class UserService {
     u.setTitle(user.getTitle());
     u.setDepartment(user.getDepartment());
     u.setAttributes(user.getAttributes());
-    userRepository.save(u);
+    return userRepository.save(u);
   }
 
   @Transactional

@@ -32,7 +32,7 @@ import org.springframework.validation.annotation.Validated;
 @ToString
 public class StorageProperties {
 
-  @ConfigurationModeConstraint(options = {"local", "egnyte"})
+  @ConfigurationModeConstraint(options = {"local", "egnyte", "onedrive"})
   private String mode;
 
   private Boolean useExisting;

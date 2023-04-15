@@ -71,7 +71,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("owner")
       }),
   @NamedEntityGraph(
@@ -80,7 +79,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
         @NamedAttributeNode("notebookFolder"),
-        @NamedAttributeNode("primaryStorageFolder"),
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("owner"),
@@ -90,12 +88,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("conclusions"),
         @NamedAttributeNode("comments"),
         @NamedAttributeNode("studyRelationships"),
-        @NamedAttributeNode("storageFolders")
+        @NamedAttributeNode(value = "storageFolders", subgraph = "study-storage-folder-details")
       },
     subgraphs = {
           @NamedSubgraph(
               name = "keyword-details",
               attributeNodes = {@NamedAttributeNode("category")}
+          ),
+          @NamedSubgraph(
+              name = "study-storage-folder-details",
+              attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
           )
     }
   )
@@ -140,16 +142,12 @@ public class Study implements Model {
   @JoinColumn(name = "notebook_folder_id")
   private ELNFolder notebookFolder;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "storage_folder_id")
-  private FileStoreFolder primaryStorageFolder;
-
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(
-      name = "study_storage_folders",
-      joinColumns = @JoinColumn(name = "study_id", nullable = false),
-      inverseJoinColumns = @JoinColumn(name = "storage_folder_id", nullable = false))
-  private Set<FileStoreFolder> storageFolders = new HashSet<>();
+  @OneToMany(
+      mappedBy = "study",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private Set<StudyStorageFolder> storageFolders = new HashSet<>();
 
   @CreatedBy
   @ManyToOne(fetch = FetchType.LAZY)
@@ -408,14 +406,6 @@ public class Study implements Model {
     this.notebookFolder = notebookFolder;
   }
 
-  public FileStoreFolder getPrimaryStorageFolder() {
-    return primaryStorageFolder;
-  }
-
-  public void setPrimaryStorageFolder(FileStoreFolder storageFolder) {
-    this.primaryStorageFolder = storageFolder;
-  }
-
   public User getCreatedBy() {
     return createdBy;
   }
@@ -558,19 +548,34 @@ public class Study implements Model {
     return this.attributes.get(key);
   }
 
-  public Set<FileStoreFolder> getStorageFolders() {
+  public Set<StudyStorageFolder> getStorageFolders() {
     return storageFolders;
   }
 
-  public void setStorageFolders(Set<FileStoreFolder> fileStoreFolders) {
+  public void setStorageFolders(Set<StudyStorageFolder> fileStoreFolders) {
     this.storageFolders = fileStoreFolders;
   }
 
-  public void addFileStoreFolder(FileStoreFolder folder) {
+  public void addStudyStorageFolder(StudyStorageFolder folder) {
     this.storageFolders.add(folder);
   }
 
-  public void removeFileStoreFolder(FileStoreFolder folder) {
+  public void addStorageFolder(StorageDriveFolder storageDriveFolder) {
+    this.addStorageFolder(storageDriveFolder, false);
+  }
+
+  public void addStorageFolder(StorageDriveFolder folder, boolean isPrimary) {
+    if (isPrimary) {
+      this.storageFolders.forEach(f -> f.setPrimary(false));
+    }
+    StudyStorageFolder studyStorageFolder = new StudyStorageFolder();
+    studyStorageFolder.setStudy(this);
+    studyStorageFolder.setStorageDriveFolder(folder);
+    studyStorageFolder.setPrimary(isPrimary);
+    this.getStorageFolders().add(studyStorageFolder);
+  }
+
+  public void removeStudyStorageFolder(StudyStorageFolder folder) {
     this.storageFolders.remove(folder);
   }
 

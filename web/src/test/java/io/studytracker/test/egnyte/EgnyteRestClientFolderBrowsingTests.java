@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
 package io.studytracker.test.egnyte;
 
 import io.studytracker.Application;
+import io.studytracker.egnyte.EgnyteClientFactory.EgnyteRestApiClientBuilder;
 import io.studytracker.egnyte.entity.EgnyteFile;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
-import java.net.URL;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -45,19 +45,27 @@ public class EgnyteRestClientFolderBrowsingTests {
 
   private static final String FILE_ID = "24d19373-f172-45f3-a8d6-92e4f2996ac3";
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-  @Autowired
-  private EgnyteRestApiClient client;
-
   @Value("${egnyte.root-url}")
   private String rootUrl;
 
   @Value("${egnyte.api-token}")
   private String token;
 
+  private EgnyteRestApiClient client;
+
+  @Before
+  public void setUp() throws Exception {
+    Assert.assertNotNull(rootUrl);
+    Assert.assertNotNull(token);
+    client = new EgnyteRestApiClientBuilder()
+        .rootUrl(rootUrl)
+        .apiKey(token)
+        .build();
+  }
+
   @Test
   public void listFolderContentsTest() throws Exception {
-    EgnyteObject egnyteObject = client.findObjectByPath(new URL(rootUrl), EGNYTE_ROOT, token);
+    EgnyteObject egnyteObject = client.findObjectByPath(EGNYTE_ROOT);
     Assert.assertTrue(egnyteObject.isFolder());
     EgnyteFolder folder = (EgnyteFolder) egnyteObject;
     System.out.println(folder);
@@ -80,7 +88,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     Exception exception = null;
     EgnyteObject folder = null;
     try {
-      folder = client.findObjectByPath(new URL(rootUrl), "bad/folder", token);
+      folder = client.findObjectByPath("bad/folder");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -92,14 +100,13 @@ public class EgnyteRestClientFolderBrowsingTests {
 
   @Test
   public void subfolderNavigationTest() throws Exception {
-    URL url = new URL(rootUrl);
-    EgnyteObject egnyteObject = client.findObjectByPath(url, EGNYTE_ROOT, token);
+    EgnyteObject egnyteObject = client.findObjectByPath(EGNYTE_ROOT);
     Assert.assertTrue(egnyteObject.isFolder());
     EgnyteFolder folder = (EgnyteFolder) egnyteObject;
     Assert.assertNotNull(folder);
     Assert.assertTrue(folder.isFolder());
     Assert.assertFalse(folder.getSubFolders().isEmpty());
-    EgnyteObject subfolderObject = client.findObjectByPath(url, folder.getSubFolders().get(0).getPath(), token);
+    EgnyteObject subfolderObject = client.findObjectByPath(folder.getSubFolders().get(0).getPath());
     Assert.assertTrue(subfolderObject.isFolder());
     EgnyteFolder subfolder = (EgnyteFolder) subfolderObject;
     Assert.assertNotNull(subfolder);
@@ -111,7 +118,7 @@ public class EgnyteRestClientFolderBrowsingTests {
 
   @Test
   public void findFolderByIdTest() throws Exception {
-    EgnyteFolder folder = client.findFolderById(new URL(rootUrl), FOLDER_ID, token);
+    EgnyteFolder folder = client.findFolderById(FOLDER_ID);
     Assert.assertNotNull(folder);
     Assert.assertTrue(folder.isFolder());
     Assert.assertEquals(folder.getName(), "Test");
@@ -130,7 +137,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     Exception exception = null;
     EgnyteFolder folder = null;
     try {
-      folder = client.findFolderById(new URL(rootUrl), "bad-id", token);
+      folder = client.findFolderById("bad-id");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -142,7 +149,7 @@ public class EgnyteRestClientFolderBrowsingTests {
 
   @Test
   public void findFileByPathTest() throws Exception {
-    EgnyteObject egnyteObject = client.findObjectByPath(new URL(rootUrl), EGNYTE_ROOT + "/test.txt", token);
+    EgnyteObject egnyteObject = client.findObjectByPath(EGNYTE_ROOT + "/test.txt");
     Assert.assertNotNull(egnyteObject);
     Assert.assertFalse(egnyteObject.isFolder());
     EgnyteFile file = (EgnyteFile) egnyteObject;
@@ -154,7 +161,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     Exception exception = null;
     EgnyteObject egnyteObject = null;
     try {
-      egnyteObject = client.findObjectByPath(new URL(rootUrl), EGNYTE_ROOT + "/bad-file.txt", token);
+      egnyteObject = client.findObjectByPath(EGNYTE_ROOT + "/bad-file.txt");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -166,7 +173,7 @@ public class EgnyteRestClientFolderBrowsingTests {
 
   @Test
   public void findFileByIdTest() throws Exception {
-    EgnyteFile file = client.findFileById(new URL(rootUrl), FILE_ID, token);
+    EgnyteFile file = client.findFileById(FILE_ID);
     Assert.assertNotNull(file);
     Assert.assertEquals("test.txt", file.getName());
   }
@@ -176,7 +183,7 @@ public class EgnyteRestClientFolderBrowsingTests {
     Exception exception = null;
     EgnyteFile file = null;
     try {
-      file = client.findFileById(new URL(rootUrl), "bad-id", token);
+      file = client.findFileById("bad-id");
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();

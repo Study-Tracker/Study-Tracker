@@ -18,13 +18,16 @@ package io.studytracker.mapstruct.dto.api;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import lombok.Data;
 
 @Data
 public class ProgramDto {
 
   private Long id;
+  private Long organizationId;
   private String code;
   private String name;
   private String description;
@@ -34,6 +37,6 @@ public class ProgramDto {
   private Date updatedAt;
   private boolean active;
   private Long notebookFolderId;
-  private Long storageFolderId;
+  private Set<Long> storageFolders = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
 }

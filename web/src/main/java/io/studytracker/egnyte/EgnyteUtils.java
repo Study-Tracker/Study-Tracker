@@ -22,7 +22,6 @@ import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageUtils;
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +35,7 @@ public class EgnyteUtils {
    * @param rootUrl the root URL of the Egnyte tenant
    * @return the converted file
    */
-  public static StorageFile convertEgnyteFile(EgnyteFile egnyteFile, URL rootUrl) {
+  public static StorageFile convertEgnyteFile(EgnyteFile egnyteFile, String rootUrl) {
     StorageFile storageFile = new StorageFile();
     if (egnyteFile.getUrl() == null && rootUrl != null) {
       storageFile.setUrl(buildFileUrl(rootUrl, egnyteFile));
@@ -62,7 +61,7 @@ public class EgnyteUtils {
    * @param rootUrl the root URL of the Egnyte tenant
    * @return the converted folder
    */
-  public static StorageFolder convertEgnyteFolder(EgnyteFolder egnyteFolder, URL rootUrl) {
+  public static StorageFolder convertEgnyteFolder(EgnyteFolder egnyteFolder, String rootUrl) {
     StorageFolder storageFolder = new StorageFolder();
     if (egnyteFolder.getUrl() == null && rootUrl != null) {
       storageFolder.setUrl(buildFolderUrl(rootUrl, egnyteFolder.getFolderId()));
@@ -89,17 +88,18 @@ public class EgnyteUtils {
    * @param egnyteFile the Egnyte file object
    * @return the URL
    */
-  private static String buildFileUrl(URL rootUrl, EgnyteFile egnyteFile) {
-    String url = rootUrl.toString();
-    if (url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
+  private static String buildFileUrl(String rootUrl, EgnyteFile egnyteFile) {
+    String url;
+    if (rootUrl.endsWith("/")) {
+      url = rootUrl.substring(0, rootUrl.length() - 1);
+    } else {
+      url = rootUrl;
     }
-    url = url + "/navigate/file/" + egnyteFile.getGroupId();
-    return url;
+    return url + "/navigate/file/" + egnyteFile.getGroupId();
   }
 
-  private static String buildFolderUrl(URL rootUrl, String folderId) {
-    String url = rootUrl.toString();
+  private static String buildFolderUrl(String rootUrl, String folderId) {
+    String url = rootUrl;
     if (url.endsWith("/")) {
       url = url.substring(0, url.length() - 1);
     }
@@ -115,7 +115,7 @@ public class EgnyteUtils {
    * @param rootUrl the root URL of the Egnyte tenant
    * @return the converted folder
    */
-  public static StorageFolder convertEgnyteFolderWithContents(EgnyteFolder egnyteFolder, URL rootUrl) {
+  public static StorageFolder convertEgnyteFolderWithContents(EgnyteFolder egnyteFolder, String rootUrl) {
     StorageFolder storageFolder = convertEgnyteFolder(egnyteFolder, rootUrl);
     egnyteFolder.getFiles()
         .forEach(egnyteFile -> storageFolder.addFile(convertEgnyteFile(egnyteFile, rootUrl)));
@@ -134,7 +134,7 @@ public class EgnyteUtils {
    * @return
    */
   public static StorageFolder convertEgnyteFolderWithContents(EgnyteFolder egnyteFolder,
-      URL rootUrl, String rootFolderPath) {
+      String rootUrl, String rootFolderPath) {
     StorageFolder storageFolder = convertEgnyteFolderWithContents(egnyteFolder, rootUrl);
     if (StorageUtils.comparePaths(rootFolderPath, storageFolder.getPath())) {
       storageFolder.setParentFolder(null);
@@ -175,6 +175,29 @@ public class EgnyteUtils {
     }
     List<String> bits = new ArrayList<>(Arrays.asList(path.split("/")));
     return bits.get(bits.size() - 1);
+  }
+
+  /**
+   * Return true if the {@code childPath} is a subfolder or the same folder as the {@code parentPath}.
+   *
+   * @param parentPath parent directory
+   * @param childPath child directory
+   * @return true if child is a subfolder of parent
+   */
+  public static boolean directoryIsSubfolderOf(String parentPath, String childPath) {
+    if (parentPath == null || childPath == null) {
+      return false;
+    }
+    if (parentPath.equals(childPath)) {
+      return true;
+    }
+    if (parentPath.endsWith("/")) {
+      parentPath = parentPath.substring(0, parentPath.length() - 1);
+    }
+    if (childPath.endsWith("/")) {
+      childPath = childPath.substring(0, childPath.length() - 1);
+    }
+    return childPath.startsWith(parentPath);
   }
 
 }

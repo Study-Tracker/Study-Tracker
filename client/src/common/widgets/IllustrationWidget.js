@@ -21,7 +21,9 @@ const IllustrationWidget = ({header, body, image, color}) => {
 
   let colorClass = "illustration";
   if (color === "dark") colorClass = "illustration-dark";
+  else if (color === "primary") colorClass = "illustration";
   else if (color === "light") colorClass = "illustration-text";
+  else if (color === "warning") colorClass = "illustration-warning";
 
   return (
       <Card className={"flex-fill " + colorClass}>

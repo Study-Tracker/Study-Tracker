@@ -16,8 +16,8 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
+import io.studytracker.mapstruct.dto.response.StorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.dto.response.UserSummaryDto;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,6 +38,6 @@ public class ProgramFormDto {
   private Date updatedAt;
   private boolean active;
   private NotebookFolderDetailsDto notebookFolder;
-  private FileStoreFolderDetailsDto storageFolder;
+  private StorageDriveFolderSummaryDto parentFolder;
   private Map<String, String> attributes = new HashMap<>();
 }

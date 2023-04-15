@@ -20,6 +20,7 @@ import io.studytracker.model.IntegrationDefinition;
 import io.studytracker.model.IntegrationInstanceConfigurationValue;
 import java.util.Set;
 
+@Deprecated
 public interface IntegrationOptions {
 
   IntegrationDefinition getDefinition();

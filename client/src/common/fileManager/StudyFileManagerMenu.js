@@ -21,35 +21,31 @@ import {getDataSourceIcon} from "./fileManagerUtils";
 
 const StudyFileManagerMenu = ({
   folders,
-  locations,
   handleFolderSelect,
   selectedFolder
 }) => {
 
-  console.debug("Locations", locations);
+  console.debug("Study folders", folders);
 
   const renderMenu = () => {
     return folders
     .sort((a, b) => {
-      if (a.primary) return -1;
-      else if (b.primary) return 1;
+      if (a.storageDriveFolder.name > b.storageDriveFolder.name) return -1;
+      else if (b.storageDriveFolder.name > a.storageDriveFolder.name) return 1;
       else return 0;
     })
     .map(f => {
       console.debug("Rendering menu folder: ", f);
-      const l = locations.find(l => l.id === f.fileStorageLocationId);
-      console.debug("Found location: ", l);
       return (
           <ListGroup.Item
               action
               key={f.id}
-              active={selectedFolder ? selectedFolder.id === f.id : false}
-              onClick={() => handleFolderSelect(f)}
+              active={selectedFolder ? selectedFolder.id === f.storageDriveFolder.id : false}
+              onClick={() => handleFolderSelect(f.storageDriveFolder)}
           >
-            {getDataSourceIcon(l)}
-            {/*{getDataSourceLabel(l)}: {f.name} {f.primary ? "(default)" : ""}*/}
-            <span className="fw-bolder me-2">{l && l.displayName}:</span>
-            {f.name}
+            {getDataSourceIcon(f.storageDriveFolder.storageDrive.driveType)}
+            <span className="fw-bolder me-2">{f.storageDriveFolder.storageDrive.driveType}:</span>
+            {f.storageDriveFolder.name}
             {f.primary && <span className="badge bg-info ms-2">default</span>}
           </ListGroup.Item>
       )
@@ -76,7 +72,6 @@ const StudyFileManagerMenu = ({
 
 StudyFileManagerMenu.propTypes = {
   folders: PropTypes.array.isRequired,
-  locations: PropTypes.array.isRequired,
   handleFolderSelect: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object
 }

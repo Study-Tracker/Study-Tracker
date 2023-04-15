@@ -14,50 +14,54 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
-import {Col, Row} from "react-bootstrap";
+import React, {useContext, useEffect, useState} from "react";
+import {Col, Form, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import FeatureToggleCard from "./FeatureToggleCard";
 import axios from "axios";
 import {S3_STORAGE_TYPE} from "../../config/storageConstants";
+import {FormGroup} from "./common";
+import Select from "react-select";
+import NotyfContext from "../../context/NotyfContext";
 
 const S3InputsCard = ({
     isActive,
     onChange,
-    selectedProgram
+    selectedProgram,
+    errors
 }) => {
 
   console.debug("Program: ", selectedProgram);
-  const [locations, setLocations] = useState([]);
-  const [error, setError] = useState(null);
+  const [rootFolders, setRootFolders] = useState([]);
   const [selectedBucket, setSelectedBucket] = useState(null);
+  const notyf = useContext(NotyfContext);
 
   useEffect(() => {
-    axios.get("/api/internal/storage-locations")
+    axios.get("/api/internal/storage-drive-folders?studyRoot=true")
     .then(response => {
-      const bucketLocations = response.data
-        .filter(location => location.active && location.type === S3_STORAGE_TYPE);
-      setLocations(bucketLocations);
-      const defaultLocation = bucketLocations.find(location => location.defaultStudyLocation === true);
-      if (!!defaultLocation) {
-        setSelectedBucket(defaultLocation);
-        onChange("s3LocationId", defaultLocation.id);
-      }
+      let folders = response.data;
+      axios.get("/api/internal/drives/s3")
+      .then(async response2 => {
+
+        const bucketRootFolders = folders
+        .filter(f => f.storageDrive.active && f.storageDrive.driveType
+            === S3_STORAGE_TYPE);
+        await bucketRootFolders.forEach(f => {
+          f.bucket = response2.data.find(b => b.storageDrive.id === f.storageDrive.id);
+        });
+        setRootFolders(bucketRootFolders);
+      })
     })
     .catch(error => {
       console.error(error);
-      setError(error);
+      notyf.open({
+        type: "error",
+        message: "Error loading S3 buckets"
+      })
     })
   }, []);
 
   console.debug("Selected Bucket", selectedBucket);
-  let bucketPath = selectedBucket ? selectedBucket.name + "/" + selectedBucket.rootFolderPath : "";
-  if (!!bucketPath && !bucketPath.endsWith("/")) {
-    bucketPath += "/";
-  }
-  if (selectedProgram) {
-    bucketPath += selectedProgram.name;
-  }
 
   return (
       <FeatureToggleCard
@@ -73,14 +77,57 @@ const S3InputsCard = ({
       >
 
         <Row>
-          <Col md={12}>
-            <p>
-              A folder will be created for your study in the S3 bucket:
-            </p>
-            <p className={"text-lg"}>
-              <code>{bucketPath}</code>
-            </p>
+
+          <Col md={6} className={"mb-3"}>
+            <FormGroup>
+              <Form.Label>S3 Bucket *</Form.Label>
+              <Select
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  options={
+                    rootFolders
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map(p => ({
+                      label: p.storageDrive.driveType + ": " + p.name,
+                      value: p
+                    }))
+                  }
+                  name="parentFolder"
+                  onChange={(selected) => {
+                    setSelectedBucket(selected.value);
+                    onChange("s3FolderId", selected.value.id);
+                  }}
+              />
+              <Form.Control.Feedback type={"invalid"}>
+                {errors.s3FolderId}
+              </Form.Control.Feedback>
+              <Form.Text>
+                Select the S3 bucket to create the study storage folder in.
+              </Form.Text>
+            </FormGroup>
           </Col>
+
+          {
+              selectedBucket && (
+                  <Col md={6}>
+                    <p>
+                      A folder will be created for your study in the S3 bucket:
+                    </p>
+                    <p className={"text-lg"}>
+                      <code>
+                        {
+                            "s3://"
+                            + selectedBucket.bucket.name
+                            + "/"
+                            + selectedBucket.path
+                            + (selectedProgram ? selectedProgram.name : "")
+                        }
+                      </code>
+                    </p>
+                  </Col>
+              )
+          }
+
         </Row>
 
       </FeatureToggleCard>

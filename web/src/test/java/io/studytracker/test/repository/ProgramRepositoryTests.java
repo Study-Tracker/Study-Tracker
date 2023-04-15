@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,25 @@
 package io.studytracker.test.repository;
 
 import io.studytracker.Application;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.exception.StudyTrackerException;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramStorageFolder;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.ELNFolderRepository;
-import io.studytracker.repository.FileStorageLocationRepository;
-import io.studytracker.repository.FileStoreFolderRepository;
+import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.ProgramStorageFolderRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.hibernate.LazyInitializationException;
@@ -52,14 +60,14 @@ public class ProgramRepositoryTests {
   @Autowired private UserRepository userRepository;
   @Autowired private ProgramRepository programRepository;
   @Autowired private ELNFolderRepository elnFolderRepository;
-  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
-
-  @Autowired private FileStorageLocationRepository fileStorageLocationRepository;
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
+  @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
+  @Autowired private ProgramStorageFolderRepository programStorageFolderRepository;
+  @Autowired private OrganizationRepository organizationRepository;
 
   @Before
   public void doBefore() {
     programRepository.deleteAll();
-    fileStoreFolderRepository.deleteAll();
     elnFolderRepository.deleteAll();
     userRepository.deleteAll();
   }
@@ -79,35 +87,45 @@ public class ProgramRepositoryTests {
     return user;
   }
 
+  private StorageDriveFolder createProgramFolder(Program program) {
+    try {
+      StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders()
+          .stream()
+          .min(Comparator.comparing(StorageDriveFolder::getId))
+          .orElseThrow(RecordNotFoundException::new);
+      StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
+          .orElseThrow(RecordNotFoundException::new);
+      return studyStorageService.createProgramFolder(rootFolder, program);
+    } catch (Exception ex) {
+      throw new StudyTrackerException(ex);
+    }
+  }
+
   @Test
   public void newProgramTest() {
 
     User user = createUser();
-    FileStorageLocation location = fileStorageLocationRepository.findAll().get(0);
+    Organization organization = organizationRepository.findAll().get(0);
+    Assert.assertNotNull(organization);
 
     Assert.assertEquals(0, programRepository.count());
-    Assert.assertEquals(0, fileStoreFolderRepository.count());
+    Assert.assertEquals(0, programStorageFolderRepository.count());
     Assert.assertEquals(0, elnFolderRepository.count());
 
     Program program = new Program();
+    program.setOrganization(organization);
     program.setActive(true);
     program.setCode("TST");
     program.setCreatedBy(user);
     program.setLastModifiedBy(user);
     program.setName("Test Program");
     program.addAttribute("key", "value");
-
-    FileStoreFolder folder = new FileStoreFolder();
-    folder.setPath("/path/to/test");
-    folder.setName("test");
-    folder.setUrl("http://test");
-    folder.setFileStorageLocation(location);
-    program.setPrimaryStorageFolder(folder);
+    program.addStorageFolder(createProgramFolder(program), true);
 
     programRepository.save(program);
 
     Assert.assertEquals(1, programRepository.count());
-    Assert.assertEquals(1, fileStoreFolderRepository.count());
+    Assert.assertEquals(1, programStorageFolderRepository.count());
     Assert.assertEquals(0, elnFolderRepository.count());
 
     Assert.assertNotNull(program.getId());
@@ -123,15 +141,15 @@ public class ProgramRepositoryTests {
     Assert.assertNotNull(createdBy);
     Assert.assertEquals("test@email.com", createdBy.getEmail());
 
-    FileStoreFolder programFolder = created.getPrimaryStorageFolder();
+    ProgramStorageFolder programFolder = created.getStorageFolders().stream().findFirst().get();
     Assert.assertNotNull(programFolder.getId());
-    Optional<FileStoreFolder> fileStoreFolderOptional =
-        fileStoreFolderRepository.findById(programFolder.getId());
+    Optional<ProgramStorageFolder> fileStoreFolderOptional =
+        programStorageFolderRepository.findById(programFolder.getId());
     Assert.assertTrue(fileStoreFolderOptional.isPresent());
 
-    created.setPrimaryStorageFolder(null);
+    created.setStorageFolders(new HashSet<>());
     programRepository.save(created);
-    Assert.assertEquals(0, fileStoreFolderRepository.count());
+    Assert.assertEquals(0, programStorageFolderRepository.count());
 
     Exception exception = null;
     Program duplicate = new Program();

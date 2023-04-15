@@ -18,6 +18,7 @@ package io.studytracker.mapstruct.dto.response;
 
 import lombok.Data;
 
+@Deprecated
 @Data
 public class IntegrationInstanceConfigurationValueDetailsDto {
 

@@ -16,6 +16,8 @@
 
 package io.studytracker.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -25,5 +27,7 @@ public class AssayOptions {
   private String notebookTemplateId;
   private boolean useGit = false;
   private boolean useStorage = true;
+  private StorageDriveFolder parentFolder;
+  private List<StorageDriveFolder> additionalFolders = new ArrayList<>();
 
 }

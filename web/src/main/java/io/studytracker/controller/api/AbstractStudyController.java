@@ -109,11 +109,11 @@ public abstract class AbstractStudyController extends AbstractApiController {
    * @return
    */
   protected Study createNewStudy(Study study, StudyOptions options) {
-    studyService.create(study, options);
-    Assert.notNull(study.getId(), "Study not persisted.");
-    Activity activity = StudyActivityUtils.fromNewStudy(study, this.getAuthenticatedUser());
+    Study created = studyService.create(study, options);
+    Assert.notNull(created.getId(), "Study not persisted.");
+    Activity activity = StudyActivityUtils.fromNewStudy(created, this.getAuthenticatedUser());
     this.logActivity(activity);
-    return study;
+    return created;
   }
 
   /**

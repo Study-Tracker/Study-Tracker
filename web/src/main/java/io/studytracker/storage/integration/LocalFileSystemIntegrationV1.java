@@ -29,6 +29,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Deprecated
 public class LocalFileSystemIntegrationV1 implements LocalFileSystemOptions {
 
   public static final String ROOT_PATH = "root-path";

@@ -36,7 +36,6 @@ public class ProgramDetailsDto {
   private Date updatedAt;
   private boolean active;
   private NotebookFolderDetailsDto notebookFolder;
-  private FileStoreFolderDetailsDto primaryStorageFolder;
   private Map<String, String> attributes = new HashMap<>();
-  private Set<FileStoreFolderDetailsDto> storageFolders = new HashSet<>();
+  private Set<ProgramStorageDriveFolderSummaryDto> storageFolders = new HashSet<>();
 }

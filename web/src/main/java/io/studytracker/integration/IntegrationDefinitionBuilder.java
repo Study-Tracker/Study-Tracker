@@ -21,6 +21,7 @@ import io.studytracker.model.IntegrationDefinition;
 import java.util.Collection;
 import org.springframework.util.Assert;
 
+@Deprecated
 public class IntegrationDefinitionBuilder {
 
   private final IntegrationDefinition integration;

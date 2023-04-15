@@ -19,6 +19,7 @@ package io.studytracker.storage.integration;
 import io.studytracker.integration.IntegrationType;
 import io.studytracker.model.IntegrationInstance;
 
+@Deprecated
 public class LocalFileSystemOptionsFactory {
 
   public static LocalFileSystemOptions create(IntegrationInstance instance) {

@@ -16,6 +16,8 @@
 
 package io.studytracker.example;
 
+import io.studytracker.config.initialization.DefaultDataInitializer;
+import io.studytracker.config.initialization.IntegrationInitializer;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -30,12 +32,12 @@ import io.studytracker.model.Comment;
 import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.KeywordCategory;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyCollection;
 import io.studytracker.model.StudyConclusions;
@@ -50,23 +52,28 @@ import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.AssayTypeTaskRepository;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.CommentRepository;
+import io.studytracker.repository.EgnyteDriveFolderRepository;
 import io.studytracker.repository.ExternalLinkRepository;
 import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.KeywordRepository;
+import io.studytracker.repository.LocalDriveFolderRepository;
+import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.PasswordResetTokenRepository;
 import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StudyCollectionRepository;
 import io.studytracker.repository.StudyConclusionsRepository;
 import io.studytracker.repository.StudyRelationshipRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
-import io.studytracker.service.StorageLocationService;
-import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +83,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.util.Assert;
+import org.springframework.transaction.annotation.Transactional;
 
 public class ExampleDataGenerator {
 
@@ -87,7 +94,6 @@ public class ExampleDataGenerator {
   public static final int KEYWORD_COUNT = 7;
   public static final int ASSAY_TYPE_COUNT = 2;
   public static final int ASSAY_COUNT = 2;
-  public static final int NOTEBOOK_ENTRY_TEMPLATE_COUNT = 5;
   public static final int STUDY_COUNT = 6;
   public static final int ACTIVITY_COUNT = 13;
   public static final int STORAGE_FOLDER_COUNT = 13;
@@ -98,9 +104,18 @@ public class ExampleDataGenerator {
   public static final int CONCLUSIONS_COUNT = 1;
   public static final int EXTERNAL_LINK_COUNT = 1;
   public static final int STUDY_COLLECTION_COUNT = 2;
+  public static final int STUDY_ROOT_FOLDER_COUNT = 1;
+  public static final int BROWSER_ROOT_FOLDER_COUNT = 1;
+  public static final int STORAGE_DRIVE_COUNT = 1;
+  public static final int STORAGE_DRIVE_FOLDER_COUNT = STUDY_COUNT + PROGRAM_COUNT + ASSAY_COUNT + STUDY_ROOT_FOLDER_COUNT;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExampleDataGenerator.class);
 
+  @Autowired private DefaultDataInitializer defaultDataInitializer;
+
+  @Autowired private IntegrationInitializer integrationInitializer;
+
+  @Autowired private OrganizationRepository organizationRepository;
   @Autowired private ProgramRepository programRepository;
 
   @Autowired private UserRepository userRepository;
@@ -137,95 +152,28 @@ public class ExampleDataGenerator {
 
   @Autowired private StudyCollectionRepository studyCollectionRepository;
 
-  @Autowired private StorageLocationService storageLocationService;
+  @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
 
-  public List<Program> generateExamplePrograms(List<User> users) {
-    User user = users.get(0);
-    List<Program> programs = new ArrayList<>();
+  @Autowired private StorageDriveFolderService storageDriveFolderService;;
+  @Autowired private StorageDriveFolderRepository storageDriveFolderRepository;
+  @Autowired private LocalDriveFolderRepository localDriveFolderRepository;
+  @Autowired private EgnyteDriveFolderRepository egnyteDriveFolderRepository;
 
-    Program program = new Program();
-    program.setName("Clinical Program A");
-    program.setCode("CPA");
-    program.setActive(true);
-    program.setCreatedBy(user);
-    program.setLastModifiedBy(user);
-    program.setCreatedAt(new Date());
-    program.setPrimaryStorageFolder(createProgramFolder(program));
-    programs.add(program);
+  public List<Organization> generateExampleOrganizations() {
 
-    program = new Program();
-    program.setName("Preclinical Project B");
-    program.setCode("PPB");
-    program.setActive(true);
-    program.setCreatedBy(user);
-    program.setLastModifiedBy(user);
-    program.setCreatedAt(new Date());
-    program.setPrimaryStorageFolder(createProgramFolder(program));
-    programs.add(program);
+    List<Organization> organizations = organizationRepository.findAll();
 
-    program = new Program();
-    program.setName("Cancelled Program C");
-    program.setCode("CPC");
-    program.setActive(false);
-    program.setCreatedBy(user);
-    program.setLastModifiedBy(user);
-    program.setCreatedAt(new Date());
-    program.setPrimaryStorageFolder(createProgramFolder(program));
-    programs.add(program);
-
-    program = new Program();
-    program.setName("Target ID Project D");
-    program.setCode("TID");
-    program.setActive(true);
-    program.setCreatedBy(user);
-    program.setLastModifiedBy(user);
-    program.setCreatedAt(new Date());
-    program.setPrimaryStorageFolder(createProgramFolder(program));
-    programs.add(program);
-
-    program = new Program();
-    program.setName("Target ID Project E");
-    program.setCode("TID");
-    program.setActive(true);
-    program.setCreatedBy(user);
-    program.setLastModifiedBy(user);
-    program.setCreatedAt(new Date());
-    program.setPrimaryStorageFolder(createProgramFolder(program));
-    programs.add(program);
-
-    return programs;
-  }
-
-  public FileStoreFolder createProgramFolder(Program program) {
-    try {
-      StorageFolder folder;
-      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-      StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-      try {
-        folder = studyStorageService.findFolder(location, program);
-      } catch (Exception e) {
-        folder = studyStorageService.createFolder(location, program);
-      }
-      Assert.notNull(folder, "Program folder must not be null");
-      return FileStoreFolder.from(location, folder);
-    } catch (Exception ex) {
-      throw new StudyTrackerException(ex);
+    if (organizations.isEmpty()) {
+      Organization organization = new Organization();
+      organization.setName("My Organization");
+      organization.setActive(true);
+      organization.setDescription("Example Organization");
+      organizationRepository.save(organization);
+      organizations.add(organization);
     }
-  }
 
-//  public void createProgramFolders() {
-//    try {
-//      for (Program program : programRepository.findAll()) {
-//        try {
-//          studyStorageService.findFolder(program);
-//        } catch (StudyStorageNotFoundException ex) {
-//          studyStorageService.createFolder(program);
-//        }
-//      }
-//    } catch (Exception e) {
-//      throw new StudyTrackerException(e);
-//    }
-//  }
+    return organizations;
+  }
 
   public List<User> generateExampleUsers() {
 
@@ -266,14 +214,90 @@ public class ExampleDataGenerator {
     user.setDepartment("IT");
     users.add(user);
 
-    return users;
+    return userRepository.saveAll(users);
+  }
+
+  private StorageDriveFolder createProgramFolder(Program program) {
+    try {
+      StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders()
+          .stream()
+          .min(Comparator.comparing(StorageDriveFolder::getId))
+          .orElseThrow(RecordNotFoundException::new);
+      StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
+          .orElseThrow(RecordNotFoundException::new);
+      return studyStorageService.createProgramFolder(rootFolder, program);
+    } catch (Exception ex) {
+      throw new StudyTrackerException(ex);
+    }
+  }
+
+  public List<Program> generateExamplePrograms(Organization organization, List<User> users) {
+    User user = users.get(0);
+    List<Program> programs = new ArrayList<>();
+
+    Program program = new Program();
+    program.setOrganization(organization);
+    program.setName("Clinical Program A");
+    program.setCode("CPA");
+    program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
+    program.addStorageFolder(createProgramFolder(program), true);
+    programs.add(program);
+
+    program = new Program();
+    program.setOrganization(organization);
+    program.setName("Preclinical Project B");
+    program.setCode("PPB");
+    program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
+    program.addStorageFolder(createProgramFolder(program), true);
+    programs.add(program);
+
+    program = new Program();
+    program.setOrganization(organization);
+    program.setName("Cancelled Program C");
+    program.setCode("CPC");
+    program.setActive(false);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
+    program.addStorageFolder(createProgramFolder(program), true);
+    programs.add(program);
+
+    program = new Program();
+    program.setOrganization(organization);
+    program.setName("Target ID Project D");
+    program.setCode("TID");
+    program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
+    program.addStorageFolder(createProgramFolder(program), true);
+    programs.add(program);
+
+    program = new Program();
+    program.setOrganization(organization);
+    program.setName("Target ID Project E");
+    program.setCode("TID");
+    program.setActive(true);
+    program.setCreatedBy(user);
+    program.setLastModifiedBy(user);
+    program.setCreatedAt(new Date());
+    program.addStorageFolder(createProgramFolder(program), true);
+    programs.add(program);
+
+    return programRepository.saveAll(programs);
   }
 
   public List<KeywordCategory> generateExampleKeywordCategories() {
     List<KeywordCategory> categories = new ArrayList<>();
     categories.add(new KeywordCategory("Cell Line"));
     categories.add(new KeywordCategory("Gene"));
-    return categories;
+    return keywordCategoryRepository.saveAll(categories);
   }
 
   public List<Keyword> generateExampleKeywords(List<KeywordCategory> categories) {
@@ -289,7 +313,7 @@ public class ExampleDataGenerator {
     keywords.add(new Keyword(category2, "AKT2"));
     keywords.add(new Keyword(category2, "AKT3"));
     keywords.add(new Keyword(category2, "PTEN"));
-    return keywords;
+    return keywordRepository.saveAll(keywords);
   }
 
   public List<Collaborator> generateExampleCollaborators() {
@@ -334,7 +358,19 @@ public class ExampleDataGenerator {
     collaborator.setCode("IN");
     collaborators.add(collaborator);
 
-    return collaborators;
+    return collaboratorRepository.saveAll(collaborators);
+  }
+
+  private StorageDriveFolder createStudyFolder(Study study) {
+    try {
+      StorageDriveFolder programFolder = storageDriveFolderRepository
+          .findByProgramId(study.getProgram().getId()).get(0);
+      StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(programFolder)
+          .orElseThrow(RecordNotFoundException::new);
+      return studyStorageService.createStudyFolder(programFolder, study);
+    } catch (Exception ex) {
+      throw new StudyTrackerException(ex);
+    }
   }
 
   public void generateExampleStudies() throws Exception {
@@ -376,7 +412,7 @@ public class ExampleDataGenerator {
     study.setCollaborator(collaborator);
     study.setExternalCode(collaborator.getCode() + "-00001");
     study.setKeywords(keywords);
-    study.setPrimaryStorageFolder(createStudyFolder(study));
+    study.addStorageFolder(createStudyFolder(study), true);
 
     ELNFolder notebookEntry = new ELNFolder();
     notebookEntry.setName("IDBS ELN");
@@ -419,7 +455,7 @@ public class ExampleDataGenerator {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
     study.setKeywords(keywords);
-    study.setPrimaryStorageFolder(createStudyFolder(study));
+    study.addStorageFolder(createStudyFolder(study), true);
 
     notebookEntry = new ELNFolder();
     notebookEntry.setName("ELN");
@@ -485,7 +521,7 @@ public class ExampleDataGenerator {
     notebookEntry.setName("ELN");
     notebookEntry.setUrl("https://google.com");
     study.setNotebookFolder(notebookEntry);
-    study.setPrimaryStorageFolder(createStudyFolder(study));
+    study.addStorageFolder(createStudyFolder(study), true);
     studyRepository.save(study);
 
     activityRepository.save(StudyActivityUtils.fromNewStudy(study, user));
@@ -517,7 +553,7 @@ public class ExampleDataGenerator {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
     study.setKeywords(keywords);
-    study.setPrimaryStorageFolder(createStudyFolder(study));
+    study.addStorageFolder(createStudyFolder(study), true);
     studyRepository.save(study);
 
     activityRepository.save(StudyActivityUtils.fromNewStudy(study, user));
@@ -550,7 +586,7 @@ public class ExampleDataGenerator {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
     study.setKeywords(keywords);
-    study.setPrimaryStorageFolder(createStudyFolder(study));
+    study.addStorageFolder(createStudyFolder(study), true);
     studyRepository.save(study);
     activityRepository.save(StudyActivityUtils.fromNewStudy(study, user));
 
@@ -581,62 +617,30 @@ public class ExampleDataGenerator {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
     study.setKeywords(keywords);
-    study.setPrimaryStorageFolder(createStudyFolder(study));
+    study.addStorageFolder(createStudyFolder(study), true);
     studyRepository.save(study);
     activityRepository.save(StudyActivityUtils.fromNewStudy(study, user));
   }
 
-  public FileStoreFolder createStudyFolder(Study study) {
-    try {
-      StorageFolder folder;
-      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-      StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-      try {
-        folder = studyStorageService.findFolder(location, study);
-      } catch (Exception e) {
-        folder = studyStorageService.createFolder(location, study);
-      }
-      Assert.notNull(folder, "Study folder must not be null");
-      return FileStoreFolder.from(location, folder);
-    } catch (Exception ex) {
-      throw new StudyTrackerException(ex);
-    }
-  }
-
-  //  public void createStudyFolders() {
-  //    for (Study study : studyRepository.findAll()) {
-  //      try {
-  //        StorageFolder folder;
-  //        try {
-  //          folder = studyStorageService.getStudyFolder(study);
-  //        } catch (Exception e) {
-  //          folder = studyStorageService.createStudyFolder(study);
-  //        }
-  //        study.setStorageFolder(FileStoreFolder.from(folder));
-  //        studyRepository.save(study);
-  //      } catch (Exception ex) {
-  //        throw new RuntimeException(ex);
-  //      }
-  //    }
-  //  }
 
   public void generateExampleAssayTypes() {
 
     List<AssayType> assayTypes = new ArrayList<>();
+    AssayType assayType;
 
-    AssayType assayType = new AssayType();
-    assayType.setName("Generic");
-    assayType.setDescription("Generic assay type for all purposes");
-    assayType.setActive(true);
-    assayTypes.add(assayType);
-
-    assayTypeRepository.save(assayType);
+    if (assayTypeRepository.findByName("Generic").isEmpty()) {
+      assayType = new AssayType();
+      assayType.setName("Generic");
+      assayType.setDescription("Generic assay type for all purposes");
+      assayType.setActive(true);
+      assayTypes.add(assayType);
+      assayTypeRepository.save(assayType);
+    }
 
     assayType = new AssayType();
     assayType.setName("Histology");
     assayType.setDescription("Histological analysis assays");
     assayType.setActive(true);
-
     assayTypeRepository.save(assayType);
 
     List<AssayTypeField> fields =
@@ -674,6 +678,18 @@ public class ExampleDataGenerator {
     assayTypeTaskRepository.save(task3);
   }
 
+  private StorageDriveFolder createAssayFolder(Assay assay) {
+    try {
+      StorageDriveFolder studyFolder = storageDriveFolderRepository
+          .findByStudyId(assay.getStudy().getId()).get(0);
+      StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(studyFolder)
+          .orElseThrow(RecordNotFoundException::new);
+      return studyStorageService.createAssayFolder(studyFolder, assay);
+    } catch (Exception ex) {
+      throw new StudyTrackerException(ex);
+    }
+  }
+
   public void generateExampleAssays(List<Study> studies) {
 
     AssayType assayType =
@@ -701,7 +717,7 @@ public class ExampleDataGenerator {
     assay.setLastModifiedBy(user);
     assay.setUpdatedAt(new Date());
     assay.setAttributes(Collections.singletonMap("key", "value"));
-    assay.setPrimaryStorageFolder(createAssayFolder(assay));
+    assay.addStorageFolder(createAssayFolder(assay), true);
 
     AssayTask task = new AssayTask();
     task.setLabel("My task");
@@ -730,7 +746,7 @@ public class ExampleDataGenerator {
     assay.setLastModifiedBy(user);
     assay.setUpdatedAt(new Date());
     assay.setAttributes(Collections.singletonMap("key", "value"));
-    assay.setPrimaryStorageFolder(createAssayFolder(assay));
+    assay.addStorageFolder(createAssayFolder(assay), true);
 
     task = new AssayTask();
     task.setLabel("My task");
@@ -741,23 +757,6 @@ public class ExampleDataGenerator {
     assay.addTask(task);
 
     assayRepository.save(assay);
-  }
-
-  public FileStoreFolder createAssayFolder(Assay assay) {
-    try {
-      StorageFolder folder;
-      FileStorageLocation location = storageLocationService.findDefaultStudyLocation();
-      StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-      try {
-        folder = studyStorageService.findFolder(location, assay);
-      } catch (Exception e) {
-        folder = studyStorageService.createFolder(location, assay);
-      }
-      Assert.notNull(folder, "Assay folder must not be null");
-      return FileStoreFolder.from(location, folder);
-    } catch (Exception ex) {
-      throw new StudyTrackerException(ex);
-    }
   }
 
   public List<StudyCollection> generateStudyCollections(List<Study> studies) {
@@ -791,10 +790,11 @@ public class ExampleDataGenerator {
     collection.setStudies(studySet);
     collections.add(collection);
 
-    return collections;
+    return studyCollectionRepository.saveAll(collections);
 
   }
 
+  @Transactional
   public void clearDatabase() {
     LOGGER.info("Wiping database...");
     studyCollectionRepository.deleteAll();
@@ -815,6 +815,10 @@ public class ExampleDataGenerator {
     keywordCategoryRepository.deleteAll();
     programRepository.deleteAll();
     userRepository.deleteAll();
+    localDriveFolderRepository.deleteAll();
+    egnyteDriveFolderRepository.deleteAll();
+    storageDriveFolderRepository.deleteAll();
+//    organizationRepository.deleteAll();
   }
 
   public void populateDatabase() {
@@ -822,19 +826,41 @@ public class ExampleDataGenerator {
 
       LOGGER.info("Preparing to populate database with example data...");
       this.clearDatabase();
+
+      LOGGER.info("Reinitializing integrations & drives...");
+      integrationInitializer.run(null);
+
       LOGGER.info("Inserting example data...");
-      userRepository.saveAll(generateExampleUsers());
-      programRepository.saveAll(generateExamplePrograms(userRepository.findAll()));
+
+      // Organizations
+      List<Organization> organizations = generateExampleOrganizations();
+      Organization organization = organizations.get(0);
+
+      // Users
+      List<User> users = generateExampleUsers();
+
+      // Programs
+      programRepository.saveAll(generateExamplePrograms(organization, users));
+
+      // Assay types
       generateExampleAssayTypes();
 
+      // Keywords
       List<KeywordCategory> categories = generateExampleKeywordCategories();
-      keywordCategoryRepository.saveAll(categories);
-      keywordRepository.saveAll(generateExampleKeywords(categories));
+      generateExampleKeywords(categories);
 
-      collaboratorRepository.saveAll(generateExampleCollaborators());
+      // Collaborators
+      generateExampleCollaborators();
+
+      // Studies
       generateExampleStudies();
+
+      // Assays
       generateExampleAssays(studyRepository.findAll());
-      studyCollectionRepository.saveAll(generateStudyCollections(studyRepository.findAll()));
+
+      // Study collections
+      generateStudyCollections(studyRepository.findAll());
+
       LOGGER.info("Done.");
 
     } catch (Exception e) {

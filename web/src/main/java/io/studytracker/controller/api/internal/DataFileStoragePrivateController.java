@@ -20,19 +20,21 @@ import io.studytracker.controller.api.AbstractApiController;
 import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.FileStorageLocation;
+import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
+import io.studytracker.mapstruct.mapper.StorageDriveMapper;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.service.FileSystemStorageService;
-import io.studytracker.service.StorageLocationService;
-import io.studytracker.storage.DataFileStorageService;
-import io.studytracker.storage.DataFileStorageServiceLookup;
+import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.StoragePermissions;
+import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,34 +62,57 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   private static final Logger LOGGER = LoggerFactory.getLogger(DataFileStoragePrivateController.class);
 
   @Autowired
-  private DataFileStorageServiceLookup dataFileStorageServiceLookup;
+  private StudyStorageServiceLookup studyStorageServiceLookup;
 
   @Autowired
   private FileSystemStorageService fileSystemStorageService;
 
   @Autowired
-  private StorageLocationService storageLocationService;
+  private StorageDriveFolderService storageDriveFolderService;
 
-  @GetMapping("/locations")
-  public List<FileStorageLocation> getFileStorageLocations() {
-    return storageLocationService.findAll().stream()
-        .filter(FileStorageLocation::isActive)
-        .collect(Collectors.toList());
+  @Autowired
+  private StorageDriveMapper driveMapper;
+
+  @Autowired
+  private StorageDriveFolderMapper folderMapper;
+
+  @RequestMapping(value ="", method = RequestMethod.HEAD)
+  public HttpEntity<?> checkFolder(
+      @RequestParam(name = "path") String rawPath,
+      @RequestParam(name = "folderId") Long folderId
+  ) throws FileStorageException {
+    LOGGER.debug("Checking for storage folder: {}: {}", folderId, rawPath);
+    StorageDriveFolder folder = storageDriveFolderService.findById(folderId)
+        .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
+    StudyStorageService storageService = studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
+    String path = rawPath != null ? rawPath : folder.getPath();
+    try {
+      boolean exists = storageService.folderExists(folder, path);
+      if (exists) {
+        return new ResponseEntity<>(HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @GetMapping("")
   public StorageFolder getDataStorageFolder(
-      @RequestParam(name = "path") String path,
-      @RequestParam(name = "locationId") Long locationId
+      @RequestParam(name = "path") String rawPath,
+      @RequestParam(name = "folderId") Long folderId
   ) throws FileStorageException {
-    LOGGER.debug("Getting data storage folder: {}: {}", locationId, path);
-    FileStorageLocation location = storageLocationService.findById(locationId)
-        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
-    if (path == null) path = location.getRootFolderPath();
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
+    LOGGER.debug("Getting data storage folder: {}: {}", folderId, rawPath);
+    StorageDriveFolder folder = storageDriveFolderService.findById(folderId)
+        .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
+    StudyStorageService storageService = studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
         .orElseThrow(() -> new FileStorageException("File storage service not found"));
+    String path = rawPath != null ? rawPath : folder.getPath();
     try {
-      return storageService.findFolderByPath(location, path);
+      return storageService.findFolderByPath(folder, path);
     } catch (Exception e) {
       e.printStackTrace();
       throw new RecordNotFoundException("Data storage folder not found: " + path, e);
@@ -96,17 +122,19 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   @PostMapping("/upload")
   public HttpEntity<StorageFile> uploadFilesToFolder(
       @RequestParam(name = "path") String path,
-      @RequestParam(name = "locationId") Long locationId,
+      @RequestParam(name = "folderId") Long folderId,
       @RequestParam("file") MultipartFile file
   ) throws Exception {
 
     LOGGER.info("Uploading file {} to data storage folder {}", file.getOriginalFilename(), path);
+    StorageDriveFolder folder = storageDriveFolderService.findById(folderId)
+        .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
+    StudyStorageService storageService = studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
 
-    // Get the location and check permissions
-    FileStorageLocation location = storageLocationService.findById(locationId)
-        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
-    if (!StoragePermissions.canWrite(location.getPermissions())) {
-      throw new InsufficientPrivilegesException("Insufficient privileges to upload files.");
+    // CHeck the permissions
+    if (!folder.isWriteEnabled()) {
+      throw new InsufficientPrivilegesException("Insufficient privileges to upload files to this folder");
     }
 
     // Save the file locally
@@ -120,9 +148,18 @@ public class DataFileStoragePrivateController extends AbstractApiController {
     }
 
     // Upload to the cloud service
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
-        .orElseThrow(() -> new FileStorageException("File storage service not found"));
-    StorageFile storageFile = storageService.saveFile(location, path, localPath.toFile());
+    File localFile = localPath.toFile();
+    StorageFile storageFile = storageService.saveFile(folder, path, localFile);
+
+    try {
+      if (localFile.exists()) {
+        FileUtils.forceDelete(localFile);
+      }
+    } catch (IOException e) {
+      LOGGER.warn("Unable to delete local file copy: " + file.getName());
+      e.printStackTrace();
+    }
+
     LOGGER.debug("Uploaded file: " + storageFile.toString());
     return new ResponseEntity<>(storageFile, HttpStatus.OK);
 
@@ -152,18 +189,20 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   @PostMapping("/create-folder")
   public HttpEntity<StorageFolder> createNewFolder(
       @RequestParam(name = "path") String path,
-      @RequestParam(name = "locationId") Long locationId,
+      @RequestParam(name = "folderId") Long parentFolderId,
       @RequestParam(name = "folderName") String folderName
   ) throws Exception {
     LOGGER.info("Creating new folder '{}' in data storage folder '{}'", folderName, path);
-    FileStorageLocation location = storageLocationService.findById(locationId)
-        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
-    if (!StoragePermissions.canWrite(location.getPermissions())) {
-      throw new InsufficientPrivilegesException("Insufficient privileges to create folder");
-    }
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
+    StorageDriveFolder parentFolder = storageDriveFolderService.findById(parentFolderId)
+        .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
+    StudyStorageService storageService = studyStorageServiceLookup.lookup(parentFolder.getStorageDrive().getDriveType())
         .orElseThrow(() -> new FileStorageException("File storage service not found"));
-    StorageFolder storageFolder = storageService.createFolder(location, path, folderName);
+
+    if (!parentFolder.isWriteEnabled()) {
+      throw new InsufficientPrivilegesException("Insufficient privileges to upload files to this folder");
+    }
+
+    StorageFolder storageFolder = storageService.createFolder(parentFolder, path, folderName);
     LOGGER.debug("Created folder: " + storageFolder.toString());
     return new ResponseEntity<>(storageFolder, HttpStatus.OK);
   }
@@ -171,14 +210,15 @@ public class DataFileStoragePrivateController extends AbstractApiController {
   @GetMapping("/download")
   public HttpEntity<Resource> downloadFile(
       @RequestParam(name = "path") String path,
-      @RequestParam(name = "locationId") Long locationId
+      @RequestParam(name = "folderId") Long folderId
   ) throws Exception {
     LOGGER.info("Downloading file from data storage folder {}", path);
-    FileStorageLocation location = storageLocationService.findById(locationId)
-        .orElseThrow(() -> new RecordNotFoundException("File storage location not found"));
-    DataFileStorageService storageService = dataFileStorageServiceLookup.lookup(location.getType())
-        .orElseThrow(() -> new FileStorageException("File storage service not found"));;
-    ByteArrayResource resource = (ByteArrayResource) storageService.fetchFile(location, path);
+    StorageDriveFolder folder = storageDriveFolderService.findById(folderId)
+        .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
+    StudyStorageService storageService = studyStorageServiceLookup.lookup(folder.getStorageDrive().getDriveType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
+
+    ByteArrayResource resource = (ByteArrayResource) storageService.fetchFile(folder, path);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentDisposition(ContentDisposition.builder("attachment")
         .filename(FilenameUtils.getName(path))

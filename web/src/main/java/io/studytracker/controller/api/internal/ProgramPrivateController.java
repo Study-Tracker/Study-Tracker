@@ -26,17 +26,16 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
+import io.studytracker.mapstruct.dto.response.StorageDriveFolderDetailsDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
+import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.model.Activity;
-import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
-import io.studytracker.service.StorageLocationService;
-import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.StudyStorageService;
-import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import io.studytracker.storage.StorageDriveFolderService;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -70,7 +69,8 @@ public class ProgramPrivateController extends AbstractProgramController {
 
   @Autowired private ActivityMapper activityMapper;
 
-  @Autowired private StorageLocationService storageLocationService;
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
+  @Autowired private StorageDriveFolderMapper storageDriveFolderMapper;
 
   @Autowired(required = false)
   private NotebookFolderService notebookFolderService;
@@ -135,7 +135,7 @@ public class ProgramPrivateController extends AbstractProgramController {
     }
 
     Optional<Program> optional = this.getProgramService().findById(programId);
-    if (!optional.isPresent()) {
+    if (optional.isEmpty()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
@@ -155,7 +155,7 @@ public class ProgramPrivateController extends AbstractProgramController {
   public HttpEntity<List<ActivityDetailsDto>> getProgramActivity(
       @PathVariable("id") Long programId) {
     Optional<Program> optional = this.getProgramService().findById(programId);
-    if (!optional.isPresent()) {
+    if (optional.isEmpty()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
@@ -164,25 +164,20 @@ public class ProgramPrivateController extends AbstractProgramController {
   }
 
   /**
-   * Retrieves the program's storage folder reference as a {@link StorageFolder} object.
+   * Retrieves a list of program {@link StorageDriveFolder}.
    *
    * @param programId PKID of the program
-   * @return
+   * @return folder list
    */
   @GetMapping("/{id}/storage")
-  public HttpEntity<StorageFolder> getProgramStorageFolder(@PathVariable("id") Long programId) {
+  public List<StorageDriveFolderDetailsDto> getProgramStorageFolders(@PathVariable("id") Long programId) {
     Optional<Program> optional = this.getProgramService().findById(programId);
-    if (!optional.isPresent()) {
+    if (optional.isEmpty()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
-    try {
-      FileStorageLocation location = storageLocationService.findByFileStoreFolder(program.getPrimaryStorageFolder());
-      StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-      return new ResponseEntity<>(studyStorageService.findFolder(location, program), HttpStatus.OK);
-    } catch (StudyStorageNotFoundException e) {
-      throw new RecordNotFoundException("Program folder not found:" + programId);
-    }
+    List<StorageDriveFolder> folders = storageDriveFolderService.findByProgram(program);
+    return storageDriveFolderMapper.toDetailsDto(folders);
   }
 
   /**
@@ -204,7 +199,7 @@ public class ProgramPrivateController extends AbstractProgramController {
 
     // Check that the program exists
     Optional<Program> optional = this.getProgramService().findById(programId);
-    if (!optional.isPresent()) {
+    if (optional.isEmpty()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
@@ -219,7 +214,7 @@ public class ProgramPrivateController extends AbstractProgramController {
 
     // Check that the program exists
     Optional<Program> optional = this.getProgramService().findById(programId);
-    if (!optional.isPresent()) {
+    if (optional.isEmpty()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();
@@ -227,7 +222,7 @@ public class ProgramPrivateController extends AbstractProgramController {
     // Check that the folder exists
     Optional<NotebookFolder> folderOptional =
         Optional.ofNullable(notebookFolderService).flatMap(service -> service.findProgramFolder(program));
-    if (!folderOptional.isPresent()) {
+    if (folderOptional.isEmpty()) {
       throw new RecordNotFoundException("Cannot find notebook folder for program: " + programId);
     }
 
@@ -246,7 +241,7 @@ public class ProgramPrivateController extends AbstractProgramController {
 
     // Check that the program exists
     Optional<Program> optional = this.getProgramService().findById(programId);
-    if (!optional.isPresent()) {
+    if (optional.isEmpty()) {
       throw new RecordNotFoundException("Program not found: " + programId);
     }
     Program program = optional.get();

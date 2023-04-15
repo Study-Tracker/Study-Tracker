@@ -32,6 +32,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
+@Deprecated
 @Getter
 @Setter
 public final class EgnyteIntegrationV1 implements EgnyteIntegrationOptions {

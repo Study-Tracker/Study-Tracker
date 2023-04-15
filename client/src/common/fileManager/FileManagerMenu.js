@@ -19,18 +19,19 @@ import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFolder, faServer} from "@fortawesome/free-solid-svg-icons";
 import {faAws} from "@fortawesome/free-brands-svg-icons";
+import PropTypes from "prop-types";
 
 const FileManagerMenu = ({
-  locations,
-  handleLocationSelect,
-  selectedLocation
+  rootFolders,
+  handleFolderSelect,
+  selectedRootFolder
 }) => {
 
   const getDataSourceIcon = (type) => {
     switch (type) {
-      case "EGNYTE_API":
+      case "EGNYTE":
         return <FontAwesomeIcon icon={faServer} className={"me-2"} />
-      case "AWS_S3":
+      case "S3":
         return <FontAwesomeIcon icon={faAws} className={"me-2"} />
       default:
         return <FontAwesomeIcon icon={faFolder} className={"me-2"} />
@@ -38,18 +39,18 @@ const FileManagerMenu = ({
   }
 
   const renderDataSourceMenu = () => {
-    return locations
-    .filter(location => location.active)
-    .map(ds => {
+    return rootFolders
+    .filter(rootFolder => rootFolder.storageDrive.active)
+    .map(f => {
       return (
           <ListGroup.Item
               action
-              key={ds.id}
-              active={selectedLocation ? selectedLocation.id === ds.id : false}
-              onClick={() => handleLocationSelect(ds)}
+              key={f.id}
+              active={selectedRootFolder ? selectedRootFolder.id === f.id : false}
+              onClick={() => handleFolderSelect(f)}
           >
-            {getDataSourceIcon(ds.type)}
-            {ds.displayName}
+            {getDataSourceIcon(f.storageDrive.driveType)}
+            {f.name}
           </ListGroup.Item>
       )
     });
@@ -71,6 +72,12 @@ const FileManagerMenu = ({
       </Card>
   );
 
+}
+
+FileManagerMenu.propTypes = {
+  rootFolders: PropTypes.array.isRequired,
+  handleFolderSelect: PropTypes.func.isRequired,
+  selectedRootFolder: PropTypes.object
 }
 
 export default FileManagerMenu;

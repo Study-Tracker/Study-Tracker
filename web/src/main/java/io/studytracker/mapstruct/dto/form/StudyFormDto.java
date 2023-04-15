@@ -71,5 +71,5 @@ public class StudyFormDto {
   private Boolean useNotebook;
   private Boolean useStorage;
   private Boolean useS3;
-  private Long s3LocationId;
+  private Long s3FolderId;
 }

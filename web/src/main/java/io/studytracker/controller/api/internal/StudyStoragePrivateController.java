@@ -17,23 +17,12 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
-import io.studytracker.events.util.StudyActivityUtils;
-import io.studytracker.exception.FileStorageException;
-import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.response.FileStoreFolderDetailsDto;
-import io.studytracker.mapstruct.mapper.FileStoreFolderMapper;
-import io.studytracker.model.Activity;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
+import io.studytracker.mapstruct.dto.response.StudyStorageDriveFolderSummaryDto;
+import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.model.Study;
-import io.studytracker.repository.FileStoreFolderRepository;
+import io.studytracker.model.StudyStorageFolder;
+import io.studytracker.repository.StudyStorageFolderRepository;
 import io.studytracker.service.FileSystemStorageService;
-import io.studytracker.service.StorageLocationService;
-import io.studytracker.storage.StorageFile;
-import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.StudyStorageService;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/api/internal/study/{studyId}/storage")
 @RestController
@@ -57,66 +44,17 @@ public class StudyStoragePrivateController extends AbstractStudyController {
 
   @Autowired private FileSystemStorageService fileStorageService;
 
-  @Autowired private StorageLocationService storageLocationService;
+  @Autowired private StudyStorageFolderRepository studyStorageFolderRepository;
 
-  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
-
-  @Autowired private FileStoreFolderMapper fileStoreFolderMapper;
+  @Autowired private StorageDriveFolderMapper storageDriveFolderMapper;
 
   @GetMapping("")
-  public List<FileStoreFolderDetailsDto> getStudyStorageFolders(@PathVariable("studyId") String studyId) {
+  public List<StudyStorageDriveFolderSummaryDto> getStudyStorageFolders(@PathVariable("studyId") String studyId) {
     LOGGER.info("Fetching storage folder for study: " + studyId);
     Study study = getStudyFromIdentifier(studyId);
-    List<FileStoreFolderDetailsDto> folders = new ArrayList<>();
-    for (FileStoreFolder fsf: study.getStorageFolders()) {
-      FileStoreFolder folder = fileStoreFolderRepository.findById(fsf.getId())
-          .orElseThrow(() -> new RecordNotFoundException("Folder not found: " + fsf.getId()));
-      FileStoreFolderDetailsDto dto = fileStoreFolderMapper.toDetailsDto(folder);
-      if (study.getPrimaryStorageFolder().getId().equals(dto.getId())) {
-        dto.setPrimary(true);
-      }
-      folders.add(dto);
-    }
-    return folders;
-  }
-
-  @GetMapping("/{folderId}/contents")
-  public StorageFolder getStudyStorageFolder(@PathVariable("studyId") String studyId,
-      @PathVariable("folderId") Long folderId)
-      throws Exception {
-    LOGGER.info("Fetching storage folder for study: " + studyId);
-    Study study = getStudyFromIdentifier(studyId);
-    FileStorageLocation location = storageLocationService.findByFileStoreFolderId(folderId);
-    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-    return studyStorageService.findFolder(location, study);
-  }
-
-  @PostMapping("")
-  public HttpEntity<StorageFile> uploadStudyFile(
-      @PathVariable("studyId") String studyId,
-      @RequestParam("file") MultipartFile file
-  ) throws Exception {
-    LOGGER.info("Uploaded file: " + file.getOriginalFilename());
-    Study study = getStudyFromIdentifier(studyId);
-    Path path;
-    try {
-      path = fileStorageService.store(file);
-      LOGGER.info(path.toString());
-    } catch (FileStorageException e) {
-      e.printStackTrace();
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    FileStorageLocation location = storageLocationService.findByFileStoreFolder(study.getPrimaryStorageFolder());
-    StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-    StorageFile storageFile = studyStorageService.saveFile(location, path.toFile(), study);
-
-    // Publish events
-    Activity activity =
-        StudyActivityUtils.fromFileUpload(study, this.getAuthenticatedUser(), storageFile);
-    getActivityService().create(activity);
-    getEventsService().dispatchEvent(activity);
-
-    return new ResponseEntity<>(storageFile, HttpStatus.CREATED);
+    List<StudyStorageFolder> studyStorageFolders = studyStorageFolderRepository
+        .findByStudyId(study.getId());
+    return storageDriveFolderMapper.toStudyFolderSummaryDto(studyStorageFolders);
   }
 
   @PostMapping("/repair")

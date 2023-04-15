@@ -30,6 +30,8 @@
 
 @warning-light-text: #e5a54b;
 
+@warning-text: #e28d15;
+
 @danger-light-bg: #fddfdf;
 
 @danger-light-text: #d9534f;
@@ -147,8 +149,20 @@ nav.navbar {
 
 }
 
+.illustration-text-light {
+  color: #4080ea7d;
+}
+
 .illustration-light {
   background: #deeafe8c;
+}
+
+.illustration-warning {
+  background: @warning-light-bg;
+  color: @warning-text;
+  .illustration-text {
+    color: @warning-text;
+  }
 }
 
 .illustration-dark {

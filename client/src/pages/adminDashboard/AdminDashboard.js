@@ -31,10 +31,13 @@ import ProgramSettings from "./ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
 import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
 import BenchlingIntegrationSettings from "./BenchlingIntegrationSettings";
-import EgnyteIntegrationSettings from "./EgnyteIntegrationSettings";
+import EgnyteIntegrationSettings
+  from "./egnyteIntegrationSettings/EgnyteIntegrationSettings";
 import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
-import StorageLocationSettings
-  from "./storageLocationSettings/StorageLocationSettings";
+import StorageFolderSettings
+  from "./storageFolderSettings/StorageFolderSettings";
+import AWSIntegrationSettings from "./AWSSettings/AWSIntegrationSettings";
+import MSAzureSettings from "./MSSettings/MSAzureSettings";
 
 const settings = {
   "users": {
@@ -61,14 +64,26 @@ const settings = {
     label: "Programs",
     tag: ProgramSettings
   },
-  "storage-locations": {
-    id: "storage-locations",
+  "storage-folders": {
+    id: "storage-folders",
     category: "site-settings",
-    label: "Storage Locations",
-    tag: StorageLocationSettings
+    label: "Storage Folders",
+    tag: StorageFolderSettings
   },
 
   // Integrations
+  "aws": {
+    id: "aws",
+    category: "integrations",
+    label: "Amazon Web Services",
+    tag: AWSIntegrationSettings
+  },
+  "azure": {
+    id: "azure",
+    category: "integrations",
+    label: "Microsoft Azure",
+    tag: MSAzureSettings
+  },
   "benchling": {
     id: "benchling",
     category: "integrations",

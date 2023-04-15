@@ -18,6 +18,7 @@ package io.studytracker.storage.integration;
 
 import io.studytracker.integration.IntegrationOptions;
 
+@Deprecated
 public interface LocalFileSystemOptions extends IntegrationOptions {
 
   String getRootPath();

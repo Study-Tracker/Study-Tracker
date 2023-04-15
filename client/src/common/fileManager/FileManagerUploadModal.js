@@ -70,7 +70,7 @@ const FileManagerUploadModal = ({
   path,
   error,
   handleSuccess,
-  locationId
+  folderId
 }) => {
 
   const notyf = useContext(NotyfContext);
@@ -116,7 +116,7 @@ const FileManagerUploadModal = ({
     const requests = queuedFiles.map(file => {
       const data = new FormData();
       data.append("file", file);
-      data.append("locationId", locationId);
+      data.append("folderId", folderId);
       data.append("path", path);
       return axios.post('/api/internal/data-files/upload', data)
       .then(() => {
@@ -258,7 +258,6 @@ const FileManagerUploadModal = ({
 FileManagerUploadModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setModalIsOpen: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
   path: PropTypes.string.isRequired,
   error: PropTypes.string,
   handleSuccess: PropTypes.func.isRequired,

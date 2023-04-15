@@ -40,10 +40,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/internal/storage-locations")
-@RestController
+//@RestController
+@Deprecated
 public class FileStorageLocationPrivateController extends AbstractApiController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageLocationPrivateController.class);

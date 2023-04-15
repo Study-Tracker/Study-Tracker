@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataGenerator;
-import io.studytracker.model.FileStoreFolder;
-import io.studytracker.repository.FileStoreFolderRepository;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.repository.StorageDriveFolderRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +56,7 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
   private MockMvc mockMvc;
 
   @Autowired
-  private FileStoreFolderRepository repository;
+  private StorageDriveFolderRepository storageDriveFolderRepository;
 
   @Test
   public void findAllTest() throws Exception {
@@ -66,7 +66,7 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", not(empty())))
-        .andExpect(jsonPath("$.content", hasSize(ExampleDataGenerator.STORAGE_FOLDER_COUNT)))
+        .andExpect(jsonPath("$.content", hasSize(ExampleDataGenerator.STORAGE_FOLDER_COUNT + 1)))
         .andExpect(jsonPath("$", hasKey("last")))
         .andExpect(jsonPath("$.last", is(true)))
         .andExpect(jsonPath("$", hasKey("pageable")))
@@ -74,7 +74,7 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(jsonPath("$", hasKey("totalPages")))
         .andExpect(jsonPath("$.totalPages", is(1)))
         .andExpect(jsonPath("$", hasKey("totalElements")))
-        .andExpect(jsonPath("$.totalElements", is(ExampleDataGenerator.STORAGE_FOLDER_COUNT)))
+        .andExpect(jsonPath("$.totalElements", is(ExampleDataGenerator.STORAGE_FOLDER_COUNT + 1)))
         .andExpect(jsonPath("$", hasKey("first")))
         .andExpect(jsonPath("$.first", is(true)))
         .andExpect(jsonPath("$", hasKey("size")))
@@ -82,18 +82,17 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(jsonPath("$", hasKey("number")))
         .andExpect(jsonPath("$.number", is(0)))
         .andExpect(jsonPath("$", hasKey("numberOfElements")))
-        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataGenerator.STORAGE_FOLDER_COUNT)))
+        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataGenerator.STORAGE_FOLDER_COUNT + 1)))
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));
   }
 
   @Test
-  public void findProgramById() throws Exception {
+  public void findFolderById() throws Exception {
 
-    FileStoreFolder folder = repository.findAll().stream()
-        .findFirst()
-        .orElseThrow();
+    StorageDriveFolder folder = storageDriveFolderRepository.findAll().get(0);
+    Assert.assertNotNull(folder);
 
     mockMvc.perform(get("/api/v1/storage-folder/" + folder.getId())
             .header("Authorization", "Bearer " + this.getToken()))
@@ -109,9 +108,8 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
   @Test
   public void uploadFileTest() throws Exception {
     Resource resource = new ClassPathResource("test.txt");
-    FileStoreFolder folder = repository.findAll().stream()
-        .findFirst()
-        .orElseThrow();
+    StorageDriveFolder folder = storageDriveFolderRepository.findAll().get(0);
+    Assert.assertNotNull(folder);
     Assert.assertEquals(resource.getFilename(), "test.txt");
     MockMultipartFile mockFile = new MockMultipartFile(
         "file",
@@ -126,6 +124,5 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(status().isOk());
 
   }
-
 
 }

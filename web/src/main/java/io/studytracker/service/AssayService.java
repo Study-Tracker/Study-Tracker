@@ -21,32 +21,33 @@ import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.exception.FileStorageException;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayOptions;
+import io.studytracker.model.AssayStorageFolder;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayTaskField;
 import io.studytracker.model.AssayTypeField;
 import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.ELNFolder;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTaskRepository;
 import io.studytracker.repository.ELNFolderRepository;
-import io.studytracker.repository.FileStoreFolderRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.storage.DataFileStorageService;
+import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
+import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -76,7 +77,9 @@ public class AssayService {
 
   @Autowired private AssayTaskRepository assayTaskRepository;
 
-  @Autowired private StorageLocationService storageLocationService;
+  @Autowired private StudyStorageServiceLookup storageServiceLookup;
+
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
 
   @Autowired(required = false)
   private NotebookFolderService notebookFolderService;
@@ -85,8 +88,6 @@ public class AssayService {
   private NotebookEntryService notebookEntryService;
 
   @Autowired private NamingService namingService;
-
-  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
 
   @Autowired private ELNFolderRepository elnFolderRepository;
 
@@ -192,6 +193,26 @@ public class AssayService {
     }
   }
 
+  private AssayStorageFolder createAssayStorageFolder(Assay assay, StorageDriveFolder parentFolder) {
+    try {
+      StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
+          .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
+              + parentFolder.getStorageDrive().getId()));
+      StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
+          .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
+              + parentFolder.getStorageDrive().getDriveType()));
+      StorageDriveFolder folder = storageService.createAssayFolder(parentFolder, assay);
+      AssayStorageFolder assayStorageFolder = new AssayStorageFolder();
+      assayStorageFolder.setStorageDriveFolder(folder);
+      assayStorageFolder.setAssay(assay);
+      return assayStorageFolder;
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode());
+      throw new StudyTrackerException(e);
+    }
+  }
+
   public void create(Assay assay) {
     this.create(assay, new AssayOptions());
   }
@@ -221,47 +242,54 @@ public class AssayService {
                 () ->
                     new RecordNotFoundException("Cannot find study: " + assay.getStudy().getId()));
 
-    // Manage assay storage
-    if (options.isUseStorage()) {
+    // Get the parent storage folder
+    Long parentFolderId;
+    if (options.getParentFolder() == null) {
+      parentFolderId = study.getStorageFolders().stream()
+          .filter(f -> f.isPrimary())
+          .findFirst()
+          .orElseThrow(() -> new RecordNotFoundException("No primary storage folder found for program: "
+              + study.getName()))
+          .getStorageDriveFolder()
+          .getId();
+    } else {
+      parentFolderId = options.getParentFolder().getId();
+    }
+    final StorageDriveFolder parentFolder = storageDriveFolderService.findById(parentFolderId)
+        .orElseThrow(() -> new RecordNotFoundException("No storage folder found for id: "
+            + parentFolderId));
 
-      // Create default storage folder
-      FileStorageLocation location = null;
-      FileStoreFolder folder = null;
-      try {
-        location = storageLocationService.findDefaultStudyLocation();
-        StudyStorageService studyStorageService = storageLocationService.lookupStudyStorageService(location);
-        StorageFolder storageFolder = studyStorageService.createFolder(location, assay);
-        folder = FileStoreFolder.from(location, storageFolder);
-        assay.setPrimaryStorageFolder(folder);
-        assay.addFileStoreFolder(folder);
-      } catch (Exception e) {
-        e.printStackTrace();
-        LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode());
-      }
+
+    // Create default storage folder
+    AssayStorageFolder folder = createAssayStorageFolder(assay, parentFolder);
+    folder.setPrimary(true);
+    assay.addStorageFolder(folder);
+
+    // Handle attached files
+    try {
+      StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
+          .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
+              + parentFolder.getStorageDrive().getId()));
+      StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
+          .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
+              + parentFolder.getStorageDrive().getDriveType()));
 
       // Move uploaded files to new folder
-      if (location != null && folder != null) {
-        for (AssayTypeField field : assay.getAssayType().getFields()) {
-          if (field.getType().equals(CustomEntityFieldType.FILE)
-              && assay.getFields().containsKey(field.getFieldName())
-              && assay.getFields().get(field.getFieldName()) != null) {
-            try {
-              String localPath = StorageUtils.cleanInputPath(
-                  assay.getFields().get(field.getFieldName()).toString());
-              DataFileStorageService dataFileStorageService =
-                  storageLocationService.lookupDataFileStorageService(location);
-              StorageFile movedFile = dataFileStorageService
-                  .saveFile(location, folder.getPath(), new File(localPath));
-//              assay.getFields().put(field.getFieldName(), movedFile.getPath());
-              assay.getFields().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
-            } catch (Exception e) {
-              e.printStackTrace();
-              LOGGER.warn("Failed to move file for assay: " + assay.getCode());
-            }
-          }
+      for (AssayTypeField field : assay.getAssayType().getFields()) {
+        if (field.getType().equals(CustomEntityFieldType.FILE)
+            && assay.getFields().containsKey(field.getFieldName())
+            && assay.getFields().get(field.getFieldName()) != null) {
+            String localPath = StorageUtils.cleanInputPath(
+                assay.getFields().get(field.getFieldName()).toString());
+            StorageFile movedFile = storageService
+                .saveFile(folder.getStorageDriveFolder(), folder.getStorageDriveFolder().getPath(),
+                    new File(localPath));
+            assay.getFields().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
         }
       }
-
+    } catch (Exception e) {
+      e.printStackTrace();
+      LOGGER.warn("Failed to move file for assay: " + assay.getCode());
     }
 
     // Create the ELN folder
@@ -395,60 +423,60 @@ public class AssayService {
   @Transactional
   public void repairStorageFolder(Assay assay) {
 
-    // Get the location and storage service
-    FileStorageLocation location;
-    StudyStorageService studyStorageService;
-    try {
-      location = storageLocationService.findDefaultStudyLocation();
-      studyStorageService = storageLocationService.lookupStudyStorageService(location);
-    } catch (FileStorageException e) {
-      e.printStackTrace();
-      throw new StudyTrackerException("Could not find default storage location or service", e);
-    }
+    LOGGER.info("Attempting to repair primary storage folder for assay: " + assay.getCode());
 
-    // Find or create the storage folder
-    StorageFolder folder;
-    try {
-      folder = studyStorageService.findFolder(location, assay);
-    } catch (StudyStorageNotFoundException e) {
-      LOGGER.warn("Storage folder not found for assay: " + assay.getCode());
-      e.printStackTrace();
-      throw new StudyTrackerException(e);
+    StorageDrive drive;
+    StorageDriveFolder folder;
+    Optional<StorageDriveFolder> optional = storageDriveFolderService.findPrimaryAssayFolder(assay);
 
-    }
-    LOGGER.debug(folder.toString());
+    // If the study already has a primary storage folder record...
+    if (optional.isPresent()) {
+      folder = optional.get();
+      drive = storageDriveFolderService.findDriveById(folder.getStorageDrive().getId())
+          .orElseThrow(() -> new RecordNotFoundException("Could not find storage drive with ID: "
+              + folder.getStorageDrive().getId()));
+      StudyStorageService storageService = storageDriveFolderService
+          .lookupStudyStorageService(folder.getStorageDrive().getDriveType());
 
-    // Check if a folder record exists in the database
-    List<FileStoreFolder> folders = fileStoreFolderRepository
-        .findByPath(location.getId(), folder.getPath());
-    FileStoreFolder fileStoreFolder = null;
-    if (!folders.isEmpty()) {
-      fileStoreFolder = folders.get(0);
-    }
-
-    // Assay has no folder record associated
-    if (assay.getPrimaryStorageFolder() == null) {
-      if (fileStoreFolder == null) {
-        fileStoreFolder = FileStoreFolder.from(location, folder);
+      // If the folder exists, do nothing
+      if (storageService.folderExists(drive, folder.getPath())) {
+        LOGGER.warn("Primary storage folder for assay: " + assay.getCode()
+            + " already exists and is valid. No action taken.");
+        return;
       }
-      assay.setPrimaryStorageFolder(fileStoreFolder);
-      if (assay.getStorageFolders().stream().noneMatch(f -> (
-          f.getFileStorageLocation().getId().equals(location.getId())
-              && f.getPath().equals(folder.getPath())))) {
-        assay.getStorageFolders().add(fileStoreFolder);
+
+      // If no, create the folder for the existing registered path
+      else {
+        String folderPath = StorageUtils.getParentPathFromPath(folder.getPath());
+        try {
+          StorageFolder storageFolder = storageService.createFolder(drive, folderPath, folder.getName());
+          LOGGER.info("Created primary storage folder for assay: " + assay.getCode()
+              + " at path: " + storageFolder.getPath());
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new StudyTrackerException("Could not create storage folder for assay: "
+              + assay.getCode() + " at path: " + folderPath, e);
+        }
       }
-      assayRepository.save(assay);
+
     }
 
-    // Assay does have a folder record, but it is malformed
+    // If no primary folder record exists, create one
     else {
-      LOGGER.info("Repairing malformed assay folder record.");
-      FileStoreFolder f = fileStoreFolderRepository.getById(assay.getPrimaryStorageFolder().getId());
-      f.setFileStorageLocation(location);
-      f.setName(folder.getName());
-      f.setPath(folder.getPath());
-      f.setUrl(folder.getUrl());
-      fileStoreFolderRepository.save(f);
+
+      Study study = studyRepository.findById(assay.getStudy().getId())
+          .orElseThrow(() -> new RecordNotFoundException("Could not find assay with ID: "
+              + assay.getStudy().getId()));
+      StorageDriveFolder parentFolder = storageDriveFolderService
+          .findPrimaryStudyFolder(study)
+          .orElseThrow(() -> new RecordNotFoundException("Could not find primary study folder : "
+              + study.getCode()));
+      AssayStorageFolder assayStorageFolder = this.createAssayStorageFolder(assay, parentFolder);
+      assayStorageFolder.setPrimary(true);
+      assay.addStorageFolder(assayStorageFolder);
+      assayRepository.save(assay);
+      LOGGER.info("Created primary storage folder for assay: " + assay.getCode()
+          + " at path: " + assayStorageFolder.getStorageDriveFolder().getPath());
     }
 
   }
@@ -459,11 +487,7 @@ public class AssayService {
     // Check to see if the folder exists and create a new one if necessary
     NotebookFolder folder;
     Optional<NotebookFolder> optional = notebookFolderService.findAssayFolder(assay);
-    if (optional.isPresent()) {
-      folder = optional.get();
-    } else {
-      folder = notebookFolderService.createAssayFolder(assay);
-    }
+    folder = optional.orElseGet(() -> notebookFolderService.createAssayFolder(assay));
 
     // Update the record
     ELNFolder f;

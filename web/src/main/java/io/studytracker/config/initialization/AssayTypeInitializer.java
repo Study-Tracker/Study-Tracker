@@ -18,7 +18,6 @@ package io.studytracker.config.initialization;
 
 import io.studytracker.model.AssayType;
 import io.studytracker.service.AssayTypeService;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,7 @@ public class AssayTypeInitializer {
 
   @Autowired private AssayTypeService assayTypeService;
 
-  @PostConstruct
-  public void initializeAdminUser() {
+  public void initializeAssayTypes() {
     if (assayTypeService.count() > 0) {
       return;
     }

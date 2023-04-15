@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,27 +18,34 @@ package io.studytracker.test.repository;
 
 import io.studytracker.Application;
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Comment;
 import io.studytracker.model.ExternalLink;
-import io.studytracker.model.FileStorageLocation;
-import io.studytracker.model.FileStoreFolder;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyConclusions;
+import io.studytracker.model.StudyStorageFolder;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.CommentRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ExternalLinkRepository;
-import io.studytracker.repository.FileStorageLocationRepository;
-import io.studytracker.repository.FileStoreFolderRepository;
+import io.studytracker.repository.LocalDriveFolderRepository;
+import io.studytracker.repository.LocalDriveRepository;
+import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyConclusionsRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -67,18 +74,20 @@ import org.springframework.test.context.junit4.SpringRunner;
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StudyRepositoryTests {
 
+  @Autowired private OrganizationRepository organizationRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private ProgramRepository programRepository;
   @Autowired private ELNFolderRepository elnFolderRepository;
-  @Autowired private FileStoreFolderRepository fileStoreFolderRepository;
   @Autowired private StudyRepository studyRepository;
   @Autowired private EntityManagerFactory entityManagerFactory;
   @Autowired private CommentRepository commentRepository;
   @Autowired private ActivityRepository activityRepository;
   @Autowired private StudyConclusionsRepository studyConclusionsRepository;
   @Autowired private ExternalLinkRepository externalLinkRepository;
-
-  @Autowired private FileStorageLocationRepository fileStorageLocationRepository;
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
+  @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
+  @Autowired private LocalDriveRepository localDriveRepository;
+  @Autowired private LocalDriveFolderRepository localDriveFolderRepository;
 
   @Before
   public void doBefore() {
@@ -88,7 +97,6 @@ public class StudyRepositoryTests {
     commentRepository.deleteAll();
     studyRepository.deleteAll();
     programRepository.deleteAll();
-    fileStoreFolderRepository.deleteAll();
     elnFolderRepository.deleteAll();
     userRepository.deleteAll();
   }
@@ -107,25 +115,35 @@ public class StudyRepositoryTests {
     userRepository.save(user);
   }
 
+  private StorageDriveFolder createProgramFolder(Program program) {
+    try {
+      StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders()
+          .stream()
+          .min(Comparator.comparing(StorageDriveFolder::getId))
+          .orElseThrow(RecordNotFoundException::new);
+      StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
+          .orElseThrow(RecordNotFoundException::new);
+      return studyStorageService.createProgramFolder(rootFolder, program);
+    } catch (Exception ex) {
+      throw new StudyTrackerException(ex);
+    }
+  }
+
   private void createProgram() {
 
     User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
-    FileStorageLocation location = fileStorageLocationRepository.findAll().get(0);
+    Organization organization =
+        organizationRepository.findAll().get(0);
 
     Program program = new Program();
+    program.setOrganization(organization);
     program.setActive(true);
     program.setCode("TST");
     program.setCreatedBy(user);
     program.setLastModifiedBy(user);
     program.setName("Test Program");
     program.addAttribute("key", "value");
-
-    FileStoreFolder folder = new FileStoreFolder();
-    folder.setPath("/path/to/test");
-    folder.setName("test");
-    folder.setUrl("http://test");
-    folder.setFileStorageLocation(location);
-    program.setPrimaryStorageFolder(folder);
+    program.addStorageFolder(createProgramFolder(program), true);
 
     programRepository.save(program);
   }
@@ -443,4 +461,38 @@ public class StudyRepositoryTests {
     Assert.assertNotNull(exception);
     Assert.assertTrue(exception instanceof LazyInitializationException);
   }
+
+  @Test
+  public void addStorageFolderTest() throws Exception {
+    newStudyTest();
+    Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(0, study.getStorageFolders().size());
+    List<StorageDriveFolder> studyFolders = storageDriveFolderService.findByStudy(study);
+    Assert.assertTrue(studyFolders.isEmpty());
+
+    List<StorageDriveFolder> programFolders = storageDriveFolderService.findByProgram(study.getProgram());
+    Assert.assertNotNull(programFolders);
+    Assert.assertFalse(programFolders.isEmpty());
+    Assert.assertEquals(1, programFolders.size());
+    StorageDriveFolder programFolder = programFolders.get(0);
+
+    StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(programFolder)
+        .orElseThrow(RecordNotFoundException::new);
+    StorageDriveFolder studyFolder = studyStorageService.createStudyFolder(programFolder, study);
+    Assert.assertNotNull(studyFolder);
+    Assert.assertNotNull(studyFolder.getId());
+    study.addStorageFolder(studyFolder, true);
+    studyRepository.save(study);
+
+    // you have to refetch the record to get updated child entities
+    study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+    StudyStorageFolder studyStorageFolder = study.getStorageFolders().stream().findFirst().get();
+    Assert.assertNotNull(studyStorageFolder);
+    Assert.assertNotNull(studyStorageFolder.getId());
+    Assert.assertEquals(1, study.getStorageFolders().size());
+    studyFolders = storageDriveFolderService.findByStudy(study);
+    Assert.assertFalse(studyFolders.isEmpty());
+
+  }
+
 }

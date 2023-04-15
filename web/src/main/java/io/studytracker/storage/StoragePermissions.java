@@ -16,6 +16,7 @@
 
 package io.studytracker.storage;
 
+@Deprecated
 public enum StoragePermissions {
   READ_ONLY,
   READ_WRITE,

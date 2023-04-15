@@ -23,6 +23,7 @@ import io.studytracker.model.IntegrationInstanceConfigurationValue;
 import java.util.Collection;
 import org.springframework.util.Assert;
 
+@Deprecated
 public class IntegrationInstanceBuilder {
 
   private final IntegrationInstance instance;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,13 @@ import io.studytracker.example.ExampleDataGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ProgramPayloadDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
+import io.studytracker.service.OrganizationService;
+import io.studytracker.storage.StorageDriveFolderService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,10 +69,16 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
   private ProgramRepository programRepository;
 
   @Autowired
+  private OrganizationService organizationService;
+
+  @Autowired
   private ObjectMapper objectMapper;
 
   @Autowired
   private ProgramMapper programMapper;
+
+  @Autowired
+  private StorageDriveFolderService storageDriveFolderService;
 
   @Test
   public void findAllTest() throws Exception {
@@ -138,11 +148,14 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .filter(u -> !u.isAdmin())
         .findFirst()
         .get();
+    Organization organization = organizationService.getCurrentOrganization();
+    StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders().get(0);
 
     ProgramPayloadDto dto = new ProgramPayloadDto();
     dto.setName("Program X");
     dto.setCode("PX");
     dto.setActive(true);
+    dto.setParentFolderId(rootFolder.getId());
 
     mockMvc
         .perform(
@@ -163,6 +176,8 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
+        .andExpect(jsonPath("$", hasKey("organizationId")))
+        .andExpect(jsonPath("$.organizationId", is(organization.getId().intValue())))
         .andExpect(jsonPath("$", hasKey("name")))
         .andExpect(jsonPath("$.name", is("Program X")))
         .andExpect(jsonPath("$", hasKey("createdBy")))
@@ -173,15 +188,20 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$.createdAt", not(nullValue())))
         .andExpect(jsonPath("$", hasKey("updatedAt")))
         .andExpect(jsonPath("$.updatedAt", not(nullValue())))
-        .andExpect(jsonPath("$", hasKey("storageFolderId")))
-        .andExpect(jsonPath("$.storageFolderId", not(nullValue())));
+        .andExpect(jsonPath("$", hasKey("storageFolders")))
+        .andExpect(jsonPath("$.storageFolders", not(empty())))
+        ;
 
     Program program = programRepository.findByName("Program X")
         .orElseThrow(RecordNotFoundException::new);
-    Assert.assertNotNull(program.getPrimaryStorageFolder());
-    System.out.println(program.getPrimaryStorageFolder().getPath());
-    System.out.println(program.getPrimaryStorageFolder().getName());
-    System.out.println(program.getPrimaryStorageFolder().getId());
+    Assert.assertFalse(program.getStorageFolders().isEmpty());
+    StorageDriveFolder folder = program.getStorageFolders().stream()
+        .findFirst()
+        .get()
+        .getStorageDriveFolder();
+    System.out.println(folder.getPath());
+    System.out.println(folder.getName());
+    System.out.println(folder.getId());
 
   }
 

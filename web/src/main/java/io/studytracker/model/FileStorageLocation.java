@@ -46,6 +46,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  * @since 0.7.1
  */
 
+@Deprecated
 @Entity
 @Table(name = "file_storage_locations")
 @EntityListeners(AuditingEntityListener.class)

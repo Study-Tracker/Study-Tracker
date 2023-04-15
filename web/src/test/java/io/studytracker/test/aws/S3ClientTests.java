@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
 package io.studytracker.test.aws;
 
 import io.studytracker.Application;
+import io.studytracker.aws.AWSClientFactory;
 import io.studytracker.aws.S3Utils;
+import io.studytracker.model.AwsIntegration;
+import io.studytracker.repository.AwsIntegrationRepository;
+import java.util.List;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +35,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
@@ -43,11 +49,19 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @ActiveProfiles({"aws-test"})
 public class S3ClientTests {
 
+  @Autowired
+  private AwsIntegrationRepository awsIntegrationRepository;
+
   @Value("${aws.example-s3-bucket}")
   private String bucketName;
 
-  @Autowired(required = false)
   private S3Client s3Client;
+
+  @Before
+  public void init() {
+    AwsIntegration integration = awsIntegrationRepository.findAll().get(0);
+    s3Client = AWSClientFactory.createS3Client(integration);
+  }
 
   @Test
   public void pathBuilderTest() throws Exception {
@@ -63,6 +77,14 @@ public class S3ClientTests {
   @Test
   public void configTest() throws Exception {
     Assert.assertNotNull(s3Client);
+  }
+
+  @Test
+  public void listBucketsTest() throws Exception {
+    List<Bucket> buckets = s3Client.listBuckets().buckets();
+    for (Bucket bucket : buckets) {
+      System.out.println(bucket.name());
+    }
   }
 
   @Test

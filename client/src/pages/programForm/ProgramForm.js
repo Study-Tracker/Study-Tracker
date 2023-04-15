@@ -17,6 +17,7 @@
 import React, {useState} from "react";
 import 'react-datepicker/dist/react-datepicker.css';
 import {
+  Alert,
   Breadcrumb,
   Button,
   Card,
@@ -44,7 +45,7 @@ const ProgramForm = ({
     programs,
     elnProjects,
     features,
-    user
+    rootFolders
 }) => {
 
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
@@ -80,6 +81,8 @@ const ProgramForm = ({
       .required("Code is required.")
       .matches("[A-Za-z0-9]+", "Code must be alphanumeric."),
     active: yup.boolean(),
+    parentFolder: yup.object()
+      .required("Parent folder is required."),
     notebookFolder: yup.object().shape({
       referenceId: yup.string()
       .test(
@@ -111,6 +114,7 @@ const ProgramForm = ({
       name: '',
       url: ''
     },
+    parentFolder: null,
     useGit: false,
     useNotebook: true,
     useStorage: true
@@ -341,6 +345,69 @@ const ProgramForm = ({
                       </Card.Body>
                     </Card>
 
+                    {/* File Storage */}
+                    <Card>
+                      <Card.Header>
+                        <Card.Title>File Storage</Card.Title>
+                        <h6 className="card-subtitle text-muted">
+                          Select a root folder location to create the program storage folder in.
+                          This will become the default location in which all study and assay files
+                          for this program will be created, unless users specify otherwise.
+                        </h6>
+                      </Card.Header>
+                      <Card.Body>
+
+                        {
+                          rootFolders && rootFolders.length > 0
+                            ? (
+                                  <Row>
+                                    <Col md={6} className={"mb-3"}>
+                                      <FormGroup>
+                                        <Form.Label>Parent Folder *</Form.Label>
+                                        <Select
+                                            className="react-select-container"
+                                            classNamePrefix="react-select"
+                                            options={
+                                              rootFolders
+                                              .sort((a, b) => a.name.localeCompare(b.name))
+                                              .map(p => ({
+                                                label: p.storageDrive.driveType + ": " + p.name,
+                                                value: p
+                                              }))
+                                            }
+                                            name="parentFolder"
+                                            onChange={(selected) => {
+                                              setFieldValue("parentFolder", selected.value);
+                                            }}
+                                        />
+                                        <Form.Control.Feedback type={"invalid"}>
+                                          {errors.parentFolder}
+                                        </Form.Control.Feedback>
+                                        <Form.Text>
+                                          Select the parent folder to create the program storage folder in.
+                                        </Form.Text>
+                                      </FormGroup>
+                                    </Col>
+                                  </Row>
+                              )
+                            : (
+                                  <Row>
+                                    <Col>
+                                      <Alert variant={"warning"}>
+                                        No root folders have been configured. Please contact your system administrator.
+                                      </Alert>
+                                    </Col>
+                                  </Row>
+                              )
+                        }
+
+
+
+
+                      </Card.Body>
+                    </Card>
+
+                    {/* ELN */}
                     {
                       features
                       && features.notebook
@@ -526,7 +593,6 @@ const ProgramForm = ({
 ProgramForm.propTypes = {
   program: PropTypes.object,
   programs: PropTypes.array.isRequired,
-  user: PropTypes.object,
   features: PropTypes.object,
   elnProjects: PropTypes.array,
 }

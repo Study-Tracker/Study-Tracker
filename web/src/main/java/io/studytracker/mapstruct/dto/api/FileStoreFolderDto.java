@@ -19,6 +19,7 @@ package io.studytracker.mapstruct.dto.api;
 import lombok.Data;
 
 @Data
+@Deprecated
 public class FileStoreFolderDto {
 
   private Long id;

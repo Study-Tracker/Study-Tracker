@@ -39,6 +39,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+@Deprecated
 public class S3DataFileStorageService  implements DataFileStorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(S3DataFileStorageService.class);

@@ -20,6 +20,7 @@ import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.IntegrationConfigurationSchemaField;
 import org.springframework.util.Assert;
 
+@Deprecated
 public class IntegrationConfigurationSchemaFieldBuilder {
 
   private final IntegrationConfigurationSchemaField field;

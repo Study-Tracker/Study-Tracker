@@ -19,6 +19,7 @@ package io.studytracker.aws.integration;
 import io.studytracker.integration.IntegrationType;
 import io.studytracker.model.IntegrationInstance;
 
+@Deprecated
 public class S3IntegrationOptionsFactory {
 
   public static S3IntegrationOptions create(IntegrationInstance instance) {

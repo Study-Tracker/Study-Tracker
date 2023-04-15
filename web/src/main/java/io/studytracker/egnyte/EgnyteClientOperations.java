@@ -21,7 +21,6 @@ import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.exception.EgnyteException;
 import java.io.File;
-import java.net.URL;
 
 public interface EgnyteClientOperations {
 
@@ -33,7 +32,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteFolder createFolder(URL rootUrl, String path, String token) throws EgnyteException;
+  EgnyteFolder createFolder(String path) throws EgnyteException;
 
   /**
    * Returns the {@link EgnyteObject} the resides at the target path. Throws an exception if nothing
@@ -44,7 +43,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteObject findObjectByPath(URL rootUrl, String path, String token) throws EgnyteException;
+  EgnyteObject findObjectByPath(String path) throws EgnyteException;
 
   /**
    * Fetches information about the folder with the provided {@code folder_id}.
@@ -53,7 +52,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteFolder findFolderById(URL rootUrl, String folderId, String token) throws EgnyteException;
+  EgnyteFolder findFolderById(String folderId) throws EgnyteException;
 
   /**
    * Fetches information about the file with the provided {@code group_id}.
@@ -62,7 +61,7 @@ public interface EgnyteClientOperations {
    * @return
    * @throws EgnyteException
    */
-  EgnyteFile findFileById(URL rootUrl, String fileId, String token) throws EgnyteException;
+  EgnyteFile findFileById(String fileId) throws EgnyteException;
 
   /**
    * Uploads the supplied file to the target directory. If the directory does not already exist, it
@@ -72,6 +71,6 @@ public interface EgnyteClientOperations {
    * @param path
    * @throws EgnyteException
    */
-  EgnyteFile uploadFile(URL rootUrl, File file, String path, String token) throws EgnyteException;
+  EgnyteFile uploadFile(File file, String path) throws EgnyteException;
 
 }

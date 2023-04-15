@@ -16,6 +16,7 @@
 
 package io.studytracker.config.initialization;
 
+import io.studytracker.config.ConfigOrder;
 import io.studytracker.example.ExampleDataGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("example")
-@Order(1)
+@Order(ConfigOrder.EXAMPLE_DATA_INIT)
 public class ExampleDataRunner implements ApplicationRunner {
 
   @Autowired private ExampleDataGenerator exampleDataGenerator;
