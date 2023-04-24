@@ -20,10 +20,10 @@ import io.studytracker.Application;
 import io.studytracker.gitlab.GitLabOptions;
 import io.studytracker.gitlab.GitLabRestClient;
 import io.studytracker.gitlab.GitLabUtils;
-import io.studytracker.gitlab.entities.GitLabGroup;
 import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
+import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
 import java.util.List;
 import java.util.Optional;
@@ -78,13 +78,13 @@ public class GitLabRestClientTests {
   public void findGroupsTest() {
 
     String token = options.getAccessToken();
-    List<GitLabGroup> groups = client.findGroups(token);
+    List<GitLabProjectGroup> groups = client.findGroups(token);
     Assert.assertNotNull(groups);
     Assert.assertFalse(groups.isEmpty());
     Assert.assertTrue(groups.size() > 1);
 
-    GitLabGroup group = groups.get(0);
-    Optional<GitLabGroup> optional = client.findGroupById(token, group.getId());
+    GitLabProjectGroup group = groups.get(0);
+    Optional<GitLabProjectGroup> optional = client.findGroupById(token, group.getId());
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals(optional.get().getName(), group.getName());
 
@@ -101,7 +101,7 @@ public class GitLabRestClientTests {
     request.setAutoDevOpsEnabled(false);
     request.setParentId(options.getRootGroupId());
     request.setVisibility("private");
-    GitLabGroup group = client.createNewGroup(token, request);
+    GitLabProjectGroup group = client.createNewGroup(token, request);
     Assert.assertNotNull(group);
     Assert.assertEquals(group.getName(), EXAMPLE_GROUP);
     Assert.assertEquals(group.getPath(), GitLabUtils.getPathFromName(EXAMPLE_GROUP));

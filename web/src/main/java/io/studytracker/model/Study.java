@@ -235,6 +235,13 @@ public class Study implements Model {
       orphanRemoval = true)
   private Set<Comment> comments = new HashSet<>();
 
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "study_gitlab_repositories",
+      joinColumns = @JoinColumn(name = "study_id", nullable = false),
+      inverseJoinColumns = @JoinColumn(name = "gitlab_repository_id", nullable = false))
+  private Set<GitLabProject> gitLabRepositories = new HashSet<>();
+
   public void addUser(User user) {
     this.users.add(user);
   }

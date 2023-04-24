@@ -24,10 +24,10 @@ import io.studytracker.git.GitRepository;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitUser;
 import io.studytracker.gitlab.entities.GitLabAuthenticationToken;
-import io.studytracker.gitlab.entities.GitLabGroup;
 import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
+import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
@@ -72,7 +72,7 @@ public class GitLabService implements GitService {
   }
 
   @Transactional
-  void updateProgramGroupAttributes(Program program, GitLabGroup group, GitLabGroup parentGroup) {
+  void updateProgramGroupAttributes(Program program, GitLabProjectGroup group, GitLabProjectGroup parentGroup) {
     Program p = programRepository.findById(program.getId()).orElseThrow();
     p.getAttributes().put(GitAttributes.GIT_SERVICE, GitLabAttributes.GIT_SERVICE_VALUE);
     p.getAttributes().put(GitAttributes.GROUP_ID, group.getId().toString());
@@ -142,11 +142,11 @@ public class GitLabService implements GitService {
 
     // Get the parent group
     LOGGER.debug("Looking up root GitLab group: {}", properties.getRootGroupId());
-    Optional<GitLabGroup> parentGroupOptional = client.findGroupById(token, properties.getRootGroupId());
+    Optional<GitLabProjectGroup> parentGroupOptional = client.findGroupById(token, properties.getRootGroupId());
     if (parentGroupOptional.isEmpty()) {
       throw new RecordNotFoundException("Root group not found. Check your GitLab configuration");
     }
-    GitLabGroup parentGroup = parentGroupOptional.get();
+    GitLabProjectGroup parentGroup = parentGroupOptional.get();
 
     // Check to make sure a group doesn't already exist
     Optional<GitGroup> optional = this.findProgramGroup(program);
@@ -165,7 +165,7 @@ public class GitLabService implements GitService {
         : "Program " + program.getName() + " study group");
     request.setParentId(parentGroup.getId());
     request.setVisibility(parentGroup.getVisibility());
-    GitLabGroup group = client.createNewGroup(token, request);
+    GitLabProjectGroup group = client.createNewGroup(token, request);
     LOGGER.info("Created group {} for program {}", group.getPath(), program.getName());
 
     // Update the program and set the namespace ID
@@ -184,7 +184,7 @@ public class GitLabService implements GitService {
     if (program.getAttributes().containsKey(GitAttributes.GROUP_ID)
         && StringUtils.hasText(program.getAttributes().get(GitAttributes.GROUP_ID))) {
       Integer groupId = Integer.parseInt(program.getAttributes().get(GitAttributes.GROUP_ID));
-      Optional<GitLabGroup> optional = client.findGroupById(token, groupId);
+      Optional<GitLabProjectGroup> optional = client.findGroupById(token, groupId);
       if (optional.isPresent()) {
         return Optional.of(GitLabUtils.toGitGroup(optional.get()));
       } else {
@@ -193,15 +193,15 @@ public class GitLabService implements GitService {
     }
 
     // Lookup by name
-    List<GitLabGroup> groups = client.findGroups(token, GitLabUtils.getPathFromName(program.getName()));
+    List<GitLabProjectGroup> groups = client.findGroups(token, GitLabUtils.getPathFromName(program.getName()));
     if (!groups.isEmpty()) {
-      for (GitLabGroup group : groups) {
+      for (GitLabProjectGroup group : groups) {
         if (group.getPath().equals(GitLabUtils.getPathFromName(program.getName()))) {
-          Optional<GitLabGroup> parentGroupOptional = client.findGroupById(token, properties.getRootGroupId());
+          Optional<GitLabProjectGroup> parentGroupOptional = client.findGroupById(token, properties.getRootGroupId());
           if (parentGroupOptional.isEmpty()) {
             throw new RecordNotFoundException("Root group not found. Check your GitLab configuration");
           }
-          GitLabGroup parentGroup = parentGroupOptional.get();
+          GitLabProjectGroup parentGroup = parentGroupOptional.get();
           updateProgramGroupAttributes(program, group, parentGroup);
           return Optional.of(GitLabUtils.toGitGroup(group));
         }
@@ -221,7 +221,7 @@ public class GitLabService implements GitService {
         .orElseThrow(RecordNotFoundException::new);
     Optional<GitGroup> optional = this.findProgramGroup(program);
     GitGroup group = optional.orElseGet(() -> createProgramGroup(program));
-    GitLabGroup gitLabGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
+    GitLabProjectGroup gitLabProjectGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
         .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
@@ -232,7 +232,7 @@ public class GitLabService implements GitService {
     request.setDescription(study.getDescription().replaceAll("<[^>]*>", ""));
     request.setAutoDevopsEnabled(false);
     request.setInitializeWithReadme(false);
-    request.setVisibility(gitLabGroup.getVisibility());
+    request.setVisibility(gitLabProjectGroup.getVisibility());
 
     // Create the repository
     GitLabProject project = client.createProject(getAccessToken(), request);
@@ -280,7 +280,7 @@ public class GitLabService implements GitService {
         .orElseThrow(RecordNotFoundException::new);
     Optional<GitGroup> optional = this.findProgramGroup(program);
     GitGroup group = optional.orElseGet(() -> createProgramGroup(program));
-    GitLabGroup gitLabGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
+    GitLabProjectGroup gitLabProjectGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
         .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
@@ -291,7 +291,7 @@ public class GitLabService implements GitService {
     request.setDescription(assay.getDescription().replaceAll("<[^>]*>", ""));
     request.setAutoDevopsEnabled(false);
     request.setInitializeWithReadme(false);
-    request.setVisibility(gitLabGroup.getVisibility());
+    request.setVisibility(gitLabProjectGroup.getVisibility());
 
     // Create the repository
     GitLabProject project = client.createProject(getAccessToken(), request);

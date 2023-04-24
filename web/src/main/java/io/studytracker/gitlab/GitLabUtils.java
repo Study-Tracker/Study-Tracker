@@ -19,8 +19,8 @@ package io.studytracker.gitlab;
 import io.studytracker.git.GitGroup;
 import io.studytracker.git.GitRepository;
 import io.studytracker.git.GitUser;
-import io.studytracker.gitlab.entities.GitLabGroup;
 import io.studytracker.gitlab.entities.GitLabProject;
+import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
@@ -49,7 +49,7 @@ public class GitLabUtils {
     return getPathFromName(assay.getCode());
   }
 
-  public static GitGroup toGitGroup(GitLabGroup group) {
+  public static GitGroup toGitGroup(GitLabProjectGroup group) {
     GitGroup gitGroup = new GitGroup();
     gitGroup.setGroupId(group.getId().toString());
     gitGroup.setParentGroupId(group.getParentId() != null ? group.getParentId().toString() : null);

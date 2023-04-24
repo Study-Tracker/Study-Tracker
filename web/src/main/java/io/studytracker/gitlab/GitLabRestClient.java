@@ -19,11 +19,11 @@ package io.studytracker.gitlab;
 import io.studytracker.config.properties.GitLabProperties;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.gitlab.entities.GitLabAuthenticationToken;
-import io.studytracker.gitlab.entities.GitLabGroup;
 import io.studytracker.gitlab.entities.GitLabNamespace;
 import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
+import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -204,7 +204,7 @@ public final class GitLabRestClient {
    * @param query the search string
    * @return the list of groups
    */
-  public List<GitLabGroup> findGroups(@NotNull String token, String query) {
+  public List<GitLabProjectGroup> findGroups(@NotNull String token, String query) {
     LOGGER.debug("Finding groups with query: {}", query);
     URL url = joinUrls(properties.getUrl(),
         "/api/v4/groups" + (query != null ? "?search=" + query : ""));
@@ -212,9 +212,9 @@ public final class GitLabRestClient {
     headers.set("Authorization", "Bearer " + token);
     headers.set("Accept", "application/json");
     HttpEntity<?> request = new HttpEntity<>(headers);
-    ResponseEntity<List<GitLabGroup>> response = restTemplate.exchange(
+    ResponseEntity<List<GitLabProjectGroup>> response = restTemplate.exchange(
         url.toString(), HttpMethod.GET, request,
-        new ParameterizedTypeReference<List<GitLabGroup>>() {});
+        new ParameterizedTypeReference<List<GitLabProjectGroup>>() {});
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return response.getBody();
     } else {
@@ -228,7 +228,7 @@ public final class GitLabRestClient {
    * @param token the access token
    * @return the list of groups
    */
-  public List<GitLabGroup> findGroups(@NotNull String token) {
+  public List<GitLabProjectGroup> findGroups(@NotNull String token) {
     return findGroups(token, null);
   }
 
@@ -239,7 +239,7 @@ public final class GitLabRestClient {
    * @param groupId the group ID
    * @return the group or an empty optional if not found
    */
-  public Optional<GitLabGroup> findGroupById(@NotNull String token, @NotNull Integer groupId) {
+  public Optional<GitLabProjectGroup> findGroupById(@NotNull String token, @NotNull Integer groupId) {
     LOGGER.debug("Finding group with id: {}", groupId);
     URL url = joinUrls(properties.getUrl(),
         "/api/v4/groups/" + groupId.toString());
@@ -247,8 +247,8 @@ public final class GitLabRestClient {
     headers.set("Authorization", "Bearer " + token);
     headers.set("Accept", "application/json");
     HttpEntity<?> request = new HttpEntity<>(headers);
-    ResponseEntity<GitLabGroup> response = restTemplate.exchange(
-        url.toString(), HttpMethod.GET, request, GitLabGroup.class);
+    ResponseEntity<GitLabProjectGroup> response = restTemplate.exchange(
+        url.toString(), HttpMethod.GET, request, GitLabProjectGroup.class);
     if (response.getStatusCode().equals(HttpStatus.OK)) {
       return Optional.ofNullable(response.getBody());
     } else {
@@ -256,7 +256,7 @@ public final class GitLabRestClient {
     }
   }
 
-  public GitLabGroup createNewGroup(@NotNull String token, @NotNull GitLabNewGroupRequest newGroupRequest) {
+  public GitLabProjectGroup createNewGroup(@NotNull String token, @NotNull GitLabNewGroupRequest newGroupRequest) {
     LOGGER.debug("Creating new group with name: {}", newGroupRequest.getName());
     URL url = joinUrls(properties.getUrl(), "/api/v4/groups");
     HttpHeaders headers = new HttpHeaders();
@@ -264,8 +264,8 @@ public final class GitLabRestClient {
     headers.set("Accept", "application/json");
     headers.set("Content-Type", "application/json");
     HttpEntity<GitLabNewGroupRequest> request = new HttpEntity<>(newGroupRequest, headers);
-    ResponseEntity<GitLabGroup> response = restTemplate.exchange(
-        url.toString(), HttpMethod.POST, request, GitLabGroup.class);
+    ResponseEntity<GitLabProjectGroup> response = restTemplate.exchange(
+        url.toString(), HttpMethod.POST, request, GitLabProjectGroup.class);
     if (response.getStatusCode().equals(HttpStatus.CREATED)) {
       return response.getBody();
     } else {
