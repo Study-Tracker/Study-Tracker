@@ -16,20 +16,20 @@
 
 package io.studytracker.gitlab;
 
-import io.studytracker.config.properties.GitLabProperties;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.git.GitAttributes;
-import io.studytracker.git.GitGroup;
-import io.studytracker.git.GitRepository;
+import io.studytracker.git.GitServerGroup;
+import io.studytracker.git.GitServerRepository;
+import io.studytracker.git.GitServerUser;
 import io.studytracker.git.GitService;
-import io.studytracker.git.GitUser;
-import io.studytracker.gitlab.entities.GitLabAuthenticationToken;
 import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
 import io.studytracker.model.Assay;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitLabIntegration;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
@@ -43,33 +43,29 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-public class GitLabService implements GitService {
+@Service
+public class GitLabService implements GitService<GitLabIntegration> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GitLabService.class);
 
-  private GitLabRestClient client;
-
-  private GitLabProperties properties;
-
+  @Autowired
   private ProgramRepository programRepository;
 
+  @Autowired
   private StudyRepository studyRepository;
 
+  @Autowired
   private AssayRepository assayRepository;
 
+  @Autowired
   private UserRepository userRepository;
 
-  private String getAccessToken() {
-    if (StringUtils.hasText(properties.getAccessKey())) {
-      return properties.getAccessKey();
-    } else {
-      GitLabAuthenticationToken token = client.authenticate();
-      return token.getAccessToken();
-    }
-  }
+  @Autowired
+  private GitLabIntegrationService gitLabIntegrationService;
 
   @Transactional
   void updateProgramGroupAttributes(Program program, GitLabProjectGroup group, GitLabProjectGroup parentGroup) {
@@ -121,35 +117,40 @@ public class GitLabService implements GitService {
   }
 
   @Override
-  public List<GitGroup> listGroups() {
-    return client.findGroups(getAccessToken()).stream()
+  public List<GitServerGroup> listAvailableGroups(GitLabIntegration integration) {
+    GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
+    return client.findGroups().stream()
         .map(GitLabUtils::toGitGroup)
         .collect(Collectors.toList());
   }
 
   @Override
-  public Iterable<GitRepository> listRepositories() {
-    return client.findProjects(getAccessToken()).stream()
+  public Iterable<GitServerRepository> listAvailableRepositories(GitLabIntegration integration) {
+    GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
+    return client.findProjects().stream()
         .map(GitLabUtils::toGitRepository)
         .collect(Collectors.toList());
   }
 
   @Override
-  public GitGroup createProgramGroup(Program program) {
+  public GitGroup createProgramGroup(GitGroup parentGroup, Program program) {
 
     LOGGER.info("Creating group for program {}", program.getName());
-    String token = getAccessToken();
+    GitLabIntegration integration = gitLabIntegrationService.findByGitGroup(parentGroup)
+        .orElseThrow(() -> new RecordNotFoundException("Integration not found for group "
+            + parentGroup.getDisplayName()));
+    GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
 
     // Get the parent group
     LOGGER.debug("Looking up root GitLab group: {}", properties.getRootGroupId());
-    Optional<GitLabProjectGroup> parentGroupOptional = client.findGroupById(token, properties.getRootGroupId());
+    Optional<GitLabProjectGroup> parentGroupOptional = client.findGroupById(properties.getRootGroupId());
     if (parentGroupOptional.isEmpty()) {
       throw new RecordNotFoundException("Root group not found. Check your GitLab configuration");
     }
     GitLabProjectGroup parentGroup = parentGroupOptional.get();
 
     // Check to make sure a group doesn't already exist
-    Optional<GitGroup> optional = this.findProgramGroup(program);
+    Optional<GitServerGroup> optional = this.findProgramGroup(program);
     if (optional.isPresent()) {
       LOGGER.info("Group already exists for program {}", program.getName());
       return optional.get();
@@ -176,7 +177,7 @@ public class GitLabService implements GitService {
   }
 
   @Override
-  public Optional<GitGroup> findProgramGroup(Program program) {
+  public Optional<GitServerGroup> findProgramGroup(Program program) {
     LOGGER.info("Getting group for program {}", program.getName());
     String token = getAccessToken();
 
@@ -213,14 +214,14 @@ public class GitLabService implements GitService {
   }
 
   @Override
-  public GitRepository createStudyRepository(Study study) {
+  public GitServerRepository createStudyRepository(Study study) {
     LOGGER.info("Creating repository for study {}", study.getName());
 
     // Get the program group
     Program program = programRepository.findById(study.getProgram().getId())
         .orElseThrow(RecordNotFoundException::new);
-    Optional<GitGroup> optional = this.findProgramGroup(program);
-    GitGroup group = optional.orElseGet(() -> createProgramGroup(program));
+    Optional<GitServerGroup> optional = this.findProgramGroup(program);
+    GitServerGroup group = optional.orElseGet(() -> createProgramGroup(program));
     GitLabProjectGroup gitLabProjectGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
         .orElseThrow(RecordNotFoundException::new);
 
@@ -244,7 +245,7 @@ public class GitLabService implements GitService {
   }
 
   @Override
-  public Optional<GitRepository> findStudyRepository(Study study) {
+  public Optional<GitServerRepository> findStudyRepository(Study study) {
     LOGGER.info("Getting repository for study {}", study.getName());
 
     // Lookup by saved study attribute
@@ -271,15 +272,15 @@ public class GitLabService implements GitService {
   }
 
   @Override
-  public GitRepository createAssayRepository(Assay assay) {
+  public GitServerRepository createAssayRepository(Assay assay) {
     LOGGER.info("Creating repository for assay {}", assay.getName());
     // Get the program group
     Study study = studyRepository.findById(assay.getStudy().getId())
         .orElseThrow(RecordNotFoundException::new);
     Program program = programRepository.findById(study.getProgram().getId())
         .orElseThrow(RecordNotFoundException::new);
-    Optional<GitGroup> optional = this.findProgramGroup(program);
-    GitGroup group = optional.orElseGet(() -> createProgramGroup(program));
+    Optional<GitServerGroup> optional = this.findProgramGroup(program);
+    GitServerGroup group = optional.orElseGet(() -> createProgramGroup(program));
     GitLabProjectGroup gitLabProjectGroup = client.findGroupById(getAccessToken(), Integer.parseInt(group.getGroupId()))
         .orElseThrow(RecordNotFoundException::new);
 
@@ -302,7 +303,7 @@ public class GitLabService implements GitService {
   }
 
   @Override
-  public Optional<GitRepository> findAssayRepository(Assay assay) {
+  public Optional<GitServerRepository> findAssayRepository(Assay assay) {
     LOGGER.info("Getting repository for assay {}", assay.getName());
     // Lookup by saved study attribute
     if (assay.getAttributes().containsKey(GitAttributes.REPOSITORY_ID)) {
@@ -328,15 +329,16 @@ public class GitLabService implements GitService {
   }
 
   @Override
-  public Iterable<GitUser> listUsers() {
+  public Iterable<GitServerUser> listAvailableUsers(GitLabIntegration integration) {
     LOGGER.debug("Getting list of GitLab users");
-    return client.findUsers(getAccessToken()).stream()
+    GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
+    return client.findUsers().stream()
         .map(GitLabUtils::toGitUser)
         .collect(Collectors.toList());
   }
 
   @Override
-  public Optional<GitUser> findUser(User user) {
+  public Optional<GitServerUser> findUser(User user) {
     LOGGER.debug("Getting GitLab user for {}", user.getUsername());
 
     // Lookup by saved user ID
@@ -362,33 +364,4 @@ public class GitLabService implements GitService {
     return Optional.empty();
   }
 
-  @Autowired
-  public void setClient(GitLabRestClient client) {
-    this.client = client;
-  }
-
-  @Autowired
-  public void setProperties(GitLabProperties properties) {
-    this.properties = properties;
-  }
-
-  @Autowired
-  public void setProgramRepository(ProgramRepository programRepository) {
-    this.programRepository = programRepository;
-  }
-
-  @Autowired
-  public void setStudyRepository(StudyRepository studyRepository) {
-    this.studyRepository = studyRepository;
-  }
-
-  @Autowired
-  public void setAssayRepository(AssayRepository assayRepository) {
-    this.assayRepository = assayRepository;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
 }

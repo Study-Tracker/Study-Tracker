@@ -16,9 +16,9 @@
 
 package io.studytracker.gitlab;
 
-import io.studytracker.git.GitGroup;
-import io.studytracker.git.GitRepository;
-import io.studytracker.git.GitUser;
+import io.studytracker.git.GitServerGroup;
+import io.studytracker.git.GitServerRepository;
+import io.studytracker.git.GitServerUser;
 import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
@@ -49,37 +49,37 @@ public class GitLabUtils {
     return getPathFromName(assay.getCode());
   }
 
-  public static GitGroup toGitGroup(GitLabProjectGroup group) {
-    GitGroup gitGroup = new GitGroup();
-    gitGroup.setGroupId(group.getId().toString());
-    gitGroup.setParentGroupId(group.getParentId() != null ? group.getParentId().toString() : null);
-    gitGroup.setName(group.getName());
-    gitGroup.setPath(group.getPath());
-    gitGroup.setDescription(group.getDescription());
-    gitGroup.setCreatedAt(group.getCreatedAt());
-    gitGroup.setWebUrl(group.getWebUrl());
-    return gitGroup;
+  public static GitServerGroup toGitGroup(GitLabProjectGroup group) {
+    GitServerGroup gitServerGroup = new GitServerGroup();
+    gitServerGroup.setGroupId(group.getId().toString());
+    gitServerGroup.setParentGroupId(group.getParentId() != null ? group.getParentId().toString() : null);
+    gitServerGroup.setName(group.getName());
+    gitServerGroup.setPath(group.getPath());
+    gitServerGroup.setDescription(group.getDescription());
+    gitServerGroup.setCreatedAt(group.getCreatedAt());
+    gitServerGroup.setWebUrl(group.getWebUrl());
+    return gitServerGroup;
   }
 
-  public static GitRepository toGitRepository(GitLabProject project) {
-    GitRepository gitRepository = new GitRepository();
-    gitRepository.setRepositoryId(project.getId().toString());
-    gitRepository.setGroupId(project.getNamespace().getId().toString());
-    gitRepository.setOwnerId(project.getOwner() != null ? project.getOwner().getId().toString() : null);
-    gitRepository.setName(project.getName());
-    gitRepository.setDescription(project.getDescription());
-    gitRepository.setPath(project.getPath());
-    gitRepository.setCreatedAt(project.getCreatedAt());
-    gitRepository.setUpdatedAt(project.getLastActivityAt());
-    gitRepository.setDefaultBranch(project.getDefaultBranch());
-    gitRepository.setSshUrl(project.getSshUrlToRepo());
-    gitRepository.setHttpUrl(project.getHttpUrlToRepo());
-    gitRepository.setWebUrl(project.getWebUrl());
-    return gitRepository;
+  public static GitServerRepository toGitRepository(GitLabProject project) {
+    GitServerRepository gitServerRepository = new GitServerRepository();
+    gitServerRepository.setRepositoryId(project.getId().toString());
+    gitServerRepository.setGroupId(project.getNamespace().getId().toString());
+    gitServerRepository.setOwnerId(project.getOwner() != null ? project.getOwner().getId().toString() : null);
+    gitServerRepository.setName(project.getName());
+    gitServerRepository.setDescription(project.getDescription());
+    gitServerRepository.setPath(project.getPath());
+    gitServerRepository.setCreatedAt(project.getCreatedAt());
+    gitServerRepository.setUpdatedAt(project.getLastActivityAt());
+    gitServerRepository.setDefaultBranch(project.getDefaultBranch());
+    gitServerRepository.setSshUrl(project.getSshUrlToRepo());
+    gitServerRepository.setHttpUrl(project.getHttpUrlToRepo());
+    gitServerRepository.setWebUrl(project.getWebUrl());
+    return gitServerRepository;
   }
 
-  public static GitUser toGitUser(GitLabUser user) {
-    GitUser gitUser = new GitUser();
+  public static GitServerUser toGitUser(GitLabUser user) {
+    GitServerUser gitUser = new GitServerUser();
     gitUser.setUserId(user.getId().toString());
     gitUser.setUsername(user.getUsername());
     gitUser.setName(user.getName());

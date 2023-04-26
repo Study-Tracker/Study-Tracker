@@ -22,7 +22,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GitGroup {
+public class GitServerGroup {
 
   private String groupId;
   private String parentGroupId;
