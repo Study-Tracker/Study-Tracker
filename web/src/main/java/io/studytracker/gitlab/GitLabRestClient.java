@@ -46,10 +46,15 @@ import org.springframework.web.client.RestTemplate;
 public final class GitLabRestClient {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GitLabRestClient.class);
+
   private final RestTemplate restTemplate = new RestTemplate();
+
   private URL rootUrl;
+
   private String username;
+
   private String password;
+
   private String accessToken;
 
   public static class GitLabRestClientBuilder {

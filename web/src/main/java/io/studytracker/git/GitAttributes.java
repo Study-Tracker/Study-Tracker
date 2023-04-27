@@ -16,6 +16,7 @@
 
 package io.studytracker.git;
 
+@Deprecated
 public class GitAttributes {
 
   public static final String GIT_SERVICE = "_git.service";

@@ -49,7 +49,7 @@ public class GitLabUtils {
     return getPathFromName(assay.getCode());
   }
 
-  public static GitServerGroup toGitGroup(GitLabProjectGroup group) {
+  public static GitServerGroup toGitServerGroup(GitLabProjectGroup group) {
     GitServerGroup gitServerGroup = new GitServerGroup();
     gitServerGroup.setGroupId(group.getId().toString());
     gitServerGroup.setParentGroupId(group.getParentId() != null ? group.getParentId().toString() : null);
@@ -61,7 +61,7 @@ public class GitLabUtils {
     return gitServerGroup;
   }
 
-  public static GitServerRepository toGitRepository(GitLabProject project) {
+  public static GitServerRepository toGitServerRepository(GitLabProject project) {
     GitServerRepository gitServerRepository = new GitServerRepository();
     gitServerRepository.setRepositoryId(project.getId().toString());
     gitServerRepository.setGroupId(project.getNamespace().getId().toString());
@@ -78,7 +78,7 @@ public class GitLabUtils {
     return gitServerRepository;
   }
 
-  public static GitServerUser toGitUser(GitLabUser user) {
+  public static GitServerUser toGitServerUser(GitLabUser user) {
     GitServerUser gitUser = new GitServerUser();
     gitUser.setUserId(user.getId().toString());
     gitUser.setUsername(user.getUsername());

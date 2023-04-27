@@ -10,4 +10,7 @@ public interface GitGroupRepository extends JpaRepository<GitGroup, Long> {
   @Query("select g from GitGroup g where g.organization.id = ?1")
   List<GitGroup> findByOrganizationId(Long organizationId);
 
+  @Query("select p.gitGroups from Program p where p.id = ?1")
+  List<GitGroup> findByProgramId(Long programId);
+
 }

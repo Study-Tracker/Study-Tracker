@@ -22,7 +22,9 @@ import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
+import io.studytracker.git.GitServiceLookup;
 import io.studytracker.model.ELNFolder;
+import io.studytracker.model.GitGroup;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.StorageDriveFolder;
@@ -53,7 +55,7 @@ public class ProgramService {
 
   private ELNFolderRepository elnFolderRepository;
 
-  private GitService gitService;
+  private GitServiceLookup gitServiceLookup;
 
   private StorageDriveFolderService storageDriveFolderService;
 
@@ -120,9 +122,15 @@ public class ProgramService {
         .orElseThrow(InvalidRequestException::new);
 
     // Create the program Git group
-    if (options.isUseGit() && gitService != null) {
+    if (options.isUseGit() && options.getGitGroup() != null) {
       try {
-        gitService.createProgramGroup(created);
+        GitGroup gitGroup = options.getGitGroup();
+        GitService gitService = gitServiceLookup.lookup(gitGroup.getGitServiceType())
+            .orElseThrow(() -> new InvalidRequestException(
+                "Git service not found: " + gitGroup.getGitServiceType()));
+        GitGroup programGroup =  gitService.createProgramGroup(gitGroup, created);
+        program.addGitGroup(programGroup);
+        programRepository.save(program);
       } catch (Exception e) {
         throw new StudyTrackerException(e);
       }
@@ -263,9 +271,9 @@ public class ProgramService {
     this.elnFolderRepository = elnFolderRepository;
   }
 
-  @Autowired(required = false)
-  public void setGitService(GitService gitService) {
-    this.gitService = gitService;
+  @Autowired
+  public void setGitServiceLookup(GitServiceLookup gitServiceLookup) {
+    this.gitServiceLookup = gitServiceLookup;
   }
 
   @Autowired

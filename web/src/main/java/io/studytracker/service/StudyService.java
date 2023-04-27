@@ -27,10 +27,10 @@ import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.git.GitServerRepository;
 import io.studytracker.git.GitService;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
+import io.studytracker.model.GitRepository;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.StorageDrive;
@@ -416,12 +416,13 @@ public class StudyService {
   private void addGitRepository(Study study) {
     LOGGER.debug("Creating Git repository for study: " + study.getName());
     try {
-      GitServerRepository repository = gitService.createStudyRepository(study);
+      GitRepository repository = gitService.createStudyRepository(study);
       ExternalLink entryLink = new ExternalLink();
       entryLink.setStudy(study);
       entryLink.setLabel("Git Repository");
       entryLink.setUrl(new URL(repository.getWebUrl()));
       study.addExternalLink(entryLink);
+      study.addGitRepository(repository);
       studyRepository.save(study);
     } catch (Exception e) {
       e.printStackTrace();

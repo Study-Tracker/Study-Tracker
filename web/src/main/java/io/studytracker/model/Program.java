@@ -32,6 +32,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -128,6 +130,13 @@ public class Program implements Model {
   @Type(type = "json")
   @Column(name = "attributes", columnDefinition = "json")
   private Map<String, String> attributes = new LinkedHashMap<>();
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "program_git_groups",
+      joinColumns = @JoinColumn(name = "program_id", nullable = false),
+      inverseJoinColumns = @JoinColumn(name = "git_group_id", nullable = false))
+  private Set<GitGroup> gitGroups = new HashSet<>();
 
   public void addAttribute(String key, String value) {
     this.attributes.put(key, value);
@@ -259,4 +268,21 @@ public class Program implements Model {
   public void removeStorageFolder(ProgramStorageFolder folder) {
     this.storageFolders.remove(folder);
   }
+
+  public Set<GitGroup> getGitGroups() {
+    return gitGroups;
+  }
+
+  public void setGitGroups(Set<GitGroup> gitGroups) {
+    this.gitGroups = gitGroups;
+  }
+
+  public void addGitGroup(GitGroup gitGroup) {
+    this.gitGroups.add(gitGroup);
+  }
+
+  public void removeGitGroup(GitGroup gitGroup) {
+    this.gitGroups.remove(gitGroup);
+  }
+
 }

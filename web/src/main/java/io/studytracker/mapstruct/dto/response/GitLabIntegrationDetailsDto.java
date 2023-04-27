@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package io.studytracker.model;
+package io.studytracker.mapstruct.dto.response;
 
+import java.util.Date;
 import lombok.Data;
 
 @Data
-public class ProgramOptions {
+public class GitLabIntegrationDetailsDto {
 
-  private boolean useNotebook = true;
-  private boolean useGit = true;
-  private boolean useStorage = true;
-  private StorageDriveFolder parentFolder;
-  private GitGroup gitGroup;
+  private Long id;
+  private OrganizationDetailsDto organization;
+  private String name;
+  private String rootUrl;
+  private String username;
+  private boolean active;
+  private Date createdAt;
+  private Date updatedAt;
 
 }

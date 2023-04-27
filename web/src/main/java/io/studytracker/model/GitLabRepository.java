@@ -1,5 +1,6 @@
 package io.studytracker.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -9,13 +10,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Table(name = "gitlab_projects")
+@Table(name = "gitlab_repositories")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class GitLabProject {
+public class GitLabRepository {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,7 +27,7 @@ public class GitLabProject {
   @JoinColumn(name = "gitlab_group_id", nullable = false)
   private GitLabGroup gitLabGroup;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @OneToOne(targetEntity = GitRepository.class, optional = false, cascade = CascadeType.ALL)
   @JoinColumn(name = "git_repository_id", nullable = false)
   private GitRepository gitRepository;
 

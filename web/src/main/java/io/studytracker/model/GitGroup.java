@@ -4,6 +4,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -42,6 +44,10 @@ public class GitGroup {
 
   @Column(name = "active", nullable = false)
   private boolean active;
+
+  @Column(name = "git_service_type", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private GitServiceType gitServiceType;
 
   @CreatedDate
   @Column(name = "created_at", nullable = false)
@@ -115,5 +121,13 @@ public class GitGroup {
 
   public void setUpdatedAt(Date updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public GitServiceType getGitServiceType() {
+    return gitServiceType;
+  }
+
+  public void setGitServiceType(GitServiceType gitServiceType) {
+    this.gitServiceType = gitServiceType;
   }
 }

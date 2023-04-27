@@ -237,10 +237,10 @@ public class Study implements Model {
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-      name = "study_gitlab_repositories",
+      name = "study_git_repositories",
       joinColumns = @JoinColumn(name = "study_id", nullable = false),
-      inverseJoinColumns = @JoinColumn(name = "gitlab_repository_id", nullable = false))
-  private Set<GitLabProject> gitLabRepositories = new HashSet<>();
+      inverseJoinColumns = @JoinColumn(name = "git_repository_id", nullable = false))
+  private Set<GitRepository> gitRepositories = new HashSet<>();
 
   public void addUser(User user) {
     this.users.add(user);
@@ -586,4 +586,19 @@ public class Study implements Model {
     this.storageFolders.remove(folder);
   }
 
+  public Set<GitRepository> getGitRepositories() {
+    return gitRepositories;
+  }
+
+  public void setGitRepositories(Set<GitRepository> gitRepositories) {
+    this.gitRepositories = gitRepositories;
+  }
+
+  public void addGitRepository(GitRepository gitRepository) {
+    this.gitRepositories.add(gitRepository);
+  }
+
+  public void removeGitRepository(GitRepository gitRepository) {
+    this.gitRepositories.remove(gitRepository);
+  }
 }

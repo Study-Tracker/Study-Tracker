@@ -21,7 +21,6 @@ import io.studytracker.model.GitGroup;
 import io.studytracker.model.GitRepository;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
-import io.studytracker.model.User;
 import java.util.Optional;
 
 public interface GitService<T extends GitServerIntegration> {
@@ -51,57 +50,57 @@ public interface GitService<T extends GitServerIntegration> {
   Iterable<GitServerUser> listAvailableUsers(T integration);
 
   /**
-   * Creates a new sub-group within the root group for the given Study Tracker program.
+   * Creates a new subgroup within a parent group for the given Study Tracker program.
    *
-   * @param integration the Git server integration to use
+   * @param parentGroup the parent group in which to create a new subgroup for study repositories
    * @param program the program to create a group for
    */
-  GitGroup createProgramGroup(T integration, Program program);
+  GitGroup createProgramGroup(GitGroup parentGroup, Program program);
 
   /**
    * Fetches an optional reference to an existing group for the given Study Tracker program.
    *
-   * @param integration the Git server integration to use
+   * @param parentGroup the parent group in which to create a new subgroup for study repositories
    * @param program the program to fetch a group for
    * @return the group for the given program
    */
-  Optional<GitGroup> findProgramGroup(T integration,Program program);
+  Optional<GitGroup> findProgramGroup(GitGroup parentGroup, Program program);
 
   /**
    * Creates a Git repository for the given study.
    *
-   * @param integration the Git server integration to use
+   * @param parentGroup the parent group in which to create the study repository
    * @param study the study to create a repository for
    * @return reference to the created repository
    */
-  GitRepository createStudyRepository(T integration,Study study);
+  GitRepository createStudyRepository(GitGroup parentGroup, Study study);
 
   /**
    * Fetches an optional reference to an existing repository for the given Study Tracker study.
    *
-   * @param integration the Git server integration to use
+   * @param parentGroup the parent group in which to check for the study repository
    * @param study the study to fetch a repository for
    * @return the repository for the given study
    */
-  Optional<GitRepository> findStudyRepository(T integration,Study study);
+//  List<GitRepository> findStudyRepositories(GitGroup parentGroup, Study study);
 
   /**
    * Creates a Git repository for the given assay.
    *
-   * @param integration the Git server integration to use
+   * @param parentGroup the parent group in which to create the assay repository
    * @param assay the assay to create a repository for
    * @return reference to the created repository
    */
-  GitRepository createAssayRepository(T integration,Assay assay);
+  GitRepository createAssayRepository(GitGroup parentGroup, Assay assay);
 
   /**
    * Fetches reference to an existing repository for the given Study Tracker assay, if it exists.
    *
-   * @param integration the Git server integration to use
+   * @param parentGroup the parent group in which to check for the assay repository
    * @param assay the assay to fetch a repository for
    * @return the repository for the given assay
    */
-  Optional<GitRepository> findAssayRepository(T integration, Assay assay);
+//  List<GitRepository> findAssayRepositories(GitGroup parentGroup, Assay assay);
 
   /**
    * Fetches the Git server user record for the given Study Tracker user.
@@ -110,6 +109,6 @@ public interface GitService<T extends GitServerIntegration> {
    * @param user the user to fetch a Git server user for
    * @return the Git server user
    */
-  Optional<GitServerUser> findUser(T integration, User user);
+//  Optional<GitServerUser> findUser(T integration, User user);
 
 }

@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package io.studytracker.model;
+package io.studytracker.mapstruct.dto.form;
 
+import io.studytracker.mapstruct.dto.response.OrganizationDetailsDto;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class ProgramOptions {
+public class GitLabIntegrationFormDto {
 
-  private boolean useNotebook = true;
-  private boolean useGit = true;
-  private boolean useStorage = true;
-  private StorageDriveFolder parentFolder;
-  private GitGroup gitGroup;
+  private Long id;
+  private OrganizationDetailsDto organization;
+  private @NotEmpty String name;
+  private @NotEmpty String rootUrl;
+  private String username;
+  private String password;
+  private String accessToken;
+  private boolean active;
 
 }

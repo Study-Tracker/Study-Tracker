@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -29,7 +30,7 @@ public class GitLabGroup {
   @JoinColumn(name = "gitlab_integration_id", nullable = false)
   private GitLabIntegration gitLabIntegration;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+  @OneToOne(targetEntity = GitGroup.class, optional = false, cascade = CascadeType.ALL)
   @JoinColumn(name = "git_group_id", nullable = false)
   private GitGroup gitGroup;
 
