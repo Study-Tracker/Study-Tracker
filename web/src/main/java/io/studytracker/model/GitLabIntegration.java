@@ -31,11 +31,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Table(name = "gitlab_integrations")
+@Table(name = "gitlab_integrations", uniqueConstraints = {
+    @UniqueConstraint(name = "uq_gitlab_integrations", columnNames = {"organization_id", "root_url"})
+})
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class GitLabIntegration implements GitServerIntegration {
