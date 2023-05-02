@@ -21,6 +21,7 @@ import io.studytracker.model.GitGroup;
 import io.studytracker.model.GitRepository;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
+import java.util.List;
 import java.util.Optional;
 
 public interface GitService<T extends GitServerIntegration> {
@@ -48,6 +49,23 @@ public interface GitService<T extends GitServerIntegration> {
    * @return user list
    */
   Iterable<GitServerUser> listAvailableUsers(T integration);
+
+  /**
+   * Registers a root {@link GitGroup} for the given {@link GitServerGroup} and {@link GitServerIntegration
+   *
+   * @param integration the Git server integration to use
+   * @param group the Git server group to register
+   * @return reference to the created group
+   */
+  GitGroup registerRootGroup(T integration, GitServerGroup group);
+
+  /**
+   * Lists all registered root {@link GitGroup}s for the given {@link GitServerIntegration}.
+   *
+   * @param integration the Git server integration to use
+   * @return list of registered root groups
+   */
+  List<GitGroup> listRegisteredRootGroups(T integration);
 
   /**
    * Creates a new subgroup within a parent group for the given Study Tracker program.

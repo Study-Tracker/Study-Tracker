@@ -25,11 +25,14 @@ import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.InvalidConstraintException;
+import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
+import io.studytracker.git.GitServiceLookup;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
+import io.studytracker.model.GitGroup;
 import io.studytracker.model.GitRepository;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
@@ -82,7 +85,7 @@ public class StudyService {
 
   private ELNFolderRepository elnFolderRepository;
 
-  private GitService gitService;
+  private GitServiceLookup gitServiceLookup;
 
   private StudyStorageServiceLookup storageServiceLookup;
 
@@ -321,8 +324,8 @@ public class StudyService {
     }
 
     // Git repository
-    if (gitService != null && options.isUseGit()) {
-      addGitRepository(study);
+    if (options.isUseGit() && options.getGitGroup() != null) {
+      addGitRepository(study, options.getGitGroup());
     }
 
     // Additional folders
@@ -413,10 +416,13 @@ public class StudyService {
     }
   }
 
-  private void addGitRepository(Study study) {
+  private void addGitRepository(Study study, GitGroup programGroup) {
     LOGGER.debug("Creating Git repository for study: " + study.getName());
     try {
-      GitRepository repository = gitService.createStudyRepository(study);
+      GitService gitService = gitServiceLookup.lookup(programGroup.getGitServiceType())
+          .orElseThrow(() -> new InvalidRequestException(
+              "Git service not found: " + programGroup.getGitServiceType()));
+      GitRepository repository = gitService.createStudyRepository(programGroup, study);
       ExternalLink entryLink = new ExternalLink();
       entryLink.setStudy(study);
       entryLink.setLabel("Git Repository");
@@ -699,9 +705,8 @@ public class StudyService {
     this.notebookFolderService = notebookFolderService;
   }
 
-  @Autowired(required = false)
-  public void setGitService(GitService gitService) {
-    this.gitService = gitService;
+  @Autowired
+  public void setGitServiceLookup(GitServiceLookup gitServiceLookup) {
+    this.gitServiceLookup = gitServiceLookup;
   }
-
 }

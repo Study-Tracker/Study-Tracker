@@ -17,7 +17,7 @@
 package io.studytracker.test.storage;
 
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
@@ -75,14 +75,14 @@ public class LocalStorageStudyStorageServiceTests {
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  private ExampleDataRunner exampleDataRunner;
 
   @Autowired private StudyStorageServiceLookup storageServiceLookup;
   @Autowired private StorageDriveFolderService storageDriveFolderService;
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   @Test

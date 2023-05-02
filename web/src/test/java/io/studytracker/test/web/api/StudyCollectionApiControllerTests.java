@@ -31,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleStudyCollectionGenerator;
+import io.studytracker.example.ExampleStudyGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.StudyCollectionPayloadDto;
 import io.studytracker.model.Study;
@@ -74,8 +75,8 @@ public class StudyCollectionApiControllerTests extends AbstractApiControllerTest
   @Test
   public void findAllTest() throws Exception {
 
-    Assert.assertEquals(ExampleDataGenerator.STUDY_COUNT, studyRepository.count());
-    Assert.assertEquals(ExampleDataGenerator.STUDY_COLLECTION_COUNT, studyCollectionRepository.count());
+    Assert.assertEquals(ExampleStudyGenerator.STUDY_COUNT, studyRepository.count());
+    Assert.assertEquals(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT, studyCollectionRepository.count());
 
     mockMvc.perform(get("/api/v1/study-collection")
             .header("Authorization", "Bearer " + this.getToken()))
@@ -83,7 +84,7 @@ public class StudyCollectionApiControllerTests extends AbstractApiControllerTest
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", not(empty())))
-        .andExpect(jsonPath("$.content", hasSize(ExampleDataGenerator.STUDY_COLLECTION_COUNT)))
+        .andExpect(jsonPath("$.content", hasSize(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT)))
         .andExpect(jsonPath("$", hasKey("last")))
         .andExpect(jsonPath("$.last", is(true)))
         .andExpect(jsonPath("$", hasKey("pageable")))
@@ -91,7 +92,7 @@ public class StudyCollectionApiControllerTests extends AbstractApiControllerTest
         .andExpect(jsonPath("$", hasKey("totalPages")))
         .andExpect(jsonPath("$.totalPages", is(1)))
         .andExpect(jsonPath("$", hasKey("totalElements")))
-        .andExpect(jsonPath("$.totalElements", is(ExampleDataGenerator.STUDY_COLLECTION_COUNT)))
+        .andExpect(jsonPath("$.totalElements", is(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT)))
         .andExpect(jsonPath("$", hasKey("first")))
         .andExpect(jsonPath("$.first", is(true)))
         .andExpect(jsonPath("$", hasKey("size")))
@@ -99,7 +100,7 @@ public class StudyCollectionApiControllerTests extends AbstractApiControllerTest
         .andExpect(jsonPath("$", hasKey("number")))
         .andExpect(jsonPath("$.number", is(0)))
         .andExpect(jsonPath("$", hasKey("numberOfElements")))
-        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataGenerator.STUDY_COLLECTION_COUNT)))
+        .andExpect(jsonPath("$.numberOfElements", is(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT)))
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));

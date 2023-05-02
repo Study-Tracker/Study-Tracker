@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.mapstruct.dto.form.AssayTypeFieldFormDto;
 import io.studytracker.mapstruct.dto.form.AssayTypeFormDto;
 import io.studytracker.mapstruct.dto.form.AssayTypeTaskFieldFormDto;
@@ -78,7 +78,7 @@ public class AssayTypeControllerTests {
 
   @Autowired private AssayTypeTaskFieldRepository assayTypeTaskFieldRepository;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -90,7 +90,7 @@ public class AssayTypeControllerTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     username = userService.findAll().get(0).getEmail();
   }
 

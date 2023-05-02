@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.model.StorageDriveFolder;
@@ -57,7 +57,7 @@ public class StorageDriveFolderPrivateControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private UserService userService;
 
@@ -71,7 +71,7 @@ public class StorageDriveFolderPrivateControllerTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     username = userService.findAll().get(0).getEmail();
   }
 
@@ -83,7 +83,7 @@ public class StorageDriveFolderPrivateControllerTests {
         .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STORAGE_DRIVE_FOLDER_COUNT)))
+        .andExpect(jsonPath("$", hasSize(ExampleDataRunner.STORAGE_DRIVE_FOLDER_COUNT)))
         ;
 
     mockMvc.perform(MockMvcRequestBuilders.get("/api/internal/storage-drive-folders?studyRoot=true")
@@ -91,7 +91,7 @@ public class StorageDriveFolderPrivateControllerTests {
             .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STUDY_ROOT_FOLDER_COUNT)))
+        .andExpect(jsonPath("$", hasSize(ExampleDataRunner.STUDY_ROOT_FOLDER_COUNT)))
         .andExpect(jsonPath("$[0]", hasKey("studyRoot")))
         .andExpect(jsonPath("$[0].studyRoot", is(true)))
     ;
@@ -101,7 +101,7 @@ public class StorageDriveFolderPrivateControllerTests {
             .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.BROWSER_ROOT_FOLDER_COUNT)))
+        .andExpect(jsonPath("$", hasSize(ExampleDataRunner.BROWSER_ROOT_FOLDER_COUNT)))
         .andExpect(jsonPath("$[0]", hasKey("browserRoot")))
         .andExpect(jsonPath("$[0].browserRoot", is(true)))
     ;
@@ -139,7 +139,7 @@ public class StorageDriveFolderPrivateControllerTests {
   public void registerRootFolderTest() throws Exception {
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findBrowserRootFolders();
     Assert.assertFalse(rootFolders.isEmpty());
-    Assert.assertEquals(ExampleDataGenerator.BROWSER_ROOT_FOLDER_COUNT, rootFolders.size());
+    Assert.assertEquals(ExampleDataRunner.BROWSER_ROOT_FOLDER_COUNT, rootFolders.size());
     StorageDriveFolder rootFolder = rootFolders.get(0);
     System.out.println(rootFolder.getPath());
 
@@ -174,7 +174,7 @@ public class StorageDriveFolderPrivateControllerTests {
 
     rootFolders = storageDriveFolderService.findBrowserRootFolders();
     Assert.assertFalse(rootFolders.isEmpty());
-    Assert.assertEquals(ExampleDataGenerator.BROWSER_ROOT_FOLDER_COUNT+1, rootFolders.size());
+    Assert.assertEquals(ExampleDataRunner.BROWSER_ROOT_FOLDER_COUNT+1, rootFolders.size());
 
   }
 

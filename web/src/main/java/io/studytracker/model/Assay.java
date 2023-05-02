@@ -77,7 +77,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode(value = "tasks", subgraph = "assay-task-details"),
         @NamedAttributeNode("users"),
         @NamedAttributeNode("study"),
-        @NamedAttributeNode(value = "storageFolders", subgraph = "assay-storage-folder-details")
+        @NamedAttributeNode(value = "storageFolders", subgraph = "assay-storage-folder-details"),
+        @NamedAttributeNode("gitRepositories")
       },
       subgraphs = {
         @NamedSubgraph(

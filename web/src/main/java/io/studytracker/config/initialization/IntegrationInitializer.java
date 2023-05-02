@@ -38,14 +38,11 @@ public class IntegrationInitializer implements ApplicationRunner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationInitializer.class);
 
-  @Autowired
-  private StudyTrackerProperties properties;
-
+  @Autowired private StudyTrackerProperties properties;
   @Autowired private LocalStorageInitializer localStorageInitializer;
-
   @Autowired private EgnyteIntegrationInitializer egnyteIntegrationInitializer;
-
   @Autowired private AwsIntegrationInitializer awsIntegrationInitializer;
+  @Autowired private GitLabIntegrationInitializer gitLabIntegrationInitializer;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
@@ -59,6 +56,9 @@ public class IntegrationInitializer implements ApplicationRunner {
 
     LOGGER.info("Initializing AWS integrations...");
     awsIntegrationInitializer.initializeIntegrations();
+
+    LOGGER.info("Initializing GitLab integrations...");
+    gitLabIntegrationInitializer.initializeIntegrations();
 
     LOGGER.info("Integrations initialized.");
   }

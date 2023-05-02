@@ -17,7 +17,7 @@
 package io.studytracker.test.service;
 
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
@@ -47,7 +47,7 @@ public class ProgramServiceTests {
 
   @Autowired private ProgramService programService;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private UserRepository userRepository;
 
@@ -55,7 +55,7 @@ public class ProgramServiceTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   @Test

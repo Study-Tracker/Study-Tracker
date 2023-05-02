@@ -16,6 +16,7 @@
 
 package io.studytracker.gitlab;
 
+import io.studytracker.config.properties.GitProperties;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.git.GitServerGroup;
 import io.studytracker.git.GitServerRepository;
@@ -79,6 +80,9 @@ public class GitLabService implements GitService<GitLabIntegration> {
   @Autowired
   private GitLabRepositoryRepository gitLabRepositoryRepository;
 
+  @Autowired
+  private GitProperties gitProperties;
+
   @Override
   public List<GitServerGroup> listAvailableGroups(GitLabIntegration integration) {
     GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
@@ -96,10 +100,65 @@ public class GitLabService implements GitService<GitLabIntegration> {
   }
 
   @Override
+  public GitGroup registerRootGroup(GitLabIntegration integration, GitServerGroup group) {
+    GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
+
+    GitGroup gitGroup = new GitGroup();
+    gitGroup.setOrganization(integration.getOrganization());
+    gitGroup.setActive(true);
+    gitGroup.setGitServiceType(GitServiceType.GITLAB);
+    gitGroup.setDisplayName(group.getName());
+    gitGroup.setWebUrl(group.getWebUrl());
+
+    GitLabGroup gitLabGroup = new GitLabGroup();
+    gitLabGroup.setGitGroup(gitGroup);
+    gitLabGroup.setGitLabIntegration(integration);
+    gitLabGroup.setGroupId(Integer.parseInt(group.getGroupId()));
+    gitLabGroup.setName(group.getName());
+    gitLabGroup.setPath(group.getPath());
+
+    gitLabGroupRepository.save(gitLabGroup);
+    GitLabGroup created = gitLabGroupRepository.findById(gitLabGroup.getId())
+        .orElseThrow(() -> new RecordNotFoundException("GitLabGroup record not persisted."));
+    LOGGER.info("Created root group {} ", group.getName());
+    return created.getGitGroup();
+  }
+
+  @Override
+  public List<GitGroup> listRegisteredRootGroups(GitLabIntegration integration) {
+    return gitGroupRepository.findRootByOrganizationId(integration.getOrganization().getId());
+  }
+
+  private GitLabGroup saveProgramGroupRecord(GitGroup parentGroup, GitLabProjectGroup group,
+      GitLabIntegration integration, Program program) {
+    // Save the group records
+    GitGroup gitGroup = new GitGroup();
+    gitGroup.setParentGroup(parentGroup);
+    gitGroup.setOrganization(parentGroup.getOrganization());
+    gitGroup.setActive(true);
+    gitGroup.setGitServiceType(GitServiceType.GITLAB);
+    gitGroup.setDisplayName(program.getName() + " Program GitLab Project Group");
+    gitGroup.setWebUrl(group.getWebUrl());
+
+    GitLabGroup gitLabGroup = new GitLabGroup();
+    gitLabGroup.setGitGroup(gitGroup);
+    gitLabGroup.setGitLabIntegration(integration);
+    gitLabGroup.setGroupId(group.getId());
+    gitLabGroup.setName(group.getName());
+    gitLabGroup.setPath(group.getPath());
+
+    gitLabGroupRepository.save(gitLabGroup);
+    GitLabGroup created = gitLabGroupRepository.findById(gitLabGroup.getId())
+        .orElseThrow(() -> new RecordNotFoundException("GitLabGroup record not persisted."));
+    LOGGER.info("Created group {} for program {}", created.getPath(), program.getName());
+    return created;
+  }
+
+  @Override
   @Transactional
   public GitGroup createProgramGroup(GitGroup parentGroup, Program program) {
 
-    LOGGER.info("Creating group for program {}", program.getName());
+    LOGGER.info("Creating GitLab group for program {}", program.getName());
 
     // Get the Git client
     GitLabIntegration integration = gitLabIntegrationService.findByGitGroup(parentGroup)
@@ -126,35 +185,17 @@ public class GitLabService implements GitService<GitLabIntegration> {
 
     // Create the group
     GitLabNewGroupRequest request = new GitLabNewGroupRequest();
-    request.setName(program.getName());
+    request.setName(GitLabUtils.getProgramGroupName(program));
     request.setPath(GitLabUtils.getPathFromName(program.getName()));
     request.setAutoDevOpsEnabled(false);
     request.setDescription(program.getDescription() != null
         ? program.getDescription().replaceAll("<[^>]*>", "")
         : "Program " + program.getName() + " study group");
-    request.setParentId(parentGroup.getId().intValue());
+    request.setParentId(parentProjectGroup.getId());
     request.setVisibility(parentProjectGroup.getVisibility());
     GitLabProjectGroup group = client.createNewGroup(request);
 
-    // Save the group records
-    GitGroup gitGroup = new GitGroup();
-    gitGroup.setParentGroup(parentGroup);
-    gitGroup.setOrganization(parentGroup.getOrganization());
-    gitGroup.setActive(true);
-    gitGroup.setGitServiceType(GitServiceType.GITLAB);
-    gitGroup.setDisplayName(program.getName() + " Program GitLab Project Group");
-    gitGroup.setWebUrl(group.getWebUrl());
-
-    GitLabGroup gitLabGroup = new GitLabGroup();
-    gitLabGroup.setGitGroup(gitGroup);
-    gitLabGroup.setGitLabIntegration(integration);
-    gitLabGroup.setGroupId(group.getId());
-    gitLabGroup.setName(group.getName());
-    gitLabGroup.setPath(group.getPath());
-
-    gitLabGroupRepository.save(gitLabGroup);
-    GitLabGroup created = gitLabGroupRepository.findById(gitLabGroup.getId())
-        .orElseThrow(() -> new RecordNotFoundException("GitLabGroup record not persisted."));
+    GitLabGroup created = this.saveProgramGroupRecord(parentGroup, group, integration, program);
     LOGGER.info("Created group {} for program {}", group.getPath(), program.getName());
     return created.getGitGroup();
 
@@ -162,12 +203,32 @@ public class GitLabService implements GitService<GitLabIntegration> {
 
   @Override
   public Optional<GitGroup> findProgramGroup(GitGroup parentGroup, Program program) {
-    LOGGER.debug("Getting group for program {}", program.getName());
+    LOGGER.debug("Finding GitLab group for program {} in parent group {}", program.getName(), parentGroup.getDisplayName());
     if (!program.getGitGroups().isEmpty()) {
       for (GitGroup group: gitGroupRepository.findByProgramId(program.getId())) {
         if (group.getParentGroup().getId().equals(parentGroup.getId())) {
           return Optional.of(group);
         }
+      }
+    } else {
+      if (gitProperties.getUseExistingGroups()) {
+        LOGGER.debug("Existing group not registered, now looking up existing GitLab group for program {}", program.getName());
+        GitLabIntegration integration = gitLabIntegrationService.findByGitGroup(parentGroup)
+            .orElseThrow(() -> new RecordNotFoundException("Integration not found for group "
+                + parentGroup.getDisplayName()));
+        GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
+        GitLabGroup parentGitLabGroup = gitLabGroupRepository.findByGitGroupId(parentGroup.getId());
+        Optional<GitLabProjectGroup> optional = client.findGroups(program.getName()).stream()
+            .filter(g -> g.getParentId().equals(parentGitLabGroup.getGroupId())
+                && g.getName().equals(GitLabUtils.getProgramGroupName(program)))
+            .findFirst();
+        if (optional.isPresent()) {
+          GitLabProjectGroup existingGroup = optional.get();
+          GitLabGroup created = this.saveProgramGroupRecord(parentGroup, existingGroup, integration, program);
+          return Optional.of(created.getGitGroup());
+        }
+      } else {
+        LOGGER.debug("No existing GitLab group for program {}", program.getName());
       }
     }
     return Optional.empty();
@@ -175,20 +236,16 @@ public class GitLabService implements GitService<GitLabIntegration> {
 
   @Override
   @Transactional
-  public GitRepository createStudyRepository(GitGroup parentGroup, Study study) {
+  public GitRepository createStudyRepository(GitGroup programGroup, Study study) {
     LOGGER.info("Creating repository for study {}", study.getName());
 
     // Get the Git client
-    GitLabIntegration integration = gitLabIntegrationService.findByGitGroup(parentGroup)
+    GitLabIntegration integration = gitLabIntegrationService.findByGitGroup(programGroup)
         .orElseThrow(() -> new RecordNotFoundException("Integration not found for group "
-            + parentGroup.getDisplayName()));
+            + programGroup.getDisplayName()));
     GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
 
     // Get the program group
-    Program program = programRepository.findById(study.getProgram().getId())
-        .orElseThrow(RecordNotFoundException::new);
-    Optional<GitGroup> optional = this.findProgramGroup(parentGroup, program);
-    GitGroup programGroup = optional.orElseGet(() -> createProgramGroup(parentGroup, program));
     GitLabGroup gitLabProgramGroup = gitLabGroupRepository.findByGitGroupId(programGroup.getId());
     GitLabProjectGroup gitLabProjectGroup = client.findGroupById(gitLabProgramGroup.getGroupId())
         .orElseThrow(RecordNotFoundException::new);

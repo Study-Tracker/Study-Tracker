@@ -277,6 +277,30 @@ public final class GitLabRestClient {
   }
 
   /**
+   * Returns a list of public groups. The list can be filtered using a search string.
+   *
+   * @param query the search string
+   * @return the list of groups
+   */
+  public List<GitLabProjectGroup> findSubgroups(Integer groupId, String query) {
+    LOGGER.debug("Finding groups with query: {}", query);
+    URL url = joinUrls(rootUrl,
+        "/api/v4/groups/" + groupId + "/subgroups" + (query != null ? "?search=" + query : ""));
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + accessToken);
+    headers.set("Accept", "application/json");
+    HttpEntity<?> request = new HttpEntity<>(headers);
+    ResponseEntity<List<GitLabProjectGroup>> response = restTemplate.exchange(
+        url.toString(), HttpMethod.GET, request,
+        new ParameterizedTypeReference<List<GitLabProjectGroup>>() {});
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      return response.getBody();
+    } else {
+      throw new StudyTrackerException("Failed to find groups in GitLab");
+    }
+  }
+
+  /**
    * Returns a list of all public groups.
    *
    * @return the list of groups

@@ -17,7 +17,6 @@
 package io.studytracker.config.initialization;
 
 import io.studytracker.config.ConfigOrder;
-import io.studytracker.example.ExampleDataGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -30,10 +29,10 @@ import org.springframework.stereotype.Component;
 @Order(ConfigOrder.EXAMPLE_DATA_INIT)
 public class ExampleDataRunner implements ApplicationRunner {
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private io.studytracker.example.ExampleDataRunner exampleDataRunner;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
   }
 }

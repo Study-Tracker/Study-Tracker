@@ -23,13 +23,13 @@ import io.studytracker.model.GitLabIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.repository.GitLabIntegrationRepository;
 import io.studytracker.service.OrganizationService;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -56,12 +56,13 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
   }
 
   @Override
-  public Collection<GitLabIntegration> findByOrganization(Organization organization) {
+  public List<GitLabIntegration> findByOrganization(Organization organization) {
     LOGGER.debug("Find GitLabIntegration by organization: {}", organization.getId());
     return gitLabIntegrationRepository.findByOrganizationId(organization.getId());
   }
 
   @Override
+  @Transactional
   public GitLabIntegration register(GitLabIntegration instance) {
     LOGGER.info("Registering GitLabIntegration for organization: {}",
         instance.getOrganization().getId());
@@ -78,6 +79,7 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
   }
 
   @Override
+  @Transactional
   public GitLabIntegration update(GitLabIntegration instance) {
     LOGGER.info("Updating GitLabIntegration : {}",
         instance.getId());
@@ -100,6 +102,8 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
   @Override
   public boolean validate(GitLabIntegration instance) {
     try {
+      Assert.notNull(instance.getOrganization(), "Organization is required.");
+      Assert.notNull(instance.getName(), "Name is required.");
       Assert.hasText(instance.getName(), "Name is required.");
       Assert.hasText(instance.getRootUrl(), "Root URL is required.");
       Assert.isTrue(StringUtils.hasText(instance.getAccessToken())
@@ -126,10 +130,12 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
   }
 
   @Override
+  @Transactional
   public void remove(GitLabIntegration instance) {
     LOGGER.info("Removing GitLabIntegration: {}", instance.getId());
     GitLabIntegration i = gitLabIntegrationRepository.getById(instance.getId());
     i.setActive(false);
     gitLabIntegrationRepository.save(i);
   }
+
 }

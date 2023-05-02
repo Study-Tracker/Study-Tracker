@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package io.studytracker.test.web.api;
 
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.User;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.security.TokenUtils;
@@ -27,7 +27,7 @@ public abstract class AbstractApiControllerTests {
 
   private TokenUtils tokenUtils;
 
-  private ExampleDataGenerator exampleDataGenerator;
+  private ExampleDataRunner exampleDataRunner;
 
   private UserRepository userRepository;
 
@@ -35,7 +35,7 @@ public abstract class AbstractApiControllerTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     if (token == null) {
       String email = userRepository.findAll().stream()
           .filter(User::isAdmin)
@@ -55,13 +55,13 @@ public abstract class AbstractApiControllerTests {
     this.tokenUtils = tokenUtils;
   }
 
-  public ExampleDataGenerator getExampleDataGenerator() {
-    return exampleDataGenerator;
+  public ExampleDataRunner getExampleDataGenerator() {
+    return exampleDataRunner;
   }
 
   @Autowired
-  public void setExampleDataGenerator(ExampleDataGenerator exampleDataGenerator) {
-    this.exampleDataGenerator = exampleDataGenerator;
+  public void setExampleDataGenerator(ExampleDataRunner exampleDataRunner) {
+    this.exampleDataRunner = exampleDataRunner;
   }
 
   public UserRepository getUserRepository() {

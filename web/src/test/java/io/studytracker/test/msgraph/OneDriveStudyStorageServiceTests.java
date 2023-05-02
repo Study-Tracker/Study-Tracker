@@ -433,6 +433,7 @@ public class OneDriveStudyStorageServiceTests {
 
   @Test
   public void fetchFileTest() throws Exception {
+    saveFileTest();
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
     Assert.assertEquals(1, rootFolders.size());
     StorageDriveFolder rootFolder = rootFolders.get(0);

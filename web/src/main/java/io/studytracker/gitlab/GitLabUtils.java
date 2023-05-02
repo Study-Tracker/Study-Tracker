@@ -23,6 +23,7 @@ import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
 import io.studytracker.model.Assay;
+import io.studytracker.model.Program;
 import io.studytracker.model.Study;
 
 public class GitLabUtils {
@@ -31,6 +32,10 @@ public class GitLabUtils {
     return name.toLowerCase()
         .replaceAll("[\\s_]+", "-")
         .replaceAll("[^a-z0-9-]", "");
+  }
+
+  public static String getProgramGroupName(Program program) {
+    return program.getName().replaceAll("[^\\w\\d\\s_+.]", "");
   }
 
   public static String getStudyProjectName(Study study) {

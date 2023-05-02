@@ -65,7 +65,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           @NamedAttributeNode("createdBy"),
           @NamedAttributeNode("lastModifiedBy"),
           @NamedAttributeNode("notebookFolder"),
-          @NamedAttributeNode(value = "storageFolders", subgraph = "program-storage-folder-details")
+          @NamedAttributeNode(value = "storageFolders", subgraph = "program-storage-folder-details"),
+          @NamedAttributeNode("gitGroups")
         },
         subgraphs = {
           @NamedSubgraph(
