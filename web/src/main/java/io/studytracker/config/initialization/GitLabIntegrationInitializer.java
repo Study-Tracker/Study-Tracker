@@ -24,8 +24,11 @@ import io.studytracker.git.GitServerGroup;
 import io.studytracker.gitlab.GitLabIntegrationService;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitLabGroup;
 import io.studytracker.model.GitLabIntegration;
 import io.studytracker.model.Organization;
+import io.studytracker.repository.GitGroupRepository;
+import io.studytracker.repository.GitLabGroupRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +56,12 @@ public class GitLabIntegrationInitializer {
   @Autowired
   private GitLabService gitLabService;
 
+  @Autowired
+  private GitLabGroupRepository gitLabGroupRepository;
+
+  @Autowired
+  private GitGroupRepository gitGroupRepository;
+
   @Transactional
   public void initializeIntegrations() throws InvalidConfigurationException {
 
@@ -72,6 +81,7 @@ public class GitLabIntegrationInitializer {
       GitLabIntegration integration = registerGitLabIntegration(organization);
       if (properties.getGitlab().getRootGroupId() != null) {
         registerRootGroup(integration, properties.getGitlab().getRootGroupId());
+        updateExistingGroups(integration);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -79,6 +89,32 @@ public class GitLabIntegrationInitializer {
       throw new InvalidConfigurationException(e);
     }
 
+  }
+
+  private void updateExistingGroups(GitLabIntegration integration) {
+    for (GitLabGroup gitLabGroup: gitLabGroupRepository.findByIntegrationId(integration.getId())){
+      GitGroup gitGroup = gitLabGroup.getGitGroup();
+      if (gitGroup.getCreatedAt().equals(gitGroup.getUpdatedAt())
+          && gitGroup.getWebUrl().equals("PLACEHOLDER")) {
+
+        Optional<GitServerGroup> optional = gitLabService.listAvailableGroups(integration)
+                .stream()
+                .filter(g -> g.getGroupId().equals(gitLabGroup.getGroupId().toString()))
+                .findFirst();
+
+        if (optional.isPresent()) {
+          GitServerGroup serverGroup = optional.get();
+          gitLabGroup.setName(serverGroup.getName());
+          gitLabGroup.setPath(serverGroup.getPath());
+          gitLabGroup.getGitGroup().setDisplayName(serverGroup.getName());
+          gitLabGroup.getGitGroup().setWebUrl(serverGroup.getWebUrl());
+          gitLabGroupRepository.save(gitLabGroup);
+        } else {
+          LOGGER.warn("GitLab group {} not found. Skipping update.", gitLabGroup.getGroupId());
+        }
+
+      }
+    }
   }
 
   private GitLabIntegration registerGitLabIntegration(Organization organization) {
@@ -94,7 +130,7 @@ public class GitLabIntegrationInitializer {
 
       if (integrations.size() > 0) {
 
-        // CHeck to see if the integration record is already updated
+        // Check to see if the integration record is already updated
         GitLabIntegration existing = integrations.get(0);
         if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
           LOGGER.info("GitLab integration for organization {} is already configured. Skipping initialization.", organization.getName());
@@ -131,14 +167,56 @@ public class GitLabIntegrationInitializer {
   }
 
   private GitGroup registerRootGroup(GitLabIntegration integration, Integer rootGroupId) {
+
+    // Find the GitLab server group that matches the config property
     Optional<GitServerGroup> optional = gitLabService.listAvailableGroups(integration)
         .stream()
         .filter(g -> g.getGroupId().equals(rootGroupId.toString()))
         .findFirst();
     if (optional.isPresent()) {
-      GitServerGroup group = optional.get();
-      LOGGER.info("Registering root GitLab group: {}", group.getName());
-      return gitLabService.registerRootGroup(integration, group);
+
+      // Check to see if it is already registered
+      GitServerGroup serverGroup = optional.get();
+      GitLabGroup rootGitLabGroup = null;
+      for (GitGroup rootGroup: gitLabService.listRegisteredRootGroups(integration)){
+        GitLabGroup glGroup = gitLabGroupRepository.findByGitGroupId(rootGroup.getId());
+        if (glGroup.getGroupId().toString().equals(serverGroup.getGroupId())) {
+          rootGitLabGroup = glGroup;
+          break;
+        }
+      }
+
+      // No group is currently registered
+      if (rootGitLabGroup == null) {
+        LOGGER.info("Registering root GitLab group: {}", serverGroup.getName());
+        return gitLabService.registerRootGroup(integration, serverGroup);
+      }
+
+      // A group is already registered
+      else {
+        return rootGitLabGroup.getGitGroup();
+
+//        // Placeholder record has not been updated
+//        if (gitGroup.getCreatedAt().equals(gitGroup.getUpdatedAt())
+//            && gitGroup.getWebUrl().equals("PLACEHOLDER")) {
+//          rootGitLabGroup.setName(serverGroup.getName());
+//          rootGitLabGroup.setPath(serverGroup.getPath());
+//          rootGitLabGroup.getGitGroup().setDisplayName(serverGroup.getName());
+//          rootGitLabGroup.getGitGroup().setWebUrl(serverGroup.getWebUrl());
+//          gitLabGroupRepository.save(rootGitLabGroup);
+//          Optional<GitGroup> groupOptional = gitGroupRepository.findById(gitGroup.getId());
+//          return groupOptional.orElse(null);
+//        }
+//
+//        // Record is up-to-date
+//        else {
+//          LOGGER.info("Root GitLab group {} is already registered. Skipping initialization.",
+//              serverGroup.getName());
+//          return gitGroup;
+//        }
+
+      }
+
     } else {
       LOGGER.warn("Root group with ID {} not found. Skipping initialization of root group.", rootGroupId);
       return null;
