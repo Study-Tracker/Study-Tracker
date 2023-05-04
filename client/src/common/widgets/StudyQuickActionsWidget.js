@@ -17,18 +17,19 @@
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
+  faEdit,
+  faFolderPlus,
   faPersonRunning,
+  faTrash,
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  faFolderOpen,
-  faPlusSquare,
-  faSquareCheck
-} from "@fortawesome/free-regular-svg-icons";
+import {faPlusSquare, faSquareCheck} from "@fortawesome/free-regular-svg-icons";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
+import swal from "sweetalert";
+import PropTypes from "prop-types";
 
 const StudyQuickActionsWidget = ({
     study,
@@ -49,6 +50,35 @@ const StudyQuickActionsWidget = ({
         message: 'Error changing status'
       });
       console.error(e);
+    });
+  }
+
+  const handleStudyDelete = () => {
+    swal({
+      title: "Are you sure you want to remove this study?",
+      text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered in the admin dashboard.",
+      icon: "warning",
+      buttons: true
+    })
+    .then(val => {
+      if (val) {
+        axios({
+          url: "/api/internal/study/" + study.code,
+          method: 'delete',
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }).then(response => {
+          navigate("/studies")
+        })
+        .catch(error => {
+          console.error(error);
+          notyf.open({
+            type: 'error',
+            message: 'Failed to remove study. Please try again.'
+          })
+        })
+      }
     });
   }
 
@@ -109,8 +139,20 @@ const StudyQuickActionsWidget = ({
                     </Dropdown.Item>
 
                     <Dropdown.Item onClick={handleAddToCollection}>
-                      <FontAwesomeIcon icon={faFolderOpen} className={"me-2"}/>
+                      <FontAwesomeIcon icon={faFolderPlus} className={"me-2"}/>
                       Add to Collection
+                    </Dropdown.Item>
+
+                    <Dropdown.Divider />
+
+                    <Dropdown.Item onClick={() => navigate("/study/" + study.code + "/edit")}>
+                      <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
+                      Edit
+                    </Dropdown.Item>
+
+                    <Dropdown.Item onClick={handleStudyDelete}>
+                      <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
+                      Remove
                     </Dropdown.Item>
 
                   </Dropdown.Menu>
@@ -122,5 +164,10 @@ const StudyQuickActionsWidget = ({
       </Card>
   )
 }
+
+StudyQuickActionsWidget.propTypes = {
+  study: PropTypes.object.isRequired,
+  handleAddToCollection: PropTypes.func.isRequired
+};
 
 export default StudyQuickActionsWidget;

@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-import {Button, Col, Dropdown, Row} from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import SelectableStatusButton
   from "../../common/detailsPage/SelectableStatusButton";
 import React from "react";
 import PropTypes from "prop-types";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBars, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {useNavigate} from "react-router-dom";
 
-const AssayDetailsHeader = ({assay, study, handleDelete}) => {
-
-  const navigate = useNavigate();
+const AssayDetailsHeader = ({assay}) => {
 
   return (
       <Row className="justify-content-between align-items-center">
@@ -52,28 +47,28 @@ const AssayDetailsHeader = ({assay, study, handleDelete}) => {
                                           assayId={assay.id}/>
 
           {/* Controls */}
-          <Dropdown className="ms-1 mb-1">
+          {/*<Dropdown className="ms-1 mb-1">*/}
 
-            <Dropdown.Toggle variant="outline-secondary">
-              <FontAwesomeIcon icon={faBars} className={"me-2"} />
-            </Dropdown.Toggle>
+          {/*  <Dropdown.Toggle variant="outline-secondary">*/}
+          {/*    <FontAwesomeIcon icon={faBars} className={"me-2"} />*/}
+          {/*  </Dropdown.Toggle>*/}
 
-            <Dropdown.Menu>
+          {/*  <Dropdown.Menu>*/}
 
-              <Dropdown.Item onClick={() => navigate("/study/" + study.code +
-                  "/assay/" + assay.code + "/edit")}>
-                <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
-                Edit
-              </Dropdown.Item>
+          {/*    <Dropdown.Item onClick={() => navigate("/study/" + study.code +*/}
+          {/*        "/assay/" + assay.code + "/edit")}>*/}
+          {/*      <FontAwesomeIcon icon={faEdit} className={"me-2"}/>*/}
+          {/*      Edit*/}
+          {/*    </Dropdown.Item>*/}
 
-              <Dropdown.Item onClick={handleDelete}>
-                <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
-                Remove
-              </Dropdown.Item>
+          {/*    <Dropdown.Item onClick={handleDelete}>*/}
+          {/*      <FontAwesomeIcon icon={faTrash} className={"me-2"}/>*/}
+          {/*      Remove*/}
+          {/*    </Dropdown.Item>*/}
 
-            </Dropdown.Menu>
+          {/*  </Dropdown.Menu>*/}
 
-          </Dropdown>
+          {/*</Dropdown>*/}
 
         </Col>
       </Row>
@@ -81,9 +76,7 @@ const AssayDetailsHeader = ({assay, study, handleDelete}) => {
 };
 
 AssayDetailsHeader.propTypes = {
-  assay: PropTypes.object.isRequired,
-  study: PropTypes.object.isRequired,
-  handleDelete: PropTypes.func.isRequired
+  assay: PropTypes.object.isRequired
 }
 
 export default AssayDetailsHeader;

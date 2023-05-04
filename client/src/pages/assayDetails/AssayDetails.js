@@ -18,11 +18,9 @@ import React, {useState} from "react";
 import {Col, Container, Row, Tab, Tabs} from "react-bootstrap";
 import AssayTimelineTab from "./AssayTimelineTab";
 import AssayNotebookTab from "./AssayNotebookTab";
-import swal from "sweetalert";
 import {Breadcrumbs} from "../../common/common";
 import PropTypes from "prop-types";
 import {useLocation, useNavigate} from "react-router-dom";
-import axios from "axios";
 import AssayDetailsHeader from "./AssayDetailsHeader";
 import AssayOverviewTab from "./AssayOverviewTab";
 import AssayFileManagerTab from "./AssayFileManagerTab";
@@ -42,27 +40,6 @@ const AssayDetails = props => {
     navigate("#" + key);
   }
 
-  const handleAssayDelete = () => {
-    swal({
-      title: "Are you sure you want to remove this assay?",
-      text: "Removed assays will be hidden from view, but their records will not be deleted. Assays can be recovered in the admin dashboard.",
-      icon: "warning",
-      buttons: true
-    })
-    .then(val => {
-      if (val) {
-        axios.delete("/api/internal/assay/" + assay.code)
-        .then(response => {
-          navigate("/assays")
-        })
-        .catch(error => {
-          console.error(error);
-          setError("Failed to remove study. Please try again.");
-        })
-      }
-    });
-  }
-
   return (
       <Container fluid className="animated fadeIn">
 
@@ -79,7 +56,6 @@ const AssayDetails = props => {
         <AssayDetailsHeader
             assay={assay}
             study={study}
-            handleDelete={handleAssayDelete}
         />
 
         <Row>
@@ -96,7 +72,7 @@ const AssayDetails = props => {
                 <AssayOverviewTab
                   assay={assay}
                   handleTabSelect={handleTabSelect}
-                  features={features}
+                  study={study}
                 />
               </Tab>
 
