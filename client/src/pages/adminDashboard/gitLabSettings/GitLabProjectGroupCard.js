@@ -39,11 +39,11 @@ const GitLabProjectGroupCard = ({group, handleEdit, handleStatusChange}) => {
             <Col xs={7} className={"d-flex align-items-center"}>
               <div>
                 <span className={"fw-bolder text-lg"}>
-                  <a href={group.webUrl} target={"_blank"} rel="noopener noreferrer">{group.displayName}</a>
+                  <a href={group.gitGroup.webUrl} target={"_blank"} rel="noopener noreferrer">{group.gitGroup.displayName}</a>
                 </span>
                 <br />
                 <span className={"text-muted"}>
-                  {group.gitServiceType}
+                  GitLab Group ID: <code>{group.groupId}</code>
                 </span>
               </div>
             </Col>
@@ -52,7 +52,7 @@ const GitLabProjectGroupCard = ({group, handleEdit, handleStatusChange}) => {
               <div>
                 <span className="text-muted">Status</span>
                 <br />
-                <DriveStatusBadge active={group.active} />
+                <DriveStatusBadge active={group.gitGroup.active} />
               </div>
             </Col>
 
@@ -64,7 +64,7 @@ const GitLabProjectGroupCard = ({group, handleEdit, handleStatusChange}) => {
                 <Dropdown.Menu>
 
                   {
-                      group.active && (
+                      group.gitGroup.active && (
                           <Dropdown.Item onClick={() => handleStatusChange(group, false)}>
                             <FontAwesomeIcon icon={faCancel} className={"me-1"} />
                             Set Inactive
@@ -73,7 +73,7 @@ const GitLabProjectGroupCard = ({group, handleEdit, handleStatusChange}) => {
                   }
 
                   {
-                      !group.active && (
+                      !group.gitGroup.active && (
                           <Dropdown.Item onClick={() => handleStatusChange(group, true)}>
                             <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
                             Set Active

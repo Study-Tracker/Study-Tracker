@@ -79,7 +79,7 @@ const GitLabIntegrationFormModal = ({
 
   return (
       <Formik
-          initialValues={selectedIntegration || integrationDefault}
+          initialValues={selectedIntegration ? {...selectedIntegration, useToken: true} : integrationDefault}
           onSubmit={handleFormSubmit}
           validationSchema={integrationSchema}
           innerRef={formikRef}

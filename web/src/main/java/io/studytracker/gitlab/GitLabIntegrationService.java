@@ -28,6 +28,7 @@ import io.studytracker.repository.GitLabIntegrationRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,9 +145,26 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
     gitLabIntegrationRepository.save(i);
   }
 
+  // Groups
+
   public Optional<GitLabGroup> findRootGroupById(Long id) {
     LOGGER.debug("Find GitLabGroup by id: {}", id);
     return gitLabGroupRepository.findById(id);
+  }
+
+  public List<GitLabGroup> findGroups(GitLabIntegration integration) {
+    return this.findGroups(integration, false);
+  }
+
+  public List<GitLabGroup> findGroups(GitLabIntegration integration, boolean isRoot) {
+    LOGGER.debug("Find GitLabGroup by integration: {}", integration.getId());
+    return gitLabGroupRepository.findByIntegrationId(integration.getId())
+        .stream()
+        .filter(g -> {
+          if (isRoot) return g.getGitGroup().getParentGroup() == null;
+          else return true;
+        })
+        .collect(Collectors.toList());
   }
   
   @Transactional

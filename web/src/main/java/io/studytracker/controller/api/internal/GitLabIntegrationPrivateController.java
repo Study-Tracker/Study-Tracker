@@ -22,7 +22,6 @@ import io.studytracker.gitlab.GitLabIntegrationService;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.mapstruct.dto.form.GitLabGroupFormDto;
 import io.studytracker.mapstruct.dto.form.GitLabIntegrationFormDto;
-import io.studytracker.mapstruct.dto.response.GitGroupDetailsDto;
 import io.studytracker.mapstruct.dto.response.GitLabGroupDetailsDto;
 import io.studytracker.mapstruct.dto.response.GitLabIntegrationDetailsDto;
 import io.studytracker.mapstruct.mapper.GitGroupMapper;
@@ -150,7 +149,7 @@ public class GitLabIntegrationPrivateController {
   }
 
   @GetMapping("/{id}/groups/registered")
-  public List<GitGroupDetailsDto> findRegisteredGroups(@PathVariable("id") Long integrationId,
+  public List<GitLabGroupDetailsDto> findRegisteredGroups(@PathVariable("id") Long integrationId,
       @RequestParam(value = "root", required = false) boolean isRoot) {
     LOGGER.debug("Fetching GitLab root groups for integration: {}", integrationId);
     Organization organization = organizationService.getCurrentOrganization();
@@ -159,9 +158,7 @@ public class GitLabIntegrationPrivateController {
     if (!integration.getOrganization().getId().equals(organization.getId())) {
       throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
     }
-    GitLabService gitLabService = (GitLabService) gitServiceLookup.lookup(GitServiceType.GITLAB)
-        .orElseThrow(() -> new IllegalStateException("GitLab service not found"));
-    return gitGroupMapper.toDetailsDto(gitLabService.findRegisteredGroups(integration, isRoot));
+    return gitLabGroupMapper.toDetailsDto(gitLabIntegrationService.findGroups(integration, isRoot));
   }
 
   @PostMapping("/{id}/groups/registered")
