@@ -178,7 +178,7 @@ public class GitLabIntegrationInitializer {
       // Check to see if it is already registered
       GitServerGroup serverGroup = optional.get();
       GitLabGroup rootGitLabGroup = null;
-      for (GitGroup rootGroup: gitLabService.listRegisteredRootGroups(integration)){
+      for (GitGroup rootGroup: gitLabService.findRegisteredGroups(integration)){
         GitLabGroup glGroup = gitLabGroupRepository.findByGitGroupId(rootGroup.getId());
         if (glGroup.getGroupId().toString().equals(serverGroup.getGroupId())) {
           rootGitLabGroup = glGroup;
@@ -189,32 +189,12 @@ public class GitLabIntegrationInitializer {
       // No group is currently registered
       if (rootGitLabGroup == null) {
         LOGGER.info("Registering root GitLab group: {}", serverGroup.getName());
-        return gitLabService.registerRootGroup(integration, serverGroup);
+        return gitLabService.registerGroup(integration, serverGroup);
       }
 
       // A group is already registered
       else {
         return rootGitLabGroup.getGitGroup();
-
-//        // Placeholder record has not been updated
-//        if (gitGroup.getCreatedAt().equals(gitGroup.getUpdatedAt())
-//            && gitGroup.getWebUrl().equals("PLACEHOLDER")) {
-//          rootGitLabGroup.setName(serverGroup.getName());
-//          rootGitLabGroup.setPath(serverGroup.getPath());
-//          rootGitLabGroup.getGitGroup().setDisplayName(serverGroup.getName());
-//          rootGitLabGroup.getGitGroup().setWebUrl(serverGroup.getWebUrl());
-//          gitLabGroupRepository.save(rootGitLabGroup);
-//          Optional<GitGroup> groupOptional = gitGroupRepository.findById(gitGroup.getId());
-//          return groupOptional.orElse(null);
-//        }
-//
-//        // Record is up-to-date
-//        else {
-//          LOGGER.info("Root GitLab group {} is already registered. Skipping initialization.",
-//              serverGroup.getName());
-//          return gitGroup;
-//        }
-
       }
 
     } else {

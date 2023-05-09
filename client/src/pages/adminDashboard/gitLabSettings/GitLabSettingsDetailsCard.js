@@ -42,7 +42,7 @@ const GitLabSettingsDetailsCard = ({settings}) => {
                 {
                   settings.username
                       ? <Badge bg={"info"}>User Credentials</Badge>
-                      : <Badge bg={"warning"}>Group Access Key</Badge>
+                      : <Badge bg={"warning"}>Access Key</Badge>
                 }
               </p>
             </Col>

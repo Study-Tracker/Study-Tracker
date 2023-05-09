@@ -147,7 +147,7 @@ public class GitLabIntegrationServiceTests {
     GitServerGroup serverGroup = optional.get();
     Assert.assertEquals(EXAMPLE_GROUP, serverGroup.getName());
 
-    GitGroup rootGroup = gitLabService.registerRootGroup(integration, serverGroup);
+    GitGroup rootGroup = gitLabService.registerGroup(integration, serverGroup);
     Assert.assertNotNull(rootGroup);
     Assert.assertEquals(1, gitGroupRepository.count());
     Assert.assertEquals(1, gitLabGroupRepository.count());

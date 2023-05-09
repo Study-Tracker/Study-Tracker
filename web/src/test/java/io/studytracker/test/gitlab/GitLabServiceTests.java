@@ -92,7 +92,7 @@ public class GitLabServiceTests {
     Program program = programRepository.findByName(EXAMPLE_PROGRAM)
         .orElseThrow(RecordNotFoundException::new);
     Assert.assertTrue(program.getGitGroups().isEmpty());
-    List<GitGroup> rootGroups = gitLabService.listRegisteredRootGroups(integration);
+    List<GitGroup> rootGroups = gitLabService.findRegisteredGroups(integration, true);
     Assert.assertNotNull(rootGroups);
     Assert.assertEquals(1, rootGroups.size());
     GitGroup rootGroup = rootGroups.get(0);
@@ -127,7 +127,7 @@ public class GitLabServiceTests {
     List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
     Assert.assertEquals(1, integrations.size());
     GitLabIntegration integration = integrations.get(0);
-    List<GitGroup> rootGroups = gitLabService.listRegisteredRootGroups(integration);
+    List<GitGroup> rootGroups = gitLabService.findRegisteredGroups(integration, true);
     Assert.assertNotNull(rootGroups);
     Assert.assertEquals(1, rootGroups.size());
     GitGroup rootGroup = rootGroups.get(0);

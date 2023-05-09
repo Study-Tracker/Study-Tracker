@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.mapper;
+package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.mapstruct.dto.form.GitGroupFormDto;
-import io.studytracker.mapstruct.dto.response.GitGroupDetailsDto;
-import io.studytracker.model.GitGroup;
-import java.util.List;
-import java.util.Set;
-import org.mapstruct.Mapper;
+import io.studytracker.model.GitServiceType;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
 
-@Mapper(componentModel = "spring")
-public interface GitGroupMapper {
+@Data
+public class GitGroupFormDto {
 
-  GitGroupDetailsDto toDetailsDto(GitGroup gitGroup);
-  List<GitGroupDetailsDto> toDetailsDto(List<GitGroup> gitGroups);
-  Set<GitGroupDetailsDto> toDetailsDto(Set<GitGroup> gitGroups);
-
-  GitGroup fromFormDto(GitGroupFormDto dto);
+  private Long id;
+  private Long organizationId;
+  private Long parentGroupId;
+  private @NotNull String displayName;
+  private @NotNull String webUrl;
+  private boolean active;
+  private @NotNull GitServiceType gitServiceType;
 
 }

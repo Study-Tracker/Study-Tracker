@@ -100,9 +100,28 @@ public class GitLabService implements GitService<GitLabIntegration> {
   }
 
   @Override
-  public GitGroup registerRootGroup(GitLabIntegration integration, GitServerGroup group) {
-    GitLabRestClient client = GitLabClientFactory.createRestClient(integration);
+  public Optional<GitGroup> findRegisteredGroupById(Long id) {
+    return gitGroupRepository.findById(id);
+  }
 
+  @Override
+  public GitGroup updateRegisteredGroup(GitGroup gitGroup) {
+    GitGroup g = gitGroupRepository.getById(gitGroup.getId());
+    g.setDisplayName(gitGroup.getDisplayName());
+    g.setWebUrl(gitGroup.getWebUrl());
+    g.setActive(gitGroup.isActive());
+    return gitGroupRepository.save(g);
+  }
+
+  @Override
+  public void unregisterGroup(GitGroup group) {
+    GitGroup g = gitGroupRepository.getById(group.getId());
+    g.setActive(false);
+    gitGroupRepository.save(g);
+  }
+
+  @Override
+  public GitGroup registerGroup(GitLabIntegration integration, GitServerGroup group) {
     GitGroup gitGroup = new GitGroup();
     gitGroup.setOrganization(integration.getOrganization());
     gitGroup.setActive(true);
@@ -125,8 +144,22 @@ public class GitLabService implements GitService<GitLabIntegration> {
   }
 
   @Override
-  public List<GitGroup> listRegisteredRootGroups(GitLabIntegration integration) {
-    return gitGroupRepository.findRootByOrganizationId(integration.getOrganization().getId());
+  public List<GitGroup> findRegisteredGroups(GitLabIntegration integration) {
+    return this.findRegisteredGroups(integration, false);
+  }
+
+  @Override
+  public List<GitGroup> findRegisteredGroups(GitLabIntegration integration, boolean isRoot) {
+    return gitGroupRepository.findByOrganizationId(integration.getOrganization().getId())
+        .stream()
+        .filter(g -> {
+          if (isRoot) {
+            return g.getParentGroup() == null;
+          } else {
+            return true;
+          }
+        })
+        .collect(Collectors.toList());
   }
 
   private GitLabGroup saveProgramGroupRecord(GitGroup parentGroup, GitLabProjectGroup group,

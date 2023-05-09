@@ -51,21 +51,52 @@ public interface GitService<T extends GitServerIntegration> {
   Iterable<GitServerUser> listAvailableUsers(T integration);
 
   /**
-   * Registers a root {@link GitGroup} for the given {@link GitServerGroup} and {@link GitServerIntegration
+   * Registers a {@link GitGroup} for the given {@link GitServerGroup} and {@link GitServerIntegration
    *
    * @param integration the Git server integration to use
    * @param group the Git server group to register
    * @return reference to the created group
    */
-  GitGroup registerRootGroup(T integration, GitServerGroup group);
+  GitGroup registerGroup(T integration, GitServerGroup group);
 
   /**
-   * Lists all registered root {@link GitGroup}s for the given {@link GitServerIntegration}.
+   * Lists all registered {@link GitGroup}s for the given {@link GitServerIntegration}.
    *
    * @param integration the Git server integration to use
-   * @return list of registered root groups
+   * @return list of registered groups
    */
-  List<GitGroup> listRegisteredRootGroups(T integration);
+  List<GitGroup> findRegisteredGroups(T integration);
+
+  /**
+   * Lists all registered {@link GitGroup}s for the given {@link GitServerIntegration}. Optionally, can
+   *  return only root groups
+   *
+   * @param integration the Git server integration to use
+   * @param isRoot whether to return only root groups
+   * @return list of registered groups
+   */
+  List<GitGroup> findRegisteredGroups(T integration, boolean isRoot);
+
+  /**
+   * Fetches an optional reference to an existing {@link GitGroup} .
+   *
+   * @param id the PKID of the group to fetch
+   * @return the group for the given Git server group
+   */
+  Optional<GitGroup> findRegisteredGroupById(Long id);
+
+  /**
+   * Updates the record for an existing {@link GitGroup}.
+   * @param gitGroup the Git group to update
+   * @return reference to the updated group
+   */
+  GitGroup updateRegisteredGroup(GitGroup gitGroup);
+
+  /**
+   * Removes the registration of a {@link GitGroup}.
+   * @param group the Git server group to unregister
+   */
+  void unregisterGroup(GitGroup group);
 
   /**
    * Creates a new subgroup within a parent group for the given Study Tracker program.

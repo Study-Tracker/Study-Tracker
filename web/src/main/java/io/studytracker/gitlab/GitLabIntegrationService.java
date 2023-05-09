@@ -19,8 +19,11 @@ package io.studytracker.gitlab;
 import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitLabGroup;
 import io.studytracker.model.GitLabIntegration;
+import io.studytracker.model.GitServiceType;
 import io.studytracker.model.Organization;
+import io.studytracker.repository.GitLabGroupRepository;
 import io.studytracker.repository.GitLabIntegrationRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
@@ -43,6 +46,9 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
 
   @Autowired
   private OrganizationService organizationService;
+
+  @Autowired
+  private GitLabGroupRepository gitLabGroupRepository;
 
   @Override
   public Optional<GitLabIntegration> findById(Long id) {
@@ -136,6 +142,50 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
     GitLabIntegration i = gitLabIntegrationRepository.getById(instance.getId());
     i.setActive(false);
     gitLabIntegrationRepository.save(i);
+  }
+
+  public Optional<GitLabGroup> findRootGroupById(Long id) {
+    LOGGER.debug("Find GitLabGroup by id: {}", id);
+    return gitLabGroupRepository.findById(id);
+  }
+  
+  @Transactional
+  public GitLabGroup registerRootGroup(GitLabIntegration integration, GitLabGroup group) {
+    LOGGER.info("Registering GitLabGroup: {}", group.getGroupId());
+    Organization organization = organizationService.getCurrentOrganization();
+    group.setGitLabIntegration(integration);
+    group.getGitGroup().setGitServiceType(GitServiceType.GITLAB);
+    group.getGitGroup().setOrganization(organization);
+    return gitLabGroupRepository.save(group);
+  }
+
+  @Transactional
+  public GitLabGroup updateRootGroup(GitLabGroup group) {
+    LOGGER.info("Updating GitLabGroup: {}", group.getGroupId());
+    GitLabGroup g = gitLabGroupRepository.getById(group.getId());
+    g.setGroupId(group.getGroupId());
+    g.setName(group.getName());
+    g.setPath(group.getPath());
+    g.setGroupId(group.getGroupId());
+    g.getGitGroup().setActive(group.getGitGroup().isActive());
+    g.getGitGroup().setWebUrl(group.getGitGroup().getWebUrl());
+    g.getGitGroup().setDisplayName(group.getGitGroup().getDisplayName());
+    return gitLabGroupRepository.save(g);
+  }
+
+  @Transactional
+  public void updateRootGroupStatus(Long groupId, boolean status) {
+    LOGGER.info("Updating GitLabGroup status: {}", groupId);
+    GitLabGroup g = gitLabGroupRepository.getById(groupId);
+    g.getGitGroup().setActive(status);
+    gitLabGroupRepository.save(g);
+  }
+
+  @Transactional
+  public void removeRootGroup(GitLabGroup group) {
+    GitLabGroup g = gitLabGroupRepository.getById(group.getId());
+    g.getGitGroup().setActive(false);
+    gitLabGroupRepository.save(g);
   }
 
 }
