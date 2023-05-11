@@ -38,4 +38,6 @@ public class ProgramDetailsDto {
   private NotebookFolderDetailsDto notebookFolder;
   private Map<String, String> attributes = new HashMap<>();
   private Set<ProgramStorageDriveFolderSummaryDto> storageFolders = new HashSet<>();
+  private Set<UserSummaryDto> users = new HashSet<>();
+  private Set<StudySummaryDto> studies = new HashSet<>();
 }

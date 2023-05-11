@@ -78,6 +78,7 @@ public class ProgramPrivateController extends AbstractProgramController {
   @GetMapping("")
   public List<?> getAllPrograms(
       @RequestParam(required = false, name = "details") boolean showDetails) throws Exception {
+    LOGGER.debug("Getting all programs: showDetails=" + showDetails);
     List<Program> programs = this.getProgramService().findAll();
     if (showDetails) {
       return this.getProgramMapper().toProgramDetailsList(programs);
