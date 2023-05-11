@@ -27,7 +27,7 @@ import {
 import UserSettings from "./userSettings/UserSettings";
 import AssayTypeSettings from "./AssayTypeSettings";
 import KeywordSettings from "./KeywordSettings";
-import ProgramSettings from "./ProgramSettings";
+import ProgramSettings from "./program/ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
 import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
 import BenchlingIntegrationSettings from "./BenchlingIntegrationSettings";
