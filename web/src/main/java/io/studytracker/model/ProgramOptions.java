@@ -22,7 +22,7 @@ import lombok.Data;
 public class ProgramOptions {
 
   private boolean useNotebook = true;
-  private boolean useGit = true;
+  private boolean useGit = false;
   private boolean useStorage = true;
   private StorageDriveFolder parentFolder;
   private GitGroup gitGroup;

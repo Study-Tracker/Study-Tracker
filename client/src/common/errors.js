@@ -22,9 +22,7 @@ export const DismissableAlert = ({header, message, color}) => {
   return (
       <Alert variant={color} dismissible>
         <div className="alert-message">
-          {
-            !!header ? (<strong>{header}</strong>) : ''
-          }
+          {header && (<h4>{header}</h4>)}
           {message}
         </div>
       </Alert>

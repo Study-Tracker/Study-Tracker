@@ -76,7 +76,9 @@ public class ProgramPublicController extends AbstractProgramController {
   @PutMapping("/{id}")
   public HttpEntity<ProgramDto> updateProgram(@PathVariable Long id, @Valid @RequestBody ProgramPayloadDto dto) {
     LOGGER.info("Updating program {}", dto);
-    Program program = this.updateExistingProgram(this.getProgramMapper().fromProgramPayloadDto(dto));
+    Program toUpdate = this.getProgramMapper().fromProgramPayloadDto(dto);
+    ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
+    Program program = this.updateExistingProgram(toUpdate, options);
     return new ResponseEntity<>(this.getProgramMapper().toProgramDto(program), HttpStatus.OK);
   }
 

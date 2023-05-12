@@ -111,7 +111,9 @@ public class ProgramPrivateController extends AbstractProgramController {
       @RequestBody @Valid ProgramFormDto dto
   ) {
     LOGGER.info("Updating program: " + programId);
-    Program program = this.updateExistingProgram(this.getProgramMapper().fromProgramFormDto(dto));
+    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
+    Program toUpdate = this.getProgramMapper().fromProgramFormDto(dto);
+    Program program = this.updateExistingProgram(toUpdate, options);
     return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.OK);
   }
 

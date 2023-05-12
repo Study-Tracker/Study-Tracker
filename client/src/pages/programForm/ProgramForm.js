@@ -39,13 +39,15 @@ import FormikFormErrorNotification
   from "../../common/forms/FormikFormErrorNotification";
 import axios from "axios";
 import * as yup from "yup";
+import ProgramGitInputs from "./ProgramGitInputs";
 
 const ProgramForm = ({
     program,
     programs,
     elnProjects,
     features,
-    rootFolders
+    rootFolders,
+    gitGroups
 }) => {
 
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
@@ -82,7 +84,10 @@ const ProgramForm = ({
       .matches("[A-Za-z0-9]+", "Code must be alphanumeric."),
     active: yup.boolean(),
     parentFolder: yup.object()
-      .required("Parent folder is required."),
+      .when("id", {
+        is: (id) => id === undefined || id === null,
+        then: yup.object().required("Parent folder is required.")
+      }),
     notebookFolder: yup.object().shape({
       referenceId: yup.string()
       .test(
@@ -101,6 +106,11 @@ const ProgramForm = ({
           "Attribute names must not be empty",
           value => Object.keys(value).every(d => d && d.trim() !== '')
       ),
+    gitGroup: yup.object()
+      .when("useGit", {
+        is: true,
+        then: yup.object().required("Git group is required.")
+      }),
   });
 
   const defaultProgramValues = {
@@ -117,7 +127,8 @@ const ProgramForm = ({
     parentFolder: null,
     useGit: false,
     useNotebook: true,
-    useStorage: true
+    useStorage: true,
+    gitGroup: null
   };
 
   const submitForm = (values, {setSubmitting}) => {
@@ -176,9 +187,24 @@ const ProgramForm = ({
     });
   };
 
+  const elnProjectOptions = elnProjects ? elnProjects
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .map(p => ({
+    label: p.name,
+    value: p
+  })) : [];
+
   return (
       <Formik
-          initialValues={program || defaultProgramValues}
+          initialValues={
+              program
+                ? {
+                    ...program,
+                    useGit: program.gitGroups.length > 0,
+                    gitGroup: program.gitGroups.length > 0 ? program.gitGroups[0] : null
+                  }
+                : defaultProgramValues
+          }
           validationSchema={programSchema}
           onSubmit={submitForm}
           validateOnBlur={false}
@@ -346,7 +372,7 @@ const ProgramForm = ({
                     </Card>
 
                     {/* File Storage */}
-                    <Card>
+                    <Card hidden={!!values.id}>
                       <Card.Header>
                         <Card.Title>File Storage</Card.Title>
                         <h6 className="card-subtitle text-muted">
@@ -401,15 +427,13 @@ const ProgramForm = ({
                               )
                         }
 
-
-
-
                       </Card.Body>
                     </Card>
 
                     {/* ELN */}
                     {
-                      features
+                      !values.id
+                      && features
                       && features.notebook
                       && features.notebook.isEnabled ? (
 
@@ -438,14 +462,7 @@ const ProgramForm = ({
                                         <Select
                                             className="react-select-container"
                                             classNamePrefix="react-select"
-                                            options={
-                                              elnProjects
-                                              .sort((a, b) => a.name.localeCompare(b.name))
-                                              .map(p => ({
-                                                label: p.name,
-                                                value: p
-                                              }))
-                                            }
+                                            options={elnProjectOptions}
                                             name="elnProject"
                                             onChange={(selected) => {
                                               setFieldValue("notebookFolder.name", selected.value.name);
@@ -529,6 +546,17 @@ const ProgramForm = ({
                       ) : ""
                     }
 
+                    {/* Git */}
+                    <ProgramGitInputs
+                        isActive={values.useGit}
+                        gitGroups={gitGroups}
+                        selectedGroup={values.gitGroup}
+                        defaultGroup={values.gitGroups && values.gitGroups.length > 0 ? values.gitGroups[0].parentGroup : null}
+                        onChange={setFieldValue}
+                        error={errors.gitGroup}
+                    />
+
+                    {/* Attributes */}
                     <Card>
                       <Card.Header>
                         <Card.Title>Program Attributes</Card.Title>
@@ -560,8 +588,9 @@ const ProgramForm = ({
                               variant="primary"
                               type={"submit"}
                               className={"me-4"}
+                              disabled={isSubmitting}
                           >
-                            Submit
+                            {isSubmitting ? "Submitting..." : "Submit"}
                           </Button>
 
                           <Button
