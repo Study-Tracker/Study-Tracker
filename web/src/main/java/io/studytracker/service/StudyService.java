@@ -25,12 +25,15 @@ import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.InvalidConstraintException;
+import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.git.GitRepository;
 import io.studytracker.git.GitService;
+import io.studytracker.git.GitServiceLookup;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitRepository;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.StorageDrive;
@@ -82,7 +85,9 @@ public class StudyService {
 
   private ELNFolderRepository elnFolderRepository;
 
-  private GitService gitService;
+  private GitServiceLookup gitServiceLookup;
+
+  private GitRepositoryService gitRepositoryService;
 
   private StudyStorageServiceLookup storageServiceLookup;
 
@@ -321,8 +326,26 @@ public class StudyService {
     }
 
     // Git repository
-    if (gitService != null && options.isUseGit()) {
-      addGitRepository(study);
+    if (options.isUseGit()) {
+      GitGroup programGroup = null;
+      if (options.getGitGroup() == null) {
+        Optional<GitGroup> groupOptional = gitRepositoryService.findProgramGitGroup(program);
+        if (groupOptional.isPresent()) {
+          programGroup = groupOptional.get();
+        } else {
+          LOGGER.warn("No Git group found for program: " + program.getName());
+        }
+      } else {
+        programGroup = options.getGitGroup();
+      }
+      if (programGroup != null) {
+        try {
+          addGitRepository(study, programGroup);
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOGGER.warn("Failed to create Git repository for study: " + study.getCode());
+        }
+      }
     }
 
     // Additional folders
@@ -413,20 +436,20 @@ public class StudyService {
     }
   }
 
-  private void addGitRepository(Study study) {
+  public GitRepository addGitRepository(Study study, GitGroup programGroup) throws Exception {
     LOGGER.debug("Creating Git repository for study: " + study.getName());
-    try {
-      GitRepository repository = gitService.createStudyRepository(study);
-      ExternalLink entryLink = new ExternalLink();
-      entryLink.setStudy(study);
-      entryLink.setLabel("Git Repository");
-      entryLink.setUrl(new URL(repository.getWebUrl()));
-      study.addExternalLink(entryLink);
-      studyRepository.save(study);
-    } catch (Exception e) {
-      e.printStackTrace();
-      LOGGER.warn("Failed to create Git repository for study: " + study.getCode());
-    }
+    GitService gitService = gitServiceLookup.lookup(programGroup.getGitServiceType())
+        .orElseThrow(() -> new InvalidRequestException(
+            "Git service not found: " + programGroup.getGitServiceType()));
+    GitRepository repository = gitService.createStudyRepository(programGroup, study);
+    ExternalLink entryLink = new ExternalLink();
+    entryLink.setStudy(study);
+    entryLink.setLabel("Git Repository");
+    entryLink.setUrl(new URL(repository.getWebUrl()));
+    study.addExternalLink(entryLink);
+    study.addGitRepository(repository);
+    studyRepository.save(study);
+    return repository;
   }
 
   /**
@@ -698,9 +721,13 @@ public class StudyService {
     this.notebookFolderService = notebookFolderService;
   }
 
-  @Autowired(required = false)
-  public void setGitService(GitService gitService) {
-    this.gitService = gitService;
+  @Autowired
+  public void setGitServiceLookup(GitServiceLookup gitServiceLookup) {
+    this.gitServiceLookup = gitServiceLookup;
   }
 
+  @Autowired
+  public void setGitRepositoryService(GitRepositoryService gitRepositoryService) {
+    this.gitRepositoryService = gitRepositoryService;
+  }
 }

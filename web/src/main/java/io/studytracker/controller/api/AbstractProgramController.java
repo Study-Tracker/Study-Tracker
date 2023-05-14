@@ -69,7 +69,7 @@ public abstract class AbstractProgramController extends AbstractApiController {
    * @param program the program to update
    * @return the updated program
    */
-  public Program updateExistingProgram(Program program) {
+  public Program updateExistingProgram(Program program, ProgramOptions options) {
 
     // Make sure the user has the necessary privileges to update a program
     User user = this.getAuthenticatedUser();
@@ -83,7 +83,7 @@ public abstract class AbstractProgramController extends AbstractApiController {
       throw new RecordNotFoundException("Could not find program: " + program.getId());
     }
 
-    Program updated = this.getProgramService().update(program);
+    Program updated = this.getProgramService().update(program, options);
     this.logActivity(ProgramActivityUtils.fromUpdatedProgram(updated, user));
 
     return updated;

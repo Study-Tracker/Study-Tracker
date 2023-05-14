@@ -21,7 +21,7 @@ import io.studytracker.egnyte.EgnyteIntegrationService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.egnyte.exception.DuplicateFolderException;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayStorageFolder;
@@ -81,7 +81,7 @@ public class EgnyteStudyStorageServiceTests {
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
-  private ExampleDataGenerator exampleDataGenerator;
+  private ExampleDataRunner exampleDataRunner;
 
   @Autowired private EgnyteIntegrationService egnyteIntegrationService;
   @Autowired private OrganizationService organizationService;
@@ -90,7 +90,7 @@ public class EgnyteStudyStorageServiceTests {
 
   @Before
   public void doBefore() throws Exception {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   @Test

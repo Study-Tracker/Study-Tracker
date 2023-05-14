@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 package io.studytracker.test.service;
 
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleAssayTypeGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.AssayTypeField;
 import io.studytracker.model.AssayTypeTask;
@@ -45,18 +46,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"test", "example"})
 public class AssayTypeServiceTests {
 
-  private static final int ASSAY_TYPE_COUNT = ExampleDataGenerator.ASSAY_TYPE_COUNT;
+  private static final int ASSAY_TYPE_COUNT = ExampleAssayTypeGenerator.ASSAY_TYPE_COUNT;
 
   @Autowired private AssayTypeService assayTypeService;
 
   @Autowired
   private AssayTypeTaskFieldRepository assayTypeTaskFieldRepository;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   @Test

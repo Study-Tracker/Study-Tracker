@@ -77,7 +77,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode(value = "tasks", subgraph = "assay-task-details"),
         @NamedAttributeNode("users"),
         @NamedAttributeNode("study"),
-        @NamedAttributeNode(value = "storageFolders", subgraph = "assay-storage-folder-details")
+        @NamedAttributeNode(value = "storageFolders", subgraph = "assay-storage-folder-details"),
+        @NamedAttributeNode("gitRepositories")
       },
       subgraphs = {
         @NamedSubgraph(
@@ -203,6 +204,13 @@ public class Assay implements Model {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   private Set<AssayTask> tasks = new HashSet<>();
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "assay_git_repositories",
+      joinColumns = @JoinColumn(name = "assay_id", nullable = false),
+      inverseJoinColumns = @JoinColumn(name = "git_repository_id", nullable = false))
+  private Set<GitRepository> gitRepositories = new HashSet<>();
 
   public void addTask(AssayTask task) {
     task.setAssay(this);
@@ -437,6 +445,22 @@ public class Assay implements Model {
 
   public void removeStorageFolder(AssayStorageFolder folder) {
     this.storageFolders.remove(folder);
+  }
+
+  public Set<GitRepository> getGitRepositories() {
+    return gitRepositories;
+  }
+
+  public void setGitRepositories(Set<GitRepository> gitRepositories) {
+    this.gitRepositories = gitRepositories;
+  }
+
+  public void addGitRepository(GitRepository gitRepository) {
+    this.gitRepositories.add(gitRepository);
+  }
+
+  public void removeGitRepository(GitRepository gitRepository) {
+    this.gitRepositories.remove(gitRepository);
   }
 
 }

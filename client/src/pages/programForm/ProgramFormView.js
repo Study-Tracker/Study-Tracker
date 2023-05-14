@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import NoSidebarPageWrapper from "../../common/structure/NoSidebarPageWrapper";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
@@ -22,6 +22,7 @@ import ProgramForm from "./ProgramForm";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import {useParams} from "react-router-dom";
+import NotyfContext from "../../context/NotyfContext";
 
 const ProgramFormView = () => {
 
@@ -34,6 +35,8 @@ const ProgramFormView = () => {
   const [error, setError] = useState(null);
   const [elnProjects, setElnProjects] = useState(null);
   const [rootFolders, setRootFolders] = useState([]);
+  const [gitGroups, setGitGroups] = useState(null);
+  const notyf = useContext(NotyfContext);
   
   useEffect(() => {
 
@@ -53,6 +56,19 @@ const ProgramFormView = () => {
         setSelectedProgram(program);
       }
 
+      // Get Git project groups
+      axios.get("/api/internal/git-groups?root=true")
+      .then(response => setGitGroups(response.data))
+      .catch(error => {
+        console.error("Error loading Git groups", error);
+        setError(error);
+        notyf.open({
+          type: "error",
+          message: "Error loading Git project groups"
+        });
+      })
+
+      // Load ELN projects
       if (features && features.notebook && features.notebook.isEnabled) {
         const projects = await axios.get("/api/internal/eln/project-folders")
           .then(response => {
@@ -91,14 +107,17 @@ const ProgramFormView = () => {
   if (error) {
     content = <ErrorMessage/>;
   } else if (!!user && programs && (!programId || selectedProgram)) {
-    content = <ProgramForm
-        program={selectedProgram}
-        programs={programs}
-        user={user}
-        features={features}
-        elnProjects={elnProjects}
-        rootFolders={rootFolders}
-    />;
+    content = (
+        <ProgramForm
+            program={selectedProgram}
+            programs={programs}
+            user={user}
+            features={features}
+            elnProjects={elnProjects}
+            rootFolders={rootFolders}
+            gitGroups={gitGroups}
+        />
+    );
   }
   return (
       <NoSidebarPageWrapper>

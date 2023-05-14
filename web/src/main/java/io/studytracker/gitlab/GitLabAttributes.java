@@ -16,6 +16,7 @@
 
 package io.studytracker.gitlab;
 
+@Deprecated
 public class GitLabAttributes {
 
   public static final String GIT_SERVICE_VALUE = "gitlab";

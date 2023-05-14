@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleStudyGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.StudyRelationshipPayloadDto;
 import io.studytracker.model.RelationshipType;
@@ -122,7 +122,7 @@ public class StudyRelationshipApiControllerTests extends AbstractApiControllerTe
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", not(empty())))
-        .andExpect(jsonPath("$.content", hasSize(ExampleDataGenerator.STUDY_RELATIONSHIPS_COUNT + 2)))
+        .andExpect(jsonPath("$.content", hasSize(ExampleStudyGenerator.STUDY_RELATIONSHIPS_COUNT + 2)))
         .andExpect(jsonPath("$", hasKey("last")))
         .andExpect(jsonPath("$.last", is(true)))
         .andExpect(jsonPath("$", hasKey("pageable")))
@@ -130,7 +130,7 @@ public class StudyRelationshipApiControllerTests extends AbstractApiControllerTe
         .andExpect(jsonPath("$", hasKey("totalPages")))
         .andExpect(jsonPath("$.totalPages", is(1)))
         .andExpect(jsonPath("$", hasKey("totalElements")))
-        .andExpect(jsonPath("$.totalElements", is(ExampleDataGenerator.STUDY_RELATIONSHIPS_COUNT + 2)))
+        .andExpect(jsonPath("$.totalElements", is(ExampleStudyGenerator.STUDY_RELATIONSHIPS_COUNT + 2)))
         .andExpect(jsonPath("$", hasKey("first")))
         .andExpect(jsonPath("$.first", is(true)))
         .andExpect(jsonPath("$", hasKey("size")))
@@ -138,7 +138,7 @@ public class StudyRelationshipApiControllerTests extends AbstractApiControllerTe
         .andExpect(jsonPath("$", hasKey("number")))
         .andExpect(jsonPath("$.number", is(0)))
         .andExpect(jsonPath("$", hasKey("numberOfElements")))
-        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataGenerator.STUDY_RELATIONSHIPS_COUNT + 2)))
+        .andExpect(jsonPath("$.numberOfElements", is(ExampleStudyGenerator.STUDY_RELATIONSHIPS_COUNT + 2)))
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));

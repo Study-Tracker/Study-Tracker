@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package io.studytracker.config;
+package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.aws.S3StudyStorageService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import io.studytracker.model.GitServiceType;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
 
-@Configuration
-public class AmazonWebServicesConfiguration {
+@Data
+public class GitGroupFormDto {
 
-  @Bean
-  public S3StudyStorageService s3StudyFileStorageService() {
-    return new S3StudyStorageService();
-  }
+  private Long id;
+  private Long organizationId;
+  private Long parentGroupId;
+  private @NotNull String displayName;
+  private @NotNull String webUrl;
+  private boolean active;
+  private @NotNull GitServiceType gitServiceType;
 
 }

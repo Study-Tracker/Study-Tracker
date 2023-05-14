@@ -23,7 +23,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GitLabGroup {
+public class GitLabProjectGroup {
 
   private Integer id;
   @JsonProperty("web_url") private String webUrl;

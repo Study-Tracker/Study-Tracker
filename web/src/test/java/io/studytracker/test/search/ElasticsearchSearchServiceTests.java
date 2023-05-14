@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package io.studytracker.test.search;
 
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleAssayGenerator;
+import io.studytracker.example.ExampleDataRunner;
+import io.studytracker.example.ExampleStudyGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayDocument;
 import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchPowerSearchDocument;
@@ -53,7 +55,7 @@ public class ElasticsearchSearchServiceTests {
   @Autowired
   private ElasticsearchSearchService elasticsearchSearchService;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private StudyRepository studyRepository;
 
@@ -67,7 +69,7 @@ public class ElasticsearchSearchServiceTests {
 
   @Before
   public void before() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     studyIndexRepository.deleteAll();
     assayIndexRepository.deleteAll();
   }
@@ -81,7 +83,7 @@ public class ElasticsearchSearchServiceTests {
       studyList.add(study);
     }
     elasticsearchSearchService.indexStudies(studyList);
-    Assert.assertEquals(ExampleDataGenerator.STUDY_COUNT, studyIndexRepository.count());
+    Assert.assertEquals(ExampleStudyGenerator.STUDY_COUNT, studyIndexRepository.count());
   }
   @Test
   public void searchStudyIndexTest() {
@@ -103,7 +105,7 @@ public class ElasticsearchSearchServiceTests {
       assayList.add(assay);
     });
     elasticsearchSearchService.indexAssays(assayList);
-    Assert.assertEquals(ExampleDataGenerator.ASSAY_COUNT, assayIndexRepository.count());
+    Assert.assertEquals(ExampleAssayGenerator.ASSAY_COUNT, assayIndexRepository.count());
   }
 
   @Test
@@ -125,7 +127,7 @@ public class ElasticsearchSearchServiceTests {
     GenericSearchHits<ElasticsearchPowerSearchDocument> hits = elasticsearchSearchService.search("Lorem ipsum");
     System.out.println(hits.toString());
     Assert.assertNotNull(hits);
-    Assert.assertEquals(ExampleDataGenerator.STUDY_COUNT + ExampleDataGenerator.ASSAY_COUNT, hits.getNumHits().intValue());
+    Assert.assertEquals(ExampleStudyGenerator.STUDY_COUNT + ExampleAssayGenerator.ASSAY_COUNT, hits.getNumHits().intValue());
 
     hits = elasticsearchSearchService.search("histology");
     System.out.println(hits.toString());

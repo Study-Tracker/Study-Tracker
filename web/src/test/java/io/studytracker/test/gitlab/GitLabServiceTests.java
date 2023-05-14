@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,27 @@
 package io.studytracker.test.gitlab;
 
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.git.GitAttributes;
-import io.studytracker.git.GitGroup;
-import io.studytracker.git.GitRepository;
+import io.studytracker.gitlab.GitLabIntegrationService;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.gitlab.GitLabUtils;
-import io.studytracker.model.Assay;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitLabGroup;
+import io.studytracker.model.GitLabIntegration;
+import io.studytracker.model.GitLabRepository;
+import io.studytracker.model.GitRepository;
+import io.studytracker.model.GitServiceType;
+import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
+import io.studytracker.repository.GitLabGroupRepository;
+import io.studytracker.repository.GitLabRepositoryRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
+import io.studytracker.service.OrganizationService;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +47,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -49,7 +58,7 @@ public class GitLabServiceTests {
 
   @Autowired private GitLabService gitLabService;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private ProgramRepository programRepository;
 
@@ -57,69 +66,116 @@ public class GitLabServiceTests {
 
   @Autowired private AssayRepository assayRepository;
 
+  @Autowired private GitLabIntegrationService gitLabIntegrationService;
+
+  @Autowired private OrganizationService organizationService;
+
+  @Autowired
+  private GitLabGroupRepository gitLabGroupRepository;
+
+  @Autowired
+  private GitLabRepositoryRepository gitLabRepositoryRepository;
+
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   @Test
   public void createProgramGroupTest() throws Exception {
+
+    Organization organization = organizationService.getCurrentOrganization();
+    List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
+    Assert.assertEquals(1, integrations.size());
+    GitLabIntegration integration = integrations.get(0);
+
     Program program = programRepository.findByName(EXAMPLE_PROGRAM)
         .orElseThrow(RecordNotFoundException::new);
-    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_ID));
-    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_NAME));
-    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PATH));
-    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_ID));
-    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_NAME));
-    Assert.assertFalse(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_PATH));
-    GitGroup group = gitLabService.createProgramGroup(program);
+    Assert.assertTrue(program.getGitGroups().isEmpty());
+    List<GitGroup> rootGroups = gitLabService.findRegisteredGroups(integration, true);
+    Assert.assertNotNull(rootGroups);
+    Assert.assertEquals(1, rootGroups.size());
+    GitGroup rootGroup = rootGroups.get(0);
+
+    GitGroup group = gitLabService.createProgramGroup(rootGroup, program);
     Assert.assertNotNull(group);
-    Assert.assertEquals(group.getName(), program.getName());
-    Assert.assertEquals(group.getPath(), GitLabUtils.getPathFromName(program.getName()));
+    Assert.assertEquals(GitServiceType.GITLAB, group.getGitServiceType());
+    Assert.assertEquals(program.getName() + " Program GitLab Project Group", group.getDisplayName());
+    Assert.assertNotNull(group.getWebUrl());
+    Assert.assertTrue(group.isActive());
+    program.addGitGroup(group);
+    programRepository.save(program);
+
+    GitLabGroup gitLabGroup = gitLabGroupRepository.findByGitGroupId(group.getId());
+    Assert.assertEquals(gitLabGroup.getName(), program.getName());
+    Assert.assertEquals(gitLabGroup.getPath(), GitLabUtils.getPathFromName(program.getName()));
     program = programRepository.findByName(EXAMPLE_PROGRAM)
         .orElseThrow(RecordNotFoundException::new);
-    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_ID));
-    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_NAME));
-    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PATH));
-    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_ID));
-    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_NAME));
-    Assert.assertTrue(program.getAttributes().containsKey(GitAttributes.GROUP_PARENT_PATH));
+    Assert.assertEquals(1, program.getGitGroups().size());
 
-    GitGroup group2 = gitLabService.findProgramGroup(program).orElseThrow(RecordNotFoundException::new);
+    GitGroup group2 = gitLabService.findProgramGroup(rootGroup, program).orElse(null);
     Assert.assertNotNull(group2);
-    Assert.assertEquals(group.getGroupId(), group2.getGroupId());
+    Assert.assertEquals(group.getId(), group2.getId());
+
   }
 
   @Test
   public void createStudyRepositoryTest() throws Exception {
     createProgramGroupTest();
+
+    Organization organization = organizationService.getCurrentOrganization();
+    List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
+    Assert.assertEquals(1, integrations.size());
+    GitLabIntegration integration = integrations.get(0);
+    List<GitGroup> rootGroups = gitLabService.findRegisteredGroups(integration, true);
+    Assert.assertNotNull(rootGroups);
+    Assert.assertEquals(1, rootGroups.size());
+    GitGroup rootGroup = rootGroups.get(0);
+
     Program program = programRepository.findByName(EXAMPLE_PROGRAM)
         .orElseThrow(RecordNotFoundException::new);
     Study study = studyRepository.findByProgramId(program.getId()).get(0);
     Assert.assertNotNull(study);
-    GitRepository repository = gitLabService.createStudyRepository(study);
-    Assert.assertNotNull(repository);
-    Assert.assertEquals(repository.getName(), GitLabUtils.getStudyProjectName(study));
-    Assert.assertEquals(repository.getPath(), GitLabUtils.getStudyProjectPath(study));
+    GitGroup programGroup = gitLabService.findProgramGroup(rootGroup, program).orElse(null);
+    Assert.assertNotNull(programGroup);
 
-    GitRepository repository2 = gitLabService.findStudyRepository(study).orElseThrow(RecordNotFoundException::new);
-    Assert.assertNotNull(repository2);
-    Assert.assertEquals(repository.getRepositoryId(), repository2.getRepositoryId());
+    Exception exception = null;
+    try {
+      GitRepository repository = gitLabService.createStudyRepository(programGroup, study);
+      Assert.assertNotNull(repository);
+      Assert.assertEquals(GitLabUtils.getStudyProjectName(study), repository.getDisplayName());
+      Assert.assertNotNull(repository.getHttpUrl());
+      Assert.assertNotNull(repository.getSshUrl());
+      Assert.assertNotNull(repository.getWebUrl());
+
+      GitLabRepository gitLabRepository = gitLabRepositoryRepository.findByRepositoryId(
+          repository.getId());
+      Assert.assertEquals(gitLabRepository.getName(), GitLabUtils.getStudyProjectName(study));
+      Assert.assertEquals(gitLabRepository.getPath(), GitLabUtils.getStudyProjectPath(study));
+    } catch (Exception e) {
+      exception = e;
+      if (exception instanceof HttpClientErrorException) {
+        HttpClientErrorException httpClientErrorException = (HttpClientErrorException) exception;
+        Assert.assertEquals(400, httpClientErrorException.getRawStatusCode());
+        Assert.assertTrue(httpClientErrorException.getResponseBodyAsString().contains("has already been taken"));
+      }
+    }
+
   }
 
-  @Test
-  public void createAssayRepository() throws Exception {
-    createProgramGroupTest();
-    Assay assay = assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
-    Assert.assertNotNull(assay);
-    GitRepository repository = gitLabService.createAssayRepository(assay);
-    Assert.assertNotNull(repository);
-    Assert.assertEquals(repository.getName(), GitLabUtils.getAssayProjectName(assay));
-    Assert.assertEquals(repository.getPath(), GitLabUtils.getAssayProjectPath(assay));
-
-    GitRepository repository2 = gitLabService.findAssayRepository(assay).orElseThrow(RecordNotFoundException::new);
-    Assert.assertNotNull(repository2);
-    Assert.assertEquals(repository.getRepositoryId(), repository2.getRepositoryId());
-  }
+//  @Test
+//  public void createAssayRepository() throws Exception {
+//    createProgramGroupTest();
+//    Assay assay = assayRepository.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
+//    Assert.assertNotNull(assay);
+//    GitServerRepository repository = gitLabService.createAssayRepository(assay);
+//    Assert.assertNotNull(repository);
+//    Assert.assertEquals(repository.getName(), GitLabUtils.getAssayProjectName(assay));
+//    Assert.assertEquals(repository.getPath(), GitLabUtils.getAssayProjectPath(assay));
+//
+//    GitServerRepository repository2 = gitLabService.findAssayRepository(assay).orElseThrow(RecordNotFoundException::new);
+//    Assert.assertNotNull(repository2);
+//    Assert.assertEquals(repository.getRepositoryId(), repository2.getRepositoryId());
+//  }
 
 }

@@ -31,5 +31,6 @@ public class StudyOptions {
   private Long s3FolderId;
   private StorageDriveFolder parentFolder;
   private List<StorageDriveFolder> additionalFolders = new ArrayList<>();
+  private GitGroup gitGroup;
 
 }

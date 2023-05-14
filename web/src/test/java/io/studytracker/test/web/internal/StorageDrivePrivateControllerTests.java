@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.UserService;
@@ -51,7 +51,7 @@ public class StorageDrivePrivateControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private UserService userService;
 
@@ -61,7 +61,7 @@ public class StorageDrivePrivateControllerTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     username = userService.findAll().get(0).getEmail();
   }
 
@@ -73,7 +73,7 @@ public class StorageDrivePrivateControllerTests {
         .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STORAGE_DRIVE_COUNT)))
+        .andExpect(jsonPath("$", hasSize(ExampleDataRunner.STORAGE_DRIVE_COUNT)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("organization")))
         .andExpect(jsonPath("$[0].organization", hasKey("id")))

@@ -16,7 +16,20 @@
 
 package io.studytracker.config;
 
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleAssayGenerator;
+import io.studytracker.example.ExampleAssayTypeGenerator;
+import io.studytracker.example.ExampleCollaboratorGenerator;
+import io.studytracker.example.ExampleDataRunner;
+import io.studytracker.example.ExampleGitRepositoryGenerator;
+import io.studytracker.example.ExampleIntegrationGenerator;
+import io.studytracker.example.ExampleKeywordGenerator;
+import io.studytracker.example.ExampleOrganizationGenerator;
+import io.studytracker.example.ExampleProgramGenerator;
+import io.studytracker.example.ExampleStorageFolderGenerator;
+import io.studytracker.example.ExampleStudyCollectionGenerator;
+import io.studytracker.example.ExampleStudyGenerator;
+import io.studytracker.example.ExampleUserGenerator;
+import io.studytracker.repository.OrganizationRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -26,7 +39,68 @@ import org.springframework.context.annotation.Profile;
 public class ExampleDataConfiguration {
 
   @Bean
-  public ExampleDataGenerator exampleDataGenerator() {
-    return new ExampleDataGenerator();
+  public ExampleDataRunner exampleDataGenerator() {
+    return new ExampleDataRunner();
   }
+
+  @Bean
+  public ExampleOrganizationGenerator exampleOrganizationGenerator(OrganizationRepository repository) {
+    return new ExampleOrganizationGenerator(repository);
+  }
+
+  @Bean
+  public ExampleUserGenerator exampleUserGenerator() {
+    return new ExampleUserGenerator();
+  }
+
+  @Bean
+  public ExampleProgramGenerator exampleProgramGenerator() {
+    return new ExampleProgramGenerator();
+  }
+
+  @Bean
+  public ExampleKeywordGenerator exampleKeywordGenerator() {
+    return new ExampleKeywordGenerator();
+  }
+
+  @Bean
+  public ExampleCollaboratorGenerator exampleCollaboratorGenerator() {
+    return new ExampleCollaboratorGenerator();
+  }
+
+  @Bean
+  public ExampleStudyGenerator exampleStudyGenerator() {
+    return new ExampleStudyGenerator();
+  }
+
+  @Bean
+  public ExampleAssayTypeGenerator exampleAssayTypeGenerator() {
+    return new ExampleAssayTypeGenerator();
+  }
+
+  @Bean
+  public ExampleAssayGenerator exampleAssayGenerator() {
+    return new ExampleAssayGenerator();
+  }
+
+  @Bean
+  public ExampleStudyCollectionGenerator exampleStudyCollectionGenerator() {
+    return new ExampleStudyCollectionGenerator();
+  }
+
+  @Bean
+  public ExampleStorageFolderGenerator exampleStorageFolderGenerator() {
+    return new ExampleStorageFolderGenerator();
+  }
+
+  @Bean
+  public ExampleIntegrationGenerator exampleIntegrationGenerator() {
+    return new ExampleIntegrationGenerator();
+  }
+
+  @Bean
+  public ExampleGitRepositoryGenerator exampleGitRepositoryGenerator() {
+    return new ExampleGitRepositoryGenerator();
+  }
+
 }

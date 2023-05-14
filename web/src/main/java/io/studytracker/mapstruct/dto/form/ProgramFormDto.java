@@ -19,6 +19,7 @@ package io.studytracker.mapstruct.dto.form;
 import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.dto.response.UserSummaryDto;
+import io.studytracker.model.GitGroup;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,4 +41,6 @@ public class ProgramFormDto {
   private NotebookFolderDetailsDto notebookFolder;
   private StorageDriveFolderSummaryDto parentFolder;
   private Map<String, String> attributes = new HashMap<>();
+  private boolean useGit;
+  private GitGroup gitGroup;
 }

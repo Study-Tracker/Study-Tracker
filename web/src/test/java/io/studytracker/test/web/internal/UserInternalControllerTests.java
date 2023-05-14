@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.mapstruct.dto.form.UserFormDto;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.User;
@@ -58,7 +58,7 @@ public class UserInternalControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private UserService userService;
 
@@ -70,7 +70,7 @@ public class UserInternalControllerTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     if (username == null) {
       username = userService.findAll().stream()
           .filter(User::isAdmin)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,21 @@
 package io.studytracker.test.gitlab;
 
 import io.studytracker.Application;
-import io.studytracker.gitlab.GitLabOptions;
 import io.studytracker.gitlab.GitLabRestClient;
+import io.studytracker.gitlab.GitLabRestClient.GitLabRestClientBuilder;
 import io.studytracker.gitlab.GitLabUtils;
-import io.studytracker.gitlab.entities.GitLabGroup;
 import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
+import io.studytracker.gitlab.entities.GitLabProjectGroup;
 import io.studytracker.gitlab.entities.GitLabUser;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
@@ -42,25 +43,42 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class GitLabRestClientTests {
 
   private static final String EXAMPLE_GROUP = "API Client Test Group";
+  private static final String EXAMPLE_PROJECT = "API Client Test Project";
 
-  @Autowired
+  @Value("${gitlab.access-key}")
+  private String accessKey;
+
+  @Value("${gitlab.url}")
+  private String rootUrl;
+
+  @Value("${gitlab.root-group-id}")
+  private Integer rootGroupId;
+
   private GitLabRestClient client;
+  private String groupName;
+  private String projectName;
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-  @Autowired
-  private GitLabOptions options;
+  @Before
+  public void setup() {
+    client = new GitLabRestClientBuilder()
+        .accessToken(accessKey)
+        .rootUrl(rootUrl)
+        .build();
+    String timestamp = "A"; //new Date().toString();
+    groupName = EXAMPLE_GROUP + " " + timestamp;
+    projectName = EXAMPLE_PROJECT + " " + timestamp;
+
+  }
 
   @Test
   public void findUsersTest() throws Exception {
 
-    String token = options.getAccessToken();
-
-    List<GitLabUser> users = client.findUsers(token);
+    List<GitLabUser> users = client.findUsers();
     Assert.assertNotNull(users);
     Assert.assertFalse(users.isEmpty());
     Assert.assertTrue(users.size() > 1);
 
-    users = client.findUsers(token, "oemler");
+    users = client.findUsers("oemler");
     Assert.assertNotNull(users);
     Assert.assertFalse(users.isEmpty());
     Assert.assertEquals(users.size(), 1);
@@ -68,7 +86,7 @@ public class GitLabRestClientTests {
     GitLabUser user = users.get(0);
     System.out.println(user.toString());
 
-    Optional<GitLabUser> optional = client.findUserById(token, user.getId());
+    Optional<GitLabUser> optional = client.findUserById(user.getId());
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals(optional.get().getName(), user.getName());
 
@@ -77,14 +95,13 @@ public class GitLabRestClientTests {
   @Test
   public void findGroupsTest() {
 
-    String token = options.getAccessToken();
-    List<GitLabGroup> groups = client.findGroups(token);
+    List<GitLabProjectGroup> groups = client.findGroups();
     Assert.assertNotNull(groups);
     Assert.assertFalse(groups.isEmpty());
     Assert.assertTrue(groups.size() > 1);
 
-    GitLabGroup group = groups.get(0);
-    Optional<GitLabGroup> optional = client.findGroupById(token, group.getId());
+    GitLabProjectGroup group = groups.get(0);
+    Optional<GitLabProjectGroup> optional = client.findGroupById(group.getId());
     Assert.assertTrue(optional.isPresent());
     Assert.assertEquals(optional.get().getName(), group.getName());
 
@@ -93,38 +110,36 @@ public class GitLabRestClientTests {
   @Test
   public void createGroupTest() {
 
-    String token = options.getAccessToken();
     GitLabNewGroupRequest request = new GitLabNewGroupRequest();
-    request.setName(EXAMPLE_GROUP);
-    request.setPath(GitLabUtils.getPathFromName(EXAMPLE_GROUP));
+    request.setName(groupName);
+    request.setPath(GitLabUtils.getPathFromName(groupName));
     request.setDescription("Test group created by API client");
     request.setAutoDevOpsEnabled(false);
-    request.setParentId(options.getRootGroupId());
+    request.setParentId(rootGroupId);
     request.setVisibility("private");
-    GitLabGroup group = client.createNewGroup(token, request);
+    GitLabProjectGroup group = client.createNewGroup(request);
     Assert.assertNotNull(group);
-    Assert.assertEquals(group.getName(), EXAMPLE_GROUP);
-    Assert.assertEquals(group.getPath(), GitLabUtils.getPathFromName(EXAMPLE_GROUP));
+    Assert.assertEquals(group.getName(), groupName);
+    Assert.assertEquals(group.getPath(), GitLabUtils.getPathFromName(groupName));
     Assert.assertEquals(group.getDescription(), "Test group created by API client");
-    Assert.assertEquals(group.getParentId(), options.getRootGroupId());
+    Assert.assertEquals(group.getParentId(), rootGroupId);
 
   }
 
   @Test
   public void createProjectTest() {
-    String token = options.getAccessToken();
     GitLabNewProjectRequest request = new GitLabNewProjectRequest();
-    request.setName("API Client Test Project");
-    request.setPath(GitLabUtils.getPathFromName("API Client Test Project"));
-    request.setNamespaceId(options.getRootGroupId());
+    request.setName(projectName);
+    request.setPath(GitLabUtils.getPathFromName(projectName));
+    request.setNamespaceId(rootGroupId);
     request.setAutoDevopsEnabled(false);
     request.setDescription("Test project created by API client");
     request.setInitializeWithReadme(false);
-    GitLabProject project = client.createProject(token, request);
+    GitLabProject project = client.createProject(request);
     Assert.assertNotNull(project);
     Assert.assertNotNull(project.getId());
-    Assert.assertEquals(project.getName(), "API Client Test Project");
-    Assert.assertEquals(project.getPath(), GitLabUtils.getPathFromName("API Client Test Project"));
+    Assert.assertEquals(project.getName(), projectName);
+    Assert.assertEquals(project.getPath(), GitLabUtils.getPathFromName(projectName));
   }
 
 }

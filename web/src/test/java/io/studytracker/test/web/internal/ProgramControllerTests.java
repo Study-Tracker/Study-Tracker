@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
@@ -65,7 +65,7 @@ public class ProgramControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private ProgramRepository programRepository;
 
@@ -81,7 +81,7 @@ public class ProgramControllerTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     username = userRepository.findAll().get(0).getEmail();
   }
 

@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package io.studytracker.git;
+package io.studytracker.gitlab;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import io.studytracker.gitlab.GitLabRestClient.GitLabRestClientBuilder;
+import io.studytracker.model.GitLabIntegration;
 
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class GitUser {
+public class GitLabClientFactory {
 
-  private String userId;
-  private String username;
-  private String name;
-  private String email;
+  public static GitLabRestClient createRestClient(GitLabIntegration integration) {
+    GitLabRestClientBuilder builder = new GitLabRestClientBuilder();
+    builder.rootUrl(integration.getRootUrl());
+    builder.accessToken(integration.getAccessToken());
+    builder.username(integration.getUsername());
+    builder.password(integration.getPassword());
+    return builder.build();
+  }
 
 }

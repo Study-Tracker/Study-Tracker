@@ -18,6 +18,7 @@ import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
   faPersonRunning,
+  faStopwatch,
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -25,10 +26,11 @@ import {
   faPlusSquare,
   faSquareCheck
 } from "@fortawesome/free-regular-svg-icons";
-import React from "react";
+import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
+import {faGit} from "@fortawesome/free-brands-svg-icons";
 
 const StudyQuickActionsWidget = ({
     study,
@@ -37,8 +39,10 @@ const StudyQuickActionsWidget = ({
 
   const navigate = useNavigate();
   const notyf = React.useContext(NotyfContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleStatusChange = (status) => {
+    setIsSubmitting(true);
     axios.post("/api/internal/study/" + study.id + "/status", {
       status: status
     })
@@ -49,7 +53,29 @@ const StudyQuickActionsWidget = ({
         message: 'Error changing status'
       });
       console.error(e);
-    });
+    })
+    .finally(() => setIsSubmitting(false));
+  }
+
+  const handleNewGitRepository = () => {
+    setIsSubmitting(true);
+    axios.post("/api/internal/study/" + study.id + "/git")
+    .then(response => {
+      notyf.open({
+        type: "success",
+        message: "Git repository created successfully."
+      })
+      navigate("#overview");
+      navigate(0);
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to create Git repository. Please try again."
+      })
+    })
+    .finally(() => setIsSubmitting(false));
   }
 
   return (
@@ -70,10 +96,19 @@ const StudyQuickActionsWidget = ({
                 </h4>
                 <br/>
                 <Dropdown className="me-1 mb-1">
-                  <Dropdown.Toggle variant={"outline-primary"}>
-                    <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
-                    Actions
-                  </Dropdown.Toggle>
+                  {
+                    isSubmitting ? (
+                        <Dropdown.Toggle variant={"outline-primary"} disabled={true}>
+                          <FontAwesomeIcon icon={faStopwatch} className={"me-2"}/>
+                          Working...
+                        </Dropdown.Toggle>
+                    ) : (
+                        <Dropdown.Toggle variant={"outline-primary"}>
+                          <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
+                          Actions
+                        </Dropdown.Toggle>
+                    )
+                  }
                   <Dropdown.Menu>
 
                     {
@@ -112,6 +147,15 @@ const StudyQuickActionsWidget = ({
                       <FontAwesomeIcon icon={faFolderOpen} className={"me-2"}/>
                       Add to Collection
                     </Dropdown.Item>
+
+                    {
+                      study.gitRepositories.length === 0 && (
+                          <Dropdown.Item onClick={handleNewGitRepository}>
+                            <FontAwesomeIcon icon={faGit} className={"me-2"} />
+                            Create Git repository
+                          </Dropdown.Item>
+                      )
+                    }
 
                   </Dropdown.Menu>
                 </Dropdown>

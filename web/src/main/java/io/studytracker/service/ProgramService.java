@@ -22,7 +22,9 @@ import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
+import io.studytracker.git.GitServiceLookup;
 import io.studytracker.model.ELNFolder;
+import io.studytracker.model.GitGroup;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.StorageDriveFolder;
@@ -53,7 +55,7 @@ public class ProgramService {
 
   private ELNFolderRepository elnFolderRepository;
 
-  private GitService gitService;
+  private GitServiceLookup gitServiceLookup;
 
   private StorageDriveFolderService storageDriveFolderService;
 
@@ -120,10 +122,18 @@ public class ProgramService {
         .orElseThrow(InvalidRequestException::new);
 
     // Create the program Git group
-    if (options.isUseGit() && gitService != null) {
+    if (options.isUseGit() && options.getGitGroup() != null) {
       try {
-        gitService.createProgramGroup(created);
+        GitGroup gitGroup = options.getGitGroup();
+        GitService gitService = gitServiceLookup.lookup(gitGroup.getGitServiceType())
+            .orElseThrow(() -> new InvalidRequestException(
+                "Git service not found: " + gitGroup.getGitServiceType()));
+        GitGroup programGroup =  gitService.createProgramGroup(gitGroup, created);
+        program.addGitGroup(programGroup);
+        programRepository.save(program);
       } catch (Exception e) {
+        LOGGER.warn("Error creating Git group for program: " + program.getName());
+        e.printStackTrace();
         throw new StudyTrackerException(e);
       }
     }
@@ -137,7 +147,7 @@ public class ProgramService {
   }
 
   @Transactional
-  public Program update(Program program) {
+  public Program update(@NotNull Program program, @NotNull ProgramOptions options) {
     LOGGER.info("Updating program with name: " + program.getName());
 
     Program p = programRepository.getById(program.getId());
@@ -146,17 +156,63 @@ public class ProgramService {
     p.setAttributes(program.getAttributes());
     programRepository.save(p);
 
-    if (program.getNotebookFolder() != null) {
-      ELNFolder f = elnFolderRepository.getById(program.getNotebookFolder().getId());
-      ELNFolder folder = program.getNotebookFolder();
-      f.setReferenceId(folder.getReferenceId());
-      f.setUrl(folder.getUrl());
-      f.setName(folder.getName());
-      elnFolderRepository.save(f);
+    // Update the notebook folder details
+//    if (program.getNotebookFolder() != null) {
+//      ELNFolder f = elnFolderRepository.getById(program.getNotebookFolder().getId());
+//      ELNFolder folder = program.getNotebookFolder();
+//      f.setReferenceId(folder.getReferenceId());
+//      f.setUrl(folder.getUrl());
+//      f.setName(folder.getName());
+//      elnFolderRepository.save(f);
+//    }
+
+    // Update the Git group details
+    if (options.isUseGit() && options.getGitGroup() != null) {
+      try {
+
+        GitGroup parentGroup = options.getGitGroup();
+        GitService gitService = gitServiceLookup.lookup(parentGroup.getGitServiceType())
+            .orElseThrow(() -> new InvalidRequestException(
+                "Git service not found: " + parentGroup.getGitServiceType()));
+
+        // has a new group been added when one did not previously exist?
+        if (p.getGitGroups().isEmpty()) {
+          LOGGER.info("Adding new Git group for program: " + program.getName());
+          GitGroup programGroup =  gitService.createProgramGroup(parentGroup, program);
+          p.addGitGroup(programGroup);
+          programRepository.save(p);
+        }
+
+        // Is the requested group different from the existing one?
+        else if (program.getGitGroups().stream()
+            .noneMatch(g -> g.getParentGroup().getId().equals(parentGroup.getId()))) {
+          LOGGER.info("Updating Git group for program: " + program.getName());
+          GitGroup existingGroup = p.getGitGroups().stream().findFirst().get();
+          p.removeGitGroup(existingGroup);
+          GitGroup programGroup =  gitService.createProgramGroup(parentGroup, program);
+          p.addGitGroup(programGroup);
+          programRepository.save(p);
+        }
+
+        // The requested group is the same as the existing one
+        else {
+          LOGGER.debug("Git group for program is unchanged: " + program.getName());
+        }
+
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new StudyTrackerException(e);
+      }
+    } else if (options.isUseGit() && options.getGitGroup() == null) {
+      LOGGER.warn("Git group not specified for program: " + program.getName());
     }
 
     return programRepository.findById(program.getId())
         .orElseThrow(() -> new StudyTrackerException("Program not found: " + program.getId()));
+  }
+
+  public Program update(Program program) {
+    return update(program, new ProgramOptions());
   }
 
   @Transactional
@@ -263,9 +319,9 @@ public class ProgramService {
     this.elnFolderRepository = elnFolderRepository;
   }
 
-  @Autowired(required = false)
-  public void setGitService(GitService gitService) {
-    this.gitService = gitService;
+  @Autowired
+  public void setGitServiceLookup(GitServiceLookup gitServiceLookup) {
+    this.gitServiceLookup = gitServiceLookup;
   }
 
   @Autowired
