@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("example")
 @Order(ConfigOrder.EXAMPLE_DATA_INIT)
-public class ExampleDataRunner implements ApplicationRunner {
+public class ExampleDataInitializationRunner implements ApplicationRunner {
 
   @Autowired private io.studytracker.example.ExampleDataRunner exampleDataRunner;
 

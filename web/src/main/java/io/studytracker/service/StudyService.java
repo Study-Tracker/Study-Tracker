@@ -87,6 +87,8 @@ public class StudyService {
 
   private GitServiceLookup gitServiceLookup;
 
+  private GitRepositoryService gitRepositoryService;
+
   private StudyStorageServiceLookup storageServiceLookup;
 
   private StorageDriveFolderService storageDriveFolderService;
@@ -324,8 +326,26 @@ public class StudyService {
     }
 
     // Git repository
-    if (options.isUseGit() && options.getGitGroup() != null) {
-      addGitRepository(study, options.getGitGroup());
+    if (options.isUseGit()) {
+      GitGroup programGroup = null;
+      if (options.getGitGroup() == null) {
+        Optional<GitGroup> groupOptional = gitRepositoryService.findProgramGitGroup(program);
+        if (groupOptional.isPresent()) {
+          programGroup = groupOptional.get();
+        } else {
+          LOGGER.warn("No Git group found for program: " + program.getName());
+        }
+      } else {
+        programGroup = options.getGitGroup();
+      }
+      if (programGroup != null) {
+        try {
+          addGitRepository(study, programGroup);
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOGGER.warn("Failed to create Git repository for study: " + study.getCode());
+        }
+      }
     }
 
     // Additional folders
@@ -416,24 +436,20 @@ public class StudyService {
     }
   }
 
-  private void addGitRepository(Study study, GitGroup programGroup) {
+  public GitRepository addGitRepository(Study study, GitGroup programGroup) throws Exception {
     LOGGER.debug("Creating Git repository for study: " + study.getName());
-    try {
-      GitService gitService = gitServiceLookup.lookup(programGroup.getGitServiceType())
-          .orElseThrow(() -> new InvalidRequestException(
-              "Git service not found: " + programGroup.getGitServiceType()));
-      GitRepository repository = gitService.createStudyRepository(programGroup, study);
-      ExternalLink entryLink = new ExternalLink();
-      entryLink.setStudy(study);
-      entryLink.setLabel("Git Repository");
-      entryLink.setUrl(new URL(repository.getWebUrl()));
-      study.addExternalLink(entryLink);
-      study.addGitRepository(repository);
-      studyRepository.save(study);
-    } catch (Exception e) {
-      e.printStackTrace();
-      LOGGER.warn("Failed to create Git repository for study: " + study.getCode());
-    }
+    GitService gitService = gitServiceLookup.lookup(programGroup.getGitServiceType())
+        .orElseThrow(() -> new InvalidRequestException(
+            "Git service not found: " + programGroup.getGitServiceType()));
+    GitRepository repository = gitService.createStudyRepository(programGroup, study);
+    ExternalLink entryLink = new ExternalLink();
+    entryLink.setStudy(study);
+    entryLink.setLabel("Git Repository");
+    entryLink.setUrl(new URL(repository.getWebUrl()));
+    study.addExternalLink(entryLink);
+    study.addGitRepository(repository);
+    studyRepository.save(study);
+    return repository;
   }
 
   /**
@@ -708,5 +724,10 @@ public class StudyService {
   @Autowired
   public void setGitServiceLookup(GitServiceLookup gitServiceLookup) {
     this.gitServiceLookup = gitServiceLookup;
+  }
+
+  @Autowired
+  public void setGitRepositoryService(GitRepositoryService gitRepositoryService) {
+    this.gitRepositoryService = gitRepositoryService;
   }
 }

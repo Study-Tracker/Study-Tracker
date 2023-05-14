@@ -51,11 +51,12 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
       StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders()
           .stream()
           .min(Comparator.comparing(StorageDriveFolder::getId))
-          .orElseThrow(RecordNotFoundException::new);
+          .orElseThrow(() -> new RecordNotFoundException("No root folder found"));
       StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
-          .orElseThrow(RecordNotFoundException::new);
+          .orElseThrow(() -> new RecordNotFoundException("No storage service found"));
       return studyStorageService.createProgramFolder(rootFolder, program);
     } catch (Exception ex) {
+      ex.printStackTrace();
       throw new StudyTrackerException(ex);
     }
   }
