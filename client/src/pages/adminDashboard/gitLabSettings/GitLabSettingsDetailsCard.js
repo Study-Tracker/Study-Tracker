@@ -32,7 +32,7 @@ const GitLabSettingsDetailsCard = ({settings}) => {
             <Col md={6}>
               <h6 className="details-label">URL</h6>
               <p>
-                <a href={settings.rootUrl} target="_blank">{settings.rootUrl}</a>
+                <a href={settings.rootUrl} target="_blank" rel="noopener noreferrer">{settings.rootUrl}</a>
               </p>
             </Col>
 

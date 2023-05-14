@@ -46,6 +46,6 @@ public class ExampleOrganizationGenerator implements ExampleDataGenerator<Organi
 
   @Override
   public void deleteData() {
-
+    System.out.println("Example organization will not be deleted");
   }
 }
