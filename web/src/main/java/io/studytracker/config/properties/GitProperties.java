@@ -32,4 +32,6 @@ public class GitProperties {
   @ConfigurationModeConstraint(options = {"none", "gitlab"})
   private String mode;
 
+  private Boolean useExistingGroups;
+
 }

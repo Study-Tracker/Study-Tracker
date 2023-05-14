@@ -28,6 +28,7 @@ import StudyQuickActionsWidget
 import PrimaryStorageFolderWidget
   from "../../common/widgets/PrimaryStorageFolderWidget";
 import PrimaryNotebookWidget from "../../common/widgets/PrimaryNotebookWidget";
+import GitRepositoryWidget from "../../common/widgets/GitRepositoryWidget";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -144,6 +145,14 @@ const StudyOverviewTab = ({
             <Col sm={6} className={"d-flex"}>
               <PrimaryNotebookWidget record={study} />
             </Col>
+
+            {
+              features && features.git.isEnabled && (
+                    <Col sm={6} className={"d-flex"}>
+                      <GitRepositoryWidget record={study} />
+                    </Col>
+              )
+            }
 
             <Col xs={12}>
 

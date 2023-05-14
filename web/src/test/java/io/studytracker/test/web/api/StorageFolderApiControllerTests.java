@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import org.junit.Assert;
@@ -66,7 +66,7 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", not(empty())))
-        .andExpect(jsonPath("$.content", hasSize(ExampleDataGenerator.STORAGE_FOLDER_COUNT + 1)))
+        .andExpect(jsonPath("$.content", hasSize(ExampleDataRunner.STORAGE_FOLDER_COUNT + 1)))
         .andExpect(jsonPath("$", hasKey("last")))
         .andExpect(jsonPath("$.last", is(true)))
         .andExpect(jsonPath("$", hasKey("pageable")))
@@ -74,7 +74,7 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(jsonPath("$", hasKey("totalPages")))
         .andExpect(jsonPath("$.totalPages", is(1)))
         .andExpect(jsonPath("$", hasKey("totalElements")))
-        .andExpect(jsonPath("$.totalElements", is(ExampleDataGenerator.STORAGE_FOLDER_COUNT + 1)))
+        .andExpect(jsonPath("$.totalElements", is(ExampleDataRunner.STORAGE_FOLDER_COUNT + 1)))
         .andExpect(jsonPath("$", hasKey("first")))
         .andExpect(jsonPath("$.first", is(true)))
         .andExpect(jsonPath("$", hasKey("size")))
@@ -82,7 +82,7 @@ public class StorageFolderApiControllerTests extends AbstractApiControllerTests 
         .andExpect(jsonPath("$", hasKey("number")))
         .andExpect(jsonPath("$.number", is(0)))
         .andExpect(jsonPath("$", hasKey("numberOfElements")))
-        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataGenerator.STORAGE_FOLDER_COUNT + 1)))
+        .andExpect(jsonPath("$.numberOfElements", is(ExampleDataRunner.STORAGE_FOLDER_COUNT + 1)))
         .andExpect(jsonPath("$", hasKey("sort")))
         .andExpect(jsonPath("$", hasKey("empty")))
         .andExpect(jsonPath("$.empty", is(false)));

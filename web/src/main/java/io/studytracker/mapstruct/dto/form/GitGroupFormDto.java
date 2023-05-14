@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package io.studytracker.git;
+package io.studytracker.mapstruct.dto.form;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Date;
+import io.studytracker.model.GitServiceType;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class GitGroup {
+public class GitGroupFormDto {
 
-  private String groupId;
-  private String parentGroupId;
-  private String name;
-  private String path;
-  private String description;
-  private Date createdAt;
-  private Date updatedAt;
-  private String webUrl;
+  private Long id;
+  private Long organizationId;
+  private Long parentGroupId;
+  private @NotNull String displayName;
+  private @NotNull String webUrl;
+  private boolean active;
+  private @NotNull GitServiceType gitServiceType;
 
 }

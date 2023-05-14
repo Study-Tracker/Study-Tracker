@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package io.studytracker.git;
+package io.studytracker.mapstruct.mapper;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import io.studytracker.mapstruct.dto.response.GitRepositoryDetailsDto;
+import io.studytracker.model.GitRepository;
+import java.util.List;
+import java.util.Set;
+import org.mapstruct.Mapper;
 
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class GitUser {
+@Mapper(componentModel = "spring")
+public interface GitRepositoryMapper {
 
-  private String userId;
-  private String username;
-  private String name;
-  private String email;
+  GitRepositoryDetailsDto toDetailsDto(GitRepository gitRepository);
+  List<GitRepositoryDetailsDto> toDetailsDto(List<GitRepository> gitRepositories);
+  Set<GitRepositoryDetailsDto> toDetailsDto(Set<GitRepository> gitRepositories);
 
 }

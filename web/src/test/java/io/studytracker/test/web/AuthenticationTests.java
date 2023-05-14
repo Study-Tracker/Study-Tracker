@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.model.Program;
@@ -82,7 +82,7 @@ public class AuthenticationTests {
 
   @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private PasswordEncoder passwordEncoder;
 
@@ -98,7 +98,7 @@ public class AuthenticationTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     String email = env.getRequiredProperty("security.example.user");
     Optional<User> optional = userRepository.findByEmail(email);
     if (!optional.isPresent()) {

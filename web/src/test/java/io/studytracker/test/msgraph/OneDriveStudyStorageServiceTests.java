@@ -36,6 +36,8 @@ import io.studytracker.msgraph.OneDriveStorageService;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayStorageFolderRepository;
 import io.studytracker.repository.AssayTypeRepository;
+import io.studytracker.repository.LocalDriveFolderRepository;
+import io.studytracker.repository.LocalDriveRepository;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.OneDriveDriveRepository;
 import io.studytracker.repository.OneDriveFolderRepository;
@@ -135,6 +137,12 @@ public class OneDriveStudyStorageServiceTests {
   @Autowired
   private AssayStorageFolderRepository assayStorageFolderRepository;
 
+  @Autowired
+  private LocalDriveRepository localDriveRepository;
+
+  @Autowired
+  private LocalDriveFolderRepository localDriveFolderRepository;
+
   @Before
   public void setup() {
 
@@ -142,8 +150,10 @@ public class OneDriveStudyStorageServiceTests {
     studyStorageFolderRepository.deleteAll();
     programStorageFolderRepository.deleteAll();
     oneDriveFolderRepository.deleteAll();
+    localDriveFolderRepository.deleteAll();
     storageDriveFolderRepository.deleteAll();
     oneDriveDriveRepository.deleteAll();
+    localDriveRepository.deleteAll();
     storageDriveRepository.deleteAll();
     sharePointSiteRepository.deleteAll();
     msGraphIntegrationRepository.deleteAll();
@@ -433,6 +443,7 @@ public class OneDriveStudyStorageServiceTests {
 
   @Test
   public void fetchFileTest() throws Exception {
+    saveFileTest();
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
     Assert.assertEquals(1, rootFolders.size());
     StorageDriveFolder rootFolder = rootFolders.get(0);

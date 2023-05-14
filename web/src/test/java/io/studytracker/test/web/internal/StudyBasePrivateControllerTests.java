@@ -31,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
-import io.studytracker.example.ExampleDataGenerator;
+import io.studytracker.example.ExampleDataRunner;
+import io.studytracker.example.ExampleStudyGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.StudyFormDto;
 import io.studytracker.mapstruct.mapper.StudyMapper;
@@ -67,7 +68,7 @@ public class StudyBasePrivateControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
-  @Autowired private ExampleDataGenerator exampleDataGenerator;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private StudyRepository studyRepository;
 
@@ -83,7 +84,7 @@ public class StudyBasePrivateControllerTests {
 
   @Before
   public void doBefore() {
-    exampleDataGenerator.populateDatabase();
+    exampleDataRunner.populateDatabase();
     username = userRepository.findAll().get(0).getEmail();
   }
 
@@ -94,7 +95,7 @@ public class StudyBasePrivateControllerTests {
     mockMvc
         .perform(get("/api/internal/study").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleDataGenerator.STUDY_COUNT - 1)))
+        .andExpect(jsonPath("$", hasSize(ExampleStudyGenerator.STUDY_COUNT - 1)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("name")))
         .andExpect(jsonPath("$[0]", hasKey("description")));

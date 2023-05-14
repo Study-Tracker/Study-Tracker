@@ -33,7 +33,8 @@ import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
 import BenchlingIntegrationSettings from "./BenchlingIntegrationSettings";
 import EgnyteIntegrationSettings
   from "./egnyteIntegrationSettings/EgnyteIntegrationSettings";
-import GitlabIntegrationSettings from "./GitlabIntegrationSettings";
+import GitlabIntegrationSettings
+  from "./gitLabSettings/GitlabIntegrationSettings";
 import StorageFolderSettings
   from "./storageFolderSettings/StorageFolderSettings";
 import AWSIntegrationSettings from "./AWSSettings/AWSIntegrationSettings";

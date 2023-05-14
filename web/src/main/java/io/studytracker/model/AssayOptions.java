@@ -29,5 +29,6 @@ public class AssayOptions {
   private boolean useStorage = true;
   private StorageDriveFolder parentFolder;
   private List<StorageDriveFolder> additionalFolders = new ArrayList<>();
+  private GitGroup gitGroup;
 
 }

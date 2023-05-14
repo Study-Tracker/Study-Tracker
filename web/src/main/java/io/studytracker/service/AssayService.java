@@ -22,9 +22,11 @@ import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.InvalidConstraintException;
+import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
+import io.studytracker.git.GitServiceLookup;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayStorageFolder;
@@ -33,6 +35,8 @@ import io.studytracker.model.AssayTaskField;
 import io.studytracker.model.AssayTypeField;
 import io.studytracker.model.CustomEntityFieldType;
 import io.studytracker.model.ELNFolder;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitRepository;
 import io.studytracker.model.Status;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
@@ -91,7 +95,7 @@ public class AssayService {
 
   @Autowired private ELNFolderRepository elnFolderRepository;
 
-  @Autowired(required = false) private GitService gitService;
+  @Autowired private GitServiceLookup gitServiceLookup;
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -341,9 +345,15 @@ public class AssayService {
     }
 
     // Git repository
-    if (options.isUseGit()) {
+    if (options.isUseGit() && options.getGitGroup() != null) {
       try {
-        gitService.createAssayRepository(created);
+        GitGroup parentGroup = options.getGitGroup();
+        GitService gitService = gitServiceLookup.lookup(parentGroup.getGitServiceType())
+            .orElseThrow(() -> new InvalidRequestException(
+                "Git service not found: " + parentGroup.getGitServiceType()));
+        GitRepository repository = gitService.createAssayRepository(parentGroup, created);
+        created.addGitRepository(repository);
+        assayRepository.save(created);
       } catch (Exception e) {
         e.printStackTrace();
         LOGGER.warn("Failed to create git repository for assay: " + created.getCode());

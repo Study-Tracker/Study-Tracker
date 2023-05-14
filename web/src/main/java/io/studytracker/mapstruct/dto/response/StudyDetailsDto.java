@@ -53,4 +53,5 @@ public class StudyDetailsDto {
   private StudyConclusionsDetailsDto conclusions;
   private Set<CommentDetailsDto> comments = new HashSet<>();
   private Set<StudyStorageDriveFolderSummaryDto> storageFolders = new HashSet<>();
+  private Set<GitRepositoryDetailsDto> gitRepositories = new HashSet<>();
 }

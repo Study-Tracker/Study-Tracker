@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package io.studytracker.config;
+package io.studytracker.git;
 
-import io.studytracker.aws.S3StudyStorageService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+public interface GitServerIntegration {
 
-@Configuration
-public class AmazonWebServicesConfiguration {
-
-  @Bean
-  public S3StudyStorageService s3StudyFileStorageService() {
-    return new S3StudyStorageService();
-  }
+  String getRootUrl();
 
 }
