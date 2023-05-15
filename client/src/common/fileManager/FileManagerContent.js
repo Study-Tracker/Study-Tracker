@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Badge, Breadcrumb, Button, Card, Col, Row} from "react-bootstrap";
+import {Badge, Button, Card, Col, Row} from "react-bootstrap";
 import {
   ArrowLeft,
   CornerLeftUp,
@@ -32,6 +32,8 @@ import NotyfContext from "../../context/NotyfContext";
 import {LoadingMessageCard} from "../loading";
 import PropTypes from "prop-types";
 import FileManagerContentError from "./FileManagerContentError";
+import FileManagerPathBreadcrumbs from "./FileManagerPathBreadcrumbs";
+import {getPathParts} from "./fileManagerUtils";
 
 const FolderSizeBadge = ({folder}) => {
   let count = 0;
@@ -44,15 +46,6 @@ const FolderSizeBadge = ({folder}) => {
         {count} item{count === 0 ? '' : 's'}
       </Badge>
   );
-}
-
-const pathIsChild = (path, parent) => {
-  console.debug("pathIsChild", path, parent);
-  if (!path.startsWith("/")) path = "/" + path;
-  if (!parent.startsWith("/")) parent = "/" + parent;
-  if (!path.endsWith("/")) path = path + "/";
-  if (!parent.endsWith("/")) parent = parent + "/";
-  return path.indexOf(parent) > -1;
 }
 
 const FileManagerContent = ({
@@ -182,6 +175,9 @@ const FileManagerContent = ({
     );
   }
 
+  const pathParts = folder ? getPathParts(folder.path, rootFolder.path) : [];
+  const currentPart = folder ? pathParts[pathParts.length - 1] : null;
+
   return (
       <Card>
 
@@ -210,8 +206,8 @@ const FileManagerContent = ({
                   variant="outline-primary"
                   className="me-2"
                   style={{width: "90px"}}
-                  disabled={!folder || !folder.parentFolder}
-                  onClick={() => handlePathUpdate(folder.parentFolder.path)}
+                  disabled={!currentPart || !currentPart.parentPath}
+                  onClick={() => handlePathUpdate(currentPart.parentPath)}
               >
                 <CornerLeftUp size={18} />
                 &nbsp;&nbsp;
@@ -279,42 +275,11 @@ const FileManagerContent = ({
             <Col xs={12}>
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <Breadcrumb>
-
-                    <Breadcrumb.Item
-                        onClick={() => handlePathUpdate(rootPath)}
-                    >
-                      Home
-                    </Breadcrumb.Item>
-
-                    {
-                      folder ? folder.path.split("/")
-                      .map((path, index) => {
-                        if (index === 0 && path === "") return null; // empty first folder name
-                        if (index === folder.path.split("/").length - 1 && path === "") return null; // empty last folder name
-                        const label = path === "" ? "root" : path; // folder name
-                        const pathSlice = folder.path.split("/").slice(0, index + 1).join("/");
-                        if (!pathIsChild(pathSlice, rootPath)) {
-                          return (
-                              <Breadcrumb.Item key={index} active={true}>
-                                {label}
-                              </Breadcrumb.Item>
-                          );
-                        } else {
-                          return (
-                              <Breadcrumb.Item
-                                  key={index}
-                                  onClick={() => handlePathUpdate(pathSlice)}
-                                  active={index === folder.path.split("/").length - 1}
-                              >
-                                {label}
-                              </Breadcrumb.Item>
-                          );
-                        }
-                      }) : ""
-                    }
-                  </Breadcrumb>
-
+                  <FileManagerPathBreadcrumbs
+                      rootFolder={rootFolder}
+                      folder={folder}
+                      handlePathUpdate={handlePathUpdate}
+                  />
                 </div>
                 <div>
                   <FolderSizeBadge folder={folder} />

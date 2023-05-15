@@ -41,3 +41,38 @@ export const getDataSourceLabel = (driveType) => {
       return "Local";
   }
 }
+
+export const pathIsChild = (path, parent) => {
+  if (!path.startsWith("/")) path = "/" + path;
+  if (!parent.startsWith("/")) parent = "/" + parent;
+  if (!path.endsWith("/")) path = path + "/";
+  if (!parent.endsWith("/")) parent = parent + "/";
+  return path.startsWith(parent);
+}
+
+export const pathIsRoot = (path, parent) => {
+  if (!path.startsWith("/")) path = "/" + path;
+  if (!parent.startsWith("/")) parent = "/" + parent;
+  if (!path.endsWith("/")) path = path + "/";
+  if (!parent.endsWith("/")) parent = parent + "/";
+  return path === parent;
+}
+
+export const getPathParts = (path, rootPath) => {
+  const bits = path.replace(/\/$/, "").split("/");
+  return bits.map((bit, index) => {
+    let currentPath = bits.slice(0, index + 1).join("/");
+    if (path.startsWith("/") && !currentPath.startsWith("/")) currentPath = "/" + currentPath;
+    let parentPath = bits.slice(0, index).join("/");
+    if (path.startsWith("/") && !parentPath.startsWith("/")) parentPath = "/" + parentPath;
+    return {
+      label: bit === "" ? "root" : bit,
+      path: currentPath,
+      parentPath: pathIsChild(parentPath, rootPath) && currentPath !== parentPath ? parentPath : null,
+      isChild: pathIsChild(bit, rootPath),
+      isRoot: pathIsRoot(bit, rootPath),
+      isLast: index === bits.length - 1,
+      index: index
+    }
+  })
+}
