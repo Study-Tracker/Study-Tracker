@@ -47,6 +47,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedBy;
@@ -61,6 +62,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     indexes = {
       @Index(name = "idx_study_code", columnList = "code"),
       @Index(name = "idx_study_name", columnList = "name")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_study_name", columnNames = {"name", "program_id"}),
+        @UniqueConstraint(name = "uq_study_code", columnNames = {"code", "program_id"}),
     })
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
@@ -109,7 +114,7 @@ public class Study implements Model {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @Column(name = "code", nullable = false, unique = true, updatable = false)
+  @Column(name = "code", nullable = false)
   private String code;
 
   @Column(name = "external_code")
@@ -119,7 +124,7 @@ public class Study implements Model {
   @Enumerated(EnumType.STRING)
   private Status status;
 
-  @Column(name = "name", nullable = false, updatable = false)
+  @Column(name = "name", nullable = false)
   private String name;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)

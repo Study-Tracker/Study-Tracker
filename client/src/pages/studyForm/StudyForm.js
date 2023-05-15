@@ -266,7 +266,6 @@ const StudyForm = ({
                                   isInvalid={!!errors.name}
                                   value={values.name}
                                   onChange={handleChange}
-                                  disabled={!!study}
                               />
                               <Form.Control.Feedback type={"invalid"}>
                                 {errors.name}
@@ -282,7 +281,7 @@ const StudyForm = ({
                                     ? values.program.id : -1}
                                 onChange={(value) => setFieldValue("program", value)}
                                 isInvalid={!!errors.program}
-                                disabled={!!study}
+                                disabled={values.id}
                                 isLegacyStudy={values.legacy}
                             />
                           </Col>

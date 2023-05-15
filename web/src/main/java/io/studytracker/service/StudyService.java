@@ -462,6 +462,7 @@ public class StudyService {
     LOGGER.info("Attempting to update existing study with code: " + updated.getCode());
     Study study = studyRepository.getById(updated.getId());
 
+    study.setName(updated.getName());
     study.setDescription(updated.getDescription());
     study.setExternalCode(updated.getExternalCode());
     study.setStatus(updated.getStatus());

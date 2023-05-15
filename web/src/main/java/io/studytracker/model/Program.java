@@ -44,6 +44,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedBy;
@@ -55,7 +56,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(
     name = "programs",
-    indexes = {@Index(name = "idx_program_name", columnList = "name")})
+    indexes = {@Index(name = "idx_program_name", columnList = "name")},
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_program_name", columnNames = {"name", "organization_id"})
+    }
+)
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @NamedEntityGraphs(
@@ -85,10 +90,10 @@ public class Program implements Model {
   @JoinColumn(name = "organization_id", nullable = false, updatable = false)
   private Organization organization;
 
-  @Column(name = "code", nullable = false, updatable = false)
+  @Column(name = "code", nullable = false)
   private String code;
 
-  @Column(name = "name", nullable = false, unique = true, updatable = false)
+  @Column(name = "name", nullable = false)
   private String name;
 
   @Column(name = "description", columnDefinition = "TEXT")
