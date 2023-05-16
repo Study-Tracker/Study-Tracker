@@ -30,6 +30,7 @@ import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import {Col, Container, Row} from "react-bootstrap";
 import ProgramSummaryCard from "./ProgramSummaryCard";
+import ProgramPlaceholder from "./ProgramPlaceholder";
 
 const ProgramListView = props => {
 
@@ -39,11 +40,6 @@ const ProgramListView = props => {
   const [programData, setProgramData] = useState(null);
   const [error, setError] = useState(null);
   const notyf = useContext(NotyfContext);
-  // const [state, setState] = useState({
-  //   isLoaded: false,
-  //   isError: false,
-  //   data: {}
-  // });
 
   const indexPrograms = (programs) => {
     console.debug("Programs", programs);
@@ -53,7 +49,6 @@ const ProgramListView = props => {
     data.dimensions.allData = data.cf.dimension(d => d);
     data.dimensions[filter.ACTIVE] = data.cf.dimension(d => d.active)
     data.dimensions[filter.INACTIVE] = data.cf.dimension(d => !d.active)
-
     setProgramData(data);
   }
 
@@ -119,15 +114,11 @@ const ProgramListView = props => {
                           </Col>
                         </Row>
 
-                        {/*<Row>*/}
-                        {/*  <Col lg={12}>*/}
-                        {/*    <Card>*/}
-                        {/*      <Card.Body>*/}
-                        {/*        <ProgramListTable programs={programs} />*/}
-                        {/*      </Card.Body>*/}
-                        {/*    </Card>*/}
-                        {/*  </Col>*/}
-                        {/*</Row>*/}
+                        {
+                          programs.length === 0 && (
+                            <ProgramPlaceholder />
+                          )
+                        }
 
                         <Row>
                           {
