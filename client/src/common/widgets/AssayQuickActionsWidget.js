@@ -17,7 +17,9 @@
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
+  faEdit,
   faPersonRunning,
+  faTrash,
   faTriangleExclamation
 } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
@@ -25,12 +27,16 @@ import PropTypes from "prop-types";
 import {faSquareCheck} from "@fortawesome/free-regular-svg-icons";
 import NotyfContext from "../../context/NotyfContext";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import swal from "sweetalert";
 
 const AssayQuickActionsWidget = ({
-    assay
+    assay,
+    study
 }) => {
 
   const notyf = React.useContext(NotyfContext);
+  const navigate = useNavigate();
 
   const handleStatusChange = (status) => {
     axios.post("/api/internal/assay/" + assay.id + "/status", {
@@ -43,6 +49,30 @@ const AssayQuickActionsWidget = ({
         message: 'Error changing status'
       });
       console.error(e);
+    });
+  }
+
+  const handleAssayDelete = () => {
+    swal({
+      title: "Are you sure you want to remove this assay?",
+      text: "Removed assays will be hidden from view, but their records will not be deleted. Assays can be recovered in the admin dashboard.",
+      icon: "warning",
+      buttons: true
+    })
+    .then(val => {
+      if (val) {
+        axios.delete("/api/internal/assay/" + assay.code)
+        .then(response => {
+          navigate("/assays")
+        })
+        .catch(error => {
+          console.error(error);
+          notyf.open({
+            type: "error",
+            message: "Failed to remove assay. Please try again."
+          });
+        })
+      }
     });
   }
 
@@ -97,6 +127,19 @@ const AssayQuickActionsWidget = ({
                         )
                     }
 
+                    <Dropdown.Divider/>
+
+                    <Dropdown.Item onClick={() => navigate("/study/" + study.code +
+                        "/assay/" + assay.code + "/edit")}>
+                      <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
+                      Edit
+                    </Dropdown.Item>
+
+                    <Dropdown.Item onClick={handleAssayDelete}>
+                      <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
+                      Remove
+                    </Dropdown.Item>
+
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
@@ -109,6 +152,7 @@ const AssayQuickActionsWidget = ({
 
 AssayQuickActionsWidget.propTypes = {
   assay: PropTypes.object.isRequired,
+  study: PropTypes.object.isRequired
 }
 
 export default AssayQuickActionsWidget;

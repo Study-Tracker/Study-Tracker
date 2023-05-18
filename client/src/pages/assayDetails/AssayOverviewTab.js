@@ -33,7 +33,7 @@ const createMarkup = (content) => {
 
 const AssayOverviewTab = ({
   assay,
-  features,
+  study,
   handleTabSelect
 }) => {
 
@@ -156,7 +156,7 @@ const AssayOverviewTab = ({
 
 AssayOverviewTab.propTypes = {
   assay: PropTypes.object.isRequired,
-  features: PropTypes.object.isRequired,
+  study: PropTypes.object.isRequired,
   handleTabSelect: PropTypes.func.isRequired
 }
 

@@ -29,13 +29,19 @@ import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveFolderDetailsDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
+import io.studytracker.mapstruct.mapper.StudyMapper;
+import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
+import io.studytracker.service.StudyService;
+import io.studytracker.service.UserService;
 import io.studytracker.storage.StorageDriveFolderService;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -71,6 +77,10 @@ public class ProgramPrivateController extends AbstractProgramController {
 
   @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StorageDriveFolderMapper storageDriveFolderMapper;
+  @Autowired private StudyService studyService;
+  @Autowired private UserService userService;
+  @Autowired private StudyMapper studyMapper;
+  @Autowired private UserMapper userMapper;
 
   @Autowired(required = false)
   private NotebookFolderService notebookFolderService;
@@ -78,9 +88,17 @@ public class ProgramPrivateController extends AbstractProgramController {
   @GetMapping("")
   public List<?> getAllPrograms(
       @RequestParam(required = false, name = "details") boolean showDetails) throws Exception {
+    LOGGER.debug("Getting all programs: showDetails=" + showDetails);
     List<Program> programs = this.getProgramService().findAll();
     if (showDetails) {
-      return this.getProgramMapper().toProgramDetailsList(programs);
+      List<ProgramDetailsDto> detailsList =new ArrayList<>();
+      for (Program program : programs) {
+        ProgramDetailsDto dto = this.getProgramMapper().toProgramDetails(program);
+        dto.setStudies(new HashSet<>(studyMapper.toStudySummaryList(studyService.findByProgram(program))));
+        dto.setUsers(userMapper.toUserSummarySet(userService.findByProgram(program)));
+        detailsList.add(dto);
+      }
+      return detailsList;
     } else {
       return this.getProgramMapper().toProgramSummaryList(programs);
     }

@@ -39,4 +39,6 @@ public class ProgramDetailsDto {
   private Map<String, String> attributes = new HashMap<>();
   private Set<ProgramStorageDriveFolderSummaryDto> storageFolders = new HashSet<>();
   private Set<GitGroupDetailsDto> gitGroups = new HashSet<>();
+  private Set<UserSummaryDto> users = new HashSet<>();
+  private Set<StudySummaryDto> studies = new HashSet<>();
 }

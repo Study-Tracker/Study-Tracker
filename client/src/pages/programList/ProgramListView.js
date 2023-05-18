@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import crossfilter from "crossfilter2";
-import ProgramList from "./ProgramList";
 import SideBar from "../../common/structure/SideBar";
 import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
 import ProgramFilters, {
   labels as filter
 } from "../../common/filters/ProgramFilters";
-import {useSearchParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import NotyfContext from "../../context/NotyfContext";
+import {Col, Container, Row} from "react-bootstrap";
+import ProgramSummaryCard from "./ProgramSummaryCard";
+import ProgramPlaceholder from "./ProgramPlaceholder";
 
-const ProgramListView = props => {
+const ProgramListView = () => {
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const user = useSelector(state => state.user.value);
+  // const [searchParams, setSearchParams] = useSearchParams();
+  // const user = useSelector(state => state.user.value);
   const filters = useSelector(state => state.filters.value);
-  const [state, setState] = useState({
-    isLoaded: false,
-    isError: false,
-    data: {}
-  });
+  const [programData, setProgramData] = useState(null);
+  const [error, setError] = useState(null);
+  const notyf = useContext(NotyfContext);
 
   const indexPrograms = (programs) => {
     console.debug("Programs", programs);
@@ -48,72 +48,42 @@ const ProgramListView = props => {
     data.dimensions.allData = data.cf.dimension(d => d);
     data.dimensions[filter.ACTIVE] = data.cf.dimension(d => d.active)
     data.dimensions[filter.INACTIVE] = data.cf.dimension(d => !d.active)
-    // data.dimensions[filter.MY_PROGRAM] = data.cf.dimension(
-    //     d => props.user && d.owner.id === props.user.id);
-
-    setState(prevState => ({
-      ...prevState,
-      data: data,
-      isLoaded: true
-    }));
+    setProgramData(data);
   }
 
   const applyFilters = (filters) => {
-    for (let key of Object.keys(state.data.dimensions)) {
-      state.data.dimensions[key].filterAll();
-      if (filters.hasOwnProperty(key) && filters[key] != null) {
+    for (let key of Object.keys(programData.dimensions)) {
+      programData.dimensions[key].filterAll();
+      if (Object.prototype.hasOwnProperty.call(filters, key) && filters[key] != null) {
         if (Array.isArray(filters[key])) {
-          state.data.dimensions[key].filter(
+          programData.dimensions[key].filter(
               d => filters[key].indexOf(d) > -1);
         } else {
-          state.data.dimensions[key].filter(filters[key]);
+          programData.dimensions[key].filter(filters[key]);
         }
       }
     }
   }
 
   useEffect(() => {
-
-    axios.get("/api/internal/program")
+    axios.get("/api/internal/program?details=true")
     .then(async response => {
       indexPrograms(response.data);
     })
     .catch(error => {
       console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
+      setError(error);
+      notyf.open({
+        type: "error",
+        message: "Error loading programs"
+      })
     });
-  }, [user]);
+  }, []);
 
-  let content = <LoadingMessage/>;
-
-  try {
-
-    if (state.isError) {
-
-      content = <ErrorMessage/>;
-
-    } else if (state.isLoaded) {
-
-      console.debug("Filters: ");
-      console.debug(filters);
-      applyFilters(filters)
-
-      content =
-          <ProgramList
-              programs={state.data.dimensions.allData.top(Infinity)}
-              filters={filters}
-              user={user}
-          />;
-
-    }
-
-  } catch (e) {
-    console.error(e);
-    content = <ErrorMessage/>
+  let programs = [];
+  if (programData) {
+    applyFilters(filters);
+    programs = programData.dimensions.allData.top(Infinity);
   }
 
   return (
@@ -123,7 +93,45 @@ const ProgramListView = props => {
           <div className="main">
             <NavBar />
             <div className="content">
-              {content}
+
+              {
+                !programData && !error && <LoadingMessage/>
+              }
+
+              {
+                error && <ErrorMessage/>
+              }
+
+              {
+                programData && !error && (
+                      <Container fluid className="animated fadeIn">
+
+                        <Row className="justify-content-between align-items-center mb-2">
+                          <Col>
+                            <h3>Programs</h3>
+                          </Col>
+                        </Row>
+
+                        {
+                          programs.length === 0 && (
+                            <ProgramPlaceholder />
+                          )
+                        }
+
+                        <Row>
+                          {
+                            programs
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map(p => {
+                              return <ProgramSummaryCard program={p} key={p.id}/>;
+                            })
+                          }
+                        </Row>
+
+                      </Container>
+                )
+              }
+
             </div>
             <Footer/>
           </div>

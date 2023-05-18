@@ -17,7 +17,10 @@
 package io.studytracker.service;
 
 import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.model.Assay;
 import io.studytracker.model.PasswordResetToken;
+import io.studytracker.model.Program;
+import io.studytracker.model.Study;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.PasswordResetTokenRepository;
@@ -27,6 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +61,18 @@ public class UserService {
 
   public List<User> findAll() {
     return userRepository.findAll();
+  }
+
+  public Set<User> findByStudy(Study study) {
+    return userRepository.findByStudyId(study.getId());
+  }
+
+  public Set<User> findByAssay(Assay assay) {
+    return userRepository.findByAssayId(assay.getId());
+  }
+
+  public Set<User> findByProgram(Program program) {
+    return userRepository.findByProgramId(program.getId());
   }
 
   public Page<User> findAll(Pageable pageable) {

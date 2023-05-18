@@ -15,17 +15,10 @@
  */
 
 import {useNavigate} from "react-router-dom";
-import {Button, Col, Dropdown, Row} from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import React from "react";
 import SelectableStatusButton
   from "../../common/detailsPage/SelectableStatusButton";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faEdit,
-  faFolderPlus,
-  faTrash
-} from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 
 const StudyDetailHeader = ({
@@ -85,31 +78,31 @@ const StudyDetailHeader = ({
           <SelectableStatusButton status={study.status} studyId={study.id}/>
 
           {/* Controls  */}
-          <Dropdown className="me-1 mb-1">
-            <Dropdown.Toggle variant={"outline-secondary"}>
-              <FontAwesomeIcon icon={faBars} className={"me-2"}/>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
+          {/*<Dropdown className="me-1 mb-1">*/}
+          {/*  <Dropdown.Toggle variant={"outline-secondary"}>*/}
+          {/*    <FontAwesomeIcon icon={faBars} className={"me-2"}/>*/}
+          {/*  </Dropdown.Toggle>*/}
+          {/*  <Dropdown.Menu>*/}
 
-              <Dropdown.Item onClick={handleAddToCollection}>
-                <FontAwesomeIcon icon={faFolderPlus} className={"me-2"}/>
-                Add to Collection
-              </Dropdown.Item>
+          {/*    <Dropdown.Item onClick={handleAddToCollection}>*/}
+          {/*      <FontAwesomeIcon icon={faFolderPlus} className={"me-2"}/>*/}
+          {/*      Add to Collection*/}
+          {/*    </Dropdown.Item>*/}
 
-              <Dropdown.Divider/>
+          {/*    <Dropdown.Divider/>*/}
 
-              <Dropdown.Item onClick={() => navigate("/study/" + study.code + "/edit")}>
-                <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
-                Edit
-              </Dropdown.Item>
+          {/*    <Dropdown.Item onClick={() => navigate("/study/" + study.code + "/edit")}>*/}
+          {/*      <FontAwesomeIcon icon={faEdit} className={"me-2"}/>*/}
+          {/*      Edit*/}
+          {/*    </Dropdown.Item>*/}
 
-              <Dropdown.Item onClick={handleDelete}>
-                <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
-                Remove
-              </Dropdown.Item>
+          {/*    <Dropdown.Item onClick={handleDelete}>*/}
+          {/*      <FontAwesomeIcon icon={faTrash} className={"me-2"}/>*/}
+          {/*      Remove*/}
+          {/*    </Dropdown.Item>*/}
 
-            </Dropdown.Menu>
-          </Dropdown>
+          {/*  </Dropdown.Menu>*/}
+          {/*</Dropdown>*/}
 
         </Col>
       </Row>
@@ -118,8 +111,8 @@ const StudyDetailHeader = ({
 
 StudyDetailHeader.propTypes = {
   study: PropTypes.object.isRequired,
-  handleAddToCollection: PropTypes.func.isRequired,
-  handleDelete: PropTypes.func.isRequired
+  // handleAddToCollection: PropTypes.func.isRequired,
+  // handleDelete: PropTypes.func.isRequired
 };
 
 export default StudyDetailHeader;
