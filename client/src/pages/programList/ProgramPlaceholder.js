@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import React from "react";
 import {Card, Col, Row} from "react-bootstrap";
 
 const ProgramPlaceholder = () => {

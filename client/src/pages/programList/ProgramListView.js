@@ -24,7 +24,6 @@ import Footer from "../../common/structure/Footer";
 import ProgramFilters, {
   labels as filter
 } from "../../common/filters/ProgramFilters";
-import {useSearchParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
@@ -32,10 +31,10 @@ import {Col, Container, Row} from "react-bootstrap";
 import ProgramSummaryCard from "./ProgramSummaryCard";
 import ProgramPlaceholder from "./ProgramPlaceholder";
 
-const ProgramListView = props => {
+const ProgramListView = () => {
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const user = useSelector(state => state.user.value);
+  // const [searchParams, setSearchParams] = useSearchParams();
+  // const user = useSelector(state => state.user.value);
   const filters = useSelector(state => state.filters.value);
   const [programData, setProgramData] = useState(null);
   const [error, setError] = useState(null);
@@ -55,7 +54,7 @@ const ProgramListView = props => {
   const applyFilters = (filters) => {
     for (let key of Object.keys(programData.dimensions)) {
       programData.dimensions[key].filterAll();
-      if (filters.hasOwnProperty(key) && filters[key] != null) {
+      if (Object.prototype.hasOwnProperty.call(filters, key) && filters[key] != null) {
         if (Array.isArray(filters[key])) {
           programData.dimensions[key].filter(
               d => filters[key].indexOf(d) > -1);
@@ -67,7 +66,6 @@ const ProgramListView = props => {
   }
 
   useEffect(() => {
-
     axios.get("/api/internal/program?details=true")
     .then(async response => {
       indexPrograms(response.data);
