@@ -15,9 +15,9 @@
  */
 
 import React from "react";
-import {Card, Col, Container, Row,} from "react-bootstrap";
+import {Col, Container, Row,} from "react-bootstrap";
 import PropTypes from "prop-types";
-import ProgramListTable from "../../common/ProgramListTable";
+import ProgramSummaryCard from "./ProgramSummaryCard";
 
 const ProgramList = ({programs}) => {
 
@@ -30,14 +30,22 @@ const ProgramList = ({programs}) => {
           </Col>
         </Row>
 
+        {/*<Row>*/}
+        {/*  <Col lg={12}>*/}
+        {/*    <Card>*/}
+        {/*      <Card.Body>*/}
+        {/*        <ProgramListTable programs={programs} />*/}
+        {/*      </Card.Body>*/}
+        {/*    </Card>*/}
+        {/*  </Col>*/}
+        {/*</Row>*/}
+
         <Row>
-          <Col lg={12}>
-            <Card>
-              <Card.Body>
-                <ProgramListTable programs={programs} />
-              </Card.Body>
-            </Card>
-          </Col>
+          {
+            programs.map(p => {
+              return <ProgramSummaryCard program={p} key={p.id}/>;
+            })
+          }
         </Row>
 
       </Container>

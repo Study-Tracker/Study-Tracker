@@ -21,12 +21,10 @@ import StudyNotebookTab from './StudyNotebookTab';
 import StudyConclusionsTab from "./StudyConclusionsTab";
 import StudyCommentsTab from "./StudyCommentsTab";
 import StudyTimelineTab from "./StudyTimelineTab";
-import swal from "sweetalert";
 import AddToStudyCollectionModal
   from "../../common/modals/AddToStudyCollectionModal";
 import StudyCollectionsTab from "./StudyCollectionsTab";
 import PropTypes from "prop-types";
-import axios from "axios";
 import {useLocation, useNavigate} from "react-router-dom";
 import StudyDetailHeader from "./StudyDetailsHeader";
 import StudyOverviewTab from "./StudyOverviewTab";
@@ -46,31 +44,31 @@ const StudyDetails = props => {
     navigate("#" + key);
   }
 
-  const handleStudyDelete = () => {
-    swal({
-      title: "Are you sure you want to remove this study?",
-      text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered in the admin dashboard.",
-      icon: "warning",
-      buttons: true
-    })
-    .then(val => {
-      if (val) {
-        axios({
-          url: "/api/internal/study/" + study.code,
-          method: 'delete',
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }).then(response => {
-          navigate("/studies")
-        })
-        .catch(error => {
-          console.error(error);
-          setModalError("Failed to remove study. Please try again.");
-        })
-      }
-    });
-  }
+  // const handleStudyDelete = () => {
+  //   swal({
+  //     title: "Are you sure you want to remove this study?",
+  //     text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered in the admin dashboard.",
+  //     icon: "warning",
+  //     buttons: true
+  //   })
+  //   .then(val => {
+  //     if (val) {
+  //       axios({
+  //         url: "/api/internal/study/" + study.code,
+  //         method: 'delete',
+  //         headers: {
+  //           "Content-Type": "application/json"
+  //         }
+  //       }).then(response => {
+  //         navigate("/studies")
+  //       })
+  //       .catch(error => {
+  //         console.error(error);
+  //         setModalError("Failed to remove study. Please try again.");
+  //       })
+  //     }
+  //   });
+  // }
 
   return (
       <Container fluid className="animated fadeIn">
@@ -89,7 +87,7 @@ const StudyDetails = props => {
         <StudyDetailHeader
             study={study}
             handleAddToCollection={() => setShowCollectionModal(true)}
-            handleDelete={handleStudyDelete}
+            // handleDelete={handleStudyDelete}
         />
 
         <Row>

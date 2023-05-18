@@ -21,6 +21,7 @@ import io.studytracker.model.UserType;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -34,6 +35,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @Query("select u from User u where lower(u.displayName) like lower(concat('%', ?1, '%'))")
   List<User> findByDisplayNameLike(String keyword);
+
+  @Query("select s.users from Study s where s.id = ?1")
+  Set<User> findByStudyId(Long studyId);
+
+  @Query("select a.users from Assay a where a.id = ?1")
+  Set<User> findByAssayId(Long assayId);
+
+  @Query("select s.users from Program p join Study s on p.id = s.program.id where p.id = ?1")
+  Set<User> findByProgramId(Long programId);
 
   long countByCreatedAtBefore(Date date);
 

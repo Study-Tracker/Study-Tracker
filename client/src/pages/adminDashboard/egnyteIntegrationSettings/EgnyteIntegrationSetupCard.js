@@ -21,12 +21,18 @@ import PropTypes from "prop-types";
 const EgnyteIntegrationSetupCard = ({handleClick}) => {
   return (
       <Card className="illustration">
-        <Card.Header>
-          <Card.Title tag={"h5"} className={"mb-0"}>
-            Egnyte integration is <span className={"text-secondary"}>DISABLED</span>
-          </Card.Title>
-        </Card.Header>
         <Card.Body>
+          <Row>
+            <Col>
+              <p>
+                Connect Study Tracker with Egnyte to enable study file storage for your tenant.
+                Study Tracker uses the Egnyte REST API to access your Egnyte account. Before you
+                begin, you must register an <a href={"https://developers.egnyte.com/"} target={"_blank"}>Egnyte developer account</a>
+                and create an Egnyte API token in the developer portal. This token will be used
+                to authenticate with your account.
+              </p>
+            </Col>
+          </Row>
           <Row>
             <Col className={"text-center"}>
               <Button size="lg" color={"primary"} onClick={handleClick}>

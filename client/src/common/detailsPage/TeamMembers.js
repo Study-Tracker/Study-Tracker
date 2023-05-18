@@ -50,11 +50,14 @@ const TeamMembers = ({users, owner}) => {
         {
           users
           .sort((a, b) => a.displayName.localeCompare(b.displayName))
-          .sort((a, b) => a.id === owner.id ? -1 : 1)
+          .sort((a, b) => owner && a.id === owner.id ? -1 : 1)
           .map((user, i) => {
             return (
-                <OverlayTrigger placement={"top"} overlay={<Tooltip>{user.displayName}{user.id === owner.id ? " (owner)" : ""}</Tooltip>}>
-                  <div key={user.id} className={"team-member team-member-35px team-member-circle " + (user.id === owner.id ? "team-member-highlight" : "")}>
+                <OverlayTrigger
+                    placement={"top"}
+                    overlay={<Tooltip>{user.displayName}{owner && user.id === owner.id ? " (owner)" : ""}</Tooltip>}
+                >
+                  <div key={user.id} className={"team-member team-member-35px team-member-circle " + (owner && user.id === owner.id ? "team-member-highlight" : "")}>
                     <span className={"team-member-label fw-bold " + (getLabelClass(i))}>{getUserInitials(user)}</span>
                   </div>
                 </OverlayTrigger>
@@ -67,7 +70,7 @@ const TeamMembers = ({users, owner}) => {
 
 TeamMembers.propTypes = {
   users: PropTypes.array.isRequired,
-  owner: PropTypes.object.isRequired
+  owner: PropTypes.object
 }
 
 export default TeamMembers;
