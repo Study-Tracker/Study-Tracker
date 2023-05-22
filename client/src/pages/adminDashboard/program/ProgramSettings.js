@@ -29,7 +29,7 @@ const ProgramSettings = () => {
   const [loadCount, setLoadCount] = useState(0);
   const [programs, setPrograms] = useState(null);
   const [error, setError] = useState(null);
-  const [showDetails, setShowDetails] = useState(false);
+  // const [showDetails, setShowDetails] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const notyf = useContext(NotyfContext);
@@ -62,7 +62,7 @@ const ProgramSettings = () => {
 
   const handleStatusChange = (id, active) => {
     axios.post("/api/internal/program/" + id + "/status?active=" + active)
-    .then(response => {
+    .then(() => {
       setLoadCount(loadCount + 1);
       notyf.open({
         type: "success",
@@ -79,7 +79,7 @@ const ProgramSettings = () => {
   }
 
   let content = '';
-  if (!!programs) {
+  if (programs) {
     content = (
         <ProgramsTable
             programs={programs}
@@ -87,7 +87,7 @@ const ProgramSettings = () => {
             handleStatusChange={handleStatusChange}
         />
     );
-  } else if (!!error) {
+  } else if (error) {
     content = <SettingsErrorMessage/>;
   } else {
     content = <SettingsLoadingMessage/>;
