@@ -143,7 +143,7 @@ const AssayOverviewTab = ({
 
         <Col md={4}>
 
-          <AssayQuickActionsWidget assay={assay} />
+          <AssayQuickActionsWidget assay={assay} study={study} />
 
           <SummaryTimelineCard assay={assay} />
 

@@ -45,6 +45,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedBy;
@@ -54,7 +55,10 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "assays")
+@Table(name = "assays", uniqueConstraints = {
+    @UniqueConstraint(name = "uq_assay_name", columnNames = {"name", "study_id"}),
+    @UniqueConstraint(name = "uq_assay_code", columnNames = {"code", "study_id"})
+})
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @NamedEntityGraphs({

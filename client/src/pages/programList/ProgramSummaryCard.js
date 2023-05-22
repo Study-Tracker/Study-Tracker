@@ -39,8 +39,8 @@ const ProgramSummaryCard = ({ program }) => {
             <Card.Title>{program.name}</Card.Title>
             {
               program.active
-                  ? <Badge color="success">Active</Badge>
-                  : <Badge color="danger">Inactive</Badge>
+                  ? <Badge bg="success">Active</Badge>
+                  : <Badge bg="danger">Inactive</Badge>
             }
           </Card.Header>
           <Card.Body>

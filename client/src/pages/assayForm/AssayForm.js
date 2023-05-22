@@ -278,7 +278,6 @@ const AssayForm = props => {
                                 isInvalid={!!errors.name}
                                 value={values.name}
                                 onChange={handleChange}
-                                disabled={!!values.id}
                             />
                             <Form.Control.Feedback type={"invalid"}>
                               {errors.name}

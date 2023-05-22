@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Begun overhaul of how Study Tracker manages external service integrations. This will allow for easier configuration of integrations, which can now be managed from the front-end of the application, without the need to restart the app.
 - Also overhauled how storage folder records are managed on the back-end, allowing for more flexible folder management across multiple file storage services.
 - Consolidated assay and study controls into a single dropdown in the Actions widget.
+- Study and assay names can now be changed by editing them. This name change will *not* cascade to storage or notebook folders created with the original names.
 
 ### Fixed
 - Fixed several issues with File Manager breadcrumbs and controls, which prevented them from acting as expected.

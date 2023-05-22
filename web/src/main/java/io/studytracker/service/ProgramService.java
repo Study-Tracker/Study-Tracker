@@ -184,7 +184,7 @@ public class ProgramService {
         }
 
         // Is the requested group different from the existing one?
-        else if (program.getGitGroups().stream()
+        else if (p.getGitGroups().stream()
             .noneMatch(g -> g.getParentGroup().getId().equals(parentGroup.getId()))) {
           LOGGER.info("Updating Git group for program: " + program.getName());
           GitGroup existingGroup = p.getGitGroups().stream().findFirst().get();

@@ -370,6 +370,7 @@ public class AssayService {
     LOGGER.info("Updating assay record with code: " + updated.getCode());
     Assay assay = assayRepository.getById(updated.getId());
 
+    assay.setName(updated.getName());
     assay.setDescription(updated.getDescription());
     assay.setStartDate(updated.getStartDate());
     assay.setEndDate(updated.getEndDate());

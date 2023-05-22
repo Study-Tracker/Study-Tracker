@@ -123,9 +123,7 @@ public abstract class AbstractStudyController extends AbstractApiController {
    * @return the updated study
    */
   protected Study updateExistingStudy(Study study) {
-    studyService.update(study);
-    Study updated = studyService.findById(study.getId())
-        .orElseThrow(() -> new RecordNotFoundException("Study not found: " + study.getId()));
+    Study updated = studyService.update(study);
     Activity activity = StudyActivityUtils.fromUpdatedStudy(updated, this.getAuthenticatedUser());
     this.logActivity(activity);
     return updated;
