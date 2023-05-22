@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Button, Card,} from 'react-bootstrap';
 import {FolderPlus} from 'react-feather';
 import {SettingsLoadingMessage} from "../../../common/loading";
@@ -22,63 +22,72 @@ import {SettingsErrorMessage} from "../../../common/errors";
 import axios from "axios";
 import ProgramsTable from "./ProgramsTable";
 import ProgramDetailsModal from "./ProgramDetailsModal";
+import NotyfContext from "../../../context/NotyfContext";
 
 const ProgramSettings = () => {
-  
-  const [state, setState] = useState({
-    programs: [],
-    isLoaded: false,
-    isError: false,
-    showDetails: false,
-    selectedProgram: null,
-    isModalOpen: false
-  });
+
+  const [loadCount, setLoadCount] = useState(0);
+  const [programs, setPrograms] = useState(null);
+  const [error, setError] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const notyf = useContext(NotyfContext);
 
   const showModal = (selected) => {
     console.debug(selected);
     if (!!selected) {
-      setState(prevState => ({
-        ...prevState,
-        selectedProgram: selected,
-        isModalOpen: true
-      }));
+      setSelectedProgram(selected);
+      setModalIsOpen(true);
     } else {
-      setState(prevState => ({
-        ...prevState,
-        isModalOpen: false,
-        selectedProgram: null
-      }))
+      setModalIsOpen(false);
+      setSelectedProgram(null);
     }
   };
 
   useEffect(() => {
     axios.get("/api/internal/program?details=true")
     .then(async response => {
-      setState(prevState => ({
-        ...prevState,
-        programs: response.data,
-        isLoaded: true
-      }))
+      setPrograms(response.data);
     })
     .catch(error => {
       console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
+      setError(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to load programs"
+      })
     });
-  }, []);
+  }, [loadCount]);
+
+  const handleStatusChange = (id, active) => {
+    axios.post("/api/internal/program/" + id + "/status?active=" + active)
+    .then(response => {
+      setLoadCount(loadCount + 1);
+      notyf.open({
+        type: "success",
+        message: "Program status updated"
+      });
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to update program status"
+      });
+    })
+  }
 
   let content = '';
-  if (state.isLoaded) {
+  if (!!programs) {
     content = (
         <ProgramsTable
-            programs={state.programs}
+            programs={programs}
             showModal={showModal}
+            handleStatusChange={handleStatusChange}
         />
     );
-  } else if (state.isError) {
+  } else if (!!error) {
     content = <SettingsErrorMessage/>;
   } else {
     content = <SettingsLoadingMessage/>;
@@ -108,8 +117,8 @@ const ProgramSettings = () => {
           {content}
 
           <ProgramDetailsModal
-              isOpen={state.isModalOpen}
-              program={state.selectedProgram}
+              isOpen={modalIsOpen}
+              program={selectedProgram}
               showModal={showModal}
           />
 

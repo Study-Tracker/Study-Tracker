@@ -1,14 +1,36 @@
+/*
+ * Copyright 2019-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {useNavigate} from "react-router-dom";
 import {Badge, Button, Dropdown} from "react-bootstrap";
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faGears, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+  faEdit,
+  faGears,
+  faInfoCircle,
+  faXmarkCircle
+} from "@fortawesome/free-solid-svg-icons";
 import ToolkitProvider, {Search} from "react-bootstrap-table2-toolkit";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import PropTypes from "prop-types";
 
-const ProgramsTable = ({programs, showModal}) => {
+const ProgramsTable = ({programs, showModal, handleStatusChange}) => {
 
   const navigate = useNavigate();
 
@@ -116,18 +138,30 @@ const ProgramsTable = ({programs, showModal}) => {
                 <Dropdown.Menu>
 
                   <Dropdown.Item onClick={() => showModal(d)}>
-                    <FontAwesomeIcon icon={faInfoCircle}/>
-                    &nbsp;&nbsp;
+                    <FontAwesomeIcon icon={faInfoCircle} className={"me-2"}/>
                     View Details
                   </Dropdown.Item>
 
                   <Dropdown.Item
                       onClick={() => navigate("/program/" + d.id + "/edit")}
                   >
-                    <FontAwesomeIcon icon={faEdit}/>
-                    &nbsp;&nbsp;
+                    <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
                     Edit Program
                   </Dropdown.Item>
+
+                  {
+                    d.active ? (
+                        <Dropdown.Item onClick={() => handleStatusChange(d.id, false)}>
+                          <FontAwesomeIcon icon={faXmarkCircle} className={"me-2"}/>
+                          Set Inactive
+                        </Dropdown.Item>
+                    ) : (
+                        <Dropdown.Item onClick={() => handleStatusChange(d.id, true)}>
+                          <FontAwesomeIcon icon={faCheckCircle} className={"me-2"}/>
+                          Set Active
+                        </Dropdown.Item>
+                    )
+                  }
 
                 </Dropdown.Menu>
 
@@ -178,7 +212,8 @@ const ProgramsTable = ({programs, showModal}) => {
 
 ProgramsTable.propTypes = {
   programs: PropTypes.array.isRequired,
-  showModal: PropTypes.func.isRequired
+  showModal: PropTypes.func.isRequired,
+  handleStatusChange: PropTypes.func.isRequired
 }
 
 export default ProgramsTable;

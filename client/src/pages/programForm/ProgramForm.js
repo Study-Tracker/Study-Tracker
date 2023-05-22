@@ -201,7 +201,7 @@ const ProgramForm = ({
                 ? {
                     ...program,
                     useGit: program.gitGroups.length > 0,
-                    gitGroup: program.gitGroups.length > 0 ? program.gitGroups[0] : null
+                    gitGroup: program.gitGroups.length > 0 ? program.gitGroups[0].parentGroup : null
                   }
                 : defaultProgramValues
           }
