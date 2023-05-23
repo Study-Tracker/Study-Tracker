@@ -95,7 +95,7 @@ public class StudyBasePrivateControllerTests {
     mockMvc
         .perform(get("/api/internal/study").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(ExampleStudyGenerator.STUDY_COUNT - 1)))
+        .andExpect(jsonPath("$", hasSize(ExampleStudyGenerator.STUDY_COUNT)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("name")))
         .andExpect(jsonPath("$[0]", hasKey("description")));

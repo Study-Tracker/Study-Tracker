@@ -45,7 +45,7 @@ const defaults = {
   [labels.LEGACY]: null,
   [labels.MY_ASSAY]: null,
   [labels.EXTERNAL]: null,
-  [labels.ACTIVE]: null,
+  [labels.ACTIVE]: true,
   [labels.STATUS]: Object.values(statuses).map(status => status.value),
   [labels.PROGRAM]: [],
   [labels.ASSAY_TYPE]: []
