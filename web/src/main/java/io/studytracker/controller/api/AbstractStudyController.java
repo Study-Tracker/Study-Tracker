@@ -152,6 +152,12 @@ public abstract class AbstractStudyController extends AbstractApiController {
     this.updateExistingStudyStatus(study, status);
   }
 
+  protected void restoreRemovedStudy(Study study) {
+    studyService.restore(study);
+    Activity activity = StudyActivityUtils.fromRestoredStudy(study, this.getAuthenticatedUser());
+    this.logActivity(activity);
+  }
+
   public StudyService getStudyService() {
     return studyService;
   }

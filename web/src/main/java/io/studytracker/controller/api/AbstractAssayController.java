@@ -191,11 +191,21 @@ public abstract class AbstractAssayController extends AbstractApiController {
    * @param user
    */
   protected void deleteAssay(String id, User user) {
-
     Assay assay = this.getAssayFromIdentifier(id);
     assayService.delete(assay);
-
     Activity activity = AssayActivityUtils.fromDeletedAssay(assay, user);
+    this.logActivity(activity);
+  }
+
+  /**
+   * Restores an {@link Assay} record that has been removed.
+   *
+   * @param id
+   */
+  protected void restoreAssay(String id, User user) {
+    Assay assay = this.getAssayFromIdentifier(id);
+    assayService.restore(assay);
+    Activity activity = AssayActivityUtils.fromRestoredAssay(assay, user);
     this.logActivity(activity);
   }
 

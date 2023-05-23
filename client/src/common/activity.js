@@ -26,6 +26,7 @@ import {
   Link,
   List,
   MessageCircle,
+  RotateCcw,
   Star,
   Tag,
   Trash2,
@@ -68,10 +69,13 @@ const ActivityIcon = ({action}) => {
       return <Star size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.UPDATED_STUDY.value:
-      return <Edit size={36} className="align-middle text-warning me-4"/>;
+      return <Edit size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.DELETED_STUDY.value:
       return <Trash2 size={36} className="align-middle text-danger me-4"/>;
+
+    case studyActions.RESTORED_STUDY.value:
+      return <RotateCcw size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.STUDY_STATUS_CHANGED.value:
       return <Bell size={36} className="align-middle text-info me-4"/>;
@@ -80,10 +84,13 @@ const ActivityIcon = ({action}) => {
       return <Star size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.UPDATED_ASSAY.value:
-      return <Edit size={36} className="align-middle text-warning me-4"/>;
+      return <Edit size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.DELETED_ASSAY.value:
       return <Trash2 size={36} className="align-middle text-danger me-4"/>;
+
+      case studyActions.RESTORED_ASSAY.value:
+      return <RotateCcw size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.ASSAY_STATUS_CHANGED.value:
       return <Bell size={36} className="align-middle text-info me-4"/>;
@@ -92,7 +99,7 @@ const ActivityIcon = ({action}) => {
       return <Star size={36} className="align-middle text-warning me-4"/>;
 
     case studyActions.UPDATED_PROGRAM.value:
-      return <Edit size={36} className="align-middle text-warning me-4"/>;
+      return <Edit size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.DELETED_PROGRAM.value:
       return <Trash2 size={36} className="align-middle text-danger me-4"/>;
@@ -122,7 +129,7 @@ const ActivityIcon = ({action}) => {
       return <Link size={36} className="align-middle text-primary me-4"/>;
 
     case studyActions.UPDATED_STUDY_RELATIONSHIP.value:
-      return <Edit size={36} className="align-middle text-warning me-4"/>;
+      return <Edit size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.DELETED_STUDY_RELATIONSHIP.value:
       return <Trash2 size={36} className="align-middle text-danger me-4"/>;
@@ -132,7 +139,7 @@ const ActivityIcon = ({action}) => {
                            className="align-middle text-primary me-4"/>;
 
     case studyActions.UPDATED_STUDY_EXTERNAL_LINK.value:
-      return <Edit size={36} className="align-middle text-warning me-4"/>;
+      return <Edit size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.DELETED_STUDY_EXTERNAL_LINK.value:
       return <Trash2 size={36} className="align-middle text-danger me-4"/>;
@@ -150,7 +157,7 @@ const ActivityIcon = ({action}) => {
       return <List size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.UPDATED_STUDY_COLLECTION.value:
-      return <Edit size={36} className="align-middle text-warning me-4"/>;
+      return <Edit size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.DELETED_STUDY_COLLECTION.value:
       return <Trash2 size={36} className="align-middle text-danger me-4"/>;
@@ -162,6 +169,7 @@ const ActivityIcon = ({action}) => {
 };
 
 const ActivityMessage = ({activity}) => {
+
   switch (activity.eventType) {
 
     case studyActions.NEW_ENTRY_TEMPLATE.value:
@@ -298,6 +306,18 @@ const ActivityMessage = ({activity}) => {
         );
 
       }
+
+    case studyActions.RESTORED_STUDY.value:
+      return (
+          <p>
+            <a href={"/user/"
+                + activity.user.id}>{activity.user.displayName}</a>
+            &nbsp;has restored study:
+            <a href={"/study/" + activity.data.study.code}>
+              {activity.data.study.code}
+            </a>
+          </p>
+      )
 
     case studyActions.STUDY_STATUS_CHANGED.value:
 
@@ -470,6 +490,19 @@ const ActivityMessage = ({activity}) => {
         );
 
       }
+
+    case studyActions.RESTORED_ASSAY.value:
+      return (
+          <p>
+            <a href={"/user/"
+                + activity.user.id}>{activity.user.displayName}</a>
+            &nbsp;has restored assay:
+            <a href={"/study/" + activity.studyId + "/assay/"
+                + activity.data.assay.code}>
+              {activity.data.assay.code}
+            </a>
+          </p>
+      )
 
     case studyActions.ASSAY_STATUS_CHANGED.value:
 

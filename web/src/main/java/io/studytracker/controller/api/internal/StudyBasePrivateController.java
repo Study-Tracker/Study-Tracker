@@ -108,7 +108,7 @@ public class StudyBasePrivateController extends AbstractStudyController {
       studies = getStudyService().findByUser(user);
     }
 
-    //
+    // Owned by user
     else if (my) {
       try {
         studies = getStudyService().findByUser(this.getAuthenticatedUser());
@@ -135,7 +135,10 @@ public class StudyBasePrivateController extends AbstractStudyController {
           getStudyService().findAll().stream()
               .filter(s -> s.isLegacy() && s.isActive())
               .collect(Collectors.toList());
-    } else if (external) {
+    }
+
+    // External
+    else if (external) {
       studies =
           getStudyService().findAll().stream()
               .filter(s -> s.getCollaborator() != null)
@@ -151,8 +154,7 @@ public class StudyBasePrivateController extends AbstractStudyController {
 
     // Find all
     else {
-      studies =
-          getStudyService().findAll().stream().filter(Study::isActive).collect(Collectors.toList());
+      studies = getStudyService().findAll();
     }
 
     return this.getStudyMapper().toStudySummaryList(studies);
@@ -224,11 +226,20 @@ public class StudyBasePrivateController extends AbstractStudyController {
       @PathVariable("id") String id,
       @RequestBody Map<String, Object> params
   ) throws StudyTrackerException {
+    LOGGER.info("Updating study status: {}", params);
     if (!params.containsKey("status")) {
       throw new StudyTrackerException("No status label provided.");
     }
     Study study = getStudyFromIdentifier(id);
     this.updateExistingStudyStatus(study, params.get("status").toString());
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @PostMapping("/{id}/restore")
+  public HttpEntity<?> restoreRemovedStudy(@PathVariable("id") String id) {
+    LOGGER.info("Restoring study: {}", id);
+    Study study = getStudyFromIdentifier(id);
+    this.restoreRemovedStudy(study);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

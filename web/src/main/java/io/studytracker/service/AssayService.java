@@ -407,6 +407,12 @@ public class AssayService {
   }
 
   @Transactional
+  public void restore(Assay assay) {
+    assay.setActive(true);
+    assayRepository.save(assay);
+  }
+
+  @Transactional
   public void updateStatus(Assay assay, Status status) {
     assay.setStatus(status);
     if (status.equals(Status.COMPLETE) && assay.getEndDate() == null) {

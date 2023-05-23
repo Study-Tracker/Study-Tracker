@@ -39,8 +39,6 @@ public class StudyActivityUtils {
     activity.setEventType(EventType.NEW_STUDY);
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
-    //    activity.setData(Collections.singletonMap("study",
-    // EntityViewUtils.createStudyView(study)));
     activity.setData(Collections.singletonMap("study", EntityViewUtils.createStudyView(study)));
     return activity;
   }
@@ -59,6 +57,16 @@ public class StudyActivityUtils {
     Activity activity = new Activity();
     activity.setStudy(study);
     activity.setEventType(EventType.DELETED_STUDY);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    activity.setData(Collections.singletonMap("study", EntityViewUtils.createStudyView(study)));
+    return activity;
+  }
+
+  public static Activity fromRestoredStudy(Study study, User triggeredBy) {
+    Activity activity = new Activity();
+    activity.setStudy(study);
+    activity.setEventType(EventType.RESTORED_STUDY);
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
     activity.setData(Collections.singletonMap("study", EntityViewUtils.createStudyView(study)));

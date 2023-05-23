@@ -51,7 +51,7 @@ const defaults = {
   [labels.ASSAY_TYPE]: []
 };
 
-const AssayFilters = props => {
+const AssayFilters = () => {
 
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -234,6 +234,18 @@ const AssayFilters = props => {
                 checked={!!state.filters[labels.EXTERNAL]}
                 onChange={(e) => updateFilters({
                   [labels.EXTERNAL]: e.target.checked ? true : null
+                })}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Form.Check
+                id="inactive-assay-check"
+                type="checkbox"
+                label="Removed Assays"
+                checked={state.filters[labels.ACTIVE] === false}
+                onChange={(e) => updateFilters({
+                  [labels.ACTIVE]: !e.target.checked
                 })}
             />
           </FormGroup>

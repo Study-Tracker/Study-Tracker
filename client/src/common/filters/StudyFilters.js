@@ -48,7 +48,7 @@ const defaults = {
   [labels.PROGRAM]: []
 };
 
-const StudyFilters = props => {
+const StudyFilters = () => {
 
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -155,7 +155,7 @@ const StudyFilters = props => {
           <FilterLabel text={"Quick Views"}/>
 
           {
-            !!user ? (
+            user && (
                 <FormGroup>
                   <Form.Check
                       id="my-studies-check"
@@ -168,7 +168,7 @@ const StudyFilters = props => {
                       })}
                   />
                 </FormGroup>
-            ) : ''
+            )
           }
 
           <FormGroup>
@@ -191,6 +191,18 @@ const StudyFilters = props => {
                 checked={!!state.filters[labels.EXTERNAL]}
                 onChange={(e) => updateFilters({
                   [labels.EXTERNAL]: e.target.checked ? true : null
+                })}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Form.Check
+                id="inactive-study-check"
+                type="checkbox"
+                label="Removed Studies"
+                checked={state.filters[labels.ACTIVE] === false}
+                onChange={(e) => updateFilters({
+                  [labels.ACTIVE]: !e.target.checked
                 })}
             />
           </FormGroup>
