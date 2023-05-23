@@ -32,6 +32,7 @@ const StudyInputs = ({studies, onChange}) => {
     axios.get("/api/internal/autocomplete/study?q=" + input)
     .then(response => {
       const options = response.data
+      .filter(study => study.active)
       .filter(study => existing.indexOf(study.id) === -1)
       .sort((a, b) => {
         const aLabel = a.code + ": " + a.name;
