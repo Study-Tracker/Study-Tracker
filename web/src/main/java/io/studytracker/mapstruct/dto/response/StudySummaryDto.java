@@ -18,6 +18,8 @@ package io.studytracker.mapstruct.dto.response;
 
 import io.studytracker.model.Status;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Data;
 
 @Data
@@ -39,5 +41,6 @@ public class StudySummaryDto {
   private Date createdAt;
   private Date updatedAt;
   private UserSummaryDto owner;
+  private Set<UserSlimDto> users = new HashSet<>();
 
 }

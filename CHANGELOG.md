@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for Microsoft 365 cloud services: SharePoint and OneDrive. OneDrive drives can be used for file storage, and SharePoint sites can be used for registering drives.
 - Added details page widgets for displaying and repairing storage folders and ELN notebooks.
 - Added the ability to associate programs with Git project groups and add git repositories to studies after they have been initially created.
+- Added the ability to restore studies and assays that have been removed. Removed studies & assays can be viewed on the respective list pages with a new filter and then  restored with a new quick-action on their details page. 
 
 ### Changed
 - Begun overhaul of how Study Tracker manages external service integrations. This will allow for easier configuration of integrations, which can now be managed from the front-end of the application, without the need to restart the app.

@@ -28,61 +28,63 @@ import AssayList from "./AssayList";
 import {useSelector} from "react-redux";
 import axios from "axios";
 
-const AssayListView = props => {
+const AssayListView = () => {
 
   const user = useSelector(state => state.user.value);
   const filters = useSelector(state => state.filters.value);
-  const [state, setState] = useState({
-    isLoaded: false,
-    isError: false,
-    data: {}
-  });
+  const [assayData, setAssayData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const indexAssays = (assays) => {
+    const data = {};
+    data.cf = crossfilter(assays);
+    data.dimensions = {};
+    data.dimensions.allData = data.cf.dimension(d => d);
+    data.dimensions[filter.PROGRAM] = data.cf.dimension(d => d.study.program.id);
+    data.dimensions[filter.LEGACY] = data.cf.dimension(d => d.study.legacy);
+    data.dimensions[filter.EXTERNAL] = data.cf.dimension(d => !!d.study.collaborator);
+    data.dimensions[filter.MY_ASSAY] = data.cf.dimension(d => {
+      if (!!user) {
+        if (d.owner.id === user.id) return true;
+        else {
+          for (const u of d.users) {
+            if (u.id === user.id) return true;
+          }
+        }
+      }
+      return false;
+    });
+    data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
+    data.dimensions[filter.ASSAY_TYPE] = data.cf.dimension(d => d.assayType.id);
+    data.dimensions[filter.ACTIVE] = data.cf.dimension(d => d.active && d.study.active);
+    setAssayData(data);
+  }
+
+  const applyFilters = (filters) => {
+    for (let key of Object.keys(assayData.dimensions)) {
+      assayData.dimensions[key].filterAll();
+      if (filters.hasOwnProperty(key) && filters[key] != null) {
+        console.debug("Applying filter", key, filters[key]);
+        if (Array.isArray(filters[key])) {
+          assayData.dimensions[key].filter(
+              d => filters[key].indexOf(d) > -1);
+        } else {
+          assayData.dimensions[key].filter(filters[key]);
+        }
+      }
+    }
+  }
 
   useEffect(() => {
 
     axios.get("/api/internal/assay")
     .then(response => {
-
       console.log("Assays", response.data);
-
-      const data = {};
-      data.cf = crossfilter(response.data);
-      data.dimensions = {};
-      data.dimensions.allData = data.cf.dimension(d => d);
-      data.dimensions[filter.PROGRAM] = data.cf.dimension(
-          d => d.study.program.id);
-      data.dimensions[filter.LEGACY] = data.cf.dimension(d => d.study.legacy);
-      data.dimensions[filter.EXTERNAL] = data.cf.dimension(
-          d => !!d.study.collaborator);
-      data.dimensions[filter.MY_ASSAY] = data.cf.dimension(d => {
-          if (!!user) {
-            if (d.owner.id === user.id) return true;
-            // else {
-            //   for (const u of d.users) {
-            //     if (u.id === user.id) return true;
-            //   }
-            // }
-          }
-          return false;
-        });
-      data.dimensions[filter.STATUS] = data.cf.dimension(d => d.status);
-      data.dimensions[filter.ASSAY_TYPE] = data.cf.dimension(
-          d => d.assayType.id);
-
-      setState(prevState => ({
-        ...prevState,
-        data: data,
-        isLoaded: true
-      }));
-
+      indexAssays(response.data);
     })
     .catch(error => {
       console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
+      setError(error);
     });
   }, [user]);
 
@@ -90,31 +92,18 @@ const AssayListView = props => {
 
   try {
 
-    if (state.isError) {
+    if (error) {
 
       content = <ErrorMessage/>;
 
-    } else if (state.isLoaded) {
+    } else if (assayData) {
 
-      // Apply filters
       console.debug("Active filters", filters);
-
-      for (let key of Object.keys(state.data.dimensions)) {
-        state.data.dimensions[key].filterAll();
-        if (filters.hasOwnProperty(key) && filters[key] != null) {
-          console.debug("Applying filter", key, filters[key]);
-          if (Array.isArray(filters[key])) {
-            state.data.dimensions[key].filter(
-                d => filters[key].indexOf(d) > -1);
-          } else {
-            state.data.dimensions[key].filter(filters[key]);
-          }
-        }
-      }
+      applyFilters(filters);
 
       content =
           <AssayList
-              assays={state.data.dimensions.allData.top(Infinity)}
+              assays={assayData.dimensions.allData.top(Infinity)}
               filters={filters}
               user={user}
           />;

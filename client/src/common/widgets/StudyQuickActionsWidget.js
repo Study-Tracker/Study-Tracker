@@ -22,6 +22,7 @@ import {
   faPersonRunning,
   faStopwatch,
   faTrash,
+  faTrashArrowUp,
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import {faPlusSquare, faSquareCheck} from "@fortawesome/free-regular-svg-icons";
@@ -82,7 +83,7 @@ const StudyQuickActionsWidget = ({
   const handleStudyDelete = () => {
     swal({
       title: "Are you sure you want to remove this study?",
-      text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered in the admin dashboard.",
+      text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered at a later date.",
       icon: "warning",
       buttons: true
     })
@@ -106,6 +107,20 @@ const StudyQuickActionsWidget = ({
         })
       }
     });
+  }
+
+  const handleStudyRestore = () => {
+    axios.post("/api/internal/study/" + study.code + "/restore")
+    .then(() => {
+      navigate(0);
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: 'error',
+        message: 'Failed to restore study. Please try again.'
+      })
+    })
   }
 
   return (
@@ -194,10 +209,21 @@ const StudyQuickActionsWidget = ({
                       Edit
                     </Dropdown.Item>
 
-                    <Dropdown.Item onClick={handleStudyDelete}>
-                      <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
-                      Remove
-                    </Dropdown.Item>
+                    {
+                      study.active ? (
+                          <Dropdown.Item onClick={handleStudyDelete}>
+                            <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
+                            Remove
+                          </Dropdown.Item>
+                      ) : (
+                          <Dropdown.Item onClick={handleStudyRestore}>
+                            <FontAwesomeIcon icon={faTrashArrowUp} className={"me-2"}/>
+                            Restore
+                          </Dropdown.Item>
+                      )
+                    }
+
+
 
                   </Dropdown.Menu>
                 </Dropdown>

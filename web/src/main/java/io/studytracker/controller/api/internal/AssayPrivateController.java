@@ -29,7 +29,6 @@ import io.studytracker.model.Status;
 import io.studytracker.model.User;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,11 +55,7 @@ public class AssayPrivateController extends AbstractAssayController {
 
   @GetMapping("")
   public List<AssayParentDto> findAll() {
-    return this.getAssayMapper().toAssayParentList(
-        getAssayService().findAll().stream()
-            .filter(Assay::isActive)
-            .filter(a -> a.getStudy().isActive())
-            .collect(Collectors.toList()));
+    return this.getAssayMapper().toAssayParentList(getAssayService().findAll());
   }
 
   @GetMapping("/{id}")
@@ -86,6 +81,13 @@ public class AssayPrivateController extends AbstractAssayController {
   public HttpEntity<?> delete(@PathVariable("id") String id) {
     LOGGER.info("Deleting assay: " + id);
     this.deleteAssay(id, this.getAuthenticatedUser());
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @PostMapping("/{id}/restore")
+  public HttpEntity<?> restore(@PathVariable("id") String id) {
+    LOGGER.info("Restoring assay: " + id);
+    this.restoreAssay(id, this.getAuthenticatedUser());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

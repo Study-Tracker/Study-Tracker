@@ -505,6 +505,18 @@ public class StudyService {
   }
 
   /**
+   * Restores a study that has been removed, identifies by its primary key ID.
+   *
+   * @param study study to be restored
+   */
+  @Transactional
+  public void restore(Study study) {
+    Study s = studyRepository.getById(study.getId());
+    s.setActive(true);
+    studyRepository.save(s);
+  }
+
+  /**
    * Updates the status of the study with the provided PKID to the provided status.
    *
    * @param study study

@@ -20,6 +20,8 @@ import React from "react";
 import SelectableStatusButton
   from "../../common/detailsPage/SelectableStatusButton";
 import PropTypes from "prop-types";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faTrash} from "@fortawesome/free-solid-svg-icons";
 
 const StudyDetailHeader = ({
   study,
@@ -55,10 +57,11 @@ const StudyDetailHeader = ({
             !study.active
                 ? <Button
                     className="me-1 mb-1"
-                    variant="outline-danger"
+                    variant="danger"
                     disabled
                 >
-                  Inactive Study
+              <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
+                  Removed Study
                 </Button>
                 : ''
           }

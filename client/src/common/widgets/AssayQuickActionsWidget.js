@@ -20,6 +20,7 @@ import {
   faEdit,
   faPersonRunning,
   faTrash,
+  faTrashArrowUp,
   faTriangleExclamation
 } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
@@ -62,7 +63,7 @@ const AssayQuickActionsWidget = ({
     .then(val => {
       if (val) {
         axios.delete("/api/internal/assay/" + assay.code)
-        .then(response => {
+        .then(() => {
           navigate("/assays")
         })
         .catch(error => {
@@ -74,6 +75,27 @@ const AssayQuickActionsWidget = ({
         })
       }
     });
+  }
+
+  const handleAssayRestore = () => {
+    if (!study.active) {
+      notyf.open({
+        type: 'error',
+        message: 'Assay cannot be restored because parent study is not active.'
+      });
+      return;
+    }
+    axios.post("/api/internal/assay/" + assay.id + "/restore")
+    .then(() => {
+      navigate(0);
+    })
+    .catch(error => {
+      console.error(error);
+      notyf.open({
+        type: 'error',
+        message: 'Failed to restore study. Please try again.'
+      })
+    })
   }
 
   return (
@@ -135,10 +157,21 @@ const AssayQuickActionsWidget = ({
                       Edit
                     </Dropdown.Item>
 
-                    <Dropdown.Item onClick={handleAssayDelete}>
-                      <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
-                      Remove
-                    </Dropdown.Item>
+                    {
+                      assay.active ? (
+                          <Dropdown.Item onClick={handleAssayDelete}>
+                            <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
+                            Remove
+                          </Dropdown.Item>
+                      ) : (
+                          <Dropdown.Item onClick={handleAssayRestore}>
+                            <FontAwesomeIcon icon={faTrashArrowUp} className={"me-2"}/>
+                            Restore
+                          </Dropdown.Item>
+                      )
+                    }
+
+
 
                   </Dropdown.Menu>
                 </Dropdown>

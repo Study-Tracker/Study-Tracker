@@ -65,6 +65,18 @@ public class AssayActivityUtils {
     return activity;
   }
 
+  public static Activity fromRestoredAssay(Assay assay, User triggeredBy) {
+    Activity activity = new Activity();
+    activity.setAssay(assay);
+    activity.setEventType(EventType.RESTORED_ASSAY);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    Map<String, Object> data = new HashMap<>();
+    data.put("assay", EntityViewUtils.createAssayView(assay));
+    activity.setData(data);
+    return activity;
+  }
+
   public static Activity fromChangedAssayStatus(
       Assay assay, User triggeredBy, Status oldStatus, Status newStatus) {
     Activity activity = new Activity();
