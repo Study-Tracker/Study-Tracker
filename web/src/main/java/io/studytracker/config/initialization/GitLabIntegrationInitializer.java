@@ -138,6 +138,7 @@ public class GitLabIntegrationInitializer {
         }
 
         // If not, update it
+        LOGGER.info("Updating GitLab integration for organization {}.", organization.getName());
         existing.setRootUrl(gitLabProperties.getUrl().toString());
         existing.setUsername(gitLabProperties.getUsername());
         existing.setPassword(gitLabProperties.getPassword());
@@ -146,6 +147,7 @@ public class GitLabIntegrationInitializer {
         return gitLabIntegrationService.update(existing);
 
       } else {
+        LOGGER.info("No GitLab integration found for organization {}. A new integration will be registered.", organization.getName());
 
         // Create a new integration record
         GitLabIntegration integration = new GitLabIntegration();
@@ -160,6 +162,8 @@ public class GitLabIntegrationInitializer {
 
       }
 
+    } else {
+      LOGGER.info("No GitLab integration properties found for organization {}. Skipping initialization.", organization.getName());
     }
 
     return null;

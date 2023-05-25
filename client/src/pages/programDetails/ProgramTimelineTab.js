@@ -15,16 +15,15 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Col, Row} from 'react-bootstrap'
+import {Card, Col, Row} from 'react-bootstrap'
 import {ActivityStream} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
 import PropTypes from "prop-types";
 
-const ProgramTimelineTab = props => {
+const ProgramTimelineTab = ({program}) => {
 
-  const {program} = props;
   const [activity, setActivity] = useState(null);
   const [error, setError] = useState(null);
 
@@ -48,13 +47,15 @@ const ProgramTimelineTab = props => {
   }
 
   return (
-      <div className="timeline-tab">
-        <Row>
-          <Col sm={12}>
-            {content}
-          </Col>
-        </Row>
-      </div>
+      <Card>
+        <Card.Body>
+          <Row>
+            <Col sm={12}>
+              {content}
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   )
 
 }
