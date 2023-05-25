@@ -15,7 +15,7 @@
 
   <groupId>io.studytracker</groupId>
   <artifactId>study-tracker-parent</artifactId>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>0.9.0</version>
   <name>Study Tracker Parent</name>
   <packaging>pom</packaging>
 
