@@ -131,6 +131,7 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
       List<GitLabProjectGroup> groups = client.findGroups();
       return groups != null;
     } catch (Exception e) {
+      e.printStackTrace();
       LOGGER.error("Failed to test GitLabIntegration: {}", e.getMessage());
       return false;
     }

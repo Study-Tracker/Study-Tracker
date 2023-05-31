@@ -119,10 +119,11 @@ public class GitLabIntegrationInitializer {
 
   private GitLabIntegration registerGitLabIntegration(Organization organization) {
 
+    LOGGER.info("Checking GitLab integration status...");
     GitLabProperties gitLabProperties = properties.getGitlab();
 
     if (gitLabProperties != null && gitLabProperties.getUrl() != null
-        && (StringUtils.hasText(gitLabProperties.getAccessKey())
+        && (StringUtils.hasText(gitLabProperties.getAccessToken())
         || (StringUtils.hasText(gitLabProperties.getUsername())
         && StringUtils.hasText(gitLabProperties.getPassword())))) {
 
@@ -142,7 +143,7 @@ public class GitLabIntegrationInitializer {
         existing.setRootUrl(gitLabProperties.getUrl().toString());
         existing.setUsername(gitLabProperties.getUsername());
         existing.setPassword(gitLabProperties.getPassword());
-        existing.setAccessToken(gitLabProperties.getAccessKey());
+        existing.setAccessToken(gitLabProperties.getAccessToken());
         existing.setActive(true);
         return gitLabIntegrationService.update(existing);
 
@@ -157,7 +158,7 @@ public class GitLabIntegrationInitializer {
         integration.setRootUrl(gitLabProperties.getUrl().toString());
         integration.setUsername(gitLabProperties.getUsername());
         integration.setPassword(gitLabProperties.getPassword());
-        integration.setAccessToken(gitLabProperties.getAccessKey());
+        integration.setAccessToken(gitLabProperties.getAccessToken());
         return gitLabIntegrationService.register(integration);
 
       }
