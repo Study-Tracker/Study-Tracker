@@ -103,6 +103,7 @@ public class AwsIntegrationInitializer {
           existing.setSecretAccessKey(null);
           existing.setUseIam(true);
         }
+        existing.setActive(true);
 
         awsIntegration = awsIntegrationService.update(existing);
 

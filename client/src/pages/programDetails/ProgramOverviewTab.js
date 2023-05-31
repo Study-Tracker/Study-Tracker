@@ -2,6 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import {Card, Col, Row} from "react-bootstrap";
 import TeamMembers from "../../common/detailsPage/TeamMembers";
+import ProgramSummaryTimelineCard from "./ProgramSummaryTimelineCard";
+import PrimaryStorageFolderWidget
+  from "../../common/widgets/PrimaryStorageFolderWidget";
+import PrimaryNotebookWidget from "../../common/widgets/PrimaryNotebookWidget";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -59,8 +63,21 @@ const ProgramOverviewTab = ({program}) => {
                 </Card.Body>
               </Card>
             </Col>
+
+            <Col sm={6} className={"d-flex"}>
+              <PrimaryStorageFolderWidget record={program} />
+            </Col>
+
+            <Col sm={6} className={"d-flex"}>
+              <PrimaryNotebookWidget record={program} />
+            </Col>
+
           </Row>
 
+        </Col>
+
+        <Col md={4}>
+          <ProgramSummaryTimelineCard program={program} />
         </Col>
 
       </Row>

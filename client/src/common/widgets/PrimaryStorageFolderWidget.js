@@ -41,6 +41,8 @@ const PrimaryStorageFolderWidget = ({record}) => {
       url = "/api/internal/assay/" + record.id + "/storage/repair";
     } else if (record.program) {
       url = "/api/internal/study/" + record.id + "/storage/repair";
+    } else {
+      url = "/api/internal/program/" + record.id + "/storage/repair";
     }
     if (!url) {
       notyf.open({

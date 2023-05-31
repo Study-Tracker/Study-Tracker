@@ -51,7 +51,9 @@ db.name=
 
 ### Events ###
 
-# Determines where to dispatch events. Can be 'eventbridge' or 'local'. Default mode: 'local'
+# Determines where to dispatch events.
+# Options: [eventbridge, local]
+# Default: local
 events.mode=
 
 
@@ -89,7 +91,8 @@ email.protocol=smtp
 ### Notebook ###
 
 # Connect Study Tracker with your ELN
-# Options: 'none', 'benchling'. Default: 'none'
+# Options: [none, benchling]
+# Default: none
 notebook.mode=
 
 # If notebook.mode is set to 'benchling', then you must provide the Benchling API key and the
@@ -110,13 +113,15 @@ benchling.api.client-secret=
 
 # Determines where to create project folders and store study files uploaded by users. Can be either
 # a local file system (default), or a cloud storage service (eg. Egnyte).
-# Options: local, egnyte. Defaults to local
+# Options: [local, egnyte, onedrive]
+# Default: local
 
 storage.mode=
 
 # If storage.use-existing is set to 'true', Study Tracker will use existing folders with the same
 # name when trying to create new ones. If set to 'false', Study Tracker throw an error when trying
-# to create a folder that already exists. Defaults to 'true'.
+# to create a folder that already exists.
+# Default: true
 
 storage.use-existing=true
 
@@ -176,6 +181,8 @@ egnyte.qps=3
 # To enable, set search.mode to 'elasticsearch'. The host value should be the full host name
 # (without protocol) and the port number. So if my host is https://myelasticdb.com, then the
 # value for elasticsearch.host would be 'myelasticdb.com' and the port would be set to 443.
+# Options: [none, elasticsearch]
+# Default: none
 
 search.mode=
 
@@ -203,7 +210,9 @@ server.ssl.key-store-password=
 ### Single Sign-On ###
 
 # Optional
-# If using Okta for SSO, set option to 'okta-saml'
+# Sets the single sign-on mode and provider to use.
+# Options: [none, okta-saml]
+# Default: none
 sso.mode=
 
 # Okta
@@ -224,7 +233,9 @@ sso.saml.max-authentication-age=
 
 # Optional
 # If you wish to integrate Study Tracker with a Git server, you can enable that here. Currently, only
-# GitLab is supported. Options: 'none', 'gitlab'. Default: 'none'
+# GitLab is supported.
+# Options: [none, gitlab]
+# Default: none
 
 git.mode=
 
