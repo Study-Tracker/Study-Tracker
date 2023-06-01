@@ -77,48 +77,6 @@ public class GitLabIntegrationInitializer {
     }
 
     // Register the GitLab integration
-    try {
-      GitLabIntegration integration = registerGitLabIntegration(organization);
-      if (properties.getGitlab().getRootGroupId() != null) {
-        registerRootGroup(integration, properties.getGitlab().getRootGroupId());
-        updateExistingGroups(integration);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      LOGGER.warn("Failed to initialize GitLab integration.");
-      throw new InvalidConfigurationException(e);
-    }
-
-  }
-
-  private void updateExistingGroups(GitLabIntegration integration) {
-    for (GitLabGroup gitLabGroup: gitLabGroupRepository.findByIntegrationId(integration.getId())){
-      GitGroup gitGroup = gitLabGroup.getGitGroup();
-      if (gitGroup.getCreatedAt().equals(gitGroup.getUpdatedAt())
-          && gitGroup.getWebUrl().equals("PLACEHOLDER")) {
-
-        Optional<GitServerGroup> optional = gitLabService.listAvailableGroups(integration)
-                .stream()
-                .filter(g -> g.getGroupId().equals(gitLabGroup.getGroupId().toString()))
-                .findFirst();
-
-        if (optional.isPresent()) {
-          GitServerGroup serverGroup = optional.get();
-          gitLabGroup.setName(serverGroup.getName());
-          gitLabGroup.setPath(serverGroup.getPath());
-          gitLabGroup.getGitGroup().setDisplayName(serverGroup.getName());
-          gitLabGroup.getGitGroup().setWebUrl(serverGroup.getWebUrl());
-          gitLabGroupRepository.save(gitLabGroup);
-        } else {
-          LOGGER.warn("GitLab group {} not found. Skipping update.", gitLabGroup.getGroupId());
-        }
-
-      }
-    }
-  }
-
-  private GitLabIntegration registerGitLabIntegration(Organization organization) {
-
     LOGGER.info("Checking GitLab integration status...");
     GitLabProperties gitLabProperties = properties.getGitlab();
 
@@ -128,47 +86,63 @@ public class GitLabIntegrationInitializer {
         && StringUtils.hasText(gitLabProperties.getPassword())))) {
 
       List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
-
-      if (integrations.size() > 0) {
-
-        // Check to see if the integration record is already updated
-        GitLabIntegration existing = integrations.get(0);
-        if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
-          LOGGER.info("GitLab integration for organization {} is already configured. Skipping initialization.", organization.getName());
-          return existing;
+      try {
+        if (integrations.size() > 0) {
+          updateExistingIntegration(integrations.get(0));
+        } else {
+          registerNewGitLabIntegration(organization);
         }
-
-        // If not, update it
-        LOGGER.info("Updating GitLab integration for organization {}.", organization.getName());
-        existing.setRootUrl(gitLabProperties.getUrl().toString());
-        existing.setUsername(gitLabProperties.getUsername());
-        existing.setPassword(gitLabProperties.getPassword());
-        existing.setAccessToken(gitLabProperties.getAccessToken());
-        existing.setActive(true);
-        return gitLabIntegrationService.update(existing);
-
-      } else {
-        LOGGER.info("No GitLab integration found for organization {}. A new integration will be registered.", organization.getName());
-
-        // Create a new integration record
-        GitLabIntegration integration = new GitLabIntegration();
-        integration.setActive(true);
-        integration.setOrganization(organization);
-        integration.setName("GitLab");
-        integration.setRootUrl(gitLabProperties.getUrl().toString());
-        integration.setUsername(gitLabProperties.getUsername());
-        integration.setPassword(gitLabProperties.getPassword());
-        integration.setAccessToken(gitLabProperties.getAccessToken());
-        return gitLabIntegrationService.register(integration);
-
+      } catch (Exception e) {
+        e.printStackTrace();
+        LOGGER.warn("Failed to initialize GitLab integration.");
+        throw new InvalidConfigurationException(e);
       }
 
     } else {
       LOGGER.info("No GitLab integration properties found for organization {}. Skipping initialization.", organization.getName());
     }
 
-    return null;
+  }
 
+  private void registerNewGitLabIntegration(Organization organization) {
+    LOGGER.info("No GitLab integration found for organization {}. A new integration will be registered.", organization.getName());
+    GitLabProperties gitLabProperties = properties.getGitlab();
+    GitLabIntegration integration = new GitLabIntegration();
+    integration.setActive(true);
+    integration.setOrganization(organization);
+    integration.setName("GitLab");
+    integration.setRootUrl(gitLabProperties.getUrl().toString());
+    integration.setUsername(gitLabProperties.getUsername());
+    integration.setPassword(gitLabProperties.getPassword());
+    integration.setAccessToken(gitLabProperties.getAccessToken());
+    GitLabIntegration created = gitLabIntegrationService.register(integration);
+
+    if (gitLabProperties.getRootGroupId() != null) {
+      registerRootGroup(created, gitLabProperties.getRootGroupId());
+      updateExistingGroups(created);
+    }
+
+
+  }
+
+  private void updateExistingIntegration(GitLabIntegration existing) {
+    GitLabProperties gitLabProperties = properties.getGitlab();
+    if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
+      LOGGER.info("GitLab integration for organization is already configured. Skipping initialization.");
+    } else {
+      LOGGER.info("Updating GitLab integration {}.", existing.getId());
+      existing.setRootUrl(gitLabProperties.getUrl().toString());
+      existing.setUsername(gitLabProperties.getUsername());
+      existing.setPassword(gitLabProperties.getPassword());
+      existing.setAccessToken(gitLabProperties.getAccessToken());
+      existing.setActive(true);
+      GitLabIntegration updated = gitLabIntegrationService.update(existing);
+
+      if (gitLabProperties.getRootGroupId() != null) {
+        registerRootGroup(updated, gitLabProperties.getRootGroupId());
+        updateExistingGroups(updated);
+      }
+    }
   }
 
   private GitGroup registerRootGroup(GitLabIntegration integration, Integer rootGroupId) {
@@ -205,6 +179,32 @@ public class GitLabIntegrationInitializer {
     } else {
       LOGGER.warn("Root group with ID {} not found. Skipping initialization of root group.", rootGroupId);
       return null;
+    }
+  }
+
+  private void updateExistingGroups(GitLabIntegration integration) {
+    for (GitLabGroup gitLabGroup: gitLabGroupRepository.findByIntegrationId(integration.getId())){
+      GitGroup gitGroup = gitLabGroup.getGitGroup();
+      if (gitGroup.getCreatedAt().equals(gitGroup.getUpdatedAt())
+          && gitGroup.getWebUrl().equals("PLACEHOLDER")) {
+
+        Optional<GitServerGroup> optional = gitLabService.listAvailableGroups(integration)
+            .stream()
+            .filter(g -> g.getGroupId().equals(gitLabGroup.getGroupId().toString()))
+            .findFirst();
+
+        if (optional.isPresent()) {
+          GitServerGroup serverGroup = optional.get();
+          gitLabGroup.setName(serverGroup.getName());
+          gitLabGroup.setPath(serverGroup.getPath());
+          gitLabGroup.getGitGroup().setDisplayName(serverGroup.getName());
+          gitLabGroup.getGitGroup().setWebUrl(serverGroup.getWebUrl());
+          gitLabGroupRepository.save(gitLabGroup);
+        } else {
+          LOGGER.warn("GitLab group {} not found. Skipping update.", gitLabGroup.getGroupId());
+        }
+
+      }
     }
   }
 
