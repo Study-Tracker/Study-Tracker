@@ -34,7 +34,7 @@ const NotebookInputsCard = ({
 
   useEffect(() => {
     if (selectedProgram) {
-      axios.get("/api/internal/program/" + selectedProgram.id + "/notebook?contents=false")
+      axios.get(`/api/internal/program/${selectedProgram.id}/notebook?contents=false`)
       .then(response => {
         setParentFolder(response.data.path || response.data.name);
       })
@@ -42,7 +42,7 @@ const NotebookInputsCard = ({
         console.error("Error loading program notebook folder: ", error);
       });
     } else if (selectedStudy) {
-      axios.get("/api/internal/study/" + selectedStudy.id + "/notebook?contents=false")
+      axios.get(`/api/internal/study/${selectedStudy.id}/notebook?contents=false`)
       .then(response => {
         setParentFolder(response.data.path || response.data.name);
       })
