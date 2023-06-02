@@ -15,53 +15,38 @@
  */
 
 import React, {useEffect, useState} from "react";
-import {Card, Col, Row} from 'react-bootstrap'
-import {ActivityStream} from "../../common/activity";
-import {CardLoadingMessage} from "../../common/loading";
-import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
+import {Card} from "react-bootstrap";
+import Timeline from "../../common/detailsPage/Timeline";
 import PropTypes from "prop-types";
 
-const ProgramTimelineTab = ({program}) => {
+const ProgramSummaryTimelineCard = ({program}) => {
 
-  const [activity, setActivity] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     axios.get("/api/internal/program/" + program.id + "/activity")
-    .then(response => {
-      setActivity(response.data);
-    })
+    .then(response => setActivity(response.data))
     .catch(e => {
-      console.error(e);
       setError(e);
+      console.error(e);
     })
   }, []);
-
-  let content = <CardLoadingMessage/>;
-  if (!!error) {
-    content = <DismissableAlert color={'warning'}
-                                message={'Failed to load program activity.'}/>;
-  } else if (!!activity) {
-    content = <ActivityStream activity={activity}/>;
-  }
 
   return (
       <Card>
         <Card.Body>
-          <Row>
-            <Col sm={12}>
-              {content}
-            </Col>
-          </Row>
+          <h5 className="card-title">Latest Activity</h5>
+          <Timeline events={activity} />
         </Card.Body>
       </Card>
   )
 
 }
 
-ProgramTimelineTab.propTypes = {
+ProgramSummaryTimelineCard.propTypes = {
   program: PropTypes.object.isRequired
 }
 
-export default ProgramTimelineTab;
+export default ProgramSummaryTimelineCard;

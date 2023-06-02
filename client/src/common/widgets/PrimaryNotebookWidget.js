@@ -41,6 +41,8 @@ const PrimaryNotebookWidget = ({record}) => {
       url = "/api/internal/assay/" + record.id + "/notebook/repair";
     } else if (record.program) {
       url = "/api/internal/study/" + record.id + "/notebook/repair";
+    } else {
+      url = "/api/internal/program/" + record.id + "/notebook/repair";
     }
     if (!url) {
       notyf.open({
