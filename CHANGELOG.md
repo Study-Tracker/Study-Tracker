@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed several issues with File Manager breadcrumbs and controls, which prevented them from acting as expected.
+- Fixed an issue where large ELN folder requests could timeout or crash study & assay creation requests.
 
 ## [0.8.2] - 2023-03-01
 
