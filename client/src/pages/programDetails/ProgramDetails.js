@@ -28,9 +28,6 @@ const ProgramDetails = ({program, studies, user}) => {
   const location = useLocation();
   const [selectedTab, setSelectedTab] = useState(location.hash.replace("#", "") || "overview");
   const navigate = useNavigate();
-  const createMarkup = (content) => {
-    return {__html: content};
-  };
 
   const handleTabSelect = (key) => {
     setSelectedTab(key);
