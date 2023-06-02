@@ -42,12 +42,29 @@ public interface NotebookFolderService {
   Optional<NotebookFolder> findStudyFolder(Study study);
 
   /**
+   * Returns a study's {@link NotebookFolder}, if one exists, optionally including its contents.
+   *
+   * @param study
+   * @param includeContents
+   * @return
+   */
+  Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents);
+
+  /**
    * Returns an assay's {@link NotebookFolder}, if one exists.
    *
    * @param assay
    * @return
    */
   Optional<NotebookFolder> findAssayFolder(Assay assay);
+
+  /**
+   * Returns an assay's {@link NotebookFolder}, if one exists, optionally including its contents.
+   *
+   * @param assay
+   * @return
+   */
+  Optional<NotebookFolder> findAssayFolder(Assay assay, boolean includeContents);
 
   /**
    * Creates a folder for a program in the ELN and returns a {@link NotebookFolder}.

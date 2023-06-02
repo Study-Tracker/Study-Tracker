@@ -271,10 +271,11 @@ public final class BenchlingNotebookFolderService
 
   @Override
   public Optional<NotebookFolder> findStudyFolder(Study study) {
-    return findStudyFolder(study, true);
+    return findStudyFolder(study, false);
   }
 
-  private Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents) {
+  @Override
+  public Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents) {
 
     LOGGER.info("Fetching notebook folder for study: " + study.getCode());
     Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByStudyId(study.getId());
@@ -301,6 +302,11 @@ public final class BenchlingNotebookFolderService
 
   @Override
   public Optional<NotebookFolder> findAssayFolder(Assay assay) {
+    return findAssayFolder(assay, false);
+  }
+
+  @Override
+  public Optional<NotebookFolder> findAssayFolder(Assay assay, boolean includeContents) {
 
     LOGGER.info("Fetching notebook folder for assay: " + assay.getCode());
     Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByAssayId(assay.getId());
@@ -311,7 +317,13 @@ public final class BenchlingNotebookFolderService
       Optional<BenchlingFolder> optional =
           this.getClient().findFolderById(assayFolder.getReferenceId(), authHeader);
       return optional.flatMap(
-          folder -> Optional.of(getContentFullNotebookFolder(folder, assay, authHeader)));
+          folder -> {
+            if (includeContents) {
+              return Optional.of(getContentFullNotebookFolder(folder, assay, authHeader));
+            } else {
+              return Optional.of(this.convertFolder(folder, authHeader));
+            }
+          });
     } else {
       LOGGER.warn(String.format("Assay %s does not have a notebook folder set.", assay.getName()));
       return Optional.empty();
