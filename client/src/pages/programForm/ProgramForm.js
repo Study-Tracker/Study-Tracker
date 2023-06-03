@@ -107,6 +107,7 @@ const ProgramForm = ({
           value => Object.keys(value).every(d => d && d.trim() !== '')
       ),
     gitGroup: yup.object()
+      .nullable()
       .when("useGit", {
         is: true,
         then: yup.object().required("Git group is required.")

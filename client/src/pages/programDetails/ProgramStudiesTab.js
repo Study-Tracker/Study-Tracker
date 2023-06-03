@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Card, Col, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
@@ -23,26 +23,28 @@ import {StudySummaryCards} from "../../common/studies";
 const ProgramStudiesTab = ({studies, user}) => {
 
   return (
-      <React.Fragment>
-        <Row className="justify-content-between align-items-center">
-          <Col>
-            {
-              !!user
-                  ? (
-                      <span className="float-end">
-                        <Button variant="info" href={"/studies/new"}>
-                          New Study
-                          &nbsp;
-                          <FontAwesomeIcon icon={faPlusCircle}/>
-                        </Button>
-                      </span>
-                  ) : ''
-            }
-          </Col>
-        </Row>
+      <Card>
+        <Card.Body>
+          <Row className="justify-content-between align-items-center">
+            <Col>
+              {
+                !!user
+                    ? (
+                        <span className="float-end">
+                          <Button variant="info" href={"/studies/new"}>
+                            New Study
+                            &nbsp;
+                            <FontAwesomeIcon icon={faPlusCircle}/>
+                          </Button>
+                        </span>
+                    ) : ''
+              }
+            </Col>
+          </Row>
 
-        <StudySummaryCards studies={studies} showDetails={true}/>
-      </React.Fragment>
+          <StudySummaryCards studies={studies} showDetails={true}/>
+        </Card.Body>
+      </Card>
   );
 
 };

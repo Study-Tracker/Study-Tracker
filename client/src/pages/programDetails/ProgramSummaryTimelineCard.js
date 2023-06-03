@@ -14,55 +14,39 @@
  * limitations under the License.
  */
 
-import {Card, Col, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {StorageFolderFileList} from "../../common/files";
 import axios from "axios";
+import {Card} from "react-bootstrap";
+import Timeline from "../../common/detailsPage/Timeline";
 import PropTypes from "prop-types";
 
-const AssayNotebookTabContent = props => {
+const ProgramSummaryTimelineCard = ({program}) => {
 
-  const {assay} = props;
-  const [folder, setFolder] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    refreshData();
-  }, []);
-
-  const refreshData = () => {
-    axios.get(`/api/internal/assay/${assay.code}/notebook?contents=true`, {timeout: 30000})
-    .then(response => {
-      setFolder(response.data);
-    })
+    axios.get("/api/internal/program/" + program.id + "/activity")
+    .then(response => setActivity(response.data))
     .catch(e => {
+      setError(e);
       console.error(e);
-      setError(e.message);
-    });
-  }
+    })
+  }, []);
 
   return (
       <Card>
         <Card.Body>
-          <Row>
-            <Col sm={12}>
-              <StorageFolderFileList
-                  folder={folder}
-                  isLoaded={!!folder}
-                  isError={!!error}
-                  errorMessage={error}
-                  folderFileKey={'entries'}
-              />
-            </Col>
-          </Row>
+          <h5 className="card-title">Latest Activity</h5>
+          <Timeline events={activity} />
         </Card.Body>
       </Card>
   )
 
 }
 
-AssayNotebookTabContent.propTypes = {
-  assay: PropTypes.object.isRequired
+ProgramSummaryTimelineCard.propTypes = {
+  program: PropTypes.object.isRequired
 }
 
-export default AssayNotebookTabContent;
+export default ProgramSummaryTimelineCard;

@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,14 +45,15 @@ public class StudyNotebookPrivateController extends AbstractStudyController {
   private NotebookFolderService notebookFolderService;
 
   @GetMapping("")
-  public NotebookFolder getStudyNotebookFolder(@PathVariable("studyId") String studyId)
+  public NotebookFolder getStudyNotebookFolder(@PathVariable("studyId") String studyId,
+      @RequestParam(value = "contents", required = false) boolean includeContents)
       throws RecordNotFoundException {
     LOGGER.info("Fetching notebook folder for study: " + studyId);
     Study study = getStudyFromIdentifier(studyId);
 
     Optional<NotebookFolder> notebookFolder =
         Optional.ofNullable(notebookFolderService)
-            .flatMap(service -> service.findStudyFolder(study));
+            .flatMap(service -> service.findStudyFolder(study, includeContents));
     return notebookFolder.orElseThrow(
         () -> new RecordNotFoundException("Could not load notebook folder"));
   }

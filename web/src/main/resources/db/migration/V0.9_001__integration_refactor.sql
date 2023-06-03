@@ -242,16 +242,6 @@ ALTER TABLE programs
 ALTER TABLE studies
     DROP CONSTRAINT fk_studies_on_storage_folder;
 
-ALTER TABLE assays
-    DROP COLUMN storage_folder_id;
-
-ALTER TABLE programs
-    DROP COLUMN storage_folder_id;
-
-ALTER TABLE studies
-    DROP COLUMN storage_folder_id;
-
-
 /*  Migrate legacy data  */
 
 -- Add default organization
@@ -264,9 +254,23 @@ WHERE organization_id is null;
 
 
 -- Update existing program/study/assay storage folders
+INSERT INTO program_storage_folders (id, program_id, storage_folder_id, is_primary)
+SELECT nextval('hibernate_sequence'), p.id, p.storage_folder_id, true
+FROM programs p
+WHERE p.id NOT IN (SELECT program_id FROM program_storage_folders)
+    AND p.storage_folder_id IS NOT NULL
+;
+
 UPDATE program_storage_folders
 SET id = nextval('hibernate_sequence'), is_primary = true
 WHERE id is null;
+;
+
+INSERT INTO study_storage_folders (id, study_id, storage_folder_id, is_primary)
+SELECT nextval('hibernate_sequence'), s.id, s.storage_folder_id, true
+FROM studies s
+WHERE s.id NOT IN (SELECT study_id FROM study_storage_folders)
+    AND s.storage_folder_id is not null
 ;
 
 UPDATE study_storage_folders
@@ -283,6 +287,13 @@ WHERE storage_folder_id in (
              join file_storage_locations fsl on fsf.file_storage_location_id = fsl.id
     where fsl.type in ('EGNYTE_API', 'LOCAL_FILE_SYSTEM')
     )
+;
+
+INSERT INTO assay_storage_folders (id, assay_id, storage_folder_id, is_primary)
+SELECT nextval('hibernate_sequence'), a.id, a.storage_folder_id, true
+FROM assays a
+WHERE a.id NOT IN (SELECT assay_id FROM assay_storage_folders)
+    AND a.storage_folder_id IS NOT NULL
 ;
 
 UPDATE assay_storage_folders
@@ -560,6 +571,15 @@ SET storage_drive_folder_id = (SELECT id FROM storage_drive_folders WHERE old_id
 WHERE storage_drive_folder_id IS NULL;
 
 -- Update tables & constraints
+
+ALTER TABLE assays
+    DROP COLUMN storage_folder_id;
+
+ALTER TABLE programs
+    DROP COLUMN storage_folder_id;
+
+ALTER TABLE studies
+    DROP COLUMN storage_folder_id;
 
 ALTER TABLE programs
     ALTER COLUMN organization_id SET NOT NULL;

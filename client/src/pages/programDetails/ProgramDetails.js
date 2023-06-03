@@ -14,59 +14,25 @@
  * limitations under the License.
  */
 
-import {
-  Breadcrumb,
-  Card,
-  Col,
-  Container,
-  Dropdown,
-  Nav,
-  Row,
-  Tab
-} from "react-bootstrap";
-import React from "react";
-import {Menu} from "react-feather";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit} from "@fortawesome/free-solid-svg-icons";
-import {
-  ProgramStatusButton,
-  SelectableProgramStatusButton
-} from "./programStatus";
+import {Breadcrumb, Col, Container, Row, Tab, Tabs} from "react-bootstrap";
+import React, {useState} from "react";
 import ProgramTimelineTab from "./ProgramTimelineTab";
 import ProgramStudiesTab from "./ProgramStudiesTab";
-import {
-  ModelDetailsAttributeList
-} from "../../common/ModelDetailsAttributeList";
 import PropTypes from "prop-types";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
+import ProgramDetailHeader from "./ProgramDetailsHeader";
+import ProgramOverviewTab from "./ProgramOverviewTab";
 
-const ProgramDetailHeader = ({program, user}) => {
-  return (
-      <Row className="justify-content-between align-items-center">
-        <Col>
-          <h3>Program {program.name} ({program.code})</h3>
-        </Col>
-        <Col className="col-auto d-flex">
-          {
-            user && user.admin
-                ? <SelectableProgramStatusButton active={program.active}
-                                                 programId={program.id}/>
-                : <ProgramStatusButton active={program.active}/>
+const ProgramDetails = ({program, studies, user}) => {
 
-          }
-
-        </Col>
-      </Row>
-  );
-};
-
-const ProgramDetails = props => {
-
-  const {program, studies, user} = props;
+  const location = useLocation();
+  const [selectedTab, setSelectedTab] = useState(location.hash.replace("#", "") || "overview");
   const navigate = useNavigate();
-  const createMarkup = (content) => {
-    return {__html: content};
-  };
+
+  const handleTabSelect = (key) => {
+    setSelectedTab(key);
+    navigate("#" + key);
+  }
 
   return (
       <Container fluid className="animated fadeIn">
@@ -76,7 +42,7 @@ const ProgramDetails = props => {
           <Col>
             <Breadcrumb>
               <Breadcrumb.Item href={"/programs"}>Programs</Breadcrumb.Item>
-              <Breadcrumb.Item active>Program Detail</Breadcrumb.Item>
+              <Breadcrumb.Item active>{program.name}</Breadcrumb.Item>
             </Breadcrumb>
           </Col>
         </Row>
@@ -86,100 +52,28 @@ const ProgramDetails = props => {
 
         <Row>
 
-          <Col lg={5}>
-            <Card className="details-card">
-
-              <Card.Header>
-
-                <div className="card-actions float-end">
-                  <Dropdown align="end">
-                    <Dropdown.Toggle as="a" bsPrefix="-">
-                      <Menu/>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-
-                      {
-                        user && user.admin ? (
-                            <Dropdown.Item href={"/program/" + program.id + "/edit"}>
-                              <FontAwesomeIcon icon={faEdit}/>
-                              &nbsp;
-                              Edit
-                            </Dropdown.Item>
-                        ) : ''
-                      }
-
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
-
-                <Card.Title tag="h5" className="mb-0 text-muted">
-                  Summary
-                </Card.Title>
-
-              </Card.Header>
-
-              <Card.Body>
-                <Row>
-                  <Col xs={12}>
-
-                    <h3>{program.name}</h3>
-
-                    <h6 className="details-label">Description</h6>
-                    <div dangerouslySetInnerHTML={
-                      createMarkup(program.description)
-                    }/>
-
-                    <h6 className="details-label">Created By</h6>
-                    <p>{program.createdBy.displayName}</p>
-
-                    <h6 className="details-label">Last Updated</h6>
-                    <p>{new Date(program.updatedAt).toLocaleString()}</p>
-
-                    <ModelDetailsAttributeList
-                        attributes={program.attributes}/>
-
-                  </Col>
-                </Row>
-              </Card.Body>
-
-            </Card>
-          </Col>
-
-          <Col lg={7}>
+          <Col lg={12}>
 
             {/* Tabs */}
-            <div className="tab">
-              <Tab.Container defaultActiveKey={"timeline"}>
-                <Nav variant={"tabs"}>
 
-                  <Nav.Item>
-                    <Nav.Link eventKey={"timeline"}>
-                      Timeline
-                    </Nav.Link>
-                  </Nav.Item>
+            <Tabs variant={"pills"} activeKey={selectedTab} onSelect={handleTabSelect}>
 
-                  <Nav.Item>
-                    <Nav.Link eventKey={"studies"}>
-                      Studies
-                    </Nav.Link>
-                  </Nav.Item>
+              <Tab eventKey={"overview"} title={"Overview"}>
+                <ProgramOverviewTab program={program} />
+              </Tab>
 
-                </Nav>
+              <Tab eventKey={"studies"} title={"Studies"}>
+                <ProgramStudiesTab studies={studies} user={user}/>
+              </Tab>
 
-                <Tab.Content>
+              <Tab eventKey={"timeline"} title={"Timeline"}>
+                <ProgramTimelineTab program={program} user={user}/>
+              </Tab>
 
-                  <Tab.Pane eventKey={"timeline"}>
-                    <ProgramTimelineTab program={program} user={user}/>
-                  </Tab.Pane>
+            </Tabs>
 
-                  <Tab.Pane eventKey={"studies"}>
-                    <ProgramStudiesTab studies={studies} user={user}/>
-                  </Tab.Pane>
-
-                </Tab.Content>
-              </Tab.Container>
-            </div>
           </Col>
+
         </Row>
       </Container>
   );

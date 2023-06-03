@@ -31,7 +31,7 @@ const StudyNotebookTabContent = props => {
   }, []);
 
   const refreshData = () => {
-    axios.get('/api/internal/study/' + study.code + '/notebook')
+    axios.get(`/api/internal/study/${study.code}/notebook?contents=true`, {timeout: 30000})
     .then(response => setFolder(response.data))
     .catch(e => {
       console.error(e);

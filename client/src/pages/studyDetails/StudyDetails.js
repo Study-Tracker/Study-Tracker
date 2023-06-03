@@ -30,45 +30,17 @@ import StudyDetailHeader from "./StudyDetailsHeader";
 import StudyOverviewTab from "./StudyOverviewTab";
 import StudyFileManagerTab from "./StudyFileManagerTab";
 
-const StudyDetails = props => {
+const StudyDetails = ({study, user, features}) => {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const {study, user, features} = props;
   const [selectedTab, setSelectedTab] = useState(location.hash.replace("#", "") || "overview");
   const [showCollectionModal, setShowCollectionModal] = useState(false);
-  const [modalError, setModalError] = useState(null);
 
   const handleTabSelect = (key) => {
     setSelectedTab(key);
     navigate("#" + key);
   }
-
-  // const handleStudyDelete = () => {
-  //   swal({
-  //     title: "Are you sure you want to remove this study?",
-  //     text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered in the admin dashboard.",
-  //     icon: "warning",
-  //     buttons: true
-  //   })
-  //   .then(val => {
-  //     if (val) {
-  //       axios({
-  //         url: "/api/internal/study/" + study.code,
-  //         method: 'delete',
-  //         headers: {
-  //           "Content-Type": "application/json"
-  //         }
-  //       }).then(response => {
-  //         navigate("/studies")
-  //       })
-  //       .catch(error => {
-  //         console.error(error);
-  //         setModalError("Failed to remove study. Please try again.");
-  //       })
-  //     }
-  //   });
-  // }
 
   return (
       <Container fluid className="animated fadeIn">
@@ -87,7 +59,6 @@ const StudyDetails = props => {
         <StudyDetailHeader
             study={study}
             handleAddToCollection={() => setShowCollectionModal(true)}
-            // handleDelete={handleStudyDelete}
         />
 
         <Row>
@@ -113,10 +84,6 @@ const StudyDetails = props => {
               <Tab eventKey={"assays"} title={"Assays"}>
                 <StudyAssaysTab study={study} user={user}/>
               </Tab>
-
-              {/*<Tab eventKey={"files"} title={"Files"}>*/}
-              {/*  <StudyFilesTab study={study} user={user}/>*/}
-              {/*</Tab>*/}
 
               <Tab title={"Files"} eventKey={"files"}>
                 <StudyFileManagerTab study={study} user={user}/>
