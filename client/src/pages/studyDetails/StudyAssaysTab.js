@@ -49,7 +49,9 @@ const StudyAssaysTab = ({study}) => {
     axios.get("/api/internal/study/" + study.code + "/assays")
     .then(response => {
       console.debug("Assays", response.data);
-      setAssays(response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      setAssays(response.data
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .filter(a => a.active));
     })
     .catch(error => {
       setError(error);
