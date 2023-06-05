@@ -214,7 +214,7 @@ const GitLabIntegrationFormModal = ({
                     </Col>
                   </Row>
 
-                  <Row>
+                  <Row hidden={values.useToken}>
                     <Col>
                       <FormGroup>
                         <Form.Label>Password *</Form.Label>
