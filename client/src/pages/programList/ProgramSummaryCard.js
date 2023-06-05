@@ -21,13 +21,14 @@ import TeamMembers from "../../common/detailsPage/TeamMembers";
 import {Clipboard} from "react-feather";
 import {useNavigate} from "react-router-dom";
 
-const createMarkup = (content) => {
-  return {__html: content};
-};
-
 const ProgramSummaryCard = ({ program }) => {
 
   const navigate = useNavigate();
+
+  const cleanupDescription = (str) => {
+    const cleaned = str.replace(/<[^>]*>?/gm, '');
+    return cleaned.length > 255 ? cleaned.substring(0, 255) + "..." : cleaned;
+  }
 
   return (
       <Col xs={12} sm={6} lg={4}>
@@ -46,7 +47,7 @@ const ProgramSummaryCard = ({ program }) => {
           <Card.Body>
             <Row>
               <Col>
-                <div dangerouslySetInnerHTML={createMarkup(program.description)}/>
+                {cleanupDescription(program.description)}
               </Col>
             </Row>
             <Row>
