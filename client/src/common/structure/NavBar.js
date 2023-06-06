@@ -50,7 +50,7 @@ const NavBar = props => {
       console.error(error);
     })
 
-  }, []);
+  }, [dispatch]);
 
   const {hideToggle} = props;
   return (

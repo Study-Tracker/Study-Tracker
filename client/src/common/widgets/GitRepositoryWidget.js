@@ -18,14 +18,9 @@ import React, {useContext, useState} from "react";
 import PropTypes from "prop-types";
 import {Button} from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import IconWidget from "./IconWidget";
-import {
-  faGitAlt,
-  faGithubSquare,
-  faGitlabSquare
-} from "@fortawesome/free-brands-svg-icons";
+import {faGitAlt, faGithubSquare, faGitlabSquare} from "@fortawesome/free-brands-svg-icons";
 
 const getRepositoryIcon = (repository) => {
   let icon = faGitAlt;
@@ -50,40 +45,40 @@ const GitRepositoryWidget = ({record}) => {
   const navigate = useNavigate();
   const notyf = useContext(NotyfContext);
 
-  const handleCreateRepository = () => {
-    let url = null;
-    if (record.assayType) {
-      url = "/api/internal/assay/" + record.id + "/git";
-    } else if (record.program) {
-      url = "/api/internal/study/" + record.id + "/git";
-    }
-    if (!url) {
-      notyf.open({
-        type: "error",
-        message: "Unable to create git repository. Unknown record type."
-      });
-      return;
-    }
-    setIsSubmitting(true);
-    axios.post(url)
-    .then(response => {
-      notyf.open({
-        type: "success",
-        message: "Git repository created successfully."
-      })
-      setIsSubmitting(false);
-      navigate("#overview");
-      navigate(0);
-    })
-    .catch(error => {
-      setIsSubmitting(false);
-      console.error(error);
-      notyf.open({
-        type: "error",
-        message: "Failed to create Git repository. Please try again."
-      })
-    });
-  }
+  // const handleCreateRepository = () => {
+  //   let url = null;
+  //   if (record.assayType) {
+  //     url = "/api/internal/assay/" + record.id + "/git";
+  //   } else if (record.program) {
+  //     url = "/api/internal/study/" + record.id + "/git";
+  //   }
+  //   if (!url) {
+  //     notyf.open({
+  //       type: "error",
+  //       message: "Unable to create git repository. Unknown record type."
+  //     });
+  //     return;
+  //   }
+  //   setIsSubmitting(true);
+  //   axios.post(url)
+  //   .then(response => {
+  //     notyf.open({
+  //       type: "success",
+  //       message: "Git repository created successfully."
+  //     })
+  //     setIsSubmitting(false);
+  //     navigate("#overview");
+  //     navigate(0);
+  //   })
+  //   .catch(error => {
+  //     setIsSubmitting(false);
+  //     console.error(error);
+  //     notyf.open({
+  //       type: "error",
+  //       message: "Failed to create Git repository. Please try again."
+  //     })
+  //   });
+  // }
 
   const repository = record.gitRepositories.length > 0 ? record.gitRepositories[0] : null;
 

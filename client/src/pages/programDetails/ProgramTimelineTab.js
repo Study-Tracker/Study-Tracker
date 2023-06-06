@@ -36,7 +36,7 @@ const ProgramTimelineTab = ({program}) => {
       console.error(e);
       setError(e);
     })
-  }, []);
+  }, [program.id]);
 
   let content = <CardLoadingMessage/>;
   if (!!error) {

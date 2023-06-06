@@ -58,7 +58,7 @@ const GitlabIntegrationSettings = () => {
         message: "Error loading GitLab integration settings"
       })
     })
-  }, [loadCount]);
+  }, [loadCount, notyf]);
 
   const handleIntegrationFormSubmit = (values, {setSubmitting, resetForm}) => {
     console.debug("GitLab integration form submitted with values: ", values);

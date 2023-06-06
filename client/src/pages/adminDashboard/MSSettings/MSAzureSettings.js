@@ -35,7 +35,6 @@ const MSAzureSettings = () => {
   const [loadCount, setLoadCount] = useState(0);
   const [integrationModalIsOpen, setIntegrationModalIsOpen] = useState(false);
   const [sharePointSiteModalIsOpen, setSharePointSiteModalIsOpen] = useState(false);
-  const [oneDriveDriveModalIsOpen, setOneDriveDriveModalIsOpen] = useState(false);
   const notyf = useContext(NotyfContext);
   const integrationFormikRef = useRef();
   const siteFormikRef = useRef();
@@ -64,7 +63,7 @@ const MSAzureSettings = () => {
         message: "Failed to load Microsoft Aure settings"
       });
     })
-  }, [loadCount]);
+  }, [loadCount, notyf]);
 
   const handleIntegrationFormSubmit = (values, {setSubmitting, resetForm}) => {
     const url = "/api/internal/integrations/msgraph/" + (values.id || '');

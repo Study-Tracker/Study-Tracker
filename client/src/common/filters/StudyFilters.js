@@ -18,12 +18,7 @@ import React, {useEffect, useState} from "react";
 import {Form} from 'react-bootstrap';
 import {FormGroup} from '../forms/common';
 import {statuses} from "../../config/statusConstants";
-import {
-  convertSearchParams,
-  FilterLabel,
-  filterNullSearchParams,
-  FilterSidebar
-} from "./filters";
+import {convertSearchParams, FilterLabel, filterNullSearchParams, FilterSidebar} from "./filters";
 import {useDispatch, useSelector} from "react-redux";
 import {useSearchParams} from "react-router-dom";
 import {setFilters} from "../../redux/filterSlice";
@@ -105,7 +100,7 @@ const StudyFilters = () => {
     }).catch(e => {
       console.error(e);
     })
-  }, []);
+  }, [dispatch]);
 
   const updateFilters = (filter) => {
     console.debug("New filter", filter);

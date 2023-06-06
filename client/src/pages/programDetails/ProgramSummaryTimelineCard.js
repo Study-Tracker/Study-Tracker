@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import {Card} from "react-bootstrap";
 import Timeline from "../../common/detailsPage/Timeline";
 import PropTypes from "prop-types";
+import NotyfContext from "../../context/NotyfContext";
 
 const ProgramSummaryTimelineCard = ({program}) => {
 
   const [activity, setActivity] = useState([]);
-  const [error, setError] = useState(null);
+  const notyf = useContext(NotyfContext);
 
   useEffect(() => {
     axios.get("/api/internal/program/" + program.id + "/activity")
     .then(response => setActivity(response.data))
     .catch(e => {
-      setError(e);
       console.error(e);
+      notyf.open({
+        type: "error",
+        message: "Failed to load program activity"
+      })
     })
-  }, []);
+  }, [notyf]);
 
   return (
       <Card>

@@ -35,7 +35,7 @@ const StudyTimelineTab = props => {
       setError(e);
       console.error(e);
     })
-  }, []);
+  }, [study.code]);
 
   let content = <CardLoadingMessage/>;
   if (error !== null) {

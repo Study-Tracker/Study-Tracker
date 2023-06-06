@@ -16,20 +16,21 @@
 
 import {Button, Card, Col, Row} from "react-bootstrap";
 import {UserPlus} from "react-feather";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import axios from "axios";
 import ApiUserTable from "./ApiUserTable";
 import ApiUserFormModal from "./ApiUserFormModal";
 import swal from "sweetalert";
+import NotyfContext from "../../../context/NotyfContext";
 
 const ApiUserSettings = () => {
 
   const [apiUsers, setApiUsers] = useState([]);
   const [counter, setCounter] = useState(0);
-  const [error, setError] = useState(null);
   const [formModalIsOpen, setFormModalIsOpen] = useState(false);
   const [selectedApiUser, setSelectedApiUser] = useState(null);
   const formikRef = useRef();
+  const notyf = useContext(NotyfContext);
 
   useEffect(() => {
     axios.get("/api/internal/user?type=API_USER")
@@ -38,7 +39,10 @@ const ApiUserSettings = () => {
     })
     .catch(error => {
       console.error(error);
-      setError(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to load API users"
+      })
     });
   }, [counter]);
 

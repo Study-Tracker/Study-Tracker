@@ -20,10 +20,8 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import FileManagerContent from "../../common/fileManager/FileManagerContent";
-import FileManagerContentPlaceholder
-  from "../../common/fileManager/FileManagerContentPlaceholder";
-import StudyFileManagerMenu
-  from "../../common/fileManager/StudyFileManagerMenu";
+import FileManagerContentPlaceholder from "../../common/fileManager/FileManagerContentPlaceholder";
+import StudyFileManagerMenu from "../../common/fileManager/StudyFileManagerMenu";
 
 const StudyFileManagerTab = ({study}) => {
 
@@ -47,7 +45,7 @@ const StudyFileManagerTab = ({study}) => {
       console.error(error);
       notyf.open({message: "Failed to load data sources", type: "error"});
     });
-  }, []);
+  }, [study.id, notyf]);
 
   const repairFolder = () => {
     axios.post("/api/internal/study/" + study.id + "/storage/repair")

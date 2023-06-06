@@ -30,10 +30,8 @@ const AssayDetails = props => {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const {user, study, features} = props;
+  const {user, study, features, assay} = props;
   const [selectedTab, setSelectedTab] = useState(location.hash.replace("#", "") || "overview");
-  const [assay, setAssay] = React.useState(props.assay);
-  const [error, setError] = React.useState(null);
 
   const handleTabSelect = (key) => {
     setSelectedTab(key);

@@ -48,7 +48,7 @@ const FileManager = ({path, rootFolderId}) => {
       console.error(error);
       notyf.open({message: "Failed to load data sources", type: "error"});
     });
-  }, []);
+  }, [rootFolderId, notyf]);
 
   return (
       <Container fluid className="animated fadeIn">
