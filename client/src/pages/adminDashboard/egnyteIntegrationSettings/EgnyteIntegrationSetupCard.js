@@ -27,7 +27,7 @@ const EgnyteIntegrationSetupCard = ({handleClick}) => {
               <p>
                 Connect Study Tracker with Egnyte to enable study file storage for your tenant.
                 Study Tracker uses the Egnyte REST API to access your Egnyte account. Before you
-                begin, you must register an <a href={"https://developers.egnyte.com/"} target={"_blank"}>Egnyte developer account</a>
+                begin, you must register an <a href={"https://developers.egnyte.com/"} target={"_blank"} rel={"noreferrer"}>Egnyte developer account</a>
                 and create an Egnyte API token in the developer portal. This token will be used
                 to authenticate with your account.
               </p>

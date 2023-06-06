@@ -19,8 +19,7 @@ import PropTypes from "prop-types";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
-import FormikFormErrorNotification
-  from "../../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification from "../../../common/forms/FormikFormErrorNotification";
 import {FormGroup} from "../../../common/forms/common";
 
 const MSGraphIntegrationFormModal = ({
@@ -163,7 +162,7 @@ const MSGraphIntegrationFormModal = ({
                       <FormGroup>
                         <Form.Label>Client Secret *</Form.Label>
                         <Form.Control
-                            type={"text"}
+                            type={"password"}
                             name={"clientSecret"}
                             isInvalid={errors.clientSecret && touched.clientSecret}
                             value={values.clientSecret}

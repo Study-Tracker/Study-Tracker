@@ -47,7 +47,7 @@ const AssayTimelineTab = props => {
         error: e.message
       }));
     })
-  }, []);
+  }, [assay.code]);
 
 
   let content = <CardLoadingMessage/>;

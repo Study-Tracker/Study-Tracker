@@ -17,13 +17,7 @@
 import React from "react";
 import {Card, Col, Container, Row} from "react-bootstrap";
 import {ActivityStream} from "../../common/activity";
-import {
-  ActiveStudies,
-  CompletedStudies,
-  NewStudies,
-  TotalStudies,
-  WelcomeBack
-} from './timelineWidgets';
+import {ActiveStudies, CompletedStudies, NewStudies, TotalStudies, WelcomeBack} from './timelineWidgets';
 import {ArrowLeft, ArrowRight} from "react-feather";
 import FrontPagePlaceholder from "./FrontPagePlaceholder";
 
@@ -38,8 +32,8 @@ const FrontPageTimeline = ({
   hasPreviousPage
 }) => {
 
-  let activityCount = stats.activityCount || 0;
-  let activeUsers = stats.activeUserCount || 0;
+  // let activityCount = stats.activityCount || 0;
+  // let activeUsers = stats.activeUserCount || 0;
   let newStudies = stats.newStudyCount || 0;
   let completedStudies = stats.completedStudyCount || 0;
   let totalStudies = stats.studyCount || 0;

@@ -58,7 +58,7 @@ const ProgramSettings = () => {
         message: "Failed to load programs"
       })
     });
-  }, [loadCount]);
+  }, [loadCount, notyf]);
 
   const handleStatusChange = (id, active) => {
     axios.post("/api/internal/program/" + id + "/status?active=" + active)

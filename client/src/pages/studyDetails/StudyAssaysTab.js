@@ -17,11 +17,11 @@
 import {Button, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-  faArrowDown19,
-  faArrowDown91,
-  faArrowDownAZ,
-  faArrowDownZA,
-  faPlusCircle
+    faArrowDown19,
+    faArrowDown91,
+    faArrowDownAZ,
+    faArrowDownZA,
+    faPlusCircle
 } from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect} from "react";
 import PropTypes from "prop-types";
@@ -41,25 +41,25 @@ const StudyAssaysTab = ({study}) => {
   const navigate = useNavigate();
   const notyf = React.useContext(NotyfContext);
   const [assays, setAssays] = React.useState([]);
-  const [error, setError] = React.useState(null);
-  const [sortOrder, setSortOrder] = React.useState("NEWEST_FIRST");
+  // const [sortOrder, setSortOrder] = React.useState("NEWEST_FIRST");
   const [sortIcon, setSortIcon] = React.useState(faArrowDown19);
 
   useEffect(() => {
     axios.get("/api/internal/study/" + study.code + "/assays")
     .then(response => {
       console.debug("Assays", response.data);
-      setAssays(response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      setAssays(response.data
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .filter(a => a.active));
     })
     .catch(error => {
-      setError(error);
       console.error(error);
       notyf.open({
         type: "error",
         message: "Error loading assays."
       })
     })
-  }, []);
+  }, [notyf]);
 
   const handleAssaySort = (order) => {
     let updated = Array.from(assays);

@@ -59,7 +59,7 @@ const SearchResultsView = () => {
         error: error
       }));
     });
-  }, []);
+  }, [searchParams]);
 
   let content = <LoadingMessage/>;
 

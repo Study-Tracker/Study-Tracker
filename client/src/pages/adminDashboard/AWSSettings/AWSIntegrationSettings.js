@@ -22,11 +22,7 @@ import AWSIntegrationSetupCard from "./AWSIntegrationSetupCard";
 import S3BucketCard from "./S3BucketCard";
 import {Button, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-  faCheckCircle,
-  faCircleXmark,
-  faEdit
-} from "@fortawesome/free-regular-svg-icons";
+import {faCheckCircle, faCircleXmark, faEdit} from "@fortawesome/free-regular-svg-icons";
 import AWSIntegrationFormModal from "./AWSIntegrationFormModal";
 import {faGears, faPlus, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import S3BucketFormModal from "./S3BucketFormModal";
@@ -72,7 +68,7 @@ const AWSIntegrationSettings = () => {
         message: "Failed to load AWS settings"
       });
     });
-  }, [loadCount]);
+  }, [loadCount, notyf]);
 
   const handleIntegrationFormSubmit = (values, {setSubmitting, resetForm}) => {
     console.debug("Saving AWS integration settings", values);

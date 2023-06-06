@@ -62,7 +62,7 @@ const StorageFolderSettings = () => {
     .finally(() => {
       setIsLoading(false);
     });
-  }, [loadCounter]);
+  }, [loadCounter, notyf]);
 
   const handleSubmitForm = (values, {setSubmitting, resetForm}) => {
     const url = selectedFolder

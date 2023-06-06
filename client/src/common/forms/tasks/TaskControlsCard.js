@@ -26,7 +26,8 @@ const TaskControlsCard = ({
     handleUpdate,
     errors,
     touched,
-    handleRemoveTask
+    handleRemoveTask,
+    showAssignments = false,
 }) => {
 
   return (
@@ -49,6 +50,7 @@ const TaskControlsCard = ({
               errors={errors}
               touched={touched}
               colWidth={6}
+              showAssignments={showAssignments}
           />
         </Card.Body>
 
@@ -62,7 +64,8 @@ TaskControlsCard.propTypes = {
   handleUpdate: PropTypes.func.isRequired,
   errors: PropTypes.object.isRequired,
   touched: PropTypes.object.isRequired,
-  handleRemoveTask: PropTypes.func.isRequired
+  handleRemoveTask: PropTypes.func.isRequired,
+    showAssignments: PropTypes.bool,
 }
 
 export default TaskControlsCard;

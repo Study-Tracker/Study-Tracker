@@ -59,7 +59,7 @@ const S3InputsCard = ({
         message: "Error loading S3 buckets"
       })
     })
-  }, []);
+  }, [notyf]);
 
   console.debug("Selected Bucket", selectedBucket);
 

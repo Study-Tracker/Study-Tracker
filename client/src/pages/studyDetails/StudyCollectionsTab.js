@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Badge, Button, Card, Col, Row, Table} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import NotyfContext from "../../context/NotyfContext";
 
 const StudyCollectionsTab = props => {
 
   const {study, showCollectionModal} = props;
   const [collections, setCollections] = useState([]);
-  const [error, setError] = useState(null);
-  const [refreshCount, setRefreshCount] = useState(0);
+  const notyf = useContext(NotyfContext);
 
   useEffect(() => {
     axios.get("/api/internal/study/" + study.id + "/studycollection")
     .then(response => {
       setCollections(response.data);
     }).catch(error => {
-      setError(error);
+      console.error(error);
+      notyf.open({
+        type: "error",
+        message: "Failed to load study collections"
+      })
     });
-  }, [refreshCount]);
+  }, [notyf, study.id]);
 
   let rows = collections.sort((a, b) => {
     if (a.name > b.name) {

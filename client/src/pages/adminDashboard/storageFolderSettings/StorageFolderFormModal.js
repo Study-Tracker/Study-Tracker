@@ -23,8 +23,7 @@ import Select from "react-select";
 import {FormGroup} from "../../../common/forms/common";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
-import FormikFormErrorNotification
-  from "../../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification from "../../../common/forms/FormikFormErrorNotification";
 
 const StorageFolderFormModal = ({
   isOpen,
@@ -48,7 +47,7 @@ const StorageFolderFormModal = ({
       console.error(e);
       notyf.open({message: 'Failed to load available storage drives.', type: 'error'});
     });
-  }, []);
+  }, [notyf]);
 
   const folderSchema = yup.object().shape({
     storageDriveId: yup.number()

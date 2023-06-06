@@ -16,20 +16,20 @@
 
 import React from "react";
 import {
-  Bell,
-  CheckSquare,
-  Edit,
-  ExternalLink,
-  File,
-  FilePlus,
-  FileText,
-  Link,
-  List,
-  MessageCircle,
-  RotateCcw,
-  Star,
-  Tag,
-  Trash2,
+    Bell,
+    CheckSquare,
+    Edit,
+    ExternalLink,
+    File,
+    FilePlus,
+    FileText,
+    Link,
+    List,
+    MessageCircle,
+    RotateCcw,
+    Star,
+    Tag,
+    Trash2,
 } from "react-feather";
 import {studyActions} from "../config/activityConstants";
 import {StatusBadge} from "./status";
@@ -523,7 +523,7 @@ const ActivityMessage = ({activity}) => {
               <a href={"/user/"
                   + activity.user.id}>{activity.user.displayName}</a>
               &nbsp;has updated the status of assay&nbsp;
-              <a href={"/study/" + activity.data.study + "/assay/"
+              <a href={"/study/" + activity.studyId + "/assay/"
                   + activity.data.assay.code}>{activity.data.assay.code}</a>
               &nbsp;from&nbsp;
               <StatusBadge status={activity.data.oldStatus}/>

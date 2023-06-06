@@ -25,7 +25,7 @@ import axios from "axios";
 import {useParams} from "react-router-dom";
 import NotyfContext from "../../context/NotyfContext";
 
-const StudyCollectionDetailsView = ({}) => {
+const StudyCollectionDetailsView = () => {
 
   const params = useParams();
   const collectionId = params.collectionId;
@@ -90,7 +90,7 @@ const StudyCollectionDetailsView = ({}) => {
         message: "There was an error loading the study collection."
       })
     })
-  }, [loadCount]);
+  }, [loadCount, collectionId, notyf]);
 
 
   let content = <LoadingMessage/>;

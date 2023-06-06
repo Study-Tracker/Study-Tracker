@@ -240,7 +240,7 @@ public class StudyService {
     StudyOptionAttributes.setStudyOptionAttributes(study, options);
 
     // Check for existing studies
-    if (study.getCode() != null) {
+    if (StringUtils.hasText(study.getCode())) {
       Optional<Study> optional = studyRepository.findByCode(study.getCode());
       if (optional.isPresent()) {
         throw new DuplicateRecordException("Duplicate study code: " + study.getCode());
@@ -251,7 +251,7 @@ public class StudyService {
     }
 
     // Assign the code, if necessary
-    if (study.getCode() == null) {
+    if (!StringUtils.hasText(study.getCode())) {
       study.setCode(namingService.generateStudyCode(study));
     }
     study.setActive(true);

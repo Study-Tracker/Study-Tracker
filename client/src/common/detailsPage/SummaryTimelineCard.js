@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import {Card} from "react-bootstrap";
 import Timeline from "../../common/detailsPage/Timeline";
 import PropTypes from "prop-types";
+import NotyfContext from "../../context/NotyfContext";
 
 const SummaryTimelineCard = ({study, assay}) => {
 
   const [activity, setActivity] = useState([]);
-  const [error, setError] = useState(null);
+  const notyf = useContext(NotyfContext);
 
   useEffect(() => {
     let url = null;
@@ -35,10 +36,13 @@ const SummaryTimelineCard = ({study, assay}) => {
     axios.get(url)
     .then(response => setActivity(response.data))
     .catch(e => {
-      setError(e);
       console.error(e);
+      notyf.open({
+        type: "error",
+        message: "Error retrieving activity"
+      })
     })
-  }, []);
+  }, [notyf]);
 
   return (
       <Card>

@@ -21,9 +21,7 @@ import crossfilter from "crossfilter2";
 import SideBar from "../../common/structure/SideBar";
 import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
-import ProgramFilters, {
-  labels as filter
-} from "../../common/filters/ProgramFilters";
+import ProgramFilters, {labels as filter} from "../../common/filters/ProgramFilters";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
@@ -78,7 +76,7 @@ const ProgramListView = () => {
         message: "Error loading programs"
       })
     });
-  }, []);
+  }, [notyf]);
 
   let programs = [];
   if (programData) {
