@@ -28,7 +28,7 @@ import IconWidget from "./IconWidget";
 
 const PrimaryNotebookWidget = ({record}) => {
 
-  const [notebook, setNotebook] = useState(record && record.notebookFolder ? record.notebookFolder : null);
+  const notebook = record && record.notebookFolder ? record.notebookFolder : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRepaird, setIsRepaird] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

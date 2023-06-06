@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
-## [0.9.0] - 2023-04-XX
+## [0.9.0] - 2023-06-06
 
 ### Added
 - Added support for Microsoft 365 cloud services: SharePoint and OneDrive. OneDrive drives can be used for file storage, and SharePoint sites can be used for registering drives.
@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed several issues with File Manager breadcrumbs and controls, which prevented them from acting as expected.
 - Fixed an issue where large ELN folder requests could timeout or crash study & assay creation requests.
+- Fixed a bug where removed assays would still appear in the study details page.
+- Fixed the ordering of assay custom input fields.
 
 ## [0.8.2] - 2023-03-01
 

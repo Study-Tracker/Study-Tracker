@@ -25,7 +25,7 @@ import {useNavigate} from "react-router-dom";
 const AssayTasksWidget = ({tasks, handleClick}) => {
   const activeCount = tasks.filter(t => t.status === 'TODO').length;
   const completedCount = tasks.filter(t => t.status === 'COMPLETE').length;
-  const incompleteCount = tasks.filter(t => t.status === 'INCOMPLETE').length;
+  // const incompleteCount = tasks.filter(t => t.status === 'INCOMPLETE').length;
   const isEmpty = tasks.length === 0;
   const isComplete = completedCount === tasks.length;
   const navigate = useNavigate();

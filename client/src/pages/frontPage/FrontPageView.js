@@ -45,10 +45,10 @@ const FrontPageView = props => {
     let page = !!params.page ? parseInt(params.page, 10) : 0;
     let size = !!params.size ? parseInt(params.size, 10) : 20;
     let sort = "date,desc";
-    let query = '';
-    if (!!params.search) {
-      query = "?search=" + params.search;
-    }
+    // let query = '';
+    // if (!!params.search) {
+    //   query = "?search=" + params.search;
+    // }
 
     axios.get("/api/internal/activity?sort=" + sort + "&page=" + page + "&size=" + size)
     .then(r1 => {

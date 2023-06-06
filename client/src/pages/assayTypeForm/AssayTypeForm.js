@@ -28,10 +28,8 @@ import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
 import axios from "axios";
 import PropTypes from "prop-types";
-import FormikFormErrorNotification
-  from "../../common/forms/FormikFormErrorNotification";
-import TaskControlsDraggableCardList
-  from "../../common/forms/tasks/TaskControlsDraggableCardList";
+import FormikFormErrorNotification from "../../common/forms/FormikFormErrorNotification";
+import TaskControlsDraggableCardList from "../../common/forms/tasks/TaskControlsDraggableCardList";
 import CustomFieldDefinitionDraggableCardList
   from "../../common/forms/customFields/CustomFieldDefinitionDraggableCardList";
 
@@ -351,6 +349,7 @@ const AssayTypeForm = props => {
                             handleUpdate={(tasks) => setFieldValue("tasks", tasks)}
                             errors={errors}
                             touched={touched}
+                            showAssignments={false}
                         />
 
                         <Row>

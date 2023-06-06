@@ -70,11 +70,8 @@ public class ProgramPrivateController extends AbstractProgramController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgramPrivateController.class);
 
   @Autowired private ActivityService activityService;
-
   @Autowired private EventsService eventsService;
-
   @Autowired private ActivityMapper activityMapper;
-
   @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StorageDriveFolderMapper storageDriveFolderMapper;
   @Autowired private StudyService studyService;
@@ -108,7 +105,10 @@ public class ProgramPrivateController extends AbstractProgramController {
   public ProgramDetailsDto getProgram(@PathVariable("id") Long programId) throws Exception {
     Optional<Program> optional = this.getProgramService().findById(programId);
     if (optional.isPresent()) {
-      return this.getProgramMapper().toProgramDetails(optional.get());
+      Program program = optional.get();
+      ProgramDetailsDto dto = this.getProgramMapper().toProgramDetails(program);
+      dto.setUsers(userMapper.toUserSummarySet(userService.findByProgram(program)));
+      return dto;
     } else {
       throw new RecordNotFoundException("Could not find program: " + programId);
     }

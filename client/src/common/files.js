@@ -17,12 +17,7 @@
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import React, {useMemo} from "react";
 import {useDropzone} from 'react-dropzone';
-import {
-  faCaretDown,
-  faCaretRight,
-  faFile,
-  faFolder
-} from "@fortawesome/free-solid-svg-icons";
+import {faCaretDown, faCaretRight, faFile, faFolder} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {CardLoadingMessage} from "./loading";
 import {DismissableAlert} from "./errors";
@@ -57,24 +52,6 @@ const acceptStyle = {
 
 const rejectStyle = {
   borderColor: '#ff1744'
-};
-
-/**
- * Converts a byte size integer into a file size display string
- *
- * @param size
- * @returns {string}
- */
-const formatFileSize = (size) => {
-  if (size >= 1000000000) {
-    return (size / 1000000000).toFixed(2) + " gb";
-  } else if (size >= 1000000) {
-    return (size / 1000000).toFixed(2) + " mb";
-  } else if (size >= 1000) {
-    return (size / 1000).toFixed(2) + " kb";
-  } else {
-    return size + " bytes";
-  }
 };
 
 const DEFAULT_FOLDER_FILE_KEY = 'files';
@@ -251,9 +228,7 @@ export const UploadFilesModal = ({isOpen, showModal, handleSubmit}) => {
     ...(isDragActive ? activeStyle : {}),
     ...(isDragAccept ? acceptStyle : {}),
     ...(isDragReject ? rejectStyle : {})
-  }), [
-    isDragActive, isDragReject
-  ]);
+  }), [isDragActive, isDragReject, isDragAccept]);
 
   return (
       <Modal

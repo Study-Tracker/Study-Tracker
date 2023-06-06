@@ -23,13 +23,11 @@ import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
 import UserList from "./UserList";
 import UserFilters, {labels as filter} from "../../common/filters/UserFilters";
-import {useSearchParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import axios from "axios";
 
-const UserListView = props => {
+const UserListView = () => {
 
-  const [searchParams, setSearchParams] = useSearchParams();
   const user = useSelector(state => state.user.value);
   const filters = useSelector(state => state.filters.value);
   const [state, setState] = useState({

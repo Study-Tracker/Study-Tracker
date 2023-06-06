@@ -101,7 +101,7 @@ const ProgramFormView = () => {
       setError(error);
     });
 
-  }, [programId, features]);
+  }, [programId, features, notyf]);
 
   let content = <LoadingMessage/>;
   if (error) {

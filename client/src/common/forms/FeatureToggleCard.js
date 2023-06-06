@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useRef, useState} from "react";
+import React, {useRef} from "react";
 import PropTypes from "prop-types";
 import {Card, Col, Form, Row} from "react-bootstrap";
 import {FormGroup} from "./common";
@@ -31,7 +31,7 @@ const FeatureToggleCard = props => {
     handleToggle
   } = props;
   const nodeRef = useRef(null);
-  const [cardClass, setCardClass] = useState(isActive ? "slide-in-down-exit" : "slide-in-down-enter");
+  const cardClass = isActive ? "slide-in-down-exit" : "slide-in-down-enter";
 
   return (
       <Card className={"form-card " + (isActive ? "" : "illustration")}>

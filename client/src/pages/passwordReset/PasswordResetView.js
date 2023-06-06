@@ -41,7 +41,7 @@ const PasswordResetView = props => {
         isLoaded: true
       }))
     }
-  }, []);
+  }, [searchParams]);
 
   const handleInputChange = (data) => {
     const auth = {

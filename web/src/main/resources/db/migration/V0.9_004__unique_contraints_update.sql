@@ -1,9 +1,6 @@
 ALTER TABLE assays
     ADD CONSTRAINT uq_assay_code UNIQUE (code, study_id);
 
-ALTER TABLE assays
-    ADD CONSTRAINT uq_assay_name UNIQUE (name, study_id);
-
 ALTER TABLE programs
     ADD CONSTRAINT uq_program_name UNIQUE (name, organization_id);
 

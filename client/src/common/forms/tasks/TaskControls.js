@@ -21,8 +21,7 @@ import {FormGroup} from "../common";
 import DatePicker from "react-datepicker";
 import AsyncSelect from "react-select/async";
 import axios from "axios";
-import CustomFieldDefinitionDraggableCardList
-  from "../customFields/CustomFieldDefinitionDraggableCardList";
+import CustomFieldDefinitionDraggableCardList from "../customFields/CustomFieldDefinitionDraggableCardList";
 
 const userAutocomplete = (input, callback) => {
   axios.get("/api/internal/autocomplete/user?q=" + input)
@@ -47,7 +46,8 @@ const TaskControls = ({
     errors,
     touched,
     handleUpdate,
-    colWidth
+    colWidth,
+    showAssignments = false
 }) => {
 
   const width = colWidth || 12;
@@ -73,7 +73,7 @@ const TaskControls = ({
             </FormGroup>
           </Col>
 
-          <Col md={width}>
+          <Col md={width} hidden={!showAssignments}>
             <FormGroup>
               <Form.Label>Due Date</Form.Label>
               <DatePicker
@@ -91,7 +91,7 @@ const TaskControls = ({
             </FormGroup>
           </Col>
 
-          <Col sm={width}>
+          <Col sm={width} hidden={!showAssignments}>
             <FormGroup>
               <Form.Label>Assigned To</Form.Label>
               <AsyncSelect
@@ -130,7 +130,8 @@ TaskControls.propTypes = {
   errors: PropTypes.object,
   touched: PropTypes.object,
   handleUpdate: PropTypes.func.isRequired,
-  colWidth: PropTypes.number
+  colWidth: PropTypes.number,
+    showAssignments: PropTypes.bool
 };
 
 export default TaskControls;

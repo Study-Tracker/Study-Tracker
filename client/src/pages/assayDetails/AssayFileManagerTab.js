@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Col, Container, Row} from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 import React, {useContext, useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
@@ -64,7 +64,7 @@ const AssayFileManagerTab = ({assay}) => {
   }
 
   return (
-      <Container fluid className="animated fadeIn">
+      <>
 
         <Row className="file-manager">
 
@@ -93,7 +93,7 @@ const AssayFileManagerTab = ({assay}) => {
 
         </Row>
 
-      </Container>
+      </>
   )
 
 }

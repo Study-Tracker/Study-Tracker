@@ -45,6 +45,7 @@ import io.studytracker.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,7 +223,7 @@ public class GitLabService implements GitService<GitLabIntegration> {
     request.setPath(GitLabUtils.getPathFromName(program.getName()));
     request.setAutoDevOpsEnabled(false);
     request.setDescription(program.getDescription() != null
-        ? program.getDescription().replaceAll("<[^>]*>", "")
+        ? StringUtils.truncate(program.getDescription().replaceAll("<[^>]*>", ""), 255)
         : "Program " + program.getName() + " study group");
     request.setParentId(parentProjectGroup.getId());
     request.setVisibility(parentProjectGroup.getVisibility());

@@ -20,14 +20,16 @@ import {Badge, Card, Col, Row} from "react-bootstrap";
 import TeamMembers from "../../common/detailsPage/TeamMembers";
 import {Clipboard} from "react-feather";
 import {useNavigate} from "react-router-dom";
-
-const createMarkup = (content) => {
-  return {__html: content};
-};
+import sanitizeHtml from "sanitize-html";
 
 const ProgramSummaryCard = ({ program }) => {
 
   const navigate = useNavigate();
+
+  function cleanupDescription(str) {
+    let cleaned = sanitizeHtml(str, {allowedTags: [], allowedAttributes: {}});
+    return cleaned.length > 255 ? `${cleaned.substring(0, 255)}...` : cleaned;
+  }
 
   return (
       <Col xs={12} sm={6} lg={4}>
@@ -46,7 +48,7 @@ const ProgramSummaryCard = ({ program }) => {
           <Card.Body>
             <Row>
               <Col>
-                <div dangerouslySetInnerHTML={createMarkup(program.description)}/>
+                {cleanupDescription(program.description)}
               </Col>
             </Row>
             <Row>

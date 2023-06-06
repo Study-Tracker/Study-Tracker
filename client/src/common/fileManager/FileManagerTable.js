@@ -144,7 +144,7 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
                 }
 
                 {
-                  dataSource.type === "AWS_S3" ? (
+                  dataSource.storageDrive && dataSource.storageDrive.driveType && dataSource.storageDrive.driveType === "S3" ? (
                       <Dropdown.Item onClick={() => handleCopyS3Path(d)}>
                         <Link className="align-middle me-2" size={18} /> Copy S3 Path
                       </Dropdown.Item>
