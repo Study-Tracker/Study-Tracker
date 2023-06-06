@@ -36,9 +36,9 @@ const CustomFieldCaptureInputList = ({
 
   let inputs = fields
   .sort((a, b) => {
-    if (a.id > b.id) {
+    if (a.fieldOrder > b.fieldOrder) {
       return 1;
-    } else if (a.id < b.id) {
+    } else if (a.fieldOrder < b.fieldOrder) {
       return -1;
     } else {
       return 0;
