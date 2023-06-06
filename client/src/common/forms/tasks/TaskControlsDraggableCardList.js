@@ -26,7 +26,8 @@ const TaskControlsDraggableCardList = ({
     tasks,
     handleUpdate,
     errors,
-    touched
+    touched,
+    showAssignments = false,
 }) => {
 
   const handleUpdateTask = (data, index) => {
@@ -107,6 +108,7 @@ const TaskControlsDraggableCardList = ({
                                   handleRemoveTask={() => handleRemoveTask(index)}
                                   errors={errors}
                                   touched={touched}
+                                  showAssignments={showAssignments}
                               />
                             </div>
                         )}
@@ -143,6 +145,10 @@ const TaskControlsDraggableCardList = ({
 
 TaskControlsDraggableCardList.propTypes = {
   tasks: PropTypes.array.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired,
+  touched: PropTypes.object.isRequired,
+  showAssignments: PropTypes.bool,
 }
 
 export default TaskControlsDraggableCardList;
