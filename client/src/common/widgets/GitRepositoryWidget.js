@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import React, {useContext, useState} from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import {Button} from "react-bootstrap";
-import {useNavigate} from "react-router-dom";
-import NotyfContext from "../../context/NotyfContext";
 import IconWidget from "./IconWidget";
 import {faGitAlt, faGithubSquare, faGitlabSquare} from "@fortawesome/free-brands-svg-icons";
 
@@ -41,9 +39,9 @@ const getRepositoryIcon = (repository) => {
 
 const GitRepositoryWidget = ({record}) => {
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-  const notyf = useContext(NotyfContext);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  // const navigate = useNavigate();
+  // const notyf = useContext(NotyfContext);
 
   // const handleCreateRepository = () => {
   //   let url = null;

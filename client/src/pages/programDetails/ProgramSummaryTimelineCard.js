@@ -36,7 +36,7 @@ const ProgramSummaryTimelineCard = ({program}) => {
         message: "Failed to load program activity"
       })
     })
-  }, [notyf]);
+  }, [program.id, notyf]);
 
   return (
       <Card>
