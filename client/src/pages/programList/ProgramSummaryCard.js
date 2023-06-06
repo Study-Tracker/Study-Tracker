@@ -20,15 +20,14 @@ import {Badge, Card, Col, Row} from "react-bootstrap";
 import TeamMembers from "../../common/detailsPage/TeamMembers";
 import {Clipboard} from "react-feather";
 import {useNavigate} from "react-router-dom";
+import * as sanitizeHtml from "sanitize-html";
 
 const ProgramSummaryCard = ({ program }) => {
 
   const navigate = useNavigate();
 
   function cleanupDescription(str) {
-    let cleaned = str.replace(/<[^>]*>?/g, "")
-        .replace(/<script[^>]*>(.*?)<\/script>/g, "")
-        .replace(/&nbsp;/g, "");
+    let cleaned = sanitizeHtml(str, {allowedTags: [], allowedAttributes: {}});
     return cleaned.length > 255 ? `${cleaned.substring(0, 255)}...` : cleaned;
   }
 
