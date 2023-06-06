@@ -20,7 +20,7 @@ import {Badge, Card, Col, Row} from "react-bootstrap";
 import TeamMembers from "../../common/detailsPage/TeamMembers";
 import {Clipboard} from "react-feather";
 import {useNavigate} from "react-router-dom";
-import * as sanitizeHtml from "sanitize-html";
+import sanitizeHtml from "sanitize-html";
 
 const ProgramSummaryCard = ({ program }) => {
 
