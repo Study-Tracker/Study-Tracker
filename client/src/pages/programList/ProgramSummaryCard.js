@@ -26,7 +26,9 @@ const ProgramSummaryCard = ({ program }) => {
   const navigate = useNavigate();
 
   const cleanupDescription = (str) => {
-    const cleaned = str.replace(/<[^>]*>?/gm, '');
+    const cleaned = str.replace(/<[^>]*>?/gm, '')
+        .replace(/<script[^>]*>(.*?)<\/script>/gm, '')
+        .replace(/&nbsp;/g, '');
     return cleaned.length > 255 ? cleaned.substring(0, 255) + "..." : cleaned;
   }
 
