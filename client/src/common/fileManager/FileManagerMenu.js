@@ -18,7 +18,7 @@ import {Card, ListGroup} from "react-bootstrap";
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFolder, faServer} from "@fortawesome/free-solid-svg-icons";
-import {faAws} from "@fortawesome/free-brands-svg-icons";
+import {faAws, faMicrosoft} from "@fortawesome/free-brands-svg-icons";
 import PropTypes from "prop-types";
 
 const FileManagerMenu = ({
@@ -33,6 +33,8 @@ const FileManagerMenu = ({
         return <FontAwesomeIcon icon={faServer} className={"me-2"} />
       case "S3":
         return <FontAwesomeIcon icon={faAws} className={"me-2"} />
+      case "ONEDRIVE":
+        return <FontAwesomeIcon icon={faMicrosoft} className={"me-2"} />
       default:
         return <FontAwesomeIcon icon={faFolder} className={"me-2"} />
     }
