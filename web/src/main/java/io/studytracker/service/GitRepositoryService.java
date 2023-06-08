@@ -18,20 +18,16 @@ package io.studytracker.service;
 
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.Assay;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.GitRepository;
-import io.studytracker.model.GitServiceType;
-import io.studytracker.model.Program;
-import io.studytracker.model.Study;
+import io.studytracker.model.*;
 import io.studytracker.repository.GitGroupRepository;
 import io.studytracker.repository.GitRepositoryRepository;
-import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GitRepositoryService {
@@ -48,6 +44,7 @@ public class GitRepositoryService {
   private GitServiceLookup gitServiceLookup;
 
   public Optional<GitGroup> findProgramGitGroup(Program program) {
+    LOGGER.debug("Looking up GitGroup for program: {}", program.getId());
     List<GitGroup> groups = gitGroupRepository.findByProgramId(program.getId());
     if (groups.isEmpty()) {
       return Optional.empty();
@@ -57,6 +54,7 @@ public class GitRepositoryService {
   }
 
   public Optional<GitRepository> findStudyGitRepository(Study study) {
+    LOGGER.debug("Looking up GitRepository for study: {}", study.getId());
     List<GitRepository> repositories = gitRepositoryRepository.findByStudyId(study.getId());
     if (repositories.isEmpty()) {
       return Optional.empty();
@@ -66,6 +64,7 @@ public class GitRepositoryService {
   }
 
   public Optional<GitRepository> findAssayGitRepository(Assay assay) {
+    LOGGER.debug("Looking up GitRepository for assay: {}", assay.getId());
     List<GitRepository> repositories = gitRepositoryRepository.findByAssayId(assay.getId());
     if (repositories.isEmpty()) {
       return Optional.empty();
@@ -75,6 +74,7 @@ public class GitRepositoryService {
   }
 
   public GitService<?> lookupGitService(GitServiceType type) {
+    LOGGER.debug("Looking up GitService for type: {}", type);
     return gitServiceLookup.lookup(type)
         .orElseThrow(() -> new IllegalArgumentException("No GitService found for type: " + type));
   }

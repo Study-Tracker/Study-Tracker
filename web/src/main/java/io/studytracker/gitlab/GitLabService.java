@@ -26,31 +26,18 @@ import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabProjectGroup;
-import io.studytracker.model.Assay;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.GitLabGroup;
-import io.studytracker.model.GitLabIntegration;
-import io.studytracker.model.GitLabRepository;
-import io.studytracker.model.GitRepository;
-import io.studytracker.model.GitServiceType;
-import io.studytracker.model.Program;
-import io.studytracker.model.Study;
-import io.studytracker.repository.AssayRepository;
-import io.studytracker.repository.GitGroupRepository;
-import io.studytracker.repository.GitLabGroupRepository;
-import io.studytracker.repository.GitLabRepositoryRepository;
-import io.studytracker.repository.ProgramRepository;
-import io.studytracker.repository.StudyRepository;
-import io.studytracker.repository.UserRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import io.studytracker.model.*;
+import io.studytracker.repository.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GitLabService implements GitService<GitLabIntegration> {
@@ -285,11 +272,13 @@ public class GitLabService implements GitService<GitLabIntegration> {
         .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
+    String description = trimRepositoryDescription(study.getDescription());
+
     GitLabNewProjectRequest request = new GitLabNewProjectRequest();
     request.setNamespaceId(gitLabProgramGroup.getGroupId());
     request.setName(GitLabUtils.getStudyProjectName(study));
     request.setPath(GitLabUtils.getStudyProjectPath(study));
-    request.setDescription(study.getDescription().replaceAll("<[^>]*>", ""));
+    request.setDescription(description);
     request.setAutoDevopsEnabled(false);
     request.setInitializeWithReadme(false);
     request.setVisibility(gitLabProjectGroup.getVisibility());
@@ -301,7 +290,7 @@ public class GitLabService implements GitService<GitLabIntegration> {
     GitRepository repository = new GitRepository();
     repository.setGitGroup(programGroup);
     repository.setDisplayName(project.getName());
-    repository.setDescription(project.getDescription());
+    repository.setDescription(description);
     repository.setWebUrl(project.getWebUrl());
     repository.setHttpUrl(project.getHttpUrlToRepo());
     repository.setSshUrl(project.getSshUrlToRepo());
@@ -377,11 +366,12 @@ public class GitLabService implements GitService<GitLabIntegration> {
         .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
+    String description = trimRepositoryDescription(assay.getDescription());
     GitLabNewProjectRequest request = new GitLabNewProjectRequest();
     request.setNamespaceId(gitLabProgramGroup.getGroupId());
     request.setName(GitLabUtils.getAssayProjectName(assay));
     request.setPath(GitLabUtils.getAssayProjectPath(assay));
-    request.setDescription(assay.getDescription().replaceAll("<[^>]*>", ""));
+    request.setDescription(description);
     request.setAutoDevopsEnabled(false);
     request.setInitializeWithReadme(false);
     request.setVisibility(gitLabProjectGroup.getVisibility());
@@ -393,7 +383,7 @@ public class GitLabService implements GitService<GitLabIntegration> {
     GitRepository repository = new GitRepository();
     repository.setGitGroup(programGroup);
     repository.setDisplayName(project.getName());
-    repository.setDescription(project.getDescription());
+    repository.setDescription(description);
     repository.setWebUrl(project.getWebUrl());
     repository.setHttpUrl(project.getHttpUrlToRepo());
     repository.setSshUrl(project.getSshUrlToRepo());
@@ -481,5 +471,13 @@ public class GitLabService implements GitService<GitLabIntegration> {
 //    LOGGER.warn("User not found for {}", user.getUsername());
 //    return Optional.empty();
 //  }
+
+  private String trimRepositoryDescription(String description) {
+    String cleaned = description.replaceAll("<[^>]*>", "");
+    if (cleaned.length() > 255) {
+      return description.substring(0, 252) + "...";
+    }
+    return cleaned;
+  }
 
 }
