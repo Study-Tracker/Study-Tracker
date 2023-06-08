@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import React, {useContext, useState} from 'react';
-import {Download, File, Folder, Link, MoreHorizontal} from "react-feather";
+import {Download, File, Folder, FolderPlus, Link, MoreHorizontal} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -45,6 +45,10 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
   const handleCopyUrl = (d) => {
     navigator.clipboard.writeText(d.url);
     notyf.open({message: "Copied URL clipboard", type: "success"});
+  }
+
+  const handleAddToStudy = (d) => {
+    console.debug("Add to study", d);
   }
 
   const columns = [
@@ -157,6 +161,13 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
                         <Link className="align-middle me-2" size={18} /> Copy Link
                       </Dropdown.Item>
                   ) : ""
+                }
+                {
+                  d.type === "folder" && (
+                    <Dropdown.Item onClick={() => handleAddToStudy(d)}>
+                      <FolderPlus className="align-middle me-2" size={18} /> Add to Study
+                    </Dropdown.Item>
+                  )
                 }
 
                 {/*<Dropdown.Item onClick={() => console.log("Click!")}>*/}
