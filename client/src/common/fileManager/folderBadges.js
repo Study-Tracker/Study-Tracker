@@ -54,3 +54,20 @@ export const FolderPermissionsBadges = ({folder}) => {
 FolderPermissionsBadges.propTypes = {
   folder: PropTypes.object.isRequired
 }
+
+export const FolderSizeBadge = ({folder}) => {
+  let count = 0;
+  if (folder) {
+    count += folder.files.length;
+    count += folder.subFolders.length;
+  }
+  return (
+    <Badge bg="info" style={{fontSize: "100%"}}>
+      {count} item{count === 0 ? '' : 's'}
+    </Badge>
+  );
+}
+
+FolderSizeBadge.propTypes = {
+  folder: PropTypes.object.isRequired
+}
