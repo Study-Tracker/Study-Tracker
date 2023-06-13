@@ -21,16 +21,23 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 import {Dropdown} from "react-bootstrap";
 import PropTypes from "prop-types";
 import NotyfContext from "../../context/NotyfContext";
+import FileManagerAddToStudyModal from "./FileManagerAddToStudyModal";
 
-const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
+const FileManagerTable = ({
+  folder,
+  handlePathChange,
+  dataSource,
+}) => {
 
   const notyf = useContext(NotyfContext);
+  const [addToStudyModalIsOpen, setAddToStudyModalIsOpen] = useState(false);
+  const [addToAssayModalIsOpen, setAddToAssayModalIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedItemIndex, setSelectedItemIndex] = useState(null);
+  // const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
   const handleItemClick = (item, index) => {
     setSelectedItem(item);
-    setSelectedItemIndex(index);
+    // setSelectedItemIndex(index);
     if (item.type === 'folder') {
       handlePathChange(item.path);
     }
@@ -45,10 +52,6 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
   const handleCopyUrl = (d) => {
     navigator.clipboard.writeText(d.url);
     notyf.open({message: "Copied URL clipboard", type: "success"});
-  }
-
-  const handleAddToStudy = (d) => {
-    console.debug("Add to study", d);
   }
 
   const columns = [
@@ -164,9 +167,25 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
                 }
                 {
                   d.type === "folder" && (
-                    <Dropdown.Item onClick={() => handleAddToStudy(d)}>
-                      <FolderPlus className="align-middle me-2" size={18} /> Add to Study
-                    </Dropdown.Item>
+                    <>
+
+                      <Dropdown.Item onClick={() => {
+                        setSelectedItem(d);
+                        setAddToStudyModalIsOpen(true);
+                      }}>
+                        <FolderPlus className="align-middle me-2" size={18} />
+                        Add to Study
+                      </Dropdown.Item>
+
+                      <Dropdown.Item onClick={() => {
+                        setSelectedItem(d);
+                        setAddToAssayModalIsOpen(true);
+                      }}>
+                        <FolderPlus className="align-middle me-2" size={18} />
+                        Add to Assay
+                      </Dropdown.Item>
+
+                    </>
                   )
                 }
 
@@ -201,44 +220,66 @@ const FileManagerTable = ({folder, handlePathChange, dataSource}) => {
   ]
 
   return (
-    <ToolkitProvider
-      keyField={"name"}
-      data={data}
-      columns={columns}
-      search
-    >
-      {props => (
-          <div className="mt-3 file-manager-table">
-            <div className="d-flex justify-content-end">
-              <Search.SearchBar
-                  {...props.searchProps}
-              />
+    <>
+
+      <ToolkitProvider
+        keyField={"name"}
+        data={data}
+        columns={columns}
+        search
+      >
+        {props => (
+            <div className="mt-3 file-manager-table">
+              <div className="d-flex justify-content-end">
+                <Search.SearchBar
+                    {...props.searchProps}
+                />
+              </div>
+              <BootstrapTable
+                  bootstrap4
+                  keyField="name"
+                  bordered={false}
+                  pagination={paginationFactory({
+                    sizePerPage: 10,
+                    sizePerPageList: [10, 20, 40, 80]
+                  })}
+                  defaultSorted={[{
+                    dataField: "name",
+                    order: "asc"
+                  }]}
+                  {...props.baseProps}
+              >
+              </BootstrapTable>
             </div>
-            <BootstrapTable
-                bootstrap4
-                keyField="name"
-                bordered={false}
-                pagination={paginationFactory({
-                  sizePerPage: 10,
-                  sizePerPageList: [10, 20, 40, 80]
-                })}
-                defaultSorted={[{
-                  dataField: "name",
-                  order: "asc"
-                }]}
-                {...props.baseProps}
-            >
-            </BootstrapTable>
-          </div>
-      )}
-    </ToolkitProvider>
+        )}
+      </ToolkitProvider>
+
+      <FileManagerAddToStudyModal
+        setModalIsOpen={setAddToStudyModalIsOpen}
+        isOpen={addToStudyModalIsOpen}
+        folder={selectedItem}
+        rootFolder={dataSource}
+        useStudies={true}
+      />
+
+      <FileManagerAddToStudyModal
+        setModalIsOpen={setAddToAssayModalIsOpen}
+        isOpen={addToAssayModalIsOpen}
+        folder={selectedItem}
+        rootFolder={dataSource}
+        useStudies={false}
+      />
+
+    </>
   );
 }
 
 FileManagerTable.propTypes = {
   folder: PropTypes.object.isRequired,
   handlePathChange: PropTypes.func.isRequired,
-  dataSource: PropTypes.object.isRequired
+  dataSource: PropTypes.object.isRequired,
+  handleAddToRecord: PropTypes.func.isRequired,
+  record: PropTypes.object
 }
 
 export default FileManagerTable;

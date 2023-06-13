@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.1] - TBD
 
+### Added
+- You can now add folders you are browsing in the File Manager to studies or assays. This allows you to associate existing storage locations and data with your studies and assays.
+
 ### Fixed
 - Fixed an issue that would cause git repository creation to fail if study or assays descriptions were too long.
 - Fixed a bug that would prevent file manager page from loading correctly when changing to a new root folder.

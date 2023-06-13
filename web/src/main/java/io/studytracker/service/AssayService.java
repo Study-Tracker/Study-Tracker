@@ -365,7 +365,7 @@ public class AssayService {
     assay.setUsers(updated.getUsers());
     assay.setAttributes(updated.getAttributes());
     assay.setFields(updated.getFields());
-    //    assay.setTasks(updated.getTasks());
+    assay.setStorageFolders(updated.getStorageFolders());
 
     // Update the tasks
     for (AssayTask task : updated.getTasks()) {
@@ -512,5 +512,9 @@ public class AssayService {
       a.setNotebookFolder(f);
       assayRepository.save(a);
     }
+  }
+  
+  public List<Assay> search(String keyword) {
+    return assayRepository.findByNameOrCodeLike(keyword);
   }
 }

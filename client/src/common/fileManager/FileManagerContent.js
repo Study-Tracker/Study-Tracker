@@ -284,7 +284,7 @@ const FileManagerContent = ({
 FileManagerContent.propTypes = {
   rootFolder: PropTypes.object.isRequired,
   path: PropTypes.string.isRequired,
-  handleRepairFolder: PropTypes.func,
+  handleRepairFolder: PropTypes.func
 }
 
 export default FileManagerContent;

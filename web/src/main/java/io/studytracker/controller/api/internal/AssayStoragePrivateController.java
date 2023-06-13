@@ -17,24 +17,25 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
+import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.mapstruct.dto.response.AssayStorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayStorageFolder;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.AssayStorageFolderRepository;
 import io.studytracker.service.FileSystemStorageService;
-import java.util.List;
+import io.studytracker.storage.StorageDriveFolderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping({"/api/internal/assay/{assayId}/storage", "/api/internal/study/{studyId}/assays/{assayId}/storage"})
 @RestController
@@ -47,6 +48,8 @@ public class AssayStoragePrivateController extends AbstractAssayController {
   @Autowired private AssayStorageFolderRepository folderRepository;
 
   @Autowired private StorageDriveFolderMapper mapper;
+  
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
 
   @GetMapping("")
   public List<AssayStorageDriveFolderSummaryDto> getAssayStorageFolders(@PathVariable("assayId") String assayId) {
@@ -54,6 +57,20 @@ public class AssayStoragePrivateController extends AbstractAssayController {
     Assay assay = getAssayFromIdentifier(assayId);
     List<AssayStorageFolder> assayStorageFolders = folderRepository.findByAssayId(assay.getId());
     return mapper.toAssayFolderSummaryDto(assayStorageFolders);
+  }
+  
+  @PatchMapping("")
+  public HttpEntity<?> addFolderToAssay(@PathVariable("assayId") String assayId,
+          @RequestBody StorageDriveFolderFormDto dto) {
+    LOGGER.info("Adding storage folder {} to assay {}", dto.getPath(), assayId);
+    Assay assay = getAssayFromIdentifier(assayId);
+    StorageDrive drive = storageDriveFolderService.findDriveById(dto.getStorageDriveId())
+            .orElseThrow(() -> new IllegalArgumentException("Storage drive not found: " + dto.getStorageDriveId()));
+    StorageDriveFolder folder = storageDriveFolderService
+            .registerFolder(mapper.fromFormDto(dto), drive);
+    assay.addStorageFolder(folder);
+    this.getAssayService().update(assay);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/repair")
