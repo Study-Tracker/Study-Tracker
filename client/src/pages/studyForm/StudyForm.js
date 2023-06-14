@@ -189,7 +189,6 @@ const StudyForm = ({
       {({
           values,
           errors,
-          touched,
           handleChange,
           setFieldValue,
           isSubmitting,
@@ -423,10 +422,7 @@ const StudyForm = ({
 
                   {/*Git*/}
                   {
-                    !values.id
-                    && features
-                    && features.git
-                    && features.git.isEnabled ? (
+                    !values.id ? (
                         <GitInputsCard
                             onChange={(key, value) => setFieldValue(key, value)}
                             isActive={values.useGit}
@@ -438,10 +434,7 @@ const StudyForm = ({
 
                   {/*S3*/}
                   {
-                    !values.id
-                    && features
-                    && features.aws
-                    && features.aws.isEnabled ? (
+                    !values.id ? (
                         <S3InputsCard
                             onChange={(key, value) => setFieldValue(key, value)}
                             isActive={values.useS3}

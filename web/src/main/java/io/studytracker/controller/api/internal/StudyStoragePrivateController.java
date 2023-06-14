@@ -17,12 +17,16 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
+import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.mapstruct.dto.response.StudyStorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyStorageFolder;
 import io.studytracker.repository.StudyStorageFolderRepository;
 import io.studytracker.service.FileSystemStorageService;
+import io.studytracker.storage.StorageDriveFolderService;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +35,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,6 +53,8 @@ public class StudyStoragePrivateController extends AbstractStudyController {
   @Autowired private StudyStorageFolderRepository studyStorageFolderRepository;
 
   @Autowired private StorageDriveFolderMapper storageDriveFolderMapper;
+  
+  @Autowired private StorageDriveFolderService storageDriveFolderService;
 
   @GetMapping("")
   public List<StudyStorageDriveFolderSummaryDto> getStudyStorageFolders(@PathVariable("studyId") String studyId) {
@@ -55,6 +63,19 @@ public class StudyStoragePrivateController extends AbstractStudyController {
     List<StudyStorageFolder> studyStorageFolders = studyStorageFolderRepository
         .findByStudyId(study.getId());
     return storageDriveFolderMapper.toStudyFolderSummaryDto(studyStorageFolders);
+  }
+
+  @PatchMapping("")
+  public HttpEntity<?> addFolderToStudy(@PathVariable("studyId") String studyId,
+          @RequestBody StorageDriveFolderFormDto dto) {
+    LOGGER.info("Adding storage folder {} to study {}", dto.getPath(), studyId);
+    Study study = getStudyFromIdentifier(studyId);
+    StorageDrive drive = storageDriveFolderService.findDriveById(dto.getStorageDriveId())
+            .orElseThrow(() -> new IllegalArgumentException("Storage drive not found: " + dto.getStorageDriveId()));
+    StorageDriveFolder folder = storageDriveFolderService
+            .registerFolder(storageDriveFolderMapper.fromFormDto(dto), drive);
+    this.getStudyService().addStorageFolder(study, folder);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/repair")

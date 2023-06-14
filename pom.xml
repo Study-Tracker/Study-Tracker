@@ -15,7 +15,7 @@
 
   <groupId>io.studytracker</groupId>
   <artifactId>study-tracker-parent</artifactId>
-  <version>0.9.0</version>
+  <version>0.9.1-SNAPSHOT</version>
   <name>Study Tracker Parent</name>
   <packaging>pom</packaging>
 
@@ -55,10 +55,10 @@
   </modules>
 
   <properties>
-    <study-tracker.version>0.7.0</study-tracker.version>
+    <study-tracker.version>${parent.version}</study-tracker.version>
     <java.version>11</java.version>
-    <node.version>v16.5.0</node.version>
-    <npm.version>8.11.0</npm.version>
+    <node.version>v16.20.0</node.version>
+    <npm.version>8.19.4</npm.version>
     <aws-sdk.version>2.17.283</aws-sdk.version>
   </properties>
 

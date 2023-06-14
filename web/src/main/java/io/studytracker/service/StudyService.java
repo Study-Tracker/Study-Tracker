@@ -492,6 +492,13 @@ public class StudyService {
         .orElseThrow(() -> new RecordNotFoundException("Failed to create study: " + study.getCode()));
   }
 
+  @Transactional
+  public void addStorageFolder(Study study, StorageDriveFolder folder) {
+    Study s = studyRepository.getById(study.getId());
+    s.addStorageFolder(folder);
+    studyRepository.save(s);
+  }
+
   /**
    * Deletes the given study, identifies by its primary key ID.
    *

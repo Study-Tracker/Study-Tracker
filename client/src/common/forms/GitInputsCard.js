@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Col, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import FeatureToggleCard from "./FeatureToggleCard";
+import axios from "axios";
 
 const GitInputsCard = ({
     isActive,
@@ -25,28 +26,48 @@ const GitInputsCard = ({
     selectedProgram
 }) => {
 
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    axios.get("/api/internal/integrations/gitlab/")
+    .then(response => {
+      console.debug("GitLab Integration: ", response.data);
+      if (response.data.length && response.data[0].active) {
+        setEnabled(true);
+      } else {
+        setEnabled(false);
+      }
+    })
+  });
+
   console.debug("Program: ", selectedProgram);
 
   return (
-      <FeatureToggleCard
-          isActive={isActive}
-          title={"Git Repository"}
-          description={"Computational studies that require versioned file management may have a Git repository "
-              + "created within the linked source code management system. If enabled, an empty repository "
-              + "will be created and linked to the study."}
-          switchLabel={"Does this study need a Git repository?"}
-          handleToggle={() => onChange("useGit", !isActive)}
-      >
+      <>
+        {
+          enabled && (
+              <FeatureToggleCard
+                  isActive={isActive}
+                  title={"Git Repository"}
+                  description={"Computational studies that require versioned file management may have a Git repository "
+                      + "created within the linked source code management system. If enabled, an empty repository "
+                      + "will be created and linked to the study."}
+                  switchLabel={"Does this study need a Git repository?"}
+                  handleToggle={() => onChange("useGit", !isActive)}
+              >
 
-        <Row>
-          <Col md={12}>
-            <p>
-              A Git repository will be created in the selected program's group on your Git server and linked on the study details page.
-            </p>
-          </Col>
-        </Row>
+                <Row>
+                  <Col md={12}>
+                    <p>
+                      A Git repository will be created in the selected program's group on your Git server and linked on the study details page.
+                    </p>
+                  </Col>
+                </Row>
 
-      </FeatureToggleCard>
+              </FeatureToggleCard>
+          )
+        }
+      </>
   );
 }
 

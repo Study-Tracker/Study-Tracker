@@ -27,14 +27,38 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
+import io.studytracker.model.AssayStorageFolder;
+import io.studytracker.model.AssayTask;
+import io.studytracker.model.AssayTaskField;
+import io.studytracker.model.AssayTypeField;
+import io.studytracker.model.CustomEntityFieldType;
+import io.studytracker.model.ELNFolder;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitRepository;
+import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTaskRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.storage.*;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFile;
+import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
+import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +66,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.ConstraintViolationException;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AssayService {
@@ -365,7 +382,6 @@ public class AssayService {
     assay.setUsers(updated.getUsers());
     assay.setAttributes(updated.getAttributes());
     assay.setFields(updated.getFields());
-    //    assay.setTasks(updated.getTasks());
 
     // Update the tasks
     for (AssayTask task : updated.getTasks()) {
@@ -384,6 +400,13 @@ public class AssayService {
     assayRepository.save(assay);
 
     return assay;
+  }
+
+  @Transactional
+  public void addStorageFolder(Assay assay, StorageDriveFolder folder) {
+    Assay a = assayRepository.getById(assay.getId());
+    a.addStorageFolder(folder);
+    assayRepository.save(a);
   }
 
   @Transactional
@@ -512,5 +535,9 @@ public class AssayService {
       a.setNotebookFolder(f);
       assayRepository.save(a);
     }
+  }
+  
+  public List<Assay> search(String keyword) {
+    return assayRepository.findByNameOrCodeLike(keyword);
   }
 }

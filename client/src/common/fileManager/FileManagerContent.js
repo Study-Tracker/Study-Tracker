@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-import {Badge, Button, Card, Col, Row} from "react-bootstrap";
-import {
-  ArrowLeft,
-  CornerLeftUp,
-  FolderPlus,
-  RotateCw,
-  Upload
-} from "react-feather";
+import {Button, Card, Col, Row} from "react-bootstrap";
+import {ArrowLeft, CornerLeftUp, FolderPlus, RotateCw, Upload} from "react-feather";
 import FileManagerUploadModal from "./FileManagerUploadModal";
 import FileManagerNewFolderModal from "./FileManagerNewFolderModal";
 import React, {useContext, useEffect, useState} from "react";
@@ -34,19 +28,7 @@ import PropTypes from "prop-types";
 import FileManagerContentError from "./FileManagerContentError";
 import FileManagerPathBreadcrumbs from "./FileManagerPathBreadcrumbs";
 import {getPathParts} from "./fileManagerUtils";
-
-const FolderSizeBadge = ({folder}) => {
-  let count = 0;
-  if (folder) {
-    count += folder.files.length;
-    count += folder.subFolders.length;
-  }
-  return (
-      <Badge bg="info" style={{fontSize: "100%"}}>
-        {count} item{count === 0 ? '' : 's'}
-      </Badge>
-  );
-}
+import {FolderSizeBadge} from "./folderBadges";
 
 const FileManagerContent = ({
     rootFolder,
@@ -59,7 +41,6 @@ const FileManagerContent = ({
 
   const notyf = useContext(NotyfContext);
 
-  const [rootPath, setRootPath] = useState(path || rootFolder.path);
   const [folder, setFolder] = useState(null);
   const [currentPath, setCurrentPath] = useState(path || rootFolder.path);
   const [history, setHistory] = useState([]);
@@ -76,7 +57,6 @@ const FileManagerContent = ({
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    setRootPath(path || rootFolder.path);
     axios.get("/api/internal/data-files", {
       params: {
         path: currentPath,
@@ -94,13 +74,13 @@ const FileManagerContent = ({
     .finally(() => {
       setIsLoading(false);
     });
-  }, [currentPath, refreshCount]);
+  }, [refreshCount]);
 
   // Reset the component on data source change
   useEffect(() => {
     setCurrentPath(path || rootFolder.path);
     setHistory([]);
-    // setRefreshCount(refreshCount + 1);
+    setRefreshCount(refreshCount + 1);
   }, [rootFolder]);
 
   /**
@@ -119,6 +99,7 @@ const FileManagerContent = ({
     setCurrentPath(path);
     searchParams.set("path", path);
     setSearchParams(searchParams);
+    setRefreshCount(refreshCount + 1);
   }
 
   const handleUploadSuccess = () => {
@@ -303,7 +284,7 @@ const FileManagerContent = ({
 FileManagerContent.propTypes = {
   rootFolder: PropTypes.object.isRequired,
   path: PropTypes.string.isRequired,
-  handleRepairFolder: PropTypes.func,
+  handleRepairFolder: PropTypes.func
 }
 
 export default FileManagerContent;

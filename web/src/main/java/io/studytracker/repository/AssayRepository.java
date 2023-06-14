@@ -17,12 +17,13 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.Assay;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 public interface AssayRepository extends JpaRepository<Assay, Long> {
 
@@ -58,4 +59,7 @@ public interface AssayRepository extends JpaRepository<Assay, Long> {
   long countByCreatedAtAfter(Date date);
 
   long countByCreatedAtBetween(Date startDate, Date endDate);
+  
+  @Query("select a from Assay a where lower(a.name) like lower(concat('%', ?1, '%')) or lower(a.code) like lower(concat('%', ?1, '%'))")
+  List<Assay> findByNameOrCodeLike(String keyword);
 }

@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
+## [0.9.1] - TBD
+
+### Added
+- You can now add folders you are browsing in the File Manager to studies or assays. This allows you to associate existing storage locations and data with your studies and assays.
+
+### Fixed
+- Fixed an issue that would cause git repository creation to fail if study or assays descriptions were too long.
+- Fixed a bug that would prevent file manager page from loading correctly when changing to a new root folder.
+- The option to add S3 buckets and git repositories to studies should now show up correctly on the study form page.
+
 ## [0.9.0] - 2023-06-06
 
 ### Added
