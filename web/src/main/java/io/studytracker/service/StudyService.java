@@ -18,17 +18,46 @@ package io.studytracker.service;
 
 import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.aws.S3Utils;
-import io.studytracker.eln.*;
-import io.studytracker.exception.*;
+import io.studytracker.eln.NotebookEntry;
+import io.studytracker.eln.NotebookEntryService;
+import io.studytracker.eln.NotebookFolder;
+import io.studytracker.eln.NotebookFolderService;
+import io.studytracker.eln.NotebookTemplate;
+import io.studytracker.exception.DuplicateRecordException;
+import io.studytracker.exception.InvalidConstraintException;
+import io.studytracker.exception.InvalidRequestException;
+import io.studytracker.exception.RecordNotFoundException;
+import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.*;
+import io.studytracker.model.ELNFolder;
+import io.studytracker.model.ExternalLink;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitRepository;
+import io.studytracker.model.Program;
+import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptionAttributes;
+import io.studytracker.model.StudyOptions;
+import io.studytracker.model.StudyStorageFolder;
+import io.studytracker.model.User;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.storage.*;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
+import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.net.URL;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +66,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import javax.validation.ConstraintViolationException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 /** Service class for reading and writing {@link Study} records. */
 @Service
@@ -449,7 +472,6 @@ public class StudyService {
     study.setUsers(updated.getUsers());
     study.setKeywords(updated.getKeywords());
     study.setAttributes(updated.getAttributes());
-    study.setStorageFolders(updated.getStorageFolders());
 
     // Collaborator changes
     if (study.getCollaborator() == null && updated.getCollaborator() != null) {
@@ -468,6 +490,13 @@ public class StudyService {
 
     return studyRepository.findById(study.getId())
         .orElseThrow(() -> new RecordNotFoundException("Failed to create study: " + study.getCode()));
+  }
+
+  @Transactional
+  public void addStorageFolder(Study study, StorageDriveFolder folder) {
+    Study s = studyRepository.getById(study.getId());
+    s.addStorageFolder(folder);
+    studyRepository.save(s);
   }
 
   /**
