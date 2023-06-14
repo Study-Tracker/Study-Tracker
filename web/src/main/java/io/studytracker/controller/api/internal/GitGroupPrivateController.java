@@ -35,9 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/git-groups")
-public class GitGroupController {
+public class GitGroupPrivateController {
 
-  public static final Logger LOGGER = LoggerFactory.getLogger(GitGroupController.class);
+  public static final Logger LOGGER = LoggerFactory.getLogger(GitGroupPrivateController.class);
 
   @Autowired
   private OrganizationService organizationService;

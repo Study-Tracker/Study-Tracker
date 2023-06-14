@@ -19,6 +19,7 @@ package io.studytracker.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,7 +42,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(UnauthorizedException.class)
+  @ExceptionHandler({UnauthorizedException.class, AccessDeniedException.class})
   public final ResponseEntity<ApiError> unauthorizedError(
       UnauthorizedException ex, WebRequest webRequest) {
     ex.printStackTrace();
