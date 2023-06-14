@@ -23,6 +23,7 @@ import {S3_STORAGE_TYPE} from "../../config/storageConstants";
 import {FormGroup} from "./common";
 import Select from "react-select";
 import NotyfContext from "../../context/NotyfContext";
+import {DismissableAlert} from "../errors";
 
 const S3InputsCard = ({
     isActive,
@@ -32,25 +33,34 @@ const S3InputsCard = ({
 }) => {
 
   console.debug("Program: ", selectedProgram);
+  const [enabled, setEnabled] = useState(false);
   const [rootFolders, setRootFolders] = useState([]);
   const [selectedBucket, setSelectedBucket] = useState(null);
   const notyf = useContext(NotyfContext);
 
   useEffect(() => {
-    axios.get("/api/internal/storage-drive-folders?studyRoot=true")
-    .then(response => {
-      let folders = response.data;
-      axios.get("/api/internal/drives/s3")
-      .then(async response2 => {
-
-        const bucketRootFolders = folders
-        .filter(f => f.storageDrive.active && f.storageDrive.driveType
-            === S3_STORAGE_TYPE);
-        await bucketRootFolders.forEach(f => {
-          f.bucket = response2.data.find(b => b.storageDrive.id === f.storageDrive.id);
-        });
-        setRootFolders(bucketRootFolders);
-      })
+    axios.get("/api/internal/integrations/aws/")
+    .then(r => {
+      console.debug("AWS Integration: ", r.data);
+      if (r.data.length && r.data[0].active) {
+        axios.get("/api/internal/storage-drive-folders?studyRoot=true")
+        .then(response => {
+          let folders = response.data;
+          axios.get("/api/internal/drives/s3")
+          .then(async response2 => {
+            const bucketRootFolders = folders
+            .filter(f => f.storageDrive.active && f.storageDrive.driveType
+                === S3_STORAGE_TYPE);
+            await bucketRootFolders.forEach(f => {
+              f.bucket = response2.data.find(b => b.storageDrive.id === f.storageDrive.id);
+            });
+            setEnabled(true);
+            setRootFolders(bucketRootFolders);
+          })
+        })
+      } else {
+        setEnabled(false);
+      }
     })
     .catch(error => {
       console.error(error);
@@ -64,73 +74,91 @@ const S3InputsCard = ({
   console.debug("Selected Bucket", selectedBucket);
 
   return (
-      <FeatureToggleCard
-          isActive={isActive}
-          title={"S3 Storage Folder"}
-          description={"AWS S3 storage allows for the storage of large amounts "
-              + "of data.  By enabling this feature for your study, a folder "
-              + "will be created in S3 that can be used for uploading and "
-              + "preserving large data files. All connected S3 buckets can be "
-              + "accessed from the File Manager page."}
-          switchLabel={"Does this study need S3 storage?"}
-          handleToggle={() => onChange("useS3", !isActive)}
-      >
+      <>
+      {
+        enabled && (
+            <FeatureToggleCard
+                isActive={isActive}
+                title={"S3 Storage Folder"}
+                description={"AWS S3 storage allows for the storage of large amounts "
+                    + "of data.  By enabling this feature for your study, a folder "
+                    + "will be created in S3 that can be used for uploading and "
+                    + "preserving large data files. All connected S3 buckets can be "
+                    + "accessed from the File Manager page."}
+                switchLabel={"Does this study need S3 storage?"}
+                handleToggle={() => onChange("useS3", !isActive)}
+            >
 
-        <Row>
+              <Row>
 
-          <Col md={6} className={"mb-3"}>
-            <FormGroup>
-              <Form.Label>S3 Bucket *</Form.Label>
-              <Select
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  options={
-                    rootFolders
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map(p => ({
-                      label: p.storageDrive.driveType + ": " + p.name,
-                      value: p
-                    }))
-                  }
-                  name="parentFolder"
-                  onChange={(selected) => {
-                    setSelectedBucket(selected.value);
-                    onChange("s3FolderId", selected.value.id);
-                  }}
-              />
-              <Form.Control.Feedback type={"invalid"}>
-                {errors.s3FolderId}
-              </Form.Control.Feedback>
-              <Form.Text>
-                Select the S3 bucket to create the study storage folder in.
-              </Form.Text>
-            </FormGroup>
-          </Col>
+                {
+                  rootFolders.length ? (
+                      <Col md={6} className={"mb-3"}>
+                        <FormGroup>
+                          <Form.Label>S3 Bucket *</Form.Label>
+                          <Select
+                              className="react-select-container"
+                              classNamePrefix="react-select"
+                              options={
+                                rootFolders
+                                .sort((a, b) => a.name.localeCompare(b.name))
+                                .map(p => ({
+                                  label: p.storageDrive.driveType + ": " + p.name,
+                                  value: p
+                                }))
+                              }
+                              name="parentFolder"
+                              onChange={(selected) => {
+                                setSelectedBucket(selected.value);
+                                onChange("s3FolderId", selected.value.id);
+                              }}
+                          />
+                          <Form.Control.Feedback type={"invalid"}>
+                            {errors.s3FolderId}
+                          </Form.Control.Feedback>
+                          <Form.Text>
+                            Select the S3 bucket to create the study storage folder in.
+                          </Form.Text>
+                        </FormGroup>
+                      </Col>
+                  ) : (
+                      <Col>
+                        <DismissableAlert
+                            header={"No S3 buckets available."}
+                            message={"Please contact your administrator to enable S3 storage for studies."}
+                            color={"warning"}
+                        />
+                      </Col>
+                  )
+                }
 
-          {
-              selectedBucket && (
-                  <Col md={6}>
-                    <p>
-                      A folder will be created for your study in the S3 bucket:
-                    </p>
-                    <p className={"text-lg"}>
-                      <code>
-                        {
-                            "s3://"
-                            + selectedBucket.bucket.name
-                            + "/"
-                            + selectedBucket.path
-                            + (selectedProgram ? selectedProgram.name : "")
-                        }
-                      </code>
-                    </p>
-                  </Col>
-              )
-          }
+                {
+                    selectedBucket && (
+                        <Col md={6}>
+                          <p>
+                            A folder will be created for your study in the S3 bucket:
+                          </p>
+                          <p className={"text-lg"}>
+                            <code>
+                              {
+                                  "s3://"
+                                  + selectedBucket.bucket.name
+                                  + "/"
+                                  + selectedBucket.path
+                                  + (selectedProgram ? selectedProgram.name : "")
+                              }
+                            </code>
+                          </p>
+                        </Col>
+                    )
+                }
 
-        </Row>
+              </Row>
 
-      </FeatureToggleCard>
+            </FeatureToggleCard>
+          )
+      }
+      </>
   );
 }
 

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed an issue that would cause git repository creation to fail if study or assays descriptions were too long.
 - Fixed a bug that would prevent file manager page from loading correctly when changing to a new root folder.
+- The option to add S3 buckets and git repositories to studies should now show up correctly on the study form page.
 
 ## [0.9.0] - 2023-06-06
 
