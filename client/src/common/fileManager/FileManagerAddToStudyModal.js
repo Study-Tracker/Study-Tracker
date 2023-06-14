@@ -25,7 +25,6 @@ import AsyncSelect from "react-select/async";
 import {FormGroup} from "../forms/common";
 import NotyfContext from "../../context/NotyfContext";
 
-
 const FileManagerAddToStudyModal = ({
   isOpen,
   setModalIsOpen,
@@ -51,10 +50,10 @@ const FileManagerAddToStudyModal = ({
   });
 
   const handleSubmit = (values, {setSubmitting}) => {
-    console.debug("Submitting AddFolderToStudy for study: " + setSelectedId, values);
+    console.debug(`Submitting AddFolderToStudy for study: ${setSelectedId}`, values);
     let url = useStudies
-      ? "/api/internal/study/" + selectedId + "/storage"
-      : "/api/internal/assay/" + selectedId + "/storage";
+      ? `/api/internal/study/${selectedId}/storage`
+      : `/api/internal/assay/${selectedId}/storage`;
     axios.patch(url, values)
     .then(response => {
       if (response.status === 200) {
@@ -74,9 +73,9 @@ const FileManagerAddToStudyModal = ({
   }
 
   const autocomplete = (input, callback) => {
-    let url = useStudies
-      ? "/api/internal/autocomplete/study?q=" + input
-      : "/api/internal/autocomplete/assay?q=" + input;
+    const url = useStudies
+      ? `/api/internal/autocomplete/study?q=${input}`
+      : `/api/internal/autocomplete/assay?q=${input}`;
     axios.get(url)
     .then(response => {
       const options = response.data
@@ -94,7 +93,7 @@ const FileManagerAddToStudyModal = ({
       })
       .map(d => {
         return {
-          label: d.code + ": " + d.name,
+          label: `${d.code}: ${d.name}`,
           value: d.id,
           obj: d
         }
