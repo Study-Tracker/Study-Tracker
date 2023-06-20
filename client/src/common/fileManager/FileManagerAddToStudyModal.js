@@ -122,7 +122,7 @@ const FileManagerAddToStudyModal = ({
             <Modal show={isOpen} onHide={() => setModalIsOpen(false)}>
 
               <Modal.Header closeButton>
-                <Modal.Title>New Folder</Modal.Title>
+                <Modal.Title>Add Folder to { useStudies ? "Study" : "Assay" }</Modal.Title>
               </Modal.Header>
 
               <Modal.Body className="mb-3">
