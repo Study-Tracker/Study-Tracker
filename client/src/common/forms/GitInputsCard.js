@@ -38,7 +38,7 @@ const GitInputsCard = ({
         setEnabled(false);
       }
     })
-  });
+  }, []);
 
   console.debug("Program: ", selectedProgram);
 
