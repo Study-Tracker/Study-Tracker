@@ -28,6 +28,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,20 +44,11 @@ public class StudyStorageServiceLookup {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyStorageServiceLookup.class);
 
-  @Autowired(required = false)
-  private EgnyteStudyStorageService egnyteStudyStorageService;
-
-  @Autowired(required = false)
-  private S3StudyStorageService s3StudyStorageService;
-
-  @Autowired(required = false)
-  private LocalFileSystemStorageService localFileSystemStorageService;
-
-  @Autowired(required = false)
-  private OneDriveStorageService oneDriveStorageService;
-
   @Autowired
   private StorageDriveRepository storageDriveRepository;
+
+  @Autowired
+  private ApplicationContext context;
 
   public Optional<StudyStorageService> lookup(StorageDriveFolder folder) {
     LOGGER.debug("Looking up StudyStorageService for storageDriveFolder: {}", folder);
@@ -70,13 +62,13 @@ public class StudyStorageServiceLookup {
     LOGGER.debug("Looking up StudyStorageService for storageLocationType: {}", driveType);
     switch (driveType) {
       case EGNYTE:
-        return Optional.ofNullable(egnyteStudyStorageService);
+        return Optional.of(context.getBean(EgnyteStudyStorageService.class));
       case S3:
-        return Optional.ofNullable(s3StudyStorageService);
+        return Optional.of(context.getBean(S3StudyStorageService.class));
       case LOCAL:
-        return Optional.ofNullable(localFileSystemStorageService);
+        return Optional.of(context.getBean(LocalFileSystemStorageService.class));
       case ONEDRIVE:
-        return Optional.ofNullable(oneDriveStorageService);
+        return Optional.of(context.getBean(OneDriveStorageService.class));
       default:
         return Optional.empty();
     }

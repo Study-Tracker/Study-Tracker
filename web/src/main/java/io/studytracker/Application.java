@@ -18,6 +18,7 @@ package io.studytracker;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ReactiveElasticsearchRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
 import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
@@ -32,6 +33,7 @@ import org.springframework.context.annotation.PropertySource;
 				UserDetailsServiceAutoConfiguration.class,
 				ElasticsearchRepositoriesAutoConfiguration.class,
 				ElasticsearchRestClientAutoConfiguration.class,
+				ReactiveElasticsearchRepositoriesAutoConfiguration.class,
 				MailSenderAutoConfiguration.class
 		}
 	)

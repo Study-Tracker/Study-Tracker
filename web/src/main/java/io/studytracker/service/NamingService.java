@@ -23,6 +23,7 @@ import io.studytracker.model.Collaborator;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
+import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,7 +34,7 @@ public class NamingService {
   private StudyProperties studyProperties;
 
   @Autowired
-  private ProgramService programService;
+  private ProgramRepository programRepository;
 
   @Autowired
   private StudyRepository studyRepository;
@@ -53,7 +54,7 @@ public class NamingService {
     }
     Program program = study.getProgram();
     Integer count = studyProperties.getStudyCodeCounterStart();
-    for (Program p : programService.findByCode(program.getCode())) {
+    for (Program p : programRepository.findByCode(program.getCode())) {
       count = count + (studyRepository.findActiveProgramStudies(p.getId())).size();
     }
     return program.getCode()
