@@ -209,24 +209,36 @@ const FileManagerContent = ({
 
             <div className="card-toolbar">
 
-              <Button
-                  variant="outline-primary"
-                  className="me-2"
-                  onClick={() => setNewFolderModalIsOpen(true)}
-              >
-                <FolderPlus size={18} />
-                &nbsp;&nbsp;
-                New Folder
-              </Button>
+              {
+                rootFolder.writeEnabled ? (
+                  <>
+                    <Button
+                      variant="outline-primary"
+                      className="me-2"
+                      onClick={() => setNewFolderModalIsOpen(true)}
+                    >
+                      <FolderPlus size={18} />
+                      &nbsp;&nbsp;
+                      New Folder
+                    </Button>
 
-              <Button
-                  variant="primary"
-                  onClick={() => setUploadModalIsOpen(true)}
-              >
-                <Upload size={18} />
-                &nbsp;&nbsp;
-                Upload
-              </Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => setUploadModalIsOpen(true)}
+                    >
+                      <Upload size={18} />
+                      &nbsp;&nbsp;
+                      Upload
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant={"outline-secondary"} disabled={true}>
+                    Read Only
+                  </Button>
+                )
+              }
+
+
 
             </div>
 
