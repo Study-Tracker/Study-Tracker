@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.mapper;
+package io.studytracker.model;
 
-import org.mapstruct.Mapper;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
-@Deprecated
-@Mapper(componentModel = "spring")
-public interface IntegrationInstanceConfigurationValueMapper {
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OneDriveFolderDetails extends StorageDriveFolderDetails {
+
+  private String folderId;
+  private String webUrl;
+  private String path;
 
 }

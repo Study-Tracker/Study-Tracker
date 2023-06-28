@@ -17,11 +17,11 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.egnyte.EgnyteIntegrationService;
-import io.studytracker.mapstruct.dto.response.EgnyteDriveDetailsDto;
-import io.studytracker.mapstruct.mapper.EgnyteDriveMapper;
-import io.studytracker.model.EgnyteDrive;
+import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
+import io.studytracker.mapstruct.mapper.StorageDriveMapper;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.service.OrganizationService;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,28 +48,28 @@ public class EgnyteDrivePrivateController {
   private EgnyteIntegrationService egnyteIntegrationService;
 
   @Autowired
-  private EgnyteDriveMapper egnyteDriveMapper;
+  private StorageDriveMapper storageDriveMapper;
 
   @Autowired
   private OrganizationService organizationService;
 
   @GetMapping("")
-  public List<EgnyteDriveDetailsDto> findAllDrives() {
+  public List<StorageDriveDetailsDto> findAllDrives() {
     Organization organization = organizationService.getCurrentOrganization();
     LOGGER.debug("Finding all egnyte drives for organization: {}", organization.getId());
-    List<EgnyteDrive> drives = new ArrayList<>();
+    List<StorageDrive> drives = new ArrayList<>();
     for (EgnyteIntegration integration: egnyteIntegrationService.findByOrganization(organization)) {
       drives.addAll(egnyteIntegrationService.listIntegrationDrives(integration));
     }
-    return egnyteDriveMapper.toDetailsDto(drives);
+    return storageDriveMapper.toDetailsDto(drives);
   }
 
   @PatchMapping("/{id}")
-  public HttpEntity<?> updateDriveStatus(@PathVariable("id") Long egnyteDriveId,
+  public HttpEntity<?> updateDriveStatus(@PathVariable("id") Long driveId,
       @RequestParam("active") boolean active) {
     LOGGER.info("Updating Egnyte drive status {}", active);
-    EgnyteDrive drive = egnyteIntegrationService.findDriveById(egnyteDriveId)
-        .orElseThrow(() -> new IllegalArgumentException("Bucket not found"));
+    StorageDrive drive = egnyteIntegrationService.findDriveById(driveId)
+        .orElseThrow(() -> new IllegalArgumentException("Drive not found"));
     egnyteIntegrationService.updateDriveStatus(drive, active);
     return new ResponseEntity<>(HttpStatus.OK);
   }

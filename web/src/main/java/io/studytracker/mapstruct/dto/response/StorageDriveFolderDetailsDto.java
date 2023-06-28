@@ -32,5 +32,6 @@ public class StorageDriveFolderDetailsDto {
   private boolean deleteEnabled;
   private Date createdAt;
   private Date updatedAt;
+  private Object details;
 
 }

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package io.studytracker.integration;
+package io.studytracker.model;
 
-@Deprecated
-public enum IntegrationType {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
-  PLACEHOLDER_FILE_STORE,
-  LOCAL_FILE_SYSTEM,
-  EGNYTE,
-  AWS_S3,
-  AWS_EVENTBRIDGE,
-  GITLAB,
-  OKTA,
-  BENCHLING,
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EgnyteDriveDetails extends StorageDriveDetails {
+
+  private String name;
+  private Long egnyteIntegrationId;
 
 }

@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package io.studytracker.repository;
+package io.studytracker.model;
 
-import io.studytracker.model.OneDriveFolder;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.jpa.repository.Query;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface OneDriveFolderRepository extends StorageDriveFolderDetailsOperations<OneDriveFolder> {
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EgnyteFolderDetails extends StorageDriveFolderDetails {
+
+  private String folderId;
+  private String webUrl;
 
   @Override
-  @Query("SELECT f FROM OneDriveFolder f WHERE f.storageDriveFolder.id = ?1")
-  Optional<OneDriveFolder> findByStorageDriveFolderId(Long id);
-
-  @Override
-  @Query("SELECT f FROM OneDriveFolder f JOIN OneDriveDrive d ON f.oneDriveDrive.id = d.id WHERE d.storageDrive.id = ?1")
-  List<OneDriveFolder> findByStorageDriveId(Long id);
+  public String getWebUrl() {
+    return webUrl;
+  }
 
 }

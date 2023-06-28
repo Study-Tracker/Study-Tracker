@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.model;
 
-import io.studytracker.integration.IntegrationType;
-import java.util.HashSet;
-import java.util.Set;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
-@Deprecated
-@Data
-public class IntegrationDefinitionDetailsDto {
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class S3FolderDetails extends StorageDriveFolderDetails {
 
-  private Long id;
-  private IntegrationType type;
-  private boolean active;
-  private Integer version;
-  private Set<IntegrationConfigurationSchemaFieldDetailsDto> configurationSchemaFields = new HashSet<>();
+  private String key;
+  private String eTag;
+
+  @Override
+  public String getWebUrl() {
+    return null;
+  }
+
 
 }

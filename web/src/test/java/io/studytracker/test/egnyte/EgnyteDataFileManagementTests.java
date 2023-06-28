@@ -22,10 +22,12 @@ import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
-import io.studytracker.model.EgnyteDrive;
 import io.studytracker.model.EgnyteIntegration;
-import io.studytracker.repository.EgnyteDriveRepository;
+import io.studytracker.model.Organization;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.repository.EgnyteIntegrationRepository;
+import io.studytracker.repository.OrganizationRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import org.junit.Assert;
@@ -49,14 +51,18 @@ public class EgnyteDataFileManagementTests {
   private EgnyteIntegrationRepository egnyteIntegrationRepository;
 
   @Autowired
-  private EgnyteDriveRepository egnyteDriveRepository;
+  private StorageDriveRepository driveRepository;
+
+  @Autowired
+  private OrganizationRepository organizationRepository;
 
   @Test
   public void getRootFolderTest() throws Exception {
     EgnyteIntegration integration = egnyteIntegrationRepository.findAll().get(0);
     EgnyteRestApiClient client = EgnyteClientFactory.createRestApiClient(integration);
-    EgnyteDrive drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
-    String rootPath = drive.getStorageDrive().getRootPath();
+    Organization organization = organizationRepository.findAll().get(0);
+    StorageDrive drive = driveRepository.findByOrganizationAndDriveType(organization.getId(), StorageDrive.DriveType.EGNYTE).get(0);
+    String rootPath = drive.getRootPath();
     EgnyteObject egnyteObject = client.findObjectByPath(rootPath);
     Assert.assertNotNull(egnyteObject);
     Assert.assertTrue(egnyteObject.isFolder());
@@ -66,10 +72,10 @@ public class EgnyteDataFileManagementTests {
 
   @Test
   public void getFolderContentsTest() throws Exception {
-    EgnyteIntegration integration = egnyteIntegrationRepository.findAll().get(0);
-    EgnyteDrive drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
-    String rootPath = drive.getStorageDrive().getRootPath();
-    StorageFolder folder = storageService.findFolderByPath(drive.getStorageDrive(), rootPath);
+    Organization organization = organizationRepository.findAll().get(0);
+    StorageDrive drive = driveRepository.findByOrganizationAndDriveType(organization.getId(), StorageDrive.DriveType.EGNYTE).get(0);
+    String rootPath = drive.getRootPath();
+    StorageFolder folder = storageService.findFolderByPath(drive, rootPath);
     Assert.assertNotNull(folder);
     for (StorageFolder subFolder : folder.getSubFolders()) {
       System.out.println(subFolder.toString());

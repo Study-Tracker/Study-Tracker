@@ -18,16 +18,20 @@ package io.studytracker.service;
 
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitRepository;
+import io.studytracker.model.GitServiceType;
+import io.studytracker.model.Program;
+import io.studytracker.model.Study;
 import io.studytracker.repository.GitGroupRepository;
 import io.studytracker.repository.GitRepositoryRepository;
+import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GitRepositoryService {

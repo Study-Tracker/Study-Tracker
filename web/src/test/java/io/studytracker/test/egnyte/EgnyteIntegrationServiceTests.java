@@ -18,12 +18,11 @@ package io.studytracker.test.egnyte;
 
 import io.studytracker.Application;
 import io.studytracker.egnyte.EgnyteIntegrationService;
-import io.studytracker.model.EgnyteDrive;
+import io.studytracker.model.EgnyteDriveDetails;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.repository.EgnyteDriveRepository;
 import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
@@ -46,9 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class EgnyteIntegrationServiceTests {
 
   @Autowired private EgnyteIntegrationService egnyteIntegrationService;
-
   @Autowired private EgnyteIntegrationRepository egnyteIntegrationRepository;
-  @Autowired private EgnyteDriveRepository egnyteDriveRepository;
   @Autowired private StorageDriveRepository storageDriveRepository;
   @Autowired private OrganizationService organizationService;
 
@@ -68,7 +65,6 @@ public class EgnyteIntegrationServiceTests {
   public void doBefore() throws Exception {
     Organization organization = organizationService.getCurrentOrganization();
     System.out.println(organization.getName());
-    egnyteDriveRepository.deleteAll();
     List<StorageDrive> egnyteDrives = storageDriveRepository.findAll().stream()
             .filter(d -> d.getDriveType().equals(DriveType.EGNYTE))
             .collect(Collectors.toList());
@@ -82,7 +78,7 @@ public class EgnyteIntegrationServiceTests {
     Organization organization = organizationService.getCurrentOrganization();
     Assert.assertNotNull(organization);
     Assert.assertEquals(0, egnyteIntegrationRepository.count());
-    Assert.assertEquals(0, egnyteDriveRepository.count());
+    Assert.assertEquals(0, storageDriveRepository.count());
     int driveCount = storageDriveRepository
         .findByOrganizationAndDriveType(organization.getId(), DriveType.EGNYTE).size();
     Assert.assertEquals(0, driveCount);
@@ -97,7 +93,7 @@ public class EgnyteIntegrationServiceTests {
     EgnyteIntegration created = egnyteIntegrationService.register(integration);
     Assert.assertNotNull(created.getId());
     Assert.assertEquals(1, egnyteIntegrationRepository.count());
-    Assert.assertEquals(0, egnyteDriveRepository.count());
+    Assert.assertEquals(0, storageDriveRepository.count());
     driveCount = storageDriveRepository
         .findByOrganizationAndDriveType(organization.getId(), DriveType.EGNYTE).size();
     Assert.assertEquals(0, driveCount);
@@ -112,7 +108,7 @@ public class EgnyteIntegrationServiceTests {
     Organization organization = organizationService.getCurrentOrganization();
 
     Assert.assertEquals(1, egnyteIntegrationRepository.count());
-    Assert.assertEquals(0, egnyteDriveRepository.count());
+    Assert.assertEquals(0, storageDriveRepository.count());
     int driveCount = storageDriveRepository
         .findByOrganizationAndDriveType(organization.getId(), DriveType.EGNYTE).size();
     Assert.assertEquals(0, driveCount);
@@ -120,17 +116,18 @@ public class EgnyteIntegrationServiceTests {
     EgnyteIntegration integration = egnyteIntegrationRepository.findByOrganizationId(organization.getId()).get(0);
     egnyteIntegrationService.registerDefaultDrive(integration);
 
-    Assert.assertEquals(1, egnyteDriveRepository.count());
-    EgnyteDrive drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
+    Assert.assertEquals(1, storageDriveRepository.count());
+    StorageDrive drive = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.EGNYTE)
+            .stream().filter(d -> ((EgnyteDriveDetails) d.getDetails()).getEgnyteIntegrationId().equals(integration.getId()))
+            .findFirst().get();
     Assert.assertNotNull(drive.getId());
     Assert.assertEquals(DriveType.EGNYTE, drive.getDriveType());
-    Assert.assertEquals("Shared", drive.getName());
+    Assert.assertEquals("Shared", ((EgnyteDriveDetails) drive.getDetails()).getName());
 
-    StorageDrive storageDrive = drive.getStorageDrive();
-    Assert.assertEquals(DriveType.EGNYTE, storageDrive.getDriveType());
-    Assert.assertEquals("/Shared", storageDrive.getRootPath());
-    Assert.assertEquals("Egnyte Shared Drive", storageDrive.getDisplayName());
-    Assert.assertTrue(storageDrive.isActive());
+    Assert.assertEquals(DriveType.EGNYTE, drive.getDriveType());
+    Assert.assertEquals("/Shared", drive.getRootPath());
+    Assert.assertEquals("Egnyte Shared Drive", drive.getDisplayName());
+    Assert.assertTrue(drive.isActive());
 
   }
 

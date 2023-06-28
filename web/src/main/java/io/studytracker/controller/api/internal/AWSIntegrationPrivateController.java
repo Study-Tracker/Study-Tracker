@@ -22,7 +22,6 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.AwsIntegrationFormDto;
 import io.studytracker.mapstruct.dto.response.AwsIntegrationDetailsDto;
 import io.studytracker.mapstruct.mapper.AwsIntegrationMapper;
-import io.studytracker.mapstruct.mapper.S3BucketMapper;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.service.OrganizationService;
@@ -60,9 +59,6 @@ public class AWSIntegrationPrivateController {
 
   @Autowired
   private AwsIntegrationMapper awsIntegrationMapper;
-
-  @Autowired
-  private S3BucketMapper s3BucketMapper;
 
   @GetMapping("")
   public List<AwsIntegrationDetailsDto> fetchAwsIntegrations() {

@@ -16,14 +16,10 @@
 
 package io.studytracker.model;
 
-import io.studytracker.model.StorageDrive.DriveType;
 
-public interface StorageDriveFolderDetails {
+public abstract class StorageDriveFolderDetails {
 
-  Long getId();
-  StorageDriveFolder getStorageDriveFolder();
-  String getWebUrl();
-  DriveType getDriveType();
+  abstract String getWebUrl();
 
 
 }

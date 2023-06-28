@@ -20,14 +20,13 @@ import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.LocalDrive;
-import io.studytracker.model.LocalDriveFolder;
+import io.studytracker.model.LocalDriveDetails;
+import io.studytracker.model.LocalDriveFolderDetails;
 import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.repository.LocalDriveFolderRepository;
-import io.studytracker.repository.LocalDriveRepository;
+import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.StorageDriveFolderService;
@@ -50,10 +49,7 @@ public class LocalStorageInitializer {
   private StudyTrackerProperties properties;
 
   @Autowired
-  private LocalDriveRepository localDriveRepository;
-
-  @Autowired
-  private LocalDriveFolderRepository localDriveFolderRepository;
+  private StorageDriveFolderRepository folderRepository;
 
   @Autowired
   private OrganizationService organizationService;
@@ -72,8 +68,6 @@ public class LocalStorageInitializer {
     if (storageProperties.getMode().equals("local") && StringUtils.hasText(storageProperties.getLocalDir())) {
 
       Organization organization;
-      LocalDrive localDrive;
-      StorageDrive storageDrive;
 
       // Check to see if the organization is already registered
       try {
@@ -96,15 +90,14 @@ public class LocalStorageInitializer {
             + storageProperties.getLocalDir());
       }
 
-      Optional<LocalDrive> optional = localDriveRepository.findByOrganizationId(organization.getId())
+      Optional<StorageDrive> optional = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.LOCAL)
           .stream()
-          .filter(d -> d.getOrganization().getId().equals(organization.getId())
-              && d.getStorageDrive().getRootPath().equals(storageProperties.getLocalDir()))
+          .filter(d -> d.getRootPath().equals(storageProperties.getLocalDir()))
           .findFirst();
+      StorageDrive storageDrive;
 
       if (optional.isPresent()) {
-        localDrive = optional.get();
-        storageDrive = storageDriveRepository.getById(localDrive.getStorageDrive().getId());
+        storageDrive = storageDriveRepository.getById(optional.get().getId());
         storageDrive.setRootPath(storageProperties.getLocalDir());
         storageDriveRepository.save(storageDrive);
       } else {
@@ -115,11 +108,11 @@ public class LocalStorageInitializer {
         storageDrive.setDriveType(DriveType.LOCAL);
         storageDrive.setActive(true);
 
-        localDrive = new LocalDrive();
-        localDrive.setStorageDrive(storageDrive);
+        LocalDriveDetails localDrive = new LocalDriveDetails();
         localDrive.setName("Default Local Drive");
-        localDrive.setOrganization(organization);
-        localDriveRepository.save(localDrive);
+        storageDrive.setDetails(localDrive);
+        storageDriveRepository.save(storageDrive);
+
       }
 
       // If root folders do not exist, create them
@@ -135,12 +128,9 @@ public class LocalStorageInitializer {
       rootFolder.setPath(storageProperties.getLocalDir());
       rootFolder.setName(StorageUtils.getFolderNameFromPath(storageProperties.getLocalDir()));
       rootFolder.setStorageDrive(storageDrive);
+      rootFolder.setDetails(new LocalDriveFolderDetails());
 
-      LocalDriveFolder localDriveFolder = new LocalDriveFolder();
-      localDriveFolder.setLocalDrive(localDrive);
-      localDriveFolder.setStorageDriveFolder(rootFolder);
-
-      localDriveFolderRepository.save(localDriveFolder);
+      folderRepository.save(rootFolder);
 
     }
 

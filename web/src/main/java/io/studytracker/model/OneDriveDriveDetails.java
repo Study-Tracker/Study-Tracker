@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.model;
 
-import io.studytracker.storage.StorageLocationType;
-import io.studytracker.storage.StoragePermissions;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class FileStorageLocationDetailsDto {
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OneDriveDriveDetails extends StorageDriveDetails {
 
-  private Long id;
-  private IntegrationInstanceDetailsDto integrationInstance;
-  private StorageLocationType type;
-  private String displayName;
   private String name;
-  private String rootFolderPath;
-  private String referenceId;
-  private String url;
-  private StoragePermissions permissions;
-  private boolean defaultStudyLocation;
-  private boolean defaultDataLocation;
-  private boolean active;
+  private String driveId;
+  private String webUrl;
+  private Long msGraphIntegrationId;
 
 }

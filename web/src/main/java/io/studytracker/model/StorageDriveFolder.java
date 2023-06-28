@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.studytracker.storage.StorageFolder;
 import java.util.Date;
 import javax.persistence.Column;
@@ -33,6 +34,8 @@ import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -46,6 +49,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("storageDrive")
     }),
 })
+@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 public class StorageDriveFolder {
 
   @Id
@@ -83,6 +87,10 @@ public class StorageDriveFolder {
   @Temporal(TemporalType.TIMESTAMP)
   @LastModifiedDate
   private Date updatedAt;
+
+  @Type(type = "json")
+  @Column(name = "details", columnDefinition = "json")
+  private Object details;
 
   public static StorageDriveFolder from(StorageDrive drive, StorageFolder f) {
     StorageDriveFolder folder = new StorageDriveFolder();
@@ -170,5 +178,13 @@ public class StorageDriveFolder {
 
   public void setUpdatedAt(Date updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public Object getDetails() {
+    return details;
+  }
+
+  public void setDetails(Object details) {
+    this.details = details;
   }
 }

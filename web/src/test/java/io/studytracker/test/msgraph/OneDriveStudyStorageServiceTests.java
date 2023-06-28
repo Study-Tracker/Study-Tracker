@@ -20,13 +20,13 @@ import io.studytracker.Application;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.MSGraphIntegration;
-import io.studytracker.model.OneDriveDrive;
-import io.studytracker.model.OneDriveFolder;
+import io.studytracker.model.OneDriveFolderDetails;
 import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.SharePointSite;
 import io.studytracker.model.Status;
 import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
@@ -36,11 +36,7 @@ import io.studytracker.msgraph.OneDriveStorageService;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayStorageFolderRepository;
 import io.studytracker.repository.AssayTypeRepository;
-import io.studytracker.repository.LocalDriveFolderRepository;
-import io.studytracker.repository.LocalDriveRepository;
 import io.studytracker.repository.MSGraphIntegrationRepository;
-import io.studytracker.repository.OneDriveDriveRepository;
-import io.studytracker.repository.OneDriveFolderRepository;
 import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.ProgramStorageFolderRepository;
@@ -93,12 +89,6 @@ public class OneDriveStudyStorageServiceTests {
   private SharePointSiteRepository sharePointSiteRepository;
 
   @Autowired
-  private OneDriveDriveRepository oneDriveDriveRepository;
-
-  @Autowired
-  private OneDriveFolderRepository oneDriveFolderRepository;
-
-  @Autowired
   private OrganizationRepository organizationRepository;
 
   @Autowired
@@ -137,23 +127,13 @@ public class OneDriveStudyStorageServiceTests {
   @Autowired
   private AssayStorageFolderRepository assayStorageFolderRepository;
 
-  @Autowired
-  private LocalDriveRepository localDriveRepository;
-
-  @Autowired
-  private LocalDriveFolderRepository localDriveFolderRepository;
-
   @Before
   public void setup() {
 
     assayStorageFolderRepository.deleteAll();
     studyStorageFolderRepository.deleteAll();
     programStorageFolderRepository.deleteAll();
-    oneDriveFolderRepository.deleteAll();
-    localDriveFolderRepository.deleteAll();
     storageDriveFolderRepository.deleteAll();
-    oneDriveDriveRepository.deleteAll();
-    localDriveRepository.deleteAll();
     storageDriveRepository.deleteAll();
     sharePointSiteRepository.deleteAll();
     msGraphIntegrationRepository.deleteAll();
@@ -191,9 +171,8 @@ public class OneDriveStudyStorageServiceTests {
         .orElse(null);
     Assert.assertNotNull(site);
     SharePointSite created = integrationService.registerSharePointSite(site);
-    List<OneDriveDrive> drives = integrationService.registerSharePointDrives(created);
-    OneDriveDrive drive = drives.get(0);
-    StorageDrive storageDrive = drive.getStorageDrive();
+    List<StorageDrive> drives = integrationService.registerSharePointDrives(created);
+    StorageDrive storageDrive = drives.get(0);
 
     StorageDriveFolder rootFolder = new StorageDriveFolder();
     rootFolder.setStorageDrive(storageDrive);
@@ -203,27 +182,29 @@ public class OneDriveStudyStorageServiceTests {
     rootFolder.setBrowserRoot(true);
     rootFolder.setWriteEnabled(true);
 
-    OneDriveFolder root = new OneDriveFolder();
-    root.setOneDriveDrive(drive);
+    OneDriveFolderDetails root = new OneDriveFolderDetails();
     root.setPath("/");
-    root.setStorageDriveFolder(rootFolder);
     root.setFolderId("root");
     root.setWebUrl("www.test.com");
-    oneDriveFolderRepository.save(root);
+    rootFolder.setDetails(root);
+    storageDriveFolderRepository.save(rootFolder);
 
   }
 
   @Test
   public void findFolderByPathTest() throws Exception {
 
-    OneDriveDrive oneDriveDrive = oneDriveDriveRepository.findAll().get(0);
-    Assert.assertNotNull(oneDriveDrive);
+    Organization organization = organizationRepository.findAll().get(0);
+    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
+    StorageDrive drive = drives.get(0);
 
     StorageFolder folder = null;
     Exception exception = null;
 
     try {
-      folder = storageService.findFolderByPath(oneDriveDrive.getStorageDrive(), "/");
+      folder = storageService.findFolderByPath(drive, "/");
     } catch (Exception e) {
       exception = e;
     }
@@ -233,7 +214,7 @@ public class OneDriveStudyStorageServiceTests {
     Assert.assertEquals("root", folder.getName());
 
     try {
-      folder = storageService.findFolderByPath(oneDriveDrive.getStorageDrive(), "/Project A");
+      folder = storageService.findFolderByPath(drive, "/Project A");
     } catch (Exception e) {
       exception = e;
     }
@@ -254,7 +235,7 @@ public class OneDriveStudyStorageServiceTests {
     folder = null;
     exception = null;
     try {
-      folder = storageService.findFolderByPath(oneDriveDrive.getStorageDrive(), "/BAD_FOLDER");
+      folder = storageService.findFolderByPath(drive, "/BAD_FOLDER");
     } catch (Exception e) {
       exception = e;
     }
@@ -266,14 +247,17 @@ public class OneDriveStudyStorageServiceTests {
 
   @Test
   public void findFileByPathTest() throws Exception {
-    OneDriveDrive oneDriveDrive = oneDriveDriveRepository.findAll().get(0);
-    Assert.assertNotNull(oneDriveDrive);
+    Organization organization = organizationRepository.findAll().get(0);
+    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
+    StorageDrive drive = drives.get(0);
 
     StorageFile file = null;
     Exception exception = null;
 
     try {
-      file = storageService.findFileByPath(oneDriveDrive.getStorageDrive(), "/Project A/test.txt");
+      file = storageService.findFileByPath(drive, "/Project A/test.txt");
     } catch (Exception e) {
       exception = e;
     }
@@ -285,7 +269,7 @@ public class OneDriveStudyStorageServiceTests {
     file = null;
     exception = null;
     try {
-      file = storageService.findFileByPath(oneDriveDrive.getStorageDrive(), "/BAD_FILE.txt");
+      file = storageService.findFileByPath(drive, "/BAD_FILE.txt");
     } catch (Exception e) {
       exception = e;
     }
@@ -402,8 +386,10 @@ public class OneDriveStudyStorageServiceTests {
 
   @Test
   public void createFolderTest() throws Exception {
-    OneDriveDrive oneDriveDrive = oneDriveDriveRepository.findAll().get(0);
-    Assert.assertNotNull(oneDriveDrive);
+    Organization organization = organizationRepository.findAll().get(0);
+    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
     Assert.assertEquals(1, rootFolders.size());
     StorageDriveFolder rootFolder = rootFolders.get(0);
@@ -422,8 +408,10 @@ public class OneDriveStudyStorageServiceTests {
 
   @Test
   public void saveFileTest() throws Exception {
-    OneDriveDrive oneDriveDrive = oneDriveDriveRepository.findAll().get(0);
-    Assert.assertNotNull(oneDriveDrive);
+    Organization organization = organizationRepository.findAll().get(0);
+    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
     ClassPathResource resource = new ClassPathResource("test.txt");
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
     Assert.assertEquals(1, rootFolders.size());
@@ -461,21 +449,27 @@ public class OneDriveStudyStorageServiceTests {
 
   @Test
   public void fileExistsTest() throws Exception {
-    OneDriveDrive oneDriveDrive = oneDriveDriveRepository.findAll().get(0);
-    Assert.assertNotNull(oneDriveDrive);
-    boolean exists = storageService.fileExists(oneDriveDrive.getStorageDrive(), "/Project A/test.txt");
+    Organization organization = organizationRepository.findAll().get(0);
+    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
+    StorageDrive drive = drives.get(0);
+    boolean exists = storageService.fileExists(drive, "/Project A/test.txt");
     Assert.assertTrue(exists);
-    exists = storageService.fileExists(oneDriveDrive.getStorageDrive(), "/Project A/BAD_FILE.txt");
+    exists = storageService.fileExists(drive, "/Project A/BAD_FILE.txt");
     Assert.assertFalse(exists);
   }
 
   @Test
   public void folderExistsTest() throws Exception {
-    OneDriveDrive oneDriveDrive = oneDriveDriveRepository.findAll().get(0);
-    Assert.assertNotNull(oneDriveDrive);
-    boolean exists = storageService.folderExists(oneDriveDrive.getStorageDrive(), "/Project A");
+    Organization organization = organizationRepository.findAll().get(0);
+    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
+    StorageDrive drive = drives.get(0);
+    boolean exists = storageService.folderExists(drive, "/Project A");
     Assert.assertTrue(exists);
-    exists = storageService.folderExists(oneDriveDrive.getStorageDrive(), "/Project XYZ");
+    exists = storageService.folderExists(drive, "/Project XYZ");
     Assert.assertFalse(exists);
   }
 

@@ -23,7 +23,6 @@ import io.studytracker.model.Collaborator;
 import io.studytracker.model.Comment;
 import io.studytracker.model.CustomEntityField;
 import io.studytracker.model.ExternalLink;
-import io.studytracker.model.FileStorageLocation;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
@@ -234,22 +233,6 @@ public class EntityViewUtils {
     view.put("organizationLocation", collaborator.getOrganizationLocation());
     view.put("contactPersonName", collaborator.getContactPersonName());
     view.put("contactEmail", collaborator.getContactEmail());
-    return view;
-  }
-
-  public static Map<String, Object> createStorageLocationView(FileStorageLocation location) {
-    Map<String, Object> view = new HashMap<>();
-    view.put("id", location.getId());
-    view.put("type", location.getType());
-    view.put("name", location.getName());
-    view.put("displayName", location.getDisplayName());
-    view.put("rootFolderPath", location.getRootFolderPath());
-    view.put("referenceId", location.getReferenceId());
-    view.put("url", location.getUrl());
-    view.put("permissions", location.getPermissions());
-    view.put("defaultStudyLocation", location.isDefaultStudyLocation());
-    view.put("defaultDataLocation", location.isDefaultDataLocation());
-    view.put("active", location.isActive());
     return view;
   }
 

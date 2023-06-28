@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +33,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -41,6 +44,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     @UniqueConstraint(name = "uq_storage_drives", columnNames = {"organization_id", "display_name"})
 })
 @EntityListeners(AuditingEntityListener.class)
+@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 public class StorageDrive {
 
   public static enum DriveType {
@@ -77,6 +81,10 @@ public class StorageDrive {
   @Column(name = "updated_at")
   @Temporal(TemporalType.TIMESTAMP)
   private Date updatedAt;
+
+  @Type(type = "json")
+  @Column(name = "details", columnDefinition = "json")
+  private Object details;
 
   public Long getId() {
     return id;
@@ -140,5 +148,13 @@ public class StorageDrive {
 
   public void setUpdatedAt(Date updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public Object getDetails() {
+    return details;
+  }
+
+  public void setDetails(Object details) {
+    this.details = details;
   }
 }

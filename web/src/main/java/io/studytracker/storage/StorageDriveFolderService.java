@@ -21,12 +21,9 @@ import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.model.StorageDriveDetails;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.StorageDriveFolderDetails;
 import io.studytracker.model.Study;
-import io.studytracker.repository.StorageDriveDetailsOperations;
-import io.studytracker.repository.StorageDriveFolderDetailsOperations;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
@@ -53,11 +50,17 @@ public class StorageDriveFolderService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StorageDriveFolderService.class);
 
-  @Autowired private OrganizationService organizationService;
-  @Autowired private StorageDriveFolderRepository folderRepository;
-  @Autowired private StorageDriveRepository driveRepository;
-  @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
-  @Autowired private StorageDriveRepositoryLookup storageDriveRepositoryLookup;
+  @Autowired
+  private OrganizationService organizationService;
+
+  @Autowired
+  private StorageDriveFolderRepository folderRepository;
+
+  @Autowired
+  private StorageDriveRepository driveRepository;
+
+  @Autowired
+  private StudyStorageServiceLookup studyStorageServiceLookup;
 
 
   public List<StorageDriveFolder> findAll() {
@@ -128,31 +131,6 @@ public class StorageDriveFolderService {
             + driveType));
   }
 
-  public StorageDriveFolderDetails lookupFolderDetails(StorageDriveFolder folder) {
-     StorageDriveFolderDetailsOperations repository = storageDriveRepositoryLookup
-         .lookupFolderRepository(folder.getStorageDrive().getDriveType());
-     return ((Optional<StorageDriveFolderDetails>) repository.findByStorageDriveFolderId(folder.getId()))
-         .orElseThrow(() -> new IllegalArgumentException("No folder details found for folder: " + folder.getId()));
-  }
-
-  /**
-   * Given a fully-formed {@link StorageDriveFolderDetails} object and an existing folder, register
-   * it with the database.
-   *
-   * @param folderDetails
-   * @param drive
-   * @return
-   * @param <S>
-   */
-  @Transactional
-  public <S extends StorageDriveFolderDetails> S registerFolderDetails(S folderDetails, StorageDrive drive) {
-    LOGGER.debug("Register folder: {}", folderDetails);
-    StorageDriveFolderDetailsOperations repository
-        = storageDriveRepositoryLookup
-        .lookupFolderRepository(drive.getDriveType());
-    return (S) repository.save(folderDetails);
-  }
-
   /**
    * Registers a {@link StorageDriveFolder} and {@link StorageDriveFolderDetails} instance in the
    *  database for the requested folder. If the folder does not exist in the provided
@@ -214,12 +192,7 @@ public class StorageDriveFolderService {
   @Transactional
   public void deleteFolder(StorageDriveFolder folder) {
     LOGGER.info("Deleting folder: {} {}", folder.getId(), folder.getPath());
-    StorageDriveFolderDetailsOperations<?> repository = storageDriveRepositoryLookup
-        .lookupFolderRepository(folder.getStorageDrive().getDriveType());
-    StorageDriveFolderDetails details = repository.findByStorageDriveFolderId(folder.getId())
-        .orElseThrow(() -> new IllegalArgumentException("No folder details found for folder: "
-            + folder.getId()));
-    repository.deleteById(details.getId());
+    folderRepository.deleteById(folder.getId());
   }
 
   // Drives
@@ -228,6 +201,12 @@ public class StorageDriveFolderService {
     LOGGER.debug("Find all drives for organization");
     Organization organization = organizationService.getCurrentOrganization();
     return driveRepository.findByOrganization(organization.getId());
+  }
+
+  public List<StorageDrive> findByDriveType(DriveType driveType) {
+    LOGGER.debug("Find all drives for organization");
+    Organization organization = organizationService.getCurrentOrganization();
+    return driveRepository.findByOrganizationAndDriveType(organization.getId(), driveType);
   }
 
   public Optional<StorageDrive> findDriveById(Long id) {
@@ -240,26 +219,6 @@ public class StorageDriveFolderService {
     LOGGER.debug("Find drive by folder: {}", folder.getId());
     Organization organization = organizationService.getCurrentOrganization();
     return driveRepository.findByOrganizationAndStorageDriveFolder(organization.getId(), folder.getId());
-  }
-
-  /**
-   * Given a fully-formed {@link StorageDriveDetails} object and an existing storage drive, save it
-   * to the appropriate repository.
-   *
-   * @param drive
-   * @return
-   * @param <S>
-   */
-  @Transactional
-  public <S extends StorageDriveDetails> S registerDrive(S drive) {
-    LOGGER.debug("Save drive: {}", drive);
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!drive.getStorageDrive().getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Drive organization does not match current organization");
-    }
-    StorageDriveDetailsOperations repository = storageDriveRepositoryLookup
-        .lookupDriveRepository(drive.getDriveType());
-    return (S) repository.save(drive);
   }
 
 }

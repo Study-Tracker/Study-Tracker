@@ -33,5 +33,6 @@ public class StorageDriveDetailsDto {
   private boolean active;
   private Date createdAt;
   private Date updatedAt;
+  private Object details;
 
 }

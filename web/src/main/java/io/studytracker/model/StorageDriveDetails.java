@@ -16,12 +16,6 @@
 
 package io.studytracker.model;
 
-import io.studytracker.model.StorageDrive.DriveType;
-
-public interface StorageDriveDetails {
-
-  Long getId();
-  StorageDrive getStorageDrive();
-  DriveType getDriveType();
+public abstract class StorageDriveDetails {
 
 }
