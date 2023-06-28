@@ -382,7 +382,6 @@ public class S3StudyStorageService implements StudyStorageService {
   public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder,
       StorageDriveFolder options) {
 
-    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
     String folderName = StringUtils.hasText(options.getName()) ? options.getName() : storageFolder.getName();
 
     StorageDriveFolder storageDriveFolder = new StorageDriveFolder();
@@ -401,7 +400,9 @@ public class S3StudyStorageService implements StudyStorageService {
     return folderRepository.save(storageDriveFolder);
   }
 
-  @Override public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
+  @Override
+  @Transactional
+  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
     return this.saveStorageFolderRecord(drive, storageFolder, new StorageDriveFolder());
   }
 

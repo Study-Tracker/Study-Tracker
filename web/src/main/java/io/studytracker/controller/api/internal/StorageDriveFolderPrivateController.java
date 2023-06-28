@@ -89,7 +89,8 @@ public class StorageDriveFolderPrivateController {
   }
 
   @PostMapping("")
-  public HttpEntity<StorageDriveFolderDetailsDto> createFolder(@Valid @RequestBody StorageDriveFolderFormDto dto) {
+  public HttpEntity<StorageDriveFolderDetailsDto> createFolder(
+      @Valid @RequestBody StorageDriveFolderFormDto dto) {
     LOGGER.info("Creating new storage drive folder: {}", dto);
     StorageDriveFolder folder = mapper.fromFormDto(dto);
     StorageDrive drive = storageDriveFolderService.findDriveById(dto.getStorageDriveId())
@@ -99,7 +100,8 @@ public class StorageDriveFolderPrivateController {
   }
 
   @PutMapping("/{id}")
-  public HttpEntity<StorageDriveFolderDetailsDto> updateFolder(@Valid @RequestBody StorageDriveFolderFormDto dto) {
+  public HttpEntity<StorageDriveFolderDetailsDto> updateFolder(
+      @Valid @RequestBody StorageDriveFolderFormDto dto) {
     LOGGER.info("Updating storage drive folder: {}", dto);
     StorageDriveFolder folder = mapper.fromFormDto(dto);
     StorageDriveFolder saved = storageDriveFolderService.updateFolder(folder);
