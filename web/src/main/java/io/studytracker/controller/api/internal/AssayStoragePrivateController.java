@@ -73,7 +73,6 @@ public class AssayStoragePrivateController extends AbstractAssayController {
             .orElseThrow(() -> new IllegalArgumentException("Storage drive not found: " + dto.getStorageDriveId()));
     StorageDriveFolder folder = storageDriveFolderService
             .registerFolder(mapper.fromFormDto(dto), drive);
-    assay.addStorageFolder(folder);
     this.getAssayService().addStorageFolder(assay, folder);
     return new ResponseEntity<>(HttpStatus.OK);
   }

@@ -137,7 +137,7 @@ const S3InputsCard = ({
                             <code>
                               {
                                   "s3://"
-                                  + selectedBucket.bucket.name
+                                  + selectedBucket.storageDrive.details.bucketName
                                   + "/"
                                   + selectedBucket.path
                                   + (selectedProgram ? selectedProgram.name : "")
