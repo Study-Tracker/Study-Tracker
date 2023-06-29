@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
-## [0.9.2] - 2023-06-XX
+## [0.9.3] - 2023-06-XX
+
+### Changed
+- Updated and simplified the data model for storage drives and folders to make them easier to work with in the long-term.
+
+## [0.9.2] - 2023-06-22
 
 ### Fixed
 - Fixed a bug causing multiple requests to be sent to GitLab servers when creating a new study.
