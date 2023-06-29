@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 import React, {useContext, useState} from 'react';
-import {Download, File, Folder, FolderPlus, Link, MoreHorizontal} from "react-feather";
+import {
+  Download,
+  File,
+  Folder,
+  FolderPlus,
+  Link,
+  MoreHorizontal
+} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -44,7 +51,7 @@ const FileManagerTable = ({
   };
 
   const handleCopyS3Path = (d) => {
-    const path = dataSource.name + "/" + d.path;
+    const path = "s3://" + dataSource.storageDrive.details.bucketName + "/" + d.path;
     navigator.clipboard.writeText(path);
     notyf.open({message: "Copied S3 path to clipboard", type: "success"});
   }
