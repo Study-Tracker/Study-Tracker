@@ -23,7 +23,8 @@ import Select from "react-select";
 import {FormGroup} from "../../../common/forms/common";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
-import FormikFormErrorNotification from "../../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification
+  from "../../../common/forms/FormikFormErrorNotification";
 
 const StorageFolderFormModal = ({
   isOpen,
@@ -70,7 +71,7 @@ const StorageFolderFormModal = ({
     browserRoot: true,
     studyRoot: false,
     writeEnabled: true,
-    deleteEnabled: false
+    deleteEnabled: false,
   }
 
   const driveOptions = drives

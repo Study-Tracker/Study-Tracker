@@ -16,6 +16,7 @@
 
 package io.studytracker.mapstruct.dto.response;
 
+import io.studytracker.model.StorageDriveFolderDetails;
 import java.util.Date;
 import lombok.Data;
 
@@ -32,6 +33,6 @@ public class StorageDriveFolderDetailsDto {
   private boolean deleteEnabled;
   private Date createdAt;
   private Date updatedAt;
-  private Object details;
+  private StorageDriveFolderDetails details;
 
 }

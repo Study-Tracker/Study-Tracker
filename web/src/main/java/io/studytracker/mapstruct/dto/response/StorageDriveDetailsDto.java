@@ -18,6 +18,7 @@ package io.studytracker.mapstruct.dto.response;
 
 import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveDetails;
 import java.util.Date;
 import lombok.Data;
 
@@ -25,7 +26,6 @@ import lombok.Data;
 public class StorageDriveDetailsDto {
 
   private Long id;
-
   private Organization organization;
   private String displayName;
   private DriveType driveType;
@@ -33,6 +33,6 @@ public class StorageDriveDetailsDto {
   private boolean active;
   private Date createdAt;
   private Date updatedAt;
-  private Object details;
+  private StorageDriveDetails details;
 
 }

@@ -90,7 +90,7 @@ public class StorageDriveFolder {
 
   @Type(type = "json")
   @Column(name = "details", columnDefinition = "json")
-  private Object details;
+  private StorageDriveFolderDetails details;
 
   public static StorageDriveFolder from(StorageDrive drive, StorageFolder f) {
     StorageDriveFolder folder = new StorageDriveFolder();
@@ -180,11 +180,11 @@ public class StorageDriveFolder {
     this.updatedAt = updatedAt;
   }
 
-  public Object getDetails() {
+  public StorageDriveFolderDetails getDetails() {
     return details;
   }
 
-  public void setDetails(Object details) {
+  public void setDetails(StorageDriveFolderDetails details) {
     this.details = details;
   }
 }

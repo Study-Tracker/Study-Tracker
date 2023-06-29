@@ -17,15 +17,23 @@
 package io.studytracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class S3BucketDetails extends StorageDriveDetails {
+
+  public static final String DISCRIMINATOR = "StorageDriveDetails.S3BucketDetails";
 
   private String bucketName;
   private Long awsIntegrationId;
 
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

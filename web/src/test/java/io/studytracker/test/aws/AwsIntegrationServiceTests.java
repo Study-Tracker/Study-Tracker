@@ -21,7 +21,11 @@ import io.studytracker.Application;
 import io.studytracker.aws.AwsIntegrationService;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Organization;
+import io.studytracker.model.S3BucketDetails;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.AwsIntegrationRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
 import org.junit.Assert;
@@ -42,6 +46,7 @@ public class AwsIntegrationServiceTests {
   @Autowired private AwsIntegrationService awsIntegrationService;
   @Autowired private AwsIntegrationRepository awsIntegrationRepository;
   @Autowired private OrganizationService organizationService;
+  @Autowired private StorageDriveRepository storageDriveRepository;
 
   @Value("${aws.access-key-id}")
   private String accessKeyId;
@@ -97,6 +102,50 @@ public class AwsIntegrationServiceTests {
     Assert.assertFalse(awsIntegrationService.test(integration));
     integration.setSecretAccessKey(secretAccessKey);
     Assert.assertTrue(awsIntegrationService.test(integration));
+  }
+
+  @Test
+  public void addingS3BucketTest() throws Exception {
+    Organization organization = organizationService.getCurrentOrganization();
+    List<AwsIntegration> integrations = awsIntegrationService.findByOrganization(organization);
+    Assert.assertNotNull(integrations);
+    Assert.assertEquals(1, integrations.size());
+    AwsIntegration integration = integrations.get(0);
+    List<StorageDrive> buckets = awsIntegrationService.findRegisteredBuckets(integration);
+    Assert.assertEquals(0, buckets.size());
+    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(
+        organization.getId(), DriveType.S3);
+    Assert.assertEquals(0, drives.size());
+
+    Assert.assertTrue(awsIntegrationService.listAvailableBuckets(integration).contains(s3BucketName));
+    StorageDrive drive = new StorageDrive();
+    drive.setActive(true);
+    drive.setDriveType(DriveType.S3);
+    drive.setDisplayName("Example Bucket");
+    drive.setOrganization(organization);
+    drive.setRootPath("");
+    S3BucketDetails details = new S3BucketDetails();
+    details.setAwsIntegrationId(integration.getId());
+    details.setBucketName(s3BucketName);
+    drive.setDetails(details);
+    awsIntegrationService.registerBucket(drive);
+
+    drives = storageDriveRepository.findByOrganizationAndDriveType(
+        organization.getId(), DriveType.S3);
+    Assert.assertEquals(1, drives.size());
+    StorageDrive bucket = drives.get(0);
+    Exception error = null;
+    S3BucketDetails bucketDetails = null;
+    Assert.assertTrue(bucket.getDetails() instanceof S3BucketDetails);
+    try {
+      bucketDetails = (S3BucketDetails) bucket.getDetails();
+    } catch (Exception e) {
+      error = e;
+    }
+    Assert.assertNull(error);
+    Assert.assertEquals(s3BucketName, bucketDetails.getBucketName());
+    buckets = awsIntegrationService.findRegisteredBuckets(integration);
+    Assert.assertEquals(1, buckets.size());
   }
 
 }

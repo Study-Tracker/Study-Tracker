@@ -16,21 +16,19 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import java.util.Date;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class StorageDriveFolderFormDto {
 
   private Long id;
-  private Long storageDriveId;
-  private String name;
+  private @NotNull Long storageDriveId;
+  private @NotNull String name;
   private String path;
   private boolean browserRoot;
   private boolean studyRoot;
   private boolean writeEnabled;
   private boolean deleteEnabled;
-  private Date createdAt;
-  private Date updatedAt;
 
 }

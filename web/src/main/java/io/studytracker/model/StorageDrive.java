@@ -38,6 +38,7 @@ import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "storage_drives", uniqueConstraints = {
@@ -84,7 +85,7 @@ public class StorageDrive {
 
   @Type(type = "json")
   @Column(name = "details", columnDefinition = "json")
-  private Object details;
+  private StorageDriveDetails details;
 
   public Long getId() {
     return id;
@@ -150,11 +151,13 @@ public class StorageDrive {
     this.updatedAt = updatedAt;
   }
 
-  public Object getDetails() {
+  public StorageDriveDetails getDetails() {
     return details;
   }
 
-  public void setDetails(Object details) {
+  public void setDetails(StorageDriveDetails details) {
+    Assert.isTrue(StorageDriveDetails.class.isAssignableFrom(details.getClass()),
+        "Details type must extend StorageDriveDetails, but was: " + details.getClass().getName());
     this.details = details;
   }
 }

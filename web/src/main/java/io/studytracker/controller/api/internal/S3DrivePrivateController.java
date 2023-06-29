@@ -17,14 +17,16 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.aws.AwsIntegrationService;
-import io.studytracker.mapstruct.dto.form.StorageDriveFormDto;
+import io.studytracker.mapstruct.dto.form.S3BucketFormDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
 import io.studytracker.mapstruct.mapper.StorageDriveMapper;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.S3BucketDetails;
 import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.service.OrganizationService;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -63,17 +65,25 @@ public class S3DrivePrivateController {
   public List<StorageDriveDetailsDto> findRegisteredBuckets() {
     LOGGER.debug("Listing registered buckets");
     Organization organization = organizationService.getCurrentOrganization();
-    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
-    return mapper.toDetailsDto(awsIntegrationService.findRegisteredBuckets(integration));
+    List<AwsIntegration> integrations = awsIntegrationService.findByOrganization(organization);
+    List<StorageDrive> drives = new ArrayList<>();
+    if (!integrations.isEmpty()) {
+      drives.addAll(awsIntegrationService.findRegisteredBuckets(integrations.get(0)));
+    }
+    return mapper.toDetailsDto(drives);
   }
 
   @PostMapping("")
-  public HttpEntity<StorageDriveDetailsDto> registerBucket(@Valid @RequestBody StorageDriveFormDto dto) {
+  public HttpEntity<StorageDriveDetailsDto> registerBucket(@Valid @RequestBody S3BucketFormDto dto) {
     LOGGER.info("Registering S3 bucket {}", dto.getDisplayName());
-    StorageDrive bucket = mapper.fromFormDto(dto);
     Organization organization = organizationService.getCurrentOrganization();
     AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
-    ((S3BucketDetails) bucket.getDetails()).setAwsIntegrationId(integration.getId());
+    StorageDrive bucket = mapper.fromS3FormDto(dto);
+    S3BucketDetails details = new S3BucketDetails();
+    details.setBucketName(dto.getBucketName());
+    details.setAwsIntegrationId(integration.getId());
+    bucket.setDetails(details);
+    bucket.setDriveType(DriveType.S3);
     bucket.setOrganization(organization);
     bucket.setRootPath("");
     StorageDrive created = awsIntegrationService.registerBucket(bucket);
@@ -82,10 +92,13 @@ public class S3DrivePrivateController {
 
   @PutMapping("/{id}")
   public HttpEntity<StorageDriveDetailsDto> updateBucket(@PathVariable("id") Long id,
-      @Valid @RequestBody StorageDriveFormDto dto) {
+      @Valid @RequestBody S3BucketFormDto dto) {
     LOGGER.info("Updating S3 bucket {}", id);
-    StorageDrive bucket = mapper.fromFormDto(dto);
+    StorageDrive bucket = mapper.fromS3FormDto(dto);
     bucket.setId(id);
+    S3BucketDetails details = new S3BucketDetails();
+    details.setBucketName(dto.getBucketName());
+    bucket.setDetails(details);
     StorageDrive updated = awsIntegrationService.updateBucket(bucket);
     return new ResponseEntity<>(mapper.toDetailsDto(updated), HttpStatus.OK);
   }

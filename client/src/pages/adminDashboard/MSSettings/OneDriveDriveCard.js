@@ -35,15 +35,15 @@ const OneDriveDriveCard = ({drive}) => {
             <Col xs={7} className={"d-flex align-items-center"}>
               <div>
                 <span className={"fw-bolder text-lg"}>
-                  <a href={drive.webUrl} target={"_blank"} rel="noopener noreferrer">{drive.storageDrive.displayName}</a>
+                  <a href={drive.details.webUrl} target={"_blank"} rel="noopener noreferrer">{drive.displayName}</a>
                 </span>
                 <br />
                 <span className={"text-muted"}>
-                  Drive Name: {drive.name}
+                  Drive Name: {drive.details.name}
                 </span>
                 <br />
                 <span className={"text-muted"}>
-                  Drive ID: <code>{drive.driveId}</code>
+                  Drive ID: <code>{drive.details.driveId}</code>
                 </span>
               </div>
             </Col>
@@ -52,7 +52,7 @@ const OneDriveDriveCard = ({drive}) => {
               <div>
                 <span className="text-muted">Status</span>
                 <br />
-                <DriveStatusBadge active={drive.storageDrive.active} />
+                <DriveStatusBadge active={drive.active} />
               </div>
             </Col>
 
@@ -64,7 +64,7 @@ const OneDriveDriveCard = ({drive}) => {
                 <Dropdown.Menu>
 
                   {
-                      drive.storageDrive.active && (
+                      drive.active && (
                           <Dropdown.Item onClick={() => console.log("Click")}>
                             <FontAwesomeIcon icon={faCancel} className={"me-1"} />
                             Set Inactive
@@ -73,7 +73,7 @@ const OneDriveDriveCard = ({drive}) => {
                   }
 
                   {
-                      !drive.storageDrive.active && (
+                      !drive.active && (
                           <Dropdown.Item onClick={() => console.log("Click")}>
                             <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
                             Set Active

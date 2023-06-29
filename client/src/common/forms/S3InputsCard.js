@@ -45,18 +45,13 @@ const S3InputsCard = ({
       if (r.data.length && r.data[0].active) {
         axios.get("/api/internal/storage-drive-folders?studyRoot=true")
         .then(response => {
-          let folders = response.data;
-          axios.get("/api/internal/drives/s3")
-          .then(async response2 => {
-            const bucketRootFolders = folders
-            .filter(f => f.storageDrive.active && f.storageDrive.driveType
-                === S3_STORAGE_TYPE);
-            await bucketRootFolders.forEach(f => {
-              f.bucket = response2.data.find(b => b.storageDrive.id === f.storageDrive.id);
-            });
-            setEnabled(true);
-            setRootFolders(bucketRootFolders);
-          })
+          let bucketRootFolders = response.data
+            .filter(f => f.storageDrive.active
+                && f.storageDrive.driveType === S3_STORAGE_TYPE
+                && f.storageDrive.details.bucketName)
+            .map(f => {return {...f, bucket: f.storageDrive.details.bucketName}});
+          setEnabled(true);
+          setRootFolders(bucketRootFolders);
         })
       } else {
         setEnabled(false);

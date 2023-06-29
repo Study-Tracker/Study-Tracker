@@ -26,6 +26,7 @@ public class S3BucketFormDto {
   private Long awsIntegrationId;
   private @NotEmpty String displayName;
   private @NotEmpty String bucketName;
+  private String rootPath;
   private boolean active;
 
 }

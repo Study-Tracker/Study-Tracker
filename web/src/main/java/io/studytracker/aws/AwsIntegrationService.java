@@ -149,7 +149,7 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
     Organization organization = integration.getOrganization();
     return storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.S3)
         .stream()
-        .filter(drive -> drive.getDetails() instanceof S3BucketDetails
+        .filter(drive -> S3BucketDetails.class.isAssignableFrom(drive.getDetails().getClass())
             && ((S3BucketDetails) drive.getDetails()).getAwsIntegrationId().equals(integration.getId()))
         .collect(Collectors.toList());
   }

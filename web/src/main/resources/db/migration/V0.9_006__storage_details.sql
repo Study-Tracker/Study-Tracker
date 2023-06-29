@@ -9,8 +9,15 @@ ALTER TABLE storage_drives
 UPDATE storage_drives
 SET details = d.data::jsonb
 FROM (
-         select sd.id, sd.display_name, format('{"bucketId": %s, "bucketName": "%s", "awsIntegrationId": %s, "storageDriveId": %s}', sb.id, sb.name, sb.aws_integration_id, sb.storage_drive_id) as data
-         from storage_drives sd join s3_buckets sb on sd.id = sb.storage_drive_id
+         select
+             sd.id,
+             sd.display_name,
+             format('{"bucketId": %s, "bucketName": "%s", "awsIntegrationId": %s, "storageDriveId": %s, "type": "StorageDriveDetails.S3BucketDetails"}',
+                 sb.id, sb.name, sb.aws_integration_id, sb.storage_drive_id) as data
+         from
+             storage_drives sd
+                 join s3_buckets sb
+                     on sd.id = sb.storage_drive_id
      ) as d
 WHERE storage_drives.id = d.id;
 
@@ -19,8 +26,15 @@ WHERE storage_drives.id = d.id;
 UPDATE storage_drives
 SET details = d.data::jsonb
 FROM (
-         select sd.id, sd.display_name, format('{"egnyteDriveId": %s, "egnyteIntegrationId": %s, "name": "%s", "storageDriveId": %s}', ed.id, ed.egnyte_integration_id, ed.name, ed.storage_drive_id) as data
-         from storage_drives sd join egnyte_drives ed on sd.id = ed.storage_drive_id
+         select
+             sd.id,
+             sd.display_name,
+             format('{"egnyteDriveId": %s, "egnyteIntegrationId": %s, "name": "%s", "storageDriveId": %s, "type": "StorageDriveDetails.EgnyteDriveDetails"}',
+                 ed.id, ed.egnyte_integration_id, ed.name, ed.storage_drive_id) as data
+         from
+             storage_drives sd
+                 join egnyte_drives ed
+                     on sd.id = ed.storage_drive_id
      ) as d
 WHERE storage_drives.id = d.id;
 
@@ -29,8 +43,15 @@ WHERE storage_drives.id = d.id;
 UPDATE storage_drives
 SET details = d.data::jsonb
 FROM (
-         select sd.id, sd.display_name, format('{"onedriveDriveId": %s, "msGraphIntegrationId": %s, "name": "%s", "storageDriveId": %s, "driveId": "%s", "webUrl": "%s"}', od.id, od.msgraph_integration_id, od.name, od.storage_drive_id, od.drive_id, od.web_url) as data
-         from storage_drives sd join onedrive_drives od on sd.id = od.storage_drive_id
+         select
+             sd.id,
+             sd.display_name,
+             format('{"onedriveDriveId": %s, "msGraphIntegrationId": %s, "name": "%s", "storageDriveId": %s, "driveId": "%s", "webUrl": "%s", "type": "StorageDriveDetails.OneDriveDriveDetails"}',
+                 od.id, od.msgraph_integration_id, od.name, od.storage_drive_id, od.drive_id, od.web_url) as data
+         from
+             storage_drives sd
+                 join onedrive_drives od
+                     on sd.id = od.storage_drive_id
      ) as d
 WHERE storage_drives.id = d.id;
 
@@ -39,8 +60,15 @@ WHERE storage_drives.id = d.id;
 UPDATE storage_drives
 SET details = d.data::jsonb
 FROM (
-         select sd.id, sd.display_name, format('{"localDriveId": %s, "name": "%s", "organizationId": %s}', ld.id, ld.name, ld.organization_id) as data
-         from storage_drives sd join local_drives ld on sd.id = ld.storage_drive_id
+         select
+             sd.id,
+             sd.display_name,
+             format('{"localDriveId": %s, "name": "%s", "organizationId": %s, "type": "StorageDriveDetails.LocalDriveDetails"}',
+                 ld.id, ld.name, ld.organization_id) as data
+         from
+             storage_drives sd
+                 join local_drives ld
+                     on sd.id = ld.storage_drive_id
      ) as d
 WHERE storage_drives.id = d.id;
 
@@ -54,7 +82,7 @@ FROM (
              sdf.id,
              sdf.name,
              format(
-                     '{"storageDriveFolderId": %s, "s3BucketId": %s, "key": "%s", "eTag": "%s"}',
+                     '{"storageDriveFolderId": %s, "s3BucketId": %s, "key": "%s", "eTag": "%s", "type": "StorageDriveFolderDetails.S3FolderDetails"}',
                      sbf.storage_drive_folder_id, sbf.s3_bucket_id, sbf.key, sbf.e_tag
                  ) as data
          from
@@ -72,7 +100,7 @@ FROM (
              sdf.id,
              sdf.name,
              format(
-                     '{"storageDriveFolderId": %s, "egnyteDriveId": %s, "folderId": "%s", "webUrl": "%s"}',
+                     '{"storageDriveFolderId": %s, "egnyteDriveId": %s, "folderId": "%s", "webUrl": "%s", "type": "StorageDriveFolderDetails.EgnyteFolderDetails"}',
                      edf.storage_drive_folder_id, edf.egnyte_drive_id, edf.folder_id, edf.web_url
                  ) as data
          from
@@ -90,7 +118,7 @@ FROM (
              sdf.id,
              sdf.name,
              format(
-                     '{"storageDriveFolderId": %s, "onedriveDriveId": %s, "folderId": "%s", "webUrl": "%s", "path": "%s"}',
+                     '{"storageDriveFolderId": %s, "onedriveDriveId": %s, "folderId": "%s", "webUrl": "%s", "path": "%s", "type": "StorageDriveFolderDetails.OneDriveFolderDetails"}',
                      odf.storage_drive_folder_id, odf.onedrive_drive_id, odf.folder_id, odf.web_url, odf.path
                  ) as data
          from
@@ -108,7 +136,7 @@ FROM (
              sdf.id,
              sdf.name,
              format(
-                     '{"storageDriveFolderId": %s, "localDriveId": %s}',
+                     '{"storageDriveFolderId": %s, "localDriveId": %s, "type": "StorageDriveFolderDetails.LocalDriveFolderDetails"}',
                      ldf.storage_drive_folder_id, ldf.local_drive_id
                  ) as data
          from

@@ -265,7 +265,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
     }
 
-    return storageDrives;
+    return storageDriveRepository.saveAll(storageDrives);
 
   }
 

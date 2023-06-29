@@ -17,15 +17,23 @@
 package io.studytracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EgnyteDriveDetails extends StorageDriveDetails {
+
+  public static final String DISCRIMINATOR = "StorageDriveDetails.EgnyteDriveDetails";
 
   private String name;
   private Long egnyteIntegrationId;
 
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

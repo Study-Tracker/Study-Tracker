@@ -34,12 +34,13 @@ const S3BucketFormModal = ({
 }) => {
 
   const bucketSchema = yup.object().shape({
-    bucketName: yup.string()
-      .required("Bucket name is required")
-      .max(255, "Bucket name must be less than 255 characters"),
     displayName: yup.string()
       .required("Display name is required")
       .max(255, "Display name must be less than 255 characters"),
+    bucketName: yup.string()
+    .required("Bucket name is required")
+    .max(255, "Bucket name must be less than 255 characters"),
+    type: yup.string(),
     active: yup.boolean()
   });
 

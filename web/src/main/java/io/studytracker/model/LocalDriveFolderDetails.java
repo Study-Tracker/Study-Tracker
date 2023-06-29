@@ -17,17 +17,25 @@
 package io.studytracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LocalDriveFolderDetails extends StorageDriveFolderDetails {
+
+  public static final String DISCRIMINATOR = "StorageDriveFolderDetails.LocalDriveFolderDetails";
 
   @Override
   public String getWebUrl() {
     return null;
   }
 
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }
