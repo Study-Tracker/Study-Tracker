@@ -14,18 +14,28 @@
  * limitations under the License.
  */
 
-package io.studytracker.integration;
+package io.studytracker.model;
 
-@Deprecated
-public enum IntegrationType {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-  PLACEHOLDER_FILE_STORE,
-  LOCAL_FILE_SYSTEM,
-  EGNYTE,
-  AWS_S3,
-  AWS_EVENTBRIDGE,
-  GITLAB,
-  OKTA,
-  BENCHLING,
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OneDriveDriveDetails extends StorageDriveDetails {
 
+  public static final String DISCRIMINATOR = "StorageDriveDetails.OneDriveDriveDetails";
+
+  private String name;
+  private String driveId;
+  private String webUrl;
+  private Long msGraphIntegrationId;
+
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

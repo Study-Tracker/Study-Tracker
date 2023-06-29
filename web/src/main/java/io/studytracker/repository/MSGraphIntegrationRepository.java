@@ -18,7 +18,6 @@ package io.studytracker.repository;
 
 import io.studytracker.model.MSGraphIntegration;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -26,16 +25,5 @@ public interface MSGraphIntegrationRepository extends JpaRepository<MSGraphInteg
 
   @Query("SELECT i FROM MSGraphIntegration i WHERE i.organization.id = ?1")
   List<MSGraphIntegration> findByOrganizationId(Long organizationId);
-
-  @Query("SELECT i FROM MSGraphIntegration i "
-      + " JOIN OneDriveDrive d ON d.msgraphIntegration.id = i.id "
-      + " JOIN StorageDrive sd ON d.storageDrive.id = sd.id "
-      + " WHERE sd.id = ?1")
-  Optional<MSGraphIntegration> findByStorageDriveId(Long storageDriveId);
-
-  @Query("SELECT i FROM MSGraphIntegration i "
-      + " JOIN OneDriveDrive d ON d.msgraphIntegration.id = i.id "
-      + " WHERE d.id = ?1")
-  Optional<MSGraphIntegration> findByOneDriveDriveId(Long oneDriveDriveId);
 
 }

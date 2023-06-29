@@ -26,19 +26,19 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayStorageFolder;
 import io.studytracker.model.AssayType;
-import io.studytracker.model.EgnyteDrive;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyStorageFolder;
 import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
-import io.studytracker.repository.EgnyteDriveRepository;
 import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.service.OrganizationService;
@@ -85,7 +85,7 @@ public class EgnyteStudyStorageServiceTests {
 
   @Autowired private EgnyteIntegrationService egnyteIntegrationService;
   @Autowired private OrganizationService organizationService;
-  @Autowired private EgnyteDriveRepository egnyteDriveRepository;
+  @Autowired private StorageDriveRepository driveRepository;
   @Autowired private StorageDriveFolderService storageDriveFolderService;
 
   @Before
@@ -98,12 +98,12 @@ public class EgnyteStudyStorageServiceTests {
 
     Organization organization = organizationService.getCurrentOrganization();
     EgnyteIntegration integration = egnyteIntegrationService.findByOrganization(organization).get(0);
-    EgnyteDrive drive = egnyteDriveRepository.findByIntegrationId(integration.getId()).get(0);
+    StorageDrive drive = egnyteIntegrationService.listIntegrationDrives(integration).get(0);
 
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");
     Assert.assertTrue(optionalProgram.isPresent());
     Program program = optionalProgram.get();
-    String path = storageService.getProgramFolderPath(program, drive.getStorageDrive().getRootPath());
+    String path = storageService.getProgramFolderPath(program, drive.getRootPath());
     System.out.println(path);
     Assert.assertTrue(path.endsWith("/Clinical Program A/"));
 
@@ -111,7 +111,7 @@ public class EgnyteStudyStorageServiceTests {
     study.setProgram(program);
     study.setName("Test Study");
     study.setCode(program.getCode() + "-12345");
-    path = storageService.getStudyFolderPath(study, drive.getStorageDrive().getRootPath());
+    path = storageService.getStudyFolderPath(study, drive.getRootPath());
     System.out.println(path);
     Assert.assertTrue(
         path.endsWith("/Clinical Program A/" + study.getCode() + " - " + study.getName() + "/"));
@@ -120,7 +120,7 @@ public class EgnyteStudyStorageServiceTests {
     assay.setStudy(study);
     assay.setName("Test Assay");
     assay.setCode(program.getCode() + "-12345-123");
-    path = storageService.getAssayFolderPath(assay, drive.getStorageDrive().getRootPath());
+    path = storageService.getAssayFolderPath(assay, drive.getRootPath());
     System.out.println(path);
     Assert.assertTrue(
         path.endsWith(

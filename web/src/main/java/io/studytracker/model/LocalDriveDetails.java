@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
-package io.studytracker.aws.integration;
+package io.studytracker.model;
 
-@Deprecated
-public interface S3IntegrationOptions {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-  String getRegion();
-  String getBucketName();
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class LocalDriveDetails extends StorageDriveDetails {
 
+  public static final String DISCRIMINATOR = "StorageDriveDetails.LocalDriveDetails";
+
+  private String name;
+
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

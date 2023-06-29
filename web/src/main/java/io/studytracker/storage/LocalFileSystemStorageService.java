@@ -20,14 +20,13 @@ import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Assay;
-import io.studytracker.model.LocalDrive;
-import io.studytracker.model.LocalDriveFolder;
+import io.studytracker.model.LocalDriveFolderDetails;
 import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
-import io.studytracker.repository.LocalDriveFolderRepository;
-import io.studytracker.repository.LocalDriveRepository;
+import io.studytracker.repository.StorageDriveFolderRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.NamingService;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
@@ -39,7 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -60,10 +58,10 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   private NamingService namingService;
 
   @Autowired
-  private LocalDriveRepository localDriveRepository;
+  private StorageDriveRepository driveRepository;
 
   @Autowired
-  private LocalDriveFolderRepository localDriveFolderRepository;
+  private StorageDriveFolderRepository folderRepository;
 
   @Autowired
   private StorageProperties storageProperties;
@@ -363,11 +361,6 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder,
       StorageDriveFolder options) {
 
-    Optional<LocalDrive> optional = localDriveRepository.findByStorageDriveId(drive.getId());
-    if (optional.isEmpty()) {
-      throw new InvalidRequestException("Egnyte drive not found.");
-    }
-    LocalDrive localDrive = optional.get();
     String folderName = StringUtils.hasText(options.getName()) ? options.getName()
         : storageFolder.getName();
 
@@ -379,15 +372,12 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     storageDriveFolder.setDeleteEnabled(options.isDeleteEnabled());
     storageDriveFolder.setStudyRoot(options.isStudyRoot());
     storageDriveFolder.setWriteEnabled(options.isWriteEnabled());
+    storageDriveFolder.setDetails(new LocalDriveFolderDetails());
 
-    LocalDriveFolder localDriveFolder = new LocalDriveFolder();
-    localDriveFolder.setLocalDrive(localDrive);
-    localDriveFolder.setStorageDriveFolder(storageDriveFolder);
-
-    localDriveFolderRepository.save(localDriveFolder);
-    return localDriveFolder.getStorageDriveFolder();
+    return folderRepository.save(storageDriveFolder);
   }
 
+  @Transactional
   @Override
   public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
     return this.saveStorageFolderRecord(drive, storageFolder, new StorageDriveFolder());

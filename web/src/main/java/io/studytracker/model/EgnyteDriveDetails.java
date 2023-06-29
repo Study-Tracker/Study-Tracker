@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.response;
+package io.studytracker.model;
 
-import io.studytracker.integration.IntegrationType;
-import java.util.HashSet;
-import java.util.Set;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Deprecated
-@Data
-public class IntegrationDefinitionDetailsDto {
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EgnyteDriveDetails extends StorageDriveDetails {
 
-  private Long id;
-  private IntegrationType type;
-  private boolean active;
-  private Integer version;
-  private Set<IntegrationConfigurationSchemaFieldDetailsDto> configurationSchemaFields = new HashSet<>();
+  public static final String DISCRIMINATOR = "StorageDriveDetails.EgnyteDriveDetails";
 
+  private String name;
+  private Long egnyteIntegrationId;
+
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

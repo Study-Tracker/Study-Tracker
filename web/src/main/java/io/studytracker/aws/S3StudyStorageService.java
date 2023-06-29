@@ -17,26 +17,24 @@
 package io.studytracker.aws;
 
 import io.studytracker.exception.InsufficientPrivilegesException;
-import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Program;
-import io.studytracker.model.S3Bucket;
-import io.studytracker.model.S3BucketFolder;
+import io.studytracker.model.S3BucketDetails;
+import io.studytracker.model.S3FolderDetails;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.repository.AwsIntegrationRepository;
-import io.studytracker.repository.S3BucketFolderRepository;
-import io.studytracker.repository.S3BucketRepository;
+import io.studytracker.repository.StorageDriveFolderRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,23 +57,24 @@ public class S3StudyStorageService implements StudyStorageService {
   private static final Logger LOGGER = LoggerFactory.getLogger(S3StudyStorageService.class);
 
   @Autowired
-  private S3BucketRepository s3BucketRepository;
+  private StorageDriveRepository driveRepository;
 
   @Autowired
-  private S3BucketFolderRepository s3BucketFolderRepository;
+  private StorageDriveFolderRepository folderRepository;
 
   @Autowired
   private AwsIntegrationRepository integrationRepository;
 
   private S3Client getClientFromDrive(StorageDrive drive) {
-    AwsIntegration integration = integrationRepository
-        .findByStorageDriveId(drive.getId())
+    S3BucketDetails bucket = (S3BucketDetails) drive.getDetails();
+    AwsIntegration integration = integrationRepository.findById(bucket.getAwsIntegrationId())
         .orElseThrow(() -> new RecordNotFoundException("Storage drive " + drive.getId()
             + " not associated with AWS integration"));
     return AWSClientFactory.createS3Client(integration);
 
   }
 
+  @Transactional
   @Override
   public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
       throws StudyStorageException {
@@ -87,6 +86,7 @@ public class S3StudyStorageService implements StudyStorageService {
     return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
+  @Transactional
   @Override
   public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
       throws StudyStorageException {
@@ -98,6 +98,7 @@ public class S3StudyStorageService implements StudyStorageService {
     return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
+  @Transactional
   @Override
   public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
       throws StudyStorageException {
@@ -110,33 +111,26 @@ public class S3StudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(StorageDrive drive, String path, String name)
+  public StorageFolder createFolder(StorageDrive bucket, String path, String name)
       throws StudyStorageException {
-    LOGGER.info("Creating folder: '{}' in path: '{}' in bucket '{}'", name, path, drive.getDisplayName());
+    LOGGER.info("Creating folder: '{}' in path: '{}' in bucket '{}'", name, path, bucket.getDisplayName());
 
-    S3Client client = getClientFromDrive(drive);
+    S3Client client = getClientFromDrive(bucket);
     String fullPath = S3Utils.joinS3Path(path, name) + "/";
-    S3Bucket bucket;
+    S3BucketDetails bucketDetails = (S3BucketDetails) bucket.getDetails();
     try {
-
-      // Get the bucket
-      bucket = s3BucketRepository.findByStorageDriveId(drive.getId())
-          .orElseThrow(() -> new RecordNotFoundException("Storage drive " + drive.getId()
-              + " not associated with S3 bucket"));
-
       PutObjectRequest request = PutObjectRequest.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .key(fullPath)
           .build();
       client.putObject(request, RequestBody.empty());
-
     } catch (Exception e) {
       throw new StudyStorageException("Failed to create folder: " + path, e);
     }
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .prefix(path)
           .delimiter("/")
           .build();
@@ -156,20 +150,22 @@ public class S3StudyStorageService implements StudyStorageService {
 
     S3Client client = getClientFromDrive(parentFolder.getStorageDrive());
     String fullPath = S3Utils.joinS3Path(path, name) + "/";
-    S3Bucket bucket;
+    StorageDrive bucket;
+    S3BucketDetails bucketDetails;
     try {
 
       // Get the bucket
-      bucket = s3BucketRepository.findByStorageDriveFolderId(parentFolder.getId())
+      bucket = driveRepository.findById(parentFolder.getStorageDrive().getId())
           .orElseThrow(() -> new RecordNotFoundException("Storage folder " + parentFolder.getId()
               + " not associated with S3 bucket"));
+      bucketDetails = (S3BucketDetails) bucket.getDetails();
 
       if (!parentFolder.isWriteEnabled()) {
         throw new InsufficientPrivilegesException("Insufficient privileges to create folder: " + fullPath);
       }
 
       PutObjectRequest request = PutObjectRequest.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .key(fullPath)
           .build();
       client.putObject(request, RequestBody.empty());
@@ -180,7 +176,7 @@ public class S3StudyStorageService implements StudyStorageService {
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .prefix(fullPath)
           .delimiter("/")
           .build();
@@ -214,13 +210,11 @@ public class S3StudyStorageService implements StudyStorageService {
     LOGGER.debug("Looking up folder by path: {}", path);
 
     S3Client client = getClientFromDrive(drive);
-    S3Bucket bucket = s3BucketRepository.findByStorageDriveId(drive.getId())
-        .orElseThrow(() -> new RecordNotFoundException("Storage folder " + drive.getId()
-            + " not associated with S3 bucket"));
+    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .prefix(path)
           .delimiter("/")
           .build();
@@ -248,13 +242,11 @@ public class S3StudyStorageService implements StudyStorageService {
     LOGGER.debug("Looking up file by path: {}", path);
 
     S3Client client = getClientFromDrive(drive);
-    S3Bucket bucket = s3BucketRepository.findByStorageDriveId(drive.getId())
-        .orElseThrow(() -> new RecordNotFoundException("Storage folder " + drive.getId()
-            + " not associated with S3 bucket"));
+    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .prefix(path)
           .delimiter("/")
           .build();
@@ -278,9 +270,10 @@ public class S3StudyStorageService implements StudyStorageService {
     LOGGER.info("Uploading file: {} to path: {} in bucket: {}", file.getName(), path, folder.getName());
 
     S3Client client = getClientFromDrive(folder.getStorageDrive());
-    S3Bucket bucket = s3BucketRepository.findByStorageDriveId(folder.getStorageDrive().getId())
+    StorageDrive bucket = driveRepository.findById(folder.getStorageDrive().getId())
         .orElseThrow(() -> new RecordNotFoundException("Storage folder " + folder.getId()
             + " not associated with S3 bucket"));
+    S3BucketDetails bucketDetails = (S3BucketDetails) bucket.getDetails();
 
     // Check permissions
     if (!folder.isWriteEnabled()) {
@@ -293,7 +286,7 @@ public class S3StudyStorageService implements StudyStorageService {
     // Upload the file to S3
     try {
       PutObjectRequest request = PutObjectRequest.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .key(fullPath)
           .build();
       client.putObject(request, RequestBody.fromFile(file));
@@ -304,7 +297,7 @@ public class S3StudyStorageService implements StudyStorageService {
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .prefix(path)
           .delimiter("/")
           .build();
@@ -327,12 +320,13 @@ public class S3StudyStorageService implements StudyStorageService {
   public Resource fetchFile(StorageDriveFolder folder, String path) throws StudyStorageException {
     LOGGER.debug("Fetching file: {} from bucket: {}", path, folder.getName());
     S3Client client = getClientFromDrive(folder.getStorageDrive());
-    S3Bucket bucket = s3BucketRepository.findByStorageDriveId(folder.getStorageDrive().getId())
+    StorageDrive bucket = driveRepository.findById(folder.getStorageDrive().getId())
         .orElseThrow(() -> new RecordNotFoundException("Storage folder " + folder.getId()
             + " not associated with S3 bucket"));
+    S3BucketDetails bucketDetails = (S3BucketDetails) bucket.getDetails();
     try {
       return new ByteArrayResource(
-          client.getObjectAsBytes(b -> b.bucket(bucket.getName()).key(path)).asByteArray());
+          client.getObjectAsBytes(b -> b.bucket(bucketDetails.getBucketName()).key(path)).asByteArray());
     } catch (Exception e) {
       throw new StudyStorageException("Failed to download file: " + path, e);
     }
@@ -342,12 +336,10 @@ public class S3StudyStorageService implements StudyStorageService {
   public boolean fileExists(StorageDrive drive, String path) {
     LOGGER.debug("Checking if file exists: {} in bucket: {}", path, drive.getDisplayName());
     S3Client client = getClientFromDrive(drive);
-    S3Bucket bucket = s3BucketRepository.findByStorageDriveId(drive.getId())
-        .orElseThrow(() -> new RecordNotFoundException("Storage folder " + drive.getId()
-            + " not associated with S3 bucket"));
+    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .prefix(path)
           .delimiter("/")
           .build();
@@ -367,12 +359,10 @@ public class S3StudyStorageService implements StudyStorageService {
   public boolean folderExists(StorageDrive drive, String path) {
     LOGGER.debug("Checking if folder exists: {} in bucket: {}", path, drive.getDisplayName());
     S3Client client = getClientFromDrive(drive);
-    S3Bucket bucket = s3BucketRepository.findByStorageDriveId(drive.getId())
-        .orElseThrow(() -> new RecordNotFoundException("Storage drive " + drive.getId()
-            + " not associated with S3 bucket"));
+    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
-          .bucket(bucket.getName())
+          .bucket(bucketDetails.getBucketName())
           .prefix(path)
           .build();
       ListObjectsV2Response response = client.listObjectsV2(request);
@@ -392,11 +382,6 @@ public class S3StudyStorageService implements StudyStorageService {
   public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder,
       StorageDriveFolder options) {
 
-    Optional<S3Bucket> optional = s3BucketRepository.findByStorageDriveId(drive.getId());
-    if (optional.isEmpty()) {
-      throw new InvalidRequestException("S3 bucket not found: " + drive.getId());
-    }
-    S3Bucket bucket = optional.get();
     String folderName = StringUtils.hasText(options.getName()) ? options.getName() : storageFolder.getName();
 
     StorageDriveFolder storageDriveFolder = new StorageDriveFolder();
@@ -408,16 +393,16 @@ public class S3StudyStorageService implements StudyStorageService {
     storageDriveFolder.setStudyRoot(options.isStudyRoot());
     storageDriveFolder.setWriteEnabled(options.isWriteEnabled());
 
-    S3BucketFolder bucketFolder = new S3BucketFolder();
-    bucketFolder.setS3Bucket(bucket);
-    bucketFolder.setStorageDriveFolder(storageDriveFolder);
+    S3FolderDetails bucketFolder = new S3FolderDetails();
+    storageDriveFolder.setDetails(bucketFolder);
     // TODO: set etag and key
 
-    s3BucketFolderRepository.save(bucketFolder);
-    return bucketFolder.getStorageDriveFolder();
+    return folderRepository.save(storageDriveFolder);
   }
 
-  @Override public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
+  @Override
+  @Transactional
+  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
     return this.saveStorageFolderRecord(drive, storageFolder, new StorageDriveFolder());
   }
 

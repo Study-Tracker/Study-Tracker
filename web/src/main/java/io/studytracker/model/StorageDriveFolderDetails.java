@@ -16,14 +16,29 @@
 
 package io.studytracker.model;
 
-import io.studytracker.model.StorageDrive.DriveType;
 
-public interface StorageDriveFolderDetails {
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import lombok.EqualsAndHashCode;
 
-  Long getId();
-  StorageDriveFolder getStorageDriveFolder();
-  String getWebUrl();
-  DriveType getDriveType();
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = S3FolderDetails.class, name = S3FolderDetails.DISCRIMINATOR),
+    @JsonSubTypes.Type(value = LocalDriveFolderDetails.class, name = LocalDriveFolderDetails.DISCRIMINATOR),
+    @JsonSubTypes.Type(value = EgnyteFolderDetails.class, name = EgnyteFolderDetails.DISCRIMINATOR),
+    @JsonSubTypes.Type(value = OneDriveFolderDetails.class, name = OneDriveFolderDetails.DISCRIMINATOR)
+})
+@EqualsAndHashCode
+public abstract class StorageDriveFolderDetails {
+
+  abstract String getWebUrl();
+
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+  public abstract String getType();
 
 
 }

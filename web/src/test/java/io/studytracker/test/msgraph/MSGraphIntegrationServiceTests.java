@@ -18,16 +18,16 @@ package io.studytracker.test.msgraph;
 
 import io.studytracker.Application;
 import io.studytracker.model.MSGraphIntegration;
-import io.studytracker.model.OneDriveDrive;
+import io.studytracker.model.OneDriveDriveDetails;
 import io.studytracker.model.Organization;
 import io.studytracker.model.SharePointSite;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.msgraph.MSGraphIntegrationService;
 import io.studytracker.repository.MSGraphIntegrationRepository;
-import io.studytracker.repository.OneDriveDriveRepository;
-import io.studytracker.repository.OneDriveFolderRepository;
 import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.SharePointSiteRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
@@ -64,7 +64,7 @@ public class MSGraphIntegrationServiceTests {
   private OrganizationRepository organizationRepository;
 
   @Autowired
-  private OneDriveDriveRepository oneDriveDriveRepository;
+  private StorageDriveRepository driveRepository;
 
   @Autowired
   private SharePointSiteRepository sharePointSiteRepository;
@@ -72,14 +72,10 @@ public class MSGraphIntegrationServiceTests {
   @Autowired
   private StorageDriveFolderRepository storageDriveFolderRepository;
 
-  @Autowired
-  private OneDriveFolderRepository oneDriveFolderRepository;
-
   @Before
   public void setup() {
-    oneDriveFolderRepository.deleteAll();
     storageDriveFolderRepository.deleteAll();
-    oneDriveDriveRepository.deleteAll();
+    driveRepository.deleteAll();
     sharePointSiteRepository.deleteAll();
     msGraphIntegrationRepository.deleteAll();
   }
@@ -195,7 +191,7 @@ public class MSGraphIntegrationServiceTests {
     Assert.assertNotNull(integration);
 
     Assert.assertEquals(0, sharePointSiteRepository.count());
-    Assert.assertEquals(0, oneDriveDriveRepository.count());
+    Assert.assertEquals(0, driveRepository.count());
 
     SharePointSite site = integrationService.listAvailableSharepointSites(integration).stream()
         .filter(s -> s.getName().equals("Study Tracker Development"))
@@ -207,16 +203,16 @@ public class MSGraphIntegrationServiceTests {
     Assert.assertNotNull(created);
     Assert.assertNotNull(created.getId());
     Assert.assertEquals(1, sharePointSiteRepository.count());
-    Assert.assertEquals(0, oneDriveDriveRepository.count());
+    Assert.assertEquals(0, driveRepository.count());
 
-    List<OneDriveDrive> drives = integrationService.registerSharePointDrives(created);
+    List<StorageDrive> drives = integrationService.registerSharePointDrives(created);
     Assert.assertNotNull(drives);
     Assert.assertEquals(1, drives.size());
-    OneDriveDrive drive = drives.get(0);
+    OneDriveDriveDetails drive = (OneDriveDriveDetails) drives.get(0).getDetails();
     System.out.println("Drive ID: " +  drive.getDriveId() + "  Name: " + drive.getName() + "  URL: " + drive.getWebUrl());
 
     Assert.assertEquals(1, sharePointSiteRepository.count());
-    Assert.assertEquals(1, oneDriveDriveRepository.count());
+    Assert.assertEquals(1, driveRepository.count());
 
   }
 

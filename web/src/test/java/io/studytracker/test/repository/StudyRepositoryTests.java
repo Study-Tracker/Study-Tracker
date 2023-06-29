@@ -34,8 +34,6 @@ import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.CommentRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ExternalLinkRepository;
-import io.studytracker.repository.LocalDriveFolderRepository;
-import io.studytracker.repository.LocalDriveRepository;
 import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyConclusionsRepository;
@@ -86,8 +84,6 @@ public class StudyRepositoryTests {
   @Autowired private ExternalLinkRepository externalLinkRepository;
   @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
-  @Autowired private LocalDriveRepository localDriveRepository;
-  @Autowired private LocalDriveFolderRepository localDriveFolderRepository;
 
   @Before
   public void doBefore() {

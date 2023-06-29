@@ -14,11 +14,31 @@
  * limitations under the License.
  */
 
-package io.studytracker.gitlab;
+package io.studytracker.model;
 
-@Deprecated
-public class GitLabAttributes {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-  public static final String GIT_SERVICE_VALUE = "gitlab";
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class S3FolderDetails extends StorageDriveFolderDetails {
 
+  public static final String DISCRIMINATOR = "StorageDriveFolderDetails.S3FolderDetails";
+
+  private String key;
+  private String eTag;
+
+  @Override
+  public String getWebUrl() {
+    return null;
+  }
+
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

@@ -19,16 +19,16 @@ package io.studytracker.egnyte;
 import io.studytracker.egnyte.entity.EgnyteObject;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.integration.IntegrationService;
-import io.studytracker.model.EgnyteDrive;
+import io.studytracker.model.EgnyteDriveDetails;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.repository.EgnyteDriveRepository;
 import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,13 +41,11 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   private static final Logger LOGGER = LoggerFactory.getLogger(EgnyteIntegrationService.class);
 
   private final EgnyteIntegrationRepository egnyteIntegrationRepository;
-  private final EgnyteDriveRepository egnyteDriveRepository;
   private final StorageDriveRepository storageDriveRepository;
 
   public EgnyteIntegrationService(EgnyteIntegrationRepository egnyteIntegrationRepository,
-      EgnyteDriveRepository egnyteDriveRepository, StorageDriveRepository storageDriveRepository) {
+      StorageDriveRepository storageDriveRepository) {
     this.egnyteIntegrationRepository = egnyteIntegrationRepository;
-    this.egnyteDriveRepository = egnyteDriveRepository;
     this.storageDriveRepository = storageDriveRepository;
   }
 
@@ -124,22 +122,33 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     egnyteIntegrationRepository.save(i);
   }
 
-  public EgnyteIntegration findByStorageDrive(StorageDrive storageDrive) {
-    return egnyteIntegrationRepository.findByStorageDriveId(storageDrive.getId());
-  }
-
   // Egnyte drives
 
-  public List<EgnyteDrive> listIntegrationDrives(EgnyteIntegration egnyteIntegration) {
-    return egnyteDriveRepository.findByIntegrationId(egnyteIntegration.getId());
+  public List<StorageDrive> listIntegrationDrives(EgnyteIntegration egnyteIntegration) {
+    Organization organization = egnyteIntegration.getOrganization();
+    return storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.EGNYTE)
+        .stream()
+        .filter(drive -> drive.getDetails() instanceof EgnyteDriveDetails
+            && ((EgnyteDriveDetails) drive.getDetails()).getEgnyteIntegrationId().equals(egnyteIntegration.getId()))
+        .collect(Collectors.toList());
   }
 
-  public Optional<EgnyteDrive> findDriveById(Long egnyteDriveId) {
-    return egnyteDriveRepository.findById(egnyteDriveId);
+  public Optional<StorageDrive> findDriveById(Long driveId) {
+    Optional<StorageDrive> optional = storageDriveRepository.findById(driveId);
+    if (optional.isPresent()) {
+      StorageDrive drive = optional.get();
+      if (drive.getDetails() instanceof EgnyteDriveDetails) {
+        return optional;
+      } else {
+        throw new IllegalArgumentException("Drive is not an Egnyte drive");
+      }
+    } else {
+      return Optional.empty();
+    }
   }
 
   @Transactional
-  public EgnyteDrive registerDefaultDrive(EgnyteIntegration egnyteIntegration) {
+  public StorageDrive registerDefaultDrive(EgnyteIntegration egnyteIntegration) {
 
     StorageDrive storageDrive = new StorageDrive();
     storageDrive.setOrganization(egnyteIntegration.getOrganization());
@@ -148,47 +157,37 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
     storageDrive.setActive(true);
     storageDrive.setRootPath("/Shared");
 
-    EgnyteDrive drive = new EgnyteDrive();
-    drive.setEgnyteIntegration(egnyteIntegration);
-    drive.setStorageDrive(storageDrive);
-    drive.setName("Shared");
+    EgnyteDriveDetails details = new EgnyteDriveDetails();
+    details.setName("Shared");
+    details.setEgnyteIntegrationId(egnyteIntegration.getId());
+    storageDrive.setDetails(details);
 
-    return egnyteDriveRepository.save(drive);
+    return storageDriveRepository.save(storageDrive);
 
   }
 
   @Transactional
-  public EgnyteDrive updateDrive(EgnyteDrive drive) {
-
-    StorageDrive storageDrive = drive.getStorageDrive();
+  public StorageDrive updateDrive(StorageDrive storageDrive) {
     StorageDrive d = storageDriveRepository.getById(storageDrive.getId());
     d.setActive(storageDrive.isActive());
     d.setDisplayName(storageDrive.getDisplayName());
     d.setRootPath(storageDrive.getRootPath());
-
-    EgnyteDrive e = egnyteDriveRepository.getById(drive.getId());
-    e.setStorageDrive(d);
-    e.setName(drive.getName());
-
-    return egnyteDriveRepository.save(e);
-
+    d.setDetails(storageDrive.getDetails());
+    return storageDriveRepository.save(d);
   }
 
   @Transactional
-  public void updateDriveStatus(EgnyteDrive drive, boolean active) {
-    StorageDrive storageDrive = drive.getStorageDrive();
-    StorageDrive d = storageDriveRepository.getById(storageDrive.getId());
+  public void updateDriveStatus(StorageDrive drive, boolean active) {
+    StorageDrive d = storageDriveRepository.getById(drive.getId());
     d.setActive(active);
     storageDriveRepository.save(d);
   }
 
   @Transactional
-  public void removeDrive(Long id) {
-    EgnyteDrive e = egnyteDriveRepository.getById(id);
-    StorageDrive s = e.getStorageDrive();
+  public void removeDrive(StorageDrive drive) {
+    StorageDrive s = storageDriveRepository.getById(drive.getId());
     s.setActive(false);
-    e.setStorageDrive(s);
-    egnyteDriveRepository.save(e);
+    storageDriveRepository.save(s);
   }
 
 }

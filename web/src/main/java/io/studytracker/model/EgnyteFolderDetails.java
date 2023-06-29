@@ -14,12 +14,31 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.mapper;
+package io.studytracker.model;
 
-import org.mapstruct.Mapper;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Deprecated
-@Mapper(componentModel = "spring")
-public interface IntegrationInstanceConfigurationValueMapper {
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EgnyteFolderDetails extends StorageDriveFolderDetails {
 
+  public static final String DISCRIMINATOR = "StorageDriveFolderDetails.EgnyteFolderDetails";
+
+  private String folderId;
+  private String webUrl;
+
+  @Override
+  public String getWebUrl() {
+    return webUrl;
+  }
+
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

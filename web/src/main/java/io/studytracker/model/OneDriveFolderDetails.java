@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package io.studytracker.storage;
+package io.studytracker.model;
 
-import io.studytracker.integration.IntegrationType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-public enum StorageLocationType {
-  LOCAL_FILE_SYSTEM,
-  EGNYTE_API,
-  AWS_S3
-  ;
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OneDriveFolderDetails extends StorageDriveFolderDetails {
 
-  public static StorageLocationType fromIntegrationType(IntegrationType integrationType) {
-    switch (integrationType) {
-      case LOCAL_FILE_SYSTEM:
-        return LOCAL_FILE_SYSTEM;
-      case EGNYTE:
-        return EGNYTE_API;
-      case AWS_S3:
-        return AWS_S3;
-      default:
-        throw new IllegalArgumentException("Unsupported file storage location integration type: " + integrationType);
-    }
+  public static final String DISCRIMINATOR = "StorageDriveFolderDetails.OneDriveFolderDetails";
+
+  private String folderId;
+  private String webUrl;
+  private String path;
+
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
   }
-
 }

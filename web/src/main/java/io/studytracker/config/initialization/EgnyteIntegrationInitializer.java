@@ -22,12 +22,14 @@ import io.studytracker.egnyte.EgnyteIntegrationService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.EgnyteDrive;
-import io.studytracker.model.EgnyteDriveFolder;
+import io.studytracker.model.EgnyteDriveDetails;
+import io.studytracker.model.EgnyteFolderDetails;
 import io.studytracker.model.EgnyteIntegration;
 import io.studytracker.model.Organization;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFolder;
@@ -60,6 +62,9 @@ public class EgnyteIntegrationInitializer {
 
   @Autowired
   private StorageDriveFolderService storageDriveFolderService;
+
+  @Autowired
+  private StorageDriveFolderRepository storageDriveFolderRepository;
 
   private EgnyteIntegration registerEgnyteIntegrations(Organization organization)
       throws InvalidConfigurationException {
@@ -120,10 +125,10 @@ public class EgnyteIntegrationInitializer {
 
   }
 
-  private EgnyteDrive registerEgnyteDrives(EgnyteIntegration egnyteIntegration) {
-    EgnyteDrive defaultDrive = egnyteIntegrationService.listIntegrationDrives(egnyteIntegration)
+  private StorageDrive registerEgnyteDrives(EgnyteIntegration egnyteIntegration) {
+    StorageDrive defaultDrive = egnyteIntegrationService.listIntegrationDrives(egnyteIntegration)
         .stream()
-        .filter(d -> d.getName().equals("Shared"))
+        .filter(d -> ((EgnyteDriveDetails) d.getDetails()).getName().equals("Shared"))
         .findFirst()
         .orElse(null);
     if (defaultDrive == null) {
@@ -133,7 +138,7 @@ public class EgnyteIntegrationInitializer {
     return defaultDrive;
   }
 
-  private void registerEgnyteFolders(EgnyteDrive egnyteDrive) {
+  private void registerEgnyteFolders(StorageDrive drive) {
 
     // Does the drive already have a root folder?
     boolean hasRoot = storageDriveFolderService.findStudyRootFolders().stream()
@@ -145,14 +150,14 @@ public class EgnyteIntegrationInitializer {
 
       // Does the folder exist already?
       StorageFolder storageFolder = null;
-      boolean folderExists = egnyteStudyStorageService.folderExists(egnyteDrive.getStorageDrive(), rootPath);
+      boolean folderExists = egnyteStudyStorageService.folderExists(drive, rootPath);
       // If yes, register it in the database
       if (folderExists) {
         try {
-          storageFolder = egnyteStudyStorageService.findFolderByPath(egnyteDrive.getStorageDrive(), rootPath);
+          storageFolder = egnyteStudyStorageService.findFolderByPath(drive, rootPath);
         } catch (StudyStorageNotFoundException e) {
           e.printStackTrace();
-          LOGGER.error("Could not find folder {} in Egnyte drive {}", rootPath, egnyteDrive.getName());
+          LOGGER.error("Could not find folder {} in Egnyte drive {}", rootPath, drive.getId());
         }
       }
       // If not, create the folder
@@ -160,17 +165,17 @@ public class EgnyteIntegrationInitializer {
         try {
           String rootFolder = StorageUtils.getFolderNameFromPath(rootPath);
           String parentPath = StorageUtils.getParentPathFromPath(rootPath);
-          storageFolder = egnyteStudyStorageService.createFolder(egnyteDrive.getStorageDrive(), parentPath, rootFolder);
+          storageFolder = egnyteStudyStorageService.createFolder(drive, parentPath, rootFolder);
         } catch (Exception e) {
           e.printStackTrace();
-          LOGGER.error("Could not create folder {} in Egnyte drive {}", rootPath, egnyteDrive.getName());
+          LOGGER.error("Could not create folder {} in Egnyte drive {}", rootPath, drive.getId());
         }
       }
 
       // Persist the record
       if (storageFolder != null) {
         StorageDriveFolder storageDriveFolder = new StorageDriveFolder();
-        storageDriveFolder.setStorageDrive(egnyteDrive.getStorageDrive());
+        storageDriveFolder.setStorageDrive(drive);
         storageDriveFolder.setName(storageFolder.getName());
         storageDriveFolder.setPath(storageFolder.getPath());
         storageDriveFolder.setBrowserRoot(true);
@@ -178,16 +183,15 @@ public class EgnyteIntegrationInitializer {
         storageDriveFolder.setWriteEnabled(true);
         storageDriveFolder.setDeleteEnabled(false);
 
-        EgnyteDriveFolder egnyteDriveFolder = new EgnyteDriveFolder();
-        egnyteDriveFolder.setEgnyteDrive(egnyteDrive);
-        egnyteDriveFolder.setStorageDriveFolder(storageDriveFolder);
-        egnyteDriveFolder.setFolderId(storageFolder.getFolderId());
-        egnyteDriveFolder.setWebUrl(storageFolder.getUrl());
+        EgnyteFolderDetails egnyteFolderDetails = new EgnyteFolderDetails();
+        egnyteFolderDetails.setFolderId(storageFolder.getFolderId());
+        egnyteFolderDetails.setWebUrl(storageFolder.getUrl());
+        storageDriveFolder.setDetails(egnyteFolderDetails);
 
-        storageDriveFolderService.registerFolderDetails(
-            egnyteDriveFolder, egnyteDrive.getStorageDrive());
+        storageDriveFolderRepository.save(storageDriveFolder);
+
       } else {
-        LOGGER.warn("Could not register Egnyte root folder {} in drive {}", rootPath, egnyteDrive.getName());
+        LOGGER.warn("Could not register Egnyte root folder {} in drive {}", rootPath, drive.getId());
       }
 
     }
@@ -212,7 +216,7 @@ public class EgnyteIntegrationInitializer {
       // Register Egnyte integration
       EgnyteIntegration egnyteIntegration = registerEgnyteIntegrations(organization);
       if (egnyteIntegration != null) {
-        EgnyteDrive drive = registerEgnyteDrives(egnyteIntegration);
+        StorageDrive drive = registerEgnyteDrives(egnyteIntegration);
         registerEgnyteFolders(drive);
         LOGGER.info("Egnyte integration initialized successfully.");
       }

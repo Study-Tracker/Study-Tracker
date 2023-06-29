@@ -37,7 +37,6 @@ import io.studytracker.model.Comment;
 import io.studytracker.model.Conclusions;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.ExternalLink;
-import io.studytracker.model.FileStoreFolder;
 import io.studytracker.model.Keyword;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
@@ -77,11 +76,6 @@ public interface ElasticsearchDocumentMapper {
 
   Set<ElasticsearchFolderDocument> fromElnFolderSet(Set<ELNFolder> folders);
 
-  ElasticsearchFolderDocument fromFileStoreFolder(FileStoreFolder fileStoreFolder);
-
-  List<ElasticsearchFolderDocument> fromFileStoreFolderList(List<FileStoreFolder> folders);
-
-  Set<ElasticsearchFolderDocument> fromFileStoreFolderSet(Set<FileStoreFolder> folders);
 
   @Mapping(target = "category", source="category.name")
   ElasticsearchKeywordDocument fromKeyword(Keyword keyword);

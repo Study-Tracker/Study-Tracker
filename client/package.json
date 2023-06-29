@@ -1,6 +1,6 @@
 {
   "name": "study-tracker-client",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "React front-end client for Study Tracker",
   "private": true,
   "author": "Will Oemler <will@oemler.io>",

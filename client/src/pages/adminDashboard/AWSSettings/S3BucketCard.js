@@ -36,11 +36,11 @@ const S3BucketCard = ({bucket, handleStatusUpdate}) => {
             <Col xs={7} className={"d-flex align-items-center"}>
               <div>
                 <span className={"fw-bolder text-lg"}>
-                  {bucket.storageDrive.displayName}
+                  {bucket.displayName}
                 </span>
                 <br />
                 <span className={"text-muted"}>
-                  <code>s3://{bucket.name}/{bucket.storageDrive.rootPath}</code>
+                  <code>s3://{bucket.details.bucketName}/{bucket.rootPath}</code>
                 </span>
               </div>
             </Col>
@@ -49,7 +49,7 @@ const S3BucketCard = ({bucket, handleStatusUpdate}) => {
               <div>
                 <span className="text-muted">Status</span>
                 <br />
-                <DriveStatusBadge active={bucket.storageDrive.active} />
+                <DriveStatusBadge active={bucket.active} />
               </div>
             </Col>
 
@@ -61,7 +61,7 @@ const S3BucketCard = ({bucket, handleStatusUpdate}) => {
                 <Dropdown.Menu>
 
                   {
-                      bucket.storageDrive.active ? (
+                      bucket.active ? (
                           <Dropdown.Item onClick={() => handleStatusUpdate(bucket.id, false)}>
                             <FontAwesomeIcon icon={faCancel} className={"me-1"} />
                             Set Inactive

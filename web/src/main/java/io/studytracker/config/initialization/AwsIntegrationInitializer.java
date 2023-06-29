@@ -24,13 +24,12 @@ import io.studytracker.exception.InvalidConfigurationException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.Organization;
-import io.studytracker.model.S3Bucket;
-import io.studytracker.model.S3BucketFolder;
+import io.studytracker.model.S3BucketDetails;
+import io.studytracker.model.S3FolderDetails;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.repository.S3BucketFolderRepository;
-import io.studytracker.repository.S3BucketRepository;
+import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.ArrayList;
@@ -66,10 +65,7 @@ public class AwsIntegrationInitializer {
   private StorageDriveRepository storageDriveRepository;
 
   @Autowired
-  private S3BucketFolderRepository s3BucketFolderRepository;
-
-  @Autowired
-  private S3BucketRepository s3BucketRepository;
+  private StorageDriveFolderRepository folderRepository;
 
   private AwsIntegration registerAwsIntegrationInstances(Organization organization) throws InvalidConfigurationException {
 
@@ -136,19 +132,19 @@ public class AwsIntegrationInitializer {
   }
 
   /**
-   * Registers an {@link S3Bucket} object for AWS S3 instances, if they are being used, as
+   * Registers an {@link S3BucketDetails} object for AWS S3 instances, if they are being used, as
    *   well as {@link StorageDrive} instances for each provided bucket.
    *
    * @throws InvalidConfigurationException if required environment variables are missing
    */
-  private List<S3Bucket> registerS3Buckets(AwsIntegration awsIntegration, Organization organization) throws InvalidConfigurationException {
+  private List<StorageDrive> registerS3Buckets(AwsIntegration awsIntegration, Organization organization) throws InvalidConfigurationException {
 
     if (awsIntegration == null || awsIntegration.getId() == null) {
       LOGGER.warn("AWS integration is not configured. Skipping S3 bucket registration.");
       return null;
     }
 
-    List<S3Bucket> buckets = null;
+    List<StorageDrive> buckets = null;
 
     S3Properties s3Properties = properties.getAws().getS3();
     if (s3Properties != null && StringUtils.hasText(s3Properties.getBuckets())) {
@@ -162,11 +158,11 @@ public class AwsIntegrationInitializer {
           storageDrive.setDisplayName("S3: " + bucketName);
           storageDrive.setDriveType(DriveType.S3);
           storageDrive.setRootPath("");
-          S3Bucket bucket = new S3Bucket();
-          bucket.setName(bucketName);
-          bucket.setAwsIntegration(awsIntegration);
-          bucket.setStorageDrive(storageDrive);
-          buckets.add(awsIntegrationService.registerBucket(bucket));
+          S3BucketDetails details = new S3BucketDetails();
+          details.setBucketName(bucketName);
+          details.setAwsIntegrationId(awsIntegration.getId());
+          storageDrive.setDetails(details);
+          buckets.add(awsIntegrationService.registerBucket(storageDrive));
         }
       }
     }
@@ -174,7 +170,7 @@ public class AwsIntegrationInitializer {
 
   }
 
-  private void registerRootFolders(List<S3Bucket> buckets) throws InvalidConfigurationException {
+  private void registerRootFolders(List<StorageDrive> buckets) throws InvalidConfigurationException {
 
     String defaultStudyBucket = null;
     String defaultStudyPath = null;
@@ -185,22 +181,18 @@ public class AwsIntegrationInitializer {
       defaultStudyPath = bits.length > 1 ? bits[1] : "";
     }
 
-    for (S3Bucket b: buckets) {
+    for (StorageDrive drive: buckets) {
 
-      S3Bucket bucket = s3BucketRepository.findById(b.getId())
-          .orElseThrow(() -> new InvalidConfigurationException("S3 bucket not found: " + b.getName()));
-      StorageDrive drive = storageDriveRepository.findById(bucket.getStorageDrive().getId())
-          .orElseThrow(() -> new InvalidConfigurationException("Storage drive not found: " + b.getName()));
+      S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
 
       // Check to see if the root folder has already been registered
-      boolean exists = s3BucketFolderRepository.findByStorageDriveId(drive.getId())
+      boolean exists = folderRepository.findByStorageDriveId(drive.getId())
           .stream()
-          .anyMatch(f -> f.getStorageDriveFolder().getPath().equals("")
-              && f.getStorageDriveFolder().isBrowserRoot());
+          .anyMatch(f -> f.getPath().equals("") && f.isBrowserRoot());
 
       if (!exists) {
 
-        LOGGER.info("Registering root folder for bucket {}.", bucket.getName());
+        LOGGER.info("Registering root folder for bucket {}.", bucketDetails.getBucketName());
 
         StorageDriveFolder rootFolder = new StorageDriveFolder();
         rootFolder.setStudyRoot(false);
@@ -210,14 +202,13 @@ public class AwsIntegrationInitializer {
         rootFolder.setStorageDrive(drive);
         rootFolder.setPath("");
 
-        S3BucketFolder bucketFolder = new S3BucketFolder();
-        bucketFolder.setS3Bucket(bucket);
-        bucketFolder.setStorageDriveFolder(rootFolder);
-        bucketFolder.setKey("");
+        S3FolderDetails details = new S3FolderDetails();
+        details.setKey("");
+        rootFolder.setDetails(details);
 
-        s3BucketFolderRepository.save(bucketFolder);
+        folderRepository.save(rootFolder);
 
-        if (bucket.getName().equals(defaultStudyBucket)) {
+        if (bucketDetails.getBucketName().equals(defaultStudyBucket)) {
 
           StorageDriveFolder studyRootFolder = new StorageDriveFolder();
           studyRootFolder.setStudyRoot(true);
@@ -227,16 +218,15 @@ public class AwsIntegrationInitializer {
           studyRootFolder.setStorageDrive(drive);
           studyRootFolder.setPath(defaultStudyPath);
 
-          S3BucketFolder studyBucketFolder = new S3BucketFolder();
-          studyBucketFolder.setS3Bucket(bucket);
-          studyBucketFolder.setStorageDriveFolder(studyRootFolder);
-          studyBucketFolder.setKey("");
+          S3FolderDetails folderDetails = new S3FolderDetails();
+          folderDetails.setKey("");
+          studyRootFolder.setDetails(folderDetails);
 
-          s3BucketFolderRepository.save(studyBucketFolder);
+          folderRepository.save(studyRootFolder);
         }
 
       } else {
-        LOGGER.info("Root folder for bucket {} has already been registered.", bucket.getName());
+        LOGGER.info("Root folder for bucket {} has already been registered.", drive.getDisplayName());
       }
 
     }
@@ -262,7 +252,7 @@ public class AwsIntegrationInitializer {
       // Register integration definitiions
       AwsIntegration awsIntegration = registerAwsIntegrationInstances(organization);
       if (awsIntegration != null) {
-        List<S3Bucket> buckets = registerS3Buckets(awsIntegration, organization);
+        List<StorageDrive> buckets = registerS3Buckets(awsIntegration, organization);
         if (buckets != null) {
           registerRootFolders(buckets);
         }

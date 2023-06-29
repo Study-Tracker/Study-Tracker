@@ -23,18 +23,19 @@ import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.requests.SiteCollectionPage;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.MSGraphIntegration;
-import io.studytracker.model.OneDriveDrive;
+import io.studytracker.model.OneDriveDriveDetails;
 import io.studytracker.model.Organization;
 import io.studytracker.model.SharePointSite;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.MSGraphIntegrationRepository;
-import io.studytracker.repository.OneDriveDriveRepository;
 import io.studytracker.repository.SharePointSiteRepository;
+import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
   private SharePointSiteRepository sharePointSiteRepository;
 
   @Autowired
-  private OneDriveDriveRepository oneDriveDriveRepository;
+  private StorageDriveRepository storageDriveRepository;
 
   @Override
   public Optional<MSGraphIntegration> findById(Long id) {
@@ -201,12 +202,17 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     return sharePointSiteRepository.save(s);
   }
 
-  public List<OneDriveDrive> listRegisteredDrives(MSGraphIntegration integration) {
+  public List<StorageDrive> listRegisteredDrives(MSGraphIntegration integration) {
     LOGGER.debug("Listing registered OneDrive drives for integration: " + integration.getId());
-    return oneDriveDriveRepository.findByIntegrationId(integration.getId());
+    Organization organization = organizationService.getCurrentOrganization();
+    return storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE)
+        .stream()
+        .filter(drive -> drive.getDetails() instanceof OneDriveDriveDetails
+            && ((OneDriveDriveDetails) drive.getDetails()).getMsGraphIntegrationId().equals(integration.getId()))
+        .collect(Collectors.toList());
   }
 
-  public List<OneDriveDrive> registerSharePointDrives(SharePointSite site) {
+  public List<StorageDrive> registerSharePointDrives(SharePointSite site) {
 
     LOGGER.info("Registering OneDrive drives for site: {}", site.getSiteId());
 
@@ -238,7 +244,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     }
 
     // Register the drives
-    List<OneDriveDrive> oneDriveDrives = new ArrayList<>();
+    List<StorageDrive> storageDrives = new ArrayList<>();
     for (Drive drive: drives) {
 
       StorageDrive storageDrive = new StorageDrive();
@@ -248,22 +254,22 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       storageDrive.setDisplayName("SharePoint Site Drive: " + site.getName());
       storageDrive.setActive(true);
 
-      OneDriveDrive oneDriveDrive = new OneDriveDrive();
-      oneDriveDrive.setDriveId(drive.id);
-      oneDriveDrive.setName(drive.name);
-      oneDriveDrive.setStorageDrive(storageDrive);
-      oneDriveDrive.setMsgraphIntegration(integration);
-      oneDriveDrive.setWebUrl(drive.webUrl);
+      OneDriveDriveDetails details = new OneDriveDriveDetails();
+      details.setDriveId(drive.id);
+      details.setName(drive.name);
+      details.setMsGraphIntegrationId(integration.getId());
+      details.setWebUrl(drive.webUrl);
+      storageDrive.setDetails(details);
 
-      oneDriveDrives.add(oneDriveDriveRepository.save(oneDriveDrive));
+      storageDrives.add(storageDrive);
 
     }
 
-    return oneDriveDrives;
+    return storageDriveRepository.saveAll(storageDrives);
 
   }
 
-  public OneDriveDrive registerOneDriveDrive(OneDriveDrive drive) {
+  public StorageDrive registerOneDriveDrive(OneDriveDriveDetails drive) {
 
     LOGGER.info("Registering OneDrive drive: {}", drive.getDriveId());
 
@@ -286,14 +292,14 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     storageDrive.setDisplayName("OneDrive Drive: " + d.name);
     storageDrive.setActive(true);
 
-    OneDriveDrive oneDriveDrive = new OneDriveDrive();
-    oneDriveDrive.setDriveId(d.id);
-    oneDriveDrive.setName(d.name);
-    oneDriveDrive.setStorageDrive(storageDrive);
-    oneDriveDrive.setMsgraphIntegration(integration);
-    oneDriveDrive.setWebUrl(d.webUrl);
+    OneDriveDriveDetails oneDriveDriveDetails = new OneDriveDriveDetails();
+    oneDriveDriveDetails.setDriveId(d.id);
+    oneDriveDriveDetails.setName(d.name);
+    oneDriveDriveDetails.setMsGraphIntegrationId(integration.getId());
+    oneDriveDriveDetails.setWebUrl(d.webUrl);
+    storageDrive.setDetails(oneDriveDriveDetails);
 
-    return oneDriveDriveRepository.save(oneDriveDrive);
+    return storageDriveRepository.save(storageDrive);
 
   }
 

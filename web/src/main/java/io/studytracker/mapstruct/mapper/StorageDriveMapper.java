@@ -16,6 +16,7 @@
 
 package io.studytracker.mapstruct.mapper;
 
+import io.studytracker.mapstruct.dto.form.S3BucketFormDto;
 import io.studytracker.mapstruct.dto.form.StorageDriveFormDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
 import io.studytracker.model.StorageDrive;
@@ -27,6 +28,7 @@ import org.mapstruct.Mapper;
 public interface StorageDriveMapper {
 
   StorageDrive fromFormDto(StorageDriveFormDto dto);
+  StorageDrive fromS3FormDto(S3BucketFormDto dto);
 
   StorageDriveDetailsDto toDetailsDto(StorageDrive storageDrive);
   List<StorageDriveDetailsDto> toDetailsDto(List<StorageDrive> storageDrives);

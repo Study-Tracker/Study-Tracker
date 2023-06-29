@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package io.studytracker.repository;
+package io.studytracker.model;
 
-import io.studytracker.model.IntegrationConfigurationSchemaField;
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Deprecated
-public interface IntegrationConfigurationSchemaFieldRepository
-    extends JpaRepository<IntegrationConfigurationSchemaField, Long> {
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class S3BucketDetails extends StorageDriveDetails {
 
-  @Query("select f from IntegrationConfigurationSchemaField f where f.integrationDefinition.id = ?1")
-  List<IntegrationConfigurationSchemaField> findByIntegrationDefinitionId(Long integrationDefinitionId);
+  public static final String DISCRIMINATOR = "StorageDriveDetails.S3BucketDetails";
 
+  private String bucketName;
+  private Long awsIntegrationId;
+
+  @Override
+  public String getType() {
+    return DISCRIMINATOR;
+  }
 }

@@ -52,42 +52,42 @@ public interface StorageDriveFolderRepository extends JpaRepository<StorageDrive
   Optional<StorageDriveFolder> findByIdAndOrganization(Long id, Long organizationId);
 
   @EntityGraph("storage-drive-folder-details")
-  @Query("SELECT distinct f FROM StorageDriveFolder f "
+  @Query("SELECT f FROM StorageDriveFolder f "
       + " JOIN ProgramStorageFolder pf ON f.id = pf.storageDriveFolder.id "
       + " JOIN Program p ON p.id = pf.program.id"
       + " WHERE p.id = ?1")
   List<StorageDriveFolder> findByProgramId(Long programId);
 
   @EntityGraph("storage-drive-folder-details")
-  @Query("SELECT distinct f FROM StorageDriveFolder f "
+  @Query("SELECT f FROM StorageDriveFolder f "
       + " JOIN ProgramStorageFolder pf ON f.id = pf.storageDriveFolder.id "
       + " JOIN Program p ON p.id = pf.program.id"
       + " WHERE pf.primary = true and p.id = ?1")
   Optional<StorageDriveFolder> findPrimaryByProgramId(Long programId);
 
   @EntityGraph("storage-drive-folder-details")
-  @Query("SELECT distinct f FROM StorageDriveFolder f "
+  @Query("SELECT f FROM StorageDriveFolder f "
       + " JOIN StudyStorageFolder sf ON sf.storageDriveFolder.id = f.id "
       + " JOIN Study s ON s.id = sf.study.id "
       + " WHERE s.id = ?1")
   List<StorageDriveFolder> findByStudyId(Long studyId);
 
   @EntityGraph("storage-drive-folder-details")
-  @Query("SELECT distinct f FROM StorageDriveFolder f "
+  @Query("SELECT f FROM StorageDriveFolder f "
       + " JOIN StudyStorageFolder sf ON sf.storageDriveFolder.id = f.id "
       + " JOIN Study s ON s.id = sf.study.id "
       + " WHERE sf.primary = true AND s.id = ?1")
   Optional<StorageDriveFolder> findPrimaryByStudyId(Long studyId);
 
   @EntityGraph("storage-drive-folder-details")
-  @Query("SELECT distinct f FROM StorageDriveFolder f "
+  @Query("SELECT f FROM StorageDriveFolder f "
       + " JOIN AssayStorageFolder af ON af.storageDriveFolder.id = f.id "
       + " JOIN Assay a ON a.id = af.assay.id "
       + " WHERE a.id = ?1")
   List<StorageDriveFolder> findByAssayId(Long assayId);
 
   @EntityGraph("storage-drive-folder-details")
-  @Query("SELECT distinct f FROM StorageDriveFolder f "
+  @Query("SELECT f FROM StorageDriveFolder f "
       + " JOIN AssayStorageFolder af ON af.storageDriveFolder.id = f.id "
       + " JOIN Assay a ON a.id = af.assay.id "
       + " WHERE af.primary = true AND a.id = ?1")

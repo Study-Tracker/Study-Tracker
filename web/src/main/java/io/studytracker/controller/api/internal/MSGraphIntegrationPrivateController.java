@@ -21,15 +21,15 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.MSGraphIntegrationFormDto;
 import io.studytracker.mapstruct.dto.form.SharePointSiteFormDto;
 import io.studytracker.mapstruct.dto.response.MSGraphIntegrationDetailsDto;
-import io.studytracker.mapstruct.dto.response.OneDriveDriveDetailsDto;
 import io.studytracker.mapstruct.dto.response.SharePointSiteDetailsDto;
+import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
 import io.studytracker.mapstruct.mapper.MSGraphIntegrationMapper;
-import io.studytracker.mapstruct.mapper.OneDriveDriveMapper;
 import io.studytracker.mapstruct.mapper.SharePointSiteMapper;
+import io.studytracker.mapstruct.mapper.StorageDriveMapper;
 import io.studytracker.model.MSGraphIntegration;
-import io.studytracker.model.OneDriveDrive;
 import io.studytracker.model.Organization;
 import io.studytracker.model.SharePointSite;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.msgraph.MSGraphIntegrationService;
 import io.studytracker.service.OrganizationService;
 import java.util.List;
@@ -72,7 +72,7 @@ public class MSGraphIntegrationPrivateController {
   private SharePointSiteMapper sharePointSiteMapper;
 
   @Autowired
-  private OneDriveDriveMapper oneDriveDriveMapper;
+  private StorageDriveMapper storageDriveMapper;
 
   @GetMapping("")
   public List<MSGraphIntegrationDetailsDto> fetchIntegrations() {
@@ -194,7 +194,7 @@ public class MSGraphIntegrationPrivateController {
   // OneDrive
 
   @GetMapping("/{id}/onedrive/drives")
-  public List<OneDriveDriveDetailsDto> findRegisteredOneDriveDrives(
+  public List<StorageDriveDetailsDto> findRegisteredOneDriveDrives(
       @PathVariable("id") Long integrationId) {
     LOGGER.debug("Fetching registered OneDrive drives for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
@@ -203,8 +203,8 @@ public class MSGraphIntegrationPrivateController {
     if (!integration.getOrganization().getId().equals(organization.getId())) {
       throw new InvalidRequestException("MS Graph integration does not belong to current organization");
     }
-    List<OneDriveDrive> drives = msGraphIntegrationService.listRegisteredDrives(integration);
-    return oneDriveDriveMapper.toDetailsDto(drives);
+    List<StorageDrive> drives = msGraphIntegrationService.listRegisteredDrives(integration);
+    return storageDriveMapper.toDetailsDto(drives);
   }
 
 

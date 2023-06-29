@@ -22,7 +22,11 @@ import AWSIntegrationSetupCard from "./AWSIntegrationSetupCard";
 import S3BucketCard from "./S3BucketCard";
 import {Button, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheckCircle, faCircleXmark, faEdit} from "@fortawesome/free-regular-svg-icons";
+import {
+  faCheckCircle,
+  faCircleXmark,
+  faEdit
+} from "@fortawesome/free-regular-svg-icons";
 import AWSIntegrationFormModal from "./AWSIntegrationFormModal";
 import {faGears, faPlus, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import S3BucketFormModal from "./S3BucketFormModal";
@@ -278,7 +282,7 @@ const AWSIntegrationSettings = () => {
         {
           drives.length > 0 && (
               drives
-              .sort((a, b) => a.name.localeCompare(b.storageDrive.displayName))
+              .sort((a, b) => a.displayName.localeCompare(b.displayName))
               .map(drive => (
                   <S3BucketCard
                       bucket={drive}
