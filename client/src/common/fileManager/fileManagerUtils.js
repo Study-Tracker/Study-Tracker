@@ -65,14 +65,17 @@ export const getPathParts = (path, rootPath) => {
     if (path.startsWith("/") && !currentPath.startsWith("/")) currentPath = "/" + currentPath;
     let parentPath = bits.slice(0, index).join("/");
     if (path.startsWith("/") && !parentPath.startsWith("/")) parentPath = "/" + parentPath;
-    return {
+    let parts = {
       label: bit === "" ? "root" : bit,
       path: currentPath,
       parentPath: pathIsChild(parentPath, rootPath) && currentPath !== parentPath ? parentPath : null,
-      isChild: pathIsChild(bit, rootPath),
-      isRoot: pathIsRoot(bit, rootPath),
+      isChild: pathIsChild(currentPath, rootPath),
+      isRoot: pathIsRoot(currentPath, rootPath),
       isLast: index === bits.length - 1,
-      index: index
+      index: index,
+      name: bit
     }
+    parts.isBrowsable = parts.isChild || parts.isRoot;
+    return parts;
   })
 }
