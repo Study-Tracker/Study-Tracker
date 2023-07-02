@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.3] - 2023-06-XX
 
+### Added
+- You can now create S3 folders for assays in the same way you can for studies.
+
 ### Fixed
 - Fixed a bug that was preventing copying correct S3 file & folder paths in the File Manager.
 - Fixed bug preventing adding folders to assays. 

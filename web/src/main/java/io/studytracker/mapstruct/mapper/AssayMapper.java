@@ -37,6 +37,7 @@ import org.mapstruct.Named;
 public interface AssayMapper {
 
   Assay fromAssayForm(AssayFormDto dto);
+  AssayFormDto toAssayForm(Assay assay);
 
   Assay fromAssayDetails(AssayDetailsDto dto);
 

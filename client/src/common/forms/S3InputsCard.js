@@ -29,6 +29,7 @@ const S3InputsCard = ({
     isActive,
     onChange,
     selectedProgram,
+    selectedStudy,
     errors
 }) => {
 
@@ -141,6 +142,7 @@ const S3InputsCard = ({
                                   + "/"
                                   + selectedBucket.path
                                   + (selectedProgram ? selectedProgram.name : "")
+                                  + (selectedStudy ? `${selectedStudy.program.name}/${selectedStudy.code}: ${selectedStudy.name}` : "")
                               }
                             </code>
                           </p>

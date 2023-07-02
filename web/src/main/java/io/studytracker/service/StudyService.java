@@ -35,6 +35,7 @@ import io.studytracker.model.ExternalLink;
 import io.studytracker.model.GitGroup;
 import io.studytracker.model.GitRepository;
 import io.studytracker.model.Program;
+import io.studytracker.model.S3FolderDetails;
 import io.studytracker.model.Status;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
@@ -407,6 +408,7 @@ public class StudyService {
         programFolder.setName("Program " + program.getName() + " S3 Folder");
         programFolder.setStorageDrive(s3Drive);
         programFolder.setWriteEnabled(true);
+        programFolder.setDetails(new S3FolderDetails());
         programs3Folder = storageDriveFolderService.registerFolder(programFolder, s3Drive);
         program.addStorageFolder(programs3Folder);
         programRepository.save(program);
