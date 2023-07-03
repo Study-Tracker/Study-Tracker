@@ -15,10 +15,16 @@
  */
 
 import {Button, Card, Col, Row} from "react-bootstrap";
-import {ArrowLeft, CornerLeftUp, FolderPlus, RotateCw, Upload} from "react-feather";
+import {
+  ArrowLeft,
+  CornerLeftUp,
+  FolderPlus,
+  RotateCw,
+  Upload
+} from "react-feather";
 import FileManagerUploadModal from "./FileManagerUploadModal";
 import FileManagerNewFolderModal from "./FileManagerNewFolderModal";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState} from "react";
 import axios from "axios";
 import FileManagerTable from "./FileManagerTable";
 import {useSearchParams} from "react-router-dom";
@@ -82,6 +88,12 @@ const FileManagerContent = ({
     setHistory([]);
     setRefreshCount(refreshCount + 1);
   }, [rootFolder]);
+
+  const pathParts = useMemo(() => {
+    return folder ? getPathParts(folder.path, rootFolder.path) : [];
+  }, [folder, rootFolder]);
+  const currentPart = folder ? pathParts[pathParts.length - 1] : null;
+
 
   /**
    * Loads the folder from the selected path and refreshes the UI.
@@ -156,9 +168,6 @@ const FileManagerContent = ({
     );
   }
 
-  const pathParts = folder ? getPathParts(folder.path, rootFolder.path) : [];
-  const currentPart = folder ? pathParts[pathParts.length - 1] : null;
-
   return (
       <Card>
 
@@ -187,7 +196,7 @@ const FileManagerContent = ({
                   variant="outline-primary"
                   className="me-2"
                   style={{width: "90px"}}
-                  disabled={!currentPart || !currentPart.parentPath}
+                  disabled={!currentPart || currentPart.parentPath === null}
                   onClick={() => handlePathUpdate(currentPart.parentPath)}
               >
                 <CornerLeftUp size={18} />
@@ -270,7 +279,7 @@ const FileManagerContent = ({
                 <div>
                   <FileManagerPathBreadcrumbs
                       rootFolder={rootFolder}
-                      folder={folder}
+                      paths={pathParts}
                       handlePathUpdate={handlePathUpdate}
                   />
                 </div>

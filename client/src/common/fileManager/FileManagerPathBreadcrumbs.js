@@ -17,19 +17,39 @@
 import React, {useMemo} from "react";
 import PropTypes from "prop-types";
 import {Breadcrumb} from "react-bootstrap";
-import {getPathParts} from "./fileManagerUtils";
 
 const FileManagerPathBreadcrumbs = ({
     rootFolder,
-    folder,
+    paths,
     handlePathUpdate
 }) => {
 
   const rootPath = rootFolder.path;
-  const paths = useMemo(() => {
-      return folder ? getPathParts(folder.path, rootPath) : []
-    }, [folder, rootPath]
-  );
+
+  const breadcrumbs = useMemo(() => paths
+  .filter(path => !(path.index === 0 && path.path === "")) // empty first folder name
+  .filter(path => !!path.isBrowsable)
+  .map((path) => {
+    console.debug("Path", path);
+    if (path.isLast) {
+      return (
+          <Breadcrumb.Item key={path.index} active={true}>
+            {path.label}
+          </Breadcrumb.Item>
+      )
+    }
+    else {
+      return (
+          <Breadcrumb.Item
+              key={path.index}
+              onClick={() => handlePathUpdate(path.path)}
+              active={false}
+          >
+            {path.label}
+          </Breadcrumb.Item>
+      );
+    }
+  }), [paths, handlePathUpdate]);
 
   console.debug("Path breadcrumbs", paths);
 
@@ -40,32 +60,8 @@ const FileManagerPathBreadcrumbs = ({
           Home
         </Breadcrumb.Item>
 
-        {
-          paths
-          .filter(path => !(path.index === 0 && path.path === "")) // empty first folder name
-          .filter(path => !!path.isBrowsable)
-          .map((path) => {
-            console.debug("Path", path);
-            if (path.isLast) {
-              return (
-                  <Breadcrumb.Item key={path.index} active={true}>
-                    {path.label}
-                  </Breadcrumb.Item>
-              )
-            }
-            else {
-              return (
-                  <Breadcrumb.Item
-                      key={path.index}
-                      onClick={() => handlePathUpdate(path.path)}
-                      active={false}
-                  >
-                    {path.label}
-                  </Breadcrumb.Item>
-              );
-            }
-          })
-        }
+        { breadcrumbs }
+
       </Breadcrumb>
   )
 
@@ -73,7 +69,7 @@ const FileManagerPathBreadcrumbs = ({
 
 FileManagerPathBreadcrumbs.propTypes = {
   rootFolder: PropTypes.object.isRequired,
-  folder: PropTypes.object,
+  paths: PropTypes.array.isRequired,
   handlePathUpdate: PropTypes.func.isRequired,
 }
 
