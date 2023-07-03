@@ -58,4 +58,6 @@ public class AssayFormDto {
   private Boolean useGit;
   private Boolean useNotebook;
   private Boolean useStorage;
+  private Boolean useS3;
+  private Long s3FolderId;
 }
