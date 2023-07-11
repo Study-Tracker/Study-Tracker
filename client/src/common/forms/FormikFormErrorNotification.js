@@ -25,7 +25,13 @@ const FormikFormErrorNotification = () => {
         if (submitCount > 0 && !isSubmitting && Object.keys(errors).length > 0) {
             let err = "";
             Object.entries(errors).forEach(([key, value]) => {
-               err = err + "- " + value + "\n";
+                if (typeof value === "object") {
+                    Object.entries(value).forEach(([k, v]) => {
+                        err = err + "- " + v + "\n";
+                    });
+                } else {
+                    err = err + "- " + value + "\n";
+                }
             });
             console.debug("Form values", values);
             console.debug("Validation errors", errors);

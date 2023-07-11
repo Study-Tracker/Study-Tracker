@@ -40,6 +40,7 @@ import FormikFormErrorNotification
 import axios from "axios";
 import * as yup from "yup";
 import ProgramGitInputs from "./ProgramGitInputs";
+import FeatureToggleCard from "../../common/forms/FeatureToggleCard";
 
 const ProgramForm = ({
     program,
@@ -84,22 +85,22 @@ const ProgramForm = ({
       .matches("[A-Za-z0-9]+", "Code must be alphanumeric."),
     active: yup.boolean(),
     parentFolder: yup.object()
+      .nullable()
       .when("id", {
         is: (id) => id === undefined || id === null,
-        then: yup.object().required("Parent folder is required.")
+        then: yup.object()
+          .required("Parent folder is required.")
       }),
-    notebookFolder: yup.object().shape({
-      referenceId: yup.string()
-      .test(
-          "not empty",
-          "Notebook folder ID is required.",
-          value => features && features.notebook
-              && features.notebook.isEnabled && !!value
-              && value.trim() !== ""
-      ),
-      name: yup.string(),
-      url: yup.string().url()
-    }),
+    notebookFolder: yup.object()
+      .nullable()
+      .when("useNotebook", {
+        is: true,
+        then: yup.object()
+          .shape({
+            referenceId: yup.string()
+              .required("Notebook folder is required.")
+        })
+      }),
     attributes: yup.object()
       .test(
           "not empty",
@@ -121,13 +122,14 @@ const ProgramForm = ({
     active: true,
     attributes: {},
     notebookFolder: {
-      referenceId: '',
-      name: '',
-      url: ''
+      referenceId: null,
+      name: null,
+      url: null
     },
     parentFolder: null,
     useGit: false,
-    useNotebook: true,
+    useNotebook: features && features.notebook && features.notebook.isEnabled
+        && features.notebook.mode !== "none",
     useStorage: true,
     gitGroup: null
   };
@@ -163,14 +165,17 @@ const ProgramForm = ({
         );
         console.error("Request failed.");
       }
-
-    }).catch(e => {
+    })
+    .catch(e => {
       setShowLoadingOverlay(false);
       swal(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
       );
       console.error(e);
+    })
+    .finally(() => {
+      setSubmitting(false);
     });
   };
 
@@ -436,113 +441,105 @@ const ProgramForm = ({
                       !values.id
                       && features
                       && features.notebook
-                      && features.notebook.isEnabled ? (
+                      && features.notebook.isEnabled
+                      && features.notebook.mode !== "none" ? (
 
-                        <Card>
-                          <Card.Header>
-                            <Card.Title>Electronic Laboratory Notebook Folder</Card.Title>
-                            <h6 className="card-subtitle text-muted">
-                              When using an electronic laboratory notebook, all
-                              programs require a folder in which all studies and
-                              entries will be created. You will have to create the
-                              program in the ELN software before Study Tracker can
-                              register the study and hook into the ELN platform.
-                              Select the program you wish to map your new program
-                              to from the dropdown below. If your project is not
-                              listed, check with your ELN administrator to ensure
-                              the project has been created.
-                            </h6>
-                          </Card.Header>
-                          <Card.Body>
-                            {
-                              elnProjects ? (
-                                  <Row>
-                                    <Col md={6} className={"mb-3"}>
-                                      <FormGroup>
-                                        <Form.Label>ELN Project</Form.Label>
-                                        <Select
-                                            className="react-select-container"
-                                            classNamePrefix="react-select"
-                                            options={elnProjectOptions}
-                                            name="elnProject"
-                                            onChange={(selected) => {
-                                              setFieldValue("notebookFolder.name", selected.value.name);
-                                              setFieldValue("notebookFolder.url", selected.value.url);
-                                              setFieldValue("notebookFolder.referenceId", selected.value.folderId);
-                                            }}
-                                        />
-                                        <Form.Text>
-                                          Select an existing project from your ELN to assign your program to.
-                                        </Form.Text>
-                                      </FormGroup>
-                                    </Col>
-                                  </Row>
-                              ) : ""
-                            }
+                        <FeatureToggleCard
+                            isActive={values.useNotebook}
+                            title={"Electronic Laboratory Notebook (ELN) Folder"}
+                            description={"When using an electronic laboratory notebook, all programs require a folder in which all studies and entries will be created. You will have to create the program in the ELN software before Study Tracker can register the study and hook into the ELN platform. Select the program you wish to map your new program to from the dropdown below. If your project is not listed, check with your ELN administrator to ensure the project has been created."}
+                            switchLabel={"Does this program need an ELN?"}
+                            handleToggle={() => setFieldValue("useNotebook", !values.useNotebook)}
+                        >
 
-                            <Row>
+                          {
+                            elnProjects ? (
+                                <Row>
+                                  <Col md={6} className={"mb-3"}>
+                                    <FormGroup>
+                                      <Form.Label>ELN Project</Form.Label>
+                                      <Select
+                                          className="react-select-container"
+                                          classNamePrefix="react-select"
+                                          options={elnProjectOptions}
+                                          name="elnProject"
+                                          onChange={(selected) => {
+                                            setFieldValue("notebookFolder.name", selected.value.name);
+                                            setFieldValue("notebookFolder.url", selected.value.url);
+                                            setFieldValue("notebookFolder.referenceId", selected.value.folderId);
+                                          }}
+                                      />
+                                      <Form.Text>
+                                        Select an existing project from your ELN to assign your program to.
+                                      </Form.Text>
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                            ) : ""
+                          }
 
-                              <Col md={6} className={"mb-3"}>
-                                <FormGroup>
-                                  <Form.Label>Program Folder ID *</Form.Label>
-                                  <Form.Control
-                                      type="text"
-                                      name={"notebookFolder.referenceId"}
-                                      isInvalid={!!errors.notebookFolder && !!errors.notebookFolder.referenceId}
-                                      value={values.notebookFolder.referenceId}
-                                      onChange={handleChange}
-                                      disabled={!!elnProjects && elnProjects.length > 0}
-                                  />
-                                  <Form.Control.Feedback type={"invalid"}>
-                                    Program Folder ID must not be empty.
-                                  </Form.Control.Feedback>
-                                  <Form.Text>
-                                    This is the ID assigned to the program
-                                    folder in the ELN. For example, in Benchling the ID
-                                    will take the form of an alphanumeric code with a
-                                    prefix of <code>lib_</code>.
-                                  </Form.Text>
-                                </FormGroup>
-                              </Col>
+                          <Row>
 
-                              <Col md={6} className={"mb-3"}>
-                                <FormGroup>
-                                  <Form.Label>Folder Name</Form.Label>
-                                  <Form.Control
-                                      type="text"
-                                      name={"notebookFolder.name"}
-                                      value={values.notebookFolder.name}
-                                      onChange={handleChange}
-                                      disabled={!!elnProjects && elnProjects.length > 0}
-                                  />
-                                  <Form.Control.Feedback type={"invalid"}>
-                                    Folder Name must not be empty.
-                                  </Form.Control.Feedback>
-                                  <Form.Text>If different from the program
-                                    name.</Form.Text>
-                                </FormGroup>
-                              </Col>
+                            <Col md={6} className={"mb-3"}>
+                              <FormGroup>
+                                <Form.Label>Program Folder ID *</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name={"notebookFolder.referenceId"}
+                                    isInvalid={!!errors.notebookFolder && !!errors.notebookFolder.referenceId}
+                                    value={values.notebookFolder.referenceId}
+                                    onChange={handleChange}
+                                    disabled={!!elnProjects && elnProjects.length > 0}
+                                />
+                                <Form.Control.Feedback type={"invalid"}>
+                                  Program Folder ID must not be empty.
+                                </Form.Control.Feedback>
+                                <Form.Text>
+                                  This is the ID assigned to the program
+                                  folder in the ELN. For example, in Benchling the ID
+                                  will take the form of an alphanumeric code with a
+                                  prefix of <code>lib_</code>.
+                                </Form.Text>
+                              </FormGroup>
+                            </Col>
 
-                              <Col md={6} className={"mb-3"}>
-                                <FormGroup>
-                                  <Form.Label>URL</Form.Label>
-                                  <Form.Control
-                                      type="text"
-                                      name={"notebookFolder.url"}
-                                      value={values.notebookFolder.url}
-                                      onChange={handleChange}
-                                      disabled={!!elnProjects && elnProjects.length > 0}
-                                  />
-                                  <Form.Control.Feedback type={"invalid"}>
-                                    URL must not be empty.
-                                  </Form.Control.Feedback>
-                                  <Form.Text>URL for the program in the ELN.</Form.Text>
-                                </FormGroup>
-                              </Col>
+                            <Col md={6} className={"mb-3"}>
+                              <FormGroup>
+                                <Form.Label>Folder Name</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name={"notebookFolder.name"}
+                                    value={values.notebookFolder.name}
+                                    onChange={handleChange}
+                                    disabled={!!elnProjects && elnProjects.length > 0}
+                                />
+                                <Form.Control.Feedback type={"invalid"}>
+                                  Folder Name must not be empty.
+                                </Form.Control.Feedback>
+                                <Form.Text>If different from the program
+                                  name.</Form.Text>
+                              </FormGroup>
+                            </Col>
 
-                            </Row>
-                          </Card.Body>
-                        </Card>
+                            <Col md={6} className={"mb-3"}>
+                              <FormGroup>
+                                <Form.Label>URL</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name={"notebookFolder.url"}
+                                    value={values.notebookFolder.url}
+                                    onChange={handleChange}
+                                    disabled={!!elnProjects && elnProjects.length > 0}
+                                />
+                                <Form.Control.Feedback type={"invalid"}>
+                                  URL must not be empty.
+                                </Form.Control.Feedback>
+                                <Form.Text>URL for the program in the ELN.</Form.Text>
+                              </FormGroup>
+                            </Col>
+
+                          </Row>
+                        </FeatureToggleCard>
 
                       ) : ""
                     }
