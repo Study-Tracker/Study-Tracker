@@ -43,4 +43,5 @@ public class ProgramFormDto {
   private Map<String, String> attributes = new HashMap<>();
   private boolean useGit;
   private GitGroup gitGroup;
+  private boolean useNotebook;
 }

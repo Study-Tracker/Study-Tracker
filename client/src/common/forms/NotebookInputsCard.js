@@ -39,6 +39,7 @@ const NotebookInputsCard = ({
         setParentFolder(response.data.path || response.data.name);
       })
       .catch(error => {
+        setParentFolder(null);
         console.error("Error loading program notebook folder: ", error);
       });
     } else if (selectedStudy) {
@@ -47,6 +48,7 @@ const NotebookInputsCard = ({
         setParentFolder(response.data.path || response.data.name);
       })
       .catch(error => {
+        setParentFolder(null);
         console.error("Error loading study notebook folder: ", error);
       });
     }
@@ -84,7 +86,12 @@ const NotebookInputsCard = ({
                   isInvalid={!parentFolder}
               />
               <Form.Control.Feedback type={"invalid"}>
-                You must select a program to associate the study with.
+                {
+                  (selectedProgram || selectedStudy) && !parentFolder
+                      ? "The selected program does not have a notebook folder."
+                      : "You must select a program to associate the study with."
+                }
+
               </Form.Control.Feedback>
               <Form.Text>The notebook folder will be created at this location in the ELN.</Form.Text>
             </FormGroup>
