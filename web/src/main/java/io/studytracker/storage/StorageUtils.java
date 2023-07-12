@@ -59,7 +59,7 @@ public class StorageUtils {
   }
 
   public static String cleanInputPath(String path) {
-    if (path == null) return null;
+    if (path == null) return "";
     return path.replaceAll("\\.\\.", ".");
   }
 

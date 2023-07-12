@@ -22,12 +22,10 @@ import io.studytracker.model.Study;
 import io.studytracker.service.NamingService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import software.amazon.awssdk.services.s3.model.CommonPrefix;
 import software.amazon.awssdk.services.s3.model.S3Object;
+
+import java.util.*;
 
 public class S3Utils {
 
@@ -99,16 +97,17 @@ public class S3Utils {
   public static String joinS3Path(String... parts) {
     StringBuilder builder = new StringBuilder();
     for (String part: parts) {
+      String p = Objects.requireNonNullElse(part, "");
       if (builder.length() > 0) {
         builder.append("/");
       }
-      if (part.startsWith("/")) {
-        part = part.substring(1);
+      if (p.startsWith("/")) {
+        p = p.substring(1);
       }
-      if (part.endsWith("/")) {
-        part = part.substring(0, part.length() - 1);
+      if (p.endsWith("/")) {
+        p = p.substring(0, p.length() - 1);
       }
-      builder.append(part);
+      builder.append(p);
     }
     return builder.toString();
   }

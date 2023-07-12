@@ -16,18 +16,6 @@
 
 package io.studytracker.test.aws;
 
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.aws.AwsIntegrationService;
@@ -39,28 +27,11 @@ import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.mapstruct.dto.form.StudyFormDto;
 import io.studytracker.mapstruct.mapper.AssayMapper;
 import io.studytracker.mapstruct.mapper.StudyMapper;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AssayType;
-import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Program;
-import io.studytracker.model.Status;
-import io.studytracker.model.StorageDrive;
+import io.studytracker.model.*;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
-import io.studytracker.model.User;
-import io.studytracker.repository.AssayRepository;
-import io.studytracker.repository.AssayTypeRepository;
-import io.studytracker.repository.AwsIntegrationRepository;
-import io.studytracker.repository.ProgramRepository;
-import io.studytracker.repository.StorageDriveFolderRepository;
-import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.repository.StudyRepository;
-import io.studytracker.repository.UserRepository;
+import io.studytracker.repository.*;
 import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.StorageDriveFolderService;
-import java.util.Collections;
-import java.util.Date;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +46,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import java.util.Collections;
+import java.util.Date;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -229,6 +211,24 @@ public class AwsWebControllerTests {
         .andExpect(jsonPath("$.name", is("S3 Study Root")))
         .andExpect(jsonPath("$.path", is("test/")))
         ;
+
+//    form = new StorageDriveFolderFormDto();
+//    form.setBrowserRoot(true);
+//    form.setStudyRoot(true);
+//    form.setName("S3 Study Data");
+//    form.setPath("");
+//    form.setWriteEnabled(true);
+//    form.setStorageDriveId(drive.getId());
+//
+//    mockMvc.perform(post("/api/internal/storage-drive-folders")
+//                    .with(user(username)).with(csrf())
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .content(objectMapper.writeValueAsBytes(form)))
+//            .andDo(MockMvcResultHandlers.print())
+//            .andExpect(status().isCreated())
+//            .andExpect(jsonPath("$.name", is("S3 Study Data")))
+//            .andExpect(jsonPath("$.path", is("")))
+//    ;
 
   }
 
