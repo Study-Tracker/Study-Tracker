@@ -285,7 +285,7 @@ public class GitLabService implements GitService<GitLabIntegration> {
         .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
-    String description = trimRepositoryDescription(study.getDescription());
+    String description = GitLabUtils.trimRepositoryDescription(study.getDescription());
 
     GitLabNewProjectRequest request = new GitLabNewProjectRequest();
     request.setNamespaceId(gitLabProgramGroup.getGroupId());
@@ -379,7 +379,7 @@ public class GitLabService implements GitService<GitLabIntegration> {
         .orElseThrow(RecordNotFoundException::new);
 
     // Create the request
-    String description = trimRepositoryDescription(assay.getDescription());
+    String description = GitLabUtils.trimRepositoryDescription(assay.getDescription());
     GitLabNewProjectRequest request = new GitLabNewProjectRequest();
     request.setNamespaceId(gitLabProgramGroup.getGroupId());
     request.setName(GitLabUtils.getAssayProjectName(assay));
@@ -484,13 +484,5 @@ public class GitLabService implements GitService<GitLabIntegration> {
 //    LOGGER.warn("User not found for {}", user.getUsername());
 //    return Optional.empty();
 //  }
-
-  private String trimRepositoryDescription(String description) {
-    String cleaned = description.replaceAll("<[^>]*>", "");
-    if (cleaned.length() > 255) {
-      return description.substring(0, 252) + "...";
-    }
-    return cleaned;
-  }
 
 }

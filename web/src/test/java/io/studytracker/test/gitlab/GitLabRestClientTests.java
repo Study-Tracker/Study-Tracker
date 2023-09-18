@@ -64,7 +64,7 @@ public class GitLabRestClientTests {
         .accessToken(accessKey)
         .rootUrl(rootUrl)
         .build();
-    String timestamp = "A"; //new Date().toString();
+    String timestamp = "B"; //new Date().toString();
     groupName = EXAMPLE_GROUP + " " + timestamp;
     projectName = EXAMPLE_PROJECT + " " + timestamp;
 

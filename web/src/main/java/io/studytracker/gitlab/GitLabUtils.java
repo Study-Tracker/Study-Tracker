@@ -25,13 +25,26 @@ import io.studytracker.gitlab.entities.GitLabUser;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
+import java.text.BreakIterator;
+import java.util.Locale;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 public class GitLabUtils {
 
-  public static String getPathFromName(String name) {
-    return name.toLowerCase()
+  public static String getPathFromName(@NonNull String name, @Nullable String code) {
+    String path = (code != null ? code.toLowerCase() + "-" : "") + name.toLowerCase()
         .replaceAll("[\\s_]+", "-")
         .replaceAll("[^a-z0-9-]", "");
+    if (path.length() > 255) {
+      return path.substring(0, 255);
+    } else {
+      return path;
+    }
+  }
+
+  public static String getPathFromName(@NonNull String name) {
+    return getPathFromName(name, null);
   }
 
   public static String getProgramGroupName(Program program) {
@@ -43,7 +56,7 @@ public class GitLabUtils {
   }
 
   public static String getStudyProjectPath(Study study) {
-    return getPathFromName(study.getCode());
+    return getPathFromName(study.getName(), study.getCode());
   }
 
   public static String getAssayProjectName(Assay assay) {
@@ -51,7 +64,7 @@ public class GitLabUtils {
   }
 
   public static String getAssayProjectPath(Assay assay) {
-    return getPathFromName(assay.getCode());
+    return getPathFromName(assay.getName(), assay.getCode());
   }
 
   public static GitServerGroup toGitServerGroup(GitLabProjectGroup group) {
@@ -90,6 +103,19 @@ public class GitLabUtils {
     gitUser.setName(user.getName());
     gitUser.setEmail(user.getEmail());
     return gitUser;
+  }
+
+  public static String trimRepositoryDescription(String description) {
+    BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
+    String cleaned = description.replaceAll("<[^>]*>", "");
+    iterator.setText(cleaned);
+    int start = iterator.first();
+    int end = iterator.next();
+    String sub = cleaned.substring(start, end);
+    if (sub.length() > 255) {
+      return sub.substring(0, 252) + "...";
+    }
+    return sub;
   }
 
 }
