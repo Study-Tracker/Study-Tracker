@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - GitLab repositories now get more specific paths created for them, including both the project codes and names. GitLab repositories also now get a better truncated description based on the study/assay description.
 
+### Fixed
+- Fixed a bug with repairing/creating notebook folders for programs/studies/assays without them.
+- Removed some unnecessary logging.
+
 ## [0.9.3] - 2023-07-04
 
 ### Added

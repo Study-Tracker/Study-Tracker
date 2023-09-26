@@ -21,19 +21,15 @@ import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RequestMapping("/api/internal/assay/{assayId}/notebook")
 @RestController
@@ -58,7 +54,7 @@ public class AssayNotebookPrivateController extends AbstractAssayController {
         () -> new RecordNotFoundException("Could not load assay folder"));
   }
 
-  @PostMapping("")
+  @PostMapping("/repair")
   public HttpEntity<?> repairNotebookFolder(@PathVariable("assayId") Long assayId) {
 
     // Check that the study exists

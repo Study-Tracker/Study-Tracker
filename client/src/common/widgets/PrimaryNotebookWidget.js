@@ -60,7 +60,6 @@ const PrimaryNotebookWidget = ({record}) => {
       })
       setIsRepaird(true);
       setIsSubmitting(false);
-      navigate("#notebook");
       navigate(0);
     })
     .catch(error => {
