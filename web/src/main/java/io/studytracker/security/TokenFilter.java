@@ -17,17 +17,19 @@
 package io.studytracker.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class TokenFilter extends OncePerRequestFilter {
 
@@ -43,7 +45,9 @@ public class TokenFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     String authHeader = request.getHeader("Authorization");
-    LOGGER.debug("Authenticating user with Authorization header: " + authHeader);
+    if (StringUtils.hasText(authHeader)) {
+      LOGGER.debug("Authenticating user with Authorization header: " + authHeader);
+    }
     if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);
       if (token.isBlank()) {

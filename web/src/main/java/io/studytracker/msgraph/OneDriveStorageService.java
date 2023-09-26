@@ -22,14 +22,7 @@ import com.microsoft.graph.models.Folder;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import io.studytracker.config.properties.StorageProperties;
-import io.studytracker.model.Assay;
-import io.studytracker.model.MSGraphIntegration;
-import io.studytracker.model.OneDriveDriveDetails;
-import io.studytracker.model.OneDriveFolderDetails;
-import io.studytracker.model.Program;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
+import io.studytracker.model.*;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -39,11 +32,6 @@ import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +40,12 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OneDriveStorageService implements StudyStorageService {
@@ -386,9 +380,8 @@ public class OneDriveStorageService implements StudyStorageService {
       StorageFolder folder = this.findFolderByPath(drive, path);
       return folder != null;
     } catch (StudyStorageNotFoundException e) {
-      e.printStackTrace();
+      return false;
     }
-    return false;
   }
 
   @Override
