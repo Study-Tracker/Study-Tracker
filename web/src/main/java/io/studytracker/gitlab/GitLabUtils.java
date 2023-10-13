@@ -35,7 +35,11 @@ public class GitLabUtils {
   public static String getPathFromName(@NonNull String name, @Nullable String code) {
     String path = (code != null ? code.toLowerCase() + "-" : "") + name.toLowerCase()
         .replaceAll("[\\s_]+", "-")
-        .replaceAll("[^a-z0-9-]", "");
+        .replaceAll("[^a-z0-9-]", "")
+        .replaceAll("-+", "-")
+        .replaceAll("^-", "")
+        .replaceAll("-$", "")
+        ;
     if (path.length() > 255) {
       return path.substring(0, 255);
     } else {
