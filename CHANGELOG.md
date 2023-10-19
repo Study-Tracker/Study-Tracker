@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug with repairing/creating notebook folders for programs/studies/assays without them.
 - Removed some unnecessary logging.
 - Fixed an issue with S3 path resolution that was throwing errors on file upload.
+- Fixed a bug that could prevent the creation of new folders in S3 drives (#118).
 
 ## [0.9.3] - 2023-07-04
 

@@ -16,20 +16,12 @@
 
 package io.studytracker.storage;
 
-import io.studytracker.model.Assay;
-import io.studytracker.model.Organization;
-import io.studytracker.model.Program;
-import io.studytracker.model.StorageDrive;
+import io.studytracker.model.*;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.StorageDriveFolderDetails;
-import io.studytracker.model.Study;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.exception.StudyStorageException;
-import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +30,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for {@link StorageDriveFolder} and {@link StorageDrive} entity records.
@@ -144,19 +139,17 @@ public class StorageDriveFolderService {
   public StorageDriveFolder registerFolder(StorageDriveFolder folder, StorageDrive drive) {
 
     String path = StorageUtils.cleanInputPath(folder.getPath());
-    String folderName = folder.getName();
-    if (!StringUtils.hasText(folderName)) {
-      folderName = StorageUtils.getFolderNameFromPath(folder.getPath());
+    String folderName = StorageUtils.getFolderNameFromPath(folder.getPath());
+    if (!StringUtils.hasText(folder.getName())) {
       folder.setName(folderName);
     }
-    LOGGER.info("Registering folder {} at path {} in drive {}", folderName, path, drive.getDisplayName());
+    LOGGER.info("Registering folder '{}' at path '{}' in drive '{}'", folderName, path, drive.getDisplayName());
 
     // Check that the requested folder is within the drive root path
     if (!path.startsWith(drive.getRootPath())) {
       throw new IllegalArgumentException("Folder path must be within drive root path");
     }
 
-    LOGGER.info("Registering folder {} in drive {}", path, drive.getDisplayName());
     StudyStorageService storageService = this.lookupStudyStorageService(drive.getDriveType());
 
     // Create or fetch the folder record
@@ -165,9 +158,13 @@ public class StorageDriveFolderService {
       if (storageService.folderExists(drive, path)) {
         LOGGER.info("Folder {} already exists in drive {}", path, drive.getDisplayName());
         storageFolder = storageService.findFolderByPath(drive, path);
+        LOGGER.debug("Found existing folder '{}' at path '{}' in drive '{}'", storageFolder.getName(),
+                storageFolder.getPath(), drive.getDisplayName());
       } else {
         LOGGER.info("Creating folder {} in drive {}", folder.getPath(), drive.getDisplayName());
         storageFolder = storageService.createFolder(drive, StorageUtils.getParentPathFromPath(path), folderName);
+        LOGGER.debug("Created folder '{}' at path '{}' in drive '{}'", storageFolder.getName(),
+                storageFolder.getPath(), drive.getDisplayName());
       }
     } catch (StudyStorageException e) {
       e.printStackTrace();

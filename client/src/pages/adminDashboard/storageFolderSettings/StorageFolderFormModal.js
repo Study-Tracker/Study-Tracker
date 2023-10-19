@@ -23,8 +23,7 @@ import Select from "react-select";
 import {FormGroup} from "../../../common/forms/common";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
-import FormikFormErrorNotification
-  from "../../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification from "../../../common/forms/FormikFormErrorNotification";
 
 const StorageFolderFormModal = ({
   isOpen,
@@ -164,7 +163,8 @@ const StorageFolderFormModal = ({
                           {errors.path}
                         </Form.Control.Feedback>
                         <Form.Text>
-                          Enter the full path to the folder on the storage drive. If the folder does not exist, it will be created.
+                          Enter the full path to the folder on the storage drive. If the folder does not exist, it will
+                          be created. If using the root path of the drive, use <code>/</code> as your folder path.
                         </Form.Text>
                       </FormGroup>
                     </Col>
