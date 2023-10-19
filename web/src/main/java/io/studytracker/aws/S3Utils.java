@@ -22,12 +22,13 @@ import io.studytracker.model.Study;
 import io.studytracker.service.NamingService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import software.amazon.awssdk.services.s3.model.CommonPrefix;
+import software.amazon.awssdk.services.s3.model.S3Object;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import software.amazon.awssdk.services.s3.model.CommonPrefix;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class S3Utils {
 
@@ -132,6 +133,12 @@ public class S3Utils {
         .replaceAll("_", " ")
         .replaceAll("\\s+", " ")
         .trim();
+  }
+  
+  public static String cleanInputPath(String path) {
+    if (path == null) return "";
+    if (path.startsWith("/")) path = path.substring(1);
+    return path.replaceAll("\\.\\.", ".");
   }
 
 
