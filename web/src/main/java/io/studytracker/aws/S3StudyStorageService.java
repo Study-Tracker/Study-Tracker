@@ -18,14 +18,7 @@ package io.studytracker.aws;
 
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Program;
-import io.studytracker.model.S3BucketDetails;
-import io.studytracker.model.S3FolderDetails;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
+import io.studytracker.model.*;
 import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -34,7 +27,6 @@ import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
-import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +42,8 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
+
+import java.io.File;
 
 @Service
 public class S3StudyStorageService implements StudyStorageService {
@@ -292,26 +286,26 @@ public class S3StudyStorageService implements StudyStorageService {
       client.putObject(request, RequestBody.fromFile(file));
     } catch (Exception e) {
       e.printStackTrace();
-      throw new StudyStorageException("Failed to upload file: " + path, e);
+      throw new StudyStorageException("Failed to upload file: " + fullPath, e);
     }
 
     try {
       ListObjectsV2Request request = ListObjectsV2Request.builder()
           .bucket(bucketDetails.getBucketName())
-          .prefix(path)
+          .prefix(fullPath)
           .delimiter("/")
           .build();
       ListObjectsV2Response response = client.listObjectsV2(request);
       S3Object s3Object = response.contents().stream().findFirst()
           .orElseThrow(
-              () -> new StudyStorageNotFoundException("Failed to lookup file by path: " + path));
+              () -> new StudyStorageNotFoundException("Failed to lookup file by path: " + fullPath));
       if (s3Object.key().endsWith("/")) {
-        throw new StudyStorageNotFoundException("Object at path is a folder: " + path);
+        throw new StudyStorageNotFoundException("Object at path is a folder: " + fullPath);
       }
       return S3Utils.convertS3ObjectToStorageFile(s3Object);
     } catch (AwsServiceException e) {
       e.printStackTrace();
-      throw new StudyStorageNotFoundException("Cannot access file at path: " + path);
+      throw new StudyStorageNotFoundException("Cannot access file at path: " + fullPath);
     }
 
   }
