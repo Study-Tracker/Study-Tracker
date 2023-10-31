@@ -15,13 +15,7 @@
  */
 
 import {Button, Card, Col, Row} from "react-bootstrap";
-import {
-  ArrowLeft,
-  CornerLeftUp,
-  FolderPlus,
-  RotateCw,
-  Upload
-} from "react-feather";
+import {ArrowLeft, CornerLeftUp, FolderPlus, RotateCw, Upload} from "react-feather";
 import FileManagerUploadModal from "./FileManagerUploadModal";
 import FileManagerNewFolderModal from "./FileManagerNewFolderModal";
 import React, {useContext, useEffect, useMemo, useState} from "react";
@@ -163,7 +157,7 @@ const FileManagerContent = ({
         <FileManagerTable
           folder={folder}
           handlePathChange={handlePathUpdate}
-          dataSource={rootFolder}
+          rootFolder={rootFolder}
         />
     );
   }
