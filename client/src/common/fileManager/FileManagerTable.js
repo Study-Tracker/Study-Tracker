@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 import React, {useContext, useState} from 'react';
-import {
-  Download,
-  File,
-  Folder,
-  FolderPlus,
-  Link,
-  MoreHorizontal
-} from "react-feather";
+import {Download, File, Folder, FolderPlus, Link, MoreHorizontal} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -33,7 +26,7 @@ import FileManagerAddToStudyModal from "./FileManagerAddToStudyModal";
 const FileManagerTable = ({
   folder,
   handlePathChange,
-  dataSource,
+  rootFolder,
 }) => {
 
   const notyf = useContext(NotyfContext);
@@ -51,7 +44,7 @@ const FileManagerTable = ({
   };
 
   const handleCopyS3Path = (d) => {
-    const path = "s3://" + dataSource.storageDrive.details.bucketName + "/" + d.path;
+    const path = "s3://" + rootFolder.storageDrive.details.bucketName + "/" + d.path;
     navigator.clipboard.writeText(path);
     notyf.open({message: "Copied S3 path to clipboard", type: "success"});
   }
@@ -151,14 +144,14 @@ const FileManagerTable = ({
 
                 {
                   d.type === "file" && d.downloadable ? (
-                    <Dropdown.Item onClick={() => window.open("/api/internal/data-files/download?locationId=" + dataSource.id + "&path=" + d.path)}>
+                    <Dropdown.Item onClick={() => window.open("/api/internal/data-files/download?folderId=" + rootFolder.id + "&path=" + d.path)}>
                       <Download className="align-middle me-2" /> Download
                     </Dropdown.Item>
                     ) : ""
                 }
 
                 {
-                  dataSource.storageDrive && dataSource.storageDrive.driveType && dataSource.storageDrive.driveType === "S3" ? (
+                  rootFolder.storageDrive && rootFolder.storageDrive.driveType && rootFolder.storageDrive.driveType === "S3" ? (
                       <Dropdown.Item onClick={() => handleCopyS3Path(d)}>
                         <Link className="align-middle me-2" size={18} /> Copy S3 Path
                       </Dropdown.Item>
@@ -265,7 +258,7 @@ const FileManagerTable = ({
         setModalIsOpen={setAddToStudyModalIsOpen}
         isOpen={addToStudyModalIsOpen}
         folder={selectedItem}
-        rootFolder={dataSource}
+        rootFolder={rootFolder}
         useStudies={true}
       />
 
@@ -273,7 +266,7 @@ const FileManagerTable = ({
         setModalIsOpen={setAddToAssayModalIsOpen}
         isOpen={addToAssayModalIsOpen}
         folder={selectedItem}
-        rootFolder={dataSource}
+        rootFolder={rootFolder}
         useStudies={false}
       />
 
@@ -284,7 +277,7 @@ const FileManagerTable = ({
 FileManagerTable.propTypes = {
   folder: PropTypes.object.isRequired,
   handlePathChange: PropTypes.func.isRequired,
-  dataSource: PropTypes.object.isRequired,
+  rootFolder: PropTypes.object.isRequired,
   handleAddToRecord: PropTypes.func.isRequired,
   record: PropTypes.object
 }
