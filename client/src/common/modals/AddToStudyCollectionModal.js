@@ -55,14 +55,51 @@ const AddToStudyCollectionModal = props => {
   .map(c => {
     return {
       value: c.id,
-      label: c.name
+      label: c.name,
+      public: c.shared
     }
   });
 
+  const groupedOptions = [
+    {
+      label: "Public Collections",
+      options: options.filter(o => o.public)
+    },
+    {
+      label: "Private Collections",
+      options: options.filter(o => !o.public)
+    }
+  ];
+
+  const groupStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  };
+  const groupBadgeStyles = {
+    backgroundColor: '#EBECF0',
+    borderRadius: '2em',
+    color: '#172B4D',
+    display: 'inline-block',
+    fontSize: 12,
+    fontWeight: 'normal',
+    lineHeight: '1',
+    minWidth: 1,
+    padding: '0.16666666666667em 0.5em',
+    textAlign: 'center',
+  };
+
+  const formatGroupLabel = (data) => {
+    return (
+        <div style={groupStyles}>
+          <span>{data.label}</span>
+          <span style={groupBadgeStyles}>{data.options.length}</span>
+        </div>
+    );
+  }
+
   return (
-      <Modal show={isOpen}
-             onHide={() => showModal(false)}
-      >
+      <Modal show={isOpen} onHide={() => showModal(false)}>
         <Modal.Header closeButton>
           Add Study to Collection
         </Modal.Header>
@@ -77,11 +114,12 @@ const AddToStudyCollectionModal = props => {
                       classNamePrefix="react-select"
                       value={options.filter(
                           o => o.value === selected)}
-                      options={options}
+                      options={groupedOptions}
                       onChange={o => {
                         console.debug("Option", o);
                         setSelected(o.value);
                       }}
+                      formatGroupLabel={formatGroupLabel}
                   />
                 </Form.Group>
               </Col>
