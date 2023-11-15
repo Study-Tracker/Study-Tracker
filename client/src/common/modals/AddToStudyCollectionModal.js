@@ -51,15 +51,7 @@ const AddToStudyCollectionModal = props => {
   }
 
   const options = collections
-  .sort((a, b) => {
-    if (a.name > b.name) {
-      return 1;
-    } else if (a.name < b.name) {
-      return -1;
-    } else {
-      return 0;
-    }
-  })
+  .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
   .map(c => {
     return {
       value: c.id,
