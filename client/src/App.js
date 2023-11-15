@@ -35,164 +35,171 @@ import FrontPageView from "./pages/frontPage/FrontPageView";
 import AssayTypeFormView from "./pages/assayTypeForm/AssayTypeFormView";
 import AssayListView from "./pages/assayList/AssayListView";
 import {TemplateFormView} from "./pages/templateForm/TemplateFormView";
-import StudyCollectionFormView
-  from "./pages/studyCollectionForm/StudyCollectionFormView";
-import StudyCollectionDetailsView
-  from "./pages/studyCollectionsDetails/StudyCollectionDetailsView";
-import StudyCollectionListView
-  from "./pages/studyCollectionList/StudyCollectionListView";
-import PasswordResetRequestView
-  from "./pages/passwordResetRequest/PasswordResetRequestView";
+import StudyCollectionFormView from "./pages/studyCollectionForm/StudyCollectionFormView";
+import StudyCollectionDetailsView from "./pages/studyCollectionsDetails/StudyCollectionDetailsView";
+import StudyCollectionListView from "./pages/studyCollectionList/StudyCollectionListView";
+import PasswordResetRequestView from "./pages/passwordResetRequest/PasswordResetRequestView";
 import SearchResultsView from "./pages/searchResults/SearchResultsView";
 import FileManagerView from "./pages/fileManager/FileManagerView";
+import {QueryClient, QueryClientProvider} from "react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = props => {
 
   return (
       <ErrorBoundary>
-        <BrowserRouter>
-          <Routes>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <Routes>
 
-            {/*Home page */}
-            <Route path={"/"}
-                   element={<FrontPageView />}
-            />
+              {/*Home page */}
+              <Route path={"/"}
+                     element={<FrontPageView />}
+              />
 
-            {/* Study List */}
-            <Route path={"/studies"}
-                   element={<StudyListView title={"All Studies"}/>}
-            />
+              {/* Study List */}
+              <Route path={"/studies"}
+                     element={<StudyListView title={"All Studies"}/>}
+              />
 
-            {/* New study*/}
-            <Route path={"/studies/new"}
-                   element={<StudyFormView />}/>
+              {/* New study*/}
+              <Route path={"/studies/new"}
+                     element={<StudyFormView />}/>
 
-            {/*Study details*/}
-            <Route path={"/study/:studyCode"}
-                   element={<StudyDetailsView />}/>
+              {/*Study details*/}
+              <Route path={"/study/:studyCode"}
+                     element={<StudyDetailsView />}/>
 
-            {/* Edit study*/}
-            <Route path={"/study/:studyCode/edit"}
-                   element={<StudyFormView />}/>
+              {/* Edit study*/}
+              <Route path={"/study/:studyCode/edit"}
+                     element={<StudyFormView />}/>
 
-            {/* Assay List */}
-            <Route path={"/assays"}
-                   element={<AssayListView title={"All Assays"}/>}/>
+              {/* Assay List */}
+              <Route path={"/assays"}
+                     element={<AssayListView title={"All Assays"}/>}/>
 
-            {/*New assay*/}
-            <Route path={"/study/:studyCode/assays/new"}
-                   element={<AssayFormView />}/>
+              {/*New assay*/}
+              <Route path={"/study/:studyCode/assays/new"}
+                     element={<AssayFormView />}/>
 
-            {/*Assay details*/}
-            <Route path={"/study/:studyCode/assay/:assayCode"}
-                   element={<AssayDetailsView />}/>
+              {/*Assay details*/}
+              <Route path={"/study/:studyCode/assay/:assayCode"}
+                     element={<AssayDetailsView />}/>
 
-            {/*Edit assay*/}
-            <Route path={"/study/:studyCode/assay/:assayCode/edit"}
-                   element={<AssayFormView />}/>
+              {/*Edit assay*/}
+              <Route path={"/study/:studyCode/assay/:assayCode/edit"}
+                     element={<AssayFormView />}/>
 
-            {/*Program list*/}
-            <Route
-                exact
-                path={"/programs"}
-                element={<ProgramListView />}
-            />
+              {/*Program list*/}
+              <Route
+                  exact
+                  path={"/programs"}
+                  element={<ProgramListView />}
+              />
 
-            {/*Program details*/}
-            <Route path={"/program/:programId"}
-                   element={<ProgramDetailsView />}/>
+              {/*Program details*/}
+              <Route path={"/program/:programId"}
+                     element={<ProgramDetailsView />}/>
 
-            {/*New Program*/}
-            <Route path={"/programs/new"}
-                   element={<ProgramFormView />}/>
+              {/*New Program*/}
+              <Route path={"/programs/new"}
+                     element={<ProgramFormView />}/>
 
-            {/*Edit Program*/}
-            <Route path={"/program/:programId/edit"}
-                   element={<ProgramFormView />}/>
+              {/*Edit Program*/}
+              <Route path={"/program/:programId/edit"}
+                     element={<ProgramFormView />}/>
 
-            {/* User list */}
-            <Route
-                exact
-                path={"/users"}
-                element={<UserListView />}
-            />
+              {/* User list */}
+              <Route
+                  exact
+                  path={"/users"}
+                  element={<UserListView />}
+              />
 
-            {/*User details*/}
-            <Route path={"/user/:userId"}
-                   element={<UserDetailsView />}/>
+              {/*User details*/}
+              <Route path={"/user/:userId"}
+                     element={<UserDetailsView />}/>
 
-            {/*New User*/}
-            <Route path={"/users/new"}
-                   element={<UserFormView />}/>
+              {/*New User*/}
+              <Route path={"/users/new"}
+                     element={<UserFormView />}/>
 
-            {/*Edit User*/}
-            <Route path={"/users/:userId/edit"}
-                   element={<UserFormView />}/>
+              {/*Edit User*/}
+              <Route path={"/users/:userId/edit"}
+                     element={<UserFormView />}/>
 
-            {/* Collection list */}
-            <Route
-                exact
-                path={"/collections"}
-                element={<StudyCollectionListView />}
-            />
+              {/* Collection list */}
+              <Route
+                  exact
+                  path={"/collections"}
+                  element={<StudyCollectionListView />}
+              />
 
-            {/*New Collection*/}
-            <Route path={"/collections/new"}
-                   element={<StudyCollectionFormView />}/>
+              {/*New Collection*/}
+              <Route path={"/collections/new"}
+                     element={<StudyCollectionFormView />}/>
 
-            {/*Edit Collection*/}
-            <Route path={"/collection/:collectionId/edit"}
-                   element={<StudyCollectionFormView />}/>
+              {/*Edit Collection*/}
+              <Route path={"/collection/:collectionId/edit"}
+                     element={<StudyCollectionFormView />}/>
 
-            {/*Collection details*/}
-            <Route path={"/collection/:collectionId"}
-                   element={<StudyCollectionDetailsView />}/>
+              {/*Collection details*/}
+              <Route path={"/collection/:collectionId"}
+                     element={<StudyCollectionDetailsView />}/>
 
-            {/* Sign in */}
-            <Route path={"/login"}
-                   element={<SignInView />}/>
+              {/* Sign in */}
+              <Route path={"/login"}
+                     element={<SignInView />}/>
 
-            <Route path={"/auth/passwordresetrequest"}
-                   element={<PasswordResetRequestView />}/>
+              <Route path={"/auth/passwordresetrequest"}
+                     element={<PasswordResetRequestView />}/>
 
-            <Route path={"/auth/passwordreset"}
-                   element={<PasswordResetView />}/>
+              <Route path={"/auth/passwordreset"}
+                     element={<PasswordResetView />}/>
 
-            {/* Assay Type Form */}
-            <Route path={"/assaytypes/new"}
-                   element={<AssayTypeFormView />}/>
+              {/* Assay Type Form */}
+              <Route path={"/assaytypes/new"}
+                     element={<AssayTypeFormView />}/>
 
-            <Route path={"/assaytypes/:assayTypeId/edit"}
-                   element={<AssayTypeFormView />}/>
+              <Route path={"/assaytypes/:assayTypeId/edit"}
+                     element={<AssayTypeFormView />}/>
 
-            <Route
-                path="/template-types/new"
-                element={<TemplateFormView />}
-            />
+              <Route
+                  path="/template-types/new"
+                  element={<TemplateFormView />}
+              />
 
-            {/* Admin */}
+              {/* Admin */}
 
-            <Route path={"/admin"}
-                   element={<AdminDashboardView />}/>
+              <Route path={"/admin"}
+                     element={<AdminDashboardView />}/>
 
-            {/* Search */}
+              {/* Search */}
 
-            <Route path={"/search"}
-                   element={<SearchResultsView />}/>
+              <Route path={"/search"}
+                     element={<SearchResultsView />}/>
 
-            {/* File Manager */}
-            <Route path={"/file-manager"}
-                   element={<FileManagerView />}/>
+              {/* File Manager */}
+              <Route path={"/file-manager"}
+                     element={<FileManagerView />}/>
 
-            {/* Error */}
-            <Route path={"/error"}
-                   element={<Error />}/>
+              {/* Error */}
+              <Route path={"/error"}
+                     element={<Error />}/>
 
-            {/*404*/}
-            <Route element={<Error code={404}/>}/>
+              {/*404*/}
+              <Route element={<Error code={404}/>}/>
 
-          </Routes>
-        </BrowserRouter>
+            </Routes>
+          </BrowserRouter>
+        </QueryClientProvider>
       </ErrorBoundary>
   );
 

@@ -14,43 +14,50 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import Select from "react-select";
 import swal from "sweetalert";
 import axios from "axios";
 import PropTypes from "prop-types";
+import {useMutation, useQuery, useQueryClient} from "react-query";
 
-const AddToStudyCollectionModal = props => {
+const AddToStudyCollectionModal = ({showModal, isOpen, study}) => {
 
-  const {showModal, isOpen, study} = props;
-  const [collections, setCollections] = useState([]);
+  // const [collections, setCollections] = useState([]);
+  const queryClient = useQueryClient();
   const [selected, setSelected] = useState(null);
 
-  useEffect(() => {
-    axios.get("/api/internal/studycollection?visibleToMe=true")
-    .then(response => setCollections(response.data))
-    .catch(e => {
-      console.error(e);
-    })
-  }, []);
+  const {data: collections, isLoading, error} = useQuery("collections", async () => {
+    return axios.get("/api/internal/studycollection?visibleToMe=true")
+    .then(response => response.data)
+  });
+
+  const mutation = useMutation(async (collectionId) => {
+    return axios.post("/api/internal/studycollection/" + selected + "/" + study.id);
+  });
 
   const handleSubmit = () => {
     if (!!selected) {
-      axios.post("/api/internal/studycollection/" + selected + "/" + study.id)
-      .then(() => showModal(false))
-      .catch(e => {
-        console.error(e);
-        console.warn("Failed to add study to collection.")
-        swal(
+      mutation.mutate(selected, {
+        onSuccess: () => {
+          queryClient.invalidateQueries("studyCollections");
+          setSelected(null);
+          showModal(false);
+        },
+        onError: (e) => {
+          console.error(e);
+          console.warn("Failed to add study to collection.")
+          swal(
             "Something went wrong",
             "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-        )
+          );
+        }
       })
     }
   }
 
-  const options = collections
+  const options = (collections || [])
   .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
   .map(c => {
     return {
