@@ -1,6 +1,6 @@
 {
   "name": "study-tracker-client",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "React front-end client for Study Tracker",
   "private": true,
   "author": "Will Oemler <will@oemler.io>",
@@ -73,6 +73,7 @@
     "react-jvectormap": "0.0.16",
     "react-perfect-scrollbar": "1.5.8",
     "react-popper": "2.3.0",
+    "react-query": "^3.39.3",
     "react-quill": "2.0.0-beta.4",
     "react-redux": "^7.2.8",
     "react-router-dom": "6.3.0",
