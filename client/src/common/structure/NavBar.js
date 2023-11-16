@@ -153,6 +153,14 @@ const NavBar = props => {
 }
 
 const NavbarUser = ({isAdmin, userId, displayName, logoutUrl}) => {
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await axios.post("/logout");
+    navigate(0);
+  }
+
   return (
       <Dropdown className="nav-item" align="end">
 
@@ -189,9 +197,12 @@ const NavbarUser = ({isAdmin, userId, displayName, logoutUrl}) => {
             Profile
           </Dropdown.Item>
 
-          <Dropdown.Item as={"a"} href={logoutUrl}>
-            <LogOut size={18}
-                    className="align-middle me-2"/>
+          <Dropdown.Item
+              as={"a"}
+              // href={logoutUrl}
+              onClick={handleLogout}
+          >
+            <LogOut size={18} className="align-middle me-2"/>
             Sign out
           </Dropdown.Item>
 
