@@ -28,13 +28,13 @@ const AddToStudyCollectionModal = ({showModal, isOpen, study}) => {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState(null);
 
-  const {data: collections, isLoading, error} = useQuery("collections", async () => {
+  const {data: collections} = useQuery("collections", async () => {
     return axios.get("/api/internal/studycollection?visibleToMe=true")
     .then(response => response.data)
   });
 
   const mutation = useMutation(async (collectionId) => {
-    return axios.post("/api/internal/studycollection/" + selected + "/" + study.id);
+    return axios.post("/api/internal/studycollection/" + collectionId + "/" + study.id);
   });
 
   const handleSubmit = () => {
@@ -78,29 +78,11 @@ const AddToStudyCollectionModal = ({showModal, isOpen, study}) => {
     }
   ];
 
-  const groupStyles = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  };
-  const groupBadgeStyles = {
-    backgroundColor: '#EBECF0',
-    borderRadius: '2em',
-    color: '#172B4D',
-    display: 'inline-block',
-    fontSize: 12,
-    fontWeight: 'normal',
-    lineHeight: '1',
-    minWidth: 1,
-    padding: '0.16666666666667em 0.5em',
-    textAlign: 'center',
-  };
-
   const formatGroupLabel = (data) => {
     return (
-        <div style={groupStyles}>
+        <div className={"react-select-group"}>
           <span>{data.label}</span>
-          <span style={groupBadgeStyles}>{data.options.length}</span>
+          <span className={"react-select-group-badge"}>{data.options.length}</span>
         </div>
     );
   }
