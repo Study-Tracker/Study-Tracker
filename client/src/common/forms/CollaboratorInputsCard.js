@@ -210,6 +210,8 @@ const CollaboratorInputsCard = ({
                           options={collaborators}
                           onChange={handleCollaboratorSelect}
                           defaultValue={selectedCollaborator}
+                          menuPortalTarget={document.body}
+                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                       />
                     </FormGroup>
 

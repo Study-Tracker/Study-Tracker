@@ -11,9 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.5] - 2023-11-XX
 
+### Changed
+- Public and private study collection are now differentiated in the 'Add Study to Collection' dialog (#127).
+
 ### Fixed
 - Fixed download button in the File Manager (#121).
 - Fixed logout link (#131).
+- Fixed ordering of study collections in the 'Add Study to Collection' dialog (#125).
+- Fixed refresh of study collection table after adding a study to a collection (#126).
+- Fixed obstructed CRO dropdown in the study form (#123).
 
 ## [0.9.4] - 2023-10-20
 

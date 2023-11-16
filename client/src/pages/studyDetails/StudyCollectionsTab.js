@@ -14,33 +14,35 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext} from "react";
 import {Badge, Button, Card, Col, Row, Table} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
+import {useQuery} from "react-query";
+import {SettingsLoadingMessage} from "../../common/loading";
 
 const StudyCollectionsTab = props => {
 
   const {study, showCollectionModal} = props;
-  const [collections, setCollections] = useState([]);
+  // const [collections, setCollections] = useState([]);
   const notyf = useContext(NotyfContext);
 
-  useEffect(() => {
-    axios.get("/api/internal/study/" + study.id + "/studycollection")
-    .then(response => {
-      setCollections(response.data);
-    }).catch(error => {
+  const {data: collections, isLoading, error} = useQuery(["studyCollections", study.id], async () => {
+    return axios.get("/api/internal/study/" + study.id + "/studycollection")
+    .then(response => response.data)
+    .catch(error => {
       console.error(error);
       notyf.open({
         type: "error",
         message: "Failed to load study collections"
-      })
+      });
+      return error;
     });
-  }, [notyf, study.id]);
+  })
 
-  let rows = collections.sort((a, b) => {
+  let rows = (collections || []).sort((a, b) => {
     if (a.name > b.name) {
       return 1;
     } else if (a.name < b.name) {
@@ -48,7 +50,8 @@ const StudyCollectionsTab = props => {
     } else {
       return 0;
     }
-  }).map((collection, i) => {
+  })
+  .map((collection, i) => {
     return (
         <tr key={'cr-' + i}>
           <td>
@@ -88,28 +91,30 @@ const StudyCollectionsTab = props => {
           <Row>
             <Col xs={12}>
               {
-                rows.length > 0
-                    ? (
-                        <Col xs={12}>
-                          <Table striped style={{fontSize: "inherit"}}>
-                            <thead>
-                            <tr>
-                              <th>Name</th>
-                              <th># Studies</th>
-                              <th>Visibility</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                              {rows}
-                            </tbody>
-                          </Table>
-                        </Col>
-                    )
-                    : (
-                        <div className={"text-center"}>
-                          <h4>This study does not belong to any collections.</h4>
-                        </div>
-                    )
+                  isLoading ? (
+                    <Col>
+                      <SettingsLoadingMessage />
+                    </Col>
+                  ) : rows.length > 0 ? (
+                      <Col xs={12}>
+                        <Table striped style={{fontSize: "inherit"}}>
+                          <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th># Studies</th>
+                            <th>Visibility</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                            {rows}
+                          </tbody>
+                        </Table>
+                      </Col>
+                  ) : (
+                      <div className={"text-center"}>
+                        <h4>This study does not belong to any collections.</h4>
+                      </div>
+                  )
               }
             </Col>
           </Row>
