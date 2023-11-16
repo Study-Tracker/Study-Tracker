@@ -15,8 +15,8 @@
  */
 
 import React, {useEffect} from "react";
-import {Button, Dropdown, Form, InputGroup, Nav, Navbar} from "react-bootstrap";
-import {LogIn, LogOut, Search, Settings, User} from "react-feather";
+import {Button, Form, InputGroup, Nav, Navbar} from "react-bootstrap";
+import {LogIn, Search} from "react-feather";
 import {Formik} from "formik";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
@@ -24,6 +24,7 @@ import {setSignedInUser} from "../../redux/userSlice";
 import {toggleSidebar} from "../../redux/sidebarSlice";
 import {setFeatures} from "../../redux/featuresSlice";
 import axios from "axios";
+import NavbarUser from "./NavbarUser";
 
 const NavBar = props => {
 
@@ -130,10 +131,6 @@ const NavBar = props => {
                           isAdmin={user.admin}
                           userId={user.id}
                           displayName={user.displayName}
-                          logoutUrl={
-                            features && features.auth && features.auth.logoutUrl
-                                ? features.auth.logoutUrl : "/logout"
-                          }
                       />
                   ) : (
                       <li>
@@ -150,65 +147,6 @@ const NavBar = props => {
       </Navbar>
   );
 
-}
-
-const NavbarUser = ({isAdmin, userId, displayName, logoutUrl}) => {
-
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await axios.post("/logout");
-    navigate(0);
-  }
-
-  return (
-      <Dropdown className="nav-item" align="end">
-
-        <span className="d-inline-block d-sm-none">
-          <Dropdown.Toggle as={"a"} className={"nav-link"}>
-            <Settings size={18} className="align-middle"/>
-          </Dropdown.Toggle>
-        </span>
-
-        <span className="d-none d-sm-inline-block">
-          <Dropdown.Toggle as={"a"} className={"nav-link"}>
-            <User/>
-            <span className="text-dark">
-              {displayName}
-            </span>
-          </Dropdown.Toggle>
-        </span>
-
-        <Dropdown.Menu drop={"end"}>
-
-          {
-            !!isAdmin
-                ? (
-                    <Dropdown.Item as={"a"} href={"/admin"}>
-                      <Settings size={18}
-                                className="align-middle me-2"/>
-                      Admin Dashboard
-                    </Dropdown.Item>
-                ) : ''
-          }
-
-          <Dropdown.Item as={"a"} href={"/user/" + userId}>
-            <User size={18} className="align-middle me-2"/>
-            Profile
-          </Dropdown.Item>
-
-          <Dropdown.Item
-              as={"a"}
-              // href={logoutUrl}
-              onClick={handleLogout}
-          >
-            <LogOut size={18} className="align-middle me-2"/>
-            Sign out
-          </Dropdown.Item>
-
-        </Dropdown.Menu>
-      </Dropdown>
-  )
 }
 
 export default NavBar;
