@@ -16,7 +16,7 @@
 
 import {useNavigate} from "react-router-dom";
 import {Badge, Button, Dropdown} from "react-bootstrap";
-import React from "react";
+import React, {useContext} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
@@ -31,10 +31,14 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 import PropTypes from "prop-types";
 import swal from "sweetalert";
 import axios from "axios";
+import {useMutation, useQueryClient} from "react-query";
+import NotyfContext from "../../../context/NotyfContext";
 
 const UserSettingsTable = ({users, showModal}) => {
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const notyf = useContext(NotyfContext);
 
   const resetUserPassword = (user) => {
     swal({
@@ -49,19 +53,19 @@ const UserSettingsTable = ({users, showModal}) => {
       if (val) {
         axios.post("/api/internal/user/" + user["id"] + "/password-reset")
         .then(() => {
-          swal("Password reset successful",
-              "A notification email has been sent to the user.",
-              "success")
+          notyf.success("Password reset successful. A notification email has been sent to the user.")
         })
         .catch(error => {
           console.error(error);
-          swal("Request failed",
-              "Check the server log for more information.",
-              "warning");
+          notyf.error("Failed to send password reset email.");
         })
       }
     })
   }
+
+  const toggleStatusMutation = useMutation(({userId, active}) => {
+    return axios.post(`/api/internal/user/${userId}/status?active=${active}`)
+  });
 
   const toggleUserActive = (user, active) => {
     swal({
@@ -74,17 +78,15 @@ const UserSettingsTable = ({users, showModal}) => {
     })
     .then(val => {
       if (val) {
-        axios.post("/api/internal/user/" + user["id"] + "/status?active=" + active)
-        .then(() => {
-          swal("User " + (!!active ? "enabled" : "disabled"),
-              "Refresh the page to view the updated user information.",
-              "success")
-        })
-        .catch(error => {
-          console.error(error);
-          swal("Request failed",
-              "Check the server log for more information.",
-              "warning");
+        toggleStatusMutation.mutateAsync({userId: user["id"], active: active}, {
+          onSuccess: () => {
+            queryClient.invalidateQueries("users");
+            notyf.success("User " + (!!active ? "enabled" : "disabled"));
+          },
+          onError: (error) => {
+            console.error(error);
+            notyf.error("Failed to " + (!!active ? "enable" : "disable"));
+          }
         })
       }
     });
