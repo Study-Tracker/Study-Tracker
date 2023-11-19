@@ -131,6 +131,10 @@ export const ErrorMessage = ({hideControls = false}) => {
   );
 };
 
+ErrorMessage.propTypes = {
+  hideControls: PropTypes.bool,
+}
+
 export const ContainerErrorMessage = () => {
   return (
       <Container>

@@ -47,7 +47,7 @@ const AssayTypeTable = ({assayTypes}) => {
       text: "Name",
       sort: true,
       headerStyle: {width: '20%'},
-      formatter: (c, d, i, x) => (
+      formatter: (c, d) => (
           <Button variant="link" onClick={() => showModal(d)}>{d.name}</Button>
       ),
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
@@ -65,15 +65,15 @@ const AssayTypeTable = ({assayTypes}) => {
       text: "Description",
       sort: false,
       headerStyle: {width: '40%'},
-      formatter: (c, d, i, x) => d.description
+      formatter: (c, d) => d.description
     },
     {
       dataField: "active",
       text: "Status",
       sort: false,
       headerStyle: {width: '20%'},
-      formatter: (c, d, i, x) => {
-        return !!d.active
+      formatter: (c, d) => {
+        return d.active
             ? <Badge bg="success">Active</Badge>
             : <Badge bg="warning">Inactive</Badge>
       }
@@ -83,7 +83,7 @@ const AssayTypeTable = ({assayTypes}) => {
       text: "",
       sort: false,
       headerStyle: {width: '20%'},
-      formatter: (c, d, i, x) => {
+      formatter: (c, d) => {
         return (
             <React.Fragment>
 
@@ -120,7 +120,7 @@ const AssayTypeTable = ({assayTypes}) => {
 
                   {
                     d.name === "Generic" ? "" : (
-                        !!d.active ? (
+                        d.active ? (
                             <Dropdown.Item
                                 className={"text-warning"}
                                 onClick={() => toggleActive(d)}
@@ -153,7 +153,7 @@ const AssayTypeTable = ({assayTypes}) => {
   ];
 
   const showModal = (selected) => {
-    if (!!selected) {
+    if (selected) {
       setIsModalOpen(true);
       setSelectedAssayType(selected);
     } else {

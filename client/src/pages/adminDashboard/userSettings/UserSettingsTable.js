@@ -81,11 +81,11 @@ const UserSettingsTable = ({users, showModal}) => {
         toggleStatusMutation.mutateAsync({userId: user["id"], active: active}, {
           onSuccess: () => {
             queryClient.invalidateQueries("users");
-            notyf.success("User " + (!!active ? "enabled" : "disabled"));
+            notyf.success("User " + (active ? "enabled" : "disabled"));
           },
           onError: (error) => {
             console.error(error);
-            notyf.error("Failed to " + (!!active ? "enable" : "disable"));
+            notyf.error("Failed to " + (active ? "enable" : "disable"));
           }
         })
       }

@@ -44,7 +44,7 @@ const DataTable = ({data, columns, defaultSort, className}) => {
     initialState: {
       pageIndex: 0,
       pageSize: 10,
-      sortBy: !!defaultSort ? [defaultSort] : []
+      sortBy: defaultSort ? [defaultSort] : []
     }
   }, useGlobalFilter, useSortBy, usePagination);
 
@@ -93,7 +93,7 @@ const DataTable = ({data, columns, defaultSort, className}) => {
               {page.map((row, i) => {
                 prepareRow(row);
                 return (
-                    <tr {...row.getRowProps()}>
+                    <tr key={`row-${i}`} {...row.getRowProps()}>
                       {row.cells.map(cell => {
                         return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
                       })}
@@ -183,7 +183,8 @@ const DataTable = ({data, columns, defaultSort, className}) => {
 DataTable.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
-  defaultSort: PropTypes.object
+  defaultSort: PropTypes.object,
+  className: PropTypes.string
 }
 
 export default DataTable;

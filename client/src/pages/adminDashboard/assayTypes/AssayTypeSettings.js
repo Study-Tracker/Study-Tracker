@@ -23,7 +23,7 @@ import axios from "axios";
 import AssayTypeTable from "./AssayTypeTable";
 import {useQuery} from "react-query";
 
-const AssayTypeSettings = props => {
+const AssayTypeSettings = () => {
 
   const {data: assayTypes, isLoading, error} = useQuery("assayTypes", () => {
     return axios.get("/api/internal/assaytype")

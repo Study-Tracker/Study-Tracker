@@ -31,7 +31,7 @@ const AssayTypeDetailsModal = ({assayType, isOpen, showModal}) => {
           <td>{f.displayName}</td>
           <td><code>{f.fieldName}</code></td>
           <td>{f.type}</td>
-          <td>{!!f.required ? "Yes" : "No"}</td>
+          <td>{f.required ? "Yes" : "No"}</td>
           <td>{f.description}</td>
         </tr>
     )
