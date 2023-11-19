@@ -25,7 +25,7 @@ import {
   Row
 } from "react-bootstrap";
 import UserSettings from "./userSettings/UserSettings";
-import AssayTypeSettings from "./AssayTypeSettings";
+import AssayTypeSettings from "./assayTypes/AssayTypeSettings";
 import KeywordSettings from "./KeywordSettings";
 import ProgramSettings from "./program/ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";

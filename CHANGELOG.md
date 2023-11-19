@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.5] - 2023-11-XX
 
+### Added
+- Added search bar to admin dashboard assay type settings table (#134).
+
 ### Changed
 - Public and private study collection are now differentiated in the 'Add Study to Collection' dialog (#127).
 
