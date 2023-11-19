@@ -18,6 +18,35 @@ import {Card, Col, Row, Spinner} from 'react-bootstrap';
 import React from "react";
 import PropTypes from "prop-types";
 
+export const Loader = ({message}) => {
+  return (
+      <Row className="justify-content-center align-self-center w-100 text-center mt-6 mb-6">
+        <Col xs={"auto"}>
+          <Spinner animation="border" variant="primary"/>
+          {" "}
+          <span className={"display-6"}>{message || "Loading..."}</span>
+        </Col>
+      </Row>
+  )
+}
+Loader.propTypes = {
+  message: PropTypes.string
+}
+
+export const LoadingMessageCard = ({message}) => {
+  return (
+      <Card className="illustration-light flex-fill">
+        <Card.Body>
+          <Loader message={message} />
+        </Card.Body>
+      </Card>
+  )
+};
+LoadingMessageCard.propTypes = {
+  message: PropTypes.string
+}
+
+
 export const CardLoadingMessage = () => {
   return (
       <Row>
@@ -31,24 +60,6 @@ export const CardLoadingMessage = () => {
   )
 };
 
-export const LoadingMessageCard = () => {
-  return (
-      <Card className="illustration-light flex-fill mt-3">
-        <Card.Body>
-          <Row>
-            <Col className={"d-flex justify-content-center"}>
-              <div className={"align-self-center"}>
-                <h1 className={"pt-5 pb-5"}>
-                  <Spinner animation="border" variant={'primary'} className="me-2"/>
-                  <span className={"display-5"}>Loading...</span>
-                </h1>
-              </div>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-  )
-};
 
 export const SettingsLoadingMessage = () => {
   return (

@@ -14,64 +14,38 @@
  * limitations under the License.
  */
 
-import React, {useEffect} from "react";
+import React from "react";
 import {Button, Card, Col, Row} from 'react-bootstrap';
 import {UserPlus} from 'react-feather';
 import {SettingsErrorMessage} from "../../../common/errors";
-import {SettingsLoadingMessage} from "../../../common/loading";
+import {LoadingMessageCard} from "../../../common/loading";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import UserSettingsTable from "./UserSettingsTable";
 import UserDetailsModal from "./UserDetailsModal";
+import {useQuery} from "react-query";
 
 const UserSettings = () => {
 
-  const [state, setState] = React.useState({
-    users: [],
-    isLoaded: false,
-    isError: false,
-    showDetails: false,
-    selectedUser: null
-  });
+  const [selectedUser, setSelectedUser] = React.useState(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const navigate = useNavigate();
 
   const showModal = (selected) => {
     if (selected) {
-      setState(prevState => ({...prevState, selectedUser: selected}));
+      setSelectedUser(selected);
       setIsModalOpen(true)
     } else {
       setIsModalOpen(false);
     }
   }
 
-  useEffect(() => {
-    axios.get("/api/internal/user")
-    .then(async response => {
-      setState(prevState => ({
-        ...prevState,
-        users: response.data,
-        isLoaded: true
-      }));
-    })
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
-  }, []);
+  const {data: users, isLoading, error} = useQuery("users", () => {
+    return axios.get("/api/internal/user").then(response => response.data);
+  });
 
-  let content = '';
-  if (state.isLoaded) {
-    content = <UserSettingsTable users={state.users} showModal={showModal}/>
-  } else if (state.isError) {
-    content = <SettingsErrorMessage/>
-  } else {
-    content = <SettingsLoadingMessage/>
-  }
+  if (isLoading) return <LoadingMessageCard />
+  if (error) return <SettingsErrorMessage error={error} />
 
   return (
       <React.Fragment>
@@ -96,14 +70,18 @@ const UserSettings = () => {
 
             <Row>
               <Col>
-                {content}
+                {
+                  users && (
+                      <UserSettingsTable users={users} showModal={showModal}/>
+                    )
+                }
               </Col>
             </Row>
 
             <UserDetailsModal
                 showModal={showModal}
                 isOpen={isModalOpen}
-                user={state.selectedUser}
+                user={selectedUser}
             />
 
           </Card.Body>

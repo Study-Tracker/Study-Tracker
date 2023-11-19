@@ -127,14 +127,14 @@ public class StudyCollectionPrivateController extends AbstractStudyCollectionCon
     LOGGER.info("Attempting to update existing study collections: " + dto.toString());
 
     // Make sure the collection exists
-    this.getStudyCollectionService()
+    StudyCollection existing = this.getStudyCollectionService()
         .findById(id)
         .orElseThrow(() -> new RecordNotFoundException("Study collection not found: " + id));
     StudyCollection collection = this.getStudyCollectionMapper().fromFormDto(dto);
     User user = this.getAuthenticatedUser();
 
     // If collections is not public, only owner can edit
-    if (!dto.isShared() && !user.getId().equals(collection.getCreatedBy().getId())) {
+    if (!dto.isShared() && !user.getId().equals(existing.getCreatedBy().getId())) {
       throw new InsufficientPrivilegesException(
           "You do not have permission to modify this study collection.");
     }

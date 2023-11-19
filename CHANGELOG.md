@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.5] - 2023-11-XX
 
+### Added
+- Added search bar to admin dashboard assay type settings table (#134).
+
 ### Changed
 - Public and private study collection are now differentiated in the 'Add Study to Collection' dialog (#127).
 
@@ -20,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed ordering of study collections in the 'Add Study to Collection' dialog (#125).
 - Fixed refresh of study collection table after adding a study to a collection (#126).
 - Fixed obstructed CRO dropdown in the study form (#123).
+- User table correctly refreshes on status change (#140).
+- Fixed a bug preventing private collections from being edited (#124 & #139).
 
 ## [0.9.4] - 2023-10-20
 
