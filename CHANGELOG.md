@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed obstructed CRO dropdown in the study form (#123).
 - User table correctly refreshes on status change (#140).
 - Fixed a bug preventing private collections from being edited (#124 & #139).
+- Fixed bug preventing assay tasks from being assigned to users after the assay had been created (#130).
 
 ## [0.9.4] - 2023-10-20
 
