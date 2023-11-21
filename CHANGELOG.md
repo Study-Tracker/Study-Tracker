@@ -13,9 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added search bar to admin dashboard assay type settings table (#134).
+- Added search bar to program list page to allow for easier filtering of large lists (#128).
 
 ### Changed
 - Public and private study collection are now differentiated in the 'Add Study to Collection' dialog (#127).
+- GitLab initializer will not run if integration is already registered.
 
 ### Fixed
 - Fixed download button in the File Manager (#121).
@@ -25,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed obstructed CRO dropdown in the study form (#123).
 - User table correctly refreshes on status change (#140).
 - Fixed a bug preventing private collections from being edited (#124 & #139).
+- Fixed bug preventing assay tasks from being assigned to users after the assay had been created (#130).
 
 ## [0.9.4] - 2023-10-20
 

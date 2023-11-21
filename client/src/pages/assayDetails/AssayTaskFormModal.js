@@ -85,6 +85,7 @@ const AssayTaskFormModal = ({
                       touched={touched}
                       handleUpdate={(field, value) => setFieldValue(field, value)}
                       colWidth={12}
+                      showAssignments={true}
                   />
 
                 </FormikForm>

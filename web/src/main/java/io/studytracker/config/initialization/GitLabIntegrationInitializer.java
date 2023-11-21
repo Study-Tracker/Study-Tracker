@@ -30,14 +30,15 @@ import io.studytracker.model.Organization;
 import io.studytracker.repository.GitGroupRepository;
 import io.studytracker.repository.GitLabGroupRepository;
 import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class GitLabIntegrationInitializer {
@@ -88,7 +89,8 @@ public class GitLabIntegrationInitializer {
       List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
       try {
         if (integrations.size() > 0) {
-          updateExistingIntegration(integrations.get(0));
+//          updateExistingIntegration(integrations.get(0));
+          LOGGER.warn("GitLab integration is already configured. Skipping initialization.");
         } else {
           registerNewGitLabIntegration(organization);
         }

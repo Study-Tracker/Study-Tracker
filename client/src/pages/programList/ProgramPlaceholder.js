@@ -24,7 +24,7 @@ const ProgramPlaceholder = () => {
           <Row>
             <Col sm={6} className={"d-flex"}>
               <div className={"align-self-center"}>
-                <h1 className="display-5 illustration-text text-center mb-4">No programs registered</h1>
+                <h1 className="display-5 illustration-text text-center mb-4">No programs found</h1>
                 <p className="text-lg">
                   Programs can be registered by admin users in the Admin Dashboard. Contact your
                   local administrator for help.
