@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - User table correctly refreshes on status change (#140).
 - Fixed a bug preventing private collections from being edited (#124 & #139).
 - Fixed bug preventing assay tasks from being assigned to users after the assay had been created (#130).
+- Fixed a bug that could cause two file-select dialogs to appear when attempting to upload files in the File Manager (#132).
 
 ## [0.9.4] - 2023-10-20
 
