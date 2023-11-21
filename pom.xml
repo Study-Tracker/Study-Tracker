@@ -55,7 +55,7 @@
   </modules>
 
   <properties>
-    <study-tracker.version>${parent.version}</study-tracker.version>
+    <study-tracker.version>${project.parent.version}</study-tracker.version>
     <java.version>11</java.version>
     <node.version>v16.20.0</node.version>
     <npm.version>8.19.4</npm.version>

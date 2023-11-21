@@ -21,13 +21,11 @@ import crossfilter from "crossfilter2";
 import SideBar from "../../common/structure/SideBar";
 import NavBar from "../../common/structure/NavBar";
 import Footer from "../../common/structure/Footer";
-import ProgramFilters, {
-  labels as filter
-} from "../../common/filters/ProgramFilters";
+import ProgramFilters, {labels as filter} from "../../common/filters/ProgramFilters";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
-import {Col, Container, Row} from "react-bootstrap";
+import {Col, Container, Form, FormGroup, Row} from "react-bootstrap";
 import ProgramSummaryCard from "./ProgramSummaryCard";
 import ProgramPlaceholder from "./ProgramPlaceholder";
 
@@ -35,6 +33,7 @@ const ProgramListView = () => {
 
   const filters = useSelector(state => state.filters.value);
   const [programData, setProgramData] = useState(null);
+  const [search, setSearch] = useState("");
   const [error, setError] = useState(null);
   const notyf = useContext(NotyfContext);
 
@@ -44,6 +43,7 @@ const ProgramListView = () => {
     data.cf = crossfilter(programs);
     data.dimensions = {};
     data.dimensions.allData = data.cf.dimension(d => d);
+    data.dimensions.text = data.cf.dimension(d => d.name.toLowerCase() + " " + d.description.toLowerCase());
     data.dimensions[filter.ACTIVE] = data.cf.dimension(d => d.active)
     data.dimensions[filter.INACTIVE] = data.cf.dimension(d => !d.active)
     setProgramData(data);
@@ -54,12 +54,14 @@ const ProgramListView = () => {
       programData.dimensions[key].filterAll();
       if (Object.prototype.hasOwnProperty.call(filters, key) && filters[key] != null) {
         if (Array.isArray(filters[key])) {
-          programData.dimensions[key].filter(
-              d => filters[key].indexOf(d) > -1);
+          programData.dimensions[key].filter(d => filters[key].indexOf(d) > -1);
         } else {
           programData.dimensions[key].filter(filters[key]);
         }
       }
+    }
+    if (search) {
+      programData.dimensions.text.filter(d => d.indexOf(search.toLowerCase()) > -1);
     }
   }
 
@@ -105,8 +107,20 @@ const ProgramListView = () => {
                       <Container fluid className="animated fadeIn">
 
                         <Row className="justify-content-between align-items-center mb-2">
+
                           <Col>
                             <h3>Programs</h3>
+                          </Col>
+
+                          <Col xs={"auto"}>
+                            <FormGroup>
+                              <Form.Control
+                                type="input"
+                                placeholder="Search"
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                              />
+                            </FormGroup>
                           </Col>
                         </Row>
 

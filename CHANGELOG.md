@@ -13,9 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added search bar to admin dashboard assay type settings table (#134).
+- Added search bar to program list page to allow for easier filtering of large lists (#128).
 
 ### Changed
 - Public and private study collection are now differentiated in the 'Add Study to Collection' dialog (#127).
+- GitLab initializer will not run if integration is already registered.
 
 ### Fixed
 - Fixed download button in the File Manager (#121).
