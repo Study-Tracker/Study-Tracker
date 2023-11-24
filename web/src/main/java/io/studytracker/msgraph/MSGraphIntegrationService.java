@@ -21,6 +21,7 @@ import com.microsoft.graph.models.Site;
 import com.microsoft.graph.requests.DriveCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.requests.SiteCollectionPage;
+import com.microsoft.graph.requests.UserCollectionPage;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
@@ -116,7 +117,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     LOGGER.info("Testing MSGraphIntegration: {}", instance.getTenantId());
     try {
       GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(instance);
-      SiteCollectionPage page = client.sites().buildRequest().get();
+      UserCollectionPage page = client.users().buildRequest().get();
       if (page != null && page.getCurrentPage().size() > 0) {
         LOGGER.info("MSGraphIntegration test successful");
         return true;
