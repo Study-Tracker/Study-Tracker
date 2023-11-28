@@ -89,7 +89,8 @@ const FileManagerUploadModal = ({
     onDropRejected: (rejectedFiles) => notyf.open({
       type: 'error',
       message: `File ${rejectedFiles[0].file.name} is too large. The limit is 20 MB`
-    })
+    }),
+    noClick: true,
   })
 
   const handleCloseModal = () => {
