@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React from "react";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import StandardWrapper from "../../common/structure/StandardWrapper";
@@ -23,56 +23,42 @@ import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import {useParams} from "react-router-dom";
+import {useQuery} from "react-query";
 
 const StudyDetailsView = props => {
 
   const params = useParams();
-  const [state, setState] = useState({
-    studyCode: params.studyCode,
-    isLoaded: false,
-    isError: false
-  });
   const user = useSelector(s => s.user.value);
   const features = useSelector(s => s.features.value);
 
-  useEffect(() => {
-    axios.get("/api/internal/study/" + state.studyCode)
-    .then(response => {
-
-      setState(prevState => ({
-        ...prevState,
-        study: response.data,
-        isLoaded: true
-      }));
-      console.debug(response.data);
-
-    })
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    })
-  }, []);
+  const {data: study, isLoading, error} = useQuery(["study", params.studyCode], () => {
+    return axios.get("/api/internal/study/" + params.studyCode)
+    .then(response => response.data);
+  });
 
 
   console.debug(features);
-  let content = <LoadingMessage/>;
-  if (state.isError) {
-    content = <ErrorMessage/>;
-  } else if (state.isLoaded) {
-    content = <StudyDetails
-        study={state.study}
-        user={user}
-        features={features}
-    />;
-  }
+
+  if (error) return (
+    <StandardWrapper {...props}>
+      <ErrorMessage/>
+    </StandardWrapper>
+  );
+
+  if (isLoading) return (
+    <StandardWrapper {...props}>
+      <LoadingMessage />
+    </StandardWrapper>
+  );
+
   return (
-      <StandardWrapper {...props}>
-        {content}
-      </StandardWrapper>
+    <StandardWrapper {...props}>
+      <StudyDetails
+          study={study}
+          user={user}
+          features={features}
+      />
+    </StandardWrapper>
   );
 
 }

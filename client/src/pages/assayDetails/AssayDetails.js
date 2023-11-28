@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useState} from "react";
+import React from "react";
 import {Col, Container, Row, Tab, Tabs} from "react-bootstrap";
 import AssayTimelineTab from "./AssayTimelineTab";
 import AssayNotebookTab from "./AssayNotebookTab";
@@ -25,16 +25,19 @@ import AssayDetailsHeader from "./AssayDetailsHeader";
 import AssayOverviewTab from "./AssayOverviewTab";
 import AssayFileManagerTab from "./AssayFileManagerTab";
 import AssayTasksTab from "./AssayTasksTab";
+import {useDispatch, useSelector} from "react-redux";
+import {setTab} from "../../redux/tabSlice";
 
 const AssayDetails = props => {
 
   const location = useLocation();
   const navigate = useNavigate();
   const {user, study, features, assay} = props;
-  const [selectedTab, setSelectedTab] = useState(location.hash.replace("#", "") || "overview");
+  const tab = useSelector(s => s.tab.value) || location.hash.replace("#", "") || "overview";
+  const dispatch = useDispatch();
 
   const handleTabSelect = (key) => {
-    setSelectedTab(key);
+    dispatch(setTab(key));
     navigate("#" + key);
   }
 
@@ -62,7 +65,7 @@ const AssayDetails = props => {
 
             <Tabs
                 variant={"pills"}
-                activeKey={selectedTab}
+                activeKey={tab}
                 onSelect={handleTabSelect}
             >
 

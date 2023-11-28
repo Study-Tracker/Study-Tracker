@@ -25,6 +25,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFileLines, faRefresh} from "@fortawesome/free-solid-svg-icons";
 import NotyfContext from "../../context/NotyfContext";
 import IconWidget from "./IconWidget";
+import {useDispatch} from "react-redux";
+import {setTab} from "../../redux/tabSlice";
 
 const PrimaryStorageFolderWidget = ({record}) => {
 
@@ -34,6 +36,7 @@ const PrimaryStorageFolderWidget = ({record}) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const notyf = useContext(NotyfContext);
+  const dispatch = useDispatch();
 
   const handleRepairFolder = () => {
     let url = null;
@@ -135,8 +138,8 @@ const PrimaryStorageFolderWidget = ({record}) => {
                   <Button
                       variant={"primary"}
                       onClick={() => {
-                        navigate("#files");
-                        navigate(0);
+                        dispatch(setTab("files"));
+                        navigate("#files")
                       }}
                       className={"mb-2"}
                   >
