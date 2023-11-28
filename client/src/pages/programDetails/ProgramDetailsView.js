@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React from "react";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import StandardWrapper from "../../common/structure/StandardWrapper";
@@ -22,54 +22,33 @@ import ProgramDetails from "./ProgramDetails";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
 import axios from "axios";
+import {useQuery} from "react-query";
 
 const ProgramDetailsView = props => {
 
-  const params = useParams();
+  const {programId} = useParams();
   const user = useSelector(s => s.user.value);
-  const [state, setState] = useState({
-    programId: params.programId,
-    isLoaded: false,
-    isError: false
+
+  const {data: program, isLoading, error} = useQuery(["program", programId], () => {
+    return axios.get(`/api/internal/program/${programId}`)
+    .then(response => response.data);
   });
 
-  useEffect(() => {
-    axios.get("/api/internal/program/" + state.programId)
-    .then(async response => {
-      const program = response.data;
-      axios.get("/api/internal/study?program=" + program.id)
-      .then(response2 => {
-        const studies = response2.data;
-        setState(prevState => ({
-          ...prevState,
-          program: program,
-          studies: studies,
-          isLoaded: true
-        }));
-        console.debug("Program", program);
-      })
-    })
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    })
-  }, []);
+  if (isLoading) return (
+    <StandardWrapper {...props}>
+      <LoadingMessage/>
+    </StandardWrapper>
+  );
 
-  let content = <LoadingMessage/>;
-  if (state.isError) {
-    content = <ErrorMessage/>;
-  } else if (state.isLoaded) {
-    content = <ProgramDetails program={state.program}
-                              studies={state.studies}
-                              user={user}/>;
-  }
+  if (error) return (
+    <StandardWrapper {...props}>
+      <ErrorMessage error={error}/>
+    </StandardWrapper>
+  );
+
   return (
       <StandardWrapper {...props}>
-        {content}
+        <ProgramDetails program={program} user={user} />
       </StandardWrapper>
   );
 

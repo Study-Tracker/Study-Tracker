@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Public and private study collection are now differentiated in the 'Add Study to Collection' dialog (#127).
 - GitLab initializer will not run if integration is already registered.
+- Replaced cards with a table in the Program Details page Studies tab.
 
 ### Fixed
 - Fixed download button in the File Manager (#121).

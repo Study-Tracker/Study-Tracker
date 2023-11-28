@@ -25,7 +25,7 @@ import ProgramOverviewTab from "./ProgramOverviewTab";
 import {useDispatch, useSelector} from "react-redux";
 import {setTab} from "../../redux/tabSlice";
 
-const ProgramDetails = ({program, studies, user}) => {
+const ProgramDetails = ({program, user}) => {
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ const ProgramDetails = ({program, studies, user}) => {
               </Tab>
 
               <Tab eventKey={"studies"} title={"Studies"}>
-                <ProgramStudiesTab studies={studies} user={user}/>
+                <ProgramStudiesTab program={program} />
               </Tab>
 
               <Tab eventKey={"timeline"} title={"Timeline"}>
@@ -85,7 +85,6 @@ const ProgramDetails = ({program, studies, user}) => {
 
 ProgramDetails.propTypes = {
   program: PropTypes.object.isRequired,
-  studies: PropTypes.array.isRequired,
   user: PropTypes.object
 }
 
