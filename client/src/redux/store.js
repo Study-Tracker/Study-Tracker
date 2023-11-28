@@ -21,6 +21,7 @@ import featuresReducer from './featuresSlice';
 import programReducer from './programSlice';
 import filterReducer from "./filterSlice";
 import assayTypeReducer from "./assayTypeSlice";
+import tabReducer from "./tabSlice";
 
 export default configureStore({
   reducer: {
@@ -29,6 +30,7 @@ export default configureStore({
     features: featuresReducer,
     programs: programReducer,
     filters: filterReducer,
-    assayTypes: assayTypeReducer
+    assayTypes: assayTypeReducer,
+    tab: tabReducer,
   },
 })

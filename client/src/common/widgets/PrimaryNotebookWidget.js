@@ -25,6 +25,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBook, faRefresh} from "@fortawesome/free-solid-svg-icons";
 import NotyfContext from "../../context/NotyfContext";
 import IconWidget from "./IconWidget";
+import {useDispatch} from "react-redux";
+import {setTab} from "../../redux/tabSlice";
 
 const PrimaryNotebookWidget = ({record}) => {
 
@@ -34,6 +36,7 @@ const PrimaryNotebookWidget = ({record}) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const notyf = useContext(NotyfContext);
+  const dispatch = useDispatch();
 
   const handleRepairNotebook = () => {
     let url = null;
@@ -107,8 +110,8 @@ const PrimaryNotebookWidget = ({record}) => {
                   <Button
                       variant={"primary"}
                       onClick={() => {
-                        navigate("#notebook");
-                        // navigate(0);
+                        dispatch(setTab("notebook"));
+                        navigate("#notebook")
                       }}
                       className={"mb-2"}
                   >
