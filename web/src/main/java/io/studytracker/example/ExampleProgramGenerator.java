@@ -64,7 +64,7 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
   @Override
   public List<Program> generateData(Object... args) {
 
-    List<User> users = (List<User>) args[1];
+    List<User> users = (List<User>) args[0];
 
     User user = users.get(0);
     List<Program> programs = new ArrayList<>();
