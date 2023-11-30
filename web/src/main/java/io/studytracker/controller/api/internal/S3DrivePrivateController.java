@@ -21,30 +21,20 @@ import io.studytracker.mapstruct.dto.form.S3BucketFormDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
 import io.studytracker.mapstruct.mapper.StorageDriveMapper;
 import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.model.S3BucketDetails;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.service.OrganizationService;
-import java.util.ArrayList;
-import java.util.List;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/internal/drives/s3")
@@ -56,16 +46,12 @@ public class S3DrivePrivateController {
   private AwsIntegrationService awsIntegrationService;
 
   @Autowired
-  private OrganizationService organizationService;
-
-  @Autowired
   private StorageDriveMapper mapper;
 
   @GetMapping("")
   public List<StorageDriveDetailsDto> findRegisteredBuckets() {
     LOGGER.debug("Listing registered buckets");
-    Organization organization = organizationService.getCurrentOrganization();
-    List<AwsIntegration> integrations = awsIntegrationService.findByOrganization(organization);
+    List<AwsIntegration> integrations = awsIntegrationService.findAll();
     List<StorageDrive> drives = new ArrayList<>();
     if (!integrations.isEmpty()) {
       drives.addAll(awsIntegrationService.findRegisteredBuckets(integrations.get(0)));
@@ -76,15 +62,13 @@ public class S3DrivePrivateController {
   @PostMapping("")
   public HttpEntity<StorageDriveDetailsDto> registerBucket(@Valid @RequestBody S3BucketFormDto dto) {
     LOGGER.info("Registering S3 bucket {}", dto.getDisplayName());
-    Organization organization = organizationService.getCurrentOrganization();
-    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
+    AwsIntegration integration = awsIntegrationService.findAll().get(0);
     StorageDrive bucket = mapper.fromS3FormDto(dto);
     S3BucketDetails details = new S3BucketDetails();
     details.setBucketName(dto.getBucketName());
     details.setAwsIntegrationId(integration.getId());
     bucket.setDetails(details);
     bucket.setDriveType(DriveType.S3);
-    bucket.setOrganization(organization);
     bucket.setRootPath("");
     StorageDrive created = awsIntegrationService.registerBucket(bucket);
     return new ResponseEntity<>(mapper.toDetailsDto(created), HttpStatus.CREATED);

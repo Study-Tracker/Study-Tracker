@@ -17,18 +17,17 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.StorageDriveDetails;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
+
+import java.util.List;
+import java.util.Optional;
 
 @NoRepositoryBean
 public interface StorageDriveDetailsOperations<T extends StorageDriveDetails>
     extends JpaRepository<T, Long> {
 
   List<T> findByIntegrationId(Long integrationId);
-
-  List<T> findByOrganizationId(Long organizationId);
 
   Optional<T> findByStorageDriveId(Long id);
 

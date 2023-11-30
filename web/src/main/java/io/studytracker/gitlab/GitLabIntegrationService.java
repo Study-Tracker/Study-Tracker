@@ -22,13 +22,8 @@ import io.studytracker.model.GitGroup;
 import io.studytracker.model.GitLabGroup;
 import io.studytracker.model.GitLabIntegration;
 import io.studytracker.model.GitServiceType;
-import io.studytracker.model.Organization;
 import io.studytracker.repository.GitLabGroupRepository;
 import io.studytracker.repository.GitLabIntegrationRepository;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class GitLabIntegrationService implements IntegrationService<GitLabIntegration> {
 
@@ -44,9 +43,6 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
 
   @Autowired
   private GitLabIntegrationRepository gitLabIntegrationRepository;
-
-  @Autowired
-  private OrganizationService organizationService;
 
   @Autowired
   private GitLabGroupRepository gitLabGroupRepository;
@@ -63,18 +59,15 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
   }
 
   @Override
-  public List<GitLabIntegration> findByOrganization(Organization organization) {
-    LOGGER.debug("Find GitLabIntegration by organization: {}", organization.getId());
-    return gitLabIntegrationRepository.findByOrganizationId(organization.getId());
+  public List<GitLabIntegration> findAll() {
+    LOGGER.debug("Find all GitLabIntegration");
+    return gitLabIntegrationRepository.findAll();
   }
 
   @Override
   @Transactional
   public GitLabIntegration register(GitLabIntegration instance) {
-    LOGGER.info("Registering GitLabIntegration for organization: {}",
-        instance.getOrganization().getId());
-    Organization organization = organizationService.getCurrentOrganization();
-    instance.setOrganization(organization);
+    LOGGER.info("Registering GitLabIntegration");
     if (!validate(instance)) {
       throw new IllegalArgumentException("One or more required fields are missing.");
     }
@@ -109,7 +102,6 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
   @Override
   public boolean validate(GitLabIntegration instance) {
     try {
-      Assert.notNull(instance.getOrganization(), "Organization is required.");
       Assert.notNull(instance.getName(), "Name is required.");
       Assert.hasText(instance.getName(), "Name is required.");
       Assert.hasText(instance.getRootUrl(), "Root URL is required.");
@@ -171,10 +163,8 @@ public class GitLabIntegrationService implements IntegrationService<GitLabIntegr
   @Transactional
   public GitLabGroup registerRootGroup(GitLabIntegration integration, GitLabGroup group) {
     LOGGER.info("Registering GitLabGroup: {}", group.getGroupId());
-    Organization organization = organizationService.getCurrentOrganization();
     group.setGitLabIntegration(integration);
     group.getGitGroup().setGitServiceType(GitServiceType.GITLAB);
-    group.getGitGroup().setOrganization(organization);
     return gitLabGroupRepository.save(group);
   }
 

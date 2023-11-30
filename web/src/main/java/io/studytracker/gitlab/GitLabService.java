@@ -26,31 +26,18 @@ import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabProjectGroup;
-import io.studytracker.model.Assay;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.GitLabGroup;
-import io.studytracker.model.GitLabIntegration;
-import io.studytracker.model.GitLabRepository;
-import io.studytracker.model.GitRepository;
-import io.studytracker.model.GitServiceType;
-import io.studytracker.model.Program;
-import io.studytracker.model.Study;
-import io.studytracker.repository.AssayRepository;
-import io.studytracker.repository.GitGroupRepository;
-import io.studytracker.repository.GitLabGroupRepository;
-import io.studytracker.repository.GitLabRepositoryRepository;
-import io.studytracker.repository.ProgramRepository;
-import io.studytracker.repository.StudyRepository;
-import io.studytracker.repository.UserRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import io.studytracker.model.*;
+import io.studytracker.repository.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GitLabService implements GitService<GitLabIntegration> {
@@ -124,7 +111,6 @@ public class GitLabService implements GitService<GitLabIntegration> {
   @Override
   public GitGroup registerGroup(GitLabIntegration integration, GitServerGroup group) {
     GitGroup gitGroup = new GitGroup();
-    gitGroup.setOrganization(integration.getOrganization());
     gitGroup.setActive(true);
     gitGroup.setGitServiceType(GitServiceType.GITLAB);
     gitGroup.setDisplayName(group.getName());
@@ -151,7 +137,7 @@ public class GitLabService implements GitService<GitLabIntegration> {
 
   @Override
   public List<GitGroup> findRegisteredGroups(GitLabIntegration integration, boolean isRoot) {
-    return gitGroupRepository.findByOrganizationId(integration.getOrganization().getId())
+    return gitGroupRepository.findAll()
         .stream()
         .filter(g -> {
           if (isRoot) {
@@ -168,7 +154,6 @@ public class GitLabService implements GitService<GitLabIntegration> {
     // Save the group records
     GitGroup gitGroup = new GitGroup();
     gitGroup.setParentGroup(parentGroup);
-    gitGroup.setOrganization(parentGroup.getOrganization());
     gitGroup.setActive(true);
     gitGroup.setGitServiceType(GitServiceType.GITLAB);
     gitGroup.setDisplayName(program.getName() + " Program GitLab Project Group");

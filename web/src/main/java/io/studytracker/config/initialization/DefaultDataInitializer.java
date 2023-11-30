@@ -33,7 +33,6 @@ public class DefaultDataInitializer implements ApplicationRunner {
 
   @Autowired private AdminUserInitializer adminUserInitializer;
   @Autowired private AssayTypeInitializer assayTypeInitializer;
-  @Autowired private DefaultOrganizationInitializer defaultOrganizationInitializer;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
@@ -44,9 +43,6 @@ public class DefaultDataInitializer implements ApplicationRunner {
 
     LOGGER.info("Initializing admin user...");
     adminUserInitializer.initializeAdminUser();
-
-    LOGGER.info("Initializing default organization...");
-    defaultOrganizationInitializer.initializeDefaultOrganization();
 
     LOGGER.info("Default data initialized.");
 

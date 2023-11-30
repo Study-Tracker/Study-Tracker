@@ -16,18 +16,14 @@
 
 package io.studytracker.mapstruct.dto.api;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import lombok.Data;
+
+import java.util.*;
 
 @Data
 public class ProgramDto {
 
   private Long id;
-  private Long organizationId;
   private String code;
   private String name;
   private String description;

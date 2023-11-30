@@ -22,22 +22,8 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.gitlab.GitLabIntegrationService;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.gitlab.GitLabUtils;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.GitLabGroup;
-import io.studytracker.model.GitLabIntegration;
-import io.studytracker.model.GitLabRepository;
-import io.studytracker.model.GitRepository;
-import io.studytracker.model.GitServiceType;
-import io.studytracker.model.Organization;
-import io.studytracker.model.Program;
-import io.studytracker.model.Study;
-import io.studytracker.repository.AssayRepository;
-import io.studytracker.repository.GitLabGroupRepository;
-import io.studytracker.repository.GitLabRepositoryRepository;
-import io.studytracker.repository.ProgramRepository;
-import io.studytracker.repository.StudyRepository;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
+import io.studytracker.model.*;
+import io.studytracker.repository.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +34,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -68,8 +56,6 @@ public class GitLabServiceTests {
 
   @Autowired private GitLabIntegrationService gitLabIntegrationService;
 
-  @Autowired private OrganizationService organizationService;
-
   @Autowired
   private GitLabGroupRepository gitLabGroupRepository;
 
@@ -84,8 +70,7 @@ public class GitLabServiceTests {
   @Test
   public void createProgramGroupTest() throws Exception {
 
-    Organization organization = organizationService.getCurrentOrganization();
-    List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
+    List<GitLabIntegration> integrations = gitLabIntegrationService.findAll();
     Assert.assertEquals(1, integrations.size());
     GitLabIntegration integration = integrations.get(0);
 
@@ -123,8 +108,7 @@ public class GitLabServiceTests {
   public void createStudyRepositoryTest() throws Exception {
     createProgramGroupTest();
 
-    Organization organization = organizationService.getCurrentOrganization();
-    List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
+    List<GitLabIntegration> integrations = gitLabIntegrationService.findAll();
     Assert.assertEquals(1, integrations.size());
     GitLabIntegration integration = integrations.get(0);
     List<GitGroup> rootGroups = gitLabService.findRegisteredGroups(integration, true);

@@ -17,33 +17,22 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.aws.AwsIntegrationService;
-import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.AwsIntegrationFormDto;
 import io.studytracker.mapstruct.dto.response.AwsIntegrationDetailsDto;
 import io.studytracker.mapstruct.mapper.AwsIntegrationMapper;
 import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Organization;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/internal/integrations/aws")
@@ -55,27 +44,18 @@ public class AWSIntegrationPrivateController {
   private AwsIntegrationService awsIntegrationService;
 
   @Autowired
-  private OrganizationService organizationService;
-
-  @Autowired
   private AwsIntegrationMapper awsIntegrationMapper;
 
   @GetMapping("")
   public List<AwsIntegrationDetailsDto> fetchAwsIntegrations() {
     LOGGER.debug("Fetching AWS integrations");
-    Organization organization = organizationService.getCurrentOrganization();
-    return awsIntegrationMapper.toDetailsDto(awsIntegrationService.findByOrganization(organization));
+    return awsIntegrationMapper.toDetailsDto(awsIntegrationService.findAll());
   }
 
   @PostMapping("")
   public HttpEntity<AwsIntegrationDetailsDto> registerIntegration(@Valid @RequestBody AwsIntegrationFormDto dto) {
-    LOGGER.info("Registering AWS integration for organization: {}", dto.getName());
+    LOGGER.info("Registering AWS integration: {}", dto.getName());
     AwsIntegration integration = awsIntegrationMapper.fromFormDto(dto);
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!organization.getId().equals(dto.getOrganization().getId())) {
-      throw new InvalidRequestException("Organization ID mismatch");
-    }
-    integration.setOrganization(organization);
     AwsIntegration created = awsIntegrationService.register(integration);
     return new ResponseEntity<>(awsIntegrationMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
@@ -83,13 +63,8 @@ public class AWSIntegrationPrivateController {
   @PutMapping("/{id}")
   public HttpEntity<AwsIntegrationDetailsDto> updateIntegration(@PathVariable("id") Long id,
       @Valid @RequestBody AwsIntegrationFormDto dto) {
-    LOGGER.info("Updating AWS integration {} for organization: {}", id, dto.getName());
+    LOGGER.info("Updating AWS integration {}", id);
     AwsIntegration integration = awsIntegrationMapper.fromFormDto(dto);
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!organization.getId().equals(dto.getOrganization().getId())) {
-      throw new InvalidRequestException("Organization ID mismatch");
-    }
-    integration.setOrganization(organization);
     AwsIntegration updated = awsIntegrationService.update(integration);
     return new ResponseEntity<>(awsIntegrationMapper.toDetailsDto(updated), HttpStatus.OK);
   }

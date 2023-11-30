@@ -23,31 +23,11 @@ import io.studytracker.egnyte.exception.DuplicateFolderException;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AssayStorageFolder;
-import io.studytracker.model.AssayType;
-import io.studytracker.model.EgnyteIntegration;
-import io.studytracker.model.Organization;
-import io.studytracker.model.Program;
-import io.studytracker.model.Status;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
-import io.studytracker.model.StudyStorageFolder;
-import io.studytracker.model.User;
-import io.studytracker.repository.AssayRepository;
-import io.studytracker.repository.AssayTypeRepository;
-import io.studytracker.repository.ProgramRepository;
-import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.repository.StudyRepository;
-import io.studytracker.repository.UserRepository;
-import io.studytracker.service.OrganizationService;
+import io.studytracker.model.*;
+import io.studytracker.repository.*;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +39,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -84,7 +68,6 @@ public class EgnyteStudyStorageServiceTests {
   private ExampleDataRunner exampleDataRunner;
 
   @Autowired private EgnyteIntegrationService egnyteIntegrationService;
-  @Autowired private OrganizationService organizationService;
   @Autowired private StorageDriveRepository driveRepository;
   @Autowired private StorageDriveFolderService storageDriveFolderService;
 
@@ -96,8 +79,7 @@ public class EgnyteStudyStorageServiceTests {
   @Test
   public void folderPathNameTest() {
 
-    Organization organization = organizationService.getCurrentOrganization();
-    EgnyteIntegration integration = egnyteIntegrationService.findByOrganization(organization).get(0);
+    EgnyteIntegration integration = egnyteIntegrationService.findAll().get(0);
     StorageDrive drive = egnyteIntegrationService.listIntegrationDrives(integration).get(0);
 
     Optional<Program> optionalProgram = programRepository.findByName("Clinical Program A");

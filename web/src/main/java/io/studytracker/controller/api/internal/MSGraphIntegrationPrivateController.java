@@ -16,7 +16,6 @@
 
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.MSGraphIntegrationFormDto;
 import io.studytracker.mapstruct.dto.form.SharePointSiteFormDto;
@@ -27,15 +26,9 @@ import io.studytracker.mapstruct.mapper.MSGraphIntegrationMapper;
 import io.studytracker.mapstruct.mapper.SharePointSiteMapper;
 import io.studytracker.mapstruct.mapper.StorageDriveMapper;
 import io.studytracker.model.MSGraphIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.model.SharePointSite;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.msgraph.MSGraphIntegrationService;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +36,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/internal/integrations/msgraph")
@@ -61,9 +51,6 @@ public class MSGraphIntegrationPrivateController {
 
   @Autowired
   private MSGraphIntegrationService msGraphIntegrationService;
-
-  @Autowired
-  private OrganizationService organizationService;
 
   @Autowired
   private MSGraphIntegrationMapper msGraphIntegrationMapper;
@@ -77,16 +64,13 @@ public class MSGraphIntegrationPrivateController {
   @GetMapping("")
   public List<MSGraphIntegrationDetailsDto> fetchIntegrations() {
     LOGGER.debug("Fetching MS Graph integrations");
-    Organization organization = organizationService.getCurrentOrganization();
-    return msGraphIntegrationMapper.toDetailsDto(msGraphIntegrationService.findByOrganization(organization));
+    return msGraphIntegrationMapper.toDetailsDto(msGraphIntegrationService.findAll());
   }
 
   @PostMapping("")
   public HttpEntity<MSGraphIntegrationDetailsDto> registerIntegration(@Valid @RequestBody MSGraphIntegrationFormDto dto) {
-    Organization organization = organizationService.getCurrentOrganization();
-    LOGGER.info("Registering MS Graph integration for organization: {}", organization.getId());
+    LOGGER.info("Registering MS Graph integration");
     MSGraphIntegration integration = msGraphIntegrationMapper.fromFormDto(dto);
-    integration.setOrganization(organization);
     MSGraphIntegration created = msGraphIntegrationService.register(integration);
     return new ResponseEntity<>(msGraphIntegrationMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
@@ -95,9 +79,7 @@ public class MSGraphIntegrationPrivateController {
   public HttpEntity<MSGraphIntegrationDetailsDto> updateRegistration(@PathVariable("id") Long id,
       @Valid @RequestBody MSGraphIntegrationFormDto dto) {
     MSGraphIntegration integration = msGraphIntegrationMapper.fromFormDto(dto);
-    Organization organization = organizationService.getCurrentOrganization();
-    LOGGER.info("Updating MS Graph integration {} for organization: {}", id, organization.getId());
-    integration.setOrganization(organization);
+    LOGGER.info("Updating MS Graph integration {}", id);
     MSGraphIntegration updated = msGraphIntegrationService.update(integration);
     return new ResponseEntity<>(msGraphIntegrationMapper.toDetailsDto(updated), HttpStatus.OK);
   }
@@ -105,13 +87,9 @@ public class MSGraphIntegrationPrivateController {
   @DeleteMapping("/{id}")
   public HttpEntity<?> deleteIntegration(@PathVariable("id") Long id) {
     LOGGER.info("Deleting MS Graph integration {}", id);
-    Organization organization = organizationService.getCurrentOrganization();
     Optional<MSGraphIntegration> optional = msGraphIntegrationService.findById(id);
     if (optional.isEmpty()) {
       throw new RecordNotFoundException("MS Graph integration not found");
-    }
-    if (!optional.get().getOrganization().getId().equals(organization.getId())) {
-      throw new InvalidRequestException("MS Graph integration does not belong to current organization");
     }
     msGraphIntegrationService.remove(optional.get());
     return new ResponseEntity<>(HttpStatus.OK);
@@ -127,10 +105,6 @@ public class MSGraphIntegrationPrivateController {
     LOGGER.debug("Fetching available Sharepoint sites for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new InvalidRequestException("MS Graph integration does not belong to current organization");
-    }
     List<SharePointSite> sites = msGraphIntegrationService.listAvailableSharepointSites(integration);
     if (StringUtils.hasText(query)) {
       sites = sites.stream()
@@ -146,10 +120,6 @@ public class MSGraphIntegrationPrivateController {
     LOGGER.debug("Fetching registered Sharepoint sites for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new InvalidRequestException("MS Graph integration does not belong to current organization");
-    }
     List<SharePointSite> sites = msGraphIntegrationService.listRegisteredSharepointSites(integration);
     return sharePointSiteMapper.toDetailsDto(sites);
   }
@@ -160,10 +130,6 @@ public class MSGraphIntegrationPrivateController {
     LOGGER.info("Registering Sharepoint site for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new InvalidRequestException("MS Graph integration does not belong to current organization");
-    }
     SharePointSite site = sharePointSiteMapper.fromFormDto(dto);
     site.setMsgraphIntegration(integration);
     SharePointSite created = msGraphIntegrationService.registerSharePointSite(site);
@@ -180,10 +146,6 @@ public class MSGraphIntegrationPrivateController {
     LOGGER.info("Updating Sharepoint site registration for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new InvalidRequestException("MS Graph integration does not belong to current organization");
-    }
     msGraphIntegrationService.findSharePointSiteById(siteId)
         .orElseThrow(() -> new RecordNotFoundException("Sharepoint site not found"));
     SharePointSite updated = msGraphIntegrationService.updateSharePointSite(
@@ -199,10 +161,6 @@ public class MSGraphIntegrationPrivateController {
     LOGGER.debug("Fetching registered OneDrive drives for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
-    Organization organization = organizationService.getCurrentOrganization();
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new InvalidRequestException("MS Graph integration does not belong to current organization");
-    }
     List<StorageDrive> drives = msGraphIntegrationService.listRegisteredDrives(integration);
     return storageDriveMapper.toDetailsDto(drives);
   }

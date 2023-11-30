@@ -18,14 +18,14 @@ package io.studytracker.mapstruct.dto.form;
 
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveDetails;
-import javax.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 
 @Data
 public class StorageDriveFormDto {
 
   private Long id;
-  private Long organizationId;
   private @NotEmpty String displayName;
   private DriveType driveType;
   private String rootPath;

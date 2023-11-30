@@ -19,25 +19,14 @@ package io.studytracker.test.repository;
 import io.studytracker.Application;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.Organization;
-import io.studytracker.model.Program;
-import io.studytracker.model.ProgramStorageFolder;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.User;
-import io.studytracker.model.UserType;
+import io.studytracker.model.*;
 import io.studytracker.repository.ELNFolderRepository;
-import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.ProgramStorageFolderRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import org.hibernate.LazyInitializationException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,6 +40,8 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test"})
@@ -63,7 +54,6 @@ public class ProgramRepositoryTests {
   @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
   @Autowired private ProgramStorageFolderRepository programStorageFolderRepository;
-  @Autowired private OrganizationRepository organizationRepository;
 
   @Before
   public void doBefore() {
@@ -105,15 +95,12 @@ public class ProgramRepositoryTests {
   public void newProgramTest() {
 
     User user = createUser();
-    Organization organization = organizationRepository.findAll().get(0);
-    Assert.assertNotNull(organization);
-
+    
     Assert.assertEquals(0, programRepository.count());
     Assert.assertEquals(0, programStorageFolderRepository.count());
     Assert.assertEquals(0, elnFolderRepository.count());
 
     Program program = new Program();
-    program.setOrganization(organization);
     program.setActive(true);
     program.setCode("TST");
     program.setCreatedBy(user);

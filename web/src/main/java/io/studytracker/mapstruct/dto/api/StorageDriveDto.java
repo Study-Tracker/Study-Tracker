@@ -17,14 +17,14 @@
 package io.studytracker.mapstruct.dto.api;
 
 import io.studytracker.model.StorageDrive.DriveType;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 public class StorageDriveDto {
 
   private Long id;
-  private Long organizationId;
   private String displayName;
   private DriveType driveType;
   private String rootPath;

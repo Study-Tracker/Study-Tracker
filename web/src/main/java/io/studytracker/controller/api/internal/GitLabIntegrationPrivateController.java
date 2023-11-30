@@ -30,11 +30,6 @@ import io.studytracker.mapstruct.mapper.GitLabIntegrationMapper;
 import io.studytracker.model.GitLabGroup;
 import io.studytracker.model.GitLabIntegration;
 import io.studytracker.model.GitServiceType;
-import io.studytracker.model.Organization;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,16 +37,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/internal/integrations/gitlab")
@@ -61,9 +51,6 @@ public class GitLabIntegrationPrivateController {
 
   @Autowired
   private GitLabIntegrationService gitLabIntegrationService;
-
-  @Autowired
-  private OrganizationService organizationService;
 
   @Autowired
   private GitLabIntegrationMapper gitLabIntegrationMapper;
@@ -80,19 +67,15 @@ public class GitLabIntegrationPrivateController {
   @GetMapping("")
   public List<GitLabIntegrationDetailsDto> fetchIntegrations() {
     LOGGER.debug("Fetching GitLab integrations");
-    Organization organization = organizationService.getCurrentOrganization();
-    List<GitLabIntegration> integrations = (List<GitLabIntegration>) gitLabIntegrationService
-        .findByOrganization(organization);
+    List<GitLabIntegration> integrations = gitLabIntegrationService.findAll();
     return gitLabIntegrationMapper.toDetailsDto(integrations);
   }
 
   @PostMapping("")
   public HttpEntity<GitLabIntegrationDetailsDto> registerIntegration(
       @Valid @RequestBody GitLabIntegrationFormDto dto) {
-    Organization organization = organizationService.getCurrentOrganization();
-    LOGGER.info("Registering GitLab integration for organization: {}", organization.getId());
+    LOGGER.info("Registering GitLab integration");
     GitLabIntegration integration = gitLabIntegrationMapper.fromFormDto(dto);
-    integration.setOrganization(organization);
     GitLabIntegration created = gitLabIntegrationService.register(integration);
     return new ResponseEntity<>(gitLabIntegrationMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
@@ -101,12 +84,8 @@ public class GitLabIntegrationPrivateController {
   public HttpEntity<GitLabIntegrationDetailsDto> updateRegistration(
       @PathVariable("id") Long integrationId, @Valid @RequestBody GitLabIntegrationFormDto dto) {
     LOGGER.info("Updating GitLab integration: {}", integrationId);
-    Organization organization = organizationService.getCurrentOrganization();
-    GitLabIntegration existing = gitLabIntegrationService.findById(integrationId)
+    gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!existing.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     GitLabIntegration updated = gitLabIntegrationService.update(gitLabIntegrationMapper.fromFormDto(dto));
     return new ResponseEntity<>(gitLabIntegrationMapper.toDetailsDto(updated), HttpStatus.OK);
   }
@@ -115,12 +94,8 @@ public class GitLabIntegrationPrivateController {
   public HttpEntity<?> removeRegistration(
       @PathVariable("id") Long integrationId) {
     LOGGER.info("Removing GitLab integration: {}", integrationId);
-    Organization organization = organizationService.getCurrentOrganization();
     GitLabIntegration existing = gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!existing.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     gitLabIntegrationService.remove(existing);
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -131,12 +106,8 @@ public class GitLabIntegrationPrivateController {
   public List<GitServerGroup> findAvailableGroups(@PathVariable("id") Long integrationId,
       @RequestParam(name = "q", required = false) String query) {
     LOGGER.debug("Fetching GitLab available groups for integration: {}", integrationId);
-    Organization organization = organizationService.getCurrentOrganization();
     GitLabIntegration integration = gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     GitLabService gitLabService = (GitLabService) gitServiceLookup.lookup(GitServiceType.GITLAB)
         .orElseThrow(() -> new IllegalStateException("GitLab service not found"));
     return gitLabService.listAvailableGroups(integration).stream()
@@ -152,12 +123,8 @@ public class GitLabIntegrationPrivateController {
   public List<GitLabGroupDetailsDto> findRegisteredGroups(@PathVariable("id") Long integrationId,
       @RequestParam(value = "root", required = false) boolean isRoot) {
     LOGGER.debug("Fetching GitLab root groups for integration: {}", integrationId);
-    Organization organization = organizationService.getCurrentOrganization();
     GitLabIntegration integration = gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     return gitLabGroupMapper.toDetailsDto(gitLabIntegrationService.findGroups(integration, isRoot));
   }
 
@@ -165,12 +132,8 @@ public class GitLabIntegrationPrivateController {
   public HttpEntity<GitLabGroupDetailsDto> registerRootGroup(@PathVariable("id") Long integrationId,
       @RequestBody @Valid GitLabGroupFormDto dto) {
     LOGGER.info("Registering GitLab root group for integration: {}", integrationId);
-    Organization organization = organizationService.getCurrentOrganization();
     GitLabIntegration integration = gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     GitLabGroup created = gitLabIntegrationService.registerRootGroup(integration, gitLabGroupMapper.fromFormDto(dto));
     return new ResponseEntity<>(gitLabGroupMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
@@ -179,17 +142,10 @@ public class GitLabIntegrationPrivateController {
   public HttpEntity<GitLabGroupDetailsDto> updateRootGroup(@PathVariable("id") Long integrationId,
       @PathVariable("groupId") Long groupId, @RequestBody @Valid GitLabGroupFormDto dto) {
     LOGGER.info("Updating GitLab root group for integration: {}", integrationId);
-    Organization organization = organizationService.getCurrentOrganization();
-    GitLabGroup existing = gitLabIntegrationService.findRootGroupById(groupId)
+    gitLabIntegrationService.findRootGroupById(groupId)
         .orElseThrow(() -> new IllegalArgumentException("Group not found: " + groupId));
-    if (!existing.getGitGroup().getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested group belongs to another organization: " + groupId);
-    }
-    GitLabIntegration integration = gitLabIntegrationService.findById(integrationId)
+    gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     GitLabGroup updated = gitLabIntegrationService.updateRootGroup(gitLabGroupMapper.fromFormDto(dto));
     return new ResponseEntity<>(gitLabGroupMapper.toDetailsDto(updated), HttpStatus.OK);
   }
@@ -198,17 +154,10 @@ public class GitLabIntegrationPrivateController {
   public HttpEntity<?> updateRootGroupStatus(@PathVariable("id") Long integrationId,
       @PathVariable("groupId") Long groupId, @RequestParam("status") boolean status) {
     LOGGER.info("Updating GitLab root group for integration: {}", integrationId);
-    Organization organization = organizationService.getCurrentOrganization();
-    GitLabGroup existing = gitLabIntegrationService.findRootGroupById(groupId)
+    gitLabIntegrationService.findRootGroupById(groupId)
         .orElseThrow(() -> new IllegalArgumentException("Group not found: " + groupId));
-    if (!existing.getGitGroup().getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested group belongs to another organization: " + groupId);
-    }
     GitLabIntegration integration = gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     GitLabGroup group = gitLabIntegrationService.findRootGroupById(groupId)
         .orElseThrow(() -> new IllegalStateException("Group not found."));
     if (!group.getGitLabIntegration().getId().equals(integration.getId())) {
@@ -222,12 +171,8 @@ public class GitLabIntegrationPrivateController {
   public HttpEntity<?> removeRootGroup(@PathVariable("id") Long integrationId,
       @PathVariable("groupId") Long groupId) {
     LOGGER.info("Removing GitLab root group: {}", groupId);
-    Organization organization = organizationService.getCurrentOrganization();
     GitLabIntegration integration = gitLabIntegrationService.findById(integrationId)
         .orElseThrow(() -> new IllegalArgumentException("Integration not found: " + integrationId));
-    if (!integration.getOrganization().getId().equals(organization.getId())) {
-      throw new IllegalArgumentException("Requested integration belongs to another organization: " + integrationId);
-    }
     GitLabGroup rootGroup = gitLabIntegrationService.findRootGroupById(groupId)
         .orElseThrow(() -> new IllegalStateException("Group not found."));
     if (!rootGroup.getGitLabIntegration().getId().equals(integration.getId())) {

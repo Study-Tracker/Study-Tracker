@@ -19,17 +19,14 @@ package io.studytracker.config.initialization;
 import io.studytracker.config.properties.GitLabProperties;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.exception.InvalidConfigurationException;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.git.GitServerGroup;
 import io.studytracker.gitlab.GitLabIntegrationService;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.model.GitGroup;
 import io.studytracker.model.GitLabGroup;
 import io.studytracker.model.GitLabIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.repository.GitGroupRepository;
 import io.studytracker.repository.GitLabGroupRepository;
-import io.studytracker.service.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +49,6 @@ public class GitLabIntegrationInitializer {
   private GitLabIntegrationService gitLabIntegrationService;
 
   @Autowired
-  private OrganizationService organizationService;
-
-  @Autowired
   private GitLabService gitLabService;
 
   @Autowired
@@ -66,17 +60,6 @@ public class GitLabIntegrationInitializer {
   @Transactional
   public void initializeIntegrations() throws InvalidConfigurationException {
 
-    Organization organization;
-
-    // Get the current organization
-    try {
-      organization = organizationService.getCurrentOrganization();
-    } catch (RecordNotFoundException e) {
-      e.printStackTrace();
-      LOGGER.warn("No organization found. Skipping initialization of GitLab integration.");
-      return;
-    }
-
     // Register the GitLab integration
     LOGGER.info("Checking GitLab integration status...");
     GitLabProperties gitLabProperties = properties.getGitlab();
@@ -86,13 +69,13 @@ public class GitLabIntegrationInitializer {
         || (StringUtils.hasText(gitLabProperties.getUsername())
         && StringUtils.hasText(gitLabProperties.getPassword())))) {
 
-      List<GitLabIntegration> integrations = gitLabIntegrationService.findByOrganization(organization);
+      List<GitLabIntegration> integrations = gitLabIntegrationService.findAll();
       try {
         if (integrations.size() > 0) {
 //          updateExistingIntegration(integrations.get(0));
           LOGGER.warn("GitLab integration is already configured. Skipping initialization.");
         } else {
-          registerNewGitLabIntegration(organization);
+          registerNewGitLabIntegration();
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -101,17 +84,16 @@ public class GitLabIntegrationInitializer {
       }
 
     } else {
-      LOGGER.info("No GitLab integration properties found for organization {}. Skipping initialization.", organization.getName());
+      LOGGER.info("No GitLab integration properties found. Skipping initialization.");
     }
 
   }
 
-  private void registerNewGitLabIntegration(Organization organization) {
-    LOGGER.info("No GitLab integration found for organization {}. A new integration will be registered.", organization.getName());
+  private void registerNewGitLabIntegration() {
+    LOGGER.info("No GitLab integration found. A new integration will be registered.");
     GitLabProperties gitLabProperties = properties.getGitlab();
     GitLabIntegration integration = new GitLabIntegration();
     integration.setActive(true);
-    integration.setOrganization(organization);
     integration.setName("GitLab");
     integration.setRootUrl(gitLabProperties.getUrl().toString());
     integration.setUsername(gitLabProperties.getUsername());
@@ -130,7 +112,7 @@ public class GitLabIntegrationInitializer {
   private void updateExistingIntegration(GitLabIntegration existing) {
     GitLabProperties gitLabProperties = properties.getGitlab();
     if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
-      LOGGER.info("GitLab integration for organization is already configured. Skipping initialization.");
+      LOGGER.info("GitLab integration is already configured. Skipping initialization.");
     } else {
       LOGGER.info("Updating GitLab integration {}.", existing.getId());
       existing.setRootUrl(gitLabProperties.getUrl().toString());

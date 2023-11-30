@@ -16,20 +16,7 @@
 
 package io.studytracker.config;
 
-import io.studytracker.example.ExampleAssayGenerator;
-import io.studytracker.example.ExampleAssayTypeGenerator;
-import io.studytracker.example.ExampleCollaboratorGenerator;
-import io.studytracker.example.ExampleDataRunner;
-import io.studytracker.example.ExampleGitRepositoryGenerator;
-import io.studytracker.example.ExampleIntegrationGenerator;
-import io.studytracker.example.ExampleKeywordGenerator;
-import io.studytracker.example.ExampleOrganizationGenerator;
-import io.studytracker.example.ExampleProgramGenerator;
-import io.studytracker.example.ExampleStorageFolderGenerator;
-import io.studytracker.example.ExampleStudyCollectionGenerator;
-import io.studytracker.example.ExampleStudyGenerator;
-import io.studytracker.example.ExampleUserGenerator;
-import io.studytracker.repository.OrganizationRepository;
+import io.studytracker.example.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -41,11 +28,6 @@ public class ExampleDataConfiguration {
   @Bean
   public ExampleDataRunner exampleDataGenerator() {
     return new ExampleDataRunner();
-  }
-
-  @Bean
-  public ExampleOrganizationGenerator exampleOrganizationGenerator(OrganizationRepository repository) {
-    return new ExampleOrganizationGenerator(repository);
   }
 
   @Bean

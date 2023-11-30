@@ -17,13 +17,8 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.EgnyteIntegration;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 public interface EgnyteIntegrationRepository extends JpaRepository<EgnyteIntegration, Long> {
-
-  @Query("SELECT e FROM EgnyteIntegration e WHERE e.organization.id = ?1")
-  List<EgnyteIntegration> findByOrganizationId(Long organizationId);
 
 }

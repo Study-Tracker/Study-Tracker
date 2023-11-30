@@ -17,13 +17,8 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.AwsIntegration;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 public interface AwsIntegrationRepository extends JpaRepository<AwsIntegration, Long> {
-
-  @Query("SELECT a FROM AwsIntegration a WHERE a.organization.id = ?1")
-  List<AwsIntegration> findByOrganizationId(Long organizationId);
 
 }

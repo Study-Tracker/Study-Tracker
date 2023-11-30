@@ -17,39 +17,30 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.StorageDriveFolder;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface StorageDriveFolderRepository extends JpaRepository<StorageDriveFolder, Long> {
+  
+  @Override
+  @EntityGraph("storage-drive-folder-details")
+  Optional<StorageDriveFolder> findById(Long id);
 
   @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.id = ?1")
   @EntityGraph("storage-drive-folder-details")
   List<StorageDriveFolder> findByStorageDriveId(Long storageDriveId);
 
-  @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1")
+  @Query("SELECT f FROM StorageDriveFolder f WHERE f.studyRoot = true")
   @EntityGraph("storage-drive-folder-details")
-  List<StorageDriveFolder> findByOrganization(Long organizationId);
+  List<StorageDriveFolder> findStudyRoot();
 
-  @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1")
+  @Query("SELECT f FROM StorageDriveFolder f WHERE f.browserRoot = true")
   @EntityGraph("storage-drive-folder-details")
-  Page<StorageDriveFolder> findByOrganization(Long organizationId, Pageable pageable);
-
-  @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1 AND f.studyRoot = true")
-  @EntityGraph("storage-drive-folder-details")
-  List<StorageDriveFolder> findStudyRootByOrganization(Long organizationId);
-
-  @Query("SELECT f FROM StorageDriveFolder f WHERE f.storageDrive.organization.id = ?1 AND f.browserRoot = true")
-  @EntityGraph("storage-drive-folder-details")
-  List<StorageDriveFolder> findBrowserRootByOrganization(Long organizationId);
-
-  @Query("SELECT f FROM StorageDriveFolder f WHERE f.id = ?1 AND f.storageDrive.organization.id = ?2")
-  @EntityGraph("storage-drive-folder-details")
-  Optional<StorageDriveFolder> findByIdAndOrganization(Long id, Long organizationId);
+  List<StorageDriveFolder> findBrowserRoot();
 
   @EntityGraph("storage-drive-folder-details")
   @Query("SELECT f FROM StorageDriveFolder f "

@@ -17,23 +17,18 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.StorageDrive;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface StorageDriveRepository extends JpaRepository<StorageDrive, Long> {
 
-  @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1")
-  List<StorageDrive> findByOrganization(Long organizationId);
+  @Query("SELECT sd FROM StorageDrive sd WHERE sd.driveType = ?1")
+  List<StorageDrive> findByDriveType(StorageDrive.DriveType driveType);
 
-  @Query("SELECT sd FROM StorageDrive sd WHERE sd.id = ?1 and sd.organization.id = ?2")
-  Optional<StorageDrive> findByIdAndOrganizationId(Long id, Long organizationId);
-
-  @Query("SELECT sd FROM StorageDrive sd WHERE sd.organization.id = ?1 AND sd.driveType = ?2")
-  List<StorageDrive> findByOrganizationAndDriveType(Long organizationId, StorageDrive.DriveType driveType);
-
-  @Query("SELECT sd FROM StorageDrive sd JOIN StorageDriveFolder f ON sd.id = f.storageDrive.id WHERE sd.organization.id = ?1 AND f.id = ?2")
-  Optional<StorageDrive> findByOrganizationAndStorageDriveFolder(Long organizationId, Long storageDriveFolderId);
+  @Query("SELECT sd FROM StorageDrive sd JOIN StorageDriveFolder f ON sd.id = f.storageDrive.id WHERE f.id = ?1")
+  Optional<StorageDrive> findByStorageDriveFolderId(Long storageDriveFolderId);
 
 }

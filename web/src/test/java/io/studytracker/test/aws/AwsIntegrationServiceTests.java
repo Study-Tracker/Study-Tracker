@@ -20,14 +20,11 @@ package io.studytracker.test.aws;
 import io.studytracker.Application;
 import io.studytracker.aws.AwsIntegrationService;
 import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.model.S3BucketDetails;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +35,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"aws-test"})
@@ -45,7 +44,6 @@ public class AwsIntegrationServiceTests {
 
   @Autowired private AwsIntegrationService awsIntegrationService;
   @Autowired private AwsIntegrationRepository awsIntegrationRepository;
-  @Autowired private OrganizationService organizationService;
   @Autowired private StorageDriveRepository storageDriveRepository;
 
   @Value("${aws.access-key-id}")
@@ -62,9 +60,7 @@ public class AwsIntegrationServiceTests {
 
   @Test
   public void configTest() {
-    Organization organization = organizationService.getCurrentOrganization();
-    Assert.assertNotNull(organization);
-    List<AwsIntegration> integrations = awsIntegrationService.findByOrganization(organization);
+    List<AwsIntegration> integrations = awsIntegrationService.findAll();
     Assert.assertNotNull(integrations);
     Assert.assertEquals(1, integrations.size());
     AwsIntegration integration = integrations.get(0);
@@ -76,12 +72,10 @@ public class AwsIntegrationServiceTests {
 
   @Test
   public void integrationValidationTest() throws Exception {
-    Organization organization = organizationService.getCurrentOrganization();
     AwsIntegration integration = new AwsIntegration();
     integration.setAccessKeyId(accessKeyId);
     integration.setRegion(region);
     integration.setUseIam(false);
-    integration.setOrganization(organization);
     integration.setName("Test Integration");
     integration.setAccountNumber("123456789012");
     Assert.assertFalse(awsIntegrationService.validate(integration));
@@ -91,12 +85,10 @@ public class AwsIntegrationServiceTests {
 
   @Test
   public void integrationTestTest() throws Exception {
-    Organization organization = organizationService.getCurrentOrganization();
     AwsIntegration integration = new AwsIntegration();
     integration.setAccessKeyId(accessKeyId);
     integration.setRegion(region);
     integration.setUseIam(false);
-    integration.setOrganization(organization);
     integration.setName("Test Integration");
     integration.setAccountNumber("123456789012");
     Assert.assertFalse(awsIntegrationService.test(integration));
@@ -106,15 +98,13 @@ public class AwsIntegrationServiceTests {
 
   @Test
   public void addingS3BucketTest() throws Exception {
-    Organization organization = organizationService.getCurrentOrganization();
-    List<AwsIntegration> integrations = awsIntegrationService.findByOrganization(organization);
+    List<AwsIntegration> integrations = awsIntegrationService.findAll();
     Assert.assertNotNull(integrations);
     Assert.assertEquals(1, integrations.size());
     AwsIntegration integration = integrations.get(0);
     List<StorageDrive> buckets = awsIntegrationService.findRegisteredBuckets(integration);
     Assert.assertEquals(0, buckets.size());
-    List<StorageDrive> drives = storageDriveRepository.findByOrganizationAndDriveType(
-        organization.getId(), DriveType.S3);
+    List<StorageDrive> drives = storageDriveRepository.findByDriveType(DriveType.S3);
     Assert.assertEquals(0, drives.size());
 
     Assert.assertTrue(awsIntegrationService.listAvailableBuckets(integration).contains(s3BucketName));
@@ -122,7 +112,6 @@ public class AwsIntegrationServiceTests {
     drive.setActive(true);
     drive.setDriveType(DriveType.S3);
     drive.setDisplayName("Example Bucket");
-    drive.setOrganization(organization);
     drive.setRootPath("");
     S3BucketDetails details = new S3BucketDetails();
     details.setAwsIntegrationId(integration.getId());
@@ -130,8 +119,7 @@ public class AwsIntegrationServiceTests {
     drive.setDetails(details);
     awsIntegrationService.registerBucket(drive);
 
-    drives = storageDriveRepository.findByOrganizationAndDriveType(
-        organization.getId(), DriveType.S3);
+    drives = storageDriveRepository.findByDriveType(DriveType.S3);
     Assert.assertEquals(1, drives.size());
     StorageDrive bucket = drives.get(0);
     Exception error = null;

@@ -17,14 +17,14 @@
 package io.studytracker.mapstruct.dto.form;
 
 import io.studytracker.model.GitServiceType;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 public class GitGroupFormDto {
 
   private Long id;
-  private Long organizationId;
   private Long parentGroupId;
   private @NotNull String displayName;
   private @NotNull String webUrl;

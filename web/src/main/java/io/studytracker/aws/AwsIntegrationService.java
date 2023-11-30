@@ -18,15 +18,11 @@ package io.studytracker.aws;
 
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.model.S3BucketDetails;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +31,10 @@ import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AwsIntegrationService implements IntegrationService<AwsIntegration> {
@@ -56,9 +56,9 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   }
 
   @Override
-  public List<AwsIntegration> findByOrganization(Organization organization) {
-    LOGGER.debug("Finding AWS integrations for organization: {}", organization);
-    return awsIntegrationRepository.findByOrganizationId(organization.getId());
+  public List<AwsIntegration> findAll() {
+    LOGGER.debug("Finding all AWS integrations");
+    return awsIntegrationRepository.findAll();
   }
 
   @Transactional
@@ -146,8 +146,7 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   }
 
   public List<StorageDrive> findRegisteredBuckets(AwsIntegration integration) {
-    Organization organization = integration.getOrganization();
-    return storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.S3)
+    return storageDriveRepository.findByDriveType(DriveType.S3)
         .stream()
         .filter(drive -> S3BucketDetails.class.isAssignableFrom(drive.getDetails().getClass())
             && ((S3BucketDetails) drive.getDetails()).getAwsIntegrationId().equals(integration.getId()))
@@ -155,8 +154,7 @@ public class AwsIntegrationService implements IntegrationService<AwsIntegration>
   }
 
   public boolean bucketIsRegistered(AwsIntegration integration, String bucketName) {
-    return storageDriveRepository.findByOrganizationAndDriveType(
-        integration.getOrganization().getId(), DriveType.S3)
+    return storageDriveRepository.findByDriveType(DriveType.S3)
         .stream()
         .anyMatch(drive -> drive.getDetails() instanceof S3BucketDetails
             && ((S3BucketDetails) drive.getDetails()).getAwsIntegrationId().equals(integration.getId())
