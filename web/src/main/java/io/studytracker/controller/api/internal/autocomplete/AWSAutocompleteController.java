@@ -18,10 +18,6 @@ package io.studytracker.controller.api.internal.autocomplete;
 
 import io.studytracker.aws.AwsIntegrationService;
 import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Organization;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,21 +27,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/internal/autocomplete/aws")
 public class AWSAutocompleteController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AWSAutocompleteController.class);
 
-  @Autowired private OrganizationService organizationService;
-
   @Autowired private AwsIntegrationService awsIntegrationService;
 
   @GetMapping("/s3")
   public List<String> listAvailableBuckets(@RequestParam("q") String keyword) {
     LOGGER.debug("Listing available buckets with keyword: {}", keyword);
-    Organization organization = organizationService.getCurrentOrganization();
-    AwsIntegration integration = awsIntegrationService.findByOrganization(organization).get(0);
+    AwsIntegration integration = awsIntegrationService.findAll().get(0);
     return awsIntegrationService.listAvailableBuckets(integration)
         .stream().filter(bucket -> !StringUtils.hasText(keyword)
             || bucket.toLowerCase().contains(keyword.toLowerCase()))

@@ -22,27 +22,17 @@ import io.studytracker.mapstruct.dto.form.EgnyteIntegrationFormDto;
 import io.studytracker.mapstruct.dto.response.EgnyteIntegrationDetailsDto;
 import io.studytracker.mapstruct.mapper.EgnyteIntegrationMapper;
 import io.studytracker.model.EgnyteIntegration;
-import io.studytracker.model.Organization;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/internal/integrations/egnyte")
@@ -56,24 +46,18 @@ public class EgnyteIntegrationPrivateController {
   @Autowired
   private EgnyteIntegrationMapper egnyteIntegrationMapper;
 
-  @Autowired
-  private OrganizationService organizationService;
-
   @GetMapping("")
   public List<EgnyteIntegrationDetailsDto> findAllIntegrations() {
-    Organization organization = organizationService.getCurrentOrganization();
-    LOGGER.debug("Finding all egnyte integrations for organization: {}", organization.getId());
-    List<EgnyteIntegration> integrations = egnyteIntegrationService.findByOrganization(organization);
+    LOGGER.debug("Finding all egnyte integrations");
+    List<EgnyteIntegration> integrations = egnyteIntegrationService.findAll();
     return egnyteIntegrationMapper.toDetailsDto(integrations);
   }
 
   @PostMapping("")
   public HttpEntity<EgnyteIntegrationDetailsDto> registerIntegration(
       @Valid @RequestBody EgnyteIntegrationFormDto dto) {;
-    Organization organization = organizationService.getCurrentOrganization();
-    LOGGER.info("Registering egnyte integration for organization: {}", organization.getId());
+    LOGGER.info("Registering egnyte integration");
     EgnyteIntegration integration = egnyteIntegrationMapper.fromFormDto(dto);
-    integration.setOrganization(organization);
     EgnyteIntegration created = egnyteIntegrationService.register(integration);
     return new ResponseEntity<>(egnyteIntegrationMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
@@ -81,12 +65,8 @@ public class EgnyteIntegrationPrivateController {
   @PutMapping("/{id}")
   public HttpEntity<EgnyteIntegrationDetailsDto> updateRegistration(@PathVariable("id") Long id,
       @Valid @RequestBody EgnyteIntegrationFormDto dto) {
-    Organization organization = organizationService.getCurrentOrganization();
-    EgnyteIntegration existing = egnyteIntegrationService.findById(id)
+    egnyteIntegrationService.findById(id)
         .orElseThrow(() -> new RecordNotFoundException("Egnyte integration not found: " + id));
-    if (!existing.getOrganization().equals(organization)) {
-      throw new RecordNotFoundException("Egnyte integration not found: " + id);
-    }
     EgnyteIntegration updated = egnyteIntegrationService
         .update(egnyteIntegrationMapper.fromFormDto(dto));
     return new ResponseEntity<>(egnyteIntegrationMapper.toDetailsDto(updated), HttpStatus.OK);
@@ -109,12 +89,8 @@ public class EgnyteIntegrationPrivateController {
   @DeleteMapping("/{id}")
   public HttpEntity<?> unregisterIntegration(@PathVariable("id") Long id) {
     LOGGER.info("Unregistering egnyte integration: {}", id);
-    Organization organization = organizationService.getCurrentOrganization();
     EgnyteIntegration existing = egnyteIntegrationService.findById(id)
         .orElseThrow(() -> new RecordNotFoundException("Egnyte integration not found: " + id));
-    if (!existing.getOrganization().equals(organization)) {
-      throw new RecordNotFoundException("Egnyte integration not found: " + id);
-    }
     egnyteIntegrationService.remove(existing);
     return new ResponseEntity<>(HttpStatus.OK);
   }

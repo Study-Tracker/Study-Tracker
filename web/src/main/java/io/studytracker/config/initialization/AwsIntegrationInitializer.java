@@ -21,25 +21,19 @@ import io.studytracker.config.properties.AWSProperties;
 import io.studytracker.config.properties.AWSProperties.S3Properties;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.exception.InvalidConfigurationException;
-import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Organization;
-import io.studytracker.model.S3BucketDetails;
-import io.studytracker.model.S3FolderDetails;
-import io.studytracker.model.StorageDrive;
+import io.studytracker.model.*;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.service.OrganizationService;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Initializes AWS service configurations and captures records in the database.
@@ -59,15 +53,12 @@ public class AwsIntegrationInitializer {
   private AwsIntegrationService awsIntegrationService;
 
   @Autowired
-  private OrganizationService organizationService;
-
-  @Autowired
   private StorageDriveRepository storageDriveRepository;
 
   @Autowired
   private StorageDriveFolderRepository folderRepository;
 
-  private AwsIntegration registerAwsIntegrationInstances(Organization organization) throws InvalidConfigurationException {
+  private AwsIntegration registerAwsIntegrationInstances() throws InvalidConfigurationException {
 
     AwsIntegration awsIntegration = null;
     AWSProperties awsProperties = properties.getAws();
@@ -75,7 +66,7 @@ public class AwsIntegrationInitializer {
     // Check to see if AWS config properties are present
     if (awsProperties != null && StringUtils.hasText(awsProperties.getRegion())) {
 
-      List<AwsIntegration> integrations = awsIntegrationService.findByOrganization(organization);
+      List<AwsIntegration> integrations = awsIntegrationService.findAll();
 
       // If yes, update the record
       if (integrations.size() > 0) {
@@ -83,12 +74,12 @@ public class AwsIntegrationInitializer {
         // Has the record already been updated?
         AwsIntegration existing = integrations.get(0);
         if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
-          LOGGER.info("AWS integration for organization {} has already been initialized.", organization.getName());
+          LOGGER.info("AWS integration has already been initialized.");
           return existing;
         }
 
         // If not, update the record
-        LOGGER.info("Updating AWS integration for organization {}", organization.getName());
+        LOGGER.info("Updating AWS integration");
         if (StringUtils.hasText(awsProperties.getAccessKeyId())
             && StringUtils.hasText(awsProperties.getSecretAccessKey())) {
           existing.setAccessKeyId(awsProperties.getAccessKeyId());
@@ -106,10 +97,9 @@ public class AwsIntegrationInitializer {
       }
       // If no, create a new record
       else {
-        LOGGER.info("Creating new AWS integration for organization {}", organization.getName());
+        LOGGER.info("Creating new AWS integration");
         AwsIntegration newIntegration = new AwsIntegration();
         newIntegration.setName("Default AWS Integration");
-        newIntegration.setOrganization(organization);
         newIntegration.setRegion(awsProperties.getRegion());
         newIntegration.setActive(true);
         if (StringUtils.hasText(awsProperties.getAccessKeyId())
@@ -137,7 +127,7 @@ public class AwsIntegrationInitializer {
    *
    * @throws InvalidConfigurationException if required environment variables are missing
    */
-  private List<StorageDrive> registerS3Buckets(AwsIntegration awsIntegration, Organization organization) throws InvalidConfigurationException {
+  private List<StorageDrive> registerS3Buckets(AwsIntegration awsIntegration) throws InvalidConfigurationException {
 
     if (awsIntegration == null || awsIntegration.getId() == null) {
       LOGGER.warn("AWS integration is not configured. Skipping S3 bucket registration.");
@@ -153,7 +143,6 @@ public class AwsIntegrationInitializer {
         if (StringUtils.hasText(bucketName) && !awsIntegrationService.bucketIsRegistered(awsIntegration, bucketName)) {
           LOGGER.info("Registering S3 bucket: " + bucketName);
           StorageDrive storageDrive = new StorageDrive();
-          storageDrive.setOrganization(organization);
           storageDrive.setActive(true);
           storageDrive.setDisplayName("S3: " + bucketName);
           storageDrive.setDriveType(DriveType.S3);
@@ -236,23 +225,12 @@ public class AwsIntegrationInitializer {
   @Transactional
   public void initializeIntegrations() throws InvalidConfigurationException {
 
-    Organization organization;
-
-    // Check to see if the AWS integration is already registered
-    try {
-      organization = organizationService.getCurrentOrganization();
-    } catch (RecordNotFoundException e) {
-      e.printStackTrace();
-      LOGGER.error("No organization found. Skipping AWS integration initialization.");
-      return;
-    }
-
     try {
 
       // Register integration definitiions
-      AwsIntegration awsIntegration = registerAwsIntegrationInstances(organization);
+      AwsIntegration awsIntegration = registerAwsIntegrationInstances();
       if (awsIntegration != null) {
-        List<StorageDrive> buckets = registerS3Buckets(awsIntegration, organization);
+        List<StorageDrive> buckets = registerS3Buckets(awsIntegration);
         if (buckets != null) {
           registerRootFolders(buckets);
         }

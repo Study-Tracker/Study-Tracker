@@ -17,14 +17,12 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.SharePointSite;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface SharePointSiteRepository extends JpaRepository<SharePointSite, Long> {
+import java.util.List;
 
-  @Query("SELECT s FROM SharePointSite s JOIN s.msgraphIntegration i WHERE i.organization.id = ?1")
-  List<SharePointSite> findByOrganizationId(Long organizationId);
+public interface SharePointSiteRepository extends JpaRepository<SharePointSite, Long> {
 
   @Query("SELECT s FROM SharePointSite s JOIN s.msgraphIntegration i WHERE i.id = ?1")
   List<SharePointSite> findByIntegrationId(Long integrationId);

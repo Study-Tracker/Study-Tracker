@@ -16,29 +16,15 @@
 
 package io.studytracker.model;
 
-import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.*;
+import java.util.Date;
+
 @Entity
-@Table(name = "egnyte_integrations", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_egnyte_integrations", columnNames = {"organization_id", "tenant_name"})
-})
+@Table(name = "egnyte_integrations")
 @EntityListeners(AuditingEntityListener.class)
 public class EgnyteIntegration {
 
@@ -46,11 +32,7 @@ public class EgnyteIntegration {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "organization_id", nullable = false)
-  private Organization organization;
-
-  @Column(name = "tenant_name", nullable = false)
+  @Column(name = "tenant_name", nullable = false, unique = true)
   private String tenantName;
 
   @Column(name = "root_url", nullable = false)
@@ -82,14 +64,6 @@ public class EgnyteIntegration {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public Organization getOrganization() {
-    return organization;
-  }
-
-  public void setOrganization(Organization organization) {
-    this.organization = organization;
   }
 
   public String getTenantName() {

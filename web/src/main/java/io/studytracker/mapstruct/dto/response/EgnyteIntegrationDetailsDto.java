@@ -16,14 +16,14 @@
 
 package io.studytracker.mapstruct.dto.response;
 
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 public class EgnyteIntegrationDetailsDto {
 
   private Long id;
-  private OrganizationDetailsDto organization;
   private String tenantName;
   private String rootUrl;
   private Integer qps;

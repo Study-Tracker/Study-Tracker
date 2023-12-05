@@ -16,32 +16,16 @@
 
 package io.studytracker.test.web.api;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleProgramGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ProgramPayloadDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
-import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
-import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.StorageDriveFolderService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,6 +40,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
@@ -67,9 +56,6 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
 
   @Autowired
   private ProgramRepository programRepository;
-
-  @Autowired
-  private OrganizationService organizationService;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -148,7 +134,6 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .filter(u -> !u.isAdmin())
         .findFirst()
         .get();
-    Organization organization = organizationService.getCurrentOrganization();
     StorageDriveFolder rootFolder = storageDriveFolderService.findStudyRootFolders().get(0);
 
     ProgramPayloadDto dto = new ProgramPayloadDto();
@@ -176,8 +161,6 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", hasKey("id")))
         .andExpect(jsonPath("$.id", notNullValue()))
-        .andExpect(jsonPath("$", hasKey("organizationId")))
-        .andExpect(jsonPath("$.organizationId", is(organization.getId().intValue())))
         .andExpect(jsonPath("$", hasKey("name")))
         .andExpect(jsonPath("$.name", is("Program X")))
         .andExpect(jsonPath("$", hasKey("createdBy")))

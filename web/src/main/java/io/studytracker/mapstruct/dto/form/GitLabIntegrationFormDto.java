@@ -16,15 +16,14 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import io.studytracker.mapstruct.dto.response.OrganizationDetailsDto;
-import javax.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 
 @Data
 public class GitLabIntegrationFormDto {
 
   private Long id;
-  private OrganizationDetailsDto organization;
   private @NotEmpty String name;
   private @NotEmpty String rootUrl;
   private String username;

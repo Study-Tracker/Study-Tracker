@@ -19,41 +19,12 @@ package io.studytracker.test.repository;
 import io.studytracker.Application;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.Comment;
-import io.studytracker.model.ExternalLink;
-import io.studytracker.model.Organization;
-import io.studytracker.model.Program;
-import io.studytracker.model.Status;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
-import io.studytracker.model.StudyConclusions;
-import io.studytracker.model.StudyStorageFolder;
-import io.studytracker.model.User;
-import io.studytracker.model.UserType;
-import io.studytracker.repository.ActivityRepository;
-import io.studytracker.repository.CommentRepository;
-import io.studytracker.repository.ELNFolderRepository;
-import io.studytracker.repository.ExternalLinkRepository;
-import io.studytracker.repository.OrganizationRepository;
-import io.studytracker.repository.ProgramRepository;
-import io.studytracker.repository.StudyConclusionsRepository;
-import io.studytracker.repository.StudyRepository;
-import io.studytracker.repository.UserRepository;
+import io.studytracker.model.*;
+import io.studytracker.repository.*;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
-import java.net.URL;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import javax.persistence.EntityManagerFactory;
-import org.hibernate.Hibernate;
-import org.hibernate.LazyInitializationException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,13 +37,16 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManagerFactory;
+import java.net.URL;
+import java.util.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test"})
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StudyRepositoryTests {
 
-  @Autowired private OrganizationRepository organizationRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private ProgramRepository programRepository;
   @Autowired private ELNFolderRepository elnFolderRepository;
@@ -128,11 +102,8 @@ public class StudyRepositoryTests {
   private void createProgram() {
 
     User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
-    Organization organization =
-        organizationRepository.findAll().get(0);
-
+    
     Program program = new Program();
-    program.setOrganization(organization);
     program.setActive(true);
     program.setCode("TST");
     program.setCreatedBy(user);

@@ -24,24 +24,23 @@ import com.microsoft.graph.requests.SiteCollectionPage;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
-import io.studytracker.model.Organization;
 import io.studytracker.model.SharePointSite;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.SharePointSiteRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.service.OrganizationService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MSGraphIntegrationService implements IntegrationService<MSGraphIntegration> {
@@ -50,9 +49,6 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
   @Autowired
   private MSGraphIntegrationRepository integrationRepository;
-
-  @Autowired
-  private OrganizationService organizationService;
 
   @Autowired
   private SharePointSiteRepository sharePointSiteRepository;
@@ -67,17 +63,14 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
   }
 
   @Override
-  public List<MSGraphIntegration> findByOrganization(Organization organization) {
-    LOGGER.debug("Finding MSGraphIntegration by organization: {}", organization.getId());
-    return integrationRepository.findByOrganizationId(organization.getId());
+  public List<MSGraphIntegration> findAll() {
+    LOGGER.debug("Finding all MSGraphIntegrations");
+    return integrationRepository.findAll();
   }
 
   @Override
   public MSGraphIntegration register(MSGraphIntegration instance) {
-    LOGGER.info("Registering MSGraphIntegration for organization: {}",
-        instance.getOrganization().getId());
-    Organization organization = organizationService.getCurrentOrganization();
-    instance.setOrganization(organization);
+    LOGGER.info("Registering MSGraphIntegration");
     if (!validate(instance)) {
       throw new IllegalArgumentException("One or more required fields are missing.");
     }
@@ -179,8 +172,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
   public SharePointSite registerSharePointSite(SharePointSite site) {
     LOGGER.info("Registering SharePoint site: {}", site.getSiteId());
-    Organization organization = organizationService.getCurrentOrganization();
-    List<MSGraphIntegration> integrations = findByOrganization(organization);
+    List<MSGraphIntegration> integrations = findAll();
     MSGraphIntegration integration = integrations.iterator().next();
     GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
     Site s = client.sites(site.getSiteId()).buildRequest().get();
@@ -204,8 +196,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
   public List<StorageDrive> listRegisteredDrives(MSGraphIntegration integration) {
     LOGGER.debug("Listing registered OneDrive drives for integration: " + integration.getId());
-    Organization organization = organizationService.getCurrentOrganization();
-    return storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.ONEDRIVE)
+    return storageDriveRepository.findByDriveType(DriveType.ONEDRIVE)
         .stream()
         .filter(drive -> drive.getDetails() instanceof OneDriveDriveDetails
             && ((OneDriveDriveDetails) drive.getDetails()).getMsGraphIntegrationId().equals(integration.getId()))
@@ -217,8 +208,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     LOGGER.info("Registering OneDrive drives for site: {}", site.getSiteId());
 
     // Get the client
-    Organization organization = organizationService.getCurrentOrganization();
-    MSGraphIntegration integration = findByOrganization(organization).get(0);
+    MSGraphIntegration integration = findAll().get(0);
     GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
 
     // Make sure the site exists
@@ -250,7 +240,6 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       StorageDrive storageDrive = new StorageDrive();
       storageDrive.setDriveType(DriveType.ONEDRIVE);
       storageDrive.setRootPath("/");
-      storageDrive.setOrganization(organization);
       storageDrive.setDisplayName("SharePoint Site Drive: " + site.getName());
       storageDrive.setActive(true);
 
@@ -274,8 +263,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     LOGGER.info("Registering OneDrive drive: {}", drive.getDriveId());
 
     // Get the client
-    Organization organization = organizationService.getCurrentOrganization();
-    MSGraphIntegration integration = findByOrganization(organization).get(0);
+    MSGraphIntegration integration = findAll().get(0);
     GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
 
     // Make sure the drive exists
@@ -288,7 +276,6 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     StorageDrive storageDrive = new StorageDrive();
     storageDrive.setDriveType(DriveType.ONEDRIVE);
     storageDrive.setRootPath("/");
-    storageDrive.setOrganization(organization);
     storageDrive.setDisplayName("OneDrive Drive: " + d.name);
     storageDrive.setActive(true);
 

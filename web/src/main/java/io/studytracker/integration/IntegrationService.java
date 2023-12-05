@@ -16,14 +16,13 @@
 
 package io.studytracker.integration;
 
-import io.studytracker.model.Organization;
 import java.util.Collection;
 import java.util.Optional;
 
 public interface IntegrationService<T> {
 
   Optional<T> findById(Long id);
-  Collection<T> findByOrganization(Organization organization);
+  Collection<T> findAll();
   T register(T instance);
   T update(T instance);
   boolean validate(T instance);

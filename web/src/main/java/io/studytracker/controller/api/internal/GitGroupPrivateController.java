@@ -20,27 +20,19 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.response.GitGroupDetailsDto;
 import io.studytracker.mapstruct.mapper.GitGroupMapper;
 import io.studytracker.model.GitGroup;
-import io.studytracker.model.Organization;
 import io.studytracker.repository.GitGroupRepository;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/internal/git-groups")
 public class GitGroupPrivateController {
 
   public static final Logger LOGGER = LoggerFactory.getLogger(GitGroupPrivateController.class);
-
-  @Autowired
-  private OrganizationService organizationService;
 
   @Autowired
   private GitGroupRepository gitGroupRepository;
@@ -51,12 +43,11 @@ public class GitGroupPrivateController {
   @GetMapping
   public List<GitGroupDetailsDto> findAll(@RequestParam(name = "root", required = false) boolean isRoot) {
     LOGGER.debug("findAll(isRoot={})", isRoot);
-    Organization organization = organizationService.getCurrentOrganization();
     List<GitGroup> groups;
     if (isRoot) {
-      groups = gitGroupRepository.findRootByOrganizationId(organization.getId());
+      groups = gitGroupRepository.findRoot();
     } else {
-      groups = gitGroupRepository.findByOrganizationId(organization.getId());
+      groups = gitGroupRepository.findAll();
     }
     return gitGroupMapper.toDetailsDto(groups);
   }
@@ -64,12 +55,8 @@ public class GitGroupPrivateController {
   @GetMapping("/{id}")
   public GitGroupDetailsDto findById(@PathVariable("id") Long groupId) {
     LOGGER.debug("findById(groupId={})", groupId);
-    Organization organization = organizationService.getCurrentOrganization();
     GitGroup group = gitGroupRepository.findById(groupId)
         .orElseThrow(() -> new RecordNotFoundException("GitGroup not found with id: " + groupId));
-    if (!group.getOrganization().getId().equals(organization.getId())) {
-      throw new RecordNotFoundException("GitGroup not found with id: " + groupId);
-    }
     return gitGroupMapper.toDetailsDto(group);
   }
 

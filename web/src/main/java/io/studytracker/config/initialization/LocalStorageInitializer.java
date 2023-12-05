@@ -19,26 +19,24 @@ package io.studytracker.config.initialization;
 import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.exception.InvalidConfigurationException;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.LocalDriveDetails;
 import io.studytracker.model.LocalDriveFolderDetails;
-import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageUtils;
-import java.io.File;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.io.File;
+import java.util.Optional;
 
 @Component
 public class LocalStorageInitializer {
@@ -52,9 +50,6 @@ public class LocalStorageInitializer {
   private StorageDriveFolderRepository folderRepository;
 
   @Autowired
-  private OrganizationService organizationService;
-
-  @Autowired
   private StorageDriveRepository storageDriveRepository;
 
   @Autowired
@@ -66,18 +61,7 @@ public class LocalStorageInitializer {
     StorageProperties storageProperties = properties.getStorage();
 
     if (storageProperties.getMode().equals("local") && StringUtils.hasText(storageProperties.getLocalDir())) {
-
-      Organization organization;
-
-      // Check to see if the organization is already registered
-      try {
-        organization = organizationService.getCurrentOrganization();
-      } catch (RecordNotFoundException e) {
-        e.printStackTrace();
-        LOGGER.warn("No organization found. Skipping local storage initialization.");
-        return;
-      }
-
+      
       // Make sure the local directory exists and is writable
       File file = new File(storageProperties.getLocalDir());
       if (!file.exists()) {
@@ -90,7 +74,7 @@ public class LocalStorageInitializer {
             + storageProperties.getLocalDir());
       }
 
-      Optional<StorageDrive> optional = storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.LOCAL)
+      Optional<StorageDrive> optional = storageDriveRepository.findByDriveType(DriveType.LOCAL)
           .stream()
           .filter(d -> d.getRootPath().equals(storageProperties.getLocalDir()))
           .findFirst();
@@ -102,7 +86,6 @@ public class LocalStorageInitializer {
         storageDriveRepository.save(storageDrive);
       } else {
         storageDrive = new StorageDrive();
-        storageDrive.setOrganization(organization);
         storageDrive.setRootPath(storageProperties.getLocalDir());
         storageDrive.setDisplayName("Default Local Drive");
         storageDrive.setDriveType(DriveType.LOCAL);

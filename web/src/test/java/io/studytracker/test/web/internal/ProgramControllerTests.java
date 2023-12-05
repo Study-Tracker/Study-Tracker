@@ -16,31 +16,16 @@
 
 package io.studytracker.test.web.internal;
 
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.mapper.ProgramMapper;
-import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.UserRepository;
-import io.studytracker.service.OrganizationService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +39,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -74,8 +66,6 @@ public class ProgramControllerTests {
   @Autowired private ObjectMapper objectMapper;
 
   @Autowired private ProgramMapper mapper;
-
-  @Autowired private OrganizationService organizationService;
 
   private String username;
 
@@ -133,13 +123,11 @@ public class ProgramControllerTests {
   public void createProgramTest() throws Exception {
 
     User user = userRepository.findByEmail("rblack@email.com").orElseThrow(RecordNotFoundException::new);
-    Organization organization = organizationService.getCurrentOrganization();
 
     Program program = new Program();
     program.setName("Program X");
     program.setCode("PX");
     program.setActive(true);
-    program.setOrganization(organization);
 
     mockMvc
         .perform(

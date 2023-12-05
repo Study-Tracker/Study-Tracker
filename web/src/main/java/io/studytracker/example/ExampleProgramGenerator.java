@@ -18,7 +18,6 @@ package io.studytracker.example;
 
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
@@ -26,11 +25,12 @@ import io.studytracker.repository.ProgramRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
@@ -64,14 +64,12 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
   @Override
   public List<Program> generateData(Object... args) {
 
-    Organization organization = (Organization) args[0];
-    List<User> users = (List<User>) args[1];
+    List<User> users = (List<User>) args[0];
 
     User user = users.get(0);
     List<Program> programs = new ArrayList<>();
 
     Program program = new Program();
-    program.setOrganization(organization);
     program.setName("Clinical Program A");
     program.setCode("CPA");
     program.setActive(true);
@@ -82,7 +80,6 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
     programs.add(program);
 
     program = new Program();
-    program.setOrganization(organization);
     program.setName("Preclinical Project B");
     program.setCode("PPB");
     program.setActive(true);
@@ -93,7 +90,6 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
     programs.add(program);
 
     program = new Program();
-    program.setOrganization(organization);
     program.setName("Cancelled Program C");
     program.setCode("CPC");
     program.setActive(false);
@@ -104,7 +100,6 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
     programs.add(program);
 
     program = new Program();
-    program.setOrganization(organization);
     program.setName("Target ID Project D");
     program.setCode("TID");
     program.setActive(true);
@@ -115,7 +110,6 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
     programs.add(program);
 
     program = new Program();
-    program.setOrganization(organization);
     program.setName("Target ID Project E");
     program.setCode("TID");
     program.setActive(true);

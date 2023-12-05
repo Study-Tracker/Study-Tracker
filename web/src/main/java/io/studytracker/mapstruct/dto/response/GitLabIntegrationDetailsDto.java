@@ -16,14 +16,14 @@
 
 package io.studytracker.mapstruct.dto.response;
 
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 public class GitLabIntegrationDetailsDto {
 
   private Long id;
-  private OrganizationDetailsDto organization;
   private String name;
   private String rootUrl;
   private String username;

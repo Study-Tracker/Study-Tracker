@@ -20,23 +20,17 @@ import io.studytracker.egnyte.EgnyteIntegrationService;
 import io.studytracker.mapstruct.dto.response.StorageDriveDetailsDto;
 import io.studytracker.mapstruct.mapper.StorageDriveMapper;
 import io.studytracker.model.EgnyteIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
-import io.studytracker.service.OrganizationService;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/internal/drives/egnyte")
@@ -50,15 +44,11 @@ public class EgnyteDrivePrivateController {
   @Autowired
   private StorageDriveMapper storageDriveMapper;
 
-  @Autowired
-  private OrganizationService organizationService;
-
   @GetMapping("")
   public List<StorageDriveDetailsDto> findAllDrives() {
-    Organization organization = organizationService.getCurrentOrganization();
-    LOGGER.debug("Finding all egnyte drives for organization: {}", organization.getId());
+    LOGGER.debug("Finding all egnyte drives");
     List<StorageDrive> drives = new ArrayList<>();
-    for (EgnyteIntegration integration: egnyteIntegrationService.findByOrganization(organization)) {
+    for (EgnyteIntegration integration: egnyteIntegrationService.findAll()) {
       drives.addAll(egnyteIntegrationService.listIntegrationDrives(integration));
     }
     return storageDriveMapper.toDetailsDto(drives);

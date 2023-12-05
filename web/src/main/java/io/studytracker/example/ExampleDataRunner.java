@@ -19,14 +19,14 @@ package io.studytracker.example;
 import io.studytracker.config.initialization.DefaultDataInitializer;
 import io.studytracker.config.initialization.IntegrationInitializer;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.Organization;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
 import io.studytracker.repository.ActivityRepository;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 public class ExampleDataRunner {
 
@@ -45,7 +45,6 @@ public class ExampleDataRunner {
 
   @Autowired private DefaultDataInitializer defaultDataInitializer;
   @Autowired private IntegrationInitializer integrationInitializer;
-  @Autowired private ExampleOrganizationGenerator organizationGenerator;
   @Autowired private ExampleUserGenerator userGenerator;
   @Autowired private ExampleProgramGenerator programGenerator;
   @Autowired private ExampleStudyGenerator studyGenerator;
@@ -73,7 +72,6 @@ public class ExampleDataRunner {
     storageFolderGenerator.deleteData();
     gitRepositoryGenerator.deleteData();
     integrationGenerator.deleteData();
-    organizationGenerator.deleteData();
   }
 
   public void populateDatabase() {
@@ -87,15 +85,11 @@ public class ExampleDataRunner {
 
       LOGGER.info("Inserting example data...");
 
-      // Organizations
-      List<Organization> organizations = organizationGenerator.generateData();
-      Organization organization = organizations.get(0);
-
       // Users
       List<User> users = userGenerator.generateData();
 
       // Programs
-      programGenerator.generateData(organization, users);
+      programGenerator.generateData(users);
 
       // Assay types
       assayTypeGenerator.generateData();

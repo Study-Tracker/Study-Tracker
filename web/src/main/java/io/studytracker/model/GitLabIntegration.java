@@ -17,28 +17,14 @@
 package io.studytracker.model;
 
 import io.studytracker.git.GitServerIntegration;
-import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Table(name = "gitlab_integrations", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_gitlab_integrations", columnNames = {"organization_id", "root_url"})
-})
+import javax.persistence.*;
+import java.util.Date;
+
+@Table(name = "gitlab_integrations")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class GitLabIntegration implements GitServerIntegration {
@@ -47,14 +33,10 @@ public class GitLabIntegration implements GitServerIntegration {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "organization_id", nullable = false)
-  private Organization organization;
-
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "root_url", nullable = false)
+  @Column(name = "root_url", nullable = false, unique = true)
   private String rootUrl;
 
   @Column(name = "username")
@@ -87,14 +69,6 @@ public class GitLabIntegration implements GitServerIntegration {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public Organization getOrganization() {
-    return organization;
-  }
-
-  public void setOrganization(Organization organization) {
-    this.organization = organization;
   }
 
   public String getName() {

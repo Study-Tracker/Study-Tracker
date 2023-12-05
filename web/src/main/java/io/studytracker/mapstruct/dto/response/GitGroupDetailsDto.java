@@ -17,14 +17,14 @@
 package io.studytracker.mapstruct.dto.response;
 
 import io.studytracker.model.GitServiceType;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 public class GitGroupDetailsDto {
 
   private Long id;
-  private OrganizationDetailsDto organization;
   private GitGroupDetailsDto parentGroup;
   private String displayName;
   private String webUrl;

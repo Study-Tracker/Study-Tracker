@@ -18,15 +18,11 @@ package io.studytracker.test.service;
 
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
-import io.studytracker.model.Organization;
 import io.studytracker.model.Program;
 import io.studytracker.model.User;
-import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.service.ProgramService;
-import java.util.List;
-import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +33,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
+import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -50,8 +49,6 @@ public class ProgramServiceTests {
   @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Autowired private UserRepository userRepository;
-
-  @Autowired private OrganizationRepository organizationRepository;
 
   @Before
   public void doBefore() {
@@ -95,12 +92,9 @@ public class ProgramServiceTests {
 
   @Test
   public void createProgramTest() {
-    Organization organization = organizationRepository.findAll().get(0);
-    Assert.assertNotNull(organization);
     Assert.assertEquals(5, programRepository.count());
     User user = userRepository.findAll().get(0);
     Program program = new Program();
-    program.setOrganization(organization);
     program.setActive(true);
     program.setCode("TST");
     program.setName("Test Program");

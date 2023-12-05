@@ -21,19 +21,19 @@ import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.EgnyteDriveDetails;
 import io.studytracker.model.EgnyteIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegration> {
@@ -56,9 +56,9 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   }
 
   @Override
-  public List<EgnyteIntegration> findByOrganization(Organization organization) {
-    LOGGER.debug("Finding Egnyte integrations for organization: {}", organization.getName());
-    return egnyteIntegrationRepository.findByOrganizationId(organization.getId());
+  public List<EgnyteIntegration> findAll() {
+    LOGGER.debug("Finding all Egnyte integrations");
+    return egnyteIntegrationRepository.findAll();
   }
 
   @Override
@@ -125,8 +125,7 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   // Egnyte drives
 
   public List<StorageDrive> listIntegrationDrives(EgnyteIntegration egnyteIntegration) {
-    Organization organization = egnyteIntegration.getOrganization();
-    return storageDriveRepository.findByOrganizationAndDriveType(organization.getId(), DriveType.EGNYTE)
+    return storageDriveRepository.findByDriveType(DriveType.EGNYTE)
         .stream()
         .filter(drive -> drive.getDetails() instanceof EgnyteDriveDetails
             && ((EgnyteDriveDetails) drive.getDetails()).getEgnyteIntegrationId().equals(egnyteIntegration.getId()))
@@ -151,7 +150,6 @@ public class EgnyteIntegrationService implements IntegrationService<EgnyteIntegr
   public StorageDrive registerDefaultDrive(EgnyteIntegration egnyteIntegration) {
 
     StorageDrive storageDrive = new StorageDrive();
-    storageDrive.setOrganization(egnyteIntegration.getOrganization());
     storageDrive.setDriveType(DriveType.EGNYTE);
     storageDrive.setDisplayName("Egnyte Shared Drive");
     storageDrive.setActive(true);

@@ -19,16 +19,13 @@ package io.studytracker.test.msgraph;
 import io.studytracker.Application;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
-import io.studytracker.model.Organization;
 import io.studytracker.model.SharePointSite;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.msgraph.MSGraphIntegrationService;
 import io.studytracker.repository.MSGraphIntegrationRepository;
-import io.studytracker.repository.OrganizationRepository;
 import io.studytracker.repository.SharePointSiteRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +36,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -61,9 +60,6 @@ public class MSGraphIntegrationServiceTests {
   private MSGraphIntegrationRepository msGraphIntegrationRepository;
 
   @Autowired
-  private OrganizationRepository organizationRepository;
-
-  @Autowired
   private StorageDriveRepository driveRepository;
 
   @Autowired
@@ -83,14 +79,10 @@ public class MSGraphIntegrationServiceTests {
   @Test
   public void registerIntegrationTest() throws Exception {
 
-    Organization organization = organizationRepository.findAll().get(0);
-    Assert.assertNotNull(organization);
-
     MSGraphIntegration integration = new MSGraphIntegration();
     integration.setName("Azure");
     integration.setDomain("myorg.onmicrosoft.com");
     integration.setActive(true);
-    integration.setOrganization(organization);
     integration.setTenantId(tenantId);
     integration.setClientId(clientId);
     integration.setClientSecret(secret);
@@ -117,14 +109,10 @@ public class MSGraphIntegrationServiceTests {
   @Test
   public void badRegistrationTests() throws Exception {
 
-    Organization organization = organizationRepository.findAll().get(0);
-    Assert.assertNotNull(organization);
-
     MSGraphIntegration integration = new MSGraphIntegration();
     integration.setName("Azure");
     integration.setDomain("myorg.onmicrosoft.com");
     integration.setActive(true);
-    integration.setOrganization(organization);
 //    integration.setTenantId(tenantId);
     integration.setClientId(clientId);
     integration.setClientSecret(secret);

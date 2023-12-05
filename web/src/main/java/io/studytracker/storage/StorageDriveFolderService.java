@@ -20,7 +20,6 @@ import io.studytracker.model.*;
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.exception.StudyStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +45,6 @@ public class StorageDriveFolderService {
   private static final Logger LOGGER = LoggerFactory.getLogger(StorageDriveFolderService.class);
 
   @Autowired
-  private OrganizationService organizationService;
-
-  @Autowired
   private StorageDriveFolderRepository folderRepository;
 
   @Autowired
@@ -59,33 +55,28 @@ public class StorageDriveFolderService {
 
 
   public List<StorageDriveFolder> findAll() {
-    LOGGER.debug("Find all drive folders for organization");
-    Organization organization = organizationService.getCurrentOrganization();
-    return folderRepository.findByOrganization(organization.getId());
+    LOGGER.debug("Find all drive folders");
+    return folderRepository.findAll();
   }
 
   public Page<StorageDriveFolder> findAll(Pageable pageable) {
-    LOGGER.debug("Find all drive folders for organization");
-    Organization organization = organizationService.getCurrentOrganization();
-    return folderRepository.findByOrganization(organization.getId(), pageable);
+    LOGGER.debug("Find all drive folders");
+    return folderRepository.findAll(pageable);
   }
 
   public List<StorageDriveFolder> findStudyRootFolders() {
-    LOGGER.debug("Find all study root drive folders for organization");
-    Organization organization = organizationService.getCurrentOrganization();
-    return folderRepository.findStudyRootByOrganization(organization.getId());
+    LOGGER.debug("Find all study root drive folders");
+    return folderRepository.findStudyRoot();
   }
 
   public List<StorageDriveFolder> findBrowserRootFolders() {
-    LOGGER.debug("Find all browser root drive folders for organization");
-    Organization organization = organizationService.getCurrentOrganization();
-    return folderRepository.findBrowserRootByOrganization(organization.getId());
+    LOGGER.debug("Find all browser root drive folders");
+    return folderRepository.findBrowserRoot();
   }
 
   public Optional<StorageDriveFolder> findById(Long id) {
-    Organization organization = organizationService.getCurrentOrganization();
-    LOGGER.debug("Find drive folder by id {} for organization {}", id, organization.getId());
-    return folderRepository.findByIdAndOrganization(id, organization.getId());
+    LOGGER.debug("Find drive folder by id");
+    return folderRepository.findById(id);
   }
 
   public List<StorageDriveFolder> findByProgram(Program program) {
@@ -195,27 +186,23 @@ public class StorageDriveFolderService {
   // Drives
 
   public List<StorageDrive> findAllDrives() {
-    LOGGER.debug("Find all drives for organization");
-    Organization organization = organizationService.getCurrentOrganization();
-    return driveRepository.findByOrganization(organization.getId());
+    LOGGER.debug("Find all drives");
+    return driveRepository.findAll();
   }
 
   public List<StorageDrive> findByDriveType(DriveType driveType) {
-    LOGGER.debug("Find all drives for organization");
-    Organization organization = organizationService.getCurrentOrganization();
-    return driveRepository.findByOrganizationAndDriveType(organization.getId(), driveType);
+    LOGGER.debug("Find all drives by type: {}", driveType);
+    return driveRepository.findByDriveType(driveType);
   }
 
   public Optional<StorageDrive> findDriveById(Long id) {
     LOGGER.debug("Find drive by id: {}", id);
-    Organization organization = organizationService.getCurrentOrganization();
-    return driveRepository.findByIdAndOrganizationId(id, organization.getId());
+    return driveRepository.findById(id);
   }
 
   public Optional<StorageDrive> findDriveByFolder(StorageDriveFolder folder) {
     LOGGER.debug("Find drive by folder: {}", folder.getId());
-    Organization organization = organizationService.getCurrentOrganization();
-    return driveRepository.findByOrganizationAndStorageDriveFolder(organization.getId(), folder.getId());
+    return driveRepository.findByStorageDriveFolderId(folder.getId());
   }
 
 }

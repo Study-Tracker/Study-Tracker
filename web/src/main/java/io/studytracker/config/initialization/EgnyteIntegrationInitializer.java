@@ -21,27 +21,21 @@ import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.egnyte.EgnyteIntegrationService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.exception.InvalidConfigurationException;
-import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.EgnyteDriveDetails;
-import io.studytracker.model.EgnyteFolderDetails;
-import io.studytracker.model.EgnyteIntegration;
-import io.studytracker.model.Organization;
-import io.studytracker.model.StorageDrive;
+import io.studytracker.model.*;
 import io.studytracker.model.StorageDrive.DriveType;
-import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.StorageDriveFolderRepository;
-import io.studytracker.service.OrganizationService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Component
 public class EgnyteIntegrationInitializer {
@@ -55,9 +49,6 @@ public class EgnyteIntegrationInitializer {
   private EgnyteIntegrationService egnyteIntegrationService;
 
   @Autowired
-  private OrganizationService organizationService;
-
-  @Autowired
   private EgnyteStudyStorageService egnyteStudyStorageService;
 
   @Autowired
@@ -66,7 +57,7 @@ public class EgnyteIntegrationInitializer {
   @Autowired
   private StorageDriveFolderRepository storageDriveFolderRepository;
 
-  private EgnyteIntegration registerEgnyteIntegrations(Organization organization)
+  private EgnyteIntegration registerEgnyteIntegrations()
       throws InvalidConfigurationException {
 
     EgnyteIntegration egnyteIntegration = null;
@@ -77,7 +68,7 @@ public class EgnyteIntegrationInitializer {
         && StringUtils.hasText(egnyteProperties.getApiToken())) {
 
       // Check to see if the integration already exists
-      List<EgnyteIntegration> integrations = egnyteIntegrationService.findByOrganization(organization);
+      List<EgnyteIntegration> integrations = egnyteIntegrationService.findAll();
 
       // If yes, update the record
       if (integrations.size() > 0) {
@@ -85,12 +76,12 @@ public class EgnyteIntegrationInitializer {
         // Check to see if the integration is already active and updated
         EgnyteIntegration existing = integrations.get(0);
         if (!existing.getCreatedAt().equals(existing.getUpdatedAt())) {
-          LOGGER.info("Egnyte integration for organization {} is already active", organization.getName());
+          LOGGER.info("Egnyte integration is already active");
           return existing;
         }
 
         // If not, update the record
-        LOGGER.info("Updating Egnyte integration for organization {}", organization.getName());
+        LOGGER.info("Updating Egnyte integration");
         existing.setTenantName(egnyteProperties.getTenantName());
         existing.setApiToken(egnyteProperties.getApiToken());
         if (StringUtils.hasText(egnyteProperties.getRootUrl())) {
@@ -108,9 +99,8 @@ public class EgnyteIntegrationInitializer {
 
       // If no, create a new integration
       else {
-        LOGGER.info("Creating new Egnyte integration for organization {}", organization.getName());
+        LOGGER.info("Creating new Egnyte integration");
         EgnyteIntegration newIntegration = new EgnyteIntegration();
-        newIntegration.setOrganization(organization);
         newIntegration.setTenantName(egnyteProperties.getTenantName());
         newIntegration.setRootUrl("https://" + egnyteProperties.getTenantName() + ".egnyte.com");
         newIntegration.setApiToken(egnyteProperties.getApiToken());
@@ -201,20 +191,9 @@ public class EgnyteIntegrationInitializer {
   @Transactional
   public void initializeIntegrations() throws InvalidConfigurationException {
 
-    Organization organization;
-
-    // Check to see if the AWS integration is already registered
-    try {
-      organization = organizationService.getCurrentOrganization();
-    } catch (RecordNotFoundException e) {
-      e.printStackTrace();
-      LOGGER.warn("No organization found. Skipping Egnyte integration initialization.");
-      return;
-    }
-
     try {
       // Register Egnyte integration
-      EgnyteIntegration egnyteIntegration = registerEgnyteIntegrations(organization);
+      EgnyteIntegration egnyteIntegration = registerEgnyteIntegrations();
       if (egnyteIntegration != null) {
         StorageDrive drive = registerEgnyteDrives(egnyteIntegration);
         registerEgnyteFolders(drive);

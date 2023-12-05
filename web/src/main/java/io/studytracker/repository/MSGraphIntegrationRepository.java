@@ -17,13 +17,8 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.MSGraphIntegration;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 public interface MSGraphIntegrationRepository extends JpaRepository<MSGraphIntegration, Long> {
-
-  @Query("SELECT i FROM MSGraphIntegration i WHERE i.organization.id = ?1")
-  List<MSGraphIntegration> findByOrganizationId(Long organizationId);
 
 }

@@ -17,22 +17,6 @@
 package io.studytracker.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
@@ -40,10 +24,11 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.Assert;
 
+import javax.persistence.*;
+import java.util.Date;
+
 @Entity
-@Table(name = "storage_drives", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_storage_drives", columnNames = {"organization_id", "display_name"})
-})
+@Table(name = "storage_drives")
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 public class StorageDrive {
@@ -56,11 +41,7 @@ public class StorageDrive {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "organization_id", nullable = false)
-  private Organization organization;
-
-  @Column(name = "display_name", nullable = false)
+  @Column(name = "display_name", nullable = false, unique = true)
   private String displayName;
 
   @Column(name = "drive_type", nullable = false)
@@ -93,14 +74,6 @@ public class StorageDrive {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public Organization getOrganization() {
-    return organization;
-  }
-
-  public void setOrganization(Organization organization) {
-    this.organization = organization;
   }
 
   public String getDisplayName() {

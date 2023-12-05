@@ -23,13 +23,9 @@ import io.studytracker.gitlab.GitLabIntegrationService;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.model.GitGroup;
 import io.studytracker.model.GitLabIntegration;
-import io.studytracker.model.Organization;
 import io.studytracker.repository.GitGroupRepository;
 import io.studytracker.repository.GitLabGroupRepository;
 import io.studytracker.repository.GitLabIntegrationRepository;
-import io.studytracker.service.OrganizationService;
-import java.util.List;
-import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +37,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+import java.util.Optional;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"gitlab-test", "example"})
@@ -50,9 +49,6 @@ public class GitLabIntegrationServiceTests {
 
   @Autowired
   private GitLabIntegrationService integrationService;
-
-  @Autowired
-  private OrganizationService organizationService;
 
   @Autowired
   private GitLabIntegrationRepository integrationRepository;
@@ -93,9 +89,7 @@ public class GitLabIntegrationServiceTests {
     Assert.assertEquals(0, gitGroupRepository.count());
     Assert.assertEquals(0, gitLabGroupRepository.count());
 
-    Organization organization = organizationService.getCurrentOrganization();
-
-    List<GitLabIntegration> integrations = integrationService.findByOrganization(organization);
+    List<GitLabIntegration> integrations = integrationService.findAll();
     Assert.assertTrue(integrations.isEmpty());
     Assert.assertEquals(0, integrationRepository.count());
 
@@ -104,7 +98,6 @@ public class GitLabIntegrationServiceTests {
     Assert.assertFalse(integrationService.test(integration));
 
     integration.setRootUrl(rootUrl);
-    integration.setOrganization(organization);
     integration.setAccessToken(accessKey);
     integration.setName("GitLab Integration Test");
     integration.setActive(true);
@@ -114,7 +107,6 @@ public class GitLabIntegrationServiceTests {
     integration = integrationService.register(integration);
     Assert.assertNotNull(integration.getId());
     Assert.assertEquals("GitLab Integration Test", integration.getName());
-    Assert.assertEquals(organization.getId(), integration.getOrganization().getId());
     integration.setName("GitLab Integration Test 2");
     integration = integrationService.update(integration);
     Assert.assertEquals("GitLab Integration Test 2", integration.getName());
@@ -133,8 +125,7 @@ public class GitLabIntegrationServiceTests {
     Assert.assertEquals(0, gitGroupRepository.count());
     Assert.assertEquals(0, gitLabGroupRepository.count());
 
-    Organization organization = organizationService.getCurrentOrganization();
-    List<GitLabIntegration> integrations = integrationService.findByOrganization(organization);
+    List<GitLabIntegration> integrations = integrationService.findAll();
     Assert.assertEquals(1, integrations.size());
     GitLabIntegration integration = integrations.get(0);
 

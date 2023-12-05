@@ -16,14 +16,6 @@
 
 package io.studytracker.test.web.internal;
 
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.StorageDrive;
@@ -42,6 +34,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -75,8 +73,6 @@ public class StorageDrivePrivateControllerTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(ExampleDataRunner.STORAGE_DRIVE_COUNT)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
-        .andExpect(jsonPath("$[0]", hasKey("organization")))
-        .andExpect(jsonPath("$[0].organization", hasKey("id")))
         .andExpect(jsonPath("$[0]", hasKey("displayName")))
         .andExpect(jsonPath("$[0]", hasKey("rootPath")))
         .andExpect(jsonPath("$[0]", hasKey("driveType")))
