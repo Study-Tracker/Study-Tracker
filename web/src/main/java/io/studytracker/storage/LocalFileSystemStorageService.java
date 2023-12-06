@@ -19,12 +19,7 @@ package io.studytracker.storage;
 import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.Assay;
-import io.studytracker.model.LocalDriveFolderDetails;
-import io.studytracker.model.Program;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
+import io.studytracker.model.*;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.NamingService;
@@ -32,13 +27,6 @@ import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import io.studytracker.storage.exception.StudyStorageWriteException;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -48,6 +36,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LocalFileSystemStorageService implements StudyStorageService {
 
@@ -81,6 +77,7 @@ public class LocalFileSystemStorageService implements StudyStorageService {
                 StorageFile file = new StorageFile();
                 file.setPath(f);
                 file.setName(f.getFileName().toString());
+                file.setDownloadable(true);
                 return file;
               })
           .collect(Collectors.toList());
