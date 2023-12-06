@@ -33,11 +33,9 @@ const FileManagerTable = ({
   const [addToStudyModalIsOpen, setAddToStudyModalIsOpen] = useState(false);
   const [addToAssayModalIsOpen, setAddToAssayModalIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  // const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
   const handleItemClick = (item, index) => {
     setSelectedItem(item);
-    // setSelectedItemIndex(index);
     if (item.type === 'folder') {
       handlePathChange(item.path);
     }
