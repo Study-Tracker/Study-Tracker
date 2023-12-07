@@ -31,17 +31,16 @@ import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.SharePointSiteRepository;
 import io.studytracker.repository.StorageDriveRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class MSGraphIntegrationService implements IntegrationService<MSGraphIntegration> {
@@ -164,6 +163,22 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       }
     }
     return sites;
+  }
+
+  public SharePointSite findSharepointSiteBySiteId(MSGraphIntegration integration, String siteId) {
+    LOGGER.debug("Finding SharePoint site by site id: {}", siteId);
+    GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
+    Site site = null;
+    try {
+      site = client.sites(siteId).buildRequest().get();
+    } catch (Exception e) {
+      LOGGER.error("Failed to find SharePoint site by site id: {}", siteId);
+    }
+    if (site != null) {
+      return SharePointUtils.fromSite(site);
+    } else {
+      return null;
+    }
   }
 
   public Optional<SharePointSite> findSharePointSiteById(Long id) {
