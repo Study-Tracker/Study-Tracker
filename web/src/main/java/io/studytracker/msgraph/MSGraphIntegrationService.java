@@ -256,7 +256,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       StorageDrive storageDrive = new StorageDrive();
       storageDrive.setDriveType(DriveType.ONEDRIVE);
       storageDrive.setRootPath("/");
-      storageDrive.setDisplayName("SharePoint Site Drive: " + site.getName());
+      storageDrive.setDisplayName("SharePoint Site " + site.getName() + " Drive: " + drive.name);
       storageDrive.setActive(true);
 
       OneDriveDriveDetails details = new OneDriveDriveDetails();
