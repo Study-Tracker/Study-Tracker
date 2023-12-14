@@ -29,6 +29,10 @@ import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.SharePointSite;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.msgraph.MSGraphIntegrationService;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +40,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/integrations/msgraph")
@@ -106,11 +113,13 @@ public class MSGraphIntegrationPrivateController {
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
     List<SharePointSite> sites = msGraphIntegrationService.listAvailableSharepointSites(integration);
-    if (StringUtils.hasText(query)) {
+    if (StringUtils.hasText(query) && !sites.isEmpty()) {
       sites = sites.stream()
           .filter(site -> site.getName().toLowerCase().contains(query.toLowerCase()))
           .collect(Collectors.toList());
     }
+    SharePointSite site = msGraphIntegrationService.findSharepointSiteBySiteId(integration, query);
+    if (site != null) sites.add(site);
     return sharePointSiteMapper.toDetailsDto(sites);
   }
 

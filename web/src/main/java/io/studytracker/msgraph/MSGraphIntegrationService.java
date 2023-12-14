@@ -21,6 +21,7 @@ import com.microsoft.graph.models.Site;
 import com.microsoft.graph.requests.DriveCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.requests.SiteCollectionPage;
+import com.microsoft.graph.requests.UserCollectionPage;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
@@ -30,17 +31,16 @@ import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.SharePointSiteRepository;
 import io.studytracker.repository.StorageDriveRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class MSGraphIntegrationService implements IntegrationService<MSGraphIntegration> {
@@ -116,7 +116,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     LOGGER.info("Testing MSGraphIntegration: {}", instance.getTenantId());
     try {
       GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(instance);
-      SiteCollectionPage page = client.sites().buildRequest().get();
+      UserCollectionPage page = client.users().buildRequest().get();
       if (page != null && page.getCurrentPage().size() > 0) {
         LOGGER.info("MSGraphIntegration test successful");
         return true;
@@ -163,6 +163,22 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       }
     }
     return sites;
+  }
+
+  public SharePointSite findSharepointSiteBySiteId(MSGraphIntegration integration, String siteId) {
+    LOGGER.debug("Finding SharePoint site by site id: {}", siteId);
+    GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
+    Site site = null;
+    try {
+      site = client.sites(siteId).buildRequest().get();
+    } catch (Exception e) {
+      LOGGER.error("Failed to find SharePoint site by site id: {}", siteId);
+    }
+    if (site != null) {
+      return SharePointUtils.fromSite(site);
+    } else {
+      return null;
+    }
   }
 
   public Optional<SharePointSite> findSharePointSiteById(Long id) {
@@ -240,7 +256,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       StorageDrive storageDrive = new StorageDrive();
       storageDrive.setDriveType(DriveType.ONEDRIVE);
       storageDrive.setRootPath("/");
-      storageDrive.setDisplayName("SharePoint Site Drive: " + site.getName());
+      storageDrive.setDisplayName("SharePoint Site " + site.getName() + " Drive: " + drive.name);
       storageDrive.setActive(true);
 
       OneDriveDriveDetails details = new OneDriveDriveDetails();

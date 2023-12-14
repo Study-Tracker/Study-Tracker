@@ -18,12 +18,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import {Form as FormikForm, Formik} from "formik";
 import * as yup from "yup";
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
 import FormikFormErrorNotification
   from "../../../common/forms/FormikFormErrorNotification";
 import {FormGroup} from "../../../common/forms/common";
 import axios from "axios";
 import AsyncSelect from "react-select/async";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 const SharePointSiteFormModal = ({
     isOpen,
@@ -95,6 +97,22 @@ const SharePointSiteFormModal = ({
                 <FormikForm autoComplete={"off"}>
 
                   <FormikFormErrorNotification />
+
+                  <Row>
+                    <Col>
+                      <Alert variant={"info"} className={"alert-outline"}>
+                        <div className="alert-icon">
+                          <FontAwesomeIcon icon={faInfoCircle} fixedWidth />
+                        </div>
+                        <div className="alert-message">
+                          You can search for SharePoint sites by name or by site ID. For organizations
+                          with restricted site access, SharePoint site options might not appear unless
+                          you provide the exact site ID. Reach out to your local Microsoft administrator
+                          for more information.
+                        </div>
+                      </Alert>
+                    </Col>
+                  </Row>
 
                   <Row>
                     <Col>
