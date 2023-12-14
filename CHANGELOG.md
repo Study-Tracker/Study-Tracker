@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
-## [0.9.5] - 2023-12-07
+## [0.9.5] - 2023-12-14
 
 ### Added
 - Added search bar to admin dashboard assay type settings table (#134).
 - Added search bar to program list page to allow for easier filtering of large lists (#128).
+- The MS Azure AD integration now supports the SharePoint `Sites.Selected` permission, which grants the app access to only sites that the user specifies. SharePoint sites and their drives can now be added by requesting them by directly by ID. This is required when using `Sites.Selected`, since this permission set will deny access to the endpoint that lists all available Sharepoint sites. (#151) 
 
 ### Changed
 - Public and private study collection are now differentiated in the 'Add Study to Collection' dialog (#127).
