@@ -16,61 +16,21 @@
 
 package io.studytracker.benchling.api;
 
-import io.studytracker.benchling.api.entities.BenchlingAuthenticationToken;
 import io.studytracker.benchling.api.entities.BenchlingEntry;
-import io.studytracker.config.properties.BenchlingProperties;
+import io.studytracker.benchling.api.entities.BenchlingFolder;
 import io.studytracker.eln.NotebookEntry;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import javax.annotation.PostConstruct;
-import org.apache.commons.codec.binary.Base64;
+import io.studytracker.eln.NotebookFolder;
+import io.studytracker.model.BenchlingIntegration;
+import io.studytracker.repository.BenchlingIntegrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
 public abstract class AbstractBenchlingApiService {
 
   @Autowired
-  private BenchlingElnRestClient client;
-
+  private BenchlingClientFactory clientFactory;
+  
   @Autowired
-  private BenchlingProperties properties;
-
-  private URL rootUrl;
-
-  private URL rootFolderUrl;
-
-  @PostConstruct
-  public void init() throws MalformedURLException {
-    rootUrl = new URL("https://" + properties.getTenantName() + ".benchling.com");
-    rootFolderUrl = new URL(rootUrl, "/" + properties.getTenantName() + "/f_");
-  }
-
-  /**
-   * Generates an Authorization header to be used in REST API requests. The header will acquired
-   * based on the provided configuration. If an application client is provided, a Bearer token will
-   * be generated. Otherwise, a HTTP Basic auth header will be used.
-   *
-   * @return token
-   */
-  protected String generateAuthorizationHeader() {
-    String token = properties.getApi().getToken();
-    String username = properties.getApi().getUsername();
-    String password = properties.getApi().getPassword();
-    String clientId = properties.getApi().getClientId();
-    String clientSecret = properties.getApi().getClientSecret();
-    if (StringUtils.hasText(token)) {
-      return "Basic " + token;
-    } else if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-      String auth = username + ":" + password;
-      byte[] bytes = Base64.encodeBase64(auth.getBytes(StandardCharsets.US_ASCII));
-      return "Basic " + new String(bytes);
-    } else {
-      BenchlingAuthenticationToken benchlingAuthenticationToken =
-          client.acquireApplicationAuthenticationToken(clientId, clientSecret);
-      return "Bearer " + benchlingAuthenticationToken.getAccessToken();
-    }
-  }
+  private BenchlingIntegrationRepository integrationRepository;
 
   /**
    * Converts a {@link BenchlingEntry} object into a {@link NotebookEntry} object.
@@ -86,16 +46,27 @@ public abstract class AbstractBenchlingApiService {
     notebookEntry.getAttributes().put("folderId", benchlingEntry.getFolderId());
     return notebookEntry;
   }
-
+  
+  /**
+   * Converts a {@link BenchlingFolder} object into a {@link NotebookFolder} object.
+   *
+   * @param benchlingFolder
+   * @return
+   */
+  protected NotebookFolder convertBenchlingFolder(BenchlingFolder benchlingFolder) {
+    NotebookFolder notebookFolder = new NotebookFolder();
+    notebookFolder.setName(benchlingFolder.getName());
+    notebookFolder.setUrl(benchlingFolder.getUrl());
+    notebookFolder.setReferenceId(benchlingFolder.getId());
+    notebookFolder.getAttributes().put("projectId", benchlingFolder.getProjectId());
+    return notebookFolder;
+  }
+  
   public BenchlingElnRestClient getClient() {
-    return client;
+    BenchlingIntegration integration = integrationRepository.findAll().stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No Benchling integration found"));
+    return clientFactory.createBenchlingClient(integration);
   }
-
-  public URL getRootUrl() {
-    return rootUrl;
-  }
-
-  public URL getRootFolderUrl() {
-    return rootFolderUrl;
-  }
+  
 }
