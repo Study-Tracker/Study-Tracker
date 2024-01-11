@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect} from "react";
+import React, {useContext} from "react";
 import {Button, Col, Form, Modal, Row} from 'react-bootstrap'
 import PropTypes from "prop-types";
 import {Form as FormikForm, Formik} from "formik";
@@ -23,33 +23,68 @@ import Select from "react-select";
 import {FormGroup} from "../../../common/forms/common";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
-import FormikFormErrorNotification from "../../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification
+  from "../../../common/forms/FormikFormErrorNotification";
+import {useMutation, useQuery, useQueryClient} from "react-query";
 
 const StorageFolderFormModal = ({
   isOpen,
   setIsOpen,
   selectedFolder,
-  handleFormSubmit,
   formikRef
 }) => {
 
   const [selectedDrive, setSelectedDrive] = React.useState(null);
-  const [drives, setDrives] = React.useState([]);
   const notyf = useContext(NotyfContext);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    axios.get("/api/internal/storage-drives")
-    .then(response => {
-      console.debug("Storage drives", response.data);
-      setDrives(response.data);
-    })
+  const {data: drives, isLoading, error} = useQuery("storageDrives", () => {
+    return axios.get("/api/internal/storage-drives")
+    .then(response => response.data)
     .catch(e => {
       console.error(e);
       notyf.open({message: 'Failed to load available storage drives.', type: 'error'});
     });
-  }, [notyf]);
+  })
+
+  const submitMutation = useMutation((values) => {
+    const url = selectedFolder
+        ? "/api/internal/storage-drive-folders/" + selectedFolder.id
+        : "/api/internal/storage-drive-folders";
+    return axios({
+      url: url,
+      method: values.id ? "PUT" : "POST",
+      data: values,
+      headers: {
+        "Content-Type": "application/json"
+      },
+    })
+  });
+
+  const handleSubmitForm = (values, {setSubmitting, resetForm}) => {
+    submitMutation.mutate(values, {
+      onSuccess: (data) => {
+        notyf.success('Storage folder saved.');
+        resetForm();
+        setIsOpen(false);
+        queryClient.invalidateQueries("rootStorageFolders");
+      },
+      onError: (e) => {
+        console.error(e);
+        if (e.response.status === 404) {
+          notyf.error('The requested folder does not exist: ' + values.rootFolderPath);
+        } else {
+          notyf.error('Failed to save storage location.');
+        }
+      },
+      onSettled: () => {
+        setSubmitting(false);
+      }
+    })
+  }
 
   const folderSchema = yup.object().shape({
+    id: yup.number(),
     storageDriveId: yup.number()
       .required("Storage drive is required"),
     path: yup.string()
@@ -64,6 +99,7 @@ const StorageFolderFormModal = ({
   });
 
   const folderDefault = {
+    id: null,
     storageDriveId: null,
     path: null,
     name: null,
@@ -73,14 +109,14 @@ const StorageFolderFormModal = ({
     deleteEnabled: false,
   }
 
-  const driveOptions = drives
+  const driveOptions = drives ? drives
   .filter(drive => drive.active)
   .map(drive => {
     return {
       value: drive.id,
       label: drive.displayName + " (" + drive.driveType + ")"
     }
-  });
+  }) : [];
 
   return (
       <Formik
@@ -89,7 +125,7 @@ const StorageFolderFormModal = ({
               ? {...selectedFolder, storageDriveId: selectedFolder.storageDrive.id }
               : folderDefault
           }
-          onSubmit={handleFormSubmit}
+          onSubmit={handleSubmitForm}
           validationSchema={folderSchema}
           innerRef={formikRef}
           enableReinitialize={true}
@@ -121,7 +157,7 @@ const StorageFolderFormModal = ({
                             className={"react-select-container " + (errors.storageDriveId && touched.storageDriveId ? "is-invalid" : "")}
                             classNamePrefix="react-select"
                             invalid={errors.storageDriveId && touched.storageDriveId}
-                            defaultValue={values.id ? driveOptions.find(option => option.value === values.storageDrive.id) : null}
+                            defaultValue={driveOptions.find(o => o.value === values.storageDriveId)}
                             isDisabled={!!values.id}
                             options={driveOptions}
                             onChange={selected => {
@@ -273,7 +309,6 @@ StorageFolderFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object,
-  handleFormSubmit: PropTypes.func.isRequired,
   formikRef: PropTypes.object.isRequired
 }
 

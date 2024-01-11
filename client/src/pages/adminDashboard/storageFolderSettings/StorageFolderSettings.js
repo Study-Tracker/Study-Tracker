@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 import axios from "axios";
 import {Button, Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FolderPlus} from "react-feather";
@@ -27,16 +27,13 @@ import StorageFolderCard from "../../../common/fileManager/StorageFolderCard";
 import StorageFoldersPlaceholder from "./StorageFoldersPlaceholder";
 import {faFilter} from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
+import {useMutation, useQuery, useQueryClient} from "react-query";
 
 const StorageFolderSettings = () => {
 
   const notyf = useContext(NotyfContext);
-
-  const [folders, setFolders] = useState(null);
-  const [loadCounter, setLoadCounter] = useState(0);
+  const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [filter, setFilter] = useState("SHOW_ALL");
   const formikRef = useRef();
@@ -47,54 +44,15 @@ const StorageFolderSettings = () => {
     BROWSER_ROOT: "Browser Root Only"
   }
 
-  useEffect(() => {
-    setIsLoading(true);
-    axios.get("/api/internal/storage-drive-folders?root=true")
-    .then(async response => {
-      console.debug("Storage folders", response.data);
-      setFolders(response.data);
-    })
+  const {data: folders, isLoading, error} = useQuery("rootStorageFolders", () => {
+    return axios.get("/api/internal/storage-drive-folders?root=true")
+    .then(response => response.data)
     .catch(e => {
       console.error(e);
-      setError(e)
-      notyf.open({message: 'Failed to load available storage folders.', type: 'error'});
+      notyf.error('Failed to load available storage folders.');
+      return e;
     })
-    .finally(() => {
-      setIsLoading(false);
-    });
-  }, [loadCounter, notyf]);
-
-  const handleSubmitForm = (values, {setSubmitting, resetForm}) => {
-    const url = selectedFolder
-        ? "/api/internal/storage-drive-folders/" + selectedFolder.id
-        : "/api/internal/storage-drive-folders/";
-    const method = selectedFolder ? "PUT" : "POST";
-    axios({
-      method: method,
-      url: url,
-      data: values,
-      headers: {
-        "Content-Type": "application/json"
-      },
-    })
-    .then(response => {
-      notyf.open({message: 'Storage folder saved.', type: 'success'});
-      resetForm();
-      setShowModal(false);
-    })
-    .catch(e => {
-      console.error(e);
-      if (e.response.status === 404) {
-        notyf.open({message: 'The requested folder does not exist: ' + values.rootFolderPath, type: 'error'});
-      } else {
-        notyf.open({message: 'Failed to save storage location.', type: 'error'});
-      }
-    })
-    .finally(() => {
-      setSubmitting(false);
-      setLoadCounter(loadCounter + 1);
-    })
-  }
+  });
 
   const handleFolderEdit = (folder) => {
     console.debug("Edit folder: ", folder);
@@ -102,6 +60,10 @@ const StorageFolderSettings = () => {
     setSelectedFolder(folder);
     setShowModal(true);
   }
+
+  const deleteMutation = useMutation((folder) => {
+    return axios.delete("/api/internal/storage-drive-folders/" + folder.id)
+  });
 
   const handleFolderDelete = (folder) => {
     swal({
@@ -114,15 +76,16 @@ const StorageFolderSettings = () => {
     })
     .then(val => {
       if (val) {
-        axios.delete("/api/internal/storage-drive-folders/" + folder.id)
-        .then(response => {
-          setLoadCounter(loadCounter + 1);
-          notyf.open({message: 'Storage folder deleted.', type: 'success'})
-        })
-        .catch(error => {
-          console.error(error);
-          notyf.open({message: 'Failed to delete storage folder.', type: 'error'});
-        })
+        deleteMutation.mutate(folder, {
+          onSuccess: (data) => {
+            notyf.success('Storage folder deleted.');
+            queryClient.invalidateQueries("rootStorageFolders");
+          },
+          onError: (e) => {
+            console.error(e);
+            notyf.error('Failed to delete storage folder.');
+          }
+        });
       }
     });
   }
@@ -256,7 +219,6 @@ const StorageFolderSettings = () => {
             isOpen={showModal}
             setIsOpen={setShowModal}
             selectedFolder={selectedFolder}
-            handleFormSubmit={handleSubmitForm}
             formikRef={formikRef}
         />
 
