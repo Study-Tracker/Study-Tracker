@@ -54,6 +54,12 @@ const StorageFolderSettings = () => {
     })
   });
 
+  const handleNewFolder = () => {
+    formikRef.current?.resetForm();
+    setSelectedFolder(null);
+    setShowModal(true);
+  }
+
   const handleFolderEdit = (folder) => {
     console.debug("Edit folder: ", folder);
     formikRef.current?.resetForm();
@@ -132,14 +138,7 @@ const StorageFolderSettings = () => {
               </span>
 
               <span>
-                <Button
-                    variant={"primary"}
-                    onClick={() => {
-                      formikRef.current?.resetForm();
-                      setSelectedFolder(null);
-                      setShowModal(true);
-                    }}
-                >
+                <Button variant={"primary"} onClick={handleNewFolder}>
                   <FolderPlus className="feather align-middle me-2 mb-1"/>
                   Add Folder
                 </Button>
@@ -205,11 +204,7 @@ const StorageFolderSettings = () => {
           (!folders || folders.length === 0) && (
               <Row>
                 <Col>
-                  <StorageFoldersPlaceholder handleClick={() => {
-                    formikRef.current?.resetForm();
-                    setSelectedFolder(null);
-                    setShowModal(true);
-                  }} />
+                  <StorageFoldersPlaceholder handleClick={handleNewFolder} />
                 </Col>
               </Row>
           )

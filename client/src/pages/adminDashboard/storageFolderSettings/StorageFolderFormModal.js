@@ -34,7 +34,7 @@ const StorageFolderFormModal = ({
   formikRef
 }) => {
 
-  const [selectedDrive, setSelectedDrive] = React.useState(null);
+  // const [selectedDrive, setSelectedDrive] = React.useState(selectedFolder?.storageDrive);
   const notyf = useContext(NotyfContext);
   const queryClient = useQueryClient();
 
@@ -54,7 +54,7 @@ const StorageFolderFormModal = ({
     return axios({
       url: url,
       method: values.id ? "PUT" : "POST",
-      data: values,
+      data: { storageDriveId: values.storageDrive.id, ...values },
       headers: {
         "Content-Type": "application/json"
       },
@@ -85,7 +85,7 @@ const StorageFolderFormModal = ({
 
   const folderSchema = yup.object().shape({
     id: yup.number(),
-    storageDriveId: yup.number()
+    storageDrive: yup.object()
       .required("Storage drive is required"),
     path: yup.string()
       .max(1024, "Folder path must be less than 1024 characters"),
@@ -100,9 +100,9 @@ const StorageFolderFormModal = ({
 
   const folderDefault = {
     id: null,
-    storageDriveId: null,
-    path: null,
-    name: null,
+    storageDrive: null,
+    path: '',
+    name: '',
     browserRoot: true,
     studyRoot: false,
     writeEnabled: true,
@@ -114,21 +114,20 @@ const StorageFolderFormModal = ({
   .map(drive => {
     return {
       value: drive.id,
-      label: drive.displayName + " (" + drive.driveType + ")"
+      label: drive.displayName + " (" + drive.driveType + ")",
+      obj: drive
     }
   }) : [];
 
+  if (isLoading) return null;
+
   return (
       <Formik
-          initialValues={
-            selectedFolder
-              ? {...selectedFolder, storageDriveId: selectedFolder.storageDrive.id }
-              : folderDefault
-          }
+          initialValues={selectedFolder || folderDefault}
           onSubmit={handleSubmitForm}
           validationSchema={folderSchema}
           innerRef={formikRef}
-          enableReinitialize={true}
+          enableReinitialize
       >
         {({
           values,
@@ -153,17 +152,17 @@ const StorageFolderFormModal = ({
                       <FormGroup>
                         <Form.Label>Storage Drive *</Form.Label>
                         <Select
-                            name={"storageDriveId"}
-                            className={"react-select-container " + (errors.storageDriveId && touched.storageDriveId ? "is-invalid" : "")}
+                            name={"storageDrive"}
+                            className={"react-select-container " + (errors.storageDrive && touched.storageDrive ? "is-invalid" : "")}
                             classNamePrefix="react-select"
-                            invalid={errors.storageDriveId && touched.storageDriveId}
-                            defaultValue={driveOptions.find(o => o.value === values.storageDriveId)}
+                            invalid={errors.storageDrive && touched.storageDrive}
+                            value={values.storageDrive ? driveOptions.find(o => o.value === values.storageDrive.id) : null}
                             isDisabled={!!values.id}
                             options={driveOptions}
                             onChange={selected => {
-                              const drive = drives.find(d => d.id === selected.value);
-                              setSelectedDrive(drive);
-                              setFieldValue("storageDriveId", drive.id);
+                              const drive = selected.obj;
+                              // setSelectedDrive(drive);
+                              setFieldValue("storageDrive", drive);
                               setFieldValue("path", drive.rootPath);
                             }}
                         />
@@ -189,8 +188,8 @@ const StorageFolderFormModal = ({
                           value={values.path}
                           onChange={e => {
                             let path = e.target.value;
-                            if (selectedDrive && !path.startsWith(selectedDrive.rootPath)) {
-                              path = selectedDrive.rootPath;
+                            if (values.storageDrive && !path.startsWith(values.storageDrive.rootPath)) {
+                              path = values.storageDrive.rootPath;
                             }
                             setFieldValue("path", path);
                           }}
@@ -234,7 +233,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Browser root"}
                             onChange={(e) => setFieldValue("browserRoot", e.target.checked)}
-                            defaultChecked={values.browserRoot}
+                            checked={values.browserRoot}
                         />
                       </FormGroup>
                     </Col>
@@ -247,7 +246,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Study root"}
                             onChange={(e) => setFieldValue("studyRoot", e.target.checked)}
-                            defaultChecked={values.studyRoot}
+                            checked={values.studyRoot}
                         />
                       </FormGroup>
                     </Col>
@@ -260,7 +259,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Write enabled"}
                             onChange={(e) => setFieldValue("writeEnabled", e.target.checked)}
-                            defaultChecked={values.writeEnabled}
+                            checked={values.writeEnabled}
                         />
                       </FormGroup>
                     </Col>
@@ -273,7 +272,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Delete enabled"}
                             onChange={(e) => setFieldValue("deleteEnabled", e.target.checked)}
-                            defaultChecked={values.deleteEnabled}
+                            checked={values.deleteEnabled}
                         />
                       </FormGroup>
                     </Col>
