@@ -17,10 +17,7 @@
 package io.studytracker.service;
 
 import io.studytracker.exception.DuplicateRecordException;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Keyword;
-import io.studytracker.model.KeywordCategory;
-import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.KeywordRepository;
 import java.util.List;
 import java.util.Optional;
@@ -38,8 +35,6 @@ public class KeywordService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeywordService.class);
 
   @Autowired private KeywordRepository keywordRepository;
-
-  @Autowired private KeywordCategoryRepository keywordCategoryRepository;
 
   public Optional<Keyword> findById(Long id) {
     return keywordRepository.findById(id);
@@ -61,16 +56,8 @@ public class KeywordService {
     return keywordRepository.findByCategory(category);
   }
 
-  public List<Keyword> findByCategoryId(Long categoryId) {
-    return keywordRepository.findByCategoryId(categoryId);
-  }
-
   public Optional<Keyword> findByKeywordAndCategory(String keyword, String category) {
     return keywordRepository.findByKeywordAndCategory(keyword, category);
-  }
-
-  public Optional<Keyword> findByKeywordAndCategoryId(String keyword, Long categoryId) {
-    return keywordRepository.findByKeywordAndCategoryId(keyword, categoryId);
   }
 
   public List<Keyword> search(String fragment) {
@@ -81,29 +68,20 @@ public class KeywordService {
     return keywordRepository.search(fragment, pageable);
   }
 
-  public List<Keyword> search(String fragment, Long categoryId) {
-    return keywordRepository.search(fragment, categoryId);
-  }
-
   public List<Keyword> search(String fragment, String category) {
-    KeywordCategory keywordCategory = keywordCategoryRepository.findByName(category)
-        .orElseThrow(() -> new RecordNotFoundException("Keyword category not found: " + category));
-    return keywordRepository.search(fragment, keywordCategory.getId());
+    return keywordRepository.search(fragment, category);
   }
 
   public List<Keyword> search(String fragment, String category, Pageable pageable) {
     return keywordRepository.search(fragment, category, pageable);
   }
 
-//  public Set<String> findAllCategories() {
-//    return keywordRepository.findAllCategories();
-//  }
 
   @Transactional
   public Keyword create(Keyword keyword) {
     LOGGER.info("Registering new keyword: " + keyword.toString());
     Optional<Keyword> optional =
-        this.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory().getName());
+        this.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
     if (optional.isPresent()) {
       throw new DuplicateRecordException(
           String.format(

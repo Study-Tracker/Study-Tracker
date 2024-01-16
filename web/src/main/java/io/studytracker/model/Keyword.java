@@ -18,74 +18,39 @@ package io.studytracker.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(
-    name = "keywords",
-    indexes = {@Index(name = "idx_keyword", columnList = "category_id, keyword")})
-@NamedEntityGraphs({
-  @NamedEntityGraph(
-      name = "keyword-details",
-      attributeNodes = {@NamedAttributeNode("category")})
-})
+@Table(name = "keywords")
+@Getter
+@Setter
 public class Keyword implements Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "category_id", nullable = false)
-  private KeywordCategory category;
+  @Column(name = "category", length = 64)
+  private String category;
 
   @Column(name = "keyword", nullable = false)
   private String keyword;
 
-  public Keyword() {}
+  public Keyword() {
+  }
 
-  public Keyword(KeywordCategory category, String keyword) {
-    this.category = category;
+  public Keyword(String keyword) {
     this.keyword = keyword;
   }
 
-  public Keyword(Long id, KeywordCategory category, String keyword) {
-    this.id = id;
-    this.category = category;
+  public Keyword(String keyword, String category) {
     this.keyword = keyword;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getKeyword() {
-    return keyword;
-  }
-
-  public void setKeyword(String keyword) {
-    this.keyword = keyword;
-  }
-
-  public KeywordCategory getCategory() {
-    return category;
-  }
-
-  public void setCategory(KeywordCategory category) {
     this.category = category;
   }
+
 }

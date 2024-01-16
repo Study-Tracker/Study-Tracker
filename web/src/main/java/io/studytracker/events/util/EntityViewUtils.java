@@ -100,7 +100,7 @@ public class EntityViewUtils {
   public static Map<String, Object> createKeywordView(Keyword keyword) {
     Map<String, Object> view = new HashMap<>();
     view.put("id", keyword.getId());
-    view.put("category", keyword.getCategory().getName());
+    view.put("category", keyword.getCategory());
     view.put("keyword", keyword.getKeyword());
     return view;
   }

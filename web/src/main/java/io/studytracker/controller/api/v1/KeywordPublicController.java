@@ -21,7 +21,6 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.KeywordDto;
 import io.studytracker.mapstruct.dto.api.KeywordPayloadDto;
 import io.studytracker.model.Keyword;
-import io.studytracker.model.KeywordCategory;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,26 +59,16 @@ public class KeywordPublicController extends AbstractKeywordController {
 
   @PostMapping("")
   public HttpEntity<KeywordDto> create(@RequestBody @Valid KeywordPayloadDto dto) {
-
-    LOGGER.info("Creating keyword");
-    LOGGER.info(dto.toString());
-    Keyword keyword = this.getKeywordMapper().fromPayloadDto(dto);
-    KeywordCategory category = this.getKeywordCategoryService().findById(dto.getCategoryId())
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find keyword category with ID: " + dto.getCategoryId()));
-    keyword.setCategory(category);
-    keyword = this.createNewKeyword(keyword);
+    LOGGER.info("Creating keyword: {}", dto.toString());
+    Keyword keyword = this.createNewKeyword(this.getKeywordMapper().fromPayloadDto(dto));
     return new ResponseEntity<>(this.getKeywordMapper().toDto(keyword), HttpStatus.CREATED);
   }
 
   @PutMapping("/{id}")
   public HttpEntity<KeywordDto> update(
       @PathVariable("id") Long id, @RequestBody @Valid KeywordPayloadDto dto) {
-    LOGGER.info("Updating keyword");
-    LOGGER.info(dto.toString());
+    LOGGER.info("Updating keyword: {}", dto.toString());
     Keyword keyword = this.getKeywordMapper().fromPayloadDto(dto);
-    KeywordCategory category = this.getKeywordCategoryService().findById(dto.getCategoryId())
-        .orElseThrow(() -> new RecordNotFoundException("Cannot find keyword category with ID: " + dto.getCategoryId()));
-    keyword.setCategory(category);
     keyword.setId(id);
     Keyword updated = this.updateExistingKeyword(keyword, id);
     return new ResponseEntity<>(this.getKeywordMapper().toDto(updated), HttpStatus.OK);

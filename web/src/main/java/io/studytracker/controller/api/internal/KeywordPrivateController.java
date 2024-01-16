@@ -47,15 +47,15 @@ public class KeywordPrivateController extends AbstractKeywordController {
 
   @GetMapping("")
   public List<KeywordDetailsDto> findAll(
-      @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) String category,
       @RequestParam(required = false, value = "q") String query) {
     List<Keyword> keywords;
-    if (query != null && categoryId != null) {
-      keywords = this.getKeywordService().search(query, categoryId);
+    if (query != null && category != null) {
+      keywords = this.getKeywordService().search(query, category);
     } else if (query != null) {
       keywords = this.getKeywordService().search(query);
-    } else if (categoryId != null) {
-      keywords = this.getKeywordService().findByCategoryId(categoryId);
+    } else if (category != null) {
+      keywords = this.getKeywordService().findByCategory(category);
     } else {
       keywords = this.getKeywordService().findAll();
     }

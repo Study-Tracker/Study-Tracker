@@ -31,9 +31,7 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Keyword;
-import io.studytracker.model.KeywordCategory;
 import io.studytracker.model.User;
-import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,8 +64,6 @@ public class KeywordPrivateControllerTests {
 
   @Autowired private UserRepository userRepository;
 
-  @Autowired private KeywordCategoryRepository keywordCategoryRepository;
-
   private String username;
 
   @Before
@@ -86,15 +82,6 @@ public class KeywordPrivateControllerTests {
   }
 
   @Test
-  public void getAllKeywordCategoryTest() throws Exception {
-    mockMvc
-        .perform(get("/api/internal/keyword-category").with(user(username)).with(csrf()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", not(empty())))
-        .andExpect(jsonPath("$", hasSize(CATEGORY_COUNT)));
-  }
-
-  @Test
   public void keywordSearchTest() throws Exception {
     mockMvc
         .perform(get("/api/internal/keyword?q=akt").with(user(username)).with(csrf()))
@@ -102,18 +89,14 @@ public class KeywordPrivateControllerTests {
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
-    KeywordCategory category = keywordCategoryRepository.findByName("Gene")
-        .orElseThrow(RecordNotFoundException::new);
     mockMvc
-        .perform(get("/api/internal/keyword?q=akt&categoryId=" + category.getId()).with(user(username)).with(csrf()))
+        .perform(get("/api/internal/keyword?q=akt&category=Gene").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", not(empty())))
         .andExpect(jsonPath("$", hasSize(3)));
 
-    category = keywordCategoryRepository.findByName("Cell Line")
-        .orElseThrow(RecordNotFoundException::new);
     mockMvc
-        .perform(get("/api/internal/keyword?q=akt&categoryId=" + category.getId()).with(user(username)).with(csrf()))
+        .perform(get("/api/internal/keyword?q=akt&category=Cell%20Line").with(user(username)).with(csrf()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", empty()));
   }
@@ -121,10 +104,7 @@ public class KeywordPrivateControllerTests {
   @Test
   public void createKeywordTest() throws Exception {
     User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
-    KeywordCategory category = keywordCategoryRepository.findByName("Gene")
-        .orElseThrow(RecordNotFoundException::new);
-
-    Keyword keyword = new Keyword(category, "TTN");
+    Keyword keyword = new Keyword("TTN", "Gene");
     mockMvc
         .perform(
             post("/api/internal/keyword")
@@ -137,9 +117,7 @@ public class KeywordPrivateControllerTests {
   @Test
   public void duplicateKeywordTest() throws Exception {
     User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
-    KeywordCategory category = keywordCategoryRepository.findByName("Gene")
-        .orElseThrow(RecordNotFoundException::new);
-    Keyword keyword = new Keyword(category, "AKT1");
+    Keyword keyword = new Keyword("AKT1", "Gene");
     mockMvc
         .perform(
             post("/api/internal/keyword")

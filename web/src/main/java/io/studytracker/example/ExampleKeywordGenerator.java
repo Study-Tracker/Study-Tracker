@@ -17,8 +17,6 @@
 package io.studytracker.example;
 
 import io.studytracker.model.Keyword;
-import io.studytracker.model.KeywordCategory;
-import io.studytracker.repository.KeywordCategoryRepository;
 import io.studytracker.repository.KeywordRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,28 +28,19 @@ public class ExampleKeywordGenerator implements ExampleDataGenerator<Keyword> {
   public static final int KEYWORD_CATEGORY_COUNT = 2;
   public static final int KEYWORD_COUNT = 7;
 
-  @Autowired private KeywordCategoryRepository keywordCategoryRepository;
   @Autowired private KeywordRepository keywordRepository;
 
   @Override
   public List<Keyword> generateData(Object... args) {
 
-    List<KeywordCategory> categories = new ArrayList<>();
-    categories.add(new KeywordCategory("Cell Line"));
-    categories.add(new KeywordCategory("Gene"));
-    keywordCategoryRepository.saveAll(categories);
-
-    KeywordCategory category = categories.get(0);
-    KeywordCategory category2 = categories.get(1);
-
     List<Keyword> keywords = new ArrayList<>();
-    keywords.add(new Keyword(category, "MCF7"));
-    keywords.add(new Keyword(category, "HELA"));
-    keywords.add(new Keyword(category, "A375"));
-    keywords.add(new Keyword(category2, "AKT1"));
-    keywords.add(new Keyword(category2, "AKT2"));
-    keywords.add(new Keyword(category2, "AKT3"));
-    keywords.add(new Keyword(category2, "PTEN"));
+    keywords.add(new Keyword("MCF7", "Cell Line"));
+    keywords.add(new Keyword("HELA", "Cell Line"));
+    keywords.add(new Keyword("A375", "Cell Line"));
+    keywords.add(new Keyword("AKT1", "Gene"));
+    keywords.add(new Keyword("AKT2", "Gene"));
+    keywords.add(new Keyword("AKT3", "Gene"));
+    keywords.add(new Keyword("PTEN", "Gene"));
     return keywordRepository.saveAll(keywords);
 
   }
@@ -59,6 +48,5 @@ public class ExampleKeywordGenerator implements ExampleDataGenerator<Keyword> {
   @Override
   public void deleteData() {
     keywordRepository.deleteAll();
-    keywordCategoryRepository.deleteAll();
   }
 }
