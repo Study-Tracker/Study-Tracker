@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect} from "react";
+import React, {useContext} from "react";
 import {Button, Col, Form, Modal, Row} from 'react-bootstrap'
 import PropTypes from "prop-types";
 import {Form as FormikForm, Formik} from "formik";
@@ -23,34 +23,69 @@ import Select from "react-select";
 import {FormGroup} from "../../../common/forms/common";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
-import FormikFormErrorNotification from "../../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification
+  from "../../../common/forms/FormikFormErrorNotification";
+import {useMutation, useQuery, useQueryClient} from "react-query";
 
 const StorageFolderFormModal = ({
   isOpen,
   setIsOpen,
   selectedFolder,
-  handleFormSubmit,
   formikRef
 }) => {
 
-  const [selectedDrive, setSelectedDrive] = React.useState(null);
-  const [drives, setDrives] = React.useState([]);
+  // const [selectedDrive, setSelectedDrive] = React.useState(selectedFolder?.storageDrive);
   const notyf = useContext(NotyfContext);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    axios.get("/api/internal/storage-drives")
-    .then(response => {
-      console.debug("Storage drives", response.data);
-      setDrives(response.data);
-    })
+  const {data: drives, isLoading, error} = useQuery("storageDrives", () => {
+    return axios.get("/api/internal/storage-drives")
+    .then(response => response.data)
     .catch(e => {
       console.error(e);
       notyf.open({message: 'Failed to load available storage drives.', type: 'error'});
     });
-  }, [notyf]);
+  })
+
+  const submitMutation = useMutation((values) => {
+    const url = selectedFolder
+        ? "/api/internal/storage-drive-folders/" + selectedFolder.id
+        : "/api/internal/storage-drive-folders";
+    return axios({
+      url: url,
+      method: values.id ? "PUT" : "POST",
+      data: { storageDriveId: values.storageDrive.id, ...values },
+      headers: {
+        "Content-Type": "application/json"
+      },
+    })
+  });
+
+  const handleSubmitForm = (values, {setSubmitting, resetForm}) => {
+    submitMutation.mutate(values, {
+      onSuccess: (data) => {
+        notyf.success('Storage folder saved.');
+        resetForm();
+        setIsOpen(false);
+        queryClient.invalidateQueries("rootStorageFolders");
+      },
+      onError: (e) => {
+        console.error(e);
+        if (e.response.status === 404) {
+          notyf.error('The requested folder does not exist: ' + values.rootFolderPath);
+        } else {
+          notyf.error('Failed to save storage location.');
+        }
+      },
+      onSettled: () => {
+        setSubmitting(false);
+      }
+    })
+  }
 
   const folderSchema = yup.object().shape({
-    storageDriveId: yup.number()
+    id: yup.number(),
+    storageDrive: yup.object()
       .required("Storage drive is required"),
     path: yup.string()
       .max(1024, "Folder path must be less than 1024 characters"),
@@ -64,35 +99,35 @@ const StorageFolderFormModal = ({
   });
 
   const folderDefault = {
-    storageDriveId: null,
-    path: null,
-    name: null,
+    id: null,
+    storageDrive: null,
+    path: '',
+    name: '',
     browserRoot: true,
     studyRoot: false,
     writeEnabled: true,
     deleteEnabled: false,
   }
 
-  const driveOptions = drives
+  const driveOptions = drives ? drives
   .filter(drive => drive.active)
   .map(drive => {
     return {
       value: drive.id,
-      label: drive.displayName + " (" + drive.driveType + ")"
+      label: drive.displayName + " (" + drive.driveType + ")",
+      obj: drive
     }
-  });
+  }) : [];
+
+  if (isLoading) return null;
 
   return (
       <Formik
-          initialValues={
-            selectedFolder
-              ? {...selectedFolder, storageDriveId: selectedFolder.storageDrive.id }
-              : folderDefault
-          }
-          onSubmit={handleFormSubmit}
+          initialValues={selectedFolder || folderDefault}
+          onSubmit={handleSubmitForm}
           validationSchema={folderSchema}
           innerRef={formikRef}
-          enableReinitialize={true}
+          enableReinitialize
       >
         {({
           values,
@@ -117,17 +152,17 @@ const StorageFolderFormModal = ({
                       <FormGroup>
                         <Form.Label>Storage Drive *</Form.Label>
                         <Select
-                            name={"storageDriveId"}
-                            className={"react-select-container " + (errors.storageDriveId && touched.storageDriveId ? "is-invalid" : "")}
+                            name={"storageDrive"}
+                            className={"react-select-container " + (errors.storageDrive && touched.storageDrive ? "is-invalid" : "")}
                             classNamePrefix="react-select"
-                            invalid={errors.storageDriveId && touched.storageDriveId}
-                            defaultValue={values.id ? driveOptions.find(option => option.value === values.storageDrive.id) : null}
+                            invalid={errors.storageDrive && touched.storageDrive}
+                            value={values.storageDrive ? driveOptions.find(o => o.value === values.storageDrive.id) : null}
                             isDisabled={!!values.id}
                             options={driveOptions}
                             onChange={selected => {
-                              const drive = drives.find(d => d.id === selected.value);
-                              setSelectedDrive(drive);
-                              setFieldValue("storageDriveId", drive.id);
+                              const drive = selected.obj;
+                              // setSelectedDrive(drive);
+                              setFieldValue("storageDrive", drive);
                               setFieldValue("path", drive.rootPath);
                             }}
                         />
@@ -153,8 +188,8 @@ const StorageFolderFormModal = ({
                           value={values.path}
                           onChange={e => {
                             let path = e.target.value;
-                            if (selectedDrive && !path.startsWith(selectedDrive.rootPath)) {
-                              path = selectedDrive.rootPath;
+                            if (values.storageDrive && !path.startsWith(values.storageDrive.rootPath)) {
+                              path = values.storageDrive.rootPath;
                             }
                             setFieldValue("path", path);
                           }}
@@ -198,7 +233,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Browser root"}
                             onChange={(e) => setFieldValue("browserRoot", e.target.checked)}
-                            defaultChecked={values.browserRoot}
+                            checked={values.browserRoot}
                         />
                       </FormGroup>
                     </Col>
@@ -211,7 +246,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Study root"}
                             onChange={(e) => setFieldValue("studyRoot", e.target.checked)}
-                            defaultChecked={values.studyRoot}
+                            checked={values.studyRoot}
                         />
                       </FormGroup>
                     </Col>
@@ -224,7 +259,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Write enabled"}
                             onChange={(e) => setFieldValue("writeEnabled", e.target.checked)}
-                            defaultChecked={values.writeEnabled}
+                            checked={values.writeEnabled}
                         />
                       </FormGroup>
                     </Col>
@@ -237,7 +272,7 @@ const StorageFolderFormModal = ({
                             type={"switch"}
                             label={"Delete enabled"}
                             onChange={(e) => setFieldValue("deleteEnabled", e.target.checked)}
-                            defaultChecked={values.deleteEnabled}
+                            checked={values.deleteEnabled}
                         />
                       </FormGroup>
                     </Col>
@@ -273,7 +308,6 @@ StorageFolderFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object,
-  handleFormSubmit: PropTypes.func.isRequired,
   formikRef: PropTypes.object.isRequired
 }
 
