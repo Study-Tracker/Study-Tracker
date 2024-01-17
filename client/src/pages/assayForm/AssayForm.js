@@ -74,6 +74,8 @@ const AssayForm = props => {
   const assaySchema = yup.object().shape({
     name: yup.string()
       .required("Name is required")
+      .trim("Name must not have leading or trailing whitespace")
+      .strict()
       .max(255, "Name cannot be larger than 255 characters"),
     status: yup.string().required("Status is required"),
     description: yup.string()

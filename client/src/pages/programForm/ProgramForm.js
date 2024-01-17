@@ -68,10 +68,17 @@ const ProgramForm = ({
     id: yup.number(),
     name: yup.string()
       .required("Name is required.")
+      .trim("Name must not have leading or trailing whitespace")
+      .strict()
       .max(255, "Name cannot be larger than 255 characters")
       .when("id", {
         is: (id) => id === undefined || id === null,
-        then: yup.string().test(
+        then: yup.string()
+        .required("Name is required.")
+        .trim("Name must not have leading or trailing whitespace")
+        .strict()
+        .max(255, "Name cannot be larger than 255 characters")
+        .test(
             "unique",
             "Name must be unique",
             value => !programs.find(p => !!value && p.name.toLowerCase() === value.toLowerCase())
