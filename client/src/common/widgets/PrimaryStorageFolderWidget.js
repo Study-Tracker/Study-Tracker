@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import PropTypes from "prop-types";
 import IllustrationWidget from "./IllustrationWidget";
 import {Button} from "react-bootstrap";
@@ -27,89 +27,65 @@ import NotyfContext from "../../context/NotyfContext";
 import IconWidget from "./IconWidget";
 import {useDispatch} from "react-redux";
 import {setTab} from "../../redux/tabSlice";
+import {useMutation, useQuery} from "react-query";
 
 const PrimaryStorageFolderWidget = ({record}) => {
 
-  const [folder, setFolder] = useState(null);
+  const primaryFolderRef = record.storageFolders.find(f => f.primary);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRepaird, setIsRepaird] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const notyf = useContext(NotyfContext);
   const dispatch = useDispatch();
 
-  const handleRepairFolder = () => {
-    let url = null;
-    if (record.assayType) {
-      url = "/api/internal/assay/" + record.id + "/storage/repair";
-    } else if (record.program) {
-      url = "/api/internal/study/" + record.id + "/storage/repair";
-    } else {
-      url = "/api/internal/program/" + record.id + "/storage/repair";
-    }
-    if (!url) {
-      notyf.open({
-        type: "error",
-        message: "Unable to repair folder. Unknown record type."
-      });
-      return;
-    }
-    setIsSubmitting(true);
-    axios.post(url)
-    .then(response => {
-      notyf.open({
-        type: "success",
-        message: "Folder repaired successfully."
-      })
-      setIsRepaird(true);
-      setIsSubmitting(false);
-      navigate("#files");
-      navigate(0);
-    })
-    .catch(error => {
-      setIsSubmitting(false);
-      console.error(error);
-      notyf.open({
-        type: "error",
-        message: "Failed to repair folder. Please try again."
-      })
-    });
-  }
-
-  useEffect(() => {
-
-    // Check to see if the record has a primary folder
-    const primaryFolderRef = record.storageFolders.find(f => f.primary);
-    if (primaryFolderRef) {
-      axios.get("/api/internal/data-files", {
+  const {data: folder, isLoading, error} = useQuery({
+    queryKey: ["recordStorageFolders", record.id],
+    queryFn: () => {
+      return axios.get("/api/internal/data-files", {
         params: {
           path: primaryFolderRef.storageDriveFolder.path,
           folderId: primaryFolderRef.storageDriveFolder.id
         }
       })
-      .then(response => {
-        if (response.status === 200) {
-          setFolder(response.data);
-        }
-      })
-      .catch(error => {
-        console.error(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .then(response => response.data);
+    },
+    enabled: !!primaryFolderRef
+  });
+
+  const repairMutation = useMutation(() => {
+    let url = null;
+    if (record.assayType) {
+      url = `/api/internal/assay/${record.id}/storage/repair`;
+    } else if (record.program) {
+      url = `/api/internal/study/${record.id}/storage/repair`;
     } else {
-      setIsLoading(false);
+      url = `/api/internal/program/${record.id}/storage/repair`;
     }
-  }, [record]);
+    return axios.post(url)
+  }, {
+    onMutate: () => {
+      setIsSubmitting(true);
+    },
+    onSuccess: () => {
+      notyf.success("Folder repaired successfully.");
+      setIsRepaird(true);
+      navigate("#files");
+      navigate(0);
+    },
+    onError: (e) => {
+      console.error(e);
+      notyf.error("Failed to repair folder: " + e.message);
+    },
+    onSettled: () => {
+      setIsSubmitting(false);
+    }
+  })
 
   console.debug("Primary Storage Folder", folder);
 
-  if (isLoading) {
-    return (
-        <LoadingMessageWidget/>
-    );
-  } else if (!folder) {
+  if (isLoading) return <LoadingMessageWidget/>
+
+  if (!folder) {
     return (
         <IllustrationWidget
             image={"/static/images/clip/information-flow-yellow.png"}
@@ -118,7 +94,7 @@ const PrimaryStorageFolderWidget = ({record}) => {
             body={(
                 <Button
                     variant={"warning"}
-                    onClick={handleRepairFolder}
+                    onClick={() => repairMutation.mutate()}
                     disabled={isSubmitting || isRepaird}
                 >
                   <FontAwesomeIcon icon={faRefresh} className={"me-2"} />

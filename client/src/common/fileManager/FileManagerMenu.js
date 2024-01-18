@@ -16,47 +16,14 @@
 
 import {Card, ListGroup} from "react-bootstrap";
 import React from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFolder, faServer} from "@fortawesome/free-solid-svg-icons";
-import {faAws, faMicrosoft} from "@fortawesome/free-brands-svg-icons";
 import PropTypes from "prop-types";
+import {DataSourceIcon} from "./fileManagerUtils";
 
 const FileManagerMenu = ({
   rootFolders,
   handleFolderSelect,
   selectedRootFolder
 }) => {
-
-  const getDataSourceIcon = (type) => {
-    switch (type) {
-      case "EGNYTE":
-        return <FontAwesomeIcon icon={faServer} className={"me-2"} />
-      case "S3":
-        return <FontAwesomeIcon icon={faAws} className={"me-2"} />
-      case "ONEDRIVE":
-        return <FontAwesomeIcon icon={faMicrosoft} className={"me-2"} />
-      default:
-        return <FontAwesomeIcon icon={faFolder} className={"me-2"} />
-    }
-  }
-
-  const renderDataSourceMenu = () => {
-    return rootFolders
-    .filter(rootFolder => rootFolder.storageDrive.active)
-    .map(f => {
-      return (
-          <ListGroup.Item
-              action
-              key={f.id}
-              active={selectedRootFolder ? selectedRootFolder.id === f.id : false}
-              onClick={() => handleFolderSelect(f)}
-          >
-            {getDataSourceIcon(f.storageDrive.driveType)}
-            {f.name}
-          </ListGroup.Item>
-      )
-    });
-  }
 
   return (
       <Card>
@@ -68,7 +35,27 @@ const FileManagerMenu = ({
         </Card.Header>
 
         <ListGroup variant="flush">
-          { renderDataSourceMenu() }
+          {
+            rootFolders
+            .filter(rootFolder => rootFolder.storageDrive.active)
+            .map(f => {
+              return (
+                <ListGroup.Item
+                  action
+                  key={f.id}
+                  active={selectedRootFolder ? selectedRootFolder.id === f.id : false}
+                  onClick={() => handleFolderSelect(f)}
+                >
+                  <div>
+                    <DataSourceIcon driveType={f.storageDrive.driveType} />
+                    <span>{f.storageDrive.driveType}</span>
+                  </div>
+
+                  <div>{f.name}</div>
+                </ListGroup.Item>
+              )
+            })
+          }
         </ListGroup>
 
       </Card>
