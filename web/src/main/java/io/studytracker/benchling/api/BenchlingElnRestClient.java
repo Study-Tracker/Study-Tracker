@@ -83,7 +83,9 @@ public final class BenchlingElnRestClient {
   /**
    * Generates an authentication token using client application authentication in the Benchling API.
    *
-   * @return
+   * @param clientId the app client ID
+   * @param clientSecret the app client secret
+   * @return {@link BenchlingAuthenticationToken}
    */
   public BenchlingAuthenticationToken acquireApplicationAuthenticationToken(
       @NotNull String clientId, @NotNull String clientSecret) {
@@ -110,7 +112,8 @@ public final class BenchlingElnRestClient {
   /**
    * Returns a list of all projects as {@link BenchlingProject} registered in the tenant.
    *
-   * @return
+   * @param nextToken
+   * @return {@link BenchlingProjectList}
    */
   public BenchlingProjectList findProjects(String nextToken) {
     LOGGER.debug("Finding Benchling projects");
@@ -135,7 +138,7 @@ public final class BenchlingElnRestClient {
    * prefix.
    *
    * @param id Project ID
-   * @return
+   * @return {@link BenchlingProject}
    */
   public Optional<BenchlingProject> findProjectById(@NotNull String id) {
     LOGGER.debug("Finding Benchling project by ID: {}", id);

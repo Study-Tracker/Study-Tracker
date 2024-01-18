@@ -72,8 +72,7 @@ public final class BenchlingNotebookFolderService
    * @param entries
    * @return
    */
-  private NotebookFolder convertFolder(
-      BenchlingFolder benchlingFolder, List<BenchlingEntry> entries) {
+  private NotebookFolder convertFolder(BenchlingFolder benchlingFolder, List<BenchlingEntry> entries) {
     NotebookFolder notebookFolder = this.convertBenchlingFolder(benchlingFolder);
     if (entries != null) {
       loadContents(benchlingFolder, notebookFolder, entries);

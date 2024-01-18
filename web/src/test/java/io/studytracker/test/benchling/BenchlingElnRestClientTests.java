@@ -18,22 +18,11 @@ package io.studytracker.test.benchling;
 
 import io.studytracker.Application;
 import io.studytracker.benchling.api.BenchlingElnRestClient;
-import io.studytracker.benchling.api.entities.BenchlingAuthenticationToken;
-import io.studytracker.benchling.api.entities.BenchlingEntry;
-import io.studytracker.benchling.api.entities.BenchlingEntrySchema;
-import io.studytracker.benchling.api.entities.BenchlingEntrySchemaList;
-import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
-import io.studytracker.benchling.api.entities.BenchlingFolder;
-import io.studytracker.benchling.api.entities.BenchlingProject;
-import io.studytracker.benchling.api.entities.BenchlingProjectList;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.apache.commons.codec.binary.Base64;
+import io.studytracker.benchling.api.entities.*;
+import io.studytracker.model.BenchlingIntegration;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,11 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
@@ -55,6 +40,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"benchling-test", "example"})
@@ -63,11 +53,12 @@ public class BenchlingElnRestClientTests {
   @Autowired
   @Qualifier("benchlingElnRestTemplate")
   private RestTemplate restTemplate;
+  
+  @Value("${benchling.tenant-name}")
+  private String tenantName;
 
   @Value("${benchling.root-url}")
   private URL rootUrl;
-
-  @Autowired private BenchlingElnRestClient client;
 
   @Autowired private Environment env;
 
@@ -83,21 +74,17 @@ public class BenchlingElnRestClientTests {
   @Value("${benchling.api.client-secret:}")
   private String clientSecret;
 
-  @Value("${benchling.api.token:}")
-  private String token;
-
-  private String generateAuthorizationHeader() {
-    if (StringUtils.hasText(token)) {
-      return "Basic " + token;
-    } else if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-      String auth = username + ":" + password;
-      byte[] bytes = Base64.encodeBase64(auth.getBytes(StandardCharsets.US_ASCII));
-      return "Basic " + new String(bytes);
-    } else {
-      String token =
-          client.acquireApplicationAuthenticationToken(clientId, clientSecret).getAccessToken();
-      return "Bearer " + token;
-    }
+  private BenchlingElnRestClient client;
+  
+  @BeforeAll
+  public void init() {
+    BenchlingIntegration integration = new BenchlingIntegration();
+    integration.setClientId(clientId);
+    integration.setClientSecret(clientSecret);
+    integration.setName("Benchling");
+    integration.setTenantName(tenantName);
+    integration.setRootUrl(rootUrl.toString());
+    client = new BenchlingElnRestClient(restTemplate, integration);
   }
 
   @Test
@@ -120,12 +107,11 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findProjectsTest() {
-    String header = generateAuthorizationHeader();
     List<BenchlingProject> projects = new ArrayList<>();
     boolean hasNext = true;
     String nextToken = null;
     while (hasNext) {
-      BenchlingProjectList projectList = client.findProjects(header, nextToken);
+      BenchlingProjectList projectList = client.findProjects(nextToken);
       projects.addAll(projectList.getProjects());
       nextToken = projectList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
@@ -139,10 +125,8 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findProjectByIdTest() throws Exception {
-    String header = generateAuthorizationHeader();
-    BenchlingProject project =
-        client.findProjects(header, null).getProjects().stream().findFirst().get();
-    Optional<BenchlingProject> projectOptional = client.findProjectById(project.getId(), header);
+    BenchlingProject project = client.findProjects(null).getProjects().stream().findFirst().get();
+    Optional<BenchlingProject> projectOptional = client.findProjectById(project.getId());
     Assert.assertTrue(projectOptional.isPresent());
     BenchlingProject project2 = projectOptional.get();
     Assert.assertEquals(project.getName(), project2.getName());
@@ -150,8 +134,7 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findRootFoldersTest() throws Exception {
-    String header = generateAuthorizationHeader();
-    List<BenchlingFolder> folders = client.findRootFolders(header, null).getFolders();
+    List<BenchlingFolder> folders = client.findRootFolders(null).getFolders();
     Assert.assertFalse(folders.isEmpty());
     for (BenchlingFolder folder : folders) {
       System.out.println(folder.toString());
@@ -160,15 +143,12 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findProjectFolderChildrenTest() throws Exception {
-    String header = generateAuthorizationHeader();
-    BenchlingProject project =
-        client.findProjects(header, null).getProjects().stream()
-            .filter(
-                p -> p.getName().equals(env.getRequiredProperty("notebook.test.default-project")))
+    BenchlingProject project = client.findProjects(null).getProjects().stream()
+            .filter(p -> p.getName().equals(env.getRequiredProperty("notebook.test.default-project")))
             .findFirst()
             .get();
     List<BenchlingFolder> folders =
-        client.findProjectFolderChildren(project.getId(), header, null).getFolders();
+        client.findProjectFolderChildren(project.getId(), null).getFolders();
     Assert.assertFalse(folders.isEmpty());
     for (BenchlingFolder folder : folders) {
       System.out.println(folder.toString());
@@ -177,20 +157,16 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findFolderChildrenTest() throws Exception {
-    String header = generateAuthorizationHeader();
-    BenchlingProject project =
-        client.findProjects(header, null).getProjects().stream()
-            .filter(
-                p -> p.getName().equals(env.getRequiredProperty("notebook.test.default-project")))
+    BenchlingProject project = client.findProjects(null).getProjects().stream()
+            .filter(p -> p.getName().equals(env.getRequiredProperty("notebook.test.default-project")))
             .findFirst()
             .get();
     BenchlingFolder parentFolder =
-        client.findRootFolders(header, null).getFolders().stream()
+        client.findRootFolders(null).getFolders().stream()
             .filter(f -> f.getProjectId().equals(project.getId()))
             .findFirst()
             .get();
-    List<BenchlingFolder> folders =
-        client.findFolderChildren(parentFolder.getId(), header, null).getFolders();
+    List<BenchlingFolder> folders = client.findFolderChildren(parentFolder.getId(), null).getFolders();
     Assert.assertFalse(folders.isEmpty());
     for (BenchlingFolder folder : folders) {
       System.out.println(folder.toString());
@@ -199,19 +175,16 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findFolderByIdTest() throws Exception {
-    String header = generateAuthorizationHeader();
-    BenchlingProject project =
-        client.findProjects(header, null).getProjects().stream()
+    BenchlingProject project = client.findProjects(null).getProjects().stream()
             .filter(
                 p -> p.getName().equals(env.getRequiredProperty("notebook.test.default-project")))
             .findFirst()
             .get();
-    BenchlingFolder parentFolder =
-        client.findRootFolders(header, null).getFolders().stream()
+    BenchlingFolder parentFolder = client.findRootFolders(null).getFolders().stream()
             .filter(f -> f.getProjectId().equals(project.getId()))
             .findFirst()
             .get();
-    Optional<BenchlingFolder> folderOptional = client.findFolderById(parentFolder.getId(), header);
+    Optional<BenchlingFolder> folderOptional = client.findFolderById(parentFolder.getId());
     Assert.assertTrue(folderOptional.isPresent());
     BenchlingFolder folder = folderOptional.get();
     Assert.assertEquals(parentFolder.getName(), folder.getName());
@@ -219,8 +192,7 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findAllEntriesTest() throws Exception {
-    String header = generateAuthorizationHeader();
-    List<BenchlingEntry> entries = client.findAllEntries(header, null).getEntries();
+    List<BenchlingEntry> entries = client.findAllEntries(null).getEntries();
     Assert.assertNotNull(entries);
     Assert.assertFalse(entries.isEmpty());
     for (BenchlingEntry entry : entries) {
@@ -230,15 +202,14 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findProjectEntriesTest() throws Exception {
-    String header = generateAuthorizationHeader();
     BenchlingProject project =
-        client.findProjects(header, null).getProjects().stream()
+        client.findProjects(null).getProjects().stream()
             .filter(
                 p -> p.getName().equals(env.getRequiredProperty("notebook.test.default-project")))
             .findFirst()
             .get();
     List<BenchlingEntry> entries =
-        client.findProjectEntries(project.getId(), header, null).getEntries();
+        client.findProjectEntries(project.getId(), null).getEntries();
     Assert.assertNotNull(entries);
     Assert.assertFalse(entries.isEmpty());
     for (BenchlingEntry entry : entries) {
@@ -248,9 +219,8 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findAllEntryTemplatesTest() throws Exception {
-    String header = generateAuthorizationHeader();
     List<BenchlingEntryTemplate> templates =
-        client.findEntryTemplates(header, null).getEntryTemplates();
+        client.findEntryTemplates(null).getEntryTemplates();
     Assert.assertNotNull(templates);
     Assert.assertFalse(templates.isEmpty());
     for (BenchlingEntryTemplate template : templates) {
@@ -260,8 +230,7 @@ public class BenchlingElnRestClientTests {
 
   @Test
   public void findAllEntrySchemasTest() throws Exception {
-    String header = generateAuthorizationHeader();
-    BenchlingEntrySchemaList schemaList = client.findEntrySchemas(header, null);
+    BenchlingEntrySchemaList schemaList = client.findEntrySchemas(null);
     Assert.assertNotNull(schemaList);
     List<BenchlingEntrySchema> schemas = schemaList.getEntrySchemas();
     Assert.assertNotNull(schemas);
