@@ -78,6 +78,8 @@ const StudyForm = ({
   const studySchema = yup.object().shape({
     name: yup.string()
       .required("Name is required")
+      .trim("Name must not have leading or trailing whitespace")
+      .strict()
       .max(255, "Name cannot be larger than 255 characters"),
     code: yup.string()
       .nullable(true)

@@ -63,7 +63,7 @@ const StorageFolderFormModal = ({
 
   const handleSubmitForm = (values, {setSubmitting, resetForm}) => {
     submitMutation.mutate(values, {
-      onSuccess: (data) => {
+      onSuccess: () => {
         notyf.success('Storage folder saved.');
         resetForm();
         setIsOpen(false);
@@ -84,7 +84,8 @@ const StorageFolderFormModal = ({
   }
 
   const folderSchema = yup.object().shape({
-    id: yup.number(),
+    id: yup.number()
+      .nullable(),
     storageDrive: yup.object()
       .required("Storage drive is required"),
     path: yup.string()
