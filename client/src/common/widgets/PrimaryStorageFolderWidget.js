@@ -38,7 +38,7 @@ const PrimaryStorageFolderWidget = ({record}) => {
   const notyf = useContext(NotyfContext);
   const dispatch = useDispatch();
 
-  const {data: folder, isLoading, error} = useQuery({
+  const {data: folder, isLoading} = useQuery({
     queryKey: ["recordStorageFolders", record.id],
     queryFn: () => {
       return axios.get("/api/internal/data-files", {

@@ -136,7 +136,7 @@ const FileManagerAddToStudyModal = ({
                     <Col>
                       <p>
                         Adding a folder to a { useStudies ? "study" : "assay" } will allow users to access
-                        it in the { useStudies ? "Study" : "Assay" } Details page's Files tab. You can
+                        it in the { useStudies ? "Study" : "Assay" } Details page&apos;s Files tab. You can
                         optionally make the folder read-only in this view, as well.
                       </p>
                     </Col>

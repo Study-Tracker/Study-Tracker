@@ -20,8 +20,10 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import FileManagerContent from "../../common/fileManager/FileManagerContent";
-import FileManagerContentPlaceholder from "../../common/fileManager/FileManagerContentPlaceholder";
-import StudyFileManagerMenu from "../../common/fileManager/StudyFileManagerMenu";
+import FileManagerContentPlaceholder
+  from "../../common/fileManager/FileManagerContentPlaceholder";
+import StudyFileManagerMenu
+  from "../../common/fileManager/StudyFileManagerMenu";
 import {useQuery} from "react-query";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 
@@ -35,7 +37,7 @@ const StudyFileManagerTab = ({study}) => {
     console.debug("Selected folder", folder);
   }
 
-  const {data: folders, isLoading, error} = useQuery(["studyStorageFolders", study.id], () => {
+  const {data: folders, isLoading} = useQuery(["studyStorageFolders", study.id], () => {
     return axios.get(`/api/internal/study/${study.id}/storage`)
     .then(response => {
       const defaultFolder = response.data.find(f => f.primary);
