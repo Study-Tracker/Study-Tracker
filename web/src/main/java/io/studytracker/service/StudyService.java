@@ -501,6 +501,13 @@ public class StudyService {
     studyRepository.save(s);
   }
 
+  @Transactional
+  public void removeStorageFolder(Study study, StudyStorageFolder studyFolder) {
+    Study s = studyRepository.getById(study.getId());
+    s.getStorageFolders().remove(studyFolder);
+    studyRepository.save(s);
+  }
+
   /**
    * Deletes the given study, identifies by its primary key ID.
    *

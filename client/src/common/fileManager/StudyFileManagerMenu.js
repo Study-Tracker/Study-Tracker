@@ -24,6 +24,7 @@ import {faCheck, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {useMutation, useQueryClient} from "react-query";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
+import swal from "sweetalert2";
 
 const StudyFileManagerMenu = ({
   study,
@@ -52,8 +53,32 @@ const StudyFileManagerMenu = ({
   });
 
   const handleRemoveFolder = (folder) => {
-    console.debug("Remove folder", folder);
+    swal.fire({
+      title: "Are you sure you want to remove this folder?",
+      text: "Your files will not be deleted and you can re-add this folder later from the File Manager.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Remove",
+    }).then((results) => {
+      if (results.isConfirmed) {
+        removeFolderMutation.mutate(folder);
+      }
+    })
   }
+
+  const removeFolderMutation = useMutation((folder) => {
+    console.debug("Remove folder", folder);
+    return axios.delete(`/api/internal/study/${study.id}/storage/${folder.id}`)
+  }, {
+    onSuccess: () => {
+      notyf.success("Folder removed successfully");
+      queryClient.invalidateQueries(["studyStorageFolders", study.id]);
+    },
+    onError: (error) => {
+      console.error(error);
+      notyf.error("Failed to remove folder: " + error.message);
+    }
+  });
 
   return (
       <Card>
