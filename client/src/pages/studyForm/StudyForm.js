@@ -45,7 +45,6 @@ const StudyForm = ({
     study,
     user,
     programs,
-    keywordCategories,
     features
 }) => {
 
@@ -450,12 +449,10 @@ const StudyForm = ({
                   <Card>
                     <Card.Header>
                       <Card.Title>Keywords</Card.Title>
-                      <h6 className="card-subtitle text-muted">Tag your study
-                        with keywords to make it more searchable and
-                        identifiable. Select a keyword category and then use
-                        the searchable select input to find available keyword
-                        terms. You may choose as many keywords as you'd
-                        like.</h6>
+                      <h6 className="card-subtitle text-muted">
+                        Tag your study with keywords to make it more searchable and
+                        identifiable. Search for existing keywords or create new ones on-demand.
+                      </h6>
                     </Card.Header>
 
                     <Card.Body>
@@ -463,7 +460,6 @@ const StudyForm = ({
                         <Col md={12}>
                           <KeywordInputs
                               keywords={values.keywords || []}
-                              keywordCategories={keywordCategories}
                               onChange={(value) => setFieldValue("keywords", value)}
                           />
                         </Col>
@@ -516,7 +512,6 @@ const StudyForm = ({
 StudyForm.propTypes = {
   study: PropTypes.object.isRequired,
   programs: PropTypes.array.isRequired,
-  keywordCategories: PropTypes.array.isRequired,
   user: PropTypes.object,
   features: PropTypes.object,
 }

@@ -16,27 +16,27 @@
 
 import React from "react";
 import {
-    Bell,
-    CheckSquare,
-    Edit,
-    ExternalLink,
-    File,
-    FilePlus,
-    FileText,
-    Link,
-    List,
-    MessageCircle,
-    RotateCcw,
-    Star,
-    Tag,
-    Trash2,
+  Bell,
+  CheckSquare,
+  Edit,
+  ExternalLink,
+  File,
+  FilePlus,
+  FileText,
+  Link,
+  List,
+  MessageCircle,
+  RotateCcw,
+  Star,
+  Tag,
+  Trash2,
 } from "react-feather";
 import {studyActions} from "../config/activityConstants";
 import {StatusBadge} from "./status";
-import {KeywordActivityBadgeList} from "./keywords";
 import {AssayTaskCard} from "./assayTasks";
 import {relationshipTypes} from "../config/studyRelationshipConstants";
 import dateFormat from "dateformat";
+import KeywordBadges from "./detailsPage/KeywordBadges";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -235,7 +235,7 @@ const ActivityMessage = ({activity}) => {
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
                 <p>
-                  <KeywordActivityBadgeList
+                  <KeywordBadges
                       keywords={activity.data.study.keywords || []}/>
                 </p>
               </div>
@@ -274,7 +274,7 @@ const ActivityMessage = ({activity}) => {
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
                 <p>
-                  <KeywordActivityBadgeList
+                  <KeywordBadges
                       keywords={activity.data.study.keywords || []}/>
                 </p>
               </div>
@@ -365,7 +365,7 @@ const ActivityMessage = ({activity}) => {
               <h4>{activity.data.study.name}</h4>
               <h5 className="text-muted">{activity.data.study.program}</h5>
               <p>
-                <KeywordActivityBadgeList
+                <KeywordBadges
                     keywords={activity.data.study.keywords || []}/>
               </p>
             </div>

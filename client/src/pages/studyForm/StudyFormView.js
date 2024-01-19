@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React from "react";
 import NoSidebarPageWrapper from "../../common/structure/NoSidebarPageWrapper";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
@@ -22,113 +22,53 @@ import StudyForm from "./StudyForm";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import {useParams} from "react-router-dom";
+import {useQuery} from "react-query";
 
 const StudyFormView = () => {
 
   const params = useParams();
-  const [state, setState] = useState({
-    studyCode: params.studyCode || null,
-    studyLoaded: false,
-    programsLoaded: false,
-    keywordCategoriesLoaded: false,
-    isError: false,
-  });
+  const studyCode = params.studyCode || null;
   const user = useSelector(s => s.user.value);
   const features = useSelector(s => s.features.value);
 
-  useEffect(() => {
+  const {data: programs, isLoading: programsLoading, error: programsError} = useQuery(["programs"], () => {
+    return axios.get("/api/internal/program")
+    .then(response => response.data);
+  })
 
-    // Programs
-    axios.get("/api/internal/program")
-    .then(response => {
-      setState(prevState => ({
-        ...prevState,
-        programs: response.data,
-        programsLoaded: true
-      }));
-    }).catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
+  const {data: study, isLoading: studyLoading, error: studyError} = useQuery({
+    queryKey: ["study", studyCode],
+    queryFn: () => {
+      return axios.get("/api/internal/study/" + studyCode)
+      .then(response => response.data);
+    },
+    enabled: studyCode !== null
+  });
 
-    // Keyword categories
-    axios.get("/api/internal/keyword-category")
-    .then(response => {
-      setState(prevState => ({
-        ...prevState,
-        keywordCategories: response.data.sort((a, b) => {
-          if (a.name > b.name) {
-            return 1;
-          } else if (a.name < b.name) {
-            return -1;
-          } else {
-            return 0;
-          }
-        }),
-        keywordCategoriesLoaded: true
-      }))
-    }).catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
-
-    // Selected study
-    if (!!state.studyCode) {
-      axios.get("/api/internal/study/" + state.studyCode)
-      .then(response => {
-        console.debug(response.data);
-        setState(prevState => ({
-          ...prevState,
-          study: response.data,
-          studyLoaded: true
-        }));
-      })
-      .catch(error => {
-        console.error(error);
-        setState(prevState => ({
-          ...prevState,
-          isError: true,
-          error: error
-        }));
-      })
-    } else {
-      setState(prevState => ({
-        ...prevState,
-        studyLoaded: true
-      }))
-    }
-
-  }, []);
-
-
-  let content = <LoadingMessage/>;
-  if (state.isError) {
-    content = <ErrorMessage/>;
-  } else if (
-      !!user
-      && state.studyLoaded
-      && state.programsLoaded
-      && state.keywordCategoriesLoaded
-  ) {
-    content = <StudyForm
-        study={state.study}
-        programs={state.programs}
-        keywordCategories={state.keywordCategories}
-        user={user}
-        features={features}
-    />;
+  if (programsLoading || studyLoading) {
+    return (
+        <NoSidebarPageWrapper>
+          <LoadingMessage/>
+        </NoSidebarPageWrapper>
+    );
   }
+
+  if (programsError || studyError) {
+    return (
+        <NoSidebarPageWrapper>
+          <ErrorMessage/>
+        </NoSidebarPageWrapper>
+    );
+  }
+
   return (
       <NoSidebarPageWrapper>
-        {content}
+        <StudyForm
+            study={study}
+            programs={programs}
+            user={user}
+            features={features}
+        />
       </NoSidebarPageWrapper>
   );
 

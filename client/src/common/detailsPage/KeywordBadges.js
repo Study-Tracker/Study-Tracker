@@ -20,16 +20,23 @@ import {Badge} from "react-bootstrap";
 
 const KeywordBadges = ({keywords}) => {
 
-  const badges = keywords.map((keyword, i) => {
-    return (
-        <Badge key={i} bg={"info"} className={"me-2 mb-2 keyword-badge"}>
-          {keyword.category.name}: {keyword.keyword}
-        </Badge>
-    )
-  })
-
   return (
-      <div>{badges}</div>
+      <div>
+        {
+          keywords.map((k, i) => {
+            return (
+                <span className={"me-2"} key={"keyword-" + k.id}>
+                  <Badge bg={"info"} className={"pt-1 pb-1 ps-2 pe-2"} pill>
+                    {
+                        k.category && <span className={"fw-light"}>{k.category}: </span>
+                    }
+                    <span className={"fw-bolder"}>{k.keyword}</span>
+                  </Badge>
+                </span>
+            )
+          })
+        }
+      </div>
   )
 }
 

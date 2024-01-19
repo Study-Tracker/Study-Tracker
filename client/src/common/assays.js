@@ -19,7 +19,7 @@ import {Col, Row} from "react-bootstrap";
 import ErrorMessage from "./structure/ErrorMessage";
 import LoadingMessage from "./structure/LoadingMessage";
 import {StatusIcon} from "./status";
-import {StudyTeam} from "./studyMetadata";
+import StudyTeam from "./StudyTeam";
 import dateFormat from "dateformat";
 import axios from "axios";
 

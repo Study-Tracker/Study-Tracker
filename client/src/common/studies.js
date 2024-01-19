@@ -19,7 +19,7 @@ import {Button, Col, Row} from "react-bootstrap";
 import {StatusIcon} from "./status";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSignInAlt} from "@fortawesome/free-solid-svg-icons";
-import {StudyTeam} from "./studyMetadata";
+import StudyTeam from "./StudyTeam";
 import PropTypes from "prop-types";
 import {useNavigate} from "react-router-dom";
 

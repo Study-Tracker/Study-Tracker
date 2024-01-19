@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 
-import React, {useState} from "react";
-import {Col, Form, Row} from "react-bootstrap";
-import Select from "react-select";
-import {KeywordCategoryBadge} from "../keywords";
+import React, {useContext} from "react";
+import {Badge, Col, Form, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTimesCircle} from "@fortawesome/free-regular-svg-icons";
 import AsyncCreatable from "react-select/async-creatable";
-import swal from "sweetalert";
 import {FormGroup} from "./common";
 import axios from "axios";
 import PropTypes from "prop-types";
+import NotyfContext from "../../context/NotyfContext";
+import {faXmark} from "@fortawesome/free-solid-svg-icons";
 
-const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
+const KeywordInputs = ({keywords, onChange}) => {
 
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const categoryOptions = keywordCategories.map(c => {
-    return {label: c.name, value: c.id}
-  });
-
-  const handleCategoryChange = (selected) => {
-    console.debug(selected);
-    setSelectedCategory(keywordCategories.find(c => c.id === selected.value))
-  }
+  const notyf = useContext(NotyfContext);
 
   const handleRemoveKeyword = (e) => {
     const selected = parseInt(e.currentTarget.dataset.id, 10);
@@ -46,90 +36,61 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
   const handleKeywordSelect = (selected) => {
     console.debug(selected);
     if (selected.__isNew__) {
+
+      let category = null;
+      let keyword = selected.label;
+      if (selected.label.includes("::")) {
+        const parts = selected.label.split("::");
+        category = parts[0].trim();
+        keyword = parts[1].trim();
+      }
+
       axios.post("/api/internal/keyword", {
-          keyword: selected.label,
-          category: selectedCategory
+          keyword: keyword,
+          category: category
         })
       .then(response => {
-        onChange([
-          ...keywords,
-          response.data
-        ])
+        onChange([...keywords, response.data])
       })
       .catch(e => {
         console.error(e);
-        swal("Failed to add new keyword",
-            "Please try again. If the problem persists, contact Study Tracker support for help.",
-            "warning");
+        notyf.error("Failed to add new keyword");
       })
     } else {
-      onChange([
-        ...keywords,
-        selected
-      ])
+      onChange([...keywords, selected])
     }
   }
 
-  const keywordAutocomplete = (input, callback) => {
-    axios.get('/api/internal/keyword/?q=' + input
-        + (!!selectedCategory ? "&categoryId=" + selectedCategory.id : ''))
+  const keywordAutocomplete = (input) => {
+
+    let category = null;
+    let val = input;
+    if (input.includes("::")) {
+      const parts = input.split("::");
+      category = parts[0].trim();
+      val = parts[1].trim();
+    }
+
+    return axios.get(`/api/internal/keyword/?q=${val}${!!category ? "&category=" + category : ''}`)
     .then(response => {
-      const kw = response.data.map(k => {
+      return response.data.map(k => {
         return {
           id: k.id,
-          label: k.keyword,
+          label: (k.category ? k.category + " :: " : "" ) + k.keyword,
           // label: k.category.name + ": " + k.keyword,
           value: k.id,
           category: k.category,
           keyword: k.keyword
         }
       });
-      callback(kw);
     }).catch(e => {
       console.error(e);
     })
   }
 
-  const selectedKeywords = keywords.map(keyword => {
-    console.debug(keyword);
-    return (
-        <Row
-            key={"keyword-" + keyword.id}
-            className="align-items-center justify-content-center mt-1"
-        >
-          <Col xs={3}>
-            <KeywordCategoryBadge label={keyword.category.name}/>
-          </Col>
-          <Col xs={7}>
-            {keyword.keyword}
-          </Col>
-          <Col xs={2}>
-            <a onClick={handleRemoveKeyword}
-               data-id={keyword.id}>
-              <FontAwesomeIcon
-                  icon={faTimesCircle}
-                  className="align-middle me-2 text-danger"
-              />
-            </a>
-          </Col>
-        </Row>
-    )
-  });
-
   return (
       <Row>
-        <Col sm={2}>
-          <FormGroup>
-            <Form.Label>Category</Form.Label>
-            <Select
-                className="react-select-container"
-                classNamePrefix="react-select"
-                options={categoryOptions}
-                onChange={handleCategoryChange}
-            />
-          </FormGroup>
-        </Col>
-        <Col sm={5}>
+        <Col sm={7}>
           <FormGroup>
             <Form.Label>Keyword Search</Form.Label>
             <AsyncCreatable
@@ -139,19 +100,37 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
                 loadOptions={keywordAutocomplete}
                 onChange={handleKeywordSelect}
                 controlShouldRenderValue={false}
-                isDisabled={!selectedCategory}
                 createOptionPosition={"first"}
                 // defaultOptions={true}
             />
+            <Form.Text>
+              Keywords are optional. When creating new keywords, you can use two colons
+              (<code>::</code>) to separate the category from the keyword. For example,
+              <code>Tissue::Liver</code> will create a keyword with the category
+              <code>Tissue</code> and the keyword <code>Liver</code>.
+            </Form.Text>
           </FormGroup>
-        </Col>
-        <Col sm={5}>
-          <Row>
-            <Col xs={12}>
-              <Form.Label>Selected</Form.Label>
-            </Col>
-          </Row>
-          {selectedKeywords}
+
+          {
+            keywords.map(k => {
+              return (
+                  <span className={"h4 me-2"} key={"keyword-" + k.id}>
+                    <Badge bg={"primary"} className={"pt-2 pb-2 ps-3 pe-3"} pill>
+                      {
+                        k.category && <span className={"fw-light"}>{k.category}: </span>
+                      }
+                      <span className={"fw-bolder"}>{k.keyword}</span>
+                      <FontAwesomeIcon
+                          style={{cursor: "pointer"}}
+                          icon={faXmark}
+                          className={"ms-3"}
+                          onClick={() => handleRemoveKeyword(k)}
+                      />
+                    </Badge>
+                  </span>
+              )
+            })
+          }
         </Col>
       </Row>
   );
@@ -160,7 +139,6 @@ const KeywordInputs = ({keywords, keywordCategories, onChange}) => {
 
 KeywordInputs.propTypes = {
   keywords: PropTypes.array,
-  keywordCategories: PropTypes.array,
   onChange: PropTypes.func.isRequired
 }
 
