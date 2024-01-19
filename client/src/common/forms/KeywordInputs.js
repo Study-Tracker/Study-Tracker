@@ -71,7 +71,7 @@ const KeywordInputs = ({keywords, onChange}) => {
       val = parts[1].trim();
     }
 
-    return axios.get(`/api/internal/keyword/?q=${val}${!!category ? "&category=" + category : ''}`)
+    return axios.get(`/api/internal/keyword/?q=${val}${category ? "&category=" + category : ''}`)
     .then(response => {
       return response.data.map(k => {
         return {
