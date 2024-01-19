@@ -23,5 +23,5 @@ public class KeywordDetailsDto {
 
   private Long id;
   private String keyword;
-  private KeywordCategoryDetailsDto category;
+  private String category;
 }

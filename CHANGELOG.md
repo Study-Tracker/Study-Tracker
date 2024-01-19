@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.6] - TBD
 
+### Changed
+- Simplified the Keywords data model, combining the category and keyword fields into a single table. This will make it simpler to search for keywords and to register keywords on-the-fly.
+
 ### Fixed
 - Fixed a bug that caused incorrect values to show in the Storage Folders settings in the Admin Dashboard. (#157)
 

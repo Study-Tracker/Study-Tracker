@@ -22,5 +22,5 @@ import lombok.Data;
 public class KeywordDto {
   private Long id;
   private String keyword;
-  private Long categoryId;
+  private String category;
 }

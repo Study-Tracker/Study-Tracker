@@ -30,11 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleKeywordGenerator;
-import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.KeywordPayloadDto;
 import io.studytracker.model.Keyword;
-import io.studytracker.model.KeywordCategory;
-import io.studytracker.repository.KeywordCategoryRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +53,6 @@ public class KeywordApiControllerTests extends AbstractApiControllerTests {
   @Autowired private MockMvc mockMvc;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private KeywordCategoryRepository keywordCategoryRepository;
 
   @Test
   public void getAllKeywordsTest() throws Exception {
@@ -92,11 +87,9 @@ public class KeywordApiControllerTests extends AbstractApiControllerTests {
 
   @Test
   public void createKeywordTest() throws Exception {
-    KeywordCategory category = keywordCategoryRepository.findByName("Gene")
-        .orElseThrow(RecordNotFoundException::new);
     KeywordPayloadDto dto = new KeywordPayloadDto();
     dto.setKeyword("TTN");
-    dto.setCategoryId(category.getId());
+    dto.setCategory("Gene");
     mockMvc
         .perform(
             post("/api/v1/keyword")
@@ -109,15 +102,13 @@ public class KeywordApiControllerTests extends AbstractApiControllerTests {
         .andExpect(jsonPath("$.id", not(nullValue())))
         .andExpect(jsonPath("$", hasKey("keyword")))
         .andExpect(jsonPath("$.keyword", is("TTN")))
-        .andExpect(jsonPath("$", hasKey("categoryId")))
-        .andExpect(jsonPath("$.categoryId", is(category.getId().intValue())));
+        .andExpect(jsonPath("$", hasKey("category")))
+        .andExpect(jsonPath("$.category", is("Gene")));
   }
 
   @Test
   public void duplicateKeywordTest() throws Exception {
-   KeywordCategory category = keywordCategoryRepository.findByName("Gene")
-        .orElseThrow(RecordNotFoundException::new);
-    Keyword keyword = new Keyword(category, "AKT1");
+    Keyword keyword = new Keyword("AKT1", "Gene");
     mockMvc
         .perform(
             post("/api/v1/keyword")

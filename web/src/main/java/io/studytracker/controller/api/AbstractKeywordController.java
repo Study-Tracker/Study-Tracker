@@ -19,8 +19,6 @@ package io.studytracker.controller.api;
 import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.mapstruct.mapper.KeywordMapper;
 import io.studytracker.model.Keyword;
-import io.studytracker.model.KeywordCategory;
-import io.studytracker.service.KeywordCategoryService;
 import io.studytracker.service.KeywordService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractKeywordController extends AbstractApiController{
 
   private KeywordService keywordService;
-
-  private KeywordCategoryService keywordCategoryService;
 
   private KeywordMapper keywordMapper;
 
@@ -41,15 +37,9 @@ public abstract class AbstractKeywordController extends AbstractApiController{
    */
   protected Keyword createNewKeyword(Keyword keyword) {
 
-    // If the category does not exist, create it
-    if (keyword.getCategory().getId() == null) {
-      KeywordCategory created = keywordCategoryService.create(keyword.getCategory());
-      keyword.setCategory(created);
-    }
-
     // Check to see if the keyword already exists
     Optional<Keyword> optional =
-        keywordService.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory().getName());
+        keywordService.findByKeywordAndCategory(keyword.getKeyword(), keyword.getCategory());
     if (optional.isPresent()) {
       throw new DuplicateRecordException(
           String.format(
@@ -60,7 +50,7 @@ public abstract class AbstractKeywordController extends AbstractApiController{
 
   protected Keyword updateExistingKeyword(Keyword updated, Long id) {
     Optional<Keyword> optional =
-        keywordService.findByKeywordAndCategory(updated.getKeyword(), updated.getCategory().getName());
+        keywordService.findByKeywordAndCategory(updated.getKeyword(), updated.getCategory());
     if (optional.isPresent()) {
       Keyword keyword = optional.get();
       if (!keyword.getId().equals(id)) {
@@ -90,13 +80,4 @@ public abstract class AbstractKeywordController extends AbstractApiController{
     this.keywordMapper = keywordMapper;
   }
 
-  public KeywordCategoryService getKeywordCategoryService() {
-    return keywordCategoryService;
-  }
-
-  @Autowired
-  public void setKeywordCategoryService(
-      KeywordCategoryService keywordCategoryService) {
-    this.keywordCategoryService = keywordCategoryService;
-  }
 }

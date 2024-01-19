@@ -26,7 +26,6 @@ import {
 } from "react-bootstrap";
 import UserSettings from "./userSettings/UserSettings";
 import AssayTypeSettings from "./assayTypes/AssayTypeSettings";
-import KeywordSettings from "./KeywordSettings";
 import ProgramSettings from "./program/ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
 import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
@@ -52,12 +51,6 @@ const settings = {
     category: "site-settings",
     label: "Assay Types",
     tag: AssayTypeSettings
-  },
-  "keywords": {
-    id: "keywords",
-    category: "site-settings",
-    label: "Keywords",
-    tag: KeywordSettings
   },
   "programs": {
     id: "programs",
