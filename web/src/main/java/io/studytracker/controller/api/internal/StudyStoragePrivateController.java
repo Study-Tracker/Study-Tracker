@@ -17,6 +17,7 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
+import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.StorageDriveFolderFormDto;
 import io.studytracker.mapstruct.dto.response.StudyStorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -85,4 +87,43 @@ public class StudyStoragePrivateController extends AbstractStudyController {
     getStudyService().repairStorageFolder(study);
     return new ResponseEntity<>(HttpStatus.OK);
   }
+  
+  @GetMapping("/{folderId}")
+  public StudyStorageDriveFolderSummaryDto getStudyFolderById(@PathVariable("studyId") String studyId,
+          @PathVariable("folderId") Long folderId) {
+    LOGGER.info("Fetching storage folder {} for study {}", folderId, studyId);
+    Study study = getStudyFromIdentifier(studyId);
+    StudyStorageFolder folder = studyStorageFolderRepository.findByStudyId(study.getId()).stream()
+            .filter(f -> f.getStorageDriveFolder().getId().equals(folderId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Storage folder not found: " + folderId));
+    return storageDriveFolderMapper.toStudyFolderSummaryDto(folder);
+  }
+  
+  @PatchMapping("/{folderId}")
+  public HttpEntity<?> setDefaultStudyFolder(@PathVariable("studyId") String studyId,
+          @PathVariable("folderId") Long folderId) {
+    LOGGER.info("Setting storage folder {} as default for study {}", folderId, studyId);
+    Study study = getStudyFromIdentifier(studyId);
+    List<StudyStorageFolder> folders = studyStorageFolderRepository.findByStudyId(study.getId());
+    for (StudyStorageFolder folder: folders) {
+      folder.setPrimary(folder.getId().equals(folderId));
+      studyStorageFolderRepository.save(folder);
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+  
+  @DeleteMapping("/{folderId}")
+  public HttpEntity<?> removeStudyFolder(@PathVariable("studyId") String studyId,
+          @PathVariable("folderId") Long folderId) {
+    LOGGER.info("Removing storage folder {} from study {}", folderId, studyId);
+    Study study = getStudyFromIdentifier(studyId);
+    StudyStorageFolder folder = studyStorageFolderRepository.findByStudyId(study.getId()).stream()
+            .filter(f -> f.getId().equals(folderId))
+            .findFirst()
+            .orElseThrow(() -> new RecordNotFoundException("Storage folder not found: " + folderId));
+    this.getStudyService().removeStorageFolder(study, folder);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+  
 }

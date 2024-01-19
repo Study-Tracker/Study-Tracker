@@ -41,12 +41,14 @@ const FileManagerAddToStudyModal = ({
     storageDriveId: rootFolder ? rootFolder.storageDrive.id : null,
     name: folder ? folder.name : null,
     path: folder ? folder.path : null,
+    writeEnabled: true,
   };
 
   const formSchema = yup.object({
     storageDriveId: yup.number().required(),
     name: yup.string().required(),
-    path: yup.string().required()
+    path: yup.string().required(),
+    writeEnabled: yup.boolean().required(),
   });
 
   const handleSubmit = (values, {setSubmitting}) => {
@@ -116,8 +118,10 @@ const FileManagerAddToStudyModal = ({
           enableReinitialize={true}
       >
         {({
-          handleSubmit,
-          isSubmitting,
+            handleSubmit,
+            isSubmitting,
+            setFieldValue,
+            values
         }) => (
             <Modal show={isOpen} onHide={() => setModalIsOpen(false)}>
 
@@ -127,6 +131,16 @@ const FileManagerAddToStudyModal = ({
 
               <Modal.Body className="mb-3">
                 <FormikForm>
+
+                  <Row>
+                    <Col>
+                      <p>
+                        Adding a folder to a { useStudies ? "study" : "assay" } will allow users to access
+                        it in the { useStudies ? "Study" : "Assay" } Details page&apos;s Files tab. You can
+                        optionally make the folder read-only in this view, as well.
+                      </p>
+                    </Col>
+                  </Row>
 
                   <Row>
                     <Col>
@@ -140,6 +154,21 @@ const FileManagerAddToStudyModal = ({
                           onChange={(selected) => setSelectedId(selected.value)}
                           controlShouldRenderValue={true}
                           defaultOptions={true}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Form.Check
+                            type={"switch"}
+                            label={"Read-only"}
+                            onChange={(e) => {
+                              setFieldValue("writeEnabled", !e.target.checked)
+                            }}
+                            value={!values.writeEnabled}
                         />
                       </FormGroup>
                     </Col>

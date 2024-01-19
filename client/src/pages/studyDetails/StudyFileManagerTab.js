@@ -15,18 +15,21 @@
  */
 
 import {Col, Row} from "react-bootstrap";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import FileManagerContent from "../../common/fileManager/FileManagerContent";
-import FileManagerContentPlaceholder from "../../common/fileManager/FileManagerContentPlaceholder";
-import StudyFileManagerMenu from "../../common/fileManager/StudyFileManagerMenu";
+import FileManagerContentPlaceholder
+  from "../../common/fileManager/FileManagerContentPlaceholder";
+import StudyFileManagerMenu
+  from "../../common/fileManager/StudyFileManagerMenu";
+import {useQuery} from "react-query";
+import LoadingMessage from "../../common/structure/LoadingMessage";
 
 const StudyFileManagerTab = ({study}) => {
 
   const notyf = useContext(NotyfContext);
-  const [folders, setFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState(null);
 
   const handleFolderSelect = (folder) => {
@@ -34,18 +37,19 @@ const StudyFileManagerTab = ({study}) => {
     console.debug("Selected folder", folder);
   }
 
-  useEffect(() => {
-    axios.get("/api/internal/study/" + study.id + "/storage")
+  const {data: folders, isLoading} = useQuery(["studyStorageFolders", study.id], () => {
+    return axios.get(`/api/internal/study/${study.id}/storage`)
     .then(response => {
-      setFolders(response.data);
       const defaultFolder = response.data.find(f => f.primary);
       setSelectedFolder(defaultFolder ? defaultFolder.storageDriveFolder : null);
+      return response.data;
     })
-    .catch(error => {
-      console.error(error);
-      notyf.open({message: "Failed to load data sources", type: "error"});
+    .catch(e => {
+      console.error(e);
+      notyf.error("Failed to load data sources: " + e.message);
+      return e;
     });
-  }, [study.id, notyf]);
+  });
 
   const repairFolder = () => {
     axios.post("/api/internal/study/" + study.id + "/storage/repair")
@@ -61,6 +65,8 @@ const StudyFileManagerTab = ({study}) => {
     });
   }
 
+  if (isLoading) return <LoadingMessage />;
+
   return (
       <>
 
@@ -69,6 +75,7 @@ const StudyFileManagerTab = ({study}) => {
           <Col xs="4" md="3">
 
             <StudyFileManagerMenu
+                study={study}
                 folders={folders}
                 handleFolderSelect={handleFolderSelect}
                 selectedFolder={selectedFolder}

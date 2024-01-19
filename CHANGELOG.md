@@ -11,8 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.6] - TBD
 
+### Added
+- The default storage folder for studies and assays can now be changed in the Files tab of the Study and Assay Details pages. It is also now possible to remove non-default folders from studies and assays.
+
 ### Changed
 - Simplified the Keywords data model, combining the category and keyword fields into a single table. This will make it simpler to search for keywords and to register keywords on-the-fly.
+- Leading and trailing whitespace for program, study, and assay names will now trigger a form validation error. This is to prevent issues with folder creation and other downstream processes. (#159)
+- When adding a folder to a study or assay in the File Manager, it will now have read-write permissions by default, with the option to make it read-only. (#162)
 
 ### Fixed
 - Fixed a bug that caused incorrect values to show in the Storage Folders settings in the Admin Dashboard. (#157)

@@ -16,18 +16,25 @@
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFolder, faServer} from "@fortawesome/free-solid-svg-icons";
-import {faAws} from "@fortawesome/free-brands-svg-icons";
+import {faAws, faMicrosoft} from "@fortawesome/free-brands-svg-icons";
 import React from "react";
+import PropTypes from "prop-types";
 
-export const getDataSourceIcon = (driveType) => {
+export const DataSourceIcon = ({driveType}) => {
   switch (driveType) {
     case "EGNYTE":
       return <FontAwesomeIcon icon={faServer} className={"me-2"} />
     case "S3":
       return <FontAwesomeIcon icon={faAws} className={"me-2"} />
+    case "ONEDRIVE":
+      return <FontAwesomeIcon icon={faMicrosoft} className={"me-2"} />
     default:
       return <FontAwesomeIcon icon={faFolder} className={"me-2"} />
   }
+}
+
+DataSourceIcon.propTypes = {
+  driveType: PropTypes.string.isRequired
 }
 
 export const getDataSourceLabel = (driveType) => {
