@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package io.studytracker.benchling.api;
+package io.studytracker.benchling;
 
+import io.studytracker.benchling.api.AbstractBenchlingApiService;
+import io.studytracker.benchling.api.BenchlingElnRestClient;
 import io.studytracker.benchling.api.entities.*;
 import io.studytracker.benchling.exception.EntityNotFoundException;
 import io.studytracker.eln.NotebookFolder;

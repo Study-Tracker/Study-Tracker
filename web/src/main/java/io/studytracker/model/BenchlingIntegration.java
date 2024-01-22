@@ -1,12 +1,19 @@
 package io.studytracker.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "benchling_integrations")
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 public class BenchlingIntegration {
     
     @Id
@@ -38,67 +45,17 @@ public class BenchlingIntegration {
     @Convert(converter = StringFieldEncryptor.class)
     private String password;
     
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "active", nullable = false)
+    private boolean active;
     
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @CreatedDate
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
     
-    public String getName() {
-        return name;
-    }
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
     
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getTenantName() {
-        return tenantName;
-    }
-    
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
-    }
-    
-    public String getRootUrl() {
-        return rootUrl;
-    }
-    
-    public void setRootUrl(String rootUrl) {
-        this.rootUrl = rootUrl;
-    }
-    
-    public String getClientId() {
-        return clientId;
-    }
-    
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-    
-    public String getClientSecret() {
-        return clientSecret;
-    }
-    
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
-    
-    public String getUsername() {
-        return username;
-    }
-    
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    public String getPassword() {
-        return password;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

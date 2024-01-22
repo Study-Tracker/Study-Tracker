@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package io.studytracker.benchling.api;
+package io.studytracker.benchling;
 
+import io.studytracker.benchling.api.AbstractBenchlingApiService;
+import io.studytracker.benchling.api.BenchlingElnRestClient;
 import io.studytracker.benchling.api.entities.BenchlingUser;
 import io.studytracker.benchling.api.entities.BenchlingUserList;
 import io.studytracker.eln.NotebookUser;
