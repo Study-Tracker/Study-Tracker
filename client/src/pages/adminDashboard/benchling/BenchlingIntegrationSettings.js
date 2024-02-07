@@ -25,6 +25,8 @@ import {faCheckCircle, faCircleXmark, faEdit} from "@fortawesome/free-regular-sv
 import BenchlingIntegrationSetupCard from "./BenchlingIntegrationSetupCard";
 import BenchlingIntegrationFormModal from "./BenchlingIntegrationFormModal";
 import BenchlingIntegrationDetailsCard from "./BenchlingIntegrationDetailsCard";
+import {CardLoadingMessage} from "../../../common/loading";
+import {CardErrorMessage} from "../../../common/errors";
 
 const BenchlingIntegrationSettings = () => {
 
@@ -52,7 +54,7 @@ const BenchlingIntegrationSettings = () => {
   const changeStatusMutation = useMutation((active) => {
       return axios.patch("/api/internal/integrations/benchling/" + settings.id + "?active=" + active)
     }, {
-    onSuccess: (response) => {
+    onSuccess: () => {
       notyf.open({
         type: "success",
         message: "Benchling integration settings saved"
@@ -141,7 +143,11 @@ const BenchlingIntegrationSettings = () => {
         </Row>
 
         {
-          !!settings ? (
+          isLoading ? (
+            <CardLoadingMessage message={"Loading Benchling integration settings..."} />
+          ) : error ? (
+            <CardErrorMessage message={error.message} />
+          ) : settings ? (
             <BenchlingIntegrationDetailsCard settings={settings} />
           ) : (
             <BenchlingIntegrationSetupCard handleClick={() => setIntegrationModalIsOpen(true)} />

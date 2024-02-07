@@ -211,7 +211,7 @@ const BenchlingIntegrationFormModal = ({
                       )
                     }
                     <Form.Text>
-                      Your Benchling App's Client ID.
+                      Your Benchling App&apos;s Client ID.
                     </Form.Text>
                   </FormGroup>
                 </Col>
@@ -239,7 +239,7 @@ const BenchlingIntegrationFormModal = ({
                       )
                     }
                     <Form.Text>
-                      You Benchling App's client secret.
+                      You Benchling App&apos;s client secret.
                     </Form.Text>
                   </FormGroup>
                 </Col>
