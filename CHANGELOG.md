@@ -18,9 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simplified the Keywords data model, combining the category and keyword fields into a single table. This will make it simpler to search for keywords and to register keywords on-the-fly.
 - Leading and trailing whitespace for program, study, and assay names will now trigger a form validation error. This is to prevent issues with folder creation and other downstream processes. (#159)
 - When adding a folder to a study or assay in the File Manager, it will now have read-write permissions by default, with the option to make it read-only. (#162)
+- Updated the admin dashboard settings for Benchling to allow creating/updating integration details within the UI. Integrations can still be initialized with existing `application.properties` config parameters.
 
 ### Fixed
 - Fixed a bug that caused incorrect values to show in the Storage Folders settings in the Admin Dashboard. (#157)
+- Fixed a bug that was causing errors when loading the study form page.
 
 ## [0.9.5] - 2023-12-14
 

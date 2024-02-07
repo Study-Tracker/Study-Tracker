@@ -1,5 +1,6 @@
-package io.studytracker.benchling.api;
+package io.studytracker.benchling;
 
+import io.studytracker.benchling.api.BenchlingElnRestClient;
 import io.studytracker.model.BenchlingIntegration;
 import org.springframework.web.client.RestTemplate;
 

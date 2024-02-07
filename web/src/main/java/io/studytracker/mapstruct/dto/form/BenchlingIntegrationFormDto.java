@@ -10,7 +10,7 @@ public class BenchlingIntegrationFormDto {
     private @NotBlank String name;
     private @NotBlank String tenantName;
     private String rootUrl;
-    private @NotBlank String clientId;
-    private @NotBlank String clientSecret;
+    private String clientId;
+    private String clientSecret;
     private boolean active;
 }

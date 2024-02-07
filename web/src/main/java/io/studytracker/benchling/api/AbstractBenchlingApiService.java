@@ -16,6 +16,7 @@
 
 package io.studytracker.benchling.api;
 
+import io.studytracker.benchling.BenchlingClientFactory;
 import io.studytracker.benchling.api.entities.BenchlingEntry;
 import io.studytracker.benchling.api.entities.BenchlingFolder;
 import io.studytracker.eln.NotebookEntry;

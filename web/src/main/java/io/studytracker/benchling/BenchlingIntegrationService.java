@@ -1,6 +1,5 @@
 package io.studytracker.benchling;
 
-import io.studytracker.benchling.api.BenchlingClientFactory;
 import io.studytracker.benchling.api.BenchlingElnRestClient;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
 import io.studytracker.integration.IntegrationService;

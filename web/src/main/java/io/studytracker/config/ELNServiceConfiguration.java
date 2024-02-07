@@ -17,7 +17,7 @@
 package io.studytracker.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.studytracker.benchling.api.BenchlingClientFactory;
+import io.studytracker.benchling.BenchlingClientFactory;
 import io.studytracker.benchling.exception.BenchlingExceptionHandler;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
