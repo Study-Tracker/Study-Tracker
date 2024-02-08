@@ -45,7 +45,7 @@ const StudyFormView = () => {
     enabled: studyCode !== null
   });
 
-  if (programsLoading || studyLoading) {
+  if (!user || programsLoading || studyLoading) {
     return (
         <NoSidebarPageWrapper>
           <LoadingMessage/>

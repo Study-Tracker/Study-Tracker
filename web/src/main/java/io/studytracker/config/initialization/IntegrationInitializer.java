@@ -43,6 +43,7 @@ public class IntegrationInitializer implements ApplicationRunner {
   @Autowired private EgnyteIntegrationInitializer egnyteIntegrationInitializer;
   @Autowired private AwsIntegrationInitializer awsIntegrationInitializer;
   @Autowired private GitLabIntegrationInitializer gitLabIntegrationInitializer;
+  @Autowired private BenchlingIntegrationInitializer benchlingIntegrationInitializer;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
@@ -59,6 +60,9 @@ public class IntegrationInitializer implements ApplicationRunner {
 
     LOGGER.info("Initializing GitLab integrations...");
     gitLabIntegrationInitializer.initializeIntegrations();
+    
+    LOGGER.info("Initializing Benchling integrations...");
+    benchlingIntegrationInitializer.initializeIntegrations();
 
     LOGGER.info("Integrations initialized.");
   }

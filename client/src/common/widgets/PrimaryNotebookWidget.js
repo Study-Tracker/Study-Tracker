@@ -32,17 +32,18 @@ const PrimaryNotebookWidget = ({record}) => {
 
   const notebook = record && record.notebookFolder ? record.notebookFolder : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isRepaird, setIsRepaird] = useState(false);
+  const [isRepaired, setIsRepaired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const notyf = useContext(NotyfContext);
   const dispatch = useDispatch();
+  const recordType = record.assayType ? "assay" : record.program ? "study" : "program";
 
   const handleRepairNotebook = () => {
     let url = null;
-    if (record.assayType) {
+    if (recordType === "assay") {
       url = "/api/internal/assay/" + record.id + "/notebook/repair";
-    } else if (record.program) {
+    } else if (recordType === "study") {
       url = "/api/internal/study/" + record.id + "/notebook/repair";
     } else {
       url = "/api/internal/program/" + record.id + "/notebook/repair";
@@ -54,6 +55,7 @@ const PrimaryNotebookWidget = ({record}) => {
       });
       return;
     }
+    setIsLoading(true);
     setIsSubmitting(true);
     axios.post(url)
     .then(response => {
@@ -61,17 +63,19 @@ const PrimaryNotebookWidget = ({record}) => {
         type: "success",
         message: "Notebook repaired successfully."
       })
-      setIsRepaird(true);
-      setIsSubmitting(false);
+      setIsRepaired(true);
       navigate(0);
     })
     .catch(error => {
-      setIsSubmitting(false);
       console.error(error);
       notyf.open({
         type: "error",
         message: "Failed to repair notebook. Please try again."
       })
+    })
+    .finally(() => {
+      setIsSubmitting(false);
+      setIsLoading(false);
     });
   }
 
@@ -91,7 +95,7 @@ const PrimaryNotebookWidget = ({record}) => {
                 <Button
                     variant={"warning"}
                     onClick={handleRepairNotebook}
-                    disabled={isSubmitting || isRepaird}
+                    disabled={isSubmitting || isRepaired}
                 >
                   <FontAwesomeIcon icon={faRefresh} className={"me-2"} />
                   {isSubmitting ? "Creating notebook..." : "Create notebook"}
@@ -107,16 +111,20 @@ const PrimaryNotebookWidget = ({record}) => {
             body={(
                 <>
 
-                  <Button
-                      variant={"primary"}
-                      onClick={() => {
-                        dispatch(setTab("notebook"));
-                        navigate("#notebook")
-                      }}
-                      className={"mb-2"}
-                  >
-                    Browse contents
-                  </Button>
+                  {
+                    recordType !== "program" ? (
+                      <Button
+                        variant={"primary"}
+                        onClick={() => {
+                          dispatch(setTab("notebook"));
+                          navigate("#notebook")
+                        }}
+                        className={"mb-2"}
+                      >
+                        Browse contents
+                      </Button>
+                    ) : ""
+                  }
 
                   {
                     notebook && !!notebook.url ? (

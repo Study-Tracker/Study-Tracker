@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package io.studytracker.benchling.api;
+package io.studytracker.benchling;
 
+import io.studytracker.benchling.api.AbstractBenchlingApiService;
+import io.studytracker.benchling.api.BenchlingElnRestClient;
 import io.studytracker.benchling.api.entities.BenchlingUser;
 import io.studytracker.benchling.api.entities.BenchlingUserList;
 import io.studytracker.eln.NotebookUser;
 import io.studytracker.eln.NotebookUserService;
 import io.studytracker.model.User;
 import io.studytracker.model.UserConfigurations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
+@Service
 public final class BenchlingNotebookUserService
     extends AbstractBenchlingApiService
     implements NotebookUserService {
@@ -39,12 +44,12 @@ public final class BenchlingNotebookUserService
   @Override
   public List<NotebookUser> findNotebookUsers() {
     LOGGER.info("Fetching Benchling user list.");
-    String authHeader = generateAuthorizationHeader();
     List<BenchlingUser> users = new ArrayList<>();
+    BenchlingElnRestClient client = this.getClient();
     String nextToken = null;
     boolean hasNext = true;
     while (hasNext) {
-      BenchlingUserList userList = this.getClient().findUsers(authHeader, nextToken);
+      BenchlingUserList userList = client.findUsers(nextToken);
       users.addAll(userList.getUsers());
       nextToken = userList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
@@ -55,13 +60,13 @@ public final class BenchlingNotebookUserService
   @Override
   public Optional<NotebookUser> findNotebookUser(User user) {
     LOGGER.info("Looking up Benchling user: " + user.getDisplayName());
-    String authHeader = generateAuthorizationHeader();
+    BenchlingElnRestClient client = this.getClient();
 
     // Lookup user by ID
     if (user.getAttributes() != null
         && user.getAttributes().containsKey(UserConfigurations.BENCHLING_USER_ID)) {
       String benchlingUserId = user.getAttributes().get(UserConfigurations.BENCHLING_USER_ID);
-      Optional<BenchlingUser> optional = this.getClient().findUserById(benchlingUserId, authHeader);
+      Optional<BenchlingUser> optional = client.findUserById(benchlingUserId);
       if (optional.isPresent()) {
         return Optional.of(this.convertUser(optional.get()));
       }
@@ -73,7 +78,7 @@ public final class BenchlingNotebookUserService
     boolean hasNext = true;
     while (hasNext) {
       BenchlingUserList userList =
-          this.getClient().findUsersByUsername(user.getEmail().replaceAll("@.+", ""), authHeader, nextToken);
+          client.findUsersByUsername(user.getEmail().replaceAll("@.+", ""), nextToken);
       users.addAll(userList.getUsers());
       nextToken = userList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
@@ -91,7 +96,7 @@ public final class BenchlingNotebookUserService
       nextToken = null;
       hasNext = true;
       while (hasNext) {
-        BenchlingUserList userList = this.getClient().findUsers(authHeader, nextToken);
+        BenchlingUserList userList = client.findUsers(nextToken);
         users.addAll(userList.getUsers());
         nextToken = userList.getNextToken();
         hasNext = StringUtils.hasText(nextToken);

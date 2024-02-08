@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-package io.studytracker.benchling.api;
+package io.studytracker.benchling;
 
+import io.studytracker.benchling.api.AbstractBenchlingApiService;
+import io.studytracker.benchling.api.BenchlingElnRestClient;
 import io.studytracker.benchling.api.entities.BenchlingEntryRequest;
 import io.studytracker.benchling.api.entities.BenchlingEntryRequest.CustomField;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
-import io.studytracker.eln.NotebookEntry;
-import io.studytracker.eln.NotebookEntryService;
-import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.eln.NotebookUser;
-import io.studytracker.eln.NotebookUserService;
+import io.studytracker.eln.*;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
 public final class BenchlingNotebookEntryService
     extends AbstractBenchlingApiService
     implements NotebookEntryService {
@@ -52,12 +49,12 @@ public final class BenchlingNotebookEntryService
   @Override
   public List<NotebookTemplate> findEntryTemplates() {
     LOGGER.info("Fetching Benchling notebook entry templates.");
-    String authHeader = generateAuthorizationHeader();
+    BenchlingElnRestClient client = this.getClient();
     List<BenchlingEntryTemplate> templates = new ArrayList<>();
     String nextToken = null;
     boolean hasNext = true;
     while (hasNext) {
-      BenchlingEntryTemplateList templateList = this.getClient().findEntryTemplates(authHeader, nextToken);
+      BenchlingEntryTemplateList templateList = client.findEntryTemplates(nextToken);
       templates.addAll(templateList.getEntryTemplates());
       nextToken = templateList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
@@ -75,8 +72,8 @@ public final class BenchlingNotebookEntryService
   @Override
   public Optional<NotebookTemplate> findEntryTemplateById(String id) {
     LOGGER.info("Fetching Benchling notebook entry template: " + id);
-    String authHeader = generateAuthorizationHeader();
-    BenchlingEntryTemplate template = this.getClient().findEntryTemplateById(id, authHeader);
+    BenchlingElnRestClient client = this.getClient();
+    BenchlingEntryTemplate template = client.findEntryTemplateById(id);
     return Optional.of(this.convertNotebookEntryTemplate(template));
   }
 
@@ -121,9 +118,9 @@ public final class BenchlingNotebookEntryService
       customFields.put("External Code", new CustomField(study.getExternalCode()));
     }
     request.setCustomFields(customFields);
-
-    String authHeader = generateAuthorizationHeader();
-    return this.convertBenchlingEntry(this.getClient().createEntry(request, authHeader));
+    
+    BenchlingElnRestClient client = this.getClient();
+    return this.convertBenchlingEntry(client.createEntry(request));
   }
 
   @Override
@@ -165,9 +162,9 @@ public final class BenchlingNotebookEntryService
     customFields.put("Assay Type", new CustomField(assay.getAssayType().getName()));
     customFields.put("Study", new CustomField(assay.getStudy().getCode()));
     request.setCustomFields(customFields);
-
-    String authHeader = generateAuthorizationHeader();
-    return this.convertBenchlingEntry(this.getClient().createEntry(request, authHeader));
+    
+    BenchlingElnRestClient client = this.getClient();
+    return this.convertBenchlingEntry(client.createEntry(request));
   }
 
 

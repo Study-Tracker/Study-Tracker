@@ -98,7 +98,7 @@ export const SettingsErrorMessage = () => {
   )
 }
 
-export const ErrorMessage = ({hideControls = false}) => {
+export const ErrorMessage = ({hideControls = false, message}) => {
 
   const navigate = useNavigate();
 
@@ -107,7 +107,7 @@ export const ErrorMessage = ({hideControls = false}) => {
         <FontAwesomeIcon icon={faWarning} size={"5x"} className={"text-danger"} />
         <h1 className={"mt-4 mb-3"}>Something went wrong...</h1>
         <p>
-          Study Tracker encountered an error while trying to load the page.
+          { message || "Study Tracker encountered an error while trying to load the page." }
         </p>
         {
             !hideControls && (
@@ -147,16 +147,20 @@ export const ContainerErrorMessage = () => {
   )
 }
 
-export const CardErrorMessage = () => {
+export const CardErrorMessage = ({message}) => {
   return (
       <Card>
         <Card.Body>
           <Row className={"justify-content-center"}>
             <Col lg={6}>
-              <ErrorMessage hideControls={true} />
+              <ErrorMessage hideControls={true} message={message} />
             </Col>
           </Row>
         </Card.Body>
       </Card>
   )
+}
+
+CardErrorMessage.propTypes = {
+  message: PropTypes.string,
 }

@@ -88,11 +88,9 @@ public class AssayService {
 
   @Autowired private StorageDriveFolderService storageDriveFolderService;
 
-  @Autowired(required = false)
-  private NotebookFolderService notebookFolderService;
+  @Autowired private NotebookFolderService notebookFolderService;
 
-  @Autowired(required = false)
-  private NotebookEntryService notebookEntryService;
+  @Autowired private NotebookEntryService notebookEntryService;
 
   @Autowired private NamingService namingService;
 
@@ -300,7 +298,7 @@ public class AssayService {
     }
 
     // Create the ELN folder
-    if (options.isUseNotebook() && notebookFolderService != null) {
+    if (options.isUseNotebook()) {
       if (study.getNotebookFolder() != null) {
         try {
 
