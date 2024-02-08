@@ -16,25 +16,46 @@
 
 package io.studytracker.benchling.api;
 
-import io.studytracker.benchling.api.entities.*;
+import io.studytracker.benchling.api.entities.BenchlingAuthenticationToken;
+import io.studytracker.benchling.api.entities.BenchlingEntry;
+import io.studytracker.benchling.api.entities.BenchlingEntryList;
+import io.studytracker.benchling.api.entities.BenchlingEntryRequest;
+import io.studytracker.benchling.api.entities.BenchlingEntrySchema;
+import io.studytracker.benchling.api.entities.BenchlingEntrySchemaList;
+import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
+import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
+import io.studytracker.benchling.api.entities.BenchlingFolder;
+import io.studytracker.benchling.api.entities.BenchlingFolderList;
+import io.studytracker.benchling.api.entities.BenchlingProject;
+import io.studytracker.benchling.api.entities.BenchlingProjectList;
+import io.studytracker.benchling.api.entities.BenchlingUser;
+import io.studytracker.benchling.api.entities.BenchlingUserList;
 import io.studytracker.benchling.exception.BenchlingAuthenticationException;
 import io.studytracker.benchling.exception.BenchlingException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.BenchlingIntegration;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.validation.constraints.NotNull;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
 
 public final class BenchlingElnRestClient {
 
@@ -183,7 +204,9 @@ public final class BenchlingElnRestClient {
     ResponseEntity<BenchlingFolderList> response =
         restTemplate.exchange(url, HttpMethod.GET, request, BenchlingFolderList.class);
     BenchlingFolderList folderList = response.getBody();
-    folderList.getFolders().stream().peek(f -> f.setUrl(createFolderUrl(f)));
+    folderList.setFolders(folderList.getFolders().stream()
+        .peek(f -> f.setUrl(createFolderUrl(f)))
+        .collect(Collectors.toList()));
     return folderList;
   }
 

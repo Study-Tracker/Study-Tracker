@@ -203,7 +203,7 @@ public class StudyService {
       }
     } else {
       // New study and notebook integration active
-      LOGGER.info(String.format("Creating ELN entry for study: %s", study.getCode()));
+      LOGGER.info(String.format("Creating ELN folder for study: %s", study.getCode()));
       if (program.getNotebookFolder() != null) {
         try {
 
@@ -286,28 +286,27 @@ public class StudyService {
 
     // Create the ELN folder
     NotebookEntry studySummaryEntry = null;
-    if (notebookEntryService != null && options.isUseNotebook()) {
-
-      LOGGER.debug("Creating ELN folder for study: " + study.getName());
+    if (options.isUseNotebook()) {
 
       ELNFolder elnFolder = this.createStudyElnFolder(study, program);
       study.setNotebookFolder(elnFolder);
 
       // Get the template
-      NotebookTemplate template = null;
-      if (StringUtils.hasText(options.getNotebookTemplateId())) {
-        Optional<NotebookTemplate> templateOptional =
-            notebookEntryService.findEntryTemplateById(options.getNotebookTemplateId());
-        if (templateOptional.isPresent()) {
-          template = templateOptional.get();
-        } else {
-          LOGGER.warn("Could not find notebook template with ID: " + options.getNotebookTemplateId());
+      if (elnFolder != null && !study.isLegacy()) {
+        NotebookTemplate template = null;
+        if (StringUtils.hasText(options.getNotebookTemplateId())) {
+          Optional<NotebookTemplate> templateOptional =
+              notebookEntryService.findEntryTemplateById(options.getNotebookTemplateId());
+          if (templateOptional.isPresent()) {
+            template = templateOptional.get();
+          } else {
+            LOGGER.warn(
+                "Could not find notebook template with ID: " + options.getNotebookTemplateId());
+          }
         }
-      }
-
-      if (!study.isLegacy()) {
         studySummaryEntry = notebookEntryService.createStudyNotebookEntry(study, template);
       }
+
     } else {
       study.setNotebookFolder(null);
     }

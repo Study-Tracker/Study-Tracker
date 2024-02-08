@@ -103,7 +103,7 @@ public class ProgramService {
     }
 
     // Create the notebook folder
-    if (options.isUseNotebook() && notebookFolderService != null) {
+    if (options.isUseNotebook()) {
       LOGGER.info("Creating notebook folder for program: " + program.getName());
       try {
         NotebookFolder notebookFolder = notebookFolderService.createProgramFolder(program);
@@ -308,7 +308,7 @@ public class ProgramService {
     this.programRepository = programRepository;
   }
 
-  @Autowired(required = false)
+  @Autowired
   public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
     this.notebookFolderService = notebookFolderService;
   }

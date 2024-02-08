@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,22 @@ package io.studytracker.test.benchling;
 
 import io.studytracker.Application;
 import io.studytracker.benchling.api.BenchlingElnRestClient;
-import io.studytracker.benchling.api.entities.*;
+import io.studytracker.benchling.api.entities.BenchlingAuthenticationToken;
+import io.studytracker.benchling.api.entities.BenchlingEntry;
+import io.studytracker.benchling.api.entities.BenchlingEntrySchema;
+import io.studytracker.benchling.api.entities.BenchlingEntrySchemaList;
+import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
+import io.studytracker.benchling.api.entities.BenchlingFolder;
+import io.studytracker.benchling.api.entities.BenchlingProject;
+import io.studytracker.benchling.api.entities.BenchlingProjectList;
 import io.studytracker.model.BenchlingIntegration;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,7 +41,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
@@ -39,11 +54,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -76,7 +86,7 @@ public class BenchlingElnRestClientTests {
 
   private BenchlingElnRestClient client;
   
-  @BeforeAll
+  @Before
   public void init() {
     BenchlingIntegration integration = new BenchlingIntegration();
     integration.setClientId(clientId);

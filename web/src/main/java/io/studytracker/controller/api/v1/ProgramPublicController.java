@@ -67,6 +67,8 @@ public class ProgramPublicController extends AbstractProgramController {
     LOGGER.info("Creating program {}", dto);
     Program newProgram = this.getProgramMapper().fromProgramPayloadDto(dto);
     ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
+    options.setUseNotebook(dto.getNotebookFolderId() != null);
+    options.setUseStorage(dto.getParentFolderId() != null);
     Program program = this.createNewProgram(newProgram, options);
     ProgramDto created = this.getProgramMapper().toProgramDto(program);
     LOGGER.info("Created program {}", created);
