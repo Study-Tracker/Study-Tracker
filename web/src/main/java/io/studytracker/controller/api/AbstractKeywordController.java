@@ -20,8 +20,9 @@ import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.mapstruct.mapper.KeywordMapper;
 import io.studytracker.model.Keyword;
 import io.studytracker.service.KeywordService;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 
 public abstract class AbstractKeywordController extends AbstractApiController{
 
@@ -30,7 +31,7 @@ public abstract class AbstractKeywordController extends AbstractApiController{
   private KeywordMapper keywordMapper;
 
   /**
-   * Creates a new keyword. If the provided category does not exist, a new category record is created for it.
+   * Creates a new keyword.
    *
    * @param keyword the keyword to create
    * @return the created keyword
