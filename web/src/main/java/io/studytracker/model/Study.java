@@ -58,7 +58,7 @@ import java.util.*;
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("users"),
-        @NamedAttributeNode(value = "keywords", subgraph = "keyword-details"),
+        @NamedAttributeNode("keywords"),
         @NamedAttributeNode("externalLinks"),
         @NamedAttributeNode("conclusions"),
         @NamedAttributeNode("comments"),
@@ -67,10 +67,6 @@ import java.util.*;
         @NamedAttributeNode("gitRepositories")
       },
     subgraphs = {
-          @NamedSubgraph(
-              name = "keyword-details",
-              attributeNodes = {@NamedAttributeNode("category")}
-          ),
           @NamedSubgraph(
               name = "study-storage-folder-details",
               attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
