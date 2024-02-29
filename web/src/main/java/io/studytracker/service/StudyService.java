@@ -40,6 +40,7 @@ import io.studytracker.model.Status;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyNotebookFolder;
 import io.studytracker.model.StudyOptionAttributes;
 import io.studytracker.model.StudyOptions;
 import io.studytracker.model.StudyStorageFolder;
@@ -195,8 +196,9 @@ public class StudyService {
     ELNFolder elnFolder = null;
     if (study.isLegacy()) {
       LOGGER.info(String.format("Legacy Study : %s", study.getCode()));
-      if (study.getNotebookFolder().getUrl() != null) {
-        elnFolder = study.getNotebookFolder();
+      if (study.getOptions().getNotebookFolder().getUrl() != null) {
+        elnFolder = new ELNFolder();
+        elnFolder.setUrl(study.getOptions().getNotebookFolder().getUrl());
         elnFolder.setName(NamingService.getStudyNotebookFolderName(study));
       } else {
         LOGGER.warn("No ELN URL set, so folder reference will not be created.");
@@ -204,7 +206,8 @@ public class StudyService {
     } else {
       // New study and notebook integration active
       LOGGER.info(String.format("Creating ELN folder for study: %s", study.getCode()));
-      if (program.getNotebookFolder() != null) {
+      NotebookFolder programFolder = notebookFolderService.findPrimaryProgramFolder(program).orElse(null);
+      if (programFolder != null) {
         try {
 
           // Create the notebook folder
@@ -223,10 +226,6 @@ public class StudyService {
     return elnFolder;
   }
 
-  public void create(Study study) {
-    this.create(study, new StudyOptions());
-  }
-
   /**
    * Creates a new study record, creates a storage folder, creates and ELN folder, and creates an
    * ELN entry for the study.
@@ -234,10 +233,11 @@ public class StudyService {
    * @param study new study
    */
   @Transactional
-  public Study create(Study study, StudyOptions options) {
+  public Study create(Study study) {
 
-    LOGGER.info("Attempting to create new study with name: {}  and options: {}" + study.getName(), options);
+    LOGGER.info("Attempting to create new study with name: {}", study.getName());
 
+    StudyOptions options = study.getOptions();
     StudyOptionAttributes.setStudyOptionAttributes(study, options);
 
     // Check for existing studies
@@ -289,7 +289,7 @@ public class StudyService {
     if (options.isUseNotebook()) {
 
       ELNFolder elnFolder = this.createStudyElnFolder(study, program);
-      study.setNotebookFolder(elnFolder);
+      study.addNotebookFolder(elnFolder, true);
 
       // Get the template
       if (elnFolder != null && !study.isLegacy()) {
@@ -304,11 +304,10 @@ public class StudyService {
                 "Could not find notebook template with ID: " + options.getNotebookTemplateId());
           }
         }
-        studySummaryEntry = notebookEntryService.createStudyNotebookEntry(study, template);
+        studySummaryEntry = notebookEntryService
+            .createStudyNotebookEntry(study, NotebookFolder.from(elnFolder), template);
       }
 
-    } else {
-      study.setNotebookFolder(null);
     }
 
     // Persist the record
@@ -681,14 +680,18 @@ public class StudyService {
   public void repairElnFolder(Study study) {
 
     // Check to see if the folder exists and create a new one if necessary
-    Optional<NotebookFolder> optional = notebookFolderService.findStudyFolder(study);
+    Optional<NotebookFolder> optional = notebookFolderService.findPrimaryStudyFolder(study);
     NotebookFolder folder = optional.orElseGet(() -> notebookFolderService.createStudyFolder(study));
 
     // Update the record
     ELNFolder f;
     boolean isNew = false;
     try {
-      f = elnFolderRepository.getById(study.getNotebookFolder().getId());
+      StudyNotebookFolder snf = study.getNotebookFolders().stream()
+          .filter(sf -> sf.isPrimary())
+          .findFirst()
+          .orElse(null);
+      f = elnFolderRepository.getById(snf.getElnFolder().getId());
     } catch (NullPointerException e) {
       f = new ELNFolder();
       isNew = true;
@@ -701,7 +704,7 @@ public class StudyService {
 
     if (isNew) {
       Study s = studyRepository.getById(study.getId());
-      s.setNotebookFolder(f);
+      s.addNotebookFolder(f);
       studyRepository.save(s);
     }
   }

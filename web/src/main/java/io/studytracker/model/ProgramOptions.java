@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import io.studytracker.eln.NotebookFolder;
 import lombok.Data;
 
 @Data
@@ -25,6 +26,7 @@ public class ProgramOptions {
   private boolean useGit = false;
   private boolean useStorage = true;
   private StorageDriveFolder parentFolder;
+  private NotebookFolder notebookFolder;
   private GitGroup gitGroup;
 
 }

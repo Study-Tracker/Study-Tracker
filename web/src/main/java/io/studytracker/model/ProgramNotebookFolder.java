@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,39 +18,38 @@ package io.studytracker.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "keywords")
+@Table(name = "program_notebook_folders", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"program_id", "eln_folder_id"})
+})
 @Getter
 @Setter
-public class Keyword extends Model {
+public class ProgramNotebookFolder extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @Column(name = "category", length = 64)
-  private String category;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "program_id", nullable = false, updatable = false)
+  private Program program;
 
-  @Column(name = "keyword", nullable = false)
-  private String keyword;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "eln_folder_id", nullable = false, updatable = false)
+  private ELNFolder elnFolder;
 
-  public Keyword() {
-  }
-
-  public Keyword(String keyword) {
-    this.keyword = keyword;
-  }
-
-  public Keyword(String keyword, String category) {
-    this.keyword = keyword;
-    this.category = category;
-  }
+  @Column(name = "is_primary", nullable = false)
+  private boolean primary = false;
 
 }

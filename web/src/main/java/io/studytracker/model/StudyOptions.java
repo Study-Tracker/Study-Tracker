@@ -16,6 +16,7 @@
 
 package io.studytracker.model;
 
+import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -24,6 +25,7 @@ import lombok.Data;
 public class StudyOptions {
 
   private boolean useNotebook = true;
+  private NotebookFolderDetailsDto notebookFolder;
   private String notebookTemplateId;
   private boolean useGit = false;
   private boolean useStorage = true;

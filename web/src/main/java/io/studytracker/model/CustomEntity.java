@@ -25,7 +25,7 @@ import lombok.Data;
 
 @MappedSuperclass
 @Data
-public abstract class CustomEntity implements Model {
+public abstract class CustomEntity extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

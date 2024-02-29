@@ -33,7 +33,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class Task implements Model {
+public abstract class Task extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

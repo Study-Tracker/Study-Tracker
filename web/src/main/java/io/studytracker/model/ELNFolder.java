@@ -26,7 +26,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "eln_folders")
-public class ELNFolder implements Model {
+public class ELNFolder extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

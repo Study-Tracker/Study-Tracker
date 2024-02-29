@@ -25,7 +25,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public abstract class CustomEntityField implements Model {
+public abstract class CustomEntityField extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

@@ -130,12 +130,12 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
     study.setKeywords(keywords);
     study.addStorageFolder(createStudyFolder(study), true);
 
-    ELNFolder notebookEntry = new ELNFolder();
-    notebookEntry.setName("IDBS ELN");
-    notebookEntry.setUrl(
+    ELNFolder elnFolder = new ELNFolder();
+    elnFolder.setName("IDBS ELN");
+    elnFolder.setUrl(
         "https://example.idbs-eworkbook.com:8443/EWorkbookWebApp/#entity/displayEntity?entityId=603e68c0e01411e7acd000000a0000a2&v=y");
-    notebookEntry.setReferenceId("12345");
-    study.setNotebookFolder(notebookEntry);
+    elnFolder.setReferenceId("12345");
+    study.addNotebookFolder(elnFolder, true);
 
     studyRepository.save(study);
     studies.add(study);
@@ -174,11 +174,11 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
     study.setKeywords(keywords);
     study.addStorageFolder(createStudyFolder(study), true);
 
-    notebookEntry = new ELNFolder();
-    notebookEntry.setName("ELN");
-    notebookEntry.setUrl("https://google.com");
-    notebookEntry.setReferenceId("12345");
-    study.setNotebookFolder(notebookEntry);
+    elnFolder = new ELNFolder();
+    elnFolder.setName("ELN");
+    elnFolder.setUrl("https://google.com");
+    elnFolder.setReferenceId("12345");
+    study.addNotebookFolder(elnFolder, true);
 
     studyRepository.save(study);
 
@@ -235,10 +235,10 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
     study.setKeywords(keywords);
-    notebookEntry = new ELNFolder();
-    notebookEntry.setName("ELN");
-    notebookEntry.setUrl("https://google.com");
-    study.setNotebookFolder(notebookEntry);
+    elnFolder = new ELNFolder();
+    elnFolder.setName("ELN");
+    elnFolder.setUrl("https://google.com");
+    study.addNotebookFolder(elnFolder, true);
     study.addStorageFolder(createStudyFolder(study), true);
     studyRepository.save(study);
 

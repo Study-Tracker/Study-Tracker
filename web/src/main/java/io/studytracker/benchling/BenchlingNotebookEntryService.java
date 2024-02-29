@@ -22,19 +22,27 @@ import io.studytracker.benchling.api.entities.BenchlingEntryRequest;
 import io.studytracker.benchling.api.entities.BenchlingEntryRequest.CustomField;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
-import io.studytracker.eln.*;
+import io.studytracker.eln.NotebookEntry;
+import io.studytracker.eln.NotebookEntryService;
+import io.studytracker.eln.NotebookFolder;
+import io.studytracker.eln.NotebookTemplate;
+import io.studytracker.eln.NotebookUser;
+import io.studytracker.eln.NotebookUserService;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public final class BenchlingNotebookEntryService
@@ -78,17 +86,17 @@ public final class BenchlingNotebookEntryService
   }
 
   @Override
-  public NotebookEntry createStudyNotebookEntry(Study study) throws NotebookException {
-    return this.createStudyNotebookEntry(study, null);
+  public NotebookEntry createStudyNotebookEntry(Study study, NotebookFolder studyFolder) throws NotebookException {
+    return this.createStudyNotebookEntry(study, studyFolder, null);
   }
 
   @Override
-  public NotebookEntry createStudyNotebookEntry(Study study, NotebookTemplate template)
-      throws NotebookException {
+  public NotebookEntry createStudyNotebookEntry(Study study, NotebookFolder studyFolder,
+      NotebookTemplate template) throws NotebookException {
 
     BenchlingEntryRequest request = new BenchlingEntryRequest();
     request.setName(study.getCode() + " Study Summary: " + study.getName());
-    request.setFolderId(study.getNotebookFolder().getReferenceId());
+    request.setFolderId(studyFolder.getReferenceId());
 
     // Users
     List<String> userIds = new ArrayList<>();

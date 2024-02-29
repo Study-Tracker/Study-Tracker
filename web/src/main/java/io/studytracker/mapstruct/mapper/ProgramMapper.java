@@ -24,37 +24,35 @@ import io.studytracker.mapstruct.dto.response.ProgramSummaryDto;
 import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.ProgramStorageFolder;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface ProgramMapper {
 
-  // ProgramSummary
-  Program fromProgramSummary(ProgramSummaryDto dto);
-
-  List<Program> fromProgramSummaryList(List<ProgramSummaryDto> dtos);
-
+  // Summary
   ProgramSummaryDto toProgramSummary(Program program);
 
   List<ProgramSummaryDto> toProgramSummaryList(List<Program> programs);
 
   // ProgramDetails
-  Program fromProgramDetails(ProgramDetailsDto dto);
-
-  List<Program> fromProgramDetailsList(List<ProgramDetailsDto> dtos);
-
   ProgramDetailsDto toProgramDetails(Program program);
 
   List<ProgramDetailsDto> toProgramDetailsList(List<Program> programs);
 
+  // Form
   ProgramFormDto toProgramFormDto(Program program);
+
+  @Mapping(source = "notebookFolder", target = "options.notebookFolder")
+  @Mapping(source = "parentFolder", target = "options.parentFolder")
+  @Mapping(source = "gitGroup", target = "options.gitGroup")
+  @Mapping(source = "useGit", target = "options.useGit")
+  @Mapping(source = "useNotebook", target = "options.useNotebook")
   Program fromProgramFormDto(ProgramFormDto dto);
 
-  // API
+  // API DTO
   List<ProgramDto> toProgramDtoList(List<Program> programs);
   @Mapping(source = "createdBy.id", target = "createdBy")
   @Mapping(source = "lastModifiedBy.id", target = "lastModifiedBy")
@@ -62,7 +60,11 @@ public interface ProgramMapper {
   @Mapping(source = "storageFolders", target = "storageFolders", qualifiedByName = "storageFolderToId")
   ProgramDto toProgramDto(Program program);
 
+  // API Payload
   ProgramPayloadDto toProgramPayloadDto(Program program);
+
+  @Mapping(source = "parentFolderId", target = "options.parentFolder.id")
+  @Mapping(source = "notebookFolderId", target = "options.notebookFolder.id")
   Program fromProgramPayloadDto(ProgramPayloadDto dto);
 
   @Mapping(target = "parentFolder.id", source = "parentFolderId")

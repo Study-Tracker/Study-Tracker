@@ -38,7 +38,7 @@ import javax.persistence.Table;
       name = "relationship-details",
       attributeNodes = {@NamedAttributeNode("sourceStudy"), @NamedAttributeNode("targetStudy")})
 })
-public class StudyRelationship implements Model {
+public class StudyRelationship extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

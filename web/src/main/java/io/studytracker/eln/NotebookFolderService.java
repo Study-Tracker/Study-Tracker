@@ -26,45 +26,68 @@ import java.util.Optional;
 public interface NotebookFolderService {
 
   /**
-   * Returns a program's {@link NotebookFolder}, if one exists.
+   * Returns a list of all folders for a program.
    *
    * @param program
    * @return
    */
-  Optional<NotebookFolder> findProgramFolder(Program program);
+  List<NotebookFolder> findProgramFolders(Program program);
 
   /**
-   * Returns a study's {@link NotebookFolder}, if one exists.
+   * Returns a list of all folders for a study.
    *
    * @param study
    * @return
    */
-  Optional<NotebookFolder> findStudyFolder(Study study);
+  List<NotebookFolder> findStudyFolders(Study study);
 
   /**
-   * Returns a study's {@link NotebookFolder}, if one exists, optionally including its contents.
+   * Returns a list of all folders for an assay.
+   * @param assay
+   * @return
+   */
+  List<NotebookFolder> findAssayFolders(Assay assay);
+
+  /**
+   * Returns a program's primary {@link NotebookFolder}, if one exists.
+   *
+   * @param program
+   * @return
+   */
+  Optional<NotebookFolder> findPrimaryProgramFolder(Program program);
+
+  /**
+   * Returns a study's primary {@link NotebookFolder}, if one exists.
+   *
+   * @param study
+   * @return
+   */
+  Optional<NotebookFolder> findPrimaryStudyFolder(Study study);
+
+  /**
+   * Returns a study's primary {@link NotebookFolder}, if one exists, optionally including its contents.
    *
    * @param study
    * @param includeContents
    * @return
    */
-  Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents);
+  Optional<NotebookFolder> findPrimaryStudyFolder(Study study, boolean includeContents);
 
   /**
-   * Returns an assay's {@link NotebookFolder}, if one exists.
+   * Returns an assay's primary {@link NotebookFolder}, if one exists.
    *
    * @param assay
    * @return
    */
-  Optional<NotebookFolder> findAssayFolder(Assay assay);
+  Optional<NotebookFolder> findPrimaryAssayFolder(Assay assay);
 
   /**
-   * Returns an assay's {@link NotebookFolder}, if one exists, optionally including its contents.
+   * Returns an assay's primary {@link NotebookFolder}, if one exists, optionally including its contents.
    *
    * @param assay
    * @return
    */
-  Optional<NotebookFolder> findAssayFolder(Assay assay, boolean includeContents);
+  Optional<NotebookFolder> findPrimaryAssayFolder(Assay assay, boolean includeContents);
 
   /**
    * Creates a folder for a program in the ELN and returns a {@link NotebookFolder}.

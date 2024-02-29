@@ -53,7 +53,7 @@ public interface NotebookEntryService {
    * @return
    * @throws NotebookException
    */
-  NotebookEntry createStudyNotebookEntry(Study study) throws NotebookException;
+  NotebookEntry createStudyNotebookEntry(Study study, NotebookFolder studyFolder) throws NotebookException;
 
   /**
    * Creates a blank notebook entry from the provided template for a study in the ELN and returns a
@@ -63,7 +63,7 @@ public interface NotebookEntryService {
    * @return
    * @throws NotebookException
    */
-  NotebookEntry createStudyNotebookEntry(Study study, NotebookTemplate template)
+  NotebookEntry createStudyNotebookEntry(Study study, NotebookFolder studyFolder, NotebookTemplate template)
       throws NotebookException;
 
   /**

@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.api;
+package io.studytracker.repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
+import io.studytracker.model.ProgramNotebookFolder;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-@Data
-public class ProgramPayloadDto {
+public interface ProgramNotebookFolderRepository extends JpaRepository<ProgramNotebookFolder, Long> {
 
-  private Long id;
-  private @NotNull(message = "Program code must not be empty") String code;
-  private @NotNull(message = "Program name must not be empty") String name;
-  private String description;
-  private boolean active;
-  private Long notebookFolderId;
-//  private Long storageFolderId;
-  private Long parentFolderId;
-  private Map<String, String> attributes = new HashMap<>();
+  @Query("SELECT psf FROM ProgramNotebookFolder psf WHERE psf.program.id = ?1")
+  List<ProgramNotebookFolder> findByProgramId(Long programId);
+
 }

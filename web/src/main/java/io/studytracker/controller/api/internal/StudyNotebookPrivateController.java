@@ -21,15 +21,19 @@ import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Study;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/study/{studyId}/notebook")
@@ -49,7 +53,7 @@ public class StudyNotebookPrivateController extends AbstractStudyController {
 
     Optional<NotebookFolder> notebookFolder =
         Optional.ofNullable(notebookFolderService)
-            .flatMap(service -> service.findStudyFolder(study, includeContents));
+            .flatMap(service -> service.findPrimaryStudyFolder(study, includeContents));
     return notebookFolder.orElseThrow(
         () -> new RecordNotFoundException("Could not load notebook folder"));
   }

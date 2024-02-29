@@ -31,24 +31,35 @@ import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.mapstruct.mapper.UserMapper;
-import io.studytracker.model.*;
+import io.studytracker.model.Activity;
+import io.studytracker.model.Program;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
 import io.studytracker.storage.StorageDriveFolderService;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
@@ -105,9 +116,8 @@ public class ProgramPrivateController extends AbstractProgramController {
   @PostMapping("")
   public HttpEntity<ProgramDetailsDto> createProgram(@RequestBody @Valid ProgramFormDto dto) {
     LOGGER.info("Creating new program: " + dto.toString());
-    Program newProgram = this.getProgramMapper().fromProgramFormDto(dto);
-    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
-    Program program = this.createNewProgram(newProgram, options);
+//    Program newProgram = this.getProgramMapper().fromProgramFormDto(dto);
+    Program program = this.createNewProgram(this.getProgramMapper().fromProgramFormDto(dto));
     return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.CREATED);
   }
 
@@ -117,9 +127,9 @@ public class ProgramPrivateController extends AbstractProgramController {
       @RequestBody @Valid ProgramFormDto dto
   ) {
     LOGGER.info("Updating program: " + programId);
-    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
-    Program toUpdate = this.getProgramMapper().fromProgramFormDto(dto);
-    Program program = this.updateExistingProgram(toUpdate, options);
+//    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
+//    Program toUpdate = this.getProgramMapper().fromProgramFormDto(dto);
+    Program program = this.updateExistingProgram(this.getProgramMapper().fromProgramFormDto(dto));
     return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.OK);
   }
 
@@ -229,7 +239,7 @@ public class ProgramPrivateController extends AbstractProgramController {
 
     // Check that the folder exists
     Optional<NotebookFolder> folderOptional =
-        Optional.ofNullable(notebookFolderService).flatMap(service -> service.findProgramFolder(program));
+        Optional.ofNullable(notebookFolderService).flatMap(service -> service.findPrimaryProgramFolder(program));
     if (folderOptional.isEmpty()) {
       throw new RecordNotFoundException("Cannot find notebook folder for program: " + programId);
     }

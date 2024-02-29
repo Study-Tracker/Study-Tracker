@@ -569,7 +569,7 @@ public class AssayService {
 
     // Check to see if the folder exists and create a new one if necessary
     NotebookFolder folder;
-    Optional<NotebookFolder> optional = notebookFolderService.findAssayFolder(assay);
+    Optional<NotebookFolder> optional = notebookFolderService.findPrimaryAssayFolder(assay);
     folder = optional.orElseGet(() -> notebookFolderService.createAssayFolder(assay));
 
     // Update the record
