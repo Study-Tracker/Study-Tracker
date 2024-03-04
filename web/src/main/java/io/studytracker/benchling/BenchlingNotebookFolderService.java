@@ -114,13 +114,11 @@ public final class BenchlingNotebookFolderService
   @Override
   public Optional<ELNFolder> findPrimaryProgramFolder(Program program) {
     LOGGER.info("Fetching benchling notebook folder for program: " + program.getName());
-    ProgramNotebookFolder programNotebookFolder = program.getNotebookFolders().stream()
-        .filter(f -> f.isPrimary())
-        .findFirst()
+    ELNFolder programNotebookFolder = elnFolderRepository.findPrimaryByProgramId(program.getId())
         .orElse(null);
     if (programNotebookFolder != null) {
       Optional<BenchlingFolder> optional = this.getClient()
-          .findFolderById(programNotebookFolder.getElnFolder().getReferenceId());
+          .findFolderById(programNotebookFolder.getReferenceId());
       return optional.map(this::convertBenchlingFolder);
     } else {
       LOGGER.warn(
@@ -133,12 +131,11 @@ public final class BenchlingNotebookFolderService
   public Optional<ELNFolder> findPrimaryStudyFolder(Study study) {
 
     LOGGER.info("Fetching notebook folder for study: " + study.getCode());
-    Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByStudyId(study.getId());
+    ELNFolder studyFolder = elnFolderRepository.findPrimaryByStudyId(study.getId()).orElse(null);
     BenchlingElnRestClient client = this.getClient();
 
     // Does the study have the folder object set?
-    if (elnFolderOptional.isPresent()) {
-      ELNFolder studyFolder = elnFolderOptional.get();
+    if (studyFolder != null) {
       Optional<BenchlingFolder> optional = client.findFolderById(studyFolder.getReferenceId());
       return optional.flatMap(f -> Optional.of(this.convertBenchlingFolder(f)));
     } else {
@@ -151,11 +148,10 @@ public final class BenchlingNotebookFolderService
   public Optional<ELNFolder> findPrimaryAssayFolder(Assay assay) {
 
     LOGGER.info("Fetching notebook folder for assay: " + assay.getCode());
-    Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByAssayId(assay.getId());
+    ELNFolder assayFolder = elnFolderRepository.findPrimaryByAssayId(assay.getId()).orElse(null);
     BenchlingElnRestClient client = this.getClient();
 
-    if (elnFolderOptional.isPresent()) {
-      ELNFolder assayFolder = elnFolderOptional.get();
+    if (assayFolder != null) {
       Optional<BenchlingFolder> optional = client.findFolderById(assayFolder.getReferenceId());
       return optional.flatMap(f -> Optional.of(this.convertBenchlingFolder(f)));
     } else {

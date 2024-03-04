@@ -35,7 +35,7 @@ public class StudySummaryDto {
   private CollaboratorDetailsDto collaborator;
   private boolean legacy = false;
   private boolean active = true;
-  private NotebookFolderDetailsDto notebookFolder;
+//  private NotebookFolderDetailsDto notebookFolder;
   private Date startDate;
   private Date endDate;
   private Date createdAt;

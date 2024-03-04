@@ -37,7 +37,7 @@ public class StudyDetailsDto {
   private CollaboratorDetailsDto collaborator;
   private boolean legacy = false;
   private boolean active = true;
-  private NotebookFolderDetailsDto notebookFolder;
+  private Set<StudyNotebookFolderDetailsDto> notebookFolders = new HashSet<>();
   private UserSummaryDto createdBy;
   private UserSummaryDto lastModifiedBy;
   private Date startDate;

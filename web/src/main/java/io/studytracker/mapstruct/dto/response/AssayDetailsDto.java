@@ -39,7 +39,7 @@ public class AssayDetailsDto {
   private UserSlimDto owner;
   private Date startDate;
   private Date endDate;
-  private NotebookFolderDetailsDto notebookFolder;
+  private Set<AssayNotebookFolderDetailsDto> notebookFolders = new HashSet<>();
   private boolean active = true;
   private Date createdAt;
   private Date updatedAt;

@@ -311,6 +311,7 @@ public class AssayService {
 
           // Create the notebook folder
           ELNFolder notebookFolder = notebookFolderService.createAssayFolder(assay);
+          elnFolderRepository.save(notebookFolder);
           assay.addNotebookFolder(notebookFolder, true);
 
           // Create the notebook entry
