@@ -16,49 +16,51 @@
 
 package io.studytracker.eln;
 
-import io.studytracker.model.ELNFolder;
-import java.net.URL;
+import io.studytracker.model.Model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
-import org.springframework.data.annotation.Transient;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class NotebookFolder {
+@MappedSuperclass
+@Getter
+@Setter
+public abstract class NotebookFolder extends Model {
 
-  @Transient private NotebookFolder parentFolder;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-  @NotNull private String url;
+  @Column(name = "url", nullable = false, length = 1024)
+  private String url;
 
-  @NotNull private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-  @NotNull private String path;
+  @Column(name = "path", length = 1024)
+  private String path;
 
-  @NotNull private String referenceId;
+  @Column(name = "reference_id")
+  private String referenceId;
 
-  @Transient private List<NotebookFolder> subFolders = new ArrayList<>();
-
-  @Transient private List<NotebookEntry> entries = new ArrayList<>();
-
+  @Transient
   private Map<String, Object> attributes = new HashMap<>();
 
-  public static NotebookFolder from(ELNFolder folder) {
-    NotebookFolder f = new NotebookFolder();
-    f.setName(folder.getName());
-    f.setPath(folder.getPath());
-    f.setUrl(folder.getUrl());
-    f.setReferenceId(folder.getReferenceId());
-    return f;
-  }
+  @Transient
+  private NotebookFolder parentFolder;
 
-  public void setUrl(URL url) {
-    this.url = url.toString();
-  }
+  @Transient
+  private List<? extends NotebookFolder> subFolders = new ArrayList<>();
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+  @Transient
+  private List<NotebookEntry> entries = new ArrayList<>();
+
 }

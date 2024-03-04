@@ -23,12 +23,12 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ELNFolderRepository extends JpaRepository<ELNFolder, Long> {
 
-  @Query("select f from ELNFolder f join Program p on p.notebookFolder.id = f.id where p.id = ?1")
+  @Query("select f from Program p join p.notebookFolders nf join nf.elnFolder f where p.id = ?1")
   Optional<ELNFolder> findByProgramId(Long programId);
 
-  @Query("select f from ELNFolder f join Study s on s.notebookFolder.id = f.id where s.id = ?1")
+  @Query("select f from Study s join s.notebookFolders nf join nf.elnFolder f where s.id = ?1")
   Optional<ELNFolder> findByStudyId(Long studyId);
 
-  @Query("select f from ELNFolder f join Assay a on a.notebookFolder.id = f.id where a.id = ?1")
+  @Query("select f from Assay a join a.notebookFolders nf join nf.elnFolder f where a.id = ?1")
   Optional<ELNFolder> findByAssayId(Long assayId);
 }

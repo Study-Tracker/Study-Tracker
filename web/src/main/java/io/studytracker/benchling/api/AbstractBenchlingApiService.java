@@ -22,6 +22,7 @@ import io.studytracker.benchling.api.entities.BenchlingFolder;
 import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.model.BenchlingIntegration;
+import io.studytracker.model.ELNFolder;
 import io.studytracker.repository.BenchlingIntegrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -54,8 +55,8 @@ public abstract class AbstractBenchlingApiService {
    * @param benchlingFolder
    * @return
    */
-  protected NotebookFolder convertBenchlingFolder(BenchlingFolder benchlingFolder) {
-    NotebookFolder notebookFolder = new NotebookFolder();
+  protected ELNFolder convertBenchlingFolder(BenchlingFolder benchlingFolder) {
+    ELNFolder notebookFolder = new ELNFolder();
     notebookFolder.setName(benchlingFolder.getName());
     notebookFolder.setUrl(benchlingFolder.getUrl());
     notebookFolder.setReferenceId(benchlingFolder.getId());

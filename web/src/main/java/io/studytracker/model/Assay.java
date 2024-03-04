@@ -303,4 +303,28 @@ public class Assay extends Model {
     this.gitRepositories.remove(gitRepository);
   }
 
+  public void addNotebookFolder(AssayNotebookFolder folder) {
+    folder.setAssay(this);
+    this.notebookFolders.add(folder);
+  }
+
+  public void addNotebookFolder(ELNFolder elnFolder, boolean isPrimary) {
+    if (isPrimary) {
+      this.notebookFolders.forEach(f -> f.setPrimary(false));
+    }
+    AssayNotebookFolder assayNotebookFolder = new AssayNotebookFolder();
+    assayNotebookFolder.setAssay(this);
+    assayNotebookFolder.setElnFolder(elnFolder);
+    assayNotebookFolder.setPrimary(isPrimary);
+    this.getNotebookFolders().add(assayNotebookFolder);
+  }
+
+  public void addNotebookFolder(ELNFolder elnFolder) {
+    this.addNotebookFolder(elnFolder, false);
+  }
+
+  public void removeNotebookFolder(AssayNotebookFolder folder) {
+    this.notebookFolders.remove(folder);
+  }
+
 }

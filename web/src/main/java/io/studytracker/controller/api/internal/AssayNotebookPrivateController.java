@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/internal/assay/{assayId}/notebook")
@@ -45,15 +44,14 @@ public class AssayNotebookPrivateController extends AbstractAssayController {
   private NotebookFolderService notebookFolderService;
 
   @GetMapping("")
-  public NotebookFolder getNotebookFolder(@PathVariable("assayId") String assayId,
-      @RequestParam(value = "contents", required = false) boolean includeContents)
+  public NotebookFolder getNotebookFolder(@PathVariable("assayId") String assayId)
       throws RecordNotFoundException {
     LOGGER.info("Fetching notebook folder for assay: " + assayId);
     Assay assay = getAssayFromIdentifier(assayId);
 
     Optional<NotebookFolder> notebookFolder =
         Optional.ofNullable(notebookFolderService)
-            .flatMap(service -> service.findPrimaryAssayFolder(assay, includeContents));
+            .flatMap(service -> service.findPrimaryAssayFolder(assay));
     return notebookFolder.orElseThrow(
         () -> new RecordNotFoundException("Could not load assay folder"));
   }

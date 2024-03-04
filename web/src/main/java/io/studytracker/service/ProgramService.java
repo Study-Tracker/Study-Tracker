@@ -16,8 +16,7 @@
 
 package io.studytracker.service;
 
-import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.NotebookFolderService;
+import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
@@ -50,14 +49,19 @@ public class ProgramService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgramService.class);
 
+  @Autowired
   private ProgramRepository programRepository;
 
-  private NotebookFolderService notebookFolderService;
+  @Autowired
+  private BenchlingNotebookFolderService notebookFolderService;
 
+  @Autowired
   private ELNFolderRepository elnFolderRepository;
 
+  @Autowired
   private GitServiceLookup gitServiceLookup;
 
+  @Autowired
   private StorageDriveFolderService storageDriveFolderService;
 
   public Optional<Program> findById(Long id) {
@@ -108,9 +112,9 @@ public class ProgramService {
     if (options.isUseNotebook()) {
       LOGGER.info("Creating notebook folder for program: " + program.getName());
       try {
-        NotebookFolder notebookFolder = notebookFolderService.createProgramFolder(program);
+        ELNFolder notebookFolder = notebookFolderService.createProgramFolder(program);
         LOGGER.debug("Created notebook folder: " + notebookFolder);
-        program.addNotebookFolder(ELNFolder.from(notebookFolder), true);
+        program.addNotebookFolder(notebookFolder, true);
       } catch (Exception e) {
         throw new StudyTrackerException(e);
       }
@@ -283,8 +287,8 @@ public class ProgramService {
   public void repairElnFolder(Program program) {
 
     // Check to see if the folder exists and create a new one if necessary
-    NotebookFolder folder;
-    Optional<NotebookFolder> optional = notebookFolderService.findPrimaryProgramFolder(program);
+    ELNFolder folder;
+    Optional<ELNFolder> optional = notebookFolderService.findPrimaryProgramFolder(program);
     if (optional.isPresent()) {
       folder = optional.get();
     } else {
@@ -304,38 +308,11 @@ public class ProgramService {
       f.setReferenceId(folder.getReferenceId());
       elnFolderRepository.save(f);
     } else {
-      ELNFolder f = ELNFolder.from(folder);
-      elnFolderRepository.save(f);
-      program.addNotebookFolder(f, true);
+      elnFolderRepository.save(folder);
+      program.addNotebookFolder(folder, true);
       programRepository.save(program);
     }
 
   }
 
-  @Autowired
-  public void setProgramRepository(ProgramRepository programRepository) {
-    this.programRepository = programRepository;
-  }
-
-  @Autowired
-  public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
-    this.notebookFolderService = notebookFolderService;
-  }
-
-
-  @Autowired
-  public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {
-    this.elnFolderRepository = elnFolderRepository;
-  }
-
-  @Autowired
-  public void setGitServiceLookup(GitServiceLookup gitServiceLookup) {
-    this.gitServiceLookup = gitServiceLookup;
-  }
-
-  @Autowired
-  public void setStorageDriveFolderService(
-      StorageDriveFolderService storageDriveFolderService) {
-    this.storageDriveFolderService = storageDriveFolderService;
-  }
 }

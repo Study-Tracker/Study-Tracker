@@ -19,9 +19,8 @@ package io.studytracker.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.aws.S3Utils;
-import io.studytracker.eln.NotebookEntryService;
-import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.NotebookFolderService;
+import io.studytracker.benchling.BenchlingNotebookEntryService;
+import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.InvalidRequestException;
@@ -30,6 +29,7 @@ import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayNotebookFolder;
 import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayStorageFolder;
 import io.studytracker.model.AssayTask;
@@ -88,9 +88,9 @@ public class AssayService {
 
   @Autowired private StorageDriveFolderService storageDriveFolderService;
 
-  @Autowired private NotebookFolderService notebookFolderService;
+  @Autowired private BenchlingNotebookFolderService notebookFolderService;
 
-  @Autowired private NotebookEntryService notebookEntryService;
+  @Autowired private BenchlingNotebookEntryService notebookEntryService;
 
   @Autowired private NamingService namingService;
 
@@ -299,14 +299,19 @@ public class AssayService {
 
     // Create the ELN folder
     if (options.isUseNotebook()) {
-      if (study.getNotebookFolder() != null) {
+      ELNFolder studyFolder = study.getNotebookFolders().stream()
+          .filter(f -> f.isPrimary())
+          .map(f -> f.getElnFolder())
+          .findFirst()
+          .orElse(null);
+      if (studyFolder != null) {
         try {
 
           LOGGER.info(String.format("Creating ELN entry for assay: %s", assay.getCode()));
 
           // Create the notebook folder
-          NotebookFolder notebookFolder = notebookFolderService.createAssayFolder(assay);
-          assay.setNotebookFolder(ELNFolder.from(notebookFolder));
+          ELNFolder notebookFolder = notebookFolderService.createAssayFolder(assay);
+          assay.addNotebookFolder(notebookFolder, true);
 
           // Create the notebook entry
           NotebookTemplate template = null;
@@ -319,7 +324,7 @@ public class AssayService {
               LOGGER.warn("Cannot find notebook template with id: " + options.getNotebookTemplateId());
             }
           }
-          notebookEntryService.createAssayNotebookEntry(assay, template);
+          notebookEntryService.createAssayNotebookEntry(assay, notebookFolder, template);
 
         } catch (Exception e) {
           e.printStackTrace();
@@ -328,8 +333,6 @@ public class AssayService {
       } else {
         LOGGER.warn(String.format("Assay study %s does not have ELN folder set.", study.getCode()));
       }
-    } else {
-      assay.setNotebookFolder(null);
     }
 
     Assay created;
@@ -568,15 +571,18 @@ public class AssayService {
   public void repairElnFolder(Assay assay) {
 
     // Check to see if the folder exists and create a new one if necessary
-    NotebookFolder folder;
-    Optional<NotebookFolder> optional = notebookFolderService.findPrimaryAssayFolder(assay);
+    ELNFolder folder;
+    Optional<ELNFolder> optional = notebookFolderService.findPrimaryAssayFolder(assay);
     folder = optional.orElseGet(() -> notebookFolderService.createAssayFolder(assay));
 
     // Update the record
     ELNFolder f;
     boolean isNew = false;
     try {
-      f = elnFolderRepository.getById(assay.getNotebookFolder().getId());
+      AssayNotebookFolder anf = assay.getNotebookFolders().stream()
+          .filter(AssayNotebookFolder::isPrimary)
+          .findFirst().orElse(null);
+      f = elnFolderRepository.getById(anf.getElnFolder().getId());
     } catch (NullPointerException e) {
       f = new ELNFolder();
       isNew = true;
@@ -589,7 +595,7 @@ public class AssayService {
 
     if (isNew) {
       Assay a = assayRepository.getById(assay.getId());
-      a.setNotebookFolder(f);
+      a.addNotebookFolder(f, true);
       assayRepository.save(a);
     }
   }

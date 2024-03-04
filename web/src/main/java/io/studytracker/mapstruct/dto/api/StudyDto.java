@@ -37,8 +37,6 @@ public class StudyDto {
   private Long collaboratorId;
   private boolean legacy = false;
   private boolean active = true;
-  private Long notebookFolderId;
-  private Long storageFolderId;
   private Long createdBy;
   private Long lastModifiedBy;
   private Date startDate;

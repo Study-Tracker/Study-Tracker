@@ -34,11 +34,13 @@ import io.studytracker.model.User;
 import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.CommentRepository;
+import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ExternalLinkRepository;
 import io.studytracker.repository.KeywordRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StudyConclusionsRepository;
+import io.studytracker.repository.StudyNotebookFolderRepository;
 import io.studytracker.repository.StudyRelationshipRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
@@ -73,6 +75,8 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
   @Autowired private CommentRepository commentRepository;
   @Autowired private StudyConclusionsRepository studyConclusionsRepository;
   @Autowired private StudyRelationshipRepository studyRelationshipRepository;
+  @Autowired private ELNFolderRepository elnFolderRepository;
+  @Autowired private StudyNotebookFolderRepository studyNotebookFolderRepository;
 
   private StorageDriveFolder createStudyFolder(Study study) {
     try {
@@ -135,6 +139,7 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
     elnFolder.setUrl(
         "https://example.idbs-eworkbook.com:8443/EWorkbookWebApp/#entity/displayEntity?entityId=603e68c0e01411e7acd000000a0000a2&v=y");
     elnFolder.setReferenceId("12345");
+    elnFolderRepository.save(elnFolder);
     study.addNotebookFolder(elnFolder, true);
 
     studyRepository.save(study);
@@ -178,6 +183,7 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
     elnFolder.setName("ELN");
     elnFolder.setUrl("https://google.com");
     elnFolder.setReferenceId("12345");
+    elnFolderRepository.save(elnFolder);
     study.addNotebookFolder(elnFolder, true);
 
     studyRepository.save(study);
@@ -235,10 +241,13 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
     study.setKeywords(keywords);
+
     elnFolder = new ELNFolder();
     elnFolder.setName("ELN");
     elnFolder.setUrl("https://google.com");
+    elnFolderRepository.save(elnFolder);
     study.addNotebookFolder(elnFolder, true);
+
     study.addStorageFolder(createStudyFolder(study), true);
     studyRepository.save(study);
 
@@ -349,6 +358,8 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
 
   @Override
   public void deleteData() {
+    studyNotebookFolderRepository.deleteAll();
+    elnFolderRepository.deleteAll();
     externalLinkRepository.deleteAll();
     studyConclusionsRepository.deleteAll();
     commentRepository.deleteAll();

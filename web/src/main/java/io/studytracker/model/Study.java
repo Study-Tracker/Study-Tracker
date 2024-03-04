@@ -255,7 +255,7 @@ public class Study extends Model {
   private Set<GitRepository> gitRepositories = new HashSet<>();
 
   @Transient
-  private StudyOptions options;
+  private StudyOptions options = new StudyOptions();
 
   public void addUser(User user) {
     this.users.add(user);
@@ -372,6 +372,10 @@ public class Study extends Model {
 
   public String getAttribute(String key) {
     return this.attributes.get(key);
+  }
+
+  public void setAttribute(String key, String value) {
+    this.attributes.put(key, value);
   }
 
   public void addStudyStorageFolder(StudyStorageFolder folder) {

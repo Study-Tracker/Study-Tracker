@@ -23,6 +23,7 @@ import io.studytracker.model.Collaborator;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.model.User;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.ProgramRepository;
@@ -139,6 +140,9 @@ public class StudyServiceTests {
     study.setStartDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
+    StudyOptions options = new StudyOptions();
+    options.setUseNotebook(false);
+    study.setOptions(options);
     studyService.create(study);
     Assert.assertEquals(STUDY_COUNT + 1, studyRepository.count());
     List<Study> studies = studyService.findByName("Study X");

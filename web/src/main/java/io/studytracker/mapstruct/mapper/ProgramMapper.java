@@ -22,6 +22,7 @@ import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramSummaryDto;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramNotebookFolder;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.ProgramStorageFolder;
 import java.util.List;
@@ -56,8 +57,8 @@ public interface ProgramMapper {
   List<ProgramDto> toProgramDtoList(List<Program> programs);
   @Mapping(source = "createdBy.id", target = "createdBy")
   @Mapping(source = "lastModifiedBy.id", target = "lastModifiedBy")
-  @Mapping(source = "notebookFolder.id", target = "notebookFolderId")
   @Mapping(source = "storageFolders", target = "storageFolders", qualifiedByName = "storageFolderToId")
+  @Mapping(source = "notebookFolders", target = "notebookFolders", qualifiedByName = "notebookFolderToId")
   ProgramDto toProgramDto(Program program);
 
   // API Payload
@@ -74,6 +75,11 @@ public interface ProgramMapper {
 
   @Named("storageFolderToId")
   public static Long storageFolderToId(ProgramStorageFolder folder) {
+    return folder.getId();
+  }
+
+  @Named("notebookFolderToId")
+  public static Long notebookFolderToId(ProgramNotebookFolder folder) {
     return folder.getId();
   }
 }

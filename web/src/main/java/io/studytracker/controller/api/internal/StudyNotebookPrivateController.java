@@ -53,7 +53,7 @@ public class StudyNotebookPrivateController extends AbstractStudyController {
 
     Optional<NotebookFolder> notebookFolder =
         Optional.ofNullable(notebookFolderService)
-            .flatMap(service -> service.findPrimaryStudyFolder(study, includeContents));
+            .flatMap(service -> service.findPrimaryStudyFolder(study));
     return notebookFolder.orElseThrow(
         () -> new RecordNotFoundException("Could not load notebook folder"));
   }

@@ -18,10 +18,10 @@ package io.studytracker.service;
 
 import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.aws.S3Utils;
+import io.studytracker.benchling.BenchlingNotebookEntryService;
+import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.eln.NotebookEntry;
-import io.studytracker.eln.NotebookEntryService;
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.exception.InvalidConstraintException;
@@ -75,24 +75,34 @@ public class StudyService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StudyService.class);
 
+  @Autowired
   private StudyRepository studyRepository;
 
+  @Autowired
   private ProgramRepository programRepository;
 
-  private NotebookEntryService notebookEntryService;
+  @Autowired
+  private BenchlingNotebookEntryService notebookEntryService;
 
-  private NotebookFolderService notebookFolderService;
+  @Autowired
+  private BenchlingNotebookFolderService notebookFolderService;
 
+  @Autowired
   private NamingService namingService;
 
+  @Autowired
   private ELNFolderRepository elnFolderRepository;
 
+  @Autowired
   private GitServiceLookup gitServiceLookup;
 
+  @Autowired
   private GitRepositoryService gitRepositoryService;
 
+  @Autowired
   private StudyStorageServiceLookup storageServiceLookup;
 
+  @Autowired
   private StorageDriveFolderService storageDriveFolderService;
 
   /**
@@ -206,14 +216,12 @@ public class StudyService {
     } else {
       // New study and notebook integration active
       LOGGER.info(String.format("Creating ELN folder for study: %s", study.getCode()));
-      NotebookFolder programFolder = notebookFolderService.findPrimaryProgramFolder(program).orElse(null);
+      ELNFolder programFolder = notebookFolderService.findPrimaryProgramFolder(program).orElse(null);
       if (programFolder != null) {
         try {
-
           // Create the notebook folder
-          NotebookFolder notebookFolder = notebookFolderService.createStudyFolder(study);
-          elnFolder = ELNFolder.from(notebookFolder);
-
+          elnFolder = notebookFolderService.createStudyFolder(study);
+          elnFolderRepository.save(elnFolder);
         } catch (Exception e) {
           e.printStackTrace();
           LOGGER.warn("Failed to create notebook folder and entry for study: " + study.getCode());
@@ -289,7 +297,9 @@ public class StudyService {
     if (options.isUseNotebook()) {
 
       ELNFolder elnFolder = this.createStudyElnFolder(study, program);
-      study.addNotebookFolder(elnFolder, true);
+      if (elnFolder != null) {
+        study.addNotebookFolder(elnFolder, true);
+      }
 
       // Get the template
       if (elnFolder != null && !study.isLegacy()) {
@@ -305,7 +315,7 @@ public class StudyService {
           }
         }
         studySummaryEntry = notebookEntryService
-            .createStudyNotebookEntry(study, NotebookFolder.from(elnFolder), template);
+            .createStudyNotebookEntry(study, elnFolder, template);
       }
 
     }
@@ -680,7 +690,7 @@ public class StudyService {
   public void repairElnFolder(Study study) {
 
     // Check to see if the folder exists and create a new one if necessary
-    Optional<NotebookFolder> optional = notebookFolderService.findPrimaryStudyFolder(study);
+    Optional<ELNFolder> optional = notebookFolderService.findPrimaryStudyFolder(study);
     NotebookFolder folder = optional.orElseGet(() -> notebookFolderService.createStudyFolder(study));
 
     // Update the record
@@ -704,61 +714,9 @@ public class StudyService {
 
     if (isNew) {
       Study s = studyRepository.getById(study.getId());
-      s.addNotebookFolder(f);
+      s.addNotebookFolder(f, true);
       studyRepository.save(s);
     }
   }
 
-  @Autowired
-  public void setStudyRepository(StudyRepository studyRepository) {
-    this.studyRepository = studyRepository;
-  }
-
-  @Autowired
-  public void setProgramRepository(ProgramRepository programRepository) {
-    this.programRepository = programRepository;
-  }
-
-  @Autowired
-  public void setStorageServiceLookup(
-      StudyStorageServiceLookup storageServiceLookup) {
-    this.storageServiceLookup = storageServiceLookup;
-  }
-
-  @Autowired
-  public void setStorageDriveFolderService(
-      StorageDriveFolderService storageDriveFolderService) {
-    this.storageDriveFolderService = storageDriveFolderService;
-  }
-
-  @Autowired(required = false)
-  public void setNotebookEntryService(NotebookEntryService notebookEntryService) {
-    this.notebookEntryService = notebookEntryService;
-  }
-
-  @Autowired
-  public void setNamingService(NamingService namingService) {
-    this.namingService = namingService;
-  }
-
-
-  @Autowired
-  public void setElnFolderRepository(ELNFolderRepository elnFolderRepository) {
-    this.elnFolderRepository = elnFolderRepository;
-  }
-
-  @Autowired(required = false)
-  public void setNotebookFolderService(NotebookFolderService notebookFolderService) {
-    this.notebookFolderService = notebookFolderService;
-  }
-
-  @Autowired
-  public void setGitServiceLookup(GitServiceLookup gitServiceLookup) {
-    this.gitServiceLookup = gitServiceLookup;
-  }
-
-  @Autowired
-  public void setGitRepositoryService(GitRepositoryService gitRepositoryService) {
-    this.gitRepositoryService = gitRepositoryService;
-  }
 }

@@ -23,7 +23,7 @@ import io.studytracker.model.Study;
 import java.util.List;
 import java.util.Optional;
 
-public interface NotebookFolderService {
+public interface NotebookFolderService<T extends NotebookFolder> {
 
   /**
    * Returns a list of all folders for a program.
@@ -31,7 +31,7 @@ public interface NotebookFolderService {
    * @param program
    * @return
    */
-  List<NotebookFolder> findProgramFolders(Program program);
+  List<T> findProgramFolders(Program program);
 
   /**
    * Returns a list of all folders for a study.
@@ -39,14 +39,14 @@ public interface NotebookFolderService {
    * @param study
    * @return
    */
-  List<NotebookFolder> findStudyFolders(Study study);
+  List<T> findStudyFolders(Study study);
 
   /**
    * Returns a list of all folders for an assay.
    * @param assay
    * @return
    */
-  List<NotebookFolder> findAssayFolders(Assay assay);
+  List<T> findAssayFolders(Assay assay);
 
   /**
    * Returns a program's primary {@link NotebookFolder}, if one exists.
@@ -54,7 +54,7 @@ public interface NotebookFolderService {
    * @param program
    * @return
    */
-  Optional<NotebookFolder> findPrimaryProgramFolder(Program program);
+  Optional<T> findPrimaryProgramFolder(Program program);
 
   /**
    * Returns a study's primary {@link NotebookFolder}, if one exists.
@@ -62,16 +62,7 @@ public interface NotebookFolderService {
    * @param study
    * @return
    */
-  Optional<NotebookFolder> findPrimaryStudyFolder(Study study);
-
-  /**
-   * Returns a study's primary {@link NotebookFolder}, if one exists, optionally including its contents.
-   *
-   * @param study
-   * @param includeContents
-   * @return
-   */
-  Optional<NotebookFolder> findPrimaryStudyFolder(Study study, boolean includeContents);
+  Optional<T> findPrimaryStudyFolder(Study study);
 
   /**
    * Returns an assay's primary {@link NotebookFolder}, if one exists.
@@ -79,15 +70,7 @@ public interface NotebookFolderService {
    * @param assay
    * @return
    */
-  Optional<NotebookFolder> findPrimaryAssayFolder(Assay assay);
-
-  /**
-   * Returns an assay's primary {@link NotebookFolder}, if one exists, optionally including its contents.
-   *
-   * @param assay
-   * @return
-   */
-  Optional<NotebookFolder> findPrimaryAssayFolder(Assay assay, boolean includeContents);
+  Optional<T> findPrimaryAssayFolder(Assay assay);
 
   /**
    * Creates a folder for a program in the ELN and returns a {@link NotebookFolder}.
@@ -96,7 +79,7 @@ public interface NotebookFolderService {
    * @return
    * @throws NotebookException
    */
-  NotebookFolder createProgramFolder(Program program) throws NotebookException;
+  T createProgramFolder(Program program) throws NotebookException;
 
   /**
    * Creates a folder for a study in the ELN and returns a {@link NotebookFolder}.
@@ -105,7 +88,7 @@ public interface NotebookFolderService {
    * @return
    * @throws NotebookException
    */
-  NotebookFolder createStudyFolder(Study study) throws NotebookException;
+  T createStudyFolder(Study study) throws NotebookException;
 
   /**
    * Creates a folder for an assay in the ELN and returns a {@link NotebookFolder}.
@@ -114,14 +97,22 @@ public interface NotebookFolderService {
    * @return
    * @throws NotebookException
    */
-  NotebookFolder createAssayFolder(Assay assay) throws NotebookException;
+  T createAssayFolder(Assay assay) throws NotebookException;
 
   /**
    * Lists all project folders within the ELN.
    *
    * @return
    */
-  List<NotebookFolder> listNotebookProjectFolders();
+  List<T> listProjectFolders();
+
+  /**
+   * Loads the contents of the target folder, including subfolders and notebook entries.
+   *
+   * @param folder
+   * @return
+   */
+  T loadFolderContents(T folder);
 
 
 }

@@ -92,7 +92,6 @@ public interface AssayMapper {
   @Mapping(target = "lastModifiedBy", source = "lastModifiedBy.id")
   @Mapping(target = "studyId", source = "study.id")
   @Mapping(target = "assayTypeId", source = "assayType.id")
-  @Mapping(target = "notebookFolderId", source = "notebookFolder.id")
   @Mapping(target = "users", source = "users", qualifiedByName = "userToId")
   @Mapping(target = "tasks", source = "tasks", qualifiedByName = "assayTaskToId")
   AssayDto toAssayDto(Assay assay);
