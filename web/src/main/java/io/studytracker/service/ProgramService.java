@@ -22,20 +22,11 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.ELNFolder;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.Program;
-import io.studytracker.model.ProgramNotebookFolder;
-import io.studytracker.model.ProgramOptions;
-import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.*;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StudyStorageService;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +34,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProgramService {
@@ -113,6 +109,7 @@ public class ProgramService {
       LOGGER.info("Creating notebook folder for program: " + program.getName());
       try {
         ELNFolder notebookFolder = notebookFolderService.createProgramFolder(program);
+        elnFolderRepository.save(notebookFolder);
         LOGGER.debug("Created notebook folder: " + notebookFolder);
         program.addNotebookFolder(notebookFolder, true);
       } catch (Exception e) {

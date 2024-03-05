@@ -16,9 +16,9 @@
 
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.controller.api.AbstractProgramController;
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.ProgramActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -39,27 +39,19 @@ import io.studytracker.service.ActivityService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
 import io.studytracker.storage.StorageDriveFolderService;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
@@ -77,20 +69,18 @@ public class ProgramPrivateController extends AbstractProgramController {
   @Autowired private UserService userService;
   @Autowired private StudyMapper studyMapper;
   @Autowired private UserMapper userMapper;
-
-  @Autowired(required = false)
-  private NotebookFolderService notebookFolderService;
+  @Autowired private BenchlingNotebookFolderService notebookFolderService;
 
   @GetMapping("")
   public List<?> getAllPrograms(
-      @RequestParam(required = false, name = "details") boolean showDetails) throws Exception {
+      @RequestParam(required = false, name = "details") boolean showDetails) {
     LOGGER.debug("Getting all programs: showDetails=" + showDetails);
     List<Program> programs = this.getProgramService().findAll();
     if (showDetails) {
       List<ProgramDetailsDto> detailsList =new ArrayList<>();
       for (Program program : programs) {
         ProgramDetailsDto dto = this.getProgramMapper().toProgramDetails(program);
-        dto.setStudies(new HashSet<>(studyMapper.toStudySummaryList(studyService.findByProgram(program))));
+        dto.setStudies(studyMapper.toStudySlimSet(new HashSet<>(studyService.findByProgram(program))));
         dto.setUsers(userMapper.toUserSummarySet(userService.findByProgram(program)));
         detailsList.add(dto);
       }

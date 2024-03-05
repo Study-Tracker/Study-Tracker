@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import {Button, Card,} from 'react-bootstrap';
 import {FolderPlus} from 'react-feather';
 import {SettingsLoadingMessage} from "../../../common/loading";
@@ -23,12 +23,11 @@ import axios from "axios";
 import ProgramsTable from "./ProgramsTable";
 import ProgramDetailsModal from "./ProgramDetailsModal";
 import NotyfContext from "../../../context/NotyfContext";
+import {useQuery} from "react-query";
 
 const ProgramSettings = () => {
 
   const [loadCount, setLoadCount] = useState(0);
-  const [programs, setPrograms] = useState(null);
-  const [error, setError] = useState(null);
   // const [showDetails, setShowDetails] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -45,20 +44,15 @@ const ProgramSettings = () => {
     }
   };
 
-  useEffect(() => {
-    axios.get("/api/internal/program?details=true")
-    .then(async response => {
-      setPrograms(response.data);
-    })
+  const {data: programs, isLoading, error} = useQuery('programs', () => {
+    return axios.get("/api/internal/program?details=true")
+    .then(response => response.data)
     .catch(error => {
       console.error(error);
-      setError(error);
-      notyf.open({
-        type: "error",
-        message: "Failed to load programs"
-      })
+      notyf.error("Failed to load programs");
+      return error;
     });
-  }, [loadCount, notyf]);
+  });
 
   const handleStatusChange = (id, active) => {
     axios.post("/api/internal/program/" + id + "/status?active=" + active)
@@ -78,8 +72,10 @@ const ProgramSettings = () => {
     })
   }
 
-  let content = '';
-  if (programs) {
+  let content = <SettingsLoadingMessage/>;
+  if (error) {
+    content = <SettingsErrorMessage/>;
+  } else if (!isLoading && !error && programs) {
     content = (
         <ProgramsTable
             programs={programs}
@@ -87,10 +83,6 @@ const ProgramSettings = () => {
             handleStatusChange={handleStatusChange}
         />
     );
-  } else if (error) {
-    content = <SettingsErrorMessage/>;
-  } else {
-    content = <SettingsLoadingMessage/>;
   }
 
   return (

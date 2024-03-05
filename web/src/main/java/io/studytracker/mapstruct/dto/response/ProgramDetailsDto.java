@@ -16,13 +16,9 @@
 
 package io.studytracker.mapstruct.dto.response;
 
-import io.studytracker.model.ProgramNotebookFolder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import lombok.Data;
+
+import java.util.*;
 
 @Data
 public class ProgramDetailsDto {
@@ -36,10 +32,10 @@ public class ProgramDetailsDto {
   private Date createdAt;
   private Date updatedAt;
   private boolean active;
-  private Set<ProgramNotebookFolder> notebookFolders = new HashSet<>();
+  private Set<ProgramNotebookFolderDetailsDto> notebookFolders = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
   private Set<ProgramStorageDriveFolderSummaryDto> storageFolders = new HashSet<>();
   private Set<GitGroupDetailsDto> gitGroups = new HashSet<>();
   private Set<UserSummaryDto> users = new HashSet<>();
-  private Set<StudySummaryDto> studies = new HashSet<>();
+  private Set<StudySlimDto> studies = new HashSet<>();
 }
