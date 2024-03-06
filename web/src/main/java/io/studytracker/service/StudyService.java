@@ -23,43 +23,16 @@ import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookTemplate;
-import io.studytracker.exception.DuplicateRecordException;
-import io.studytracker.exception.InvalidConstraintException;
-import io.studytracker.exception.InvalidRequestException;
-import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.exception.StudyTrackerException;
+import io.studytracker.exception.*;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.ELNFolder;
-import io.studytracker.model.ExternalLink;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.GitRepository;
-import io.studytracker.model.Program;
-import io.studytracker.model.S3FolderDetails;
-import io.studytracker.model.Status;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
-import io.studytracker.model.StudyNotebookFolder;
-import io.studytracker.model.StudyOptionAttributes;
-import io.studytracker.model.StudyOptions;
-import io.studytracker.model.StudyStorageFolder;
-import io.studytracker.model.User;
+import io.studytracker.model.*;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.storage.StorageDriveFolderService;
-import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.StorageUtils;
-import io.studytracker.storage.StudyStorageService;
-import io.studytracker.storage.StudyStorageServiceLookup;
+import io.studytracker.storage.*;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +41,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import javax.validation.ConstraintViolationException;
+import java.net.URL;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /** Service class for reading and writing {@link Study} records. */
 @Service
@@ -174,7 +153,7 @@ public class StudyService {
    * @param study study object
    * @return storage folder record
    */
-  private StudyStorageFolder createStudyStorageFolder(Study study, StorageDriveFolder parentFolder) {
+  private StorageDriveFolder createStudyStorageFolder(Study study, StorageDriveFolder parentFolder) {
     try {
       StorageDrive drive = storageDriveFolderService.findDriveByFolder(parentFolder)
           .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
@@ -182,14 +161,9 @@ public class StudyService {
       StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
           .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
               + parentFolder.getStorageDrive().getDriveType()));
-      StorageDriveFolder folder = storageService.createStudyFolder(parentFolder, study);
-      StudyStorageFolder studyFolder = new StudyStorageFolder();
-      studyFolder.setStorageDriveFolder(folder);
-      studyFolder.setStudy(study);
-      return studyFolder;
+      return storageService.createStudyFolder(parentFolder, study);
     } catch (Exception e) {
-      e.printStackTrace();
-      LOGGER.warn("Failed to create storage folder for study: " + study.getCode());
+      LOGGER.warn("Failed to create storage folder for study: " + study.getCode(), e);
       throw new StudyTrackerException(e);
     }
   }
@@ -288,9 +262,8 @@ public class StudyService {
               + program.getName()))
           .getStorageDriveFolder();
     }
-    StudyStorageFolder folder = this.createStudyStorageFolder(study, parentFolder);
-    folder.setPrimary(true);
-    study.addStudyStorageFolder(folder);
+    StorageDriveFolder folder = this.createStudyStorageFolder(study, parentFolder);
+    study.addStorageFolder(folder, true);
 
     // Create the ELN folder
     NotebookEntry studySummaryEntry = null;
@@ -360,10 +333,9 @@ public class StudyService {
     // Additional folders
     for (StorageDriveFolder folderOption : options.getAdditionalFolders()) {
       LOGGER.debug("Creating additional folder for study: " + folder.toString());
-      StudyStorageFolder additionalFolder =
+      StorageDriveFolder additionalFolder =
           this.createStudyStorageFolder(study, folderOption);
-      additionalFolder.setPrimary(false);
-      study.addStudyStorageFolder(additionalFolder);
+      study.addStorageFolder(additionalFolder);
     }
 
 
@@ -676,12 +648,11 @@ public class StudyService {
           .findPrimaryProgramFolder(program)
           .orElseThrow(() -> new RecordNotFoundException("Could not find primary program folder : "
               + study.getCode()));
-      StudyStorageFolder studyStorageFolder = this.createStudyStorageFolder(study, parentFolder);
-      studyStorageFolder.setPrimary(true);
-      study.addStudyStorageFolder(studyStorageFolder);
+      StorageDriveFolder studyStorageFolder = this.createStudyStorageFolder(study, parentFolder);
+      study.addStorageFolder(studyStorageFolder, true);
       studyRepository.save(study);
       LOGGER.info("Created primary storage folder for study: " + study.getCode()
-          + " at path: " + studyStorageFolder.getStorageDriveFolder().getPath());
+          + " at path: " + studyStorageFolder.getPath());
     }
 
   }
@@ -717,6 +688,39 @@ public class StudyService {
       s.addNotebookFolder(f, true);
       studyRepository.save(s);
     }
+  }
+  
+  @Transactional
+  public void moveStudyToProgram(Study study, Program program) {
+    
+    // Update the study record
+    Study s = studyRepository.getById(study.getId());
+    s.setProgram(program);
+    s.setCode(namingService.generateStudyCode(s));
+    
+    // Create a new primary storage folder
+    StorageDriveFolder parentFolder = this.storageDriveFolderService.findPrimaryProgramFolder(program).orElse(null);
+    if (parentFolder != null) {
+      StorageDriveFolder storageFolder = this.createStudyStorageFolder(s, parentFolder);
+      s.addStorageFolder(storageFolder, true);
+    } else {
+      LOGGER.warn("No primary storage folder found for program {}. No new study storage folder will be created. ", program.getName());
+    }
+    
+    // Create a new ELN folder
+    ELNFolder programElnFolder = elnFolderRepository.findPrimaryByProgramId(program.getId()).orElse(null);
+    if (programElnFolder != null) {
+      ELNFolder elnFolder = this.createStudyElnFolder(s, program);
+      if (elnFolder != null) {
+        s.addNotebookFolder(elnFolder, true);
+      }
+    } else {
+        LOGGER.warn("No primary ELN folder found for program {}. No new study ELN folder will be created. ", program.getName());
+    }
+    
+    studyRepository.save(s);
+    LOGGER.info("Successfully moved study {} to program {}", s.getId(), program.getName());
+    
   }
 
 }

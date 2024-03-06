@@ -37,6 +37,11 @@ export const studyActions = {
     label: "Study Restored",
     visible: true
   },
+  MOVED_STUDY: {
+    value: "MOVED_STUDY",
+    label: "Study Moved",
+    visible: true
+  },
   STUDY_STATUS_CHANGED: {
     value: "STUDY_STATUS_CHANGED",
     label: "Study Status Update",
@@ -133,6 +138,11 @@ export const studyActions = {
   RESTORED_ASSAY: {
     value: "RESTORED_ASSAY",
     label: "Assay Restored",
+    visible: true
+  },
+  MOVED_ASSAY: {
+    value: "MOVED_ASSAY",
+    label: "Assay Moved",
     visible: true
   },
   ASSAY_STATUS_CHANGED: {

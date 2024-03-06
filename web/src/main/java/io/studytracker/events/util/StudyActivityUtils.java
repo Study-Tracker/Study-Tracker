@@ -17,19 +17,10 @@
 package io.studytracker.events.util;
 
 import io.studytracker.events.EventType;
-import io.studytracker.model.Activity;
-import io.studytracker.model.Comment;
-import io.studytracker.model.ExternalLink;
-import io.studytracker.model.Status;
-import io.studytracker.model.Study;
-import io.studytracker.model.StudyConclusions;
-import io.studytracker.model.StudyRelationship;
-import io.studytracker.model.User;
+import io.studytracker.model.*;
 import io.studytracker.storage.StorageFile;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
 
 public class StudyActivityUtils {
 
@@ -70,6 +61,20 @@ public class StudyActivityUtils {
     activity.setDate(new Date());
     activity.setUser(triggeredBy);
     activity.setData(Collections.singletonMap("study", EntityViewUtils.createStudyView(study)));
+    return activity;
+  }
+  
+  public static Activity fromMovedStudy(Study study, Program oldProgram, Program newProgram, User triggeredBy) {
+    Activity activity = new Activity();
+    activity.setStudy(study);
+    activity.setEventType(EventType.MOVED_STUDY);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    Map<String, Object> data = new LinkedHashMap<>();
+    data.put("study", EntityViewUtils.createStudyView(study));
+    data.put("oldProgram", EntityViewUtils.createProgramView(oldProgram));
+    data.put("newProgram", EntityViewUtils.createProgramView(newProgram));
+    activity.setData(data);
     return activity;
   }
 

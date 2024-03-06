@@ -19,23 +19,13 @@ package io.studytracker.test.service;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.Collaborator;
-import io.studytracker.model.Program;
-import io.studytracker.model.Status;
-import io.studytracker.model.Study;
-import io.studytracker.model.StudyOptions;
-import io.studytracker.model.User;
+import io.studytracker.model.*;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +35,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -277,4 +269,36 @@ public class StudyServiceTests {
     Assert.assertEquals(STUDY_COUNT, studyService.countFromDate(monthAgo));
     Assert.assertEquals(STUDY_COUNT, studyService.countBetweenDates(monthAgo, now));
   }
+  
+  @Test
+  public void moveStudyTest() {
+    
+    Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(1, study.getStorageFolders().size());
+    Long id = study.getId();
+    Program program = programRepository.findByName("Preclinical Project B")
+            .orElseThrow(RecordNotFoundException::new);
+    
+    Exception exception = null;
+    try {
+      studyService.moveStudyToProgram(study, program);
+    } catch (Exception e) {
+      e.printStackTrace();
+      exception = e;
+    }
+    
+    Assert.assertNull(exception);
+    
+    Optional<Study> optional = studyService.findByCode("CPA-10001");
+    Assert.assertFalse(optional.isPresent());
+    optional = studyService.findByCode("PPB-10002");
+    Assert.assertTrue(optional.isPresent());
+    
+    Study updated = optional.get();
+    Assert.assertEquals(id, updated.getId());
+    Assert.assertEquals(program.getId(), updated.getProgram().getId());
+    Assert.assertEquals(2, study.getStorageFolders().size());
+    
+  }
+  
 }
