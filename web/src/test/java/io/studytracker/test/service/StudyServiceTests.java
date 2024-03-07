@@ -19,13 +19,23 @@ package io.studytracker.test.service;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.*;
+import io.studytracker.model.Collaborator;
+import io.studytracker.model.Program;
+import io.studytracker.model.Status;
+import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
+import io.studytracker.model.User;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
 import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +45,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -291,13 +299,13 @@ public class StudyServiceTests {
     
     Optional<Study> optional = studyService.findByCode("CPA-10001");
     Assert.assertFalse(optional.isPresent());
-    optional = studyService.findByCode("PPB-10002");
+    optional = studyService.findByCode("PPB-10003");
     Assert.assertTrue(optional.isPresent());
     
     Study updated = optional.get();
     Assert.assertEquals(id, updated.getId());
     Assert.assertEquals(program.getId(), updated.getProgram().getId());
-    Assert.assertEquals(2, study.getStorageFolders().size());
+    Assert.assertEquals(2, updated.getStorageFolders().size());
     
   }
   
