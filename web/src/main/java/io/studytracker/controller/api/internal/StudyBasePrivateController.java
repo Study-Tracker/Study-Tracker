@@ -225,6 +225,8 @@ public class StudyBasePrivateController extends AbstractStudyController {
           @RequestBody Map<String, Object> params
   ) throws StudyTrackerException {
     LOGGER.info("Updating study program: {}", params);
+    
+    // Get the study and the new program
     if (!params.containsKey("programId")) {
       throw new StudyTrackerException("No program ID provided.");
     }
@@ -233,8 +235,17 @@ public class StudyBasePrivateController extends AbstractStudyController {
     Program oldProgram = study.getProgram();
     Program program = this.getProgramService().findById(programId)
             .orElseThrow(() -> new RecordNotFoundException("Cannot find program with ID: " + programId));
+    
+    // Move the study
     this.getStudyService().moveStudyToProgram(study, program);
     Study updated = getStudyFromIdentifier(id);
+    
+    // If the study has assays, move them, too
+    for (Assay assay: this.getAssayService().findByStudyId(updated.getId())) {
+      this.getAssayService().moveAssayToStudy(assay, updated);
+    }
+    
+    // Publish the activity
     Activity activity = StudyActivityUtils.fromMovedStudy(study, oldProgram, program, this.getAuthenticatedUser());
     this.logActivity(activity);
     return this.getStudyMapper().toStudyDetails(updated);

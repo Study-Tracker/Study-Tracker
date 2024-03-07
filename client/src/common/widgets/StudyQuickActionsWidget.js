@@ -17,6 +17,7 @@
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
+  faBolt,
   faDolly,
   faEdit,
   faFolderPlus,
@@ -152,7 +153,7 @@ const StudyQuickActionsWidget = ({
                         </Dropdown.Toggle>
                     ) : (
                         <Dropdown.Toggle variant={"outline-primary"}>
-                          <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
+                          <FontAwesomeIcon icon={faBolt} className={"me-2"}/>
                           Actions
                         </Dropdown.Toggle>
                     )

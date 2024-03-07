@@ -17,14 +17,12 @@
 package io.studytracker.events.util;
 
 import io.studytracker.events.EventType;
-import io.studytracker.model.Activity;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AssayTask;
-import io.studytracker.model.Status;
-import io.studytracker.model.User;
+import io.studytracker.model.*;
 import io.studytracker.storage.StorageFile;
+
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class AssayActivityUtils {
@@ -88,6 +86,20 @@ public class AssayActivityUtils {
     data.put("assay", EntityViewUtils.createAssayView(assay));
     data.put("oldStatus", oldStatus.toString());
     data.put("newStatus", newStatus.toString());
+    activity.setData(data);
+    return activity;
+  }
+  
+  public static Activity fromMovedAssay(Assay assay, Study oldStudy, Study newStudy, User triggeredBy) {
+    Activity activity = new Activity();
+    activity.setAssay(assay);
+    activity.setEventType(EventType.MOVED_ASSAY);
+    activity.setDate(new Date());
+    activity.setUser(triggeredBy);
+    Map<String, Object> data = new LinkedHashMap<>();
+    data.put("assay", EntityViewUtils.createAssayView(assay));
+    data.put("oldStudy", EntityViewUtils.createStudyView(oldStudy));
+    data.put("newStudy", EntityViewUtils.createStudyView(newStudy));
     activity.setData(data);
     return activity;
   }

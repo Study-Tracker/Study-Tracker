@@ -100,6 +100,8 @@ const MoveStudyModal = ({ study, isOpen, setIsOpen }) => {
 
 MoveStudyModal.propTypes = {
   study: PropTypes.object.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  setIsOpen: PropTypes.func.isRequired,
 }
 
 export default MoveStudyModal;

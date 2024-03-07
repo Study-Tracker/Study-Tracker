@@ -693,6 +693,8 @@ public class StudyService {
   @Transactional
   public void moveStudyToProgram(Study study, Program program) {
     
+    LOGGER.info("Attempting to move study {} to program {}", study.getCode(), program.getName());
+    
     // Update the study record
     Study s = studyRepository.getById(study.getId());
     s.setProgram(program);
@@ -710,16 +712,16 @@ public class StudyService {
     // Create a new ELN folder
     ELNFolder programElnFolder = elnFolderRepository.findPrimaryByProgramId(program.getId()).orElse(null);
     if (programElnFolder != null) {
-      ELNFolder elnFolder = this.createStudyElnFolder(s, program);
-      if (elnFolder != null) {
-        s.addNotebookFolder(elnFolder, true);
+      ELNFolder studyFolder = this.createStudyElnFolder(s, program);
+      if (studyFolder != null) {
+        s.addNotebookFolder(studyFolder, true);
       }
     } else {
         LOGGER.warn("No primary ELN folder found for program {}. No new study ELN folder will be created. ", program.getName());
     }
     
     studyRepository.save(s);
-    LOGGER.info("Successfully moved study {} to program {}", s.getId(), program.getName());
+    LOGGER.info("Successfully moved study with new code {} to program {}", s.getCode(), program.getName());
     
   }
 

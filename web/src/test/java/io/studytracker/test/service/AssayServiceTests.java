@@ -20,24 +20,12 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AssayTask;
-import io.studytracker.model.AssayType;
-import io.studytracker.model.Status;
-import io.studytracker.model.Study;
-import io.studytracker.model.TaskStatus;
-import io.studytracker.model.User;
+import io.studytracker.model.*;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.service.AssayService;
 import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +35,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -250,4 +240,34 @@ public class AssayServiceTests {
         assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Status.COMPLETE, updated.getStatus());
   }
+  
+  @Test
+  public void moveAssayTest() {
+    Assay assay =
+        assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(1, assay.getStorageFolders().size());
+    Long assayId = assay.getId();
+    Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    
+    Exception exception = null;
+    try {
+      assayService.moveAssayToStudy(assay, study);
+    } catch (Exception e) {
+      exception = e;
+    }
+    
+    Assert.assertNull(exception);
+    
+    Optional<Assay> optional = assayService.findByCode("PPB-10001-001");
+    Assert.assertFalse(optional.isPresent());
+    optional = assayService.findByCode("CPA-10001-001");
+    Assert.assertTrue(optional.isPresent());
+    
+    Assay updated = optional.get();
+    Assert.assertEquals(assayId, updated.getId());
+    Assert.assertEquals(study.getId(), updated.getStudy().getId());
+    Assert.assertEquals(2, updated.getStorageFolders().size());
+    
+  }
+  
 }

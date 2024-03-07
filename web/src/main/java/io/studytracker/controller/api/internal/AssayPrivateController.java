@@ -17,6 +17,7 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
+import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.AssayFormDto;
@@ -24,26 +25,18 @@ import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
 import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssayParentDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
-import io.studytracker.model.Assay;
-import io.studytracker.model.Status;
-import io.studytracker.model.User;
-import java.util.List;
-import java.util.Map;
-import javax.validation.Valid;
+import io.studytracker.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/internal/assay")
@@ -103,6 +96,24 @@ public class AssayPrivateController extends AbstractAssayController {
     LOGGER.info(String.format("Setting status of assay %s to %s", id, label));
     this.updateAssayStatus(assay.getId(), status, this.getAuthenticatedUser());
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+  
+  @PutMapping("/{id}/study")
+  public AssayDetailsDto updateAssayStudy(
+      @PathVariable("id") String id,
+      @RequestBody Map<String, Object> params
+  ) throws StudyTrackerException {
+    if (!params.containsKey("studyId")) throw new StudyTrackerException("No studyId provided.");
+    String studyId = (String) params.get("studyId");
+    LOGGER.info(String.format("Setting study of assay %s to %s", id, studyId));
+    Assay assay = this.getAssayFromIdentifier(id);
+    Study oldStudy = assay.getStudy();
+    Study study = this.getStudyFromIdentifier(studyId);
+    this.getAssayService().moveAssayToStudy(assay, study);
+    Assay updated = this.getAssayFromIdentifier(id);
+    Activity activity = AssayActivityUtils.fromMovedAssay(assay, oldStudy, study, this.getAuthenticatedUser());
+    this.logActivity(activity);
+    return this.getAssayMapper().toAssayDetails(updated);
   }
 
   @GetMapping("/{assayId}/activity")

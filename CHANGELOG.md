@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - The default storage folder for studies and assays can now be changed in the Files tab of the Study and Assay Details pages. It is also now possible to remove non-default folders from studies and assays.
 - Studies can now be moved from one program to another. This will result in a new study code and new storage/ELN folders for the study. Old folders will still be associated with the study.
+- Assays can also be moved from one study to another. This will result in a new assay code and new storage/ELN folders for the assay. Old folders will still be associated with the assay.
 
 ### Changed
 - Simplified the Keywords data model, combining the category and keyword fields into a single table. This will make it simpler to search for keywords and to register keywords on-the-fly.
