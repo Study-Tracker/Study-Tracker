@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React, {useContext, useState} from "react";
 import {useMutation, useQueryClient} from "react-query";
 import PropTypes from "prop-types";
@@ -8,19 +24,20 @@ import NotyfContext from "../../context/NotyfContext";
 import {useNavigate} from "react-router-dom";
 import AsyncSelect from "react-select/async";
 
-const MoveAssayModal = ({ assay, isOpen, setIsOpen }) => {
+const MoveAssayModal = ({ assay, study, isOpen, setIsOpen }) => {
 
   const queryClient = useQueryClient();
   const notyf = useContext(NotyfContext);
   const navigate = useNavigate();
-  const [selectedStudy, setSelectedStudy] = useState(assay.study);
+  const [selectedStudy, setSelectedStudy] = useState(study);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const studyAutocomplete = (input) => {
     return axios.get(`/api/internal/autocomplete/study?q=${input}`)
     .then(response => {
       return response.data
-      .filter(study => study.active)
-      .filter(study => study.id !== assay.study.id)
+      .filter(s => s.active)
+      .filter(s => s.id !== study.id)
       .sort((a, b) => {
         const aLabel = a.code + ": " + a.name;
         const bLabel = b.code + ": " + b.name;
@@ -32,11 +49,11 @@ const MoveAssayModal = ({ assay, isOpen, setIsOpen }) => {
         }
         return 0;
       })
-      .map(study => {
+      .map(s => {
         return {
-          label: study.code + ": " + study.name,
-          value: study.id,
-          obj: study
+          label: s.code + ": " + s.name,
+          value: s.id,
+          obj: s
         }
       });
     }).catch(e => {
@@ -48,20 +65,24 @@ const MoveAssayModal = ({ assay, isOpen, setIsOpen }) => {
     return axios.put(`/api/internal/assay/${assay.id}/study`, {"studyId": newStudy.id});
   })
 
-  const handleSubmit = (study) => {
-    changeStudyMutation.mutate(study, {
+  const handleSubmit = (s) => {
+    setIsSubmitting(true);
+    changeStudyMutation.mutate(s, {
       onSuccess: (data) => {
         console.debug("Updated assay", data);
         queryClient.invalidateQueries({queryKey: "assays"});
         queryClient.invalidateQueries({queryKey: "assay"});
         notyf.success("Assay moved successfully");
         setIsOpen(false);
-        navigate(`/assay/${data.data.code}`);
+        navigate(`/study/${s.code}/assay/${data.data.code}`);
       },
       onError: (e) => {
         console.error(e);
         console.warn("Failed to move assay.")
         notyf.error("Failed to move assay");
+      },
+      onSettled: () => {
+        setIsSubmitting(false);
       }
     })
   }
@@ -94,8 +115,8 @@ const MoveAssayModal = ({ assay, isOpen, setIsOpen }) => {
                 classNamePrefix="react-select"
                 loadOptions={studyAutocomplete}
                 onChange={(selected) => setSelectedStudy(selected.obj)}
-                controlShouldRenderValue={false}
-                defaultOptions={true}
+                // controlShouldRenderValue={false}
+                // defaultOptions={true}
               />
               <Form.Text className="text-muted">
                 Select a new study to associate your assay with.
@@ -116,9 +137,9 @@ const MoveAssayModal = ({ assay, isOpen, setIsOpen }) => {
         <Button
           variant="primary"
           onClick={() => handleSubmit(selectedStudy)}
-          disabled={selectedStudy === null || !selectedStudy.id === assay.study.id}
+          disabled={selectedStudy === null || selectedStudy?.id === study.id || isSubmitting}
         >
-          Submit
+          {isSubmitting ? "Working..." : "Submit"}
         </Button>
       </Modal.Footer>
 
@@ -129,6 +150,7 @@ const MoveAssayModal = ({ assay, isOpen, setIsOpen }) => {
 
 MoveAssayModal.propTypes = {
   assay: PropTypes.object.isRequired,
+  study: PropTypes.object.isRequired,
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
 }

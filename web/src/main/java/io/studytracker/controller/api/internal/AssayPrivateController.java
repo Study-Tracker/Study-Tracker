@@ -25,18 +25,28 @@ import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
 import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssayParentDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
-import io.studytracker.model.*;
+import io.studytracker.model.Activity;
+import io.studytracker.model.Assay;
+import io.studytracker.model.Status;
+import io.studytracker.model.Study;
+import io.studytracker.model.User;
+import java.util.List;
+import java.util.Map;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/assay")
@@ -104,7 +114,7 @@ public class AssayPrivateController extends AbstractAssayController {
       @RequestBody Map<String, Object> params
   ) throws StudyTrackerException {
     if (!params.containsKey("studyId")) throw new StudyTrackerException("No studyId provided.");
-    String studyId = (String) params.get("studyId");
+    String studyId = params.get("studyId").toString();
     LOGGER.info(String.format("Setting study of assay %s to %s", id, studyId));
     Assay assay = this.getAssayFromIdentifier(id);
     Study oldStudy = assay.getStudy();

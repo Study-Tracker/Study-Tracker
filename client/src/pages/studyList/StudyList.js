@@ -140,37 +140,6 @@ const columns = [
         ) : ''
   },
   {
-    dataField: "links",
-    text: "Links",
-    sort: false,
-    searchable: false,
-    headerStyle: {width: '10%'},
-    csvExport: false,
-    formatter: (c, d) => {
-      let links = [];
-      if (!!d.primaryStorageFolder) {
-        links.push(
-            <a key={'files-links-' + d.id} target="_blank" rel="noopener noreferrer"
-               href={d.primaryStorageFolder.url}>Files</a>
-        )
-      }
-      if (!!d.notebookFolder) {
-        if (links.length > 0) {
-          links.push(" | ");
-        }
-        links.push(
-            <a key={'eln-links-' + d.id} target="_blank" rel="noopener noreferrer"
-               href={d.notebookFolder.url}>ELN</a>
-        )
-      }
-      return (
-          <div>
-            {links}
-          </div>
-      )
-    }
-  },
-  {
     dataField: 'search',
     text: 'Search',
     sort: false,

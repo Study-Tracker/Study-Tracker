@@ -20,12 +20,27 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayTask;
+import io.studytracker.model.AssayType;
+import io.studytracker.model.Status;
+import io.studytracker.model.Study;
+import io.studytracker.model.TaskStatus;
+import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
+import io.studytracker.repository.StudyRepository;
 import io.studytracker.service.AssayService;
 import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,8 +51,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.*;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "example"})
@@ -46,6 +59,7 @@ public class AssayServiceTests {
   @Autowired private AssayService assayService;
 
   @Autowired private AssayRepository assayRepository;
+  @Autowired private StudyRepository studyRepository;
 
   @Autowired private AssayTypeRepository assayTypeRepository;
 
@@ -248,7 +262,11 @@ public class AssayServiceTests {
     Assert.assertEquals(1, assay.getStorageFolders().size());
     Long assayId = assay.getId();
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
-    
+
+    // Need to remove the notebook folders for this test
+    study.setNotebookFolders(new HashSet<>());
+    studyRepository.save(study);
+
     Exception exception = null;
     try {
       assayService.moveAssayToStudy(assay, study);

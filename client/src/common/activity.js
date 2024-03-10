@@ -529,9 +529,9 @@ const ActivityMessage = ({activity}) => {
         <p>
           <a href={"/user/"
             + activity.user.id}>{activity.user.displayName}</a>
-          &nbsp;has moved assay
-          <a href={"/assay/" + activity.data.assay.code}>
-            {activity.data.study.code}
+          &nbsp;has moved assay&nbsp;
+          <a href={"/study/" + activity.studyId + "/assay/" + activity.data.assay.code}>
+            {activity.data.assay.code}
           </a>
           &nbsp;from study {activity.data.oldStudy.code} to study {activity.data.newStudy.code}
         </p>

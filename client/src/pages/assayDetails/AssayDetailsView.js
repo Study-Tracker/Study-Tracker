@@ -14,86 +14,62 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React from "react";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
 import AssayDetails from "./AssayDetails";
 import StandardWrapper from "../../common/structure/StandardWrapper";
-import PropTypes from "prop-types";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
 import axios from "axios";
+import {useQuery} from "react-query";
 
 const AssayDetailsView = props => {
 
   const params = useParams();
   const user = useSelector(state => state.user.value)
   const features = useSelector(state => state.features.value);
-  const [state, setState] = useState({
-    studyCode: params.studyCode,
-    assayCode: params.assayCode,
-    isLoaded: false,
-    isError: false
+  const {studyCode, assayCode} = params;
+
+  const {data: study, isLoading: studyIsLoading, error: studyError} = useQuery("study", () => {
+    return axios.get("/api/internal/study/" + studyCode)
+    .then(response => response.data);
   });
 
-  useEffect(() => {
-    axios.get("/api/internal/study/" + state.studyCode)
-    .then(async response => {
-      const study = response.data;
-      axios.get("/api/internal/study/" + state.studyCode + "/assays/"
-          + state.assayCode)
-      .then(response2 => {
-        const assay = response2.data;
-        setState(prevState => ({
-          ...prevState,
-          study: study,
-          assay: assay,
-          isLoaded: true
-        }));
-        console.debug("Assay", assay);
-      })
-      .catch(error => {
-        console.error(error);
-        setState(prevState => ({
-          ...prevState,
-          isError: true,
-          error: error
-        }));
-      });
-    })
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    })
-  }, []);
+  const {data: assay, isLoading: assayIsLoading, error: assayError} = useQuery("assay", () => {
+    return axios.get("/api/internal/assay/" + assayCode)
+    .then(response => response.data);
+  });
 
-
-  let content = <LoadingMessage/>;
-  if (state.isError) {
-    content = <ErrorMessage/>;
-  } else if (state.isLoaded) {
-    content = <AssayDetails
-        study={state.study}
-        assay={state.assay}
-        user={user}
-        features={features}
-    />;
+  if (studyIsLoading || assayIsLoading) {
+    return (
+        <StandardWrapper {...props}>
+          <LoadingMessage/>
+        </StandardWrapper>
+    )
   }
+
+  if (studyError || assayError) {
+    return (
+        <StandardWrapper {...props}>
+          <ErrorMessage/>
+        </StandardWrapper>
+    )
+  }
+
   return (
       <StandardWrapper {...props}>
-        {content}
+        <AssayDetails
+          study={study}
+          assay={assay}
+          user={user}
+          features={features}
+        />
       </StandardWrapper>
-  );
+  )
 
 }
 
-AssayDetailsView.propTypes = {
-  user: PropTypes.object,
-  features: PropTypes.object,
-}
+AssayDetailsView.propTypes = {}
 
 export default AssayDetailsView;

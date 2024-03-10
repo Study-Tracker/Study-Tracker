@@ -25,7 +25,7 @@ import {
   faTrashArrowUp,
   faTriangleExclamation
 } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import React, {useState} from "react";
 import PropTypes from "prop-types";
 import {faSquareCheck} from "@fortawesome/free-regular-svg-icons";
 import NotyfContext from "../../context/NotyfContext";
@@ -191,6 +191,7 @@ const AssayQuickActionsWidget = ({
 
         <MoveAssayModal
           assay={assay}
+          study={study}
           isOpen={moveAssayModalIsOpen}
           setIsOpen={setMoveAssayModalIsOpen}
         />
