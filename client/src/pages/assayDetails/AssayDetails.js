@@ -48,7 +48,7 @@ const AssayDetails = props => {
           <Col>
             <Breadcrumbs crumbs={[
               {label: "Home", url: "/"},
-              {label: "Study " + study.code, url: "/study/" + study.code},
+              {label: "Study " + study.code, url: `/study/${study.code}#assays`},
               {label: "Assay " + assay.code}
             ]}/>
           </Col>
