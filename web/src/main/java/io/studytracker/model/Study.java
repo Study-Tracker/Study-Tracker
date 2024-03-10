@@ -18,6 +18,36 @@ package io.studytracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -46,7 +76,8 @@ import java.util.*;
       attributeNodes = {
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
-        @NamedAttributeNode("owner")
+        @NamedAttributeNode("owner"),
+        @NamedAttributeNode("keywords"),
       }),
   @NamedEntityGraph(
       name = "study-with-attributes",
@@ -58,7 +89,7 @@ import java.util.*;
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("users"),
-        @NamedAttributeNode(value = "keywords", subgraph = "keyword-details"),
+        @NamedAttributeNode("keywords"),
         @NamedAttributeNode("externalLinks"),
         @NamedAttributeNode("conclusions"),
         @NamedAttributeNode("comments"),
@@ -67,10 +98,6 @@ import java.util.*;
         @NamedAttributeNode("gitRepositories")
       },
     subgraphs = {
-          @NamedSubgraph(
-              name = "keyword-details",
-              attributeNodes = {@NamedAttributeNode("category")}
-          ),
           @NamedSubgraph(
               name = "study-storage-folder-details",
               attributeNodes = {@NamedAttributeNode("storageDriveFolder")}

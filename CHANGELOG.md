@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed a bug that caused incorrect values to show in the Storage Folders settings in the Admin Dashboard. (#157)
 - Fixed a bug that was causing errors when loading the study form page.
+- Fixed study list not filtering by keywords when using the search bar (#129).
 
 ## [0.9.5] - 2023-12-14
 
