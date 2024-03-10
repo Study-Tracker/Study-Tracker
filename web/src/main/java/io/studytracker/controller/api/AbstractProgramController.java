@@ -25,9 +25,8 @@ import io.studytracker.model.Program;
 import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.User;
 import io.studytracker.service.ProgramService;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractProgramController extends AbstractApiController {
 
@@ -40,7 +39,9 @@ public abstract class AbstractProgramController extends AbstractApiController {
    * @param program the program to create
    * @return the created program
    */
-  public Program createNewProgram(Program program, ProgramOptions options) {
+  public Program createNewProgram(Program program) {
+
+    ProgramOptions options = program.getOptions();
 
     // Make sure the user has the necessary privileges to create a new program
     User user = this.getAuthenticatedUser();
@@ -50,7 +51,7 @@ public abstract class AbstractProgramController extends AbstractApiController {
     }
 
     // Create the new program and publish the event
-    Program created = this.getProgramService().create(program, options);
+    Program created = this.getProgramService().create(program);
     Activity activity = ProgramActivityUtils.fromNewProgram(created, user);
     this.logActivity(activity);
 
@@ -63,7 +64,9 @@ public abstract class AbstractProgramController extends AbstractApiController {
    * @param program the program to update
    * @return the updated program
    */
-  public Program updateExistingProgram(Program program, ProgramOptions options) {
+  public Program updateExistingProgram(Program program) {
+
+    ProgramOptions options = program.getOptions();
 
     // Make sure the user has the necessary privileges to update a program
     User user = this.getAuthenticatedUser();

@@ -22,24 +22,32 @@ import io.studytracker.benchling.api.entities.BenchlingEntryRequest;
 import io.studytracker.benchling.api.entities.BenchlingEntryRequest.CustomField;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
-import io.studytracker.eln.*;
+import io.studytracker.eln.NotebookEntry;
+import io.studytracker.eln.NotebookEntryService;
+import io.studytracker.eln.NotebookTemplate;
+import io.studytracker.eln.NotebookUser;
+import io.studytracker.eln.NotebookUserService;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
+import io.studytracker.model.ELNFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Service
 public final class BenchlingNotebookEntryService
     extends AbstractBenchlingApiService
-    implements NotebookEntryService {
+    implements NotebookEntryService<ELNFolder> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingNotebookEntryService.class);
 
@@ -78,17 +86,17 @@ public final class BenchlingNotebookEntryService
   }
 
   @Override
-  public NotebookEntry createStudyNotebookEntry(Study study) throws NotebookException {
-    return this.createStudyNotebookEntry(study, null);
+  public NotebookEntry createStudyNotebookEntry(Study study, ELNFolder studyFolder) throws NotebookException {
+    return this.createStudyNotebookEntry(study, studyFolder, null);
   }
 
   @Override
-  public NotebookEntry createStudyNotebookEntry(Study study, NotebookTemplate template)
-      throws NotebookException {
+  public NotebookEntry createStudyNotebookEntry(Study study, ELNFolder studyFolder,
+      NotebookTemplate template) throws NotebookException {
 
     BenchlingEntryRequest request = new BenchlingEntryRequest();
     request.setName(study.getCode() + " Study Summary: " + study.getName());
-    request.setFolderId(study.getNotebookFolder().getReferenceId());
+    request.setFolderId(studyFolder.getReferenceId());
 
     // Users
     List<String> userIds = new ArrayList<>();
@@ -99,6 +107,9 @@ public final class BenchlingNotebookEntryService
       } else {
         LOGGER.warn("Could not find user registered in Benchling: " + user);
       }
+    }
+    if (userIds.isEmpty()) {
+      throw new NotebookException("No registered Benchling users found for authoring entry");
     }
     request.setAuthorIds(userIds);
 
@@ -124,17 +135,17 @@ public final class BenchlingNotebookEntryService
   }
 
   @Override
-  public NotebookEntry createAssayNotebookEntry(Assay assay) throws NotebookException {
-    return this.createAssayNotebookEntry(assay, null);
+  public NotebookEntry createAssayNotebookEntry(Assay assay, ELNFolder folder) throws NotebookException {
+    return this.createAssayNotebookEntry(assay, folder, null);
   }
 
   @Override
-  public NotebookEntry createAssayNotebookEntry(Assay assay, NotebookTemplate template)
+  public NotebookEntry createAssayNotebookEntry(Assay assay, ELNFolder folder, NotebookTemplate template)
       throws NotebookException {
 
     BenchlingEntryRequest request = new BenchlingEntryRequest();
     request.setName(assay.getCode() + " Assay Summary: " + assay.getName());
-    request.setFolderId(assay.getNotebookFolder().getReferenceId());
+    request.setFolderId(folder.getReferenceId());
 
     // Users
     List<String> userIds = new ArrayList<>();
@@ -145,6 +156,9 @@ public final class BenchlingNotebookEntryService
       } else {
         LOGGER.warn("Could not find user registered in Benchling: " + user.getUsername());
       }
+    }
+    if (userIds.isEmpty()) {
+      throw new NotebookException("No registered Benchling users found for authoring entry");
     }
     request.setAuthorIds(userIds);
 

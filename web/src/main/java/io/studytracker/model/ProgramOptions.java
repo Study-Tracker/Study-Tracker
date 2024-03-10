@@ -25,6 +25,7 @@ public class ProgramOptions {
   private boolean useGit = false;
   private boolean useStorage = true;
   private StorageDriveFolder parentFolder;
+  private ELNFolder notebookFolder;
   private GitGroup gitGroup;
 
 }

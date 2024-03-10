@@ -30,7 +30,8 @@ import {setTab} from "../../redux/tabSlice";
 
 const PrimaryNotebookWidget = ({record}) => {
 
-  const notebook = record && record.notebookFolder ? record.notebookFolder : null;
+  const notebook = record && record.notebookFolders.length > 0
+      ? record.notebookFolders.find(f => f.primary)?.elnFolder : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRepaired, setIsRepaired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

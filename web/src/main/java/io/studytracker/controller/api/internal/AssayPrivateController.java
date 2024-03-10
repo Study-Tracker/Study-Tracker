@@ -17,6 +17,7 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractAssayController;
+import io.studytracker.events.util.AssayActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.AssayFormDto;
@@ -24,8 +25,10 @@ import io.studytracker.mapstruct.dto.response.ActivitySummaryDto;
 import io.studytracker.mapstruct.dto.response.AssayDetailsDto;
 import io.studytracker.mapstruct.dto.response.AssayParentDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
+import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Status;
+import io.studytracker.model.Study;
 import io.studytracker.model.User;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +106,24 @@ public class AssayPrivateController extends AbstractAssayController {
     LOGGER.info(String.format("Setting status of assay %s to %s", id, label));
     this.updateAssayStatus(assay.getId(), status, this.getAuthenticatedUser());
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+  
+  @PutMapping("/{id}/study")
+  public AssayDetailsDto updateAssayStudy(
+      @PathVariable("id") String id,
+      @RequestBody Map<String, Object> params
+  ) throws StudyTrackerException {
+    if (!params.containsKey("studyId")) throw new StudyTrackerException("No studyId provided.");
+    String studyId = params.get("studyId").toString();
+    LOGGER.info(String.format("Setting study of assay %s to %s", id, studyId));
+    Assay assay = this.getAssayFromIdentifier(id);
+    Study oldStudy = assay.getStudy();
+    Study study = this.getStudyFromIdentifier(studyId);
+    this.getAssayService().moveAssayToStudy(assay, study);
+    Assay updated = this.getAssayFromIdentifier(id);
+    Activity activity = AssayActivityUtils.fromMovedAssay(assay, oldStudy, study, this.getAuthenticatedUser());
+    this.logActivity(activity);
+    return this.getAssayMapper().toAssayDetails(updated);
   }
 
   @GetMapping("/{assayId}/activity")

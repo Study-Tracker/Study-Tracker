@@ -22,7 +22,7 @@ import io.studytracker.model.Study;
 import java.util.List;
 import java.util.Optional;
 
-public interface NotebookEntryService {
+public interface NotebookEntryService<F extends NotebookFolder> {
 
   /**
    * Fetches a list of notebook entry templates.
@@ -53,7 +53,7 @@ public interface NotebookEntryService {
    * @return
    * @throws NotebookException
    */
-  NotebookEntry createStudyNotebookEntry(Study study) throws NotebookException;
+  NotebookEntry createStudyNotebookEntry(Study study, F studyFolder) throws NotebookException;
 
   /**
    * Creates a blank notebook entry from the provided template for a study in the ELN and returns a
@@ -63,7 +63,7 @@ public interface NotebookEntryService {
    * @return
    * @throws NotebookException
    */
-  NotebookEntry createStudyNotebookEntry(Study study, NotebookTemplate template)
+  NotebookEntry createStudyNotebookEntry(Study study, F studyFolder, NotebookTemplate template)
       throws NotebookException;
 
   /**
@@ -73,7 +73,7 @@ public interface NotebookEntryService {
    * @return
    * @throws NotebookException
    */
-  NotebookEntry createAssayNotebookEntry(Assay assay) throws NotebookException;
+  NotebookEntry createAssayNotebookEntry(Assay assay, F assayFolder) throws NotebookException;
 
   /**
    * Creates a blank notebook entry from the provided template for an assay in the ELN and returns a
@@ -83,7 +83,7 @@ public interface NotebookEntryService {
    * @return
    * @throws NotebookException
    */
-  NotebookEntry createAssayNotebookEntry(Assay assay, NotebookTemplate template)
+  NotebookEntry createAssayNotebookEntry(Assay assay, F assayFolder, NotebookTemplate template)
       throws NotebookException;
 
 

@@ -17,6 +17,34 @@
 package io.studytracker.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedBy;
@@ -24,9 +52,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
-import java.util.*;
 
 @Entity
 @Table(name = "programs")
@@ -38,7 +63,7 @@ import java.util.*;
         attributeNodes = {
           @NamedAttributeNode("createdBy"),
           @NamedAttributeNode("lastModifiedBy"),
-          @NamedAttributeNode("notebookFolder"),
+          @NamedAttributeNode(value = "notebookFolders", subgraph = "program-notebook-folder-details"),
           @NamedAttributeNode(value = "storageFolders", subgraph = "program-storage-folder-details"),
           @NamedAttributeNode("gitGroups")
         },
@@ -46,10 +71,16 @@ import java.util.*;
           @NamedSubgraph(
               name = "program-storage-folder-details",
               attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
+          ),
+          @NamedSubgraph(
+              name = "program-notebook-folder-details",
+              attributeNodes = {@NamedAttributeNode("elnFolder")}
           )
         }
       ))
-public class Program implements Model {
+@Getter
+@Setter
+public class Program extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -84,9 +115,12 @@ public class Program implements Model {
   @Temporal(TemporalType.TIMESTAMP)
   private Date updatedAt;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "notebook_folder_id")
-  private ELNFolder notebookFolder;
+  @OneToMany(
+      mappedBy = "program",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private Set<ProgramNotebookFolder> notebookFolders = new HashSet<>();
 
   @OneToMany(
       mappedBy = "program",
@@ -109,6 +143,9 @@ public class Program implements Model {
       inverseJoinColumns = @JoinColumn(name = "git_group_id", nullable = false))
   private Set<GitGroup> gitGroups = new HashSet<>();
 
+  @Transient
+  private ProgramOptions options = new ProgramOptions();
+
   public void addAttribute(String key, String value) {
     this.attributes.put(key, value);
   }
@@ -117,100 +154,24 @@ public class Program implements Model {
     this.attributes.remove(key);
   }
 
-  public Long getId() {
-    return id;
+  public void addNotebookFolder(ELNFolder folder, boolean isPrimary) {
+    ProgramNotebookFolder programNotebookFolder = new ProgramNotebookFolder();
+    programNotebookFolder.setProgram(this);
+    programNotebookFolder.setElnFolder(folder);
+    programNotebookFolder.setPrimary(isPrimary);
+    this.getNotebookFolders().add(programNotebookFolder);
   }
 
-  public void setId(Long id) {
-    this.id = id;
+  public void addNotebookFolder(ELNFolder folder) {
+    this.addNotebookFolder(folder, false);
   }
 
-  public String getCode() {
-    return code;
+  public void addNotebookFolder(ProgramNotebookFolder folder) {
+    this.getNotebookFolders().add(folder);
   }
 
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public User getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public User getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(User lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
-  public Date getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public Date getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public ELNFolder getNotebookFolder() {
-    return notebookFolder;
-  }
-
-  public void setNotebookFolder(ELNFolder notebookFolder) {
-    this.notebookFolder = notebookFolder;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
-  public Map<String, String> getAttributes() {
-    return attributes;
-  }
-
-  public void setAttributes(Map<String, String> attributes) {
-    this.attributes = attributes;
-  }
-
-  public Set<ProgramStorageFolder> getStorageFolders() {
-    return storageFolders;
-  }
-
-  public void setStorageFolders(Set<ProgramStorageFolder> fileStoreFolders) {
-    this.storageFolders = fileStoreFolders;
+  public void removeNotebookFolder(ProgramNotebookFolder folder) {
+    this.notebookFolders.remove(folder);
   }
 
   public void addStorageFolder(StorageDriveFolder folder) {
@@ -230,14 +191,6 @@ public class Program implements Model {
 
   public void removeStorageFolder(ProgramStorageFolder folder) {
     this.storageFolders.remove(folder);
-  }
-
-  public Set<GitGroup> getGitGroups() {
-    return gitGroups;
-  }
-
-  public void setGitGroups(Set<GitGroup> gitGroups) {
-    this.gitGroups = gitGroups;
   }
 
   public void addGitGroup(GitGroup gitGroup) {

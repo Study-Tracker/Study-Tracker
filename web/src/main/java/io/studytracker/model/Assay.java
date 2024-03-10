@@ -41,11 +41,12 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedBy;
@@ -66,7 +67,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       name = "assay-summary",
       attributeNodes = {
         @NamedAttributeNode("assayType"),
-        @NamedAttributeNode("notebookFolder"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("users")
       }),
@@ -74,7 +74,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       name = "assay-with-attributes",
       attributeNodes = {
         @NamedAttributeNode(value = "assayType", subgraph = "assay-type-details"),
-        @NamedAttributeNode("notebookFolder"),
+        @NamedAttributeNode(value = "notebookFolders", subgraph = "assay-notebook-folder-details"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
@@ -98,6 +98,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedSubgraph(
             name = "assay-storage-folder-details",
             attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
+        ),
+        @NamedSubgraph(
+            name = "assay-notebook-folder-details",
+            attributeNodes = {@NamedAttributeNode("elnFolder")}
         )
       }),
   @NamedEntityGraph(
@@ -105,7 +109,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       attributeNodes = {
         @NamedAttributeNode("assayType"),
         @NamedAttributeNode("owner"),
-        @NamedAttributeNode("notebookFolder"),
         @NamedAttributeNode(value = "study", subgraph = "study-summary")
       },
       subgraphs = {
@@ -114,7 +117,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
             attributeNodes = {@NamedAttributeNode("program"), @NamedAttributeNode("collaborator")})
       })
 })
-public class Assay implements Model {
+@Getter
+@Setter
+public class Assay extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -163,9 +168,12 @@ public class Assay implements Model {
   @Temporal(TemporalType.TIMESTAMP)
   private Date endDate;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "notebook_folder_id")
-  private ELNFolder notebookFolder;
+  @OneToMany(
+      mappedBy = "assay",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private Set<AssayNotebookFolder> notebookFolders = new HashSet<>();
 
   @OneToMany(
       mappedBy = "assay",
@@ -257,175 +265,11 @@ public class Assay implements Model {
     this.users.removeIf(u -> u.getId().equals(id));
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public AssayType getAssayType() {
-    return assayType;
-  }
-
-  public void setAssayType(AssayType assayType) {
-    this.assayType = assayType;
-  }
-
-  public Study getStudy() {
-    return study;
-  }
-
-  public void setStudy(Study study) {
-    this.study = study;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public User getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public User getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(User lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
-  public User getOwner() {
-    return owner;
-  }
-
-  public void setOwner(User owner) {
-    this.owner = owner;
-  }
-
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(Date startDate) {
-    this.startDate = startDate;
-  }
-
-  public Date getEndDate() {
-    return endDate;
-  }
-
-  public void setEndDate(Date endDate) {
-    this.endDate = endDate;
-  }
-
-  public ELNFolder getNotebookFolder() {
-    return notebookFolder;
-  }
-
-  public void setNotebookFolder(ELNFolder notebookFolder) {
-    this.notebookFolder = notebookFolder;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
-  public Date getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public Date getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public Set<User> getUsers() {
-    return users;
-  }
-
-  public void setUsers(Set<User> users) {
-    this.users = users;
-  }
-
-  public Map<String, Object> getFields() {
-    return fields;
-  }
-
-  public void setFields(Map<String, Object> fields) {
-    this.fields = fields;
-  }
-
-  public Map<String, String> getAttributes() {
-    return attributes;
-  }
-
-  public void setAttributes(Map<String, String> attributes) {
-    this.attributes = attributes;
-  }
-
-  public Set<AssayTask> getTasks() {
-    return tasks;
-  }
-
   public void setTasks(Set<AssayTask> tasks) {
     for (AssayTask task : tasks) {
       task.setAssay(this);
     }
     this.tasks = tasks;
-  }
-
-  public Set<AssayStorageFolder> getStorageFolders() {
-    return storageFolders;
-  }
-
-  public void setStorageFolders(Set<AssayStorageFolder> fileStoreFolders) {
-    this.storageFolders = fileStoreFolders;
   }
 
   public void addStorageFolder(AssayStorageFolder folder) {
@@ -451,20 +295,36 @@ public class Assay implements Model {
     this.storageFolders.remove(folder);
   }
 
-  public Set<GitRepository> getGitRepositories() {
-    return gitRepositories;
-  }
-
-  public void setGitRepositories(Set<GitRepository> gitRepositories) {
-    this.gitRepositories = gitRepositories;
-  }
-
   public void addGitRepository(GitRepository gitRepository) {
     this.gitRepositories.add(gitRepository);
   }
 
   public void removeGitRepository(GitRepository gitRepository) {
     this.gitRepositories.remove(gitRepository);
+  }
+
+  public void addNotebookFolder(AssayNotebookFolder folder) {
+    folder.setAssay(this);
+    this.notebookFolders.add(folder);
+  }
+
+  public void addNotebookFolder(ELNFolder elnFolder, boolean isPrimary) {
+    if (isPrimary) {
+      this.notebookFolders.forEach(f -> f.setPrimary(false));
+    }
+    AssayNotebookFolder assayNotebookFolder = new AssayNotebookFolder();
+    assayNotebookFolder.setAssay(this);
+    assayNotebookFolder.setElnFolder(elnFolder);
+    assayNotebookFolder.setPrimary(isPrimary);
+    this.getNotebookFolders().add(assayNotebookFolder);
+  }
+
+  public void addNotebookFolder(ELNFolder elnFolder) {
+    this.addNotebookFolder(elnFolder, false);
+  }
+
+  public void removeNotebookFolder(AssayNotebookFolder folder) {
+    this.notebookFolders.remove(folder);
   }
 
 }

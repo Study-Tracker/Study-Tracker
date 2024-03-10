@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@ import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.benchling.BenchlingNotebookUserService;
 import io.studytracker.eln.NotebookFolder;
 import io.studytracker.eln.NotebookUser;
+import io.studytracker.model.ELNFolder;
 import io.studytracker.model.User;
+import java.util.List;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,9 +33,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
-import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -48,7 +48,7 @@ public class BenchlingServiceTests {
 
   @Test
   public void findProjectsFoldersTest() {
-    List<NotebookFolder> folders = benchlingNotebookFolderService.listNotebookProjectFolders();
+    List<ELNFolder> folders = benchlingNotebookFolderService.listProjectFolders();
     Assert.assertNotNull(folders);
     Assert.assertFalse(folders.isEmpty());
     for (NotebookFolder folder: folders) {

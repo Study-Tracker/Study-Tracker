@@ -29,15 +29,18 @@ import io.studytracker.model.TaskStatus;
 import io.studytracker.model.User;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
+import io.studytracker.repository.StudyRepository;
 import io.studytracker.service.AssayService;
 import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +59,7 @@ public class AssayServiceTests {
   @Autowired private AssayService assayService;
 
   @Autowired private AssayRepository assayRepository;
+  @Autowired private StudyRepository studyRepository;
 
   @Autowired private AssayTypeRepository assayTypeRepository;
 
@@ -250,4 +254,38 @@ public class AssayServiceTests {
         assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(Status.COMPLETE, updated.getStatus());
   }
+  
+  @Test
+  public void moveAssayTest() {
+    Assay assay =
+        assayService.findByCode("PPB-10001-001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(1, assay.getStorageFolders().size());
+    Long assayId = assay.getId();
+    Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+
+    // Need to remove the notebook folders for this test
+    study.setNotebookFolders(new HashSet<>());
+    studyRepository.save(study);
+
+    Exception exception = null;
+    try {
+      assayService.moveAssayToStudy(assay, study);
+    } catch (Exception e) {
+      exception = e;
+    }
+    
+    Assert.assertNull(exception);
+    
+    Optional<Assay> optional = assayService.findByCode("PPB-10001-001");
+    Assert.assertFalse(optional.isPresent());
+    optional = assayService.findByCode("CPA-10001-001");
+    Assert.assertTrue(optional.isPresent());
+    
+    Assay updated = optional.get();
+    Assert.assertEquals(assayId, updated.getId());
+    Assert.assertEquals(study.getId(), updated.getStudy().getId());
+    Assert.assertEquals(2, updated.getStorageFolders().size());
+    
+  }
+  
 }

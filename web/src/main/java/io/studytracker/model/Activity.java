@@ -60,7 +60,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("assay")
       })
 })
-public class Activity implements Model {
+public class Activity extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

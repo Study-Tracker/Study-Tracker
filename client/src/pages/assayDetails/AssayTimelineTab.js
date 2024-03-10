@@ -14,56 +14,39 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Card, Col, Row} from 'react-bootstrap'
 import {ActivityStream} from "../../common/activity";
 import {CardLoadingMessage} from "../../common/loading";
 import {DismissableAlert} from "../../common/errors";
 import axios from "axios";
 import PropTypes from "prop-types";
+import {useQuery} from "react-query";
 
-const AssayTimelineTab = props => {
+const AssayTimelineTab = ({assay}) => {
 
-  const {assay} = props;
-
-  const [state, setState] = useState({
-    isLoaded: false,
-    isError: false,
+  const {data: activity, isLoading, error} = useQuery("activity", () => {
+    return axios.get(`/api/internal/assay/${assay.code}/activity`)
+    .then(response => response.data);
   });
-
-  useEffect(() => {
-    axios.get("/api/internal/assay/" + assay.code + "/activity")
-    .then(response => {
-      setState(prevState => ({
-        ...prevState,
-        activity: response.data,
-        isLoaded: true
-      }));
-    })
-    .catch(e => {
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: e.message
-      }));
-    })
-  }, [assay.code]);
-
-
-  let content = <CardLoadingMessage/>;
-  if (!!state.isLoaded && !!state.activity) {
-    content = <ActivityStream activity={state.activity}/>;
-  } else if (state.isError) {
-    content = <DismissableAlert color={'warning'}
-                                message={'Failed to load assay activity.'}/>;
-  }
 
   return (
       <Card>
         <Card.Body>
           <Row>
             <Col sm={12}>
-              {content}
+              {
+                isLoading ? (
+                    <CardLoadingMessage/>
+                ) : error ? (
+                    <DismissableAlert
+                        color={'warning'}
+                        message={'Failed to load assay activity.'}
+                    />
+                ) : (
+                    <ActivityStream activity={activity}/>
+                )
+              }
             </Col>
           </Row>
         </Card.Body>

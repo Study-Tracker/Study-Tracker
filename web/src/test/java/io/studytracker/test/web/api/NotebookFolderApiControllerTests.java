@@ -29,6 +29,7 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.repository.ELNFolderRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,15 @@ public class NotebookFolderApiControllerTests extends AbstractApiControllerTests
 
   @Autowired
   private ELNFolderRepository repository;
+
+  @Autowired
+  private ExampleDataRunner exampleDataRunner;
+
+  @Before
+  public void init() {
+    exampleDataRunner.clearDatabase();
+    exampleDataRunner.populateDatabase();
+  }
 
   @Test
   public void findAllTest() throws Exception {

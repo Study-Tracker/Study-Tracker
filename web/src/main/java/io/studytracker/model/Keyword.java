@@ -29,7 +29,7 @@ import lombok.Setter;
 @Table(name = "keywords")
 @Getter
 @Setter
-public class Keyword implements Model {
+public class Keyword extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

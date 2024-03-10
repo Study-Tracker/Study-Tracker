@@ -23,6 +23,7 @@ import io.studytracker.model.Collaborator;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.model.User;
 import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.ProgramRepository;
@@ -139,6 +140,9 @@ public class StudyServiceTests {
     study.setStartDate(new Date());
     study.setOwner(user);
     study.setUsers(Collections.singleton(user));
+    StudyOptions options = new StudyOptions();
+    options.setUseNotebook(false);
+    study.setOptions(options);
     studyService.create(study);
     Assert.assertEquals(STUDY_COUNT + 1, studyRepository.count());
     List<Study> studies = studyService.findByName("Study X");
@@ -273,4 +277,36 @@ public class StudyServiceTests {
     Assert.assertEquals(STUDY_COUNT, studyService.countFromDate(monthAgo));
     Assert.assertEquals(STUDY_COUNT, studyService.countBetweenDates(monthAgo, now));
   }
+  
+  @Test
+  public void moveStudyTest() {
+    
+    Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(1, study.getStorageFolders().size());
+    Long id = study.getId();
+    Program program = programRepository.findByName("Preclinical Project B")
+            .orElseThrow(RecordNotFoundException::new);
+    
+    Exception exception = null;
+    try {
+      studyService.moveStudyToProgram(study, program);
+    } catch (Exception e) {
+      e.printStackTrace();
+      exception = e;
+    }
+    
+    Assert.assertNull(exception);
+    
+    Optional<Study> optional = studyService.findByCode("CPA-10001");
+    Assert.assertFalse(optional.isPresent());
+    optional = studyService.findByCode("PPB-10003");
+    Assert.assertTrue(optional.isPresent());
+    
+    Study updated = optional.get();
+    Assert.assertEquals(id, updated.getId());
+    Assert.assertEquals(program.getId(), updated.getProgram().getId());
+    Assert.assertEquals(2, updated.getStorageFolders().size());
+    
+  }
+  
 }

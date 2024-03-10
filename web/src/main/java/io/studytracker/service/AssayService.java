@@ -19,9 +19,8 @@ package io.studytracker.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.aws.S3Utils;
-import io.studytracker.eln.NotebookEntryService;
-import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.NotebookFolderService;
+import io.studytracker.benchling.BenchlingNotebookEntryService;
+import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.InvalidRequestException;
@@ -29,39 +28,14 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AssayOptions;
-import io.studytracker.model.AssayStorageFolder;
-import io.studytracker.model.AssayTask;
-import io.studytracker.model.AssayTaskField;
-import io.studytracker.model.AssayTypeField;
-import io.studytracker.model.CustomEntityFieldType;
-import io.studytracker.model.ELNFolder;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.GitRepository;
-import io.studytracker.model.S3FolderDetails;
-import io.studytracker.model.Status;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
+import io.studytracker.model.*;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTaskRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.storage.StorageDriveFolderService;
-import io.studytracker.storage.StorageFile;
-import io.studytracker.storage.StorageFolder;
-import io.studytracker.storage.StorageUtils;
-import io.studytracker.storage.StudyStorageService;
-import io.studytracker.storage.StudyStorageServiceLookup;
+import io.studytracker.storage.*;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +43,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.ConstraintViolationException;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AssayService {
@@ -88,9 +69,9 @@ public class AssayService {
 
   @Autowired private StorageDriveFolderService storageDriveFolderService;
 
-  @Autowired private NotebookFolderService notebookFolderService;
+  @Autowired private BenchlingNotebookFolderService notebookFolderService;
 
-  @Autowired private NotebookEntryService notebookEntryService;
+  @Autowired private BenchlingNotebookEntryService notebookEntryService;
 
   @Autowired private NamingService namingService;
 
@@ -198,7 +179,7 @@ public class AssayService {
     }
   }
 
-  private AssayStorageFolder createAssayStorageFolder(Assay assay, StorageDriveFolder parentFolder) {
+  private StorageDriveFolder createAssayStorageFolder(Assay assay, StorageDriveFolder parentFolder) {
     try {
       StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
           .orElseThrow(() -> new StudyStorageException("No storage drive found for id: "
@@ -206,14 +187,9 @@ public class AssayService {
       StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
           .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
               + parentFolder.getStorageDrive().getDriveType()));
-      StorageDriveFolder folder = storageService.createAssayFolder(parentFolder, assay);
-      AssayStorageFolder assayStorageFolder = new AssayStorageFolder();
-      assayStorageFolder.setStorageDriveFolder(folder);
-      assayStorageFolder.setAssay(assay);
-      return assayStorageFolder;
+      return storageService.createAssayFolder(parentFolder, assay);
     } catch (Exception e) {
-      e.printStackTrace();
-      LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode());
+      LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode(), e);
       throw new StudyTrackerException(e);
     }
   }
@@ -266,9 +242,8 @@ public class AssayService {
 
 
     // Create default storage folder
-    AssayStorageFolder folder = createAssayStorageFolder(assay, parentFolder);
-    folder.setPrimary(true);
-    assay.addStorageFolder(folder);
+    StorageDriveFolder folder = createAssayStorageFolder(assay, parentFolder);
+    assay.addStorageFolder(folder, true);
 
     // Handle attached files
     try {
@@ -286,27 +261,30 @@ public class AssayService {
             && assay.getFields().get(field.getFieldName()) != null) {
             String localPath = StorageUtils.cleanInputPath(
                 assay.getFields().get(field.getFieldName()).toString());
-            StorageFile movedFile = storageService
-                .saveFile(folder.getStorageDriveFolder(), folder.getStorageDriveFolder().getPath(),
-                    new File(localPath));
+            StorageFile movedFile = storageService.saveFile(folder, folder.getPath(), new File(localPath));
             assay.getFields().put(field.getFieldName(), objectMapper.writeValueAsString(movedFile));
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
-      LOGGER.warn("Failed to move file for assay: " + assay.getCode());
+      LOGGER.warn("Failed to move file for assay: " + assay.getCode(), e);
     }
 
     // Create the ELN folder
     if (options.isUseNotebook()) {
-      if (study.getNotebookFolder() != null) {
+      ELNFolder studyFolder = study.getNotebookFolders().stream()
+          .filter(f -> f.isPrimary())
+          .map(f -> f.getElnFolder())
+          .findFirst()
+          .orElse(null);
+      if (studyFolder != null) {
         try {
 
           LOGGER.info(String.format("Creating ELN entry for assay: %s", assay.getCode()));
 
           // Create the notebook folder
-          NotebookFolder notebookFolder = notebookFolderService.createAssayFolder(assay);
-          assay.setNotebookFolder(ELNFolder.from(notebookFolder));
+          ELNFolder notebookFolder = notebookFolderService.createAssayFolder(assay);
+          elnFolderRepository.save(notebookFolder);
+          assay.addNotebookFolder(notebookFolder, true);
 
           // Create the notebook entry
           NotebookTemplate template = null;
@@ -319,7 +297,7 @@ public class AssayService {
               LOGGER.warn("Cannot find notebook template with id: " + options.getNotebookTemplateId());
             }
           }
-          notebookEntryService.createAssayNotebookEntry(assay, template);
+          notebookEntryService.createAssayNotebookEntry(assay, notebookFolder, template);
 
         } catch (Exception e) {
           e.printStackTrace();
@@ -328,8 +306,6 @@ public class AssayService {
       } else {
         LOGGER.warn(String.format("Assay study %s does not have ELN folder set.", study.getCode()));
       }
-    } else {
-      assay.setNotebookFolder(null);
     }
 
     Assay created;
@@ -554,12 +530,11 @@ public class AssayService {
           .findPrimaryStudyFolder(study)
           .orElseThrow(() -> new RecordNotFoundException("Could not find primary study folder : "
               + study.getCode()));
-      AssayStorageFolder assayStorageFolder = this.createAssayStorageFolder(assay, parentFolder);
-      assayStorageFolder.setPrimary(true);
-      assay.addStorageFolder(assayStorageFolder);
+      StorageDriveFolder assayStorageFolder = this.createAssayStorageFolder(assay, parentFolder);
+      assay.addStorageFolder(assayStorageFolder, true);
       assayRepository.save(assay);
       LOGGER.info("Created primary storage folder for assay: " + assay.getCode()
-          + " at path: " + assayStorageFolder.getStorageDriveFolder().getPath());
+          + " at path: " + assayStorageFolder.getPath());
     }
 
   }
@@ -568,15 +543,18 @@ public class AssayService {
   public void repairElnFolder(Assay assay) {
 
     // Check to see if the folder exists and create a new one if necessary
-    NotebookFolder folder;
-    Optional<NotebookFolder> optional = notebookFolderService.findAssayFolder(assay);
+    ELNFolder folder;
+    Optional<ELNFolder> optional = notebookFolderService.findPrimaryAssayFolder(assay);
     folder = optional.orElseGet(() -> notebookFolderService.createAssayFolder(assay));
 
     // Update the record
     ELNFolder f;
     boolean isNew = false;
     try {
-      f = elnFolderRepository.getById(assay.getNotebookFolder().getId());
+      AssayNotebookFolder anf = assay.getNotebookFolders().stream()
+          .filter(AssayNotebookFolder::isPrimary)
+          .findFirst().orElse(null);
+      f = elnFolderRepository.getById(anf.getElnFolder().getId());
     } catch (NullPointerException e) {
       f = new ELNFolder();
       isNew = true;
@@ -589,7 +567,7 @@ public class AssayService {
 
     if (isNew) {
       Assay a = assayRepository.getById(assay.getId());
-      a.setNotebookFolder(f);
+      a.addNotebookFolder(f, true);
       assayRepository.save(a);
     }
   }
@@ -597,4 +575,40 @@ public class AssayService {
   public List<Assay> search(String keyword) {
     return assayRepository.findByNameOrCodeLike(keyword);
   }
+  
+  @Transactional
+  public void moveAssayToStudy(Assay assay, Study study) {
+    
+    LOGGER.info("Attempting to move assay {} to study {}", assay.getCode(), study.getCode());
+    
+    // Update the assay record
+    Assay a = assayRepository.getById(assay.getId());
+    a.setStudy(study);
+    a.setCode(namingService.generateAssayCode(a));
+    
+    // Create a new primary storage folder
+    StorageDriveFolder parentFolder = this.storageDriveFolderService.findPrimaryStudyFolder(study).orElse(null);
+    if (parentFolder != null) {
+      StorageDriveFolder storageFolder = this.createAssayStorageFolder(a, parentFolder);
+      a.addStorageFolder(storageFolder, true);
+    } else {
+      LOGGER.warn("No primary storage folder found for study {}. No new study storage folder will be created. ", study.getCode());
+    }
+    
+    // Create a new ELN folder
+    ELNFolder studyElnFolder = elnFolderRepository.findPrimaryByStudyId(study.getId()).orElse(null);
+    if (studyElnFolder != null) {
+      ELNFolder assayElnFolder = notebookFolderService.createAssayFolder(a);
+      elnFolderRepository.save(assayElnFolder);
+      a.addNotebookFolder(assayElnFolder, true);
+    } else {
+      LOGGER.warn("No primary ELN folder found for study {}. No new study ELN folder will be created. ", study.getCode());
+      
+      assayRepository.save(a);
+      LOGGER.info("Successfully moved assay with new code {} to study {}", a.getCode(), study.getCode());
+      
+    }
+    
+  }
+  
 }

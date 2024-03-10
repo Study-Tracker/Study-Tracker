@@ -38,7 +38,7 @@ public class NotebookPrivateController {
   @GetMapping("/project-folders")
   public List<NotebookFolder> findNotebookProjects() {
     LOGGER.debug("Find notebook project folders");
-    return notebookFolderService.listNotebookProjectFolders();
+    return notebookFolderService.listProjectFolders();
   }
 
 }

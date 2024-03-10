@@ -17,6 +17,8 @@
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
+  faBolt,
+  faDolly,
   faEdit,
   faFolderPlus,
   faPersonRunning,
@@ -33,6 +35,7 @@ import NotyfContext from "../../context/NotyfContext";
 import swal from "sweetalert";
 import PropTypes from "prop-types";
 import {faGit} from "@fortawesome/free-brands-svg-icons";
+import MoveStudyModal from "../modals/MoveStudyModal";
 
 const StudyQuickActionsWidget = ({
     study,
@@ -42,6 +45,7 @@ const StudyQuickActionsWidget = ({
   const navigate = useNavigate();
   const notyf = React.useContext(NotyfContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [moveStudyModalIsOpen, setMoveStudyModalIsOpen] = useState(false);
 
   const handleStatusChange = (status) => {
     setIsSubmitting(true);
@@ -149,7 +153,7 @@ const StudyQuickActionsWidget = ({
                         </Dropdown.Toggle>
                     ) : (
                         <Dropdown.Toggle variant={"outline-primary"}>
-                          <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
+                          <FontAwesomeIcon icon={faBolt} className={"me-2"}/>
                           Actions
                         </Dropdown.Toggle>
                     )
@@ -204,6 +208,11 @@ const StudyQuickActionsWidget = ({
 
                     <Dropdown.Divider />
 
+                    <Dropdown.Item onClick={() => setMoveStudyModalIsOpen(true)}>
+                      <FontAwesomeIcon icon={faDolly} className={"me-2"} />
+                      Move to another program
+                    </Dropdown.Item>
+
                     <Dropdown.Item onClick={() => navigate("/study/" + study.code + "/edit")}>
                       <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
                       Edit
@@ -231,6 +240,13 @@ const StudyQuickActionsWidget = ({
             </Col>
           </Row>
         </Card.Body>
+
+        <MoveStudyModal
+          study={study}
+          isOpen={moveStudyModalIsOpen}
+          setIsOpen={setMoveStudyModalIsOpen}
+        />
+
       </Card>
   )
 }

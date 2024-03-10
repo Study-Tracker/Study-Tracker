@@ -57,7 +57,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("studies")
       })
 })
-public class StudyCollection implements Model {
+public class StudyCollection extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

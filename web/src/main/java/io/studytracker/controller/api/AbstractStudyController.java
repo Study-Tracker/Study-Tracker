@@ -27,7 +27,6 @@ import io.studytracker.model.Activity;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Status;
 import io.studytracker.model.Study;
-import io.studytracker.model.StudyOptions;
 import io.studytracker.service.AssayService;
 import io.studytracker.service.CollaboratorService;
 import io.studytracker.service.KeywordService;
@@ -105,11 +104,10 @@ public abstract class AbstractStudyController extends AbstractApiController {
   /**
    * Creates a new study with notebook and storage folders, where appropriate.
    * @param study the study to create
-   * @param options study creation options
    * @return
    */
-  protected Study createNewStudy(Study study, StudyOptions options) {
-    Study created = studyService.create(study, options);
+  protected Study createNewStudy(Study study) {
+    Study created = studyService.create(study);
     Assert.notNull(created.getId(), "Study not persisted.");
     Activity activity = StudyActivityUtils.fromNewStudy(created, this.getAuthenticatedUser());
     this.logActivity(activity);

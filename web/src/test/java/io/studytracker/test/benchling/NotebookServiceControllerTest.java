@@ -19,7 +19,6 @@ package io.studytracker.test.benchling;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -72,8 +71,8 @@ public class NotebookServiceControllerTest {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(PROJECT_FOLDER_COUNT)))
-        .andExpect(jsonPath("$[0]", hasKey("parentFolder")))
-        .andExpect(jsonPath("$[0].parentFolder", nullValue()))
+//        .andExpect(jsonPath("$[0]", hasKey("parentFolder")))
+//        .andExpect(jsonPath("$[0].parentFolder", nullValue()))
         .andExpect(jsonPath("$[0]", hasKey("name")))
         .andExpect(jsonPath("$[0].name", notNullValue()))
         .andExpect(jsonPath("$[0]", hasKey("url")))

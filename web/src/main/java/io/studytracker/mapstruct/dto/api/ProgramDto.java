@@ -16,9 +16,12 @@
 
 package io.studytracker.mapstruct.dto.api;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import lombok.Data;
-
-import java.util.*;
 
 @Data
 public class ProgramDto {
@@ -34,5 +37,6 @@ public class ProgramDto {
   private boolean active;
   private Long notebookFolderId;
   private Set<Long> storageFolders = new HashSet<>();
+  private Set<Long> notebookFolders = new HashSet<>();
   private Map<String, String> attributes = new HashMap<>();
 }

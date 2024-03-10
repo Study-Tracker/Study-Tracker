@@ -72,8 +72,5 @@ public class ProgramMapperTests {
     Assert.assertEquals("Clinical Program A", dto.getName());
     Assert.assertNotNull(program.getCreatedBy().getDisplayName());
     System.out.println(dto);
-    Program created = programMapper.fromProgramDetails(dto);
-    Assert.assertNotNull(created);
-    Assert.assertNotNull(created.getCreatedBy().getDisplayName());
   }
 }

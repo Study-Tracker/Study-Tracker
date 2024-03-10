@@ -17,40 +17,24 @@
 package io.studytracker.controller.api.internal;
 
 import io.studytracker.controller.api.AbstractStudyController;
+import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.mapstruct.dto.form.StudyFormDto;
 import io.studytracker.mapstruct.dto.response.StudyDetailsDto;
 import io.studytracker.mapstruct.dto.response.StudySummaryDto;
-import io.studytracker.model.Program;
-import io.studytracker.model.Status;
-import io.studytracker.model.Study;
-import io.studytracker.model.StudyOptions;
-import io.studytracker.model.User;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
+import io.studytracker.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/internal/study")
@@ -189,9 +173,9 @@ public class StudyBasePrivateController extends AbstractStudyController {
   public HttpEntity<StudyDetailsDto> createStudy(@RequestBody @Valid StudyFormDto dto) {
     LOGGER.info("Creating study: {}", dto);
     Study study = this.getStudyMapper().fromStudyForm(dto);
-    StudyOptions options = this.getStudyMapper().optionsFromStudyForm(dto);
+//    StudyOptions options = this.getStudyMapper().optionsFromStudyForm(dto);
     mapPayloadFields(study, dto);
-    study = this.createNewStudy(study, options);
+    study = this.createNewStudy(study);
     return new ResponseEntity<>(this.getStudyMapper().toStudyDetails(study), HttpStatus.CREATED);
   }
 
@@ -233,6 +217,38 @@ public class StudyBasePrivateController extends AbstractStudyController {
     Study study = getStudyFromIdentifier(id);
     this.updateExistingStudyStatus(study, params.get("status").toString());
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+  
+  @PutMapping("/{id}/program")
+  public StudyDetailsDto updateStudyProgram(
+          @PathVariable("id") String id,
+          @RequestBody Map<String, Object> params
+  ) throws StudyTrackerException {
+    LOGGER.info("Updating study program: {}", params);
+    
+    // Get the study and the new program
+    if (!params.containsKey("programId")) {
+      throw new StudyTrackerException("No program ID provided.");
+    }
+    Long programId = Long.parseLong(params.get("programId").toString());
+    Study study = getStudyFromIdentifier(id);
+    Program oldProgram = study.getProgram();
+    Program program = this.getProgramService().findById(programId)
+            .orElseThrow(() -> new RecordNotFoundException("Cannot find program with ID: " + programId));
+    
+    // Move the study
+    this.getStudyService().moveStudyToProgram(study, program);
+    Study updated = getStudyFromIdentifier(id);
+    
+    // If the study has assays, move them, too
+    for (Assay assay: this.getAssayService().findByStudyId(updated.getId())) {
+      this.getAssayService().moveAssayToStudy(assay, updated);
+    }
+    
+    // Publish the activity
+    Activity activity = StudyActivityUtils.fromMovedStudy(study, oldProgram, program, this.getAuthenticatedUser());
+    this.logActivity(activity);
+    return this.getStudyMapper().toStudyDetails(updated);
   }
 
   @PostMapping("/{id}/restore")

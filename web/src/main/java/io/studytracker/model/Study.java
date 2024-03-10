@@ -18,36 +18,8 @@ package io.studytracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedBy;
@@ -56,16 +28,15 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.*;
+import java.util.*;
+
 @Entity
 @Table(
     name = "studies",
     indexes = {
       @Index(name = "idx_study_code", columnList = "code"),
       @Index(name = "idx_study_name", columnList = "name")
-    },
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uq_study_name", columnNames = {"name", "program_id"}),
-        @UniqueConstraint(name = "uq_study_code", columnNames = {"code", "program_id"}),
     })
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)
@@ -75,7 +46,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       attributeNodes = {
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
-        @NamedAttributeNode("notebookFolder"),
         @NamedAttributeNode("owner")
       }),
   @NamedEntityGraph(
@@ -83,7 +53,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       attributeNodes = {
         @NamedAttributeNode("program"),
         @NamedAttributeNode("collaborator"),
-        @NamedAttributeNode("notebookFolder"),
+        @NamedAttributeNode(value = "notebookFolders", subgraph = "study-notebook-folder-details"),
         @NamedAttributeNode("createdBy"),
         @NamedAttributeNode("lastModifiedBy"),
         @NamedAttributeNode("owner"),
@@ -104,11 +74,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
           @NamedSubgraph(
               name = "study-storage-folder-details",
               attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
+          ),
+          @NamedSubgraph(
+              name = "study-notebook-folder-details",
+              attributeNodes = {@NamedAttributeNode("elnFolder")}
           )
     }
   )
 })
-public class Study implements Model {
+@Getter
+@Setter
+public class Study extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -128,7 +104,7 @@ public class Study implements Model {
   private String name;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "program_id", nullable = false, updatable = false)
+  @JoinColumn(name = "program_id", nullable = false)
   private Program program;
 
   @Column(name = "description", nullable = false, columnDefinition = "TEXT")
@@ -144,9 +120,12 @@ public class Study implements Model {
   @Column(name = "active", nullable = false)
   private boolean active = true;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "notebook_folder_id")
-  private ELNFolder notebookFolder;
+  @OneToMany(
+      mappedBy = "study",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private Set<StudyNotebookFolder> notebookFolders = new HashSet<>();
 
   @OneToMany(
       mappedBy = "study",
@@ -248,6 +227,9 @@ public class Study implements Model {
       inverseJoinColumns = @JoinColumn(name = "git_repository_id", nullable = false))
   private Set<GitRepository> gitRepositories = new HashSet<>();
 
+  @Transient
+  private StudyOptions options = new StudyOptions();
+
   public void addUser(User user) {
     this.users.add(user);
   }
@@ -331,187 +313,11 @@ public class Study implements Model {
     this.comments.removeIf(c -> c.getId().equals(id));
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public String getExternalCode() {
-    return externalCode;
-  }
-
-  public void setExternalCode(String externalCode) {
-    this.externalCode = externalCode;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Program getProgram() {
-    return program;
-  }
-
-  public void setProgram(Program program) {
-    this.program = program;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public Collaborator getCollaborator() {
-    return collaborator;
-  }
-
-  public void setCollaborator(Collaborator collaborator) {
-    this.collaborator = collaborator;
-  }
-
-  public boolean isLegacy() {
-    return legacy;
-  }
-
-  public void setLegacy(boolean legacy) {
-    this.legacy = legacy;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
-  public ELNFolder getNotebookFolder() {
-    return notebookFolder;
-  }
-
-  public void setNotebookFolder(ELNFolder notebookFolder) {
-    this.notebookFolder = notebookFolder;
-  }
-
-  public User getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public User getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(User lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(Date startDate) {
-    this.startDate = startDate;
-  }
-
-  public Date getEndDate() {
-    return endDate;
-  }
-
-  public void setEndDate(Date endDate) {
-    this.endDate = endDate;
-  }
-
-  public Date getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public Date getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public User getOwner() {
-    return owner;
-  }
-
-  public void setOwner(User owner) {
-    this.owner = owner;
-  }
-
-  public Set<User> getUsers() {
-    return users;
-  }
-
-  public void setUsers(Set<User> users) {
-    this.users = users;
-  }
-
-  public Set<Keyword> getKeywords() {
-    return keywords;
-  }
-
-  public void setKeywords(Set<Keyword> keywords) {
-    this.keywords = keywords;
-  }
-
-  public Set<Assay> getAssays() {
-    return assays;
-  }
-
   public void setAssays(Set<Assay> assays) {
     for (Assay assay : assays) {
       assay.setStudy(this);
     }
     this.assays = assays;
-  }
-
-  public Map<String, String> getAttributes() {
-    return attributes;
-  }
-
-  public void setAttributes(Map<String, String> attributes) {
-    this.attributes = attributes;
-  }
-
-  public Set<ExternalLink> getExternalLinks() {
-    return externalLinks;
   }
 
   public void setExternalLinks(Set<ExternalLink> externalLinks) {
@@ -521,25 +327,9 @@ public class Study implements Model {
     this.externalLinks = externalLinks;
   }
 
-  public Set<StudyRelationship> getStudyRelationships() {
-    return studyRelationships;
-  }
-
-  public void setStudyRelationships(Set<StudyRelationship> studyRelationships) {
-    this.studyRelationships = studyRelationships;
-  }
-
-  public StudyConclusions getConclusions() {
-    return conclusions;
-  }
-
   public void setConclusions(StudyConclusions conclusions) {
     if (conclusions != null) conclusions.setStudy(this);
     this.conclusions = conclusions;
-  }
-
-  public Set<Comment> getComments() {
-    return comments;
   }
 
   public void setComments(Set<Comment> comments) {
@@ -547,10 +337,6 @@ public class Study implements Model {
       comment.setStudy(this);
     }
     this.comments = comments;
-  }
-
-  public void setAttribute(String key, String value) {
-    this.attributes.put(key, value);
   }
 
   public boolean hasAttribute(String key) {
@@ -561,12 +347,8 @@ public class Study implements Model {
     return this.attributes.get(key);
   }
 
-  public Set<StudyStorageFolder> getStorageFolders() {
-    return storageFolders;
-  }
-
-  public void setStorageFolders(Set<StudyStorageFolder> fileStoreFolders) {
-    this.storageFolders = fileStoreFolders;
+  public void setAttribute(String key, String value) {
+    this.attributes.put(key, value);
   }
 
   public void addStudyStorageFolder(StudyStorageFolder folder) {
@@ -592,12 +374,28 @@ public class Study implements Model {
     this.storageFolders.remove(folder);
   }
 
-  public Set<GitRepository> getGitRepositories() {
-    return gitRepositories;
+  public void addNotebookFolder(StudyNotebookFolder folder) {
+    folder.setStudy(this);
+    this.notebookFolders.add(folder);
   }
 
-  public void setGitRepositories(Set<GitRepository> gitRepositories) {
-    this.gitRepositories = gitRepositories;
+  public void addNotebookFolder(ELNFolder elnFolder, boolean isPrimary) {
+    if (isPrimary) {
+      this.notebookFolders.forEach(f -> f.setPrimary(false));
+    }
+    StudyNotebookFolder studyNotebookFolder = new StudyNotebookFolder();
+    studyNotebookFolder.setStudy(this);
+    studyNotebookFolder.setElnFolder(elnFolder);
+    studyNotebookFolder.setPrimary(isPrimary);
+    this.getNotebookFolders().add(studyNotebookFolder);
+  }
+
+  public void addNotebookFolder(ELNFolder elnFolder) {
+    this.addNotebookFolder(elnFolder, false);
+  }
+
+  public void removeNotebookFolder(StudyNotebookFolder folder) {
+    this.notebookFolders.remove(folder);
   }
 
   public void addGitRepository(GitRepository gitRepository) {

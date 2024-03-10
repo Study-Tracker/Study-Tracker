@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,39 @@
 package io.studytracker.model;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
-@MappedSuperclass
+@Entity
+@Table(name = "study_notebook_folders", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"study_id", "eln_folder_id"})
+})
 @Getter
 @Setter
-public abstract class CustomEntity extends Model {
+public class StudyNotebookFolder extends Model {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @Column(name = "name", unique = true, nullable = false)
-  private String name;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "study_id", nullable = false, updatable = false)
+  private Study study;
 
-  @Column(name = "description", nullable = false, length = 1024)
-  private String description;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "eln_folder_id", nullable = false, updatable = false)
+  private ELNFolder elnFolder;
 
-  @Column(name = "active", nullable = false)
-  private boolean active;
+  @Column(name = "is_primary", nullable = false)
+  private boolean primary = false;
 
 }

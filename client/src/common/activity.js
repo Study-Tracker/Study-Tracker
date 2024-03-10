@@ -26,6 +26,7 @@ import {
   Link,
   List,
   MessageCircle,
+  Package,
   RotateCcw,
   Star,
   Tag,
@@ -77,6 +78,9 @@ const ActivityIcon = ({action}) => {
     case studyActions.RESTORED_STUDY.value:
       return <RotateCcw size={36} className="align-middle text-warning me-4"/>;
 
+    case studyActions.MOVED_STUDY.value:
+      return <Package size={36} className="align-middle text-info me-4"/>;
+
     case studyActions.STUDY_STATUS_CHANGED.value:
       return <Bell size={36} className="align-middle text-info me-4"/>;
 
@@ -89,8 +93,11 @@ const ActivityIcon = ({action}) => {
     case studyActions.DELETED_ASSAY.value:
       return <Trash2 size={36} className="align-middle text-danger me-4"/>;
 
-      case studyActions.RESTORED_ASSAY.value:
+    case studyActions.RESTORED_ASSAY.value:
       return <RotateCcw size={36} className="align-middle text-warning me-4"/>;
+
+    case studyActions.MOVED_ASSAY.value:
+      return <Package size={36} className="align-middle text-info me-4"/>;
 
     case studyActions.ASSAY_STATUS_CHANGED.value:
       return <Bell size={36} className="align-middle text-info me-4"/>;
@@ -317,7 +324,20 @@ const ActivityMessage = ({activity}) => {
               {activity.data.study.code}
             </a>
           </p>
-      )
+      );
+
+    case studyActions.MOVED_STUDY.value:
+      return (
+        <p>
+          <a href={"/user/"
+            + activity.user.id}>{activity.user.displayName}</a>
+          &nbsp;has moved study&nbsp;
+          <a href={"/study/" + activity.data.study.code}>
+            {activity.data.study.code}
+          </a>
+          &nbsp;from program {activity.data.oldProgram.name} to {activity.data.newProgram.name}.
+        </p>
+      );
 
     case studyActions.STUDY_STATUS_CHANGED.value:
 
@@ -503,6 +523,19 @@ const ActivityMessage = ({activity}) => {
             </a>
           </p>
       )
+
+    case studyActions.MOVED_ASSAY.value:
+      return (
+        <p>
+          <a href={"/user/"
+            + activity.user.id}>{activity.user.displayName}</a>
+          &nbsp;has moved assay&nbsp;
+          <a href={"/study/" + activity.studyId + "/assay/" + activity.data.assay.code}>
+            {activity.data.assay.code}
+          </a>
+          &nbsp;from study {activity.data.oldStudy.code} to study {activity.data.newStudy.code}
+        </p>
+      );
 
     case studyActions.ASSAY_STATUS_CHANGED.value:
 

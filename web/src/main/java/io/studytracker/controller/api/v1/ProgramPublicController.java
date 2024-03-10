@@ -21,7 +21,6 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.ProgramDto;
 import io.studytracker.mapstruct.dto.api.ProgramPayloadDto;
 import io.studytracker.model.Program;
-import io.studytracker.model.ProgramOptions;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,10 +65,10 @@ public class ProgramPublicController extends AbstractProgramController {
   public HttpEntity<ProgramDto> createProgram(@Valid @RequestBody ProgramPayloadDto dto) {
     LOGGER.info("Creating program {}", dto);
     Program newProgram = this.getProgramMapper().fromProgramPayloadDto(dto);
-    ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
-    options.setUseNotebook(dto.getNotebookFolderId() != null);
-    options.setUseStorage(dto.getParentFolderId() != null);
-    Program program = this.createNewProgram(newProgram, options);
+//    ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
+    newProgram.getOptions().setUseNotebook(dto.getNotebookFolderId() != null);
+    newProgram.getOptions().setUseStorage(dto.getParentFolderId() != null);
+    Program program = this.createNewProgram(newProgram);
     ProgramDto created = this.getProgramMapper().toProgramDto(program);
     LOGGER.info("Created program {}", created);
     return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -78,9 +77,9 @@ public class ProgramPublicController extends AbstractProgramController {
   @PutMapping("/{id}")
   public HttpEntity<ProgramDto> updateProgram(@PathVariable Long id, @Valid @RequestBody ProgramPayloadDto dto) {
     LOGGER.info("Updating program {}", dto);
-    Program toUpdate = this.getProgramMapper().fromProgramPayloadDto(dto);
-    ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
-    Program program = this.updateExistingProgram(toUpdate, options);
+//    Program toUpdate = this.getProgramMapper().fromProgramPayloadDto(dto);
+//    ProgramOptions options = this.getProgramMapper().optionsFromPayloadDto(dto);
+    Program program = this.updateExistingProgram(this.getProgramMapper().fromProgramPayloadDto(dto));
     return new ResponseEntity<>(this.getProgramMapper().toProgramDto(program), HttpStatus.OK);
   }
 

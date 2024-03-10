@@ -16,9 +16,9 @@
 
 package io.studytracker.controller.api.internal;
 
+import io.studytracker.benchling.BenchlingNotebookFolderService;
 import io.studytracker.controller.api.AbstractProgramController;
 import io.studytracker.eln.NotebookFolder;
-import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.events.EventsService;
 import io.studytracker.events.util.ProgramActivityUtils;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -31,7 +31,10 @@ import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.mapstruct.mapper.UserMapper;
-import io.studytracker.model.*;
+import io.studytracker.model.Activity;
+import io.studytracker.model.Program;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
@@ -66,20 +69,18 @@ public class ProgramPrivateController extends AbstractProgramController {
   @Autowired private UserService userService;
   @Autowired private StudyMapper studyMapper;
   @Autowired private UserMapper userMapper;
-
-  @Autowired(required = false)
-  private NotebookFolderService notebookFolderService;
+  @Autowired private BenchlingNotebookFolderService notebookFolderService;
 
   @GetMapping("")
   public List<?> getAllPrograms(
-      @RequestParam(required = false, name = "details") boolean showDetails) throws Exception {
+      @RequestParam(required = false, name = "details") boolean showDetails) {
     LOGGER.debug("Getting all programs: showDetails=" + showDetails);
     List<Program> programs = this.getProgramService().findAll();
     if (showDetails) {
       List<ProgramDetailsDto> detailsList =new ArrayList<>();
       for (Program program : programs) {
         ProgramDetailsDto dto = this.getProgramMapper().toProgramDetails(program);
-        dto.setStudies(new HashSet<>(studyMapper.toStudySummaryList(studyService.findByProgram(program))));
+        dto.setStudies(studyMapper.toStudySlimSet(new HashSet<>(studyService.findByProgram(program))));
         dto.setUsers(userMapper.toUserSummarySet(userService.findByProgram(program)));
         detailsList.add(dto);
       }
@@ -105,9 +106,8 @@ public class ProgramPrivateController extends AbstractProgramController {
   @PostMapping("")
   public HttpEntity<ProgramDetailsDto> createProgram(@RequestBody @Valid ProgramFormDto dto) {
     LOGGER.info("Creating new program: " + dto.toString());
-    Program newProgram = this.getProgramMapper().fromProgramFormDto(dto);
-    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
-    Program program = this.createNewProgram(newProgram, options);
+//    Program newProgram = this.getProgramMapper().fromProgramFormDto(dto);
+    Program program = this.createNewProgram(this.getProgramMapper().fromProgramFormDto(dto));
     return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.CREATED);
   }
 
@@ -117,9 +117,9 @@ public class ProgramPrivateController extends AbstractProgramController {
       @RequestBody @Valid ProgramFormDto dto
   ) {
     LOGGER.info("Updating program: " + programId);
-    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
-    Program toUpdate = this.getProgramMapper().fromProgramFormDto(dto);
-    Program program = this.updateExistingProgram(toUpdate, options);
+//    ProgramOptions options = this.getProgramMapper().optionsFromFormDto(dto);
+//    Program toUpdate = this.getProgramMapper().fromProgramFormDto(dto);
+    Program program = this.updateExistingProgram(this.getProgramMapper().fromProgramFormDto(dto));
     return new ResponseEntity<>(this.getProgramMapper().toProgramDetails(program), HttpStatus.OK);
   }
 
@@ -229,7 +229,7 @@ public class ProgramPrivateController extends AbstractProgramController {
 
     // Check that the folder exists
     Optional<NotebookFolder> folderOptional =
-        Optional.ofNullable(notebookFolderService).flatMap(service -> service.findProgramFolder(program));
+        Optional.ofNullable(notebookFolderService).flatMap(service -> service.findPrimaryProgramFolder(program));
     if (folderOptional.isEmpty()) {
       throw new RecordNotFoundException("Cannot find notebook folder for program: " + programId);
     }

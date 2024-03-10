@@ -38,14 +38,15 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface StudyMapper {
 
+  @Mapping(target = "options.useNotebook", source = "useNotebook")
+  @Mapping(target = "options.notebookFolder", source = "notebookFolder")
+  @Mapping(target = "options.notebookTemplateId", source = "notebookTemplateId")
+  @Mapping(target = "options.useStorage", source = "useStorage")
+  @Mapping(target = "options.useGit", source = "useGit")
+  @Mapping(target = "options.useS3", source = "useS3")
+  @Mapping(target = "options.s3FolderId", source = "s3FolderId")
   Study fromStudyForm(StudyFormDto dto);
   StudyFormDto toStudyForm(Study study);
-
-  Study fromStudyDetails(StudyDetailsDto dto);
-
-  List<Study> fromStudyDetailsList(List<StudyDetailsDto> dtos);
-
-  Set<Study> fromStudyDetailsSet(Set<StudyDetailsDto> dtos);
 
   StudyDetailsDto toStudyDetails(Study study);
 
@@ -53,23 +54,11 @@ public interface StudyMapper {
 
   Set<StudyDetailsDto> toStudyDetailsSet(Set<Study> studies);
 
-  Study fromStudySummary(StudySummaryDto dto);
-
-  List<Study> fromStudySummaryList(List<StudySummaryDto> dtos);
-
-  Set<Study> fromStudySummarySet(Set<StudySummaryDto> dtos);
-
   StudySummaryDto toStudySummary(Study study);
 
   List<StudySummaryDto> toStudySummaryList(List<Study> studies);
 
   Set<StudySummaryDto> toStudySummarySet(Set<Study> studies);
-
-  Study fromStudySlim(StudySlimDto dto);
-
-  List<Study> fromStudySlimList(List<StudySlimDto> dtos);
-
-  Set<Study> fromStudySlimSet(Set<StudySlimDto> dtos);
 
   StudySlimDto toStudySlim(Study study);
 
@@ -82,7 +71,6 @@ public interface StudyMapper {
   @Mapping(target = "lastModifiedBy", source = "lastModifiedBy.id")
   @Mapping(target = "programId", source = "program.id")
   @Mapping(target = "collaboratorId", source = "collaborator.id")
-  @Mapping(target = "notebookFolderId", source = "notebookFolder.id")
   @Mapping(target = "users", source = "users", qualifiedByName = "userToId")
   @Mapping(target = "comments", source = "comments", qualifiedByName = "commentToId")
   @Mapping(target = "keywords", source = "keywords", qualifiedByName = "keywordToId")
@@ -95,6 +83,11 @@ public interface StudyMapper {
   @Mapping(target = "owner", ignore = true)
   @Mapping(target = "users", ignore = true)
   @Mapping(target = "keywords", ignore = true)
+  @Mapping(target = "options.useNotebook", source = "useNotebook")
+  @Mapping(target = "options.notebookFolder", source = "notebookFolder")
+  @Mapping(target = "options.notebookTemplateId", source = "notebookTemplateId")
+  @Mapping(target = "options.useStorage", source = "useStorage")
+  @Mapping(target = "options.useGit", source = "useGit")
   Study fromPayload(StudyPayloadDto dto);
 
   @Named("userToId")

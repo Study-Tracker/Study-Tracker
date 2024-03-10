@@ -17,9 +17,16 @@
 package io.studytracker.mapstruct.mapper;
 
 import io.studytracker.mapstruct.dto.api.NotebookFolderDto;
+import io.studytracker.mapstruct.dto.response.AssayNotebookFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
+import io.studytracker.mapstruct.dto.response.ProgramNotebookFolderDetailsDto;
+import io.studytracker.mapstruct.dto.response.StudyNotebookFolderDetailsDto;
+import io.studytracker.model.AssayNotebookFolder;
 import io.studytracker.model.ELNFolder;
+import io.studytracker.model.ProgramNotebookFolder;
+import io.studytracker.model.StudyNotebookFolder;
 import java.util.List;
+import java.util.Set;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
@@ -30,4 +37,20 @@ public interface NotebookFolderMapper {
 
   NotebookFolderDto toDto(ELNFolder folder);
   List<NotebookFolderDto> toDtoList(List<ELNFolder> folders);
+
+  // Program
+  ProgramNotebookFolderDetailsDto toProgramFolderDto(ProgramNotebookFolder folder);
+  Set<ProgramNotebookFolderDetailsDto> toProgramFolderDto(Set<ProgramNotebookFolder> folders);
+  List<ProgramNotebookFolderDetailsDto> toProgramFolderDto(List<ProgramNotebookFolder> folders);
+
+  // Study
+  StudyNotebookFolderDetailsDto toStudyFolderDto(StudyNotebookFolder folder);
+  Set<StudyNotebookFolderDetailsDto> toStudyFolderDto(Set<StudyNotebookFolder> folders);
+  List<StudyNotebookFolderDetailsDto> toStudyFolderDto(List<StudyNotebookFolder> folders);
+
+  // Assay
+  AssayNotebookFolderDetailsDto toAssayFolderDto(AssayNotebookFolder folder);
+  Set<AssayNotebookFolderDetailsDto> toAssayFolderDto(Set<AssayNotebookFolder> folders);
+  List<AssayNotebookFolderDetailsDto> toAssayFolderDto(List<AssayNotebookFolder> folders);
+
 }

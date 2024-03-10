@@ -15,7 +15,7 @@
  */
 
 import React from "react";
-import {ProgramDropdown} from "../../common/forms/programs";
+import ProgramDropdown from "../../common/forms/ProgramDropdown";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {FormGroup} from "../../common/forms/common";
@@ -31,8 +31,7 @@ import {LoadingOverlay} from "../../common/loading";
 import {Breadcrumbs} from "../../common/common";
 import {useNavigate} from "react-router-dom";
 import {Form as FormikForm, Formik} from "formik";
-import FormikFormErrorNotification
-  from "../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification from "../../common/forms/FormikFormErrorNotification";
 import * as yup from "yup";
 import axios from "axios";
 import PropTypes from "prop-types";

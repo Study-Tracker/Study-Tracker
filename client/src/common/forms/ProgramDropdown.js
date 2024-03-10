@@ -18,14 +18,17 @@ import React, {useEffect, useState} from "react";
 import {FormGroup} from "./common";
 import {Form} from "react-bootstrap";
 import Select from "react-select";
+import PropTypes from "prop-types";
 
-export const ProgramDropdown = ({
+const ProgramDropdown = ({
   programs,
   selectedProgram,
   onChange,
-  isInvalid,
-  disabled,
-  isLegacyStudy
+  isInvalid = false,
+  disabled = false,
+  isLegacyStudy = false,
+  description = "Select the program your study is associated with.",
+  error = "You must select a program"
 }) => {
 
   const [programOptions, setProgramOptions] = useState([]);
@@ -72,12 +75,25 @@ export const ProgramDropdown = ({
             isDisabled={disabled}
         />
         <Form.Control.Feedback type={"invalid"}>
-          You must select a program.
+          {error}
         </Form.Control.Feedback>
         <Form.Text>
-          Select the program your study is associated with.
+          {description}
         </Form.Text>
       </FormGroup>
   );
 
 };
+
+ProgramDropdown.propTypes = {
+  programs: PropTypes.array.isRequired,
+  selectedProgram: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+  isInvalid: PropTypes.bool,
+  disabled: PropTypes.bool,
+  isLegacyStudy: PropTypes.bool,
+  description: PropTypes.string,
+  error: PropTypes.string
+}
+
+export default ProgramDropdown;

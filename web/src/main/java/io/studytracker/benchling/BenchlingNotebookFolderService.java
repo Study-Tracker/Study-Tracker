@@ -18,33 +18,41 @@ package io.studytracker.benchling;
 
 import io.studytracker.benchling.api.AbstractBenchlingApiService;
 import io.studytracker.benchling.api.BenchlingElnRestClient;
-import io.studytracker.benchling.api.entities.*;
+import io.studytracker.benchling.api.entities.BenchlingEntryList;
+import io.studytracker.benchling.api.entities.BenchlingFolder;
+import io.studytracker.benchling.api.entities.BenchlingFolderList;
 import io.studytracker.benchling.exception.EntityNotFoundException;
-import io.studytracker.eln.NotebookFolder;
+import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.MalformedEntityException;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayNotebookFolder;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.Program;
+import io.studytracker.model.ProgramNotebookFolder;
+import io.studytracker.model.ProgramOptions;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyNotebookFolder;
+import io.studytracker.repository.AssayNotebookFolderRepository;
 import io.studytracker.repository.ELNFolderRepository;
+import io.studytracker.repository.ProgramNotebookFolderRepository;
+import io.studytracker.repository.StudyNotebookFolderRepository;
 import io.studytracker.service.NamingService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Service
 public final class BenchlingNotebookFolderService 
     extends AbstractBenchlingApiService
-    implements NotebookFolderService {
+    implements NotebookFolderService<ELNFolder> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingNotebookFolderService.class);
 
@@ -54,172 +62,64 @@ public final class BenchlingNotebookFolderService
   @Autowired 
   private ELNFolderRepository elnFolderRepository;
 
-  /**
-   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} via {@link
-   * #convertBenchlingFolder(BenchlingFolder)}, without loading the contents of linked entries.
-   *
-   * @param benchlingFolder
-   * @return
-   */
-  private NotebookFolder convertFolder(BenchlingFolder benchlingFolder) {
-    return convertFolder(benchlingFolder, null);
-  }
+  @Autowired
+  private ProgramNotebookFolderRepository programNotebookFolderRepository;
 
-  /**
-   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} via {@link
-   * #convertBenchlingFolder(BenchlingFolder)}, loading the contents of linked {@link
-   * BenchlingEntry} entries.
-   *
-   * @param benchlingFolder
-   * @param entries
-   * @return
-   */
-  private NotebookFolder convertFolder(BenchlingFolder benchlingFolder, List<BenchlingEntry> entries) {
-    NotebookFolder notebookFolder = this.convertBenchlingFolder(benchlingFolder);
-    if (entries != null) {
-      loadContents(benchlingFolder, notebookFolder, entries);
+  @Autowired
+  private StudyNotebookFolderRepository studyNotebookFolderRepository;
+
+  @Autowired
+  private AssayNotebookFolderRepository assayNotebookFolderRepository;
+
+  @Override
+  public List<ELNFolder> findProgramFolders(Program program) {
+    List<ProgramNotebookFolder> folderSet = programNotebookFolderRepository.findByProgramId(program.getId());
+    BenchlingElnRestClient client = this.getClient();
+    List<ELNFolder> folders = new ArrayList<>();
+    for (ProgramNotebookFolder programNotebookFolder : folderSet) {
+      Optional<BenchlingFolder> optional = client.findFolderById(programNotebookFolder.getElnFolder().getReferenceId());
+      optional.ifPresent(
+          benchlingFolder -> folders.add(this.convertBenchlingFolder(benchlingFolder)));
     }
-    return notebookFolder;
-  }
-
-  /**
-   * Loads the contents of {@link BenchlingFolder} folders and appends them to the referenced {@link
-   * NotebookFolder} object.
-   *
-   * @param benchlingFolder
-   * @param notebookFolder
-   * @param entries
-   */
-  private void loadContents(BenchlingFolder benchlingFolder, NotebookFolder notebookFolder,
-          List<BenchlingEntry> entries) {
-    entries.stream()
-        .filter(entry -> entry.getFolderId().equals(benchlingFolder.getId()))
-        .forEach(entry -> notebookFolder.getEntries().add(convertBenchlingEntry(entry)));
-    List<BenchlingFolder> childrenFolders = new ArrayList<>();
-    boolean hasNext = true;
-    String nextToken = null;
-    while (hasNext) {
-      BenchlingFolderList folderList =
-          this.getClient().findFolderChildren(benchlingFolder.getId(), nextToken);
-      childrenFolders.addAll(folderList.getFolders());
-      nextToken = folderList.getNextToken();
-      hasNext = StringUtils.hasText(nextToken);
-    }
-    childrenFolders.forEach(
-        folder -> notebookFolder.getSubFolders().add(convertFolder(folder, entries)));
-  }
-
-  /**
-   * Gets the folder path of the provided project's {@link NotebookFolder}.
-   *
-   * @param folder
-   * @return
-   */
-  private String getProjectPath(NotebookFolder folder) {
-    return this.getClient()
-        .findFolderById(folder.getReferenceId())
-        .flatMap(
-            benchlingFolder -> this.getClient().findProjectById(benchlingFolder.getProjectId()))
-        .map(BenchlingProject::getName)
-        .map(name -> name + "/")
-        .orElse("");
-  }
-
-  /**
-   * Returns the folder path of the provided {@link Study}.
-   *
-   * @param study
-   * @return
-   */
-  private String getNotebookFolderPath(Study study) {
-    StringBuilder path = new StringBuilder("/");
-    NotebookFolder studyFolder = NotebookFolder.from(study.getNotebookFolder());
-    path.append(getProjectPath(studyFolder)).append(study.getName());
-    return path.toString();
-  }
-
-  /**
-   * Returns the folder path of the provided {@link Assay}.
-   *
-   * @param assay
-   * @return
-   */
-  private String getNotebookFolderPath(Assay assay) {
-    StringBuilder path = new StringBuilder("/");
-    NotebookFolder assayFolder = NotebookFolder.from(assay.getNotebookFolder());
-    path.append(getProjectPath(assayFolder));
-    Study study = assay.getStudy();
-    path.append(study.getName()).append("/").append(assay.getName());
-    return path.toString();
-  }
-
-  /**
-   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} and fetches it contents for the
-   * given {@link Assay}.
-   *
-   * @param benchlingFolder
-   * @param assay
-   * @return
-   */
-  private NotebookFolder getContentFullNotebookFolder(BenchlingFolder benchlingFolder, Assay assay) {
-
-    // Get notebook entries
-    List<BenchlingEntry> entries = new ArrayList<>();
-    String nextToken = null;
-    boolean hasNext = true;
-    while (hasNext) {
-      BenchlingEntryList entryList =
-          this.getClient().findProjectEntries(benchlingFolder.getProjectId(), nextToken);
-      entries.addAll(entryList.getEntries());
-      nextToken = entryList.getNextToken();
-      hasNext = StringUtils.hasText(nextToken);
-    }
-
-    // Convert the folder object
-    NotebookFolder notebookFolder = convertFolder(benchlingFolder, entries);
-    String path = getNotebookFolderPath(assay);
-    notebookFolder.setPath(path);
-
-    return notebookFolder;
-  }
-
-  /**
-   * Converts a {@link BenchlingFolder} to a {@link NotebookFolder} and fetches it contents for the
-   * given {@link Study}.
-   *
-   * @param benchlingFolder
-   * @param study
-   * @return
-   */
-  private NotebookFolder getContentFullNotebookFolder(BenchlingFolder benchlingFolder, Study study) {
-
-    List<BenchlingEntry> entries = new ArrayList<>();
-    String nextToken = null;
-    boolean hasNext = true;
-    while (hasNext) {
-      BenchlingEntryList entryList =
-          this.getClient().findProjectEntries(benchlingFolder.getProjectId(), nextToken);
-      entries.addAll(entryList.getEntries());
-      nextToken = entryList.getNextToken();
-      hasNext = StringUtils.hasText(nextToken);
-    }
-
-    NotebookFolder notebookFolder = convertFolder(benchlingFolder, entries);
-    String path = getNotebookFolderPath(study);
-    notebookFolder.setPath(path);
-
-    return notebookFolder;
+    return folders;
   }
 
   @Override
-  public Optional<NotebookFolder> findProgramFolder(Program program) {
-
-    LOGGER.info("Fetching benchling notebook folder for program: " + program.getName());
-    Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByProgramId(program.getId());
+  public List<ELNFolder> findStudyFolders(Study study) {
+    List<StudyNotebookFolder> folderSet = studyNotebookFolderRepository.findByStudyId(study.getId());
     BenchlingElnRestClient client = this.getClient();
-    if (elnFolderOptional.isPresent()) {
-      Optional<BenchlingFolder> optional = client.findFolderById(elnFolderOptional.get().getReferenceId());
-      return Optional.of(convertFolder(optional.get()));
+    List<ELNFolder> folders = new ArrayList<>();
+    for (StudyNotebookFolder studyNotebookFolder : folderSet) {
+      client
+          .findFolderById(studyNotebookFolder.getElnFolder().getReferenceId())
+          .ifPresent(folder -> folders.add(this.convertBenchlingFolder(folder)));
+    }
+    return folders;
+  }
+
+  @Override
+  public List<ELNFolder> findAssayFolders(Assay assay) {
+    List<AssayNotebookFolder> folderSet = assayNotebookFolderRepository.findByAssayId(assay.getId());
+    BenchlingElnRestClient client = this.getClient();
+    List<ELNFolder> folders = new ArrayList<>();
+    for (AssayNotebookFolder assayNotebookFolder : folderSet) {
+      Optional<BenchlingFolder> optional = client.findFolderById(assayNotebookFolder.getElnFolder().getReferenceId());
+      if (optional.isPresent()) {
+        folders.add(this.convertBenchlingFolder(optional.get()));
+      }
+    }
+    return folders;
+  }
+
+  @Override
+  public Optional<ELNFolder> findPrimaryProgramFolder(Program program) {
+    LOGGER.info("Fetching benchling notebook folder for program: " + program.getName());
+    ELNFolder programNotebookFolder = elnFolderRepository.findPrimaryByProgramId(program.getId())
+        .orElse(null);
+    if (programNotebookFolder != null) {
+      Optional<BenchlingFolder> optional = this.getClient()
+          .findFolderById(programNotebookFolder.getReferenceId());
+      return optional.map(this::convertBenchlingFolder);
     } else {
       LOGGER.warn(
           String.format("Program %s does not have a notebook folder set.", program.getName()));
@@ -228,29 +128,16 @@ public final class BenchlingNotebookFolderService
   }
 
   @Override
-  public Optional<NotebookFolder> findStudyFolder(Study study) {
-    return findStudyFolder(study, false);
-  }
-
-  @Override
-  public Optional<NotebookFolder> findStudyFolder(Study study, boolean includeContents) {
+  public Optional<ELNFolder> findPrimaryStudyFolder(Study study) {
 
     LOGGER.info("Fetching notebook folder for study: " + study.getCode());
-    Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByStudyId(study.getId());
+    ELNFolder studyFolder = elnFolderRepository.findPrimaryByStudyId(study.getId()).orElse(null);
     BenchlingElnRestClient client = this.getClient();
 
     // Does the study have the folder object set?
-    if (elnFolderOptional.isPresent()) {
-      NotebookFolder studyFolder = NotebookFolder.from(elnFolderOptional.get());
+    if (studyFolder != null) {
       Optional<BenchlingFolder> optional = client.findFolderById(studyFolder.getReferenceId());
-      return optional.flatMap(
-          folder -> {
-            if (includeContents) {
-              return Optional.of(getContentFullNotebookFolder(folder, study));
-            } else {
-              return Optional.of(this.convertFolder(folder));
-            }
-          });
+      return optional.flatMap(f -> Optional.of(this.convertBenchlingFolder(f)));
     } else {
       LOGGER.warn(String.format("Study %s does not have a notebook folder set.", study.getName()));
       return Optional.empty();
@@ -258,28 +145,15 @@ public final class BenchlingNotebookFolderService
   }
 
   @Override
-  public Optional<NotebookFolder> findAssayFolder(Assay assay) {
-    return findAssayFolder(assay, false);
-  }
-
-  @Override
-  public Optional<NotebookFolder> findAssayFolder(Assay assay, boolean includeContents) {
+  public Optional<ELNFolder> findPrimaryAssayFolder(Assay assay) {
 
     LOGGER.info("Fetching notebook folder for assay: " + assay.getCode());
-    Optional<ELNFolder> elnFolderOptional = elnFolderRepository.findByAssayId(assay.getId());
+    ELNFolder assayFolder = elnFolderRepository.findPrimaryByAssayId(assay.getId()).orElse(null);
     BenchlingElnRestClient client = this.getClient();
 
-    if (elnFolderOptional.isPresent()) {
-      NotebookFolder assayFolder = NotebookFolder.from(elnFolderOptional.get());
+    if (assayFolder != null) {
       Optional<BenchlingFolder> optional = client.findFolderById(assayFolder.getReferenceId());
-      return optional.flatMap(
-          folder -> {
-            if (includeContents) {
-              return Optional.of(getContentFullNotebookFolder(folder, assay));
-            } else {
-              return Optional.of(this.convertFolder(folder));
-            }
-          });
+      return optional.flatMap(f -> Optional.of(this.convertBenchlingFolder(f)));
     } else {
       LOGGER.warn(String.format("Assay %s does not have a notebook folder set.", assay.getName()));
       return Optional.empty();
@@ -287,16 +161,17 @@ public final class BenchlingNotebookFolderService
   }
 
   @Override
-  public NotebookFolder createProgramFolder(Program program) throws NotebookException {
+  public ELNFolder createProgramFolder(Program program) throws NotebookException {
     LOGGER.info(
         "Registering new program folder. NOTE: Benchling does not support project "
             + "creation, so a valid folderId must be provided when registering new programs.");
     BenchlingElnRestClient client = this.getClient();
-    if (program.getNotebookFolder() != null
-        && program.getNotebookFolder().getReferenceId() != null) {
+    ProgramOptions options = program.getOptions();
+    if (options.getNotebookFolder() != null
+        && options.getNotebookFolder().getReferenceId() != null) {
       try {
-        BenchlingFolder folder = client.findFolderById(program.getNotebookFolder().getReferenceId()).get();
-        return this.convertFolder(folder);
+        BenchlingFolder folder = client.findFolderById(options.getNotebookFolder().getReferenceId()).get();
+        return this.convertBenchlingFolder(folder);
       } catch (Exception e) {
         LOGGER.error("Failed to register new program: " + program.getName());
         throw new NotebookException(e);
@@ -310,46 +185,46 @@ public final class BenchlingNotebookFolderService
   }
 
   @Override
-  public NotebookFolder createStudyFolder(Study study) {
+  public ELNFolder createStudyFolder(Study study) {
     LOGGER.info("Creating Benchling folder for study: " + study.getCode());
 
-    Optional<NotebookFolder> programFolderOptional = this.findProgramFolder(study.getProgram());
+    Optional<ELNFolder> programFolderOptional = this.findPrimaryProgramFolder(study.getProgram());
     BenchlingElnRestClient client = this.getClient();
     if (!programFolderOptional.isPresent()) {
       throw new EntityNotFoundException(
           "Could not find folder for program: " + study.getProgram().getName());
     }
-    NotebookFolder programFolder = programFolderOptional.get();
+    ELNFolder programFolder = programFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client.createFolder(
-            namingService.getStudyNotebookFolderName(study), programFolder.getReferenceId());
-    NotebookFolder studyFolder = this.convertFolder(benchlingFolder);
+            NamingService.getStudyNotebookFolderName(study), programFolder.getReferenceId());
+    ELNFolder studyFolder = this.convertBenchlingFolder(benchlingFolder);
     studyFolder.setParentFolder(programFolder);
     return studyFolder;
   }
 
   @Override
-  public NotebookFolder createAssayFolder(Assay assay) {
+  public ELNFolder createAssayFolder(Assay assay) {
     LOGGER.info("Creating Benchling folder for assay: " + assay.getCode());
 
-    Optional<NotebookFolder> studyFolderOptional = this.findStudyFolder(assay.getStudy(), false);
+    Optional<ELNFolder> studyFolderOptional = this.findPrimaryStudyFolder(assay.getStudy());
     if (!studyFolderOptional.isPresent()) {
       throw new EntityNotFoundException(
           "Could not find folder for study: " + assay.getStudy().getCode());
     }
     BenchlingElnRestClient client = this.getClient();
-    NotebookFolder studyFolder = studyFolderOptional.get();
+    ELNFolder studyFolder = studyFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client.createFolder(
-            namingService.getAssayNotebookFolderName(assay), studyFolder.getReferenceId());
-    NotebookFolder assayFolder = this.convertFolder(benchlingFolder);
+            NamingService.getAssayNotebookFolderName(assay), studyFolder.getReferenceId());
+    ELNFolder assayFolder = this.convertBenchlingFolder(benchlingFolder);
     assayFolder.setParentFolder(studyFolder);
 
     return assayFolder;
   }
 
   @Override
-  public List<NotebookFolder> listNotebookProjectFolders() {
+  public List<ELNFolder> listProjectFolders() {
     LOGGER.debug("Listing all notebook projects");
     BenchlingElnRestClient client = this.getClient();
     List<BenchlingFolder> folders = new ArrayList<>();
@@ -363,4 +238,45 @@ public final class BenchlingNotebookFolderService
     }
     return folders.stream().map(this::convertBenchlingFolder).collect(Collectors.toList());
   }
+
+  @Override
+  public ELNFolder loadFolderContents(ELNFolder folder) {
+    LOGGER.debug("Loading contents of notebook folder: " + folder.getReferenceId());
+    BenchlingElnRestClient client = this.getClient();
+
+    // Get the notebook entries
+    List<NotebookEntry> entries = new ArrayList<>();
+    boolean hasNext = true;
+    String nextToken = null;
+    while (hasNext) {
+      BenchlingEntryList entryList =
+          client.findEntriesByFolderId(folder.getReferenceId(), nextToken);
+      entries.addAll(
+          entryList.getEntries().stream()
+              .map(e -> convertBenchlingEntry(e))
+              .collect(Collectors.toList()));
+      nextToken = entryList.getNextToken();
+      hasNext = StringUtils.hasText(nextToken);
+    }
+    folder.setEntries(entries);
+
+    // Get the subfolders
+    List<ELNFolder> childrenFolders = new ArrayList<>();
+    hasNext = true;
+    nextToken = null;
+    while (hasNext) {
+      BenchlingFolderList folderList =
+          client.findFolderChildren(folder.getReferenceId(), nextToken);
+      childrenFolders.addAll(
+          folderList.getFolders().stream()
+              .map(f -> convertBenchlingFolder(f))
+              .collect(Collectors.toList()));
+      nextToken = folderList.getNextToken();
+      hasNext = StringUtils.hasText(nextToken);
+    }
+    folder.setSubFolders(childrenFolders);
+
+    return folder;
+  }
+
 }

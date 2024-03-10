@@ -40,8 +40,6 @@ public class AssayDto {
   private Long owner;
   private Date startDate;
   private Date endDate;
-  private Long notebookFolderId;
-  private Long storageFolderId;
   private boolean active = true;
   private Date createdAt;
   private Date updatedAt;

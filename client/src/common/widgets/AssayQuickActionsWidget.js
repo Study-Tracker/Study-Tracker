@@ -17,19 +17,22 @@
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
+  faBolt,
+  faDolly,
   faEdit,
   faPersonRunning,
   faTrash,
   faTrashArrowUp,
   faTriangleExclamation
 } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import React, {useState} from "react";
 import PropTypes from "prop-types";
 import {faSquareCheck} from "@fortawesome/free-regular-svg-icons";
 import NotyfContext from "../../context/NotyfContext";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import swal from "sweetalert";
+import MoveAssayModal from "../modals/MoveAssayModal";
 
 const AssayQuickActionsWidget = ({
     assay,
@@ -38,6 +41,7 @@ const AssayQuickActionsWidget = ({
 
   const notyf = React.useContext(NotyfContext);
   const navigate = useNavigate();
+  const [moveAssayModalIsOpen, setMoveAssayModalIsOpen] = useState(false);
 
   const handleStatusChange = (status) => {
     axios.post("/api/internal/assay/" + assay.id + "/status", {
@@ -117,7 +121,7 @@ const AssayQuickActionsWidget = ({
                 <br/>
                 <Dropdown className="me-1 mb-1">
                   <Dropdown.Toggle variant={"outline-primary"}>
-                    <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
+                    <FontAwesomeIcon icon={faBolt} className={"me-2"}/>
                     Actions
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
@@ -151,6 +155,11 @@ const AssayQuickActionsWidget = ({
 
                     <Dropdown.Divider/>
 
+                    <Dropdown.Item onClick={() => setMoveAssayModalIsOpen(true)}>
+                      <FontAwesomeIcon icon={faDolly} className={"me-2"} />
+                      Move to another study
+                    </Dropdown.Item>
+
                     <Dropdown.Item onClick={() => navigate("/study/" + study.code +
                         "/assay/" + assay.code + "/edit")}>
                       <FontAwesomeIcon icon={faEdit} className={"me-2"}/>
@@ -179,6 +188,14 @@ const AssayQuickActionsWidget = ({
             </Col>
           </Row>
         </Card.Body>
+
+        <MoveAssayModal
+          assay={assay}
+          study={study}
+          isOpen={moveAssayModalIsOpen}
+          setIsOpen={setMoveAssayModalIsOpen}
+        />
+
       </Card>
   )
 }

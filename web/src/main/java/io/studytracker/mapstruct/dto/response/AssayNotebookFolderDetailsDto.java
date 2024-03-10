@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.api;
+package io.studytracker.mapstruct.dto.response;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class ProgramPayloadDto {
+public class AssayNotebookFolderDetailsDto {
 
   private Long id;
-  private @NotNull(message = "Program code must not be empty") String code;
-  private @NotNull(message = "Program name must not be empty") String name;
-  private String description;
-  private boolean active;
-  private Long notebookFolderId;
-//  private Long storageFolderId;
-  private Long parentFolderId;
-  private Map<String, String> attributes = new HashMap<>();
+  private boolean primary;
+  private NotebookFolderDetailsDto elnFolder;
+
 }
