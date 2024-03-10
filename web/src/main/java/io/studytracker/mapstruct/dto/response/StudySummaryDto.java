@@ -42,5 +42,6 @@ public class StudySummaryDto {
   private Date updatedAt;
   private UserSummaryDto owner;
   private Set<UserSlimDto> users = new HashSet<>();
+  private Set<KeywordDetailsDto> keywords = new HashSet<>();
 
 }

@@ -65,16 +65,6 @@ const columns = [
     formatter: (c, d) => <StatusBadge status={d.status}/>
   },
   {
-    dataField: "updatedAt",
-    text: "Last Updated",
-    type: "date",
-    sort: true,
-    searchable: false,
-    headerStyle: {width: '10%'},
-    formatter: (c, d) => new Date(d.updatedAt).toLocaleDateString(),
-    csvFormatter: (c, d) => new Date(d.updatedAt).toLocaleDateString()
-  },
-  {
     dataField: "program",
     text: "Program",
     sort: true,
@@ -105,6 +95,36 @@ const columns = [
     headerStyle: {width: '10%'},
     formatter: (c, d) => d.owner.displayName,
     csvFormatter: (c, d) => d.owner.displayName
+  },
+  {
+    dataField: "startDate",
+    text: "Start Date",
+    type: "date",
+    sort: true,
+    searchable: false,
+    headerStyle: {width: '10%'},
+    formatter: (c, d) => new Date(d.startDate).toLocaleDateString(),
+    csvFormatter: (c, d) => new Date(d.startDate).toLocaleDateString()
+  },
+  {
+    dataField: "createdAt",
+    text: "Created",
+    type: "date",
+    sort: true,
+    searchable: false,
+    headerStyle: {width: '10%'},
+    formatter: (c, d) => new Date(d.createdAt).toLocaleDateString(),
+    csvFormatter: (c, d) => new Date(d.createdAt).toLocaleDateString()
+  },
+  {
+    dataField: "updatedAt",
+    text: "Last Updated",
+    type: "date",
+    sort: true,
+    searchable: false,
+    headerStyle: {width: '10%'},
+    formatter: (c, d) => new Date(d.updatedAt).toLocaleDateString(),
+    csvFormatter: (c, d) => new Date(d.updatedAt).toLocaleDateString()
   },
   {
     dataField: "cro",
