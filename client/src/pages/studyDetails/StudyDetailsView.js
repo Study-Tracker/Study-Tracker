@@ -45,7 +45,7 @@ const StudyDetailsView = props => {
     </StandardWrapper>
   );
 
-  if (isLoading) return (
+  if (isLoading || !user || !features) return (
     <StandardWrapper {...props}>
       <LoadingMessage />
     </StandardWrapper>

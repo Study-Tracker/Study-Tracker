@@ -16,13 +16,9 @@
 
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.mapstruct.dto.features.AWSFeaturesDto;
-import io.studytracker.mapstruct.dto.features.AuthFeaturesDto;
-import io.studytracker.mapstruct.dto.features.FeaturesSummaryDto;
-import io.studytracker.mapstruct.dto.features.GitFeaturesDto;
-import io.studytracker.mapstruct.dto.features.NotebookFeaturesDto;
-import io.studytracker.mapstruct.dto.features.SearchFeaturesDto;
-import io.studytracker.mapstruct.dto.features.StorageFeaturesDto;
+import io.studytracker.mapstruct.dto.features.*;
+import io.studytracker.model.BenchlingIntegration;
+import io.studytracker.repository.BenchlingIntegrationRepository;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +36,7 @@ public class ConfigPrivateController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ConfigPrivateController.class);
 
   @Autowired private Environment env;
+  @Autowired private BenchlingIntegrationRepository benchlingIntegrationRepository;
 
   @GetMapping("/features")
   public FeaturesSummaryDto getFeatures() {
@@ -57,11 +54,16 @@ public class ConfigPrivateController {
     features.setStorage(storageFeaturesDto);
 
     // ELN
+    BenchlingIntegration benchlingIntegration = benchlingIntegrationRepository.findAll().stream()
+            .filter(i -> i.isActive())
+            .findFirst()
+            .orElse(null);
     NotebookFeaturesDto notebookFeaturesDto = new NotebookFeaturesDto();
-    String elnMode = env.getProperty("notebook.mode", "none");
-    notebookFeaturesDto.setMode(elnMode);
-    if (elnMode.equals("benchling")) {
-      notebookFeaturesDto.setElnUrl(env.getProperty("benchling.root-url"));
+    if (benchlingIntegration != null) {
+      notebookFeaturesDto.setMode("benchling");
+      notebookFeaturesDto.setElnUrl(benchlingIntegration.getRootUrl());
+    } else {
+      notebookFeaturesDto.setMode("none");
     }
     features.setNotebook(notebookFeaturesDto);
 
@@ -93,9 +95,9 @@ public class ConfigPrivateController {
     if (env.containsProperty("aws.region")) {
       awsFeaturesDto.setRegion(env.getRequiredProperty("aws.region"));
     }
-    if (env.containsProperty("aws.access-key-id")) {
-      awsFeaturesDto.setAccessKey(env.getRequiredProperty("aws.access-key-id"));
-    }
+//    if (env.containsProperty("aws.access-key-id")) {
+//      awsFeaturesDto.setAccessKey(env.getRequiredProperty("aws.access-key-id"));
+//    }
     if (env.containsProperty("aws.s3.default-study-location")) {
       awsFeaturesDto.setDefaultS3StudyLocation(
           env.getRequiredProperty("aws.s3.default-study-location"));
