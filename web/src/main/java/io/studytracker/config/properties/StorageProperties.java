@@ -16,14 +16,15 @@
 
 package io.studytracker.config.properties;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 
 @ConfigurationProperties(prefix = "storage")
 @Validated
@@ -33,6 +34,7 @@ import org.springframework.validation.annotation.Validated;
 public class StorageProperties {
 
   @ConfigurationModeConstraint(options = {"local", "egnyte", "onedrive"})
+  @Deprecated
   private String mode;
 
   private Boolean useExisting;
