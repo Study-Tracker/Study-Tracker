@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 public class NotebookProperties {
 
   @ConfigurationModeConstraint(options = {"none", "benchling"})
+  @Deprecated
   private String mode;
 
 }

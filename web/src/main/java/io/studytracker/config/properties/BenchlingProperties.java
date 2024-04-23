@@ -17,23 +17,27 @@
 package io.studytracker.config.properties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
+
 @ConfigurationProperties(prefix = "benchling")
 @Validated
 @Getter
 @Setter
 @ToString
+@Deprecated
 public class BenchlingProperties {
 
+  @Deprecated
   private String tenantName;
 
   @Valid
+  @Deprecated
   private final BenchlingApiProperties api = new BenchlingApiProperties();
 
   @Getter
@@ -41,9 +45,11 @@ public class BenchlingProperties {
   public static class BenchlingApiProperties {
 
     @JsonIgnore
+    @Deprecated
     private String clientId;
 
     @JsonIgnore
+    @Deprecated
     private String clientSecret;
 
     @JsonIgnore
