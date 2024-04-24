@@ -22,7 +22,8 @@ import {useMutation, useQueryClient} from "react-query";
 import * as yup from "yup";
 import axios from "axios";
 import {Form as FormikForm, Formik} from "formik";
-import FormikFormErrorNotification from "../../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification
+  from "../../../common/forms/FormikFormErrorNotification";
 import {FormGroup} from "../../../common/forms/common";
 import CharacterCounter from "../../../common/forms/CharacterCounter";
 
@@ -74,7 +75,7 @@ const BenchlingIntegrationFormModal = ({
     })
   });
 
-  const handleIntegrationFormSubmit = async (values, {setSubmitting, resetForm, setErrors}) => {
+  const handleIntegrationFormSubmit = (values, {setSubmitting, resetForm, setErrors}) => {
     setSubmitting(true);
     console.debug("Saving Benchling integration settings", values);
     saveIntegrationMutation.mutate(values, {

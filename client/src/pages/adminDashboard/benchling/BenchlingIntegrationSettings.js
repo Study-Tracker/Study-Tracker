@@ -21,7 +21,11 @@ import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGears, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
-import {faCheckCircle, faCircleXmark, faEdit} from "@fortawesome/free-regular-svg-icons";
+import {
+  faCheckCircle,
+  faCircleXmark,
+  faEdit
+} from "@fortawesome/free-regular-svg-icons";
 import BenchlingIntegrationSetupCard from "./BenchlingIntegrationSetupCard";
 import BenchlingIntegrationFormModal from "./BenchlingIntegrationFormModal";
 import BenchlingIntegrationDetailsCard from "./BenchlingIntegrationDetailsCard";
@@ -126,12 +130,12 @@ const BenchlingIntegrationSettings = () => {
                         <FontAwesomeIcon icon={faCircleXmark} className={"me-2"}/>
                         Disable Integration
                       </Dropdown.Item>
-                    ) : (
+                    ) : settings && !settings.active ? (
                       <Dropdown.Item onClick={() => changeStatusMutation.mutate(true)}>
                         <FontAwesomeIcon icon={faCheckCircle} className={"me-2"}/>
                         Re-enable Integration
                       </Dropdown.Item>
-                    )
+                    ) : ""
                   }
 
                 </Dropdown.Menu>

@@ -17,7 +17,6 @@
 import React, {useState} from "react";
 import 'react-datepicker/dist/react-datepicker.css';
 import {
-  Alert,
   Breadcrumb,
   Button,
   Card,
@@ -41,6 +40,7 @@ import axios from "axios";
 import * as yup from "yup";
 import ProgramGitInputs from "./ProgramGitInputs";
 import FeatureToggleCard from "../../common/forms/FeatureToggleCard";
+import {DismissableAlert} from "../../common/errors";
 
 const ProgramForm = ({
     program,
@@ -432,9 +432,12 @@ const ProgramForm = ({
                             : (
                                   <Row>
                                     <Col>
-                                      <Alert variant={"warning"}>
-                                        No root folders have been configured. Please contact your system administrator.
-                                      </Alert>
+                                      <DismissableAlert
+                                          header={"No Root Folders Configured"}
+                                          message={"Please have your system administrator create at least one 'study root' folder to use for project storage."}
+                                          color={"warning"}
+                                          dismissable={false}
+                                      />
                                     </Col>
                                   </Row>
                               )
