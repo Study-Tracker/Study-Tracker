@@ -20,10 +20,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
+@Deprecated
 public class StorageFeaturesDto {
 
+  @Deprecated
   private String mode;
 
+  @Deprecated
   private String storageServiceUrl;
 
   @JsonProperty("label")

@@ -16,7 +16,13 @@
 
 package io.studytracker.controller.api.internal;
 
-import io.studytracker.mapstruct.dto.features.*;
+import io.studytracker.mapstruct.dto.features.AWSFeaturesDto;
+import io.studytracker.mapstruct.dto.features.AuthFeaturesDto;
+import io.studytracker.mapstruct.dto.features.FeaturesSummaryDto;
+import io.studytracker.mapstruct.dto.features.GitFeaturesDto;
+import io.studytracker.mapstruct.dto.features.NotebookFeaturesDto;
+import io.studytracker.mapstruct.dto.features.SearchFeaturesDto;
+import io.studytracker.mapstruct.dto.features.StorageFeaturesDto;
 import io.studytracker.model.BenchlingIntegration;
 import io.studytracker.repository.BenchlingIntegrationRepository;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -48,14 +54,14 @@ public class ConfigPrivateController {
     StorageFeaturesDto storageFeaturesDto = new StorageFeaturesDto();
     String storageMode = env.getProperty("storage.mode", "local");
     storageFeaturesDto.setMode(storageMode);
-    if (storageMode.equals("egnyte")) {
+    if ("egnyte".equals(storageMode)) {
       storageFeaturesDto.setStorageServiceUrl(env.getProperty("egnyte.root-url"));
     }
     features.setStorage(storageFeaturesDto);
 
     // ELN
     BenchlingIntegration benchlingIntegration = benchlingIntegrationRepository.findAll().stream()
-            .filter(i -> i.isActive())
+            .filter(BenchlingIntegration::isActive)
             .findFirst()
             .orElse(null);
     NotebookFeaturesDto notebookFeaturesDto = new NotebookFeaturesDto();
