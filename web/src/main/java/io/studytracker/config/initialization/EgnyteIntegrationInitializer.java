@@ -21,21 +21,24 @@ import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.egnyte.EgnyteIntegrationService;
 import io.studytracker.egnyte.EgnyteStudyStorageService;
 import io.studytracker.exception.InvalidConfigurationException;
-import io.studytracker.model.*;
+import io.studytracker.model.EgnyteDriveDetails;
+import io.studytracker.model.EgnyteFolderDetails;
+import io.studytracker.model.EgnyteIntegration;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
 
 @Component
 public class EgnyteIntegrationInitializer {
@@ -60,6 +63,7 @@ public class EgnyteIntegrationInitializer {
   private EgnyteIntegration registerEgnyteIntegrations()
       throws InvalidConfigurationException {
 
+    LOGGER.info("Initializing Egnyte integrations");
     EgnyteIntegration egnyteIntegration = null;
     EgnyteProperties egnyteProperties = properties.getEgnyte();
 
@@ -109,6 +113,8 @@ public class EgnyteIntegrationInitializer {
         egnyteIntegration = egnyteIntegrationService.register(newIntegration);
       }
 
+    } else {
+      LOGGER.info("Egnyte integration properties are not set");
     }
 
     return egnyteIntegration;
@@ -202,7 +208,6 @@ public class EgnyteIntegrationInitializer {
 
     } catch (Exception e) {
       LOGGER.error("Failed to initialize Egnyte integrations", e);
-      e.printStackTrace();
       throw new InvalidConfigurationException(e);
     }
 

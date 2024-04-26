@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
+## [0.9.8] - 2024-04-26
+
+### Changed
+- Registering an Egnyte integration will now automatically register the default Shared drive.
+
+### Fixed
+- Fixed a bug that would crash the Egnyte settings view.
+
 ## [0.9.7] - 2024-04-24
 
 ### Added

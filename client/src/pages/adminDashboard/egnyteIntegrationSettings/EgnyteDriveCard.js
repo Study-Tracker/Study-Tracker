@@ -34,11 +34,11 @@ const EgnyteDriveCard = ({drive, handleDriveStatusChange}) => {
            <Col xs={7} className={"d-flex align-items-center"}>
               <div>
                 <span className={"fw-bolder text-lg"}>
-                  {drive.storageDrive.displayName}
+                  {drive.displayName}
                 </span>
                 <br/>
                  <span className={"text-muted"}>
-                  {drive.storageDrive.rootPath}
+                  {drive.rootPath}
                 </span>
               </div>
            </Col>
@@ -47,7 +47,7 @@ const EgnyteDriveCard = ({drive, handleDriveStatusChange}) => {
              <div>
                <span className="text-muted">Status</span>
                <br />
-               <DriveStatusBadge active={drive.storageDrive.active} />
+               <DriveStatusBadge active={drive.active} />
              </div>
            </Col>
 
@@ -59,7 +59,7 @@ const EgnyteDriveCard = ({drive, handleDriveStatusChange}) => {
                <Dropdown.Menu>
 
                  {
-                     drive.storageDrive.active ? (
+                     drive.active ? (
                          <Dropdown.Item onClick={() => handleDriveStatusChange(drive.id, false)}>
                            <FontAwesomeIcon icon={faCancel} className={"me-1"} />
                            Set Inactive
