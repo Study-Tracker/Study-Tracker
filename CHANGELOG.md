@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed a bug that would crash the Egnyte settings view.
+- Fixed a bug that prevented removing keywords from studies (#183).
 
 ## [0.9.7] - 2024-04-24
 
