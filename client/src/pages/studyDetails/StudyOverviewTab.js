@@ -147,7 +147,7 @@ const StudyOverviewTab = ({
             </Col>
 
             {
-              features && features.git.isEnabled && (
+              features && features.git && features.git.isEnabled && (
                     <Col sm={6} className={"d-flex"}>
                       <GitRepositoryWidget record={study} />
                     </Col>
