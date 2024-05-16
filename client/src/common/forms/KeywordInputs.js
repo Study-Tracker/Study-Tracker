@@ -28,9 +28,9 @@ const KeywordInputs = ({keywords, onChange}) => {
 
   const notyf = useContext(NotyfContext);
 
-  const handleRemoveKeyword = (e) => {
-    const selected = parseInt(e.currentTarget.dataset.id, 10);
-    onChange(keywords.filter(k => k.id !== selected));
+  const handleRemoveKeyword = (keyword) => {
+    console.debug("Removing keyword", keyword);
+    onChange(keywords.filter(k => k.id !== keyword.id));
   }
 
   const handleKeywordSelect = (selected) => {

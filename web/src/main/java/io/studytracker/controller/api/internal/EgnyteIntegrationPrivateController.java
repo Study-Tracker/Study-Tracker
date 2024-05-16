@@ -22,17 +22,25 @@ import io.studytracker.mapstruct.dto.form.EgnyteIntegrationFormDto;
 import io.studytracker.mapstruct.dto.response.EgnyteIntegrationDetailsDto;
 import io.studytracker.mapstruct.mapper.EgnyteIntegrationMapper;
 import io.studytracker.model.EgnyteIntegration;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/integrations/egnyte")
@@ -59,6 +67,7 @@ public class EgnyteIntegrationPrivateController {
     LOGGER.info("Registering egnyte integration");
     EgnyteIntegration integration = egnyteIntegrationMapper.fromFormDto(dto);
     EgnyteIntegration created = egnyteIntegrationService.register(integration);
+    egnyteIntegrationService.registerDefaultDrive(created);
     return new ResponseEntity<>(egnyteIntegrationMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
 
@@ -95,4 +104,14 @@ public class EgnyteIntegrationPrivateController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
+  // Drives
+
+  @PostMapping("/{id}/drives")
+  public HttpEntity<?> registerDefaultDrive(@PathVariable("id") Long id) {
+    LOGGER.info("Registering default drive for Egnyte integration: {}", id);
+    EgnyteIntegration integration = egnyteIntegrationService.findById(id)
+        .orElseThrow(() -> new RecordNotFoundException("Egnyte integration not found: " + id));
+    egnyteIntegrationService.registerDefaultDrive(integration);
+    return new ResponseEntity<>(HttpStatus.CREATED);
+  }
 }
