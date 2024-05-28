@@ -22,11 +22,21 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.*;
+import io.studytracker.model.ELNFolder;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.Program;
+import io.studytracker.model.ProgramNotebookFolder;
+import io.studytracker.model.ProgramOptions;
+import io.studytracker.model.ProgramStorageFolder;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StudyStorageService;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +44,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProgramService {
@@ -244,6 +249,20 @@ public class ProgramService {
 
   public long countBetweenDates(Date startDate, Date endDate) {
     return programRepository.countByCreatedAtBetween(startDate, endDate);
+  }
+
+  @Transactional
+  public void addStorageFolder(Program program, StorageDriveFolder folder) {
+    Program p = programRepository.getById(program.getId());
+    p.addStorageFolder(folder);
+    programRepository.save(p);
+  }
+
+  @Transactional
+  public void removeStorageFolder(Program program, ProgramStorageFolder programStorageFolder) {
+    Program p = programRepository.getById(program.getId());
+    p.getStorageFolders().remove(programStorageFolder);
+    programRepository.save(p);
   }
 
   @Transactional
