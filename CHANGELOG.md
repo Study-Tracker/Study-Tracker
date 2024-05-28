@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added 'Files' tab to program details page (#175).
+- Folders can be added to programs from the File Manager, just like with assays and studies.
+- You can now set a different default program storage folder from the Files tab in the program 
+  details page (#156).
 
 ## [0.9.8] - 2024-04-26
 

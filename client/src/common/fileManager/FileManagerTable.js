@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 import React, {useContext, useState} from 'react';
-import {Download, File, Folder, FolderPlus, Link, MoreHorizontal} from "react-feather";
+import {
+  Download,
+  File,
+  Folder,
+  FolderPlus,
+  Link,
+  MoreHorizontal
+} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -32,6 +39,7 @@ const FileManagerTable = ({
   const notyf = useContext(NotyfContext);
   const [addToStudyModalIsOpen, setAddToStudyModalIsOpen] = useState(false);
   const [addToAssayModalIsOpen, setAddToAssayModalIsOpen] = useState(false);
+  const [addToProgramModalIsOpen, setAddToProgramModalIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const handleItemClick = (item, index) => {
@@ -169,6 +177,14 @@ const FileManagerTable = ({
 
                       <Dropdown.Item onClick={() => {
                         setSelectedItem(d);
+                        setAddToProgramModalIsOpen(true);
+                      }}>
+                        <FolderPlus className="align-middle me-2" size={18} />
+                        Add to Program
+                      </Dropdown.Item>
+
+                      <Dropdown.Item onClick={() => {
+                        setSelectedItem(d);
                         setAddToStudyModalIsOpen(true);
                       }}>
                         <FolderPlus className="align-middle me-2" size={18} />
@@ -253,11 +269,19 @@ const FileManagerTable = ({
       </ToolkitProvider>
 
       <FileManagerAddToStudyModal
+          setModalIsOpen={setAddToProgramModalIsOpen}
+          isOpen={addToProgramModalIsOpen}
+          folder={selectedItem}
+          rootFolder={rootFolder}
+          type={"program"}
+      />
+
+      <FileManagerAddToStudyModal
         setModalIsOpen={setAddToStudyModalIsOpen}
         isOpen={addToStudyModalIsOpen}
         folder={selectedItem}
         rootFolder={rootFolder}
-        useStudies={true}
+        type={"study"}
       />
 
       <FileManagerAddToStudyModal
@@ -265,7 +289,7 @@ const FileManagerTable = ({
         isOpen={addToAssayModalIsOpen}
         folder={selectedItem}
         rootFolder={rootFolder}
-        useStudies={false}
+        type={"assay"}
       />
 
     </>
