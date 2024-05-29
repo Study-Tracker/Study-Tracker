@@ -27,7 +27,7 @@ import NotyfContext from "../../context/NotyfContext";
 import swal from "sweetalert2";
 
 const StudyFileManagerMenu = ({
-  study,
+  record,
   folders,
   handleFolderSelect,
   selectedFolder
@@ -36,15 +36,22 @@ const StudyFileManagerMenu = ({
   const notyf = useContext(NotyfContext);
   const queryClient = useQueryClient();
 
-  console.debug("Study folders", folders);
+  let type = "program";
+  if (record.hasOwnProperty("programId")) {
+    type = "study";
+  } else if (record.hasOwnProperty("studyId")) {
+    type = "assay";
+  }
+
+  console.debug("Storage folders", folders);
 
   const handleChangeDefaultFolderMutation = useMutation((folder) => {
     console.debug("Change default folder", folder);
-    return axios.patch(`/api/internal/study/${study.id}/storage/${folder.id}`)
+    return axios.patch(`/api/internal/${type}/${record.id}/storage/${folder.id}`)
   }, {
     onSuccess: () => {
       notyf.success("Default folder updated successfully");
-      queryClient.invalidateQueries(["studyStorageFolders", study.id]);
+      queryClient.invalidateQueries(["storageFolders", record.id]);
     },
     onError: (error) => {
       console.error(error);
@@ -68,11 +75,11 @@ const StudyFileManagerMenu = ({
 
   const removeFolderMutation = useMutation((folder) => {
     console.debug("Remove folder", folder);
-    return axios.delete(`/api/internal/study/${study.id}/storage/${folder.id}`)
+    return axios.delete(`/api/internal/${type}/${record.id}/storage/${folder.id}`)
   }, {
     onSuccess: () => {
       notyf.success("Folder removed successfully");
-      queryClient.invalidateQueries(["studyStorageFolders", study.id]);
+      queryClient.invalidateQueries(["storageFolders", record.id]);
     },
     onError: (error) => {
       console.error(error);
@@ -167,7 +174,7 @@ const StudyFileManagerMenu = ({
 }
 
 StudyFileManagerMenu.propTypes = {
-  study: PropTypes.object.isRequired,
+  record: PropTypes.object.isRequired,
   folders: PropTypes.array.isRequired,
   handleFolderSelect: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object

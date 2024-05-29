@@ -24,6 +24,7 @@ import ProgramDetailHeader from "./ProgramDetailsHeader";
 import ProgramOverviewTab from "./ProgramOverviewTab";
 import {useDispatch, useSelector} from "react-redux";
 import {setTab} from "../../redux/tabSlice";
+import ProgramFileManagerTab from "./ProgramFileManagerTab";
 
 const ProgramDetails = ({program, user}) => {
 
@@ -71,6 +72,10 @@ const ProgramDetails = ({program, user}) => {
 
               <Tab eventKey={"timeline"} title={"Timeline"}>
                 <ProgramTimelineTab program={program} user={user}/>
+              </Tab>
+
+              <Tab eventKey={"files"} title={"Files"}>
+                <ProgramFileManagerTab program={program} />
               </Tab>
 
             </Tabs>

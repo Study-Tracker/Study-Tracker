@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import {Col, Row} from "react-bootstrap";
-import React, {useContext, useState} from "react";
-import PropTypes from "prop-types";
-import axios from "axios";
+import React, {useContext, useState} from 'react';
 import NotyfContext from "../../context/NotyfContext";
+import {useQuery} from "react-query";
+import axios from "axios";
+import LoadingMessage from "../../common/structure/LoadingMessage";
+import {Col, Row} from "react-bootstrap";
+import StudyFileManagerMenu
+  from "../../common/fileManager/StudyFileManagerMenu";
 import FileManagerContent from "../../common/fileManager/FileManagerContent";
 import FileManagerContentPlaceholder
   from "../../common/fileManager/FileManagerContentPlaceholder";
-import StudyFileManagerMenu
-  from "../../common/fileManager/StudyFileManagerMenu";
-import {useQuery} from "react-query";
-import LoadingMessage from "../../common/structure/LoadingMessage";
+import PropTypes from "prop-types";
 
-const StudyFileManagerTab = ({study}) => {
+const ProgramFileManagerTab = ({program}) => {
 
   const notyf = useContext(NotyfContext);
   const [selectedFolder, setSelectedFolder] = useState(null);
@@ -37,8 +37,8 @@ const StudyFileManagerTab = ({study}) => {
     console.debug("Selected folder", folder);
   }
 
-  const {data: folders, isLoading} = useQuery(["storageFolders", study.id], () => {
-    return axios.get(`/api/internal/study/${study.id}/storage`)
+  const {data: folders, isLoading} = useQuery(["storageFolders", program.id], () => {
+    return axios.get(`/api/internal/program/${program.id}/storage`)
     .then(response => {
       const defaultFolder = response.data.find(f => f.primary);
       setSelectedFolder(defaultFolder ? defaultFolder.storageDriveFolder : null);
@@ -52,16 +52,16 @@ const StudyFileManagerTab = ({study}) => {
   });
 
   const repairFolder = () => {
-    axios.post("/api/internal/study/" + study.id + "/storage/repair")
+    axios.post(`/api/internal/program/${program.id}/storage/repair`)
     .then(response => {
-      notyf.open({message: "Study folder repaired", type: "success"});
+      notyf.open({message: "Program folder repaired", type: "success"});
       const s = selectedFolder;
       setSelectedFolder(null);
       setSelectedFolder(s);
     })
     .catch(error => {
       console.error(error);
-      notyf.open({message: "Failed to repair study folder", type: "error"});
+      notyf.open({message: "Failed to repair program folder", type: "error"});
     });
   }
 
@@ -75,7 +75,7 @@ const StudyFileManagerTab = ({study}) => {
           <Col xs="4" md="3">
 
             <StudyFileManagerMenu
-                record={study}
+                record={program}
                 folders={folders}
                 handleFolderSelect={handleFolderSelect}
                 selectedFolder={selectedFolder}
@@ -90,7 +90,7 @@ const StudyFileManagerTab = ({study}) => {
                       rootFolder={selectedFolder}
                       path={selectedFolder.path}
                       handleRepairFolder={repairFolder}
-                    />
+                  />
                   : <FileManagerContentPlaceholder />
             }
 
@@ -103,8 +103,8 @@ const StudyFileManagerTab = ({study}) => {
 
 }
 
-StudyFileManagerTab.propTypes = {
-  study: PropTypes.object,
+ProgramFileManagerTab.propTypes = {
+  program: PropTypes.object.isRequired,
 }
 
-export default StudyFileManagerTab;
+export default ProgramFileManagerTab;
