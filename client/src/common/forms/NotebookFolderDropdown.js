@@ -21,10 +21,10 @@ import AsyncSelect from "react-select/async";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-const NotebookEntryTemplatesDropdown = ({onChange}) => {
+const NotebookFolderDropdown = ({onChange, parentFolder}) => {
 
-  const templateAutocomplete = (input, callback) => {
-    axios.get("/api/internal/autocomplete/notebook/entry-template?q=" + input)
+  const folderAutocomplete = (input, callback) => {
+    axios.get("/api/internal/eln/folder/" + input)
     .then(response => {
       const options = response.data
       .sort((a, b) => {
@@ -48,28 +48,28 @@ const NotebookEntryTemplatesDropdown = ({onChange}) => {
 
   return (
       <FormGroup>
-        <Form.Label>Notebook Entry Template</Form.Label>
+        <Form.Label>Notebook Folder Path</Form.Label>
         <AsyncSelect
-          placeholder={"Select a template..."}
+          placeholder={"Search for an select a folder..."}
           className={"react-select-container"}
           classNamePrefix="react-select"
-          loadOptions={templateAutocomplete}
+          loadOptions={folderAutocomplete}
           onChange={(selected) => {
-            console.debug("Selected template: ", selected);
+            console.debug("Selected folder: ", selected);
             onChange(selected.value)
           }}
           defaultOptions={true}
           menuPortalTarget={document.body}
         />
         <Form.Control.Feedback>
-          Select a template for notebook entry.
+          Select a notebook folder.
         </Form.Control.Feedback>
       </FormGroup>
   );
 }
 
-NotebookEntryTemplatesDropdown.propTypes = {
+NotebookFolderDropdown.propTypes = {
   onChange: PropTypes.func.isRequired,
 }
 
-export default NotebookEntryTemplatesDropdown;
+export default NotebookFolderDropdown;

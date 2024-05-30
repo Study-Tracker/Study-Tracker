@@ -23,36 +23,33 @@ import FeatureToggleCard from "./FeatureToggleCard";
 import axios from "axios";
 
 const NotebookInputsCard = ({
-    isActive,
-    onChange,
-    selectedProgram,
-    selectedStudy
+  isActive,
+  onChange,
+  selectedProgram,
+  selectedStudy,
+  useExistingFolder,
+  notebookFolder
 }) => {
 
-  console.debug("Program: ", selectedProgram);
   const [parentFolder, setParentFolder] = useState(null);
 
   useEffect(() => {
-    if (selectedProgram) {
-      axios.get(`/api/internal/program/${selectedProgram.id}/notebook?contents=false`)
+    let url = null;
+    if (selectedProgram) url = `/api/internal/program/${selectedProgram.id}/notebook?contents=false`;
+    else if (selectedStudy) url = `/api/internal/study/${selectedStudy.id}/notebook?contents=false`;
+    if (url !== null) {
+      axios.get(url)
       .then(response => {
-        setParentFolder(response.data.path || response.data.name);
+        setParentFolder(response.data);
       })
       .catch(error => {
         setParentFolder(null);
-        console.error("Error loading program notebook folder: ", error);
-      });
-    } else if (selectedStudy) {
-      axios.get(`/api/internal/study/${selectedStudy.id}/notebook?contents=false`)
-      .then(response => {
-        setParentFolder(response.data.path || response.data.name);
-      })
-      .catch(error => {
-        setParentFolder(null);
-        console.error("Error loading study notebook folder: ", error);
+        console.error("Error loading notebook folder: ", error);
       });
     }
   }, [selectedProgram, selectedStudy]);
+
+  let placeholderName = parentFolder ? `${parentFolder.path || parentFolder.name} / ${selectedStudy ? selectedStudy.code : selectedProgram.code}-XXX: ${selectedStudy ? "Assay" : "Study"} Name` : "";
 
   return (
       <FeatureToggleCard
@@ -67,34 +64,80 @@ const NotebookInputsCard = ({
         switchLabel={"Does this " + (selectedProgram ? "study" : "assay") + " need an electronic notebook?"}
         handleToggle={() => onChange("useNotebook", !isActive)}
       >
+        <Row className={"mb-2"}>
+
+          <Col sm={6}>
+            <Form.Group>
+              <Form.Label>Notebook Folder</Form.Label>
+            </Form.Group>
+            <Form.Group>
+              <Form.Check
+                label={"Create new notebook folder"}
+                type={"radio"}
+                name={"notebookFolderOption"}
+                defaultChecked={!useExistingFolder}
+                onChange={(e) => onChange("useExistingNotebookFolder", !e.target.checked)}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Check
+                label={"Use existing notebook folder"}
+                type={"radio"}
+                name={"notebookFolderOption"}
+                defaultChecked={useExistingFolder}
+                onChange={(e) => onChange("useExistingNotebookFolder", e.target.checked)}
+              />
+            </Form.Group>
+          </Col>
+
+          <Col sm={6} hidden={useExistingFolder}>
+            <FormGroup>
+              <Form.Label>Notebook Folder Path</Form.Label>
+              <Form.Control
+                type="text"
+                name="notebookFolderPath"
+                value={placeholderName}
+                disabled={true}
+                isInvalid={!parentFolder}
+              />
+              <Form.Control.Feedback type={"invalid"}>
+                {
+                  (selectedProgram || selectedStudy) && !parentFolder
+                    ? "The selected program does not have a notebook folder."
+                    : "You must select a program to associate the study with."
+                }
+
+              </Form.Control.Feedback>
+              <Form.Text>The notebook folder will be created at this location in the ELN.</Form.Text>
+            </FormGroup>
+          </Col>
+
+          <Col sm={6} hidden={!useExistingFolder}>
+            <FormGroup>
+              <Form.Label>Notebook Folder Path</Form.Label>
+              <Form.Control
+                type="text"
+                name="existingNotebookFolderPath"
+                value={notebookFolder.path}
+                isInvalid={false}
+              />
+              <Form.Control.Feedback type={"invalid"}>
+                The selected folder does not exist.
+              </Form.Control.Feedback>
+              <Form.Text>
+                Select an existing folder to use for your notebook entries.
+              </Form.Text>
+            </FormGroup>
+          </Col>
+
+        </Row>
+
         <Row>
 
           <Col md={6}>
             <NotebookEntryTemplatesDropdown
                 onChange={selected => onChange("notebookTemplateId", selected || "") }
             />
-          </Col>
-
-          <Col lg={6}>
-            <FormGroup>
-              <Form.Label>Folder Path</Form.Label>
-              <Form.Control
-                  type="text"
-                  name="notebookFolderPath"
-                  value={parentFolder}
-                  disabled={true}
-                  isInvalid={!parentFolder}
-              />
-              <Form.Control.Feedback type={"invalid"}>
-                {
-                  (selectedProgram || selectedStudy) && !parentFolder
-                      ? "The selected program does not have a notebook folder."
-                      : "You must select a program to associate the study with."
-                }
-
-              </Form.Control.Feedback>
-              <Form.Text>The notebook folder will be created at this location in the ELN.</Form.Text>
-            </FormGroup>
           </Col>
 
         </Row>
@@ -107,7 +150,9 @@ NotebookInputsCard.propTypes = {
   isActive: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   selectedProgram: PropTypes.string,
-  selectedStudy: PropTypes.string
+  selectedStudy: PropTypes.string,
+  useExistingFolder: PropTypes.bool,
+  notebookFolder: PropTypes.object
 }
 
 export default NotebookInputsCard;

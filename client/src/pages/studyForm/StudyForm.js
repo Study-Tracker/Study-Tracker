@@ -67,6 +67,7 @@ const StudyForm = ({
     notebookFolder: {},
     notebookTemplateId: null,
     useNotebook: true,
+    useExistingNotebookFolder: false,
     useGit: false,
     useStorage: true,
     useS3: false,
@@ -416,6 +417,8 @@ const StudyForm = ({
                           isActive={values.useNotebook}
                           selectedProgram={values.program}
                           onChange={(key, value) => setFieldValue(key, value)}
+                          useExistingFolder={values.useExistingNotebookFolder}
+                          notebookFolder={values.notebookFolder}
                         />
                     ) : ''
                   }
