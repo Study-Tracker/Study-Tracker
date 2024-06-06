@@ -61,9 +61,9 @@ const NotebookEntryTemplatesDropdown = ({onChange}) => {
           defaultOptions={true}
           menuPortalTarget={document.body}
         />
-        <Form.Control.Feedback>
-          Select a template for notebook entry.
-        </Form.Control.Feedback>
+        <Form.Text>
+          Select a template for the summary notebook entry. If no template is selected, a blank entry will be created.
+        </Form.Text>
       </FormGroup>
   );
 }

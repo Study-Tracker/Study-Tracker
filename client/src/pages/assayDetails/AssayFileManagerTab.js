@@ -20,10 +20,8 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import FileManagerContent from "../../common/fileManager/FileManagerContent";
-import FileManagerContentPlaceholder
-  from "../../common/fileManager/FileManagerContentPlaceholder";
-import StudyFileManagerMenu
-  from "../../common/fileManager/StudyFileManagerMenu";
+import FileManagerContentPlaceholder from "../../common/fileManager/FileManagerContentPlaceholder";
+import StudyFileManagerMenu from "../../common/fileManager/StudyFileManagerMenu";
 
 const AssayFileManagerTab = ({assay}) => {
 
@@ -71,6 +69,7 @@ const AssayFileManagerTab = ({assay}) => {
           <Col xs="4" md="3">
 
             <StudyFileManagerMenu
+                record={assay}
                 folders={folders}
                 handleFolderSelect={handleFolderSelect}
                 selectedFolder={selectedFolder}

@@ -21,6 +21,7 @@ import NotebookEntryTemplatesDropdown from "./NotebookEntryTemplateDropdown";
 import PropTypes from "prop-types";
 import FeatureToggleCard from "./FeatureToggleCard";
 import axios from "axios";
+import NotebookFolderDropdown from "./NotebookFolderDropdown";
 
 const NotebookInputsCard = ({
   isActive,
@@ -106,40 +107,26 @@ const NotebookInputsCard = ({
                     ? "The selected program does not have a notebook folder."
                     : "You must select a program to associate the study with."
                 }
-
               </Form.Control.Feedback>
               <Form.Text>The notebook folder will be created at this location in the ELN.</Form.Text>
             </FormGroup>
           </Col>
 
           <Col sm={6} hidden={!useExistingFolder}>
-            <FormGroup>
-              <Form.Label>Notebook Folder Path</Form.Label>
-              <Form.Control
-                type="text"
-                name="existingNotebookFolderPath"
-                value={notebookFolder.path}
-                isInvalid={false}
-              />
-              <Form.Control.Feedback type={"invalid"}>
-                The selected folder does not exist.
-              </Form.Control.Feedback>
-              <Form.Text>
-                Select an existing folder to use for your notebook entries.
-              </Form.Text>
-            </FormGroup>
+            <NotebookFolderDropdown
+              onChange={(d) => onChange("notebookFolder", d)}
+              parentFolder={parentFolder}
+            />
           </Col>
 
         </Row>
 
         <Row>
-
           <Col md={6}>
             <NotebookEntryTemplatesDropdown
                 onChange={selected => onChange("notebookTemplateId", selected || "") }
             />
           </Col>
-
         </Row>
       </FeatureToggleCard>
   )

@@ -47,6 +47,8 @@ public class NotebookPrivateController {
     NotebookFolder notebookFolder = notebookFolderService.findFolderById(folderId);
     if (loadContents) {
       notebookFolder = notebookFolderService.loadFolderContents(notebookFolder);
+      LOGGER.debug("Loaded {} subfolders and {} entries", notebookFolder.getSubFolders().size(),
+              notebookFolder.getEntries().size());
     }
     return notebookFolder;
   }

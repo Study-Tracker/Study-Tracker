@@ -43,6 +43,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolationException;
 import java.io.File;
@@ -271,41 +272,53 @@ public class AssayService {
 
     // Create the ELN folder
     if (options.isUseNotebook()) {
-      ELNFolder studyFolder = study.getNotebookFolders().stream()
-          .filter(f -> f.isPrimary())
-          .map(f -> f.getElnFolder())
-          .findFirst()
-          .orElse(null);
-      if (studyFolder != null) {
+      
+      ELNFolder assayFolder = null;
+      
+      // An existing folder was provided
+      if (options.getNotebookFolder() != null && StringUtils.hasText(options.getNotebookFolder().getReferenceId())) {
+        assayFolder = notebookFolderService.findFolderById(options.getNotebookFolder().getReferenceId());
+        assayFolder = elnFolderRepository.save(assayFolder);
+      }
+      
+      // Create a new folder
+      else {
+        ELNFolder studyFolder = study.getNotebookFolders().stream()
+                .filter(f -> f.isPrimary())
+                .map(f -> f.getElnFolder())
+                .findFirst()
+                .orElse(null);
+        if (studyFolder != null) {
+          assayFolder = notebookFolderService.createAssayFolder(assay);
+          elnFolderRepository.save(assayFolder);
+        } else {
+          LOGGER.warn("Assay study {} does not have ELN folder set.", study.getCode());
+        }
+      }
+      
+      if (assayFolder != null) {
+        assay.addNotebookFolder(assayFolder, true);
+        
+        // Create notebook entry
         try {
-
           LOGGER.info(String.format("Creating ELN entry for assay: %s", assay.getCode()));
-
-          // Create the notebook folder
-          ELNFolder notebookFolder = notebookFolderService.createAssayFolder(assay);
-          elnFolderRepository.save(notebookFolder);
-          assay.addNotebookFolder(notebookFolder, true);
-
-          // Create the notebook entry
           NotebookTemplate template = null;
           if (options.getNotebookTemplateId() != null) {
             Optional<NotebookTemplate> templateOptional =
-                notebookEntryService.findEntryTemplateById(options.getNotebookTemplateId());
+                    notebookEntryService.findEntryTemplateById(options.getNotebookTemplateId());
             if (templateOptional.isPresent()) {
               template = templateOptional.get();
             } else {
-              LOGGER.warn("Cannot find notebook template with id: " + options.getNotebookTemplateId());
+              LOGGER.warn("Cannot find notebook template with id: {}", options.getNotebookTemplateId());
             }
           }
-          notebookEntryService.createAssayNotebookEntry(assay, notebookFolder, template);
-
+          notebookEntryService.createAssayNotebookEntry(assay, assayFolder, template);
         } catch (Exception e) {
-          e.printStackTrace();
-          LOGGER.warn("Failed to create notebook entry for assay: " + assay.getCode());
+          LOGGER.warn("Failed to create notebook entry for assay: {}", assay.getCode(), e);
         }
-      } else {
-        LOGGER.warn(String.format("Assay study %s does not have ELN folder set.", study.getCode()));
+        
       }
+      
     }
 
     Assay created;

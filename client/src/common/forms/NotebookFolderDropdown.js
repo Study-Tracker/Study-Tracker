@@ -14,56 +14,78 @@
  * limitations under the License.
  */
 
-import React from "react";
-import {Form} from "react-bootstrap";
+import React, {useContext} from "react";
+import {Form, Spinner} from "react-bootstrap";
 import {FormGroup} from "./common";
-import AsyncSelect from "react-select/async";
 import PropTypes from "prop-types";
 import axios from "axios";
+import Select from "react-select";
+import {useQuery} from "react-query";
+import NotyfContext from "../../context/NotyfContext";
 
 const NotebookFolderDropdown = ({onChange, parentFolder}) => {
 
-  const folderAutocomplete = (input, callback) => {
-    axios.get("/api/internal/eln/folder/" + input)
-    .then(response => {
-      const options = response.data
-      .sort((a, b) => {
-        if (a.name > b.name) {
-          return 1;
-        }
-        if (a.name < b.name) {
-          return -1;
-        }
-        return 0;
-      })
-      .map(t => {
-        return {
-          value: t.referenceId,
-          label: t.name
-        };
-      });
-      callback(options);
+  const notyf = useContext(NotyfContext);
+
+  const {data: folders, isLoading} = useQuery(["notebookFolder", parentFolder?.referenceId],  () => {
+    return axios.get(`/api/internal/eln/folder/${parentFolder.referenceId}?loadContents=true`)
+    .then(response => response.data.subFolders || [])
+    .catch(error => {
+      notyf.error("Error loading notebook folders: " + error.message);
+      console.error("Error loading notebook folders: ", error);
+      return error;
     })
-  }
+      ;
+  }, {
+    enabled: !!parentFolder,
+    initialData: []
+  });
+
+  const options = folders.sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    }
+    if (a.name < b.name) {
+      return -1;
+    }
+    return 0;
+  })
+  .map(t => {
+    return {
+      value: t,
+      label: t.name
+    };
+  });
+
+  console.debug("Notebook Subfolders: ", folders);
+  console.debug("NotebookFolderDropdown options: ", options);
 
   return (
       <FormGroup>
         <Form.Label>Notebook Folder Path</Form.Label>
-        <AsyncSelect
+        <Select
           placeholder={"Search for an select a folder..."}
           className={"react-select-container"}
           classNamePrefix="react-select"
-          loadOptions={folderAutocomplete}
+          options={options}
           onChange={(selected) => {
-            console.debug("Selected folder: ", selected);
-            onChange(selected.value)
+            console.debug("Selected folder: ", selected.value);
+            onChange(selected.value);
           }}
           defaultOptions={true}
           menuPortalTarget={document.body}
+          isClearable={true}
         />
-        <Form.Control.Feedback>
-          Select a notebook folder.
-        </Form.Control.Feedback>
+        <div hidden={!isLoading}>
+          <Spinner animation={"border"} role={"status"} variant={"primary"} size={"sm"} />&nbsp;Loading folders...
+        </div>
+        <Form.Text hidden={!!parentFolder} className={"text-danger"}>
+          You must select a program to associate the study with.<br />
+        </Form.Text>
+        <Form.Text>
+          Select a notebook folder to use for your study. Only folders in the selected Program's project folder will
+          be selectable.
+        </Form.Text>
       </FormGroup>
   );
 }

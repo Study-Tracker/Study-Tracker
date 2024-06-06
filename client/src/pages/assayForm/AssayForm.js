@@ -23,8 +23,7 @@ import {statuses} from "../../config/statusConstants";
 import UserInputs from "../../common/forms/UserInputs";
 import swal from 'sweetalert';
 import AssayTypeDropdown from "./AssayTypeDropdown";
-import CustomFieldCaptureInputList
-  from "../../common/forms/customFields/CustomFieldCaptureInputList";
+import CustomFieldCaptureInputList from "../../common/forms/customFields/CustomFieldCaptureInputList";
 import AttributeInputs from "../../common/forms/AttributeInputs";
 import {LoadingOverlay} from "../../common/loading";
 import ReactQuill from "react-quill";
@@ -35,11 +34,9 @@ import {Form as FormikForm, Formik} from "formik";
 import {useNavigate} from "react-router-dom";
 import * as yup from "yup";
 import axios from "axios";
-import FormikFormErrorNotification
-  from "../../common/forms/FormikFormErrorNotification";
+import FormikFormErrorNotification from "../../common/forms/FormikFormErrorNotification";
 import NotebookInputsCard from "../../common/forms/NotebookInputsCard";
-import TaskControlsDraggableCardList
-  from "../../common/forms/tasks/TaskControlsDraggableCardList";
+import TaskControlsDraggableCardList from "../../common/forms/tasks/TaskControlsDraggableCardList";
 import S3InputsCard from "../../common/forms/S3InputsCard";
 
 const AssayForm = props => {
@@ -69,6 +66,7 @@ const AssayForm = props => {
     useNotebook: !!study.notebookFolders.length > 0,
     useGit: false,
     useStorage: true,
+    useExistingNotebookFolder: false,
   };
 
   const assaySchema = yup.object().shape({
@@ -414,6 +412,8 @@ const AssayForm = props => {
                             isActive={values.useNotebook}
                             selectedStudy={study}
                             onChange={(key, value) => setFieldValue(key, value)}
+                            useExistingFolder={values.useExistingNotebookFolder}
+                            notebookFolder={values.notebookFolder}
                         />
                     ) : ''
                   }

@@ -17,15 +17,26 @@
 package io.studytracker.model;
 
 import io.studytracker.eln.NotebookFolder;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "eln_folders")
 @Getter
 @Setter
 public class ELNFolder extends NotebookFolder {
+    
+    public static ELNFolder from(NotebookFolder folder) {
+        ELNFolder elnFolder = new ELNFolder();
+        elnFolder.setId(folder.getId());
+        elnFolder.setUrl(folder.getUrl());
+        elnFolder.setName(folder.getName());
+        elnFolder.setPath(folder.getPath());
+        elnFolder.setReferenceId(folder.getReferenceId());
+        return elnFolder;
+    }
 
 }
