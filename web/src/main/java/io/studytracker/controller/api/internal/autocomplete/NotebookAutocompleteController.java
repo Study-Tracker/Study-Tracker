@@ -17,6 +17,7 @@
 package io.studytracker.controller.api.internal.autocomplete;
 
 import io.studytracker.eln.NotebookEntryService;
+import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.eln.NotebookTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +33,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/internal/autocomplete/notebook-entry-template")
-public class NotebookTemplateAutocompleteController {
+@RequestMapping("/api/internal/autocomplete/notebook")
+public class NotebookAutocompleteController {
 
   private static final Logger LOGGER = LoggerFactory
-      .getLogger(NotebookTemplateAutocompleteController.class);
+      .getLogger(NotebookAutocompleteController.class);
 
   @Autowired
   private NotebookEntryService notebookEntryService;
+  
+  @Autowired
+  private NotebookFolderService notebookFolderService;
 
-  @GetMapping("")
+  @GetMapping("/entry-template")
   public HttpEntity<List<NotebookTemplate>> findNotebookTemplates(@RequestParam("q") String keyword) {
     LOGGER.info("findNotebookTemplates: {}", keyword);
     if (notebookEntryService != null) {

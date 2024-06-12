@@ -26,28 +26,22 @@ import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.MalformedEntityException;
 import io.studytracker.exception.NotebookException;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AssayNotebookFolder;
-import io.studytracker.model.ELNFolder;
-import io.studytracker.model.Program;
-import io.studytracker.model.ProgramNotebookFolder;
-import io.studytracker.model.ProgramOptions;
-import io.studytracker.model.Study;
-import io.studytracker.model.StudyNotebookFolder;
+import io.studytracker.model.*;
 import io.studytracker.repository.AssayNotebookFolderRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramNotebookFolderRepository;
 import io.studytracker.repository.StudyNotebookFolderRepository;
 import io.studytracker.service.NamingService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public final class BenchlingNotebookFolderService 
@@ -277,6 +271,14 @@ public final class BenchlingNotebookFolderService
     folder.setSubFolders(childrenFolders);
 
     return folder;
+  }
+  
+  @Override
+  public ELNFolder findFolderById(String folderId) {
+    LOGGER.debug("Finding notebook folder by ID: " + folderId);
+    BenchlingElnRestClient client = this.getClient();
+    Optional<BenchlingFolder> optional = client.findFolderById(folderId);
+    return optional.map(this::convertBenchlingFolder).orElse(null);
   }
 
 }

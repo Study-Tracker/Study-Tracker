@@ -154,6 +154,7 @@ public class AssayApiControllerTests extends AbstractApiControllerTests {
     assay.setOwner(user.getId());
     assay.setUsers(Collections.singleton(user.getId()));
     assay.setAttributes(Collections.singletonMap("key", "value"));
+    assay.setUseNotebook(false);
     Map<String, Object> fields = new LinkedHashMap<>();
     fields.put("number_of_slides", 10);
     fields.put("antibodies", "AKT1, AKT2, AKT3");

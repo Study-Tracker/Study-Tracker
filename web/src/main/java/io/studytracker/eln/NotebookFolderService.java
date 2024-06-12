@@ -20,11 +20,20 @@ import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface NotebookFolderService<T extends NotebookFolder> {
 
+    /**
+     * Returns a folder by its unique internal identifier.
+     *
+     * @param folderId
+     * @return
+     */
+  T findFolderById(String folderId);
+  
   /**
    * Returns a list of all folders for a program.
    *

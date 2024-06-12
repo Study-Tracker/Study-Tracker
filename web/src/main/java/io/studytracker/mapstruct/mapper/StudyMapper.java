@@ -35,7 +35,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {StorageDriveFolderMapper.class})
 public interface StudyMapper {
 
   @Mapping(target = "options.useNotebook", source = "useNotebook")

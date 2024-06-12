@@ -197,12 +197,10 @@ public class StudyService {
           elnFolder = notebookFolderService.createStudyFolder(study);
           elnFolderRepository.save(elnFolder);
         } catch (Exception e) {
-          e.printStackTrace();
-          LOGGER.warn("Failed to create notebook folder and entry for study: " + study.getCode());
+          LOGGER.warn("Failed to create notebook folder and entry for study: {}", study.getCode(), e);
         }
       } else {
-        LOGGER.warn(
-            String.format("Study program %s does not have ELN folder set.", program.getName()));
+        LOGGER.warn("Study program {} does not have ELN folder set.", program.getName());
       }
     }
     return elnFolder;
@@ -268,8 +266,19 @@ public class StudyService {
     // Create the ELN folder
     NotebookEntry studySummaryEntry = null;
     if (options.isUseNotebook()) {
-
-      ELNFolder elnFolder = this.createStudyElnFolder(study, program);
+      
+      ELNFolder elnFolder;
+      
+      // An existing folder was provided
+      if (options.getNotebookFolder() != null && StringUtils.hasText(options.getNotebookFolder().getReferenceId())) {
+        elnFolder = notebookFolderService.findFolderById(options.getNotebookFolder().getReferenceId());
+        elnFolder = elnFolderRepository.save(elnFolder);
+      }
+      // Create a new folder
+      else {
+        elnFolder = this.createStudyElnFolder(study, program);
+      }
+      
       if (elnFolder != null) {
         study.addNotebookFolder(elnFolder, true);
       }
@@ -283,8 +292,7 @@ public class StudyService {
           if (templateOptional.isPresent()) {
             template = templateOptional.get();
           } else {
-            LOGGER.warn(
-                "Could not find notebook template with ID: " + options.getNotebookTemplateId());
+            LOGGER.warn("Could not find notebook template with ID: {}", options.getNotebookTemplateId());
           }
         }
         studySummaryEntry = notebookEntryService
