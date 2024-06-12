@@ -22,7 +22,7 @@ import lombok.Data;
 public class AssayStorageDriveFolderSummaryDto {
 
   private Long id;
-  private StorageDriveFolderDetailsDto storageDriveFolder;
+  private StorageDriveFolderSummaryDto storageDriveFolder;
 //  private Long assayStorageFolderId;
 //  private Long storageDriveId;
 //  private Long storageDriveFolderId;

@@ -58,9 +58,6 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import java.util.*;
-
 @Entity
 @Table(
     name = "studies",
@@ -78,6 +75,7 @@ import java.util.*;
         @NamedAttributeNode("collaborator"),
         @NamedAttributeNode("owner"),
         @NamedAttributeNode("keywords"),
+        @NamedAttributeNode("users")
       }),
   @NamedEntityGraph(
       name = "study-with-attributes",

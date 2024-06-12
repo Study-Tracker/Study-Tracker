@@ -21,6 +21,7 @@ import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.Status;
@@ -105,6 +106,8 @@ public class AssayServiceTests {
     assay.setLastModifiedBy(user);
     assay.setUpdatedAt(new Date());
     assay.setAttributes(Collections.singletonMap("key", "value"));
+    AssayOptions options = new AssayOptions();
+    options.setUseNotebook(false);
 
     AssayTask task = new AssayTask();
     task.setLabel("My task");
@@ -114,7 +117,7 @@ public class AssayServiceTests {
     task.setLastModifiedBy(user);
     assay.addTask(task);
 
-    assayService.create(assay);
+    assayService.create(assay, options);
 
     Assert.assertEquals(ASSAY_COUNT + 1, assayRepository.count());
     Assert.assertNotNull(assay.getId());
@@ -157,7 +160,10 @@ public class AssayServiceTests {
     fields.put("stain", "DAPI");
     assay.setFields(fields);
 
-    assayService.create(assay);
+    AssayOptions options = new AssayOptions();
+    options.setUseNotebook(false);
+
+    assayService.create(assay, options);
     Assert.assertEquals(ASSAY_COUNT + 1, assayRepository.count());
     Assert.assertNotNull(assay.getId());
     Assert.assertNotNull(assay.getCode());

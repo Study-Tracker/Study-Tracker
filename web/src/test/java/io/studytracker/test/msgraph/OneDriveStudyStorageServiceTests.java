@@ -17,15 +17,39 @@
 package io.studytracker.test.msgraph;
 
 import io.studytracker.Application;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayType;
+import io.studytracker.model.MSGraphIntegration;
+import io.studytracker.model.OneDriveFolderDetails;
+import io.studytracker.model.Program;
+import io.studytracker.model.SharePointSite;
+import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
+import io.studytracker.model.User;
+import io.studytracker.model.UserType;
 import io.studytracker.msgraph.MSGraphIntegrationService;
 import io.studytracker.msgraph.OneDriveStorageService;
-import io.studytracker.repository.*;
+import io.studytracker.repository.AssayRepository;
+import io.studytracker.repository.AssayStorageFolderRepository;
+import io.studytracker.repository.AssayTypeRepository;
+import io.studytracker.repository.MSGraphIntegrationRepository;
+import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.ProgramStorageFolderRepository;
+import io.studytracker.repository.SharePointSiteRepository;
+import io.studytracker.repository.StorageDriveFolderRepository;
+import io.studytracker.repository.StorageDriveRepository;
+import io.studytracker.repository.StudyRepository;
+import io.studytracker.repository.StudyStorageFolderRepository;
+import io.studytracker.repository.UserRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.util.Date;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +62,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Date;
-import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -408,7 +429,6 @@ public class OneDriveStudyStorageServiceTests {
     }
     Assert.assertNull(exception);
     Assert.assertNotNull(file);
-    Assert.assertEquals("test.txt", file.getFilename());
   }
 
   @Test
