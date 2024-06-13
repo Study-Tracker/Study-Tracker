@@ -17,10 +17,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Badge, Card, Col, Row} from "react-bootstrap";
-import TeamMembers from "../../common/detailsPage/TeamMembers";
 import {Clipboard} from "react-feather";
 import {useNavigate} from "react-router-dom";
 import sanitizeHtml from "sanitize-html";
+import TeamMembersCompact from "../../common/users/TeamMembersCompact";
 
 const ProgramSummaryCard = ({ program }) => {
 
@@ -32,7 +32,7 @@ const ProgramSummaryCard = ({ program }) => {
   }
 
   return (
-      <Col xs={12} sm={6} lg={4}>
+      <Col xs={12} sm={6} xxl={4}>
         <Card
             onClick={() => navigate("/program/" + program.id)}
             className={"program-card"}
@@ -53,7 +53,7 @@ const ProgramSummaryCard = ({ program }) => {
             </Row>
             <Row>
               <Col>
-                <TeamMembers users={program.users} />
+                <TeamMembersCompact users={program.users} animated={false} />
               </Col>
             </Row>
             <div className={"d-flex align-items-start"}>

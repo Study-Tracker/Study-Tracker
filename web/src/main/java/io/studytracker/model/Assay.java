@@ -97,7 +97,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
             }),
         @NamedSubgraph(
             name = "assay-storage-folder-details",
-            attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
+            attributeNodes = {@NamedAttributeNode(value = "storageDriveFolder", subgraph = "storage-folder-details")}
+        ),
+        @NamedSubgraph(
+            name = "storage-folder-details",
+            attributeNodes = {
+                @NamedAttributeNode("storageDrive")
+            }
         ),
         @NamedSubgraph(
             name = "assay-notebook-folder-details",

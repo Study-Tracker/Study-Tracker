@@ -17,31 +17,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
-
-const getUserInitials = (user) => {
-  return user.displayName.split(" ").map(name => name.charAt(0)).join("");
-}
-
-const getLabelClass = (i) => {
-  switch (i % 7) {
-    case 0:
-      return "team-member-primary";
-    case 1:
-      return "team-member-success";
-    case 2:
-      return "team-member-info";
-    case 3:
-      return "team-member-warning";
-    case 4:
-      return "team-member-danger";
-    case 5:
-      return "team-member-secondary";
-    case 6:
-      return "team-member-tertiary";
-    default:
-      return "team-member-primary"
-  }
-}
+import {getLabelClass, getUserInitials} from "./users";
 
 const TeamMembers = ({users, owner}) => {
 

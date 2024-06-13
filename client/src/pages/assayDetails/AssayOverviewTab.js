@@ -17,7 +17,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {Card, Col, Row} from "react-bootstrap";
-import TeamMembers from "../../common/detailsPage/TeamMembers";
 import AssayQuickActionsWidget
   from "../../common/widgets/AssayQuickActionsWidget";
 import SummaryTimelineCard from "../../common/detailsPage/SummaryTimelineCard";
@@ -26,6 +25,7 @@ import AssayTasksWidget from "./AssayTasksWidget";
 import PrimaryStorageFolderWidget
   from "../../common/widgets/PrimaryStorageFolderWidget";
 import PrimaryNotebookWidget from "../../common/widgets/PrimaryNotebookWidget";
+import TeamMembersCompact from "../../common/users/TeamMembersCompact";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -95,7 +95,7 @@ const AssayOverviewTab = ({
 
                   <Col md={12}>
                     <h6 className="details-label">Study Team</h6>
-                    <TeamMembers owner={assay.owner} users={assay.users} />
+                    <TeamMembersCompact owner={assay.owner} users={assay.users} />
                   </Col>
 
                 </Row>

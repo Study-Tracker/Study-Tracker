@@ -16,7 +16,6 @@
 
 import {Card, Col, Row} from "react-bootstrap";
 import KeywordBadges from "../../common/detailsPage/KeywordBadges";
-import TeamMembers from "../../common/detailsPage/TeamMembers";
 import Collaborator from "./Collaborator";
 import ExternalLinks from "../../common/externalLinks";
 import StudyRelationships from "../../common/studyRelationships";
@@ -29,6 +28,7 @@ import PrimaryStorageFolderWidget
   from "../../common/widgets/PrimaryStorageFolderWidget";
 import PrimaryNotebookWidget from "../../common/widgets/PrimaryNotebookWidget";
 import GitRepositoryWidget from "../../common/widgets/GitRepositoryWidget";
+import TeamMembersCompact from "../../common/users/TeamMembersCompact";
 
 const createMarkup = (content) => {
   return {__html: content};
@@ -114,7 +114,7 @@ const StudyOverviewTab = ({
 
                     <Col md={12}>
                       <h6 className="details-label">Study Team</h6>
-                      <TeamMembers owner={study.owner} users={study.users} />
+                      <TeamMembersCompact owner={study.owner} users={study.users} />
                     </Col>
 
                   </Row>
