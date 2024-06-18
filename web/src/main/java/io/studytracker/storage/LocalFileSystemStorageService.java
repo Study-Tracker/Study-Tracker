@@ -181,7 +181,33 @@ public class LocalFileSystemStorageService implements StudyStorageService {
       throws StudyStorageNotFoundException {
     return findFolderByPath(parentFolder.getStorageDrive(), path);
   }
-
+  
+  @Override
+  public StorageFolder renameFolder(StorageDrive drive, String path, String newName) throws StudyStorageException {
+    try {
+      validatePath(drive.getRootPath(), path);
+    } catch (StudyStorageException e) {
+      throw new StudyStorageNotFoundException("Invalid folder path", e);
+    }
+    Path folderPath = Paths.get(path).normalize();
+    File file = folderPath.toFile();
+    if (!file.isDirectory() || !file.exists()) {
+      throw new StudyStorageNotFoundException("Cannot find folder at path: " + path);
+    }
+    File newFolder = new File(file.getParentFile(), newName);
+    try {
+      file.renameTo(newFolder);
+    } catch (Exception e) {
+      throw new StudyStorageWriteException("Failed to rename folder at path: " + path, e);
+    }
+    
+    StorageFolder folder = new StorageFolder();
+    folder.setPath(newFolder.getAbsolutePath());
+    folder.setName(newFolder.getName());
+    return folder;
+    
+  }
+  
   @Override
   public StorageFile findFileByPath(StorageDrive drive, String path)
       throws StudyStorageNotFoundException {

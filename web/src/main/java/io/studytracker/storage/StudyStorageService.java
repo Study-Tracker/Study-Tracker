@@ -16,17 +16,13 @@
 
 package io.studytracker.storage;
 
-import io.studytracker.model.Assay;
-import io.studytracker.model.Program;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.StorageDriveFolderDetails;
-import io.studytracker.model.Study;
+import io.studytracker.model.*;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
-import java.io.File;
 import org.springframework.core.io.Resource;
+
+import java.io.File;
 
 /**
  * Base interface for a service that reads and writes study files to a connected file system.
@@ -114,6 +110,17 @@ public interface StudyStorageService {
    * @throws StudyStorageNotFoundException if the folder is not found
    */
   StorageFolder findFolderByPath(StorageDrive drive, String path) throws StudyStorageNotFoundException;
+  
+  /**
+   * Renames a folder at the given path.
+   *
+   * @param storageDrive parent storage drive
+   * @param path path of existing folder
+   * @param newName new name for the folder
+   * @return updated folder reference
+   * @throws StudyStorageException if folder is not found or failed to rename
+   */
+  StorageFolder renameFolder(StorageDrive storageDrive, String path, String newName) throws StudyStorageException;
 
   /**
    * Finds a file by its path in the file system, given a parent folder.

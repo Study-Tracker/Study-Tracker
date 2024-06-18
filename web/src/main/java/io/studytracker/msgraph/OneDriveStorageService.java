@@ -22,14 +22,7 @@ import com.microsoft.graph.models.Folder;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import io.studytracker.config.properties.StorageProperties;
-import io.studytracker.model.Assay;
-import io.studytracker.model.MSGraphIntegration;
-import io.studytracker.model.OneDriveDriveDetails;
-import io.studytracker.model.OneDriveFolderDetails;
-import io.studytracker.model.Program;
-import io.studytracker.model.StorageDrive;
-import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
+import io.studytracker.model.*;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -39,11 +32,6 @@ import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +40,12 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OneDriveStorageService implements StudyStorageService {
@@ -248,7 +242,47 @@ public class OneDriveStorageService implements StudyStorageService {
     LOGGER.debug("Found folder: {}", folder);
     return folder;
   }
-
+  
+  @Override
+  public StorageFolder renameFolder(StorageDrive storageDrive, String path, String newName) throws StudyStorageException {
+    
+    // Get the client
+    GraphServiceClient<?> client = this.getClientFromDrive(storageDrive);
+    OneDriveDriveDetails oneDriveDriveDetails = (OneDriveDriveDetails) storageDrive.getDetails();
+    
+    // Find the folder
+    DriveItem folderItem = null;
+    try {
+      folderItem = client.drives(oneDriveDriveDetails.getDriveId()).root().itemWithPath(path)
+              .buildRequest().get();
+      LOGGER.debug("Found drive folder item: id={}  name={}  path={}", folderItem.id, folderItem.name,
+              folderItem.parentReference != null ? folderItem.parentReference.path : "");
+    } catch (Exception e) {
+      LOGGER.warn("Folder not found: " + path);
+    }
+    if (folderItem == null || folderItem.folder == null || folderItem.id == null) {
+      throw new StudyStorageNotFoundException(
+              "No folder found for path: " + path + " in drive with id: " + storageDrive.getId());
+    }
+    
+    folderItem.name = newName;
+    folderItem.additionalDataManager()
+            .put("@microsoft.graph.conflictBehavior", new JsonPrimitive("fail"));
+    
+    try {
+      DriveItem updated = client.drives(oneDriveDriveDetails.getDriveId())
+              .items(folderItem.id)
+              .buildRequest()
+              .patch(folderItem);
+      StorageFolder folder = OneDriveUtils.convertDriveItemFolder(updated);
+      LOGGER.debug("Renamed folder: {}", folder);
+      return folder;
+    } catch (Exception e) {
+      throw new StudyStorageException("Error while renaming folder in OneDrive", e);
+    }
+    
+  }
+  
   @Override
   public StorageFile findFileByPath(StorageDriveFolder parentFolder, String path)
       throws StudyStorageNotFoundException {

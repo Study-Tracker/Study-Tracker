@@ -80,7 +80,7 @@ public class S3Utils {
     }
     return storageFolder;
   }
-
+  
   public static StorageFolder deriveParentFolder(String path) {
     if (path.trim().equals("")) return null;
     StorageFolder parentFolder = new StorageFolder();
