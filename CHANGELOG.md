@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Studies and assays can now use existing Benchling folders instead of creating new folders automatically.
+- Updated components for listing program, study, and assay users to make them more readable.
+- Inactive programs will now be hidden by default in the program list.
 
 ### Fixed
 - Fixed a bug preventing OneDrive file download.
