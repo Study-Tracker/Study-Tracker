@@ -24,6 +24,7 @@ import io.studytracker.model.AssayType;
 import io.studytracker.model.Program;
 import io.studytracker.model.Status;
 import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.Study;
 import io.studytracker.model.User;
@@ -36,11 +37,13 @@ import io.studytracker.storage.LocalFileSystemStorageService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -277,4 +280,78 @@ public class LocalStorageStudyStorageServiceTests {
     Assert.assertTrue(exception instanceof StudyStorageNotFoundException);
     Assert.assertNull(folder);
   }
+
+  @Test
+  public void renameFolderTest() throws Exception {
+    StorageDrive drive = storageDriveFolderService.findAllDrives().stream()
+        .filter(d -> d.getDriveType().equals(DriveType.LOCAL))
+        .findFirst()
+        .orElse(null);
+    Assert.assertNotNull(drive);
+    StorageFolder folder = null;
+    Exception exception = null;
+    String uuid = UUID.randomUUID().toString();
+    try {
+      folder = storageService.createFolder(drive, drive.getRootPath(), uuid);
+    } catch (Exception e) {
+      exception = e;
+    }
+    Assert.assertNull(exception);
+    Assert.assertNotNull(folder);
+    Assert.assertEquals(uuid, folder.getName());
+    Assert.assertEquals(StorageUtils.joinPath(drive.getRootPath(), uuid), folder.getPath());
+
+    StorageFolder updated = null;
+    exception = null;
+    try {
+      updated = storageService.renameFolder(drive, folder.getPath(), uuid + "_renamed");
+    } catch (Exception e) {
+      exception = e;
+    }
+
+    Assert.assertNull(exception);
+    Assert.assertNotNull(updated);
+    Assert.assertEquals(uuid + "_renamed", updated.getName());
+    Assert.assertEquals(StorageUtils.joinPath(drive.getRootPath(), uuid + "_renamed"), updated.getPath());
+  }
+
+  @Test
+  public void moveFolderTest() throws Exception {
+    StorageDrive drive = storageDriveFolderService.findAllDrives().stream()
+        .filter(d -> d.getDriveType().equals(DriveType.LOCAL))
+        .findFirst()
+        .orElse(null);
+    Assert.assertNotNull(drive);
+    StorageFolder folder = null;
+    StorageFolder parentFolder = null;
+    Exception exception = null;
+    String uuid = UUID.randomUUID().toString();
+    try {
+      folder = storageService.createFolder(drive, drive.getRootPath(), uuid + "_original");
+      parentFolder = storageService.createFolder(drive, drive.getRootPath(), uuid + "_parent");
+    } catch (Exception e) {
+      exception = e;
+    }
+    Assert.assertNull(exception);
+    Assert.assertNotNull(folder);
+    Assert.assertNotNull(parentFolder);
+    Assert.assertEquals(uuid + "_original", folder.getName());
+    Assert.assertEquals(uuid + "_parent", parentFolder.getName());
+    Assert.assertEquals(StorageUtils.joinPath(drive.getRootPath(), uuid + "_original"), folder.getPath());
+    Assert.assertEquals(StorageUtils.joinPath(drive.getRootPath(), uuid + "_parent"), parentFolder.getPath());
+
+    StorageFolder updated = null;
+    exception = null;
+    try {
+      updated = storageService.moveFolder(drive, folder.getPath(), parentFolder.getPath());
+    } catch (Exception e) {
+      exception = e;
+    }
+
+    Assert.assertNull(exception);
+    Assert.assertNotNull(updated);
+    Assert.assertEquals(uuid + "_original", updated.getName());
+    Assert.assertEquals(StorageUtils.joinPath(StorageUtils.joinPath(drive.getRootPath(), uuid + "_parent"), uuid + "_original"), updated.getPath());
+  }
+
 }

@@ -18,7 +18,14 @@ package io.studytracker.aws;
 
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AwsIntegration;
+import io.studytracker.model.Program;
+import io.studytracker.model.S3BucketDetails;
+import io.studytracker.model.S3FolderDetails;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
 import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -27,6 +34,8 @@ import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.io.File;
+import javax.persistence.Persistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +47,12 @@ import org.springframework.util.StringUtils;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
-
-import javax.persistence.Persistence;
-import java.io.File;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
 public class S3StudyStorageService implements StudyStorageService {
@@ -207,7 +218,65 @@ public class S3StudyStorageService implements StudyStorageService {
     }
     
   }
-  
+
+  @Override
+  public StorageFolder moveFolder(StorageDrive drive, String rawPath, String targetRawPath)
+      throws StudyStorageException {
+    LOGGER.info("Moving folder {} to {}", rawPath, targetRawPath);
+
+    // Clean the path input
+    String path = S3Utils.cleanInputPath(rawPath);
+    if (!path.isEmpty() && !path.endsWith("/")) {
+      path = path + "/";
+    }
+    String targetParentPath = S3Utils.cleanInputPath(targetRawPath);
+    if (!targetParentPath.isEmpty() && !targetParentPath.endsWith("/")) {
+      targetParentPath = targetParentPath + "/";
+    }
+
+    String folderName = S3Utils.deriveObjectName(path);
+    String targetPath = S3Utils.joinS3Path(targetParentPath, folderName);
+
+    LOGGER.debug("Looking up folder by path: {}", path);
+
+    S3Client client = getClientFromDrive(drive);
+    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
+
+    try {
+
+      // Copy the object
+      CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+          .sourceBucket(bucketDetails.getBucketName())
+          .sourceKey(path)
+          .destinationBucket(bucketDetails.getBucketName())
+          .destinationKey(targetPath)
+          .build();
+      client.copyObject(copyRequest);
+
+      // Fetch the new reference
+      ListObjectsV2Request request = ListObjectsV2Request.builder()
+          .bucket(bucketDetails.getBucketName())
+          .prefix(targetPath)
+          .delimiter("/")
+          .build();
+      ListObjectsV2Response response = client.listObjectsV2(request);
+      StorageFolder folder = S3Utils.convertS3ObjectsToStorageFolderWithContents(targetPath,
+          response.contents(), response.commonPrefixes());
+
+      // Delete the old folder
+      DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+          .bucket(bucketDetails.getBucketName())
+          .key(path)
+          .build();
+      client.deleteObject(deleteRequest);
+
+      return folder;
+
+    } catch (Exception e) {
+      throw new StudyStorageException("Failed to rename folder: " + path, e);
+    }
+  }
+
   @Override
   public StorageFolder findFolderByPath(StorageDriveFolder parentFolder, String rawPath)
       throws StudyStorageNotFoundException {

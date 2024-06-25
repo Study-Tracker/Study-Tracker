@@ -22,13 +22,12 @@ import io.studytracker.model.Study;
 import io.studytracker.service.NamingService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
-import software.amazon.awssdk.services.s3.model.CommonPrefix;
-import software.amazon.awssdk.services.s3.model.S3Object;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import software.amazon.awssdk.services.s3.model.CommonPrefix;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class S3Utils {
 
@@ -80,7 +79,13 @@ public class S3Utils {
     }
     return storageFolder;
   }
-  
+
+  /**
+   * Returns the parent path of the provided file or folder path.
+   *
+   * @param path
+   * @return
+   */
   public static StorageFolder deriveParentFolder(String path) {
     if (path.trim().equals("")) return null;
     StorageFolder parentFolder = new StorageFolder();
@@ -95,6 +100,18 @@ public class S3Utils {
     parentFolder.setPath(parentPath);
     parentFolder.setName(parentName);
     return parentFolder;
+  }
+
+  /**
+   * Returns the name of the object at the provided path
+   *
+   * @param path
+   * @return
+   */
+  public static String deriveObjectName(String path) {
+    if (path.trim().equals("")) return null;
+    String[] bits = path.split("/");
+    return bits[bits.length - 1];
   }
 
   public static String joinS3Path(String... parts) {

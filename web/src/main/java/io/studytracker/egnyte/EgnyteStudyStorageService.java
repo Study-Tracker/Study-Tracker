@@ -26,14 +26,27 @@ import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.EgnyteDriveDetails;
+import io.studytracker.model.EgnyteFolderDetails;
+import io.studytracker.model.EgnyteIntegration;
+import io.studytracker.model.Program;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
 import io.studytracker.repository.EgnyteIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.storage.*;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFile;
+import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
+import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.io.File;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +54,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.io.File;
-import java.util.Optional;
 
 @Service
 public class EgnyteStudyStorageService implements StudyStorageService {
@@ -487,6 +497,12 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   
   @Override
   public StorageFolder renameFolder(StorageDrive storageDrive, String path, String newName) throws StudyStorageException {
+    throw new StudyStorageException("Not implemented");
+  }
+
+  @Override
+  public StorageFolder moveFolder(StorageDrive storageDrive, String path, String newPath)
+      throws StudyStorageException {
     throw new StudyStorageException("Not implemented");
   }
 }

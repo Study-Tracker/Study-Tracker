@@ -19,7 +19,12 @@ package io.studytracker.storage;
 import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.LocalDriveFolderDetails;
+import io.studytracker.model.Program;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.service.NamingService;
@@ -27,6 +32,13 @@ import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import io.studytracker.storage.exception.StudyStorageWriteException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -36,14 +48,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class LocalFileSystemStorageService implements StudyStorageService {
 
@@ -61,6 +65,37 @@ public class LocalFileSystemStorageService implements StudyStorageService {
 
   @Autowired
   private StorageProperties storageProperties;
+
+  private File getObjectByPath(String rootPath, String objectPath)
+      throws StudyStorageNotFoundException {
+    try {
+      validatePath(rootPath, objectPath);
+    } catch (StudyStorageException e) {
+      throw new StudyStorageNotFoundException("Invalid object path", e);
+    }
+    Path path = Paths.get(objectPath).normalize();
+    File file = path.toFile();
+    if (!file.exists()) {
+      throw new StudyStorageNotFoundException("Cannot find object at path: " + objectPath);
+    }
+    return file;
+  }
+
+  private File getFolderByPath(String rootPath, String folderPath) throws StudyStorageNotFoundException {
+    File folder = getObjectByPath(rootPath, folderPath);
+    if (!folder.isDirectory()) {
+      throw new StudyStorageNotFoundException("Object at path is not a folder: " + folderPath);
+    }
+    return folder;
+  }
+
+  private File getFileByPath(String rootPath, String filePath) throws StudyStorageNotFoundException {
+    File file = getObjectByPath(rootPath, filePath);
+    if (file.isDirectory()) {
+      throw new StudyStorageNotFoundException("Object at path is not a folder: " + filePath);
+    }
+    return file;
+  }
 
   /**
    * Returns {@link StorageFile} instances for every file in the target folder, at the top level.
@@ -157,22 +192,12 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   @Override
   public StorageFolder findFolderByPath(StorageDrive drive, String path)
       throws StudyStorageNotFoundException {
-    try {
-      validatePath(drive.getRootPath(), path);
-    } catch (StudyStorageException e) {
-      e.printStackTrace();
-      throw new StudyStorageNotFoundException(e);
-    }
-    Path folderPath = Paths.get(path).normalize();
-    File file = folderPath.toFile();
-    if (!file.isDirectory() || !file.exists()) {
-      throw new StudyStorageNotFoundException("Cannot find folder at path: " + path);
-    }
+    File file = this.getFolderByPath(drive.getRootPath(), path);
     StorageFolder folder = new StorageFolder();
-    folder.setPath(folderPath.toString());
+    folder.setPath(file.getAbsolutePath());
     folder.setName(file.getName());
-    folder.setFiles(getFolderFiles(folderPath));
-    folder.setSubFolders(getSubfolders(folderPath));
+    folder.setFiles(getFolderFiles(file.getAbsoluteFile().toPath()));
+    folder.setSubFolders(getSubfolders(file.getAbsoluteFile().toPath()));
     return folder;
   }
 
@@ -184,17 +209,10 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   
   @Override
   public StorageFolder renameFolder(StorageDrive drive, String path, String newName) throws StudyStorageException {
-    try {
-      validatePath(drive.getRootPath(), path);
-    } catch (StudyStorageException e) {
-      throw new StudyStorageNotFoundException("Invalid folder path", e);
-    }
-    Path folderPath = Paths.get(path).normalize();
-    File file = folderPath.toFile();
-    if (!file.isDirectory() || !file.exists()) {
-      throw new StudyStorageNotFoundException("Cannot find folder at path: " + path);
-    }
+    LOGGER.info("Renaming folder at path {} to {}", path, newName);
+    File file = this.getFolderByPath(drive.getRootPath(), path);
     File newFolder = new File(file.getParentFile(), newName);
+
     try {
       file.renameTo(newFolder);
     } catch (Exception e) {
@@ -207,21 +225,27 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     return folder;
     
   }
-  
+
+  @Override
+  public StorageFolder moveFolder(StorageDrive storageDrive, String path, String newParentPath)
+      throws StudyStorageException {
+    File existingFolder = this.getFolderByPath(storageDrive.getRootPath(), path);
+    String folderName = existingFolder.getName();
+    File targetFolder = Paths.get(StorageUtils.joinPath(newParentPath, folderName))
+        .normalize()
+        .toFile();
+    try {
+      FileUtils.moveDirectoryToDirectory(existingFolder, targetFolder, true);
+    } catch (IOException e) {
+      throw new StudyStorageException("Failed to move folder: " + path, e);
+    }
+    return this.findFolderByPath(storageDrive, targetFolder.getPath());
+  }
+
   @Override
   public StorageFile findFileByPath(StorageDrive drive, String path)
       throws StudyStorageNotFoundException {
-    try {
-      validatePath(drive.getRootPath(), path);
-    } catch (StudyStorageException e) {
-      e.printStackTrace();
-      throw new StudyStorageNotFoundException(e);
-    }
-    Path filePath = Paths.get(path).normalize();
-    File file = filePath.toFile();
-    if (!file.isFile() || !file.exists()) {
-      throw new StudyStorageNotFoundException("Cannot find file at path: " + path);
-    }
+    File file = this.getFileByPath(drive.getRootPath(), path);
     StorageFile storageFile = new StorageFile();
     storageFile.setName(file.getName());
     storageFile.setPath(file.getPath());
