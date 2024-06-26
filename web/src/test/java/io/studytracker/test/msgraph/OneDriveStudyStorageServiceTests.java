@@ -32,6 +32,7 @@ import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.msgraph.MSGraphIntegrationService;
 import io.studytracker.msgraph.OneDriveStorageService;
+import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayStorageFolderRepository;
 import io.studytracker.repository.AssayTypeRepository;
@@ -123,9 +124,13 @@ public class OneDriveStudyStorageServiceTests {
   @Autowired
   private AssayStorageFolderRepository assayStorageFolderRepository;
 
+  @Autowired
+  private ActivityRepository activityRepository;
+
   @Before
   public void setup() {
 
+    activityRepository.deleteAll();
     assayStorageFolderRepository.deleteAll();
     studyStorageFolderRepository.deleteAll();
     programStorageFolderRepository.deleteAll();
