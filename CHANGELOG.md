@@ -9,15 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Working on a new module for capturing data sets and their metadata. This module will allow the registration of various data sources (such as AWS S3), and the creation of data set records that will include one-or-more resources from these storage locations, along with metadata describing them. Users will then be allowed to associate one-or-more data sets with a study. Studies will likely get data set records created for them, which will include their storage folder and notebook by default.
 - Will add a notifications feature that will capture and display notifications for users.
 
-## [0.9.10] - 2024-06-28
-
-### Changed
-- Studies and assays can now use existing Benchling folders instead of creating new folders automatically.
-
-### Fixed
-- Fixed a bug preventing OneDrive file download.
-
-## [0.9.9] - 2024-05-30
+## [0.9.9] - 2024-06-28
 
 ### Added
 - Added 'Files' tab to program details page (#175).
@@ -25,7 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - You can now set a different default program storage folder from the Files tab in the program 
   details page (#156).
 
-## [0.9.8] - 2024-04-26
+### Changed
+- Studies and assays can now use existing Benchling folders instead of creating new folders automatically.
+
+### Fixed
+- Fixed a bug preventing OneDrive file download.
+
+## [0.9.8] - 2024-05-16
 
 ### Changed
 - Registering an Egnyte integration will now automatically register the default Shared drive.
