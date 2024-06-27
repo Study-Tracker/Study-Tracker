@@ -32,6 +32,8 @@ import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.service.AssayService;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
 import java.util.ArrayList;
@@ -60,7 +62,12 @@ public class ExampleAssayGenerator implements ExampleDataGenerator<Assay> {
           .findByStudyId(assay.getStudy().getId()).get(0);
       StudyStorageService studyStorageService = storageServiceLookup.lookup(studyFolder)
           .orElseThrow(RecordNotFoundException::new);
-      return studyStorageService.createAssayFolder(studyFolder, assay);
+      String folderName = AssayService.generateAssayStorageFolderName(assay);
+      StorageFolder storageFolder = studyStorageService.createFolder(studyFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      return studyStorageService.saveStorageFolderRecord(studyFolder.getStorageDrive(),
+          storageFolder, folderOptions);
     } catch (Exception ex) {
       throw new StudyTrackerException(ex);
     }

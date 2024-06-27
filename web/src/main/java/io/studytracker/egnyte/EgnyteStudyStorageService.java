@@ -20,7 +20,6 @@ import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.egnyte.entity.EgnyteFile;
 import io.studytracker.egnyte.entity.EgnyteFolder;
 import io.studytracker.egnyte.entity.EgnyteObject;
-import io.studytracker.egnyte.exception.DuplicateFolderException;
 import io.studytracker.egnyte.exception.EgnyteException;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.exception.InsufficientPrivilegesException;
@@ -42,7 +41,6 @@ import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.StudyStorageService;
-import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
@@ -216,8 +214,9 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name)
+  public StorageFolder createFolder(StorageDriveFolder parentFolder, String name)
       throws StudyStorageException {
+    String path = parentFolder.getPath();
     LOGGER.info("Creating folder: {} in {}", name, path);
     EgnyteIntegration integration = this.findIntegrationByDrive(parentFolder.getStorageDrive());
     EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
@@ -251,137 +250,6 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       LOGGER.error("Error while creating folder", e);
       throw new StudyStorageException("Error while creating folder", e);
     }
-  }
-
-  @Override
-  public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
-      throws StudyStorageException {
-
-    LOGGER.info(String.format("Creating folder for program %s", program.getName()));
-
-    // Check that parent folder is study root
-    if (!parentFolder.isStudyRoot()) {
-      throw new InvalidRequestException("Parent folder is not a study root folder.");
-    }
-
-    EgnyteIntegration integration = this.findIntegrationByDrive(parentFolder.getStorageDrive());
-    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
-    String path = getProgramFolderPath(program, parentFolder.getPath());
-    StorageFolder storageFolder;
-
-    // Try to create the folder
-    try {
-      EgnyteFolder egnyteFolder = egnyteClient.createFolder(path);
-      storageFolder = this.convertFolder(egnyteFolder, integration.getRootUrl());
-    }
-
-    // If the folder already exists, check if it can be used
-    catch (DuplicateFolderException e) {
-      LOGGER.warn("Duplicate folder found: " + path);
-      if (storageProperties.getUseExisting()) {
-        LOGGER.warn("Existing folder will be used.");
-        storageFolder = this.findFolderByPath(parentFolder, path);
-      } else {
-        throw new StudyStorageDuplicateException(e);
-      }
-    }
-
-    // Throw remaining exceptions
-    catch (EgnyteException e) {
-      throw new StudyStorageException(e);
-    }
-
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-
-    // Save the records in the database
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-
-  }
-
-  @Override
-  public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
-      throws StudyStorageException {
-
-    EgnyteIntegration integration = this.findIntegrationByDrive(parentFolder.getStorageDrive());
-    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
-    Program program = study.getProgram();
-    String path = getStudyFolderPath(study, parentFolder.getPath());
-    StorageFolder storageFolder;
-    LOGGER.info(
-        String.format(
-            "Creating folder for study %s in program folder %s with path: %s",
-            study.getCode(), program.getName(), path));
-
-    // Trey to create the folder
-    try {
-      EgnyteFolder egnyteFolder = egnyteClient.createFolder(path);
-      storageFolder = this.convertFolder(egnyteFolder, integration.getRootUrl());
-    }
-
-    // If the folder already exists, check if it can be used
-    catch (DuplicateFolderException e) {
-      if (storageProperties.getUseExisting()) {
-        LOGGER.warn("Existing folder will be used.");
-        storageFolder = this.findFolderByPath(parentFolder, path);
-      } else {
-        throw new StudyStorageDuplicateException(e);
-      }
-    }
-
-    // Throw any remaining exceptions
-    catch (EgnyteException e) {
-      throw new StudyStorageException(e);
-    }
-
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-
-    // Save the records in the database
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-
-  }
-
-  @Override
-  public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
-      throws StudyStorageException {
-
-    Study study = assay.getStudy();
-    LOGGER.info(
-        String.format(
-            "Creating folder for assay %s in study folder %s",
-            assay.getCode(), study.getName() + " (" + study.getCode() + ")"));
-    EgnyteIntegration integration = this.findIntegrationByDrive(parentFolder.getStorageDrive());
-    EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
-    String path = getAssayFolderPath(assay, parentFolder.getPath());
-    StorageFolder storageFolder;
-
-    // Try to create the folder
-    try {
-      EgnyteFolder egnyteFolder = egnyteClient.createFolder(path);
-      storageFolder = this.convertFolder(egnyteFolder, integration.getRootUrl());
-    }
-
-    // If the folder already exists, check if it can be used
-    catch (DuplicateFolderException e) {
-      if (storageProperties.getUseExisting()) {
-        LOGGER.warn("Existing folder will be used.");
-        storageFolder = this.findFolderByPath(parentFolder, path);
-      } else {
-        throw new StudyStorageDuplicateException(e);
-      }
-    }
-
-    // throw any remaining exceptions
-    catch (EgnyteException e) {
-      throw new StudyStorageException(e);
-    }
-
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-
   }
 
   @Override

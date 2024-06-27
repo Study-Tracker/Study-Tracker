@@ -300,8 +300,6 @@ FileManagerTable.propTypes = {
   folder: PropTypes.object.isRequired,
   handlePathChange: PropTypes.func.isRequired,
   rootFolder: PropTypes.object.isRequired,
-  handleAddToRecord: PropTypes.func.isRequired,
-  record: PropTypes.object
 }
 
 export default FileManagerTable;

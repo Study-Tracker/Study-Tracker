@@ -202,7 +202,7 @@ public class DataFileStoragePrivateController extends AbstractApiController {
       throw new InsufficientPrivilegesException("Insufficient privileges to upload files to this folder");
     }
 
-    StorageFolder storageFolder = storageService.createFolder(parentFolder, path, folderName);
+    StorageFolder storageFolder = storageService.createFolder(parentFolder.getStorageDrive(), path, folderName);
     LOGGER.debug("Created folder: " + storageFolder.toString());
     return new ResponseEntity<>(storageFolder, HttpStatus.OK);
   }

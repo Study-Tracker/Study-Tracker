@@ -18,14 +18,11 @@ package io.studytracker.aws;
 
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.Assay;
 import io.studytracker.model.AwsIntegration;
-import io.studytracker.model.Program;
 import io.studytracker.model.S3BucketDetails;
 import io.studytracker.model.S3FolderDetails;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
 import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -75,42 +72,6 @@ public class S3StudyStorageService implements StudyStorageService {
 
   }
 
-  @Transactional
-  @Override
-  public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
-      throws StudyStorageException {
-    LOGGER.info("Creating program folder: '{}' in bucket '{}'", program.getName(), parentFolder.getName());
-    String folderName = S3Utils.generateProgramFolderName(program);
-    StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-  }
-
-  @Transactional
-  @Override
-  public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
-      throws StudyStorageException {
-    LOGGER.info("Creating study folder: '{}' in bucket '{}'", study.getName(), parentFolder.getName());
-    String folderName = S3Utils.generateStudyFolderName(study);
-    StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-  }
-
-  @Transactional
-  @Override
-  public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
-      throws StudyStorageException {
-    LOGGER.info("Creating assay folder: '{}' in bucket '{}'", assay.getName(), parentFolder.getName());
-    String folderName = S3Utils.generateAssayFolderName(assay);
-    StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-  }
-
   @Override
   public StorageFolder createFolder(StorageDrive bucket, String rawPath, String name)
       throws StudyStorageException {
@@ -150,7 +111,7 @@ public class S3StudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(StorageDriveFolder parentFolder, String rawPath, String name)
+  public StorageFolder createFolder(StorageDriveFolder parentFolder, String name)
       throws StudyStorageException {
     StorageDrive bucket;
     if (Persistence.getPersistenceUtil().isLoaded(parentFolder.getStorageDrive())) {
@@ -160,7 +121,7 @@ public class S3StudyStorageService implements StudyStorageService {
               .orElseThrow(() -> new RecordNotFoundException("Storage folder " + parentFolder.getId()
                       + " not associated with S3 bucket"));
     }
-    return this.createFolder(bucket, rawPath, name);
+    return this.createFolder(bucket, parentFolder.getPath(), name);
   }
 
   @Override

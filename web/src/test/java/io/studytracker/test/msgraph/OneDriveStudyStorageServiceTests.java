@@ -45,6 +45,9 @@ import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.StudyStorageFolderRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.service.AssayService;
+import io.studytracker.service.ProgramService;
+import io.studytracker.service.StudyService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
@@ -287,7 +290,12 @@ public class OneDriveStudyStorageServiceTests {
     Assert.assertEquals(1, rootFolders.size());
     StorageDriveFolder rootFolder = rootFolders.get(0);
 
-    StorageDriveFolder programFolder = storageService.createProgramFolder(rootFolder, program);
+    String folderName = ProgramService.generateProgramStorageFolderName(program);
+    StorageFolder storageFolder = storageService.createFolder(rootFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder programFolder = storageService.saveStorageFolderRecord(rootFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(programFolder);
     program.addStorageFolder(programFolder, true);
     programRepository.save(program);
@@ -324,7 +332,12 @@ public class OneDriveStudyStorageServiceTests {
 
     StorageDriveFolder programFolder = storageDriveFolderService.findPrimaryProgramFolder(program)
         .orElseThrow(() -> new StudyStorageNotFoundException("Test Program"));
-    StorageDriveFolder studyFolder = storageService.createStudyFolder(programFolder, study);
+    String folderName = StudyService.generateStudyStorageFolderName(study);
+    StorageFolder storageFolder = storageService.createFolder(programFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder studyFolder = storageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(studyFolder);
     study.addStorageFolder(studyFolder, true);
     studyRepository.save(study);
@@ -363,7 +376,12 @@ public class OneDriveStudyStorageServiceTests {
 
     StorageDriveFolder studyFolder = storageDriveFolderService.findPrimaryStudyFolder(study)
         .orElseThrow(() -> new StudyStorageNotFoundException("Test Study"));
-    StorageDriveFolder assayFolder = storageService.createAssayFolder(studyFolder, assay);
+    String folderName = AssayService.generateAssayStorageFolderName(assay);
+    StorageFolder storageFolder = storageService.createFolder(studyFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder assayFolder = storageService.saveStorageFolderRecord(studyFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(assayFolder);
     assay.addStorageFolder(assayFolder, true);
     assayRepository.save(assay);
@@ -388,7 +406,7 @@ public class OneDriveStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createFolder(rootFolder, "/", "Test Create Folder");
+      folder = storageService.createFolder(rootFolder,  "Test Create Folder");
     } catch (Exception e) {
       exception = e;
     }
@@ -410,7 +428,7 @@ public class OneDriveStudyStorageServiceTests {
     Exception exception = null;
     String uuid = UUID.randomUUID().toString();
     try {
-      folder = storageService.createFolder(rootFolder, "/", uuid);
+      folder = storageService.createFolder(rootFolder, uuid);
     } catch (Exception e) {
       exception = e;
     }
@@ -447,8 +465,8 @@ public class OneDriveStudyStorageServiceTests {
     Exception exception = null;
     String uuid = UUID.randomUUID().toString();
     try {
-      folder = storageService.createFolder(rootFolder, "/", uuid + "_original");
-      parentFolder = storageService.createFolder(rootFolder, "/", uuid + "_parent");
+      folder = storageService.createFolder(rootFolder, uuid + "_original");
+      parentFolder = storageService.createFolder(rootFolder, uuid + "_parent");
     } catch (Exception e) {
       exception = e;
     }

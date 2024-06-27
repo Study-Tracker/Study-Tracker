@@ -19,12 +19,42 @@ package io.studytracker.test.repository;
 import io.studytracker.Application;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.*;
-import io.studytracker.repository.*;
+import io.studytracker.model.Comment;
+import io.studytracker.model.ExternalLink;
+import io.studytracker.model.Program;
+import io.studytracker.model.Status;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
+import io.studytracker.model.StudyConclusions;
+import io.studytracker.model.StudyStorageFolder;
+import io.studytracker.model.User;
+import io.studytracker.model.UserType;
+import io.studytracker.repository.ActivityRepository;
+import io.studytracker.repository.CommentRepository;
+import io.studytracker.repository.ELNFolderRepository;
+import io.studytracker.repository.ExternalLinkRepository;
+import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.StudyConclusionsRepository;
+import io.studytracker.repository.StudyRepository;
+import io.studytracker.repository.UserRepository;
+import io.studytracker.service.ProgramService;
+import io.studytracker.service.StudyService;
 import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
-import org.hibernate.*;
+import java.net.URL;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import javax.persistence.EntityManagerFactory;
+import org.hibernate.Hibernate;
+import org.hibernate.LazyInitializationException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,10 +66,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import javax.persistence.EntityManagerFactory;
-import java.net.URL;
-import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -93,7 +119,12 @@ public class StudyRepositoryTests {
           .orElseThrow(RecordNotFoundException::new);
       StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
           .orElseThrow(RecordNotFoundException::new);
-      return studyStorageService.createProgramFolder(rootFolder, program);
+      String folderName = ProgramService.generateProgramStorageFolderName(program);
+      StorageFolder storageFolder = studyStorageService.createFolder(rootFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      return studyStorageService.saveStorageFolderRecord(rootFolder.getStorageDrive(),
+          storageFolder, folderOptions);
     } catch (Exception ex) {
       throw new StudyTrackerException(ex);
     }
@@ -445,7 +476,12 @@ public class StudyRepositoryTests {
 
     StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(programFolder)
         .orElseThrow(RecordNotFoundException::new);
-    StorageDriveFolder studyFolder = studyStorageService.createStudyFolder(programFolder, study);
+    String folderName = StudyService.generateStudyStorageFolderName(study);
+    StorageFolder storageFolder = studyStorageService.createFolder(programFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder studyFolder = studyStorageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(studyFolder);
     Assert.assertNotNull(studyFolder.getId());
     study.addStorageFolder(studyFolder, true);

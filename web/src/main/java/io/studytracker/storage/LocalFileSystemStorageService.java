@@ -17,17 +17,12 @@
 package io.studytracker.storage;
 
 import io.studytracker.config.properties.StorageProperties;
-import io.studytracker.exception.InvalidRequestException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.Assay;
 import io.studytracker.model.LocalDriveFolderDetails;
-import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
-import io.studytracker.service.NamingService;
 import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
@@ -53,9 +48,6 @@ public class LocalFileSystemStorageService implements StudyStorageService {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(LocalFileSystemStorageService.class);
-
-  @Autowired
-  private NamingService namingService;
 
   @Autowired
   private StorageDriveRepository driveRepository;
@@ -143,50 +135,6 @@ public class LocalFileSystemStorageService implements StudyStorageService {
     } catch (IOException e) {
       throw new StudyTrackerException(e);
     }
-  }
-
-  @Override
-  @Transactional
-  public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
-      throws StudyStorageException {
-    LOGGER.info("Creating storage folder instance for program: " + program.getName());
-
-    // Check that parent folder is study root
-    if (!parentFolder.isStudyRoot()) {
-      throw new InvalidRequestException("Parent folder is not a study root folder.");
-    }
-
-    // Create the folder
-    String folderName = NamingService.getProgramStorageFolderName(program);
-    StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(), folderName);
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-
-  }
-
-  @Override
-  @Transactional
-  public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
-      throws StudyStorageException {
-    LOGGER.info("Creating storage folder instance for study: " + study.getCode());
-    StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(),
-        NamingService.getStudyStorageFolderName(study));
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-  }
-
-  @Override
-  @Transactional
-  public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
-      throws StudyStorageException {
-    LOGGER.info("Creating storage folder instance for assay: " + assay.getCode());
-    StorageFolder storageFolder = createFolder(parentFolder, parentFolder.getPath(),
-        NamingService.getAssayStorageFolderName(assay));
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
   }
 
   @Override
@@ -300,12 +248,11 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name)
+  public StorageFolder createFolder(StorageDriveFolder parentFolder, String name)
       throws StudyStorageException {
     LOGGER.info("Creating storage folder {} at path {} for location {}",
-        name, path, parentFolder.getName());
-    validatePath(parentFolder.getPath(), path);
-    return this.createFolder(path, name);
+        name, parentFolder.getPath(), parentFolder.getName());
+    return this.createFolder(parentFolder.getPath(), name);
   }
 
   @Override

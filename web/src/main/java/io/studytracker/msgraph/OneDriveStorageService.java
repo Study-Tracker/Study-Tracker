@@ -23,14 +23,11 @@ import com.microsoft.graph.models.ItemReference;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import io.studytracker.config.properties.StorageProperties;
-import io.studytracker.model.Assay;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
 import io.studytracker.model.OneDriveFolderDetails;
-import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -114,69 +111,12 @@ public class OneDriveStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
-      throws StudyStorageException {
-    String path = OneDriveUtils.joinPaths(parentFolder.getPath(), OneDriveUtils.getProgramFolderName(program));
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException(
-            "No drive found for folder with id: " + parentFolder.getId()));
-    StorageFolder storageFolder;
-    if (this.folderExists(drive, path)) {
-      storageFolder = this.findFolderByPath(drive, path);
-    } else {
-      storageFolder = this.createFolder(parentFolder, parentFolder.getPath(),
-          OneDriveUtils.getProgramFolderName(program));
-    }
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return this.saveStorageFolderRecord(drive, storageFolder, options);
-  }
-
-  @Override
-  public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
-      throws StudyStorageException {
-    String path = OneDriveUtils.joinPaths(parentFolder.getPath(), OneDriveUtils.getStudyFolderName(study));
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException(
-            "No drive found for folder with id: " + parentFolder.getId()));
-    StorageFolder storageFolder;
-    if (this.folderExists(drive, path)) {
-      storageFolder = this.findFolderByPath(drive, path);
-    } else {
-      storageFolder = this.createFolder(parentFolder, parentFolder.getPath(),
-          OneDriveUtils.getStudyFolderName(study));
-    }
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return this.saveStorageFolderRecord(drive, storageFolder, options);
-  }
-
-  @Override
-  public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
-      throws StudyStorageException {
-    String path = OneDriveUtils.joinPaths(parentFolder.getPath(), OneDriveUtils.getAssayFolderName(assay));
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException(
-            "No drive found for folder with id: " + parentFolder.getId()));
-    StorageFolder storageFolder;
-    if (this.folderExists(drive, path)) {
-      storageFolder = this.findFolderByPath(drive, path);
-    } else {
-      storageFolder = this.createFolder(parentFolder, parentFolder.getPath(),
-          OneDriveUtils.getAssayFolderName(assay));
-    }
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return this.saveStorageFolderRecord(drive, storageFolder, options);
-  }
-
-  @Override
-  public StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name)
+  public StorageFolder createFolder(StorageDriveFolder parentFolder, String name)
       throws StudyStorageException {
     StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
         .orElseThrow(() -> new StudyStorageNotFoundException(
             "No drive found for folder with id: " + parentFolder.getId()));
-    return this.createFolder(drive, path, name);
+    return this.createFolder(drive, parentFolder.getPath(), name);
   }
 
   @Override

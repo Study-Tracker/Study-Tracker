@@ -16,13 +16,9 @@
 
 package io.studytracker.storage;
 
-import io.studytracker.model.Assay;
-import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.StorageDriveFolderDetails;
-import io.studytracker.model.Study;
-import io.studytracker.storage.exception.StudyStorageDuplicateException;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.io.File;
@@ -37,52 +33,14 @@ import org.springframework.core.io.Resource;
 public interface StudyStorageService {
 
   /**
-   * Creates a {@link StorageDriveFolder} and accompanying
-   * {@link io.studytracker.model.StorageDriveFolderDetails} object for the target
-   * {@link Program}. Throws a {@link StudyStorageDuplicateException} if the folder already exists
-   * and a {@link io.studytracker.storage.exception.StudyStorageWriteException} if the folder cannot
-   * be created.
-   *
-   * @param parentFolder the parent folder
-   * @param program the program
-   * @return the created storage folder
-   */
-  StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program) throws StudyStorageException;
-
-  /**
-   * Creates a {@link StorageDriveFolder} and accompanying
-   * {@link io.studytracker.model.StorageDriveFolderDetails} object for the target {@link Study}.
-   * Throws a {@link StudyStorageDuplicateException} if the folder already exists and a {@link
-   * io.studytracker.storage.exception.StudyStorageWriteException} if the folder cannot be created.
-   *
-   * @param parentFolder the parent folder
-   * @param study the study
-   * @return the created storage folder
-   */
-  StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study) throws StudyStorageException;
-
-  /**
-   * Creates a {@link StorageDriveFolder} and accompanying
-   * {@link io.studytracker.model.StorageDriveFolderDetails} object for the target {@link Assay}.
-   * Throws a {@link StudyStorageDuplicateException} if the folder already exists and a {@link
-   * io.studytracker.storage.exception.StudyStorageWriteException} if the folder cannot be created.
-   *
-   * @param parentFolder the parent folder
-   * @param assay the assay
-   * @return the created storage folder
-   */
-  StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay) throws StudyStorageException;
-
-  /**
    * Creates a new folder at the given path.
    *
    * @param parentFolder the storage location
-   * @param path the path to the folder to create the new folder within
    * @param name the name of the new folder
    * @return the new folder
    * @throws StudyStorageException if the folder cannot be created
    */
-  StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name) throws StudyStorageException;
+  StorageFolder createFolder(StorageDriveFolder parentFolder, String name) throws StudyStorageException;
 
   /**
    * Creates a new folder at the given path.

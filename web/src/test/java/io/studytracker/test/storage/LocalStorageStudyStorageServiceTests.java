@@ -33,6 +33,8 @@ import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.service.AssayService;
+import io.studytracker.service.StudyService;
 import io.studytracker.storage.LocalFileSystemStorageService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
@@ -120,7 +122,12 @@ public class LocalStorageStudyStorageServiceTests {
     Exception exception = null;
 
     try {
-      folder = storageService.createStudyFolder(programFolder, study);
+      String folderName = StudyService.generateStudyStorageFolderName(study);
+      StorageFolder storageFolder = storageService.createFolder(programFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      folder = storageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+          storageFolder, folderOptions);
     } catch (Exception e) {
       exception = e;
       e.printStackTrace();
@@ -207,7 +214,12 @@ public class LocalStorageStudyStorageServiceTests {
         .findFirst()
         .get()
         .getStorageDriveFolder();
-    StorageDriveFolder studyFolder = storageService.createStudyFolder(programFolder, study);
+    String folderName = StudyService.generateStudyStorageFolderName(study);
+    StorageFolder storageFolder = storageService.createFolder(programFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder studyFolder = storageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(studyFolder.getId());
     study.addStorageFolder(studyFolder, true);
     studyRepository.save(study);
@@ -229,7 +241,12 @@ public class LocalStorageStudyStorageServiceTests {
     StorageDriveFolder assayFolder = null;
     Exception exception = null;
     try {
-      assayFolder = storageService.createAssayFolder(studyFolder, assay);
+      folderName = AssayService.generateAssayStorageFolderName(assay);
+      storageFolder = storageService.createFolder(studyFolder, folderName);
+      folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      assayFolder = storageService.saveStorageFolderRecord(studyFolder.getStorageDrive(),
+          storageFolder, folderOptions);
     } catch (Exception e) {
       e.printStackTrace();
       exception = e;

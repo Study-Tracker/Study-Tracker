@@ -19,7 +19,9 @@ package io.studytracker.aws;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
-import io.studytracker.service.NamingService;
+import io.studytracker.service.AssayService;
+import io.studytracker.service.ProgramService;
+import io.studytracker.service.StudyService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import java.util.ArrayList;
@@ -132,21 +134,21 @@ public class S3Utils {
   }
 
   public static String generateStudyFolderName(Study study) {
-    return NamingService.getStudyStorageFolderName(study)
+    return StudyService.generateStudyStorageFolderName(study)
         .replaceAll("_", " ")
         .replaceAll("\\s+", " ")
         .trim();
   }
 
   public static String generateAssayFolderName(Assay assay) {
-    return NamingService.getAssayStorageFolderName(assay)
+    return AssayService.generateAssayStorageFolderName(assay)
         .replaceAll("_", " ")
         .replaceAll("\\s+", " ")
         .trim();
   }
 
   public static String generateProgramFolderName(Program program) {
-    return NamingService.getProgramStorageFolderName(program)
+    return ProgramService.generateProgramStorageFolderName(program)
         .replaceAll("_", " ")
         .replaceAll("\\s+", " ")
         .trim();

@@ -26,22 +26,29 @@ import io.studytracker.eln.NotebookEntry;
 import io.studytracker.eln.NotebookFolderService;
 import io.studytracker.exception.MalformedEntityException;
 import io.studytracker.exception.NotebookException;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayNotebookFolder;
+import io.studytracker.model.ELNFolder;
+import io.studytracker.model.Program;
+import io.studytracker.model.ProgramNotebookFolder;
+import io.studytracker.model.ProgramOptions;
+import io.studytracker.model.Study;
+import io.studytracker.model.StudyNotebookFolder;
 import io.studytracker.repository.AssayNotebookFolderRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramNotebookFolderRepository;
 import io.studytracker.repository.StudyNotebookFolderRepository;
-import io.studytracker.service.NamingService;
+import io.studytracker.service.AssayService;
+import io.studytracker.service.StudyService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public final class BenchlingNotebookFolderService 
@@ -49,9 +56,6 @@ public final class BenchlingNotebookFolderService
     implements NotebookFolderService<ELNFolder> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingNotebookFolderService.class);
-
-  @Autowired 
-  private NamingService namingService;
 
   @Autowired 
   private ELNFolderRepository elnFolderRepository;
@@ -191,7 +195,7 @@ public final class BenchlingNotebookFolderService
     ELNFolder programFolder = programFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client.createFolder(
-            NamingService.getStudyNotebookFolderName(study), programFolder.getReferenceId());
+            StudyService.generateStudyNotebookFolderName(study), programFolder.getReferenceId());
     ELNFolder studyFolder = this.convertBenchlingFolder(benchlingFolder);
     studyFolder.setParentFolder(programFolder);
     return studyFolder;
@@ -210,7 +214,7 @@ public final class BenchlingNotebookFolderService
     ELNFolder studyFolder = studyFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client.createFolder(
-            NamingService.getAssayNotebookFolderName(assay), studyFolder.getReferenceId());
+            AssayService.generateAssayNotebookFolderName(assay), studyFolder.getReferenceId());
     ELNFolder assayFolder = this.convertBenchlingFolder(benchlingFolder);
     assayFolder.setParentFolder(studyFolder);
 

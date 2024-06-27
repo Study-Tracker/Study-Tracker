@@ -32,6 +32,7 @@ import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import java.util.Date;
 import java.util.List;
@@ -100,7 +101,12 @@ public class ProgramService {
             .orElseThrow(() -> new RecordNotFoundException(
                 "Parent folder not found: " + options.getParentFolder().getId()));
         StudyStorageService studyStorageService = storageDriveFolderService.lookupStudyStorageService(parentFolder);
-        StorageDriveFolder programFolder = studyStorageService.createProgramFolder(parentFolder, program);
+        String folderName = generateProgramStorageFolderName(program);
+        StorageFolder storageFolder = studyStorageService.createFolder(parentFolder, folderName);
+        StorageDriveFolder folderOptions = new StorageDriveFolder();
+        folderOptions.setWriteEnabled(true);
+        StorageDriveFolder programFolder = studyStorageService
+            .saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, folderOptions);
         program.addStorageFolder(programFolder, true);
       } catch (Exception e) {
         throw new StudyTrackerException(e);
@@ -329,6 +335,16 @@ public class ProgramService {
       programRepository.save(program);
     }
 
+  }
+
+  /**
+   * Returns a {@link Program} object's derived storage folder name.
+   *
+   * @param program
+   * @return
+   */
+  public static String generateProgramStorageFolderName(Program program) {
+    return program.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
   }
 
 }
