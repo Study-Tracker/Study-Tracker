@@ -16,9 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Folders can be added to programs from the File Manager, just like with assays and studies.
 - You can now set a different default program storage folder from the Files tab in the program 
   details page (#156).
+- You can now rename folders in the File Manager.
 
 ### Changed
 - Studies and assays can now use existing Benchling folders instead of creating new folders automatically.
+- When studies and assays are edited and renamed, their storage folders are also renamed where 
+  possible (#184).
 
 ### Fixed
 - Fixed a bug preventing OneDrive file download.

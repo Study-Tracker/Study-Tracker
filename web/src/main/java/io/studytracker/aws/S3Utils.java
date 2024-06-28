@@ -160,5 +160,11 @@ public class S3Utils {
     return path.replaceAll("\\.\\.", ".");
   }
 
+  public static String cleanInputObjectName(String input) {
+    return input.replaceAll("_", " ")
+        .replaceAll("\\s+", " ")
+        .trim();
+  }
+
 
 }

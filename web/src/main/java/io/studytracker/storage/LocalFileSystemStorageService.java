@@ -159,7 +159,7 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   public StorageFolder renameFolder(StorageDrive drive, String path, String newName) throws StudyStorageException {
     LOGGER.info("Renaming folder at path {} to {}", path, newName);
     File file = this.getFolderByPath(drive.getRootPath(), path);
-    File newFolder = new File(file.getParentFile(), newName);
+    File newFolder = new File(file.getParentFile(), StorageUtils.cleanInputObjectName(newName));
 
     try {
       file.renameTo(newFolder);
@@ -207,7 +207,7 @@ public class LocalFileSystemStorageService implements StudyStorageService {
   }
 
   private StorageFolder createFolder(String path, String name) throws StudyStorageException {
-    Path newFolderPath = Paths.get(path).normalize().resolve(name);
+    Path newFolderPath = Paths.get(path).normalize().resolve(StorageUtils.cleanInputObjectName(name));
     File newFolder = newFolderPath.toFile();
 
     // Folder exists

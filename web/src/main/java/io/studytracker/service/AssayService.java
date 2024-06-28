@@ -447,6 +447,7 @@ public class AssayService {
 
     LOGGER.info("Updating assay record with code: " + updated.getCode());
     Assay assay = assayRepository.getById(updated.getId());
+    boolean nameChange = !assay.getName().equals(updated.getName());
 
     assay.setName(updated.getName());
     assay.setDescription(updated.getDescription());
@@ -473,6 +474,11 @@ public class AssayService {
     }
 
     assayRepository.save(assay);
+
+    // Rename the storage folder if the assay name has changed
+    if (nameChange) {
+      renameStorageFolders(assay);
+    }
 
     return assay;
   }
@@ -653,6 +659,27 @@ public class AssayService {
     
   }
 
+  private void renameStorageFolders(Assay assay) {
+    for (StorageDriveFolder folder: storageDriveFolderService.findByAssay(assay)) {
+      try {
+        StorageDrive drive = storageDriveFolderService.findDriveByFolder(folder)
+            .orElseThrow(() -> new StudyStorageException("No storage drive found for folder: "
+                + folder.getId()));
+        StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
+            .orElseThrow(() -> new StudyStorageNotFoundException(
+                "No storage service found for drive type: "
+                    + drive.getDriveType()));
+        String oldPath = folder.getPath();
+        String newName = generateAssayStorageFolderName(assay);
+        String newPath = StorageUtils.joinPath(StorageUtils.getParentPathFromPath(oldPath), newName);
+        storageService.renameFolder(drive, folder.getPath(), newName);
+        storageDriveFolderService.renameFolderReferences(drive, oldPath, newPath);
+      } catch (Exception e) {
+        LOGGER.warn("Failed to rename storage folder for assay: " + assay.getCode(), e);
+      }
+    }
+  }
+
   /**
    * Generates a new {@link Assay} code, given that assay record.
    *
@@ -675,7 +702,7 @@ public class AssayService {
    * @return
    */
   public static String generateAssayStorageFolderName(Assay assay) {
-    return assay.getCode() + " - " + assay.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+    return assay.getCode() + " - " + assay.getName();
   }
 
   /**

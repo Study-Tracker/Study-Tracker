@@ -131,23 +131,24 @@ public class OneDriveStorageService implements StudyStorageService {
     DriveItem folderItem = this.fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
 
     // Check to see if the folder already exists
+    String cleanName = OneDriveUtils.cleanInputObjectName(name);
     DriveItem existing = null;
     try {
-      existing = this.fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), OneDriveUtils.joinPaths(path, name));
+      existing = this.fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), OneDriveUtils.joinPaths(path, cleanName));
     } catch (Exception e) {
-      LOGGER.warn("Folder not found: " + name);
+      LOGGER.warn("Folder not found: " + cleanName);
     }
     if (existing != null) {
       if (storageProperties.getUseExisting()) {
         return OneDriveUtils.convertDriveItemFolderWithChildren(existing, new ArrayList<>());
       } else {
-        throw new StudyStorageException("Folder already exists: " + name);
+        throw new StudyStorageException("Folder already exists: " + cleanName);
       }
     }
 
     // Create the folder
     DriveItem newFolder = new DriveItem();
-    newFolder.name = name;
+    newFolder.name = cleanName;
     newFolder.folder = new Folder();
     if (storageProperties.getUseExisting()) {
       newFolder.additionalDataManager()
@@ -217,7 +218,7 @@ public class OneDriveStorageService implements StudyStorageService {
     
     // Find the folder
     DriveItem folderItem = fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
-    folderItem.name = newName;
+    folderItem.name = OneDriveUtils.cleanInputObjectName(newName);
     folderItem.additionalDataManager()
             .put("@microsoft.graph.conflictBehavior", new JsonPrimitive("fail"));
     

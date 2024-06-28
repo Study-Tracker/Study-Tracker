@@ -77,7 +77,7 @@ public class S3StudyStorageService implements StudyStorageService {
       throws StudyStorageException {
     
     String path = S3Utils.cleanInputPath(rawPath);
-    String fullPath = S3Utils.joinS3Path(path, name) + "/";
+    String fullPath = S3Utils.joinS3Path(path, S3Utils.cleanInputObjectName(name)) + "/";
     LOGGER.info("Creating folder: '{}' in path: '{}' in bucket '{}'", name, path, bucket.getDisplayName());
 
     S3Client client = getClientFromDrive(bucket);

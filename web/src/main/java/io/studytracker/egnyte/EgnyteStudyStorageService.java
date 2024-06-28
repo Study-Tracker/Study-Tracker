@@ -75,7 +75,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
   public String getProgramFolderPath(Program program, String rootPath) {
     LOGGER.debug("getProgramFolderPath({})", program.getName());
-    Optional<StorageDriveFolder> optional = storageDriveFolderService.findPrimaryProgramFolder(program);
+    Optional<StorageDriveFolder> optional = storageDriveFolderService
+        .findPrimaryProgramFolder(program);
     String path;
     if (optional.isPresent()) {
       StorageDriveFolder storageDriveFolder = optional.get();
@@ -157,8 +158,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFolder findFolderByPath(StorageDriveFolder parentFolder, String path)
       throws StudyStorageNotFoundException {
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException("Drive not found: " + parentFolder.getStorageDrive().getId()));
+    StorageDrive drive = storageDriveFolderService
+        .findDriveById(parentFolder.getStorageDrive().getId())
+        .orElseThrow(() -> new StudyStorageNotFoundException("Drive not found: "
+            + parentFolder.getStorageDrive().getId()));
     return this.findFolderByPath(drive, path);
   }
 
@@ -187,8 +190,10 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public StorageFile findFileByPath(StorageDriveFolder parentFolder, String path)
       throws StudyStorageNotFoundException {
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException("Drive not found: " + parentFolder.getStorageDrive().getId()));
+    StorageDrive drive = storageDriveFolderService
+        .findDriveById(parentFolder.getStorageDrive().getId())
+        .orElseThrow(() -> new StudyStorageNotFoundException("Drive not found: "
+            + parentFolder.getStorageDrive().getId()));
     return this.findFileByPath(drive, path);
   }
 
@@ -227,7 +232,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
       if (!EgnyteUtils.directoryIsSubfolderOf(parentFolder.getPath(), path)) {
         throw new InvalidRequestException("Requested path is not a subfolder of parent folder");
       }
-      EgnyteFolder folder = egnyteClient.createFolder(StorageUtils.joinPath(path, name));
+      EgnyteFolder folder = egnyteClient.createFolder(StorageUtils.joinPath(path,
+          EgnyteUtils.cleanInputObjectName(name)));
       return EgnyteUtils.convertEgnyteFolder(folder, integration.getRootUrl());
     } catch (Exception e) {
       e.printStackTrace();
@@ -243,7 +249,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
     EgnyteIntegration integration = this.findIntegrationByDrive(drive);
     EgnyteClientOperations egnyteClient = EgnyteClientFactory.createRestApiClient(integration);
     try {
-      EgnyteFolder folder = egnyteClient.createFolder(StorageUtils.joinPath(path, name));
+      EgnyteFolder folder = egnyteClient.createFolder(StorageUtils.joinPath(path,
+          EgnyteUtils.cleanInputObjectName(name)));
       return EgnyteUtils.convertEgnyteFolder(folder, integration.getRootUrl());
     } catch (Exception e) {
       e.printStackTrace();
@@ -297,7 +304,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public boolean fileExists(StorageDriveFolder folder, String path) {
     StorageDrive drive = storageDriveFolderService.findDriveById(folder.getStorageDrive().getId())
-        .orElseThrow(() -> new RecordNotFoundException("Drive not found: " + folder.getStorageDrive().getId()));
+        .orElseThrow(() -> new RecordNotFoundException("Drive not found: "
+            + folder.getStorageDrive().getId()));
     return this.fileExists(drive, path);
   }
 
@@ -321,7 +329,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   @Override
   public boolean folderExists(StorageDriveFolder folder, String path) {
     StorageDrive drive = storageDriveFolderService.findDriveById(folder.getStorageDrive().getId())
-        .orElseThrow(() -> new RecordNotFoundException("Drive not found: " + folder.getStorageDrive().getId()));
+        .orElseThrow(() -> new RecordNotFoundException("Drive not found: "
+            + folder.getStorageDrive().getId()));
     return this.folderExists(drive, path);
   }
 
@@ -352,7 +361,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
 
   @Transactional
   @Override
-  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive, StorageFolder storageFolder) {
+  public StorageDriveFolder saveStorageFolderRecord(StorageDrive drive,
+      StorageFolder storageFolder) {
     return this.saveStorageFolderRecord(drive, storageFolder, new StorageDriveFolder());
   }
 
@@ -364,7 +374,8 @@ public class EgnyteStudyStorageService implements StudyStorageService {
   }
   
   @Override
-  public StorageFolder renameFolder(StorageDrive storageDrive, String path, String newName) throws StudyStorageException {
+  public StorageFolder renameFolder(StorageDrive storageDrive, String path, String newName)
+      throws StudyStorageException {
     throw new StudyStorageException("Not implemented");
   }
 

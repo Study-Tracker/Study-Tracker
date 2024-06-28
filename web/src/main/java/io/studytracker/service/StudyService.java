@@ -207,7 +207,11 @@ public class StudyService {
             .orElseThrow(() -> new StudyStorageNotFoundException(
                 "No storage service found for drive type: "
                 + drive.getDriveType()));
-        storageService.renameFolder(drive, folder.getPath(), generateStudyStorageFolderName(study));
+        String oldPath = folder.getPath();
+        String newName = generateStudyStorageFolderName(study);
+        String newPath = StorageUtils.joinPath(StorageUtils.getParentPathFromPath(oldPath), newName);
+        storageService.renameFolder(drive, folder.getPath(), newName);
+        storageDriveFolderService.renameFolderReferences(drive, oldPath, newPath);
       } catch (Exception e) {
         LOGGER.warn("Failed to rename storage folder for study: " + study.getCode(), e);
       }
@@ -512,6 +516,7 @@ public class StudyService {
   public Study update(Study updated) {
     LOGGER.info("Attempting to update existing study with code: " + updated.getCode());
     Study study = studyRepository.getById(updated.getId());
+    boolean nameChange = !study.getName().equals(updated.getName());
 
     study.setName(updated.getName());
     study.setDescription(updated.getDescription());
@@ -538,6 +543,10 @@ public class StudyService {
     }
 
     studyRepository.save(study);
+
+    if (nameChange) {
+      renameStorageFolders(study);
+    }
 
     return studyRepository.findById(study.getId())
         .orElseThrow(() -> new RecordNotFoundException("Failed to create study: "
@@ -847,7 +856,7 @@ public class StudyService {
    * @return
    */
   public static String generateStudyStorageFolderName(Study study) {
-    return study.getCode() + " - " + study.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+    return study.getCode() + " - " + study.getName();
   }
 
   /**
