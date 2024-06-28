@@ -21,6 +21,7 @@ import io.studytracker.aws.S3StudyStorageService;
 import io.studytracker.aws.S3Utils;
 import io.studytracker.benchling.BenchlingNotebookEntryService;
 import io.studytracker.benchling.BenchlingNotebookFolderService;
+import io.studytracker.config.properties.StudyProperties;
 import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.InvalidRequestException;
@@ -28,14 +29,39 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.git.GitService;
 import io.studytracker.git.GitServiceLookup;
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayNotebookFolder;
+import io.studytracker.model.AssayOptions;
+import io.studytracker.model.AssayTask;
+import io.studytracker.model.AssayTaskField;
+import io.studytracker.model.AssayTypeField;
+import io.studytracker.model.CustomEntityFieldType;
+import io.studytracker.model.ELNFolder;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitRepository;
+import io.studytracker.model.S3FolderDetails;
+import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTaskRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.StudyRepository;
-import io.studytracker.storage.*;
+import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFile;
+import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
+import io.studytracker.storage.StudyStorageService;
+import io.studytracker.storage.StudyStorageServiceLookup;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,13 +71,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.validation.ConstraintViolationException;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class AssayService {
 
@@ -59,6 +78,8 @@ public class AssayService {
 
   private static final SimpleDateFormat JAVASCRIPT_DATE_FORMAT =
       new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // 2021-01-02T05:00:00.000Z
+
+  @Autowired private StudyProperties studyProperties;
 
   @Autowired private AssayRepository assayRepository;
 
@@ -73,8 +94,6 @@ public class AssayService {
   @Autowired private BenchlingNotebookFolderService notebookFolderService;
 
   @Autowired private BenchlingNotebookEntryService notebookEntryService;
-
-  @Autowired private NamingService namingService;
 
   @Autowired private ELNFolderRepository elnFolderRepository;
 
@@ -188,7 +207,11 @@ public class AssayService {
       StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
           .orElseThrow(() -> new StudyStorageNotFoundException("No storage service found for drive type: "
               + parentFolder.getStorageDrive().getDriveType()));
-      return storageService.createAssayFolder(parentFolder, assay);
+      String folderName = generateAssayStorageFolderName(assay);
+      StorageFolder storageFolder = storageService.createFolder(parentFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      return storageService.saveStorageFolderRecord(drive, storageFolder, folderOptions);
     } catch (Exception e) {
       LOGGER.warn("Failed to create storage folder for assay: " + assay.getCode(), e);
       throw new StudyTrackerException(e);
@@ -206,7 +229,7 @@ public class AssayService {
 
     validateAssayFields(assay);
 
-    assay.setCode(namingService.generateAssayCode(assay));
+    assay.setCode(this.generateAssayCode(assay));
     assay.setActive(true);
 
     for (AssayTask task : assay.getTasks()) {
@@ -391,7 +414,8 @@ public class AssayService {
       if (optional.isPresent()) {
         studyS3Folder = optional.get();
       } else {
-        String studyFolderPath = S3Utils.joinS3Path(s3RootFolder.getPath(), S3Utils.generateStudyFolderName(study));
+        String studyFolderPath = S3Utils.joinS3Path(s3RootFolder.getPath(),
+            S3Utils.generateStudyFolderName(study));
         StorageDriveFolder studyFolder = new StorageDriveFolder();
         studyFolder.setPath(studyFolderPath);
         studyFolder.setName("Study " + study.getCode() + " S3 Folder");
@@ -404,7 +428,12 @@ public class AssayService {
       }
 
       // Create the study S3 folder
-      StorageDriveFolder assayS3Folder = s3Service.createStudyFolder(studyS3Folder, study);
+      String folderName = generateAssayStorageFolderName(assay);
+      StorageFolder storageFolder = s3Service.createFolder(studyS3Folder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      StorageDriveFolder assayS3Folder = s3Service
+          .saveStorageFolderRecord(s3Drive, storageFolder, folderOptions);
       assay.addStorageFolder(assayS3Folder);
       assayRepository.save(assay);
     } catch (StudyStorageException e) {
@@ -418,6 +447,7 @@ public class AssayService {
 
     LOGGER.info("Updating assay record with code: " + updated.getCode());
     Assay assay = assayRepository.getById(updated.getId());
+    boolean nameChange = !assay.getName().equals(updated.getName());
 
     assay.setName(updated.getName());
     assay.setDescription(updated.getDescription());
@@ -444,6 +474,11 @@ public class AssayService {
     }
 
     assayRepository.save(assay);
+
+    // Rename the storage folder if the assay name has changed
+    if (nameChange) {
+      renameStorageFolders(assay);
+    }
 
     return assay;
   }
@@ -597,7 +632,7 @@ public class AssayService {
     // Update the assay record
     Assay a = assayRepository.getById(assay.getId());
     a.setStudy(study);
-    a.setCode(namingService.generateAssayCode(a));
+    a.setCode(this.generateAssayCode(a));
     
     // Create a new primary storage folder
     StorageDriveFolder parentFolder = this.storageDriveFolderService.findPrimaryStudyFolder(study).orElse(null);
@@ -622,6 +657,61 @@ public class AssayService {
       
     }
     
+  }
+
+  private void renameStorageFolders(Assay assay) {
+    for (StorageDriveFolder folder: storageDriveFolderService.findByAssay(assay)) {
+      try {
+        StorageDrive drive = storageDriveFolderService.findDriveByFolder(folder)
+            .orElseThrow(() -> new StudyStorageException("No storage drive found for folder: "
+                + folder.getId()));
+        StudyStorageService storageService = storageServiceLookup.lookup(drive.getDriveType())
+            .orElseThrow(() -> new StudyStorageNotFoundException(
+                "No storage service found for drive type: "
+                    + drive.getDriveType()));
+        String oldPath = folder.getPath();
+        String newName = generateAssayStorageFolderName(assay);
+        String newPath = StorageUtils.joinPath(StorageUtils.getParentPathFromPath(oldPath), newName);
+        storageService.renameFolder(drive, folder.getPath(), newName);
+        storageDriveFolderService.renameFolderReferences(drive, oldPath, newPath);
+      } catch (Exception e) {
+        LOGGER.warn("Failed to rename storage folder for assay: " + assay.getCode(), e);
+      }
+    }
+  }
+
+  /**
+   * Generates a new {@link Assay} code, given that assay record.
+   *
+   * @param assay
+   * @return
+   */
+  public String generateAssayCode(Assay assay) {
+    Study study = assay.getStudy();
+    String prefix = study.getCode().split("-")[0] + "-";
+    long count = studyProperties.getAssayCodeCounterStart() + assayRepository.countByCodePrefix(prefix);
+    return study.getCode()
+        + "-"
+        + String.format("%0" + studyProperties.getAssayCodeMinDigits() + "d", count);
+  }
+
+  /**
+   * Returns a {@link Assay} object's derived storage folder name.
+   *
+   * @param assay
+   * @return
+   */
+  public static String generateAssayStorageFolderName(Assay assay) {
+    return assay.getCode() + " - " + assay.getName();
+  }
+
+  /**
+   * Returns a {@link Assay} object's derived notebook folder name.
+   * @param assay
+   * @return
+   */
+  public static String generateAssayNotebookFolderName(Assay assay) {
+    return assay.getCode() + ": " + assay.getName();
   }
   
 }

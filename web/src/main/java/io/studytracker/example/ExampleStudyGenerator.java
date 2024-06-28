@@ -44,6 +44,8 @@ import io.studytracker.repository.StudyNotebookFolderRepository;
 import io.studytracker.repository.StudyRelationshipRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.service.StudyService;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
 import java.net.URL;
@@ -84,7 +86,12 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
           .findByProgramId(study.getProgram().getId()).get(0);
       StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(programFolder)
           .orElseThrow(RecordNotFoundException::new);
-      return studyStorageService.createStudyFolder(programFolder, study);
+      String folderName = StudyService.generateStudyNotebookFolderName(study);
+      StorageFolder storageFolder = studyStorageService.createFolder(programFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      return studyStorageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+          storageFolder, folderOptions);
     } catch (Exception ex) {
       throw new StudyTrackerException(ex);
     }
@@ -110,7 +117,8 @@ public class ExampleStudyGenerator implements ExampleDataGenerator<Study> {
         programRepository
             .findByName("Clinical Program A")
             .orElseThrow(RecordNotFoundException::new);
-    User user = userRepository.findByEmail("jsmith@email.com").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("jsmith@email.com")
+        .orElseThrow(RecordNotFoundException::new);
     Collaborator collaborator =
         collaboratorRepository
             .findByLabel("University of Somewhere")

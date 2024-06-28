@@ -32,6 +32,7 @@ import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.msgraph.MSGraphIntegrationService;
 import io.studytracker.msgraph.OneDriveStorageService;
+import io.studytracker.repository.ActivityRepository;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayStorageFolderRepository;
 import io.studytracker.repository.AssayTypeRepository;
@@ -44,12 +45,16 @@ import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.StudyStorageFolderRepository;
 import io.studytracker.repository.UserRepository;
+import io.studytracker.service.AssayService;
+import io.studytracker.service.ProgramService;
+import io.studytracker.service.StudyService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -122,9 +127,13 @@ public class OneDriveStudyStorageServiceTests {
   @Autowired
   private AssayStorageFolderRepository assayStorageFolderRepository;
 
+  @Autowired
+  private ActivityRepository activityRepository;
+
   @Before
   public void setup() {
 
+    activityRepository.deleteAll();
     assayStorageFolderRepository.deleteAll();
     studyStorageFolderRepository.deleteAll();
     programStorageFolderRepository.deleteAll();
@@ -281,7 +290,12 @@ public class OneDriveStudyStorageServiceTests {
     Assert.assertEquals(1, rootFolders.size());
     StorageDriveFolder rootFolder = rootFolders.get(0);
 
-    StorageDriveFolder programFolder = storageService.createProgramFolder(rootFolder, program);
+    String folderName = ProgramService.generateProgramStorageFolderName(program);
+    StorageFolder storageFolder = storageService.createFolder(rootFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder programFolder = storageService.saveStorageFolderRecord(rootFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(programFolder);
     program.addStorageFolder(programFolder, true);
     programRepository.save(program);
@@ -318,7 +332,12 @@ public class OneDriveStudyStorageServiceTests {
 
     StorageDriveFolder programFolder = storageDriveFolderService.findPrimaryProgramFolder(program)
         .orElseThrow(() -> new StudyStorageNotFoundException("Test Program"));
-    StorageDriveFolder studyFolder = storageService.createStudyFolder(programFolder, study);
+    String folderName = StudyService.generateStudyStorageFolderName(study);
+    StorageFolder storageFolder = storageService.createFolder(programFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder studyFolder = storageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(studyFolder);
     study.addStorageFolder(studyFolder, true);
     studyRepository.save(study);
@@ -357,7 +376,12 @@ public class OneDriveStudyStorageServiceTests {
 
     StorageDriveFolder studyFolder = storageDriveFolderService.findPrimaryStudyFolder(study)
         .orElseThrow(() -> new StudyStorageNotFoundException("Test Study"));
-    StorageDriveFolder assayFolder = storageService.createAssayFolder(studyFolder, assay);
+    String folderName = AssayService.generateAssayStorageFolderName(assay);
+    StorageFolder storageFolder = storageService.createFolder(studyFolder, folderName);
+    StorageDriveFolder folderOptions = new StorageDriveFolder();
+    folderOptions.setWriteEnabled(true);
+    StorageDriveFolder assayFolder = storageService.saveStorageFolderRecord(studyFolder.getStorageDrive(),
+        storageFolder, folderOptions);
     Assert.assertNotNull(assayFolder);
     assay.addStorageFolder(assayFolder, true);
     assayRepository.save(assay);
@@ -382,7 +406,7 @@ public class OneDriveStudyStorageServiceTests {
     StorageFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createFolder(rootFolder, "/", "Test Create Folder");
+      folder = storageService.createFolder(rootFolder,  "Test Create Folder");
     } catch (Exception e) {
       exception = e;
     }
@@ -390,6 +414,82 @@ public class OneDriveStudyStorageServiceTests {
     Assert.assertNotNull(folder);
     Assert.assertEquals("Test Create Folder", folder.getName());
     Assert.assertEquals("/Test Create Folder", folder.getPath());
+  }
+  
+  @Test
+  public void renameFolderTest() throws Exception {
+    List<StorageDrive> drives = storageDriveRepository.findByDriveType(DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
+    List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
+    Assert.assertEquals(1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.get(0);
+    StorageFolder folder = null;
+    Exception exception = null;
+    String uuid = UUID.randomUUID().toString();
+    try {
+      folder = storageService.createFolder(rootFolder, uuid);
+    } catch (Exception e) {
+      exception = e;
+    }
+    Assert.assertNull(exception);
+    Assert.assertNotNull(folder);
+    Assert.assertEquals(uuid, folder.getName());
+    Assert.assertEquals("/" + uuid, folder.getPath());
+    
+    StorageFolder updated = null;
+    exception = null;
+    try {
+      updated = storageService.renameFolder(rootFolder.getStorageDrive(), folder.getPath(), uuid + "_renamed");
+    } catch (Exception e) {
+      exception = e;
+    }
+    
+    Assert.assertNull(exception);
+    Assert.assertNotNull(updated);
+    Assert.assertEquals(uuid + "_renamed", updated.getName());
+    Assert.assertEquals("/" + uuid + "_renamed", updated.getPath());
+    
+  }
+
+  @Test
+  public void moveFolderTest() {
+    List<StorageDrive> drives = storageDriveRepository.findByDriveType(DriveType.ONEDRIVE);
+    Assert.assertNotNull(drives);
+    Assert.assertTrue(drives.size() > 0);
+    List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
+    Assert.assertEquals(1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.get(0);
+    StorageFolder folder = null;
+    StorageFolder parentFolder = null;
+    Exception exception = null;
+    String uuid = UUID.randomUUID().toString();
+    try {
+      folder = storageService.createFolder(rootFolder, uuid + "_original");
+      parentFolder = storageService.createFolder(rootFolder, uuid + "_parent");
+    } catch (Exception e) {
+      exception = e;
+    }
+    Assert.assertNull(exception);
+    Assert.assertNotNull(folder);
+    Assert.assertNotNull(parentFolder);
+    Assert.assertEquals(uuid + "_original", folder.getName());
+    Assert.assertEquals("/" + uuid + "_original", folder.getPath());
+    Assert.assertEquals(uuid + "_parent", parentFolder.getName());
+    Assert.assertEquals("/" + uuid + "_parent", parentFolder.getPath());
+
+    StorageFolder updated = null;
+    exception = null;
+    try {
+      updated = storageService.moveFolder(rootFolder.getStorageDrive(), folder.getPath(), parentFolder.getPath());
+    } catch (Exception e) {
+      exception = e;
+    }
+
+    Assert.assertNull(exception);
+    Assert.assertNotNull(updated);
+    Assert.assertEquals(uuid + "_original", updated.getName());
+    Assert.assertEquals( "/" + uuid + "_parent/" + uuid + "_original", updated.getPath());
   }
 
   @Test

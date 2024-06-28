@@ -22,11 +22,29 @@ import io.studytracker.events.util.EntityViewUtils;
 import io.studytracker.events.util.StudyActivityUtils;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
-import io.studytracker.model.*;
-import io.studytracker.repository.*;
+import io.studytracker.model.Activity;
+import io.studytracker.model.Program;
+import io.studytracker.model.Status;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
+import io.studytracker.model.User;
+import io.studytracker.model.UserType;
+import io.studytracker.repository.ActivityRepository;
+import io.studytracker.repository.ELNFolderRepository;
+import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.StudyRepository;
+import io.studytracker.repository.UserRepository;
+import io.studytracker.service.ProgramService;
 import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +56,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -89,7 +104,12 @@ public class ActivityRepositoryTests {
           .orElseThrow(RecordNotFoundException::new);
       StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
           .orElseThrow(RecordNotFoundException::new);
-      return studyStorageService.createProgramFolder(rootFolder, program);
+      String folderName = ProgramService.generateProgramStorageFolderName(program);
+      StorageFolder storageFolder = studyStorageService.createFolder(rootFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      return studyStorageService.saveStorageFolderRecord(rootFolder.getStorageDrive(),
+          storageFolder, folderOptions);
     } catch (Exception ex) {
       throw new StudyTrackerException(ex);
     }

@@ -32,7 +32,6 @@ import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.service.AssayService;
-import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
 import java.util.Collections;
 import java.util.Date;
@@ -67,8 +66,6 @@ public class AssayServiceTests {
   @Autowired private StudyService studyService;
 
   @Autowired private ExampleDataRunner exampleDataRunner;
-
-  @Autowired private NamingService namingService;
 
   private static final int ASSAY_COUNT = 2;
 
@@ -234,7 +231,7 @@ public class AssayServiceTests {
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
     assay.setStudy(study);
-    String code = namingService.generateAssayCode(assay);
+    String code = assayService.generateAssayCode(assay);
     Assert.assertNotNull(code);
     Assert.assertEquals(study.getCode() + "-001", code);
   }

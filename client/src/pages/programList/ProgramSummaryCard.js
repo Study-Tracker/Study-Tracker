@@ -32,7 +32,7 @@ const ProgramSummaryCard = ({ program }) => {
   }
 
   return (
-      <Col xs={12} sm={6} lg={4}>
+      <Col xs={12} sm={6} xxl={4}>
         <Card
             onClick={() => navigate("/program/" + program.id)}
             className={"program-card"}

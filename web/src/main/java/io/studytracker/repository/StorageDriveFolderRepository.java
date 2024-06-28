@@ -17,12 +17,11 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.StorageDriveFolder;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface StorageDriveFolderRepository extends JpaRepository<StorageDriveFolder, Long> {
   
@@ -83,5 +82,10 @@ public interface StorageDriveFolderRepository extends JpaRepository<StorageDrive
       + " JOIN Assay a ON a.id = af.assay.id "
       + " WHERE af.primary = true AND a.id = ?1")
   Optional<StorageDriveFolder> findPrimaryByAssayId(Long assayId);
+
+  @Query(value = "select * from storage_drive_folders "
+      + "where storage_drive_id = ?1 "
+      + "and (path = ?2 or path like ?2 || '/%')", nativeQuery = true)
+  List<StorageDriveFolder> findByParentPath(Long driveId, String parentPath);
 
 }

@@ -21,6 +21,10 @@ import java.util.Arrays;
 
 public class StorageUtils {
 
+  public static String cleanInputObjectName(String input) {
+    return input.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+  }
+
   /**
    * Joins two paths into a single path.
    *
@@ -64,11 +68,23 @@ public class StorageUtils {
     return path.replaceAll("\\.\\.", ".");
   }
 
+  /**
+   * Returns the name of the file or folder from the given path.
+   *
+   * @param path
+   * @return
+   */
   public static String getFolderNameFromPath(String path) {
     File file = new File(cleanInputPath(path));
     return file.getName();
   }
 
+  /**
+   * Returns the parent path of the given path.
+   *
+   * @param path
+   * @return
+   */
   public static String getParentPathFromPath(String path) {
     File file = new File(cleanInputPath(path));
     return file.getParent();

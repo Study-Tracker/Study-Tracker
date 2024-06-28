@@ -19,17 +19,15 @@ package io.studytracker.msgraph;
 import com.google.gson.JsonPrimitive;
 import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.models.Folder;
+import com.microsoft.graph.models.ItemReference;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import io.studytracker.config.properties.StorageProperties;
-import io.studytracker.model.Assay;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
 import io.studytracker.model.OneDriveFolderDetails;
-import io.studytracker.model.Program;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDriveFolder;
-import io.studytracker.model.Study;
 import io.studytracker.repository.MSGraphIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -73,70 +71,52 @@ public class OneDriveStorageService implements StudyStorageService {
   @Autowired
   private StorageProperties storageProperties;
 
-  @Override
-  public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
-      throws StudyStorageException {
-    String path = OneDriveUtils.joinPaths(parentFolder.getPath(), OneDriveUtils.getProgramFolderName(program));
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException(
-            "No drive found for folder with id: " + parentFolder.getId()));
-    StorageFolder storageFolder;
-    if (this.folderExists(drive, path)) {
-      storageFolder = this.findFolderByPath(drive, path);
-    } else {
-      storageFolder = this.createFolder(parentFolder, parentFolder.getPath(),
-          OneDriveUtils.getProgramFolderName(program));
+  private DriveItem fetchDriveItemByPath(GraphServiceClient<?> client, String driveId, String path)
+      throws StudyStorageNotFoundException {
+    DriveItem driveItem = null;
+    try {
+      driveItem = client.drives(driveId)
+          .root()
+          .itemWithPath(path)
+          .buildRequest()
+          .get();
+    } catch (Exception e) {
+      LOGGER.warn("Drive item not found: " + path);
     }
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return this.saveStorageFolderRecord(drive, storageFolder, options);
+    if (driveItem == null || driveItem.id == null) {
+      throw new StudyStorageNotFoundException(
+          "No drive item found for path: " + path + " in drive: " + driveId);
+    }
+    return driveItem;
+  }
+
+  private DriveItem fetchFolderItemByPath(GraphServiceClient<?> client, String driveId, String path)
+      throws StudyStorageNotFoundException {
+    DriveItem driveItem = this.fetchDriveItemByPath(client, driveId, path);
+    if (driveItem.folder == null) {
+      throw new StudyStorageNotFoundException(
+          "No drive folder found for path: " + path + " in drive: " + driveId);
+    }
+    return driveItem;
+  }
+
+  private DriveItem fetchFileItemByPath(GraphServiceClient<?> client, String driveId, String path)
+      throws StudyStorageNotFoundException {
+    DriveItem driveItem = this.fetchDriveItemByPath(client, driveId, path);
+    if (driveItem.file == null) {
+      throw new StudyStorageNotFoundException(
+          "No drive file found for path: " + path + " in drive: " + driveId);
+    }
+    return driveItem;
   }
 
   @Override
-  public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
-      throws StudyStorageException {
-    String path = OneDriveUtils.joinPaths(parentFolder.getPath(), OneDriveUtils.getStudyFolderName(study));
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException(
-            "No drive found for folder with id: " + parentFolder.getId()));
-    StorageFolder storageFolder;
-    if (this.folderExists(drive, path)) {
-      storageFolder = this.findFolderByPath(drive, path);
-    } else {
-      storageFolder = this.createFolder(parentFolder, parentFolder.getPath(),
-          OneDriveUtils.getStudyFolderName(study));
-    }
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return this.saveStorageFolderRecord(drive, storageFolder, options);
-  }
-
-  @Override
-  public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
-      throws StudyStorageException {
-    String path = OneDriveUtils.joinPaths(parentFolder.getPath(), OneDriveUtils.getAssayFolderName(assay));
-    StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
-        .orElseThrow(() -> new StudyStorageNotFoundException(
-            "No drive found for folder with id: " + parentFolder.getId()));
-    StorageFolder storageFolder;
-    if (this.folderExists(drive, path)) {
-      storageFolder = this.findFolderByPath(drive, path);
-    } else {
-      storageFolder = this.createFolder(parentFolder, parentFolder.getPath(),
-          OneDriveUtils.getAssayFolderName(assay));
-    }
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return this.saveStorageFolderRecord(drive, storageFolder, options);
-  }
-
-  @Override
-  public StorageFolder createFolder(StorageDriveFolder parentFolder, String path, String name)
+  public StorageFolder createFolder(StorageDriveFolder parentFolder, String name)
       throws StudyStorageException {
     StorageDrive drive = storageDriveFolderService.findDriveById(parentFolder.getStorageDrive().getId())
         .orElseThrow(() -> new StudyStorageNotFoundException(
             "No drive found for folder with id: " + parentFolder.getId()));
-    return this.createFolder(drive, path, name);
+    return this.createFolder(drive, parentFolder.getPath(), name);
   }
 
   @Override
@@ -148,35 +128,27 @@ public class OneDriveStorageService implements StudyStorageService {
     GraphServiceClient<?> client = this.getClientFromDrive(drive);
 
     // Get the parent folder
-    DriveItem folderItem = client.drives(oneDriveDriveDetails.getDriveId()).root().itemWithPath(path)
-        .buildRequest().get();
-    if (folderItem == null || folderItem.folder == null || folderItem.id == null) {
-      throw new StudyStorageNotFoundException(
-          "No folder found for path: " + path + " in drive with id: " + drive.getId());
-    }
+    DriveItem folderItem = this.fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
 
     // Check to see if the folder already exists
+    String cleanName = OneDriveUtils.cleanInputObjectName(name);
     DriveItem existing = null;
     try {
-      existing = client.drives(oneDriveDriveDetails.getDriveId())
-          .root()
-          .itemWithPath(OneDriveUtils.joinPaths(path, name))
-          .buildRequest()
-          .get();
+      existing = this.fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), OneDriveUtils.joinPaths(path, cleanName));
     } catch (Exception e) {
-      LOGGER.warn("Folder not found: " + name);
+      LOGGER.warn("Folder not found: " + cleanName);
     }
     if (existing != null) {
       if (storageProperties.getUseExisting()) {
         return OneDriveUtils.convertDriveItemFolderWithChildren(existing, new ArrayList<>());
       } else {
-        throw new StudyStorageException("Folder already exists: " + name);
+        throw new StudyStorageException("Folder already exists: " + cleanName);
       }
     }
 
     // Create the folder
     DriveItem newFolder = new DriveItem();
-    newFolder.name = name;
+    newFolder.name = cleanName;
     newFolder.folder = new Folder();
     if (storageProperties.getUseExisting()) {
       newFolder.additionalDataManager()
@@ -214,19 +186,7 @@ public class OneDriveStorageService implements StudyStorageService {
     GraphServiceClient<?> client = this.getClientFromDrive(drive);
 
     // Find the folder
-    DriveItem folderItem = null;
-    try {
-      folderItem = client.drives(oneDriveDriveDetails.getDriveId()).root().itemWithPath(path)
-          .buildRequest().get();
-      LOGGER.debug("Found drive folder item: id={}  name={}  path={}", folderItem.id, folderItem.name,
-          folderItem.parentReference != null ? folderItem.parentReference.path : "");
-    } catch (Exception e) {
-      LOGGER.warn("Folder not found: " + path);
-    }
-    if (folderItem == null || folderItem.folder == null || folderItem.id == null) {
-      throw new StudyStorageNotFoundException(
-          "No folder found for path: " + path + " in drive with id: " + drive.getId());
-    }
+    DriveItem folderItem = this.fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
 
     // Get the folder contents
     List<DriveItem> children = new ArrayList<>();
@@ -248,6 +208,63 @@ public class OneDriveStorageService implements StudyStorageService {
     LOGGER.debug("Found folder: {}", folder);
     return folder;
   }
+  
+  @Override
+  public StorageFolder renameFolder(StorageDrive storageDrive, String path, String newName) throws StudyStorageException {
+    
+    // Get the client
+    GraphServiceClient<?> client = this.getClientFromDrive(storageDrive);
+    OneDriveDriveDetails oneDriveDriveDetails = (OneDriveDriveDetails) storageDrive.getDetails();
+    
+    // Find the folder
+    DriveItem folderItem = fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
+    folderItem.name = OneDriveUtils.cleanInputObjectName(newName);
+    folderItem.additionalDataManager()
+            .put("@microsoft.graph.conflictBehavior", new JsonPrimitive("fail"));
+    
+    try {
+      DriveItem updated = client.drives(oneDriveDriveDetails.getDriveId())
+              .items(folderItem.id)
+              .buildRequest()
+              .patch(folderItem);
+      StorageFolder folder = OneDriveUtils.convertDriveItemFolder(updated);
+      LOGGER.debug("Renamed folder: {}", folder);
+      return folder;
+    } catch (Exception e) {
+      throw new StudyStorageException("Error while renaming folder in OneDrive", e);
+    }
+    
+  }
+
+  @Override
+  public StorageFolder moveFolder(StorageDrive storageDrive, String path, String newPath)
+      throws StudyStorageException {
+    LOGGER.info("Moving OneDrive folder {} to {}", path, newPath);
+    // Get the client
+    GraphServiceClient<?> client = this.getClientFromDrive(storageDrive);
+    OneDriveDriveDetails oneDriveDriveDetails = (OneDriveDriveDetails) storageDrive.getDetails();
+
+    // Find the folder to move
+    DriveItem folderItem = fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
+    DriveItem parentFolder = fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), newPath);
+    ItemReference parentReference = new ItemReference();
+    parentReference.id = parentFolder.id;
+    folderItem.parentReference = parentReference;
+
+    // Update the record
+    try {
+      DriveItem updated = client.drives(oneDriveDriveDetails.getDriveId())
+              .items(folderItem.id)
+              .buildRequest()
+              .patch(folderItem);
+      StorageFolder folder = OneDriveUtils.convertDriveItemFolder(updated);
+      LOGGER.debug("Moved folder: {}", folder);
+      return folder;
+    } catch (Exception e) {
+      throw new StudyStorageException("Error while moving folder in OneDrive", e);
+    }
+
+  }
 
   @Override
   public StorageFile findFileByPath(StorageDriveFolder parentFolder, String path)
@@ -264,21 +281,7 @@ public class OneDriveStorageService implements StudyStorageService {
     LOGGER.debug("Finding file by path: {} in drive with id: {}", path, drive.getId());
     OneDriveDriveDetails oneDriveDriveDetails = (OneDriveDriveDetails) drive.getDetails();
     GraphServiceClient<?> client = this.getClientFromDrive(drive);
-    DriveItem fileItem = null;
-    try {
-      fileItem = client.drives(oneDriveDriveDetails.getDriveId())
-          .root()
-          .itemWithPath(path)
-          .buildRequest()
-          .get();
-    } catch (Exception e) {
-      LOGGER.warn("File not found: " + path);
-    }
-
-    if (fileItem == null || fileItem.file == null) {
-      throw new StudyStorageNotFoundException(
-          "No file found for path: " + path + " in drive with id: " + drive.getId());
-    }
+    DriveItem fileItem = this.fetchFileItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
     StorageFile file = OneDriveUtils.convertDriveItemFile(fileItem);
     LOGGER.debug("Found file: {}", file);
     return file;
@@ -294,12 +297,7 @@ public class OneDriveStorageService implements StudyStorageService {
             "No storage drive found for folder with id: " + folder.getId()));
     OneDriveDriveDetails oneDriveDriveDetails = (OneDriveDriveDetails) storageDrive.getDetails();
     GraphServiceClient<?> client = this.getClientFromDrive(storageDrive);
-    DriveItem folderItem = client.drives(oneDriveDriveDetails.getDriveId()).root().itemWithPath(path)
-        .buildRequest().get();
-    if (folderItem == null || folderItem.id == null || folderItem.folder == null) {
-      throw new StudyStorageNotFoundException(
-          "No folder found for path: " + path + " in drive with id: " + oneDriveDriveDetails.getDriveId());
-    }
+    DriveItem folderItem = this.fetchFolderItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
     try {
       DriveItem uploadedFileItem = client
           .drives(oneDriveDriveDetails.getDriveId())
@@ -323,12 +321,7 @@ public class OneDriveStorageService implements StudyStorageService {
             "No OneDrive drive found for folder with id: " + folder.getId()));
     OneDriveDriveDetails oneDriveDriveDetails = (OneDriveDriveDetails) storageDrive.getDetails();
     GraphServiceClient client = this.getClientFromDrive(storageDrive);
-    DriveItem fileItem = client.drives(oneDriveDriveDetails.getDriveId()).root().itemWithPath(path)
-        .buildRequest().get();
-    if (fileItem == null || fileItem.id == null || fileItem.file == null) {
-      throw new StudyStorageNotFoundException(
-          "No file found for path: " + path + " in drive with id: " + oneDriveDriveDetails.getDriveId());
-    }
+    DriveItem fileItem = this.fetchFileItemByPath(client, oneDriveDriveDetails.getDriveId(), path);
     try {
       InputStream inputStream = client
           .drives(oneDriveDriveDetails.getDriveId())

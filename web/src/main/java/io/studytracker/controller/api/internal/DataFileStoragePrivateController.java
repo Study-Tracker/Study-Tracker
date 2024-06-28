@@ -27,6 +27,7 @@ import io.studytracker.service.FileSystemStorageService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import io.studytracker.storage.StorageUtils;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
 import java.io.File;
@@ -199,11 +200,33 @@ public class DataFileStoragePrivateController extends AbstractApiController {
         .orElseThrow(() -> new FileStorageException("File storage service not found"));
 
     if (!parentFolder.isWriteEnabled()) {
-      throw new InsufficientPrivilegesException("Insufficient privileges to upload files to this folder");
+      throw new InsufficientPrivilegesException("Insufficient privileges to create folders in this folder");
     }
 
-    StorageFolder storageFolder = storageService.createFolder(parentFolder, path, folderName);
-    LOGGER.debug("Created folder: " + storageFolder.toString());
+    StorageFolder storageFolder = storageService.createFolder(parentFolder.getStorageDrive(), path, folderName);
+    LOGGER.debug("Created folder: {}", storageFolder.toString());
+    return new ResponseEntity<>(storageFolder, HttpStatus.OK);
+  }
+
+  @PostMapping("/rename-folder")
+  public HttpEntity<StorageFolder> renameFolder(
+      @RequestParam(name = "path") String path,
+      @RequestParam(name = "folderId") Long parentFolderId,
+      @RequestParam(name = "name") String newName
+  ) throws Exception {
+    LOGGER.info("Renaming folder '{}' in data storage folder '{}' to {}", path, parentFolderId, newName);
+    StorageDriveFolder parentFolder = storageDriveFolderService.findById(parentFolderId)
+        .orElseThrow(() -> new RecordNotFoundException("Data storage folder not found"));
+    StudyStorageService storageService = studyStorageServiceLookup.lookup(parentFolder.getStorageDrive().getDriveType())
+        .orElseThrow(() -> new FileStorageException("File storage service not found"));
+
+    if (!parentFolder.isWriteEnabled()) {
+      throw new InsufficientPrivilegesException("Insufficient privileges to rename this folder");
+    }
+    String newPath = StorageUtils.joinPath(StorageUtils.getParentPathFromPath(path), newName);
+    StorageFolder storageFolder = storageService.renameFolder(parentFolder.getStorageDrive(), path, newName);
+    storageDriveFolderService.renameFolderReferences(parentFolder.getStorageDrive(), path, newPath);
+    LOGGER.debug("Renamed folder: {}", storageFolder.toString());
     return new ResponseEntity<>(storageFolder, HttpStatus.OK);
   }
 

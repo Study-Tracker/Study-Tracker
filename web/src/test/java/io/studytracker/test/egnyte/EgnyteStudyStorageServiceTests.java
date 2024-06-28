@@ -23,11 +23,32 @@ import io.studytracker.egnyte.exception.DuplicateFolderException;
 import io.studytracker.egnyte.exception.ObjectNotFoundException;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.*;
-import io.studytracker.repository.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayStorageFolder;
+import io.studytracker.model.AssayType;
+import io.studytracker.model.EgnyteIntegration;
+import io.studytracker.model.Program;
+import io.studytracker.model.Status;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.Study;
+import io.studytracker.model.StudyStorageFolder;
+import io.studytracker.model.User;
+import io.studytracker.repository.AssayRepository;
+import io.studytracker.repository.AssayTypeRepository;
+import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.StorageDriveRepository;
+import io.studytracker.repository.StudyRepository;
+import io.studytracker.repository.UserRepository;
+import io.studytracker.service.AssayService;
+import io.studytracker.service.ProgramService;
+import io.studytracker.service.StudyService;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,10 +60,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -151,7 +168,12 @@ public class EgnyteStudyStorageServiceTests {
     StorageDriveFolder folder = null;
     Exception exception = null;
     try {
-      folder = storageService.createStudyFolder(parentFolder, study);
+      String folderName = ProgramService.generateProgramStorageFolderName(program);
+      StorageFolder storageFolder = storageService.createFolder(parentFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      folder = storageService.saveStorageFolderRecord(parentFolder.getStorageDrive(),
+          storageFolder, folderOptions);
     } catch (Exception e) {
       exception = e;
     }
@@ -250,7 +272,13 @@ public class EgnyteStudyStorageServiceTests {
 
     Exception exception = null;
     try {
-      study.addStorageFolder(storageService.createStudyFolder(programFolder, study), true);
+      String folderName = StudyService.generateStudyStorageFolderName(study);
+      StorageFolder storageFolder = storageService.createFolder(programFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      StorageDriveFolder studyFolder = storageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+          storageFolder, folderOptions);
+      study.addStorageFolder(studyFolder, true);
       studyRepository.save(study);
     } catch (Exception e) {
       exception = e;
@@ -281,7 +309,13 @@ public class EgnyteStudyStorageServiceTests {
     Assert.assertNotNull(assay.getId());
 
     try {
-      assay.addStorageFolder(storageService.createAssayFolder(studyFolder.getStorageDriveFolder(), assay), true);
+      String folderName = AssayService.generateAssayStorageFolderName(assay);
+      StorageFolder storageFolder = storageService.createFolder(studyFolder.getStorageDriveFolder(), folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      StorageDriveFolder assayFolder = storageService.saveStorageFolderRecord(programFolder.getStorageDrive(),
+          storageFolder, folderOptions);
+      assay.addStorageFolder(assayFolder, true);
       assayRepository.save(assay);
     } catch (Exception e) {
       exception = e;
