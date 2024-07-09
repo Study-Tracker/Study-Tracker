@@ -18,7 +18,11 @@ package io.studytracker.aws;
 
 import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.model.*;
+import io.studytracker.model.AwsIntegration;
+import io.studytracker.model.S3BucketDetails;
+import io.studytracker.model.S3FolderDetails;
+import io.studytracker.model.StorageDrive;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
@@ -27,6 +31,8 @@ import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.exception.StudyStorageException;
 import io.studytracker.storage.exception.StudyStorageNotFoundException;
+import java.io.File;
+import javax.persistence.Persistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +48,6 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
-
-import javax.persistence.Persistence;
-import java.io.File;
 
 @Service
 public class S3StudyStorageService implements StudyStorageService {
@@ -69,48 +72,12 @@ public class S3StudyStorageService implements StudyStorageService {
 
   }
 
-  @Transactional
-  @Override
-  public StorageDriveFolder createProgramFolder(StorageDriveFolder parentFolder, Program program)
-      throws StudyStorageException {
-    LOGGER.info("Creating program folder: '{}' in bucket '{}'", program.getName(), parentFolder.getName());
-    String folderName = S3Utils.generateProgramFolderName(program);
-    StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-  }
-
-  @Transactional
-  @Override
-  public StorageDriveFolder createStudyFolder(StorageDriveFolder parentFolder, Study study)
-      throws StudyStorageException {
-    LOGGER.info("Creating study folder: '{}' in bucket '{}'", study.getName(), parentFolder.getName());
-    String folderName = S3Utils.generateStudyFolderName(study);
-    StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-  }
-
-  @Transactional
-  @Override
-  public StorageDriveFolder createAssayFolder(StorageDriveFolder parentFolder, Assay assay)
-      throws StudyStorageException {
-    LOGGER.info("Creating assay folder: '{}' in bucket '{}'", assay.getName(), parentFolder.getName());
-    String folderName = S3Utils.generateAssayFolderName(assay);
-    StorageFolder storageFolder = this.createFolder(parentFolder, parentFolder.getPath(), folderName);
-    StorageDriveFolder options = new StorageDriveFolder();
-    options.setWriteEnabled(true);
-    return saveStorageFolderRecord(parentFolder.getStorageDrive(), storageFolder, options);
-  }
-
   @Override
   public StorageFolder createFolder(StorageDrive bucket, String rawPath, String name)
       throws StudyStorageException {
     
     String path = S3Utils.cleanInputPath(rawPath);
-    String fullPath = S3Utils.joinS3Path(path, name) + "/";
+    String fullPath = S3Utils.joinS3Path(path, S3Utils.cleanInputObjectName(name)) + "/";
     LOGGER.info("Creating folder: '{}' in path: '{}' in bucket '{}'", name, path, bucket.getDisplayName());
 
     S3Client client = getClientFromDrive(bucket);
@@ -144,7 +111,7 @@ public class S3StudyStorageService implements StudyStorageService {
   }
 
   @Override
-  public StorageFolder createFolder(StorageDriveFolder parentFolder, String rawPath, String name)
+  public StorageFolder createFolder(StorageDriveFolder parentFolder, String name)
       throws StudyStorageException {
     StorageDrive bucket;
     if (Persistence.getPersistenceUtil().isLoaded(parentFolder.getStorageDrive())) {
@@ -154,8 +121,134 @@ public class S3StudyStorageService implements StudyStorageService {
               .orElseThrow(() -> new RecordNotFoundException("Storage folder " + parentFolder.getId()
                       + " not associated with S3 bucket"));
     }
-    return this.createFolder(bucket, rawPath, name);
+    return this.createFolder(bucket, parentFolder.getPath(), name);
   }
+
+  @Override
+  public StorageFolder renameFolder(StorageDrive storageDrive, String path, String newName)
+      throws StudyStorageException {
+    throw new StudyStorageException("Not implemented");
+  }
+
+  @Override
+  public StorageFolder moveFolder(StorageDrive storageDrive, String path, String newParentPath)
+      throws StudyStorageException {
+    throw new StudyStorageException("Not implemented");
+  }
+
+  // TODO: Moving or renaming S3 folders requires copying the folder and all contents individually, then deleting the originals
+
+  //  @Override
+//  public StorageFolder renameFolder(StorageDrive drive, String rawPath, String newName) throws StudyStorageException {
+//
+//    LOGGER.info("Renaming folder at path: {} to {}", rawPath, newName);
+//
+//    // Clean the path input
+//    String path = S3Utils.cleanInputPath(rawPath);
+//    if (!path.isEmpty() && !path.endsWith("/")) {
+//      path = path + "/";
+//    }
+//    String parentPath = S3Utils.deriveParentFolder(rawPath).getPath();
+//    String newPath = S3Utils.joinS3Path(parentPath, newName);
+//
+//    LOGGER.debug("Looking up folder by path: {}", path);
+//
+//    S3Client client = getClientFromDrive(drive);
+//    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
+//
+//    try {
+//
+//      // Copy the object
+//      CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+//              .sourceBucket(bucketDetails.getBucketName())
+//              .sourceKey(path)
+//              .destinationBucket(bucketDetails.getBucketName())
+//              .destinationKey(newPath)
+//              .build();
+//      client.copyObject(copyRequest);
+//
+//      // Fetch the new reference
+//      ListObjectsV2Request request = ListObjectsV2Request.builder()
+//              .bucket(bucketDetails.getBucketName())
+//              .prefix(newPath)
+//              .delimiter("/")
+//              .build();
+//      ListObjectsV2Response response = client.listObjectsV2(request);
+//      StorageFolder folder = S3Utils.convertS3ObjectsToStorageFolderWithContents(path, response.contents(),
+//              response.commonPrefixes());
+//
+//      // Delete the old folder
+//      DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+//              .bucket(bucketDetails.getBucketName())
+//              .key(path)
+//              .build();
+//      client.deleteObject(deleteRequest);
+//
+//      return folder;
+//
+//    } catch (Exception e) {
+//        throw new StudyStorageException("Failed to rename folder: " + path, e);
+//    }
+//
+//  }
+//
+//  @Override
+//  public StorageFolder moveFolder(StorageDrive drive, String rawPath, String targetRawPath)
+//      throws StudyStorageException {
+//    LOGGER.info("Moving folder {} to {}", rawPath, targetRawPath);
+//
+//    // Clean the path input
+//    String path = S3Utils.cleanInputPath(rawPath);
+//    if (!path.isEmpty() && !path.endsWith("/")) {
+//      path = path + "/";
+//    }
+//    String targetParentPath = S3Utils.cleanInputPath(targetRawPath);
+//    if (!targetParentPath.isEmpty() && !targetParentPath.endsWith("/")) {
+//      targetParentPath = targetParentPath + "/";
+//    }
+//
+//    String folderName = S3Utils.deriveObjectName(path);
+//    String targetPath = S3Utils.joinS3Path(targetParentPath, folderName);
+//
+//    LOGGER.debug("Looking up folder by path: {}", path);
+//
+//    S3Client client = getClientFromDrive(drive);
+//    S3BucketDetails bucketDetails = (S3BucketDetails) drive.getDetails();
+//
+//    try {
+//
+//      // Copy the object
+//      CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+//          .sourceBucket(bucketDetails.getBucketName())
+//          .sourceKey(path)
+//          .destinationBucket(bucketDetails.getBucketName())
+//          .destinationKey(targetPath)
+//          .build();
+//      client.copyObject(copyRequest);
+//
+//      // Fetch the new reference
+//      ListObjectsV2Request request = ListObjectsV2Request.builder()
+//          .bucket(bucketDetails.getBucketName())
+//          .prefix(targetPath)
+//          .delimiter("/")
+//          .build();
+//      ListObjectsV2Response response = client.listObjectsV2(request);
+//      StorageFolder folder = S3Utils.convertS3ObjectsToStorageFolderWithContents(targetPath,
+//          response.contents(), response.commonPrefixes());
+//
+//      // Delete the old folder
+//      DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+//          .bucket(bucketDetails.getBucketName())
+//          .key(path)
+//          .build();
+//      client.deleteObject(deleteRequest);
+//
+//      return folder;
+//
+//    } catch (Exception e) {
+//      throw new StudyStorageException("Failed to rename folder: " + path, e);
+//    }
+//  }
 
   @Override
   public StorageFolder findFolderByPath(StorageDriveFolder parentFolder, String rawPath)

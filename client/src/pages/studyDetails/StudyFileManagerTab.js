@@ -37,7 +37,7 @@ const StudyFileManagerTab = ({study}) => {
     console.debug("Selected folder", folder);
   }
 
-  const {data: folders, isLoading} = useQuery(["studyStorageFolders", study.id], () => {
+  const {data: folders, isLoading} = useQuery(["storageFolders", study.id], () => {
     return axios.get(`/api/internal/study/${study.id}/storage`)
     .then(response => {
       const defaultFolder = response.data.find(f => f.primary);
@@ -75,7 +75,7 @@ const StudyFileManagerTab = ({study}) => {
           <Col xs="4" md="3">
 
             <StudyFileManagerMenu
-                study={study}
+                record={study}
                 folders={folders}
                 handleFolderSelect={handleFolderSelect}
                 selectedFolder={selectedFolder}

@@ -16,11 +16,18 @@
 
 package io.studytracker.storage;
 
-import io.studytracker.model.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.Program;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveFolder;
+import io.studytracker.model.StorageDriveFolderDetails;
+import io.studytracker.model.Study;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.storage.exception.StudyStorageException;
+import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +36,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Service for {@link StorageDriveFolder} and {@link StorageDrive} entity records.
@@ -181,6 +185,18 @@ public class StorageDriveFolderService {
   public void deleteFolder(StorageDriveFolder folder) {
     LOGGER.info("Deleting folder: {} {}", folder.getId(), folder.getPath());
     folderRepository.deleteById(folder.getId());
+  }
+
+  @Transactional
+  public void renameFolderReferences(StorageDrive drive, String oldPath, String newPath) {
+    LOGGER.info("Renaming folder references in drive: {} from {} to {}", drive.getId(), oldPath, newPath);
+    if (oldPath.endsWith("/")) oldPath = oldPath.substring(0, oldPath.length() - 1);
+    if (newPath.endsWith("/")) newPath = newPath.substring(0, newPath.length() - 1);
+    for (StorageDriveFolder folder: folderRepository.findByParentPath(drive.getId(), oldPath)) {
+      String newPathForFolder = newPath + folder.getPath().substring(oldPath.length());
+      folder.setPath(newPathForFolder);
+      folderRepository.save(folder);
+    }
   }
 
   // Drives

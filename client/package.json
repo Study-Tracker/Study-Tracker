@@ -1,6 +1,6 @@
 {
   "name": "study-tracker-client",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "React front-end client for Study Tracker",
   "private": true,
   "author": "Will Oemler <will@oemler.io>",
@@ -81,7 +81,7 @@
     "react-syntax-highlighter": "15.5.0",
     "react-table": "^7.7.0",
     "react-transition-group": "^4.4.2",
-    "sanitize-html": "^2.10.0",
+    "sanitize-html": "^2.12.1",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.5.1",
     "web-vitals": "^2.1.4",

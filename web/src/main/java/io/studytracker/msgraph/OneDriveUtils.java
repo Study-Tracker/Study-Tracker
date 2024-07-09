@@ -17,9 +17,6 @@
 package io.studytracker.msgraph;
 
 import com.microsoft.graph.models.DriveItem;
-import io.studytracker.model.Assay;
-import io.studytracker.model.Program;
-import io.studytracker.model.Study;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import java.util.ArrayList;
@@ -30,24 +27,12 @@ public class OneDriveUtils {
 
   private static final String REGEXP = "[\\/:*?”<>|#{}%~&]+";
 
-  public static String getProgramFolderName(Program program) {
-    return program.getName().replaceAll(REGEXP, " ");
-  }
-
-  public static String getStudyFolderName(Study study) {
-    String folderName = study.getCode() + " - " + study.getName().replaceAll(REGEXP, " ");
-    if (folderName.length() > 100) {
-      return folderName.substring(0, 100);
+  public static String cleanInputObjectName(String input) {
+    String output = input.replaceAll(REGEXP, " ");
+    if (output.length() > 100) {
+      return output.substring(0, 100);
     }
-    return folderName;
-  }
-
-  public static String getAssayFolderName(Assay assay) {
-    String folderName = assay.getCode() + " - " + assay.getName().replaceAll(REGEXP, " ");
-    if (folderName.length() > 100) {
-      return folderName.substring(0, 100);
-    }
-    return folderName;
+    return output;
   }
 
   public static String getPathFromDriveItem(DriveItem item) {

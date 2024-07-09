@@ -22,15 +22,16 @@ import io.studytracker.model.Program;
 import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.repository.ProgramRepository;
+import io.studytracker.service.ProgramService;
 import io.studytracker.storage.StorageDriveFolderService;
+import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
@@ -54,7 +55,12 @@ public class ExampleProgramGenerator implements ExampleDataGenerator<Program> {
           .orElseThrow(() -> new RecordNotFoundException("No root folder found"));
       StudyStorageService studyStorageService = studyStorageServiceLookup.lookup(rootFolder)
           .orElseThrow(() -> new RecordNotFoundException("No storage service found"));
-      return studyStorageService.createProgramFolder(rootFolder, program);
+      String folderName = ProgramService.generateProgramStorageFolderName(program);
+      StorageFolder storageFolder = studyStorageService.createFolder(rootFolder, folderName);
+      StorageDriveFolder folderOptions = new StorageDriveFolder();
+      folderOptions.setWriteEnabled(true);
+      return studyStorageService
+          .saveStorageFolderRecord(rootFolder.getStorageDrive(), storageFolder, folderOptions);
     } catch (Exception ex) {
       ex.printStackTrace();
       throw new StudyTrackerException(ex);

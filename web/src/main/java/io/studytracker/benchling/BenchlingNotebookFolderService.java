@@ -38,7 +38,8 @@ import io.studytracker.repository.AssayNotebookFolderRepository;
 import io.studytracker.repository.ELNFolderRepository;
 import io.studytracker.repository.ProgramNotebookFolderRepository;
 import io.studytracker.repository.StudyNotebookFolderRepository;
-import io.studytracker.service.NamingService;
+import io.studytracker.service.AssayService;
+import io.studytracker.service.StudyService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,9 +56,6 @@ public final class BenchlingNotebookFolderService
     implements NotebookFolderService<ELNFolder> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BenchlingNotebookFolderService.class);
-
-  @Autowired 
-  private NamingService namingService;
 
   @Autowired 
   private ELNFolderRepository elnFolderRepository;
@@ -197,7 +195,7 @@ public final class BenchlingNotebookFolderService
     ELNFolder programFolder = programFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client.createFolder(
-            NamingService.getStudyNotebookFolderName(study), programFolder.getReferenceId());
+            StudyService.generateStudyNotebookFolderName(study), programFolder.getReferenceId());
     ELNFolder studyFolder = this.convertBenchlingFolder(benchlingFolder);
     studyFolder.setParentFolder(programFolder);
     return studyFolder;
@@ -216,7 +214,7 @@ public final class BenchlingNotebookFolderService
     ELNFolder studyFolder = studyFolderOptional.get();
 
     BenchlingFolder benchlingFolder = client.createFolder(
-            NamingService.getAssayNotebookFolderName(assay), studyFolder.getReferenceId());
+            AssayService.generateAssayNotebookFolderName(assay), studyFolder.getReferenceId());
     ELNFolder assayFolder = this.convertBenchlingFolder(benchlingFolder);
     assayFolder.setParentFolder(studyFolder);
 
@@ -277,6 +275,14 @@ public final class BenchlingNotebookFolderService
     folder.setSubFolders(childrenFolders);
 
     return folder;
+  }
+  
+  @Override
+  public ELNFolder findFolderById(String folderId) {
+    LOGGER.debug("Finding notebook folder by ID: " + folderId);
+    BenchlingElnRestClient client = this.getClient();
+    Optional<BenchlingFolder> optional = client.findFolderById(folderId);
+    return optional.map(this::convertBenchlingFolder).orElse(null);
   }
 
 }

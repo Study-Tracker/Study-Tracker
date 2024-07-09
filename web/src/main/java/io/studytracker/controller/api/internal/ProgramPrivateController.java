@@ -26,32 +26,38 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.form.ProgramFormDto;
 import io.studytracker.mapstruct.dto.response.ActivityDetailsDto;
 import io.studytracker.mapstruct.dto.response.ProgramDetailsDto;
-import io.studytracker.mapstruct.dto.response.StorageDriveFolderDetailsDto;
 import io.studytracker.mapstruct.mapper.ActivityMapper;
 import io.studytracker.mapstruct.mapper.StorageDriveFolderMapper;
 import io.studytracker.mapstruct.mapper.StudyMapper;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.Activity;
 import io.studytracker.model.Program;
-import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.model.User;
 import io.studytracker.service.ActivityService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
 import io.studytracker.storage.StorageDriveFolderService;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RestController
@@ -169,52 +175,6 @@ public class ProgramPrivateController extends AbstractProgramController {
     Program program = optional.get();
     List<Activity> activities = activityService.findByProgram(program);
     return new ResponseEntity<>(activityMapper.toActivityDetailsList(activities), HttpStatus.OK);
-  }
-
-  /**
-   * Retrieves a list of program {@link StorageDriveFolder}.
-   *
-   * @param programId PKID of the program
-   * @return folder list
-   */
-  @GetMapping("/{id}/storage")
-  public List<StorageDriveFolderDetailsDto> getProgramStorageFolders(@PathVariable("id") Long programId) {
-    Optional<Program> optional = this.getProgramService().findById(programId);
-    if (optional.isEmpty()) {
-      throw new RecordNotFoundException("Program not found: " + programId);
-    }
-    Program program = optional.get();
-    List<StorageDriveFolder> folders = storageDriveFolderService.findByProgram(program);
-    return storageDriveFolderMapper.toDetailsDto(folders);
-  }
-
-  /**
-   * Repairs the reference to a program's storage folder by either fetching a new reference or
-   * creating a new folder.
-   *
-   * @param programId
-   * @return
-   */
-  @PatchMapping("/{id}/storage")
-  public HttpEntity<?> repairProgramStorageFolder(@PathVariable("id") Long programId) {
-
-    // Check user privileges
-    User user = this.getAuthenticatedUser();
-    if (!user.isAdmin()) {
-      throw new InsufficientPrivilegesException(
-          "You do not have permission to perform this action.");
-    }
-
-    // Check that the program exists
-    Optional<Program> optional = this.getProgramService().findById(programId);
-    if (optional.isEmpty()) {
-      throw new RecordNotFoundException("Program not found: " + programId);
-    }
-    Program program = optional.get();
-
-    // Repair the storage folder
-    this.getProgramService().repairStorageFolder(program);
-    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @GetMapping("/{id}/notebook")

@@ -169,6 +169,7 @@ public class StudyAssayPrivateControllerTests {
     assay.setLastModifiedBy(userDto);
     assay.setUpdatedAt(new Date());
     assay.setAttributes(Collections.singletonMap("key", "value"));
+    assay.setUseNotebook(false);
 
     Map<String, Object> fields = new LinkedHashMap<>();
     fields.put("number_of_slides", 10);

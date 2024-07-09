@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 import React, {useContext, useState} from 'react';
-import {Download, File, Folder, FolderPlus, Link, MoreHorizontal} from "react-feather";
+import {
+  Download,
+  Edit,
+  File,
+  Folder,
+  FolderPlus,
+  Link,
+  MoreHorizontal
+} from "react-feather";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, {Search} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -22,6 +30,8 @@ import {Dropdown} from "react-bootstrap";
 import PropTypes from "prop-types";
 import NotyfContext from "../../context/NotyfContext";
 import FileManagerAddToStudyModal from "./FileManagerAddToStudyModal";
+import FileManagerRenameFolderModal from "./FileManagerRenameFolderModal";
+import axios from "axios";
 
 const FileManagerTable = ({
   folder,
@@ -32,7 +42,9 @@ const FileManagerTable = ({
   const notyf = useContext(NotyfContext);
   const [addToStudyModalIsOpen, setAddToStudyModalIsOpen] = useState(false);
   const [addToAssayModalIsOpen, setAddToAssayModalIsOpen] = useState(false);
+  const [addToProgramModalIsOpen, setAddToProgramModalIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [renameFolderModalIsOpen, setRenameFolderModalIsOpen] = useState(false);
 
   const handleItemClick = (item, index) => {
     setSelectedItem(item);
@@ -50,6 +62,28 @@ const FileManagerTable = ({
   const handleCopyUrl = (d) => {
     navigator.clipboard.writeText(d.url);
     notyf.open({message: "Copied URL clipboard", type: "success"});
+  }
+
+  const handleRenameFolder = (values, { setSubmitting, resetForm }) => {
+    setSubmitting(true);
+    const data = new FormData();
+    data.append("folderId", rootFolder.id);
+    data.append("path", values.path);
+    data.append("name", values.name);
+    axios.post("/api/internal/data-files/rename-folder", data)
+    .then(() => {
+      notyf.open({message: "Folder renamed successfully.", type: "success"});
+    })
+    .catch(e => {
+      console.error(e);
+      console.error("Failed to rename folder");
+      notyf.open({message: "Failed to rename folder. Please try again.", type: "error"});
+    })
+    .finally(() => {
+      setSubmitting(false);
+      resetForm();
+      setRenameFolderModalIsOpen(false);
+    });
   }
 
   const columns = [
@@ -167,6 +201,27 @@ const FileManagerTable = ({
                   d.type === "folder" && (
                     <>
 
+                      {
+                        rootFolder.storageDrive && rootFolder.storageDrive.driveType
+                        && ["ONEDRIVE", "LOCAL"].includes(rootFolder.storageDrive.driveType) ? (
+                            <Dropdown.Item onClick={() => {
+                                setSelectedItem(d);
+                                setRenameFolderModalIsOpen(true);
+                            }}>
+                              <Edit className="align-middle me-2" size={18} />
+                              Rename Folder
+                            </Dropdown.Item>
+                        ) : ""
+                      }
+
+                      <Dropdown.Item onClick={() => {
+                        setSelectedItem(d);
+                        setAddToProgramModalIsOpen(true);
+                      }}>
+                        <FolderPlus className="align-middle me-2" size={18} />
+                        Add to Program
+                      </Dropdown.Item>
+
                       <Dropdown.Item onClick={() => {
                         setSelectedItem(d);
                         setAddToStudyModalIsOpen(true);
@@ -253,11 +308,19 @@ const FileManagerTable = ({
       </ToolkitProvider>
 
       <FileManagerAddToStudyModal
+          setModalIsOpen={setAddToProgramModalIsOpen}
+          isOpen={addToProgramModalIsOpen}
+          folder={selectedItem}
+          rootFolder={rootFolder}
+          type={"program"}
+      />
+
+      <FileManagerAddToStudyModal
         setModalIsOpen={setAddToStudyModalIsOpen}
         isOpen={addToStudyModalIsOpen}
         folder={selectedItem}
         rootFolder={rootFolder}
-        useStudies={true}
+        type={"study"}
       />
 
       <FileManagerAddToStudyModal
@@ -265,7 +328,14 @@ const FileManagerTable = ({
         isOpen={addToAssayModalIsOpen}
         folder={selectedItem}
         rootFolder={rootFolder}
-        useStudies={false}
+        type={"assay"}
+      />
+
+      <FileManagerRenameFolderModal
+          folder={selectedItem}
+          setModalIsOpen={setRenameFolderModalIsOpen}
+          isOpen={renameFolderModalIsOpen}
+          handleFormSubmit={handleRenameFolder}
       />
 
     </>
@@ -276,8 +346,6 @@ FileManagerTable.propTypes = {
   folder: PropTypes.object.isRequired,
   handlePathChange: PropTypes.func.isRequired,
   rootFolder: PropTypes.object.isRequired,
-  handleAddToRecord: PropTypes.func.isRequired,
-  record: PropTypes.object
 }
 
 export default FileManagerTable;

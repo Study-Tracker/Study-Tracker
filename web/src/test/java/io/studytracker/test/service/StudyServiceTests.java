@@ -29,7 +29,6 @@ import io.studytracker.repository.CollaboratorRepository;
 import io.studytracker.repository.ProgramRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.repository.UserRepository;
-import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
 import java.util.Calendar;
 import java.util.Collections;
@@ -62,8 +61,6 @@ public class StudyServiceTests {
   @Autowired private CollaboratorRepository collaboratorRepository;
 
   @Autowired private ExampleDataRunner exampleDataRunner;
-
-  @Autowired private NamingService namingService;
 
   private static final int STUDY_COUNT = 6;
 
@@ -179,7 +176,7 @@ public class StudyServiceTests {
             .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setProgram(program);
-    String code = namingService.generateStudyCode(study);
+    String code = studyService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("CPA-10003", code);
 
@@ -189,7 +186,7 @@ public class StudyServiceTests {
             .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
-    code = namingService.generateStudyCode(study);
+    code = studyService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("PPB-10002", code);
 
@@ -199,7 +196,7 @@ public class StudyServiceTests {
             .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
-    code = namingService.generateStudyCode(study);
+    code = studyService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("TID-10003", code);
 
@@ -209,14 +206,14 @@ public class StudyServiceTests {
             .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setProgram(program);
-    code = namingService.generateStudyCode(study);
+    code = studyService.generateStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("CPC-10001", code);
 
     Exception exception = null;
     study = new Study();
     try {
-      code = namingService.generateStudyCode(study);
+      code = studyService.generateStudyCode(study);
     } catch (Exception e) {
       exception = e;
     }
@@ -231,7 +228,7 @@ public class StudyServiceTests {
             .orElseThrow(RecordNotFoundException::new);
     Study study = new Study();
     study.setCollaborator(collaborator);
-    String code = namingService.generateExternalStudyCode(study);
+    String code = studyService.generateExternalStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("IN-00001", code);
 
@@ -241,7 +238,7 @@ public class StudyServiceTests {
             .orElseThrow(RecordNotFoundException::new);
     study = new Study();
     study.setCollaborator(collaborator);
-    code = namingService.generateExternalStudyCode(study);
+    code = studyService.generateExternalStudyCode(study);
     Assert.assertNotNull(code);
     Assert.assertEquals("US-00002", code);
   }

@@ -21,6 +21,7 @@ import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.InvalidConstraintException;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.Status;
@@ -31,7 +32,6 @@ import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.service.AssayService;
-import io.studytracker.service.NamingService;
 import io.studytracker.service.StudyService;
 import java.util.Collections;
 import java.util.Date;
@@ -66,8 +66,6 @@ public class AssayServiceTests {
   @Autowired private StudyService studyService;
 
   @Autowired private ExampleDataRunner exampleDataRunner;
-
-  @Autowired private NamingService namingService;
 
   private static final int ASSAY_COUNT = 2;
 
@@ -105,6 +103,8 @@ public class AssayServiceTests {
     assay.setLastModifiedBy(user);
     assay.setUpdatedAt(new Date());
     assay.setAttributes(Collections.singletonMap("key", "value"));
+    AssayOptions options = new AssayOptions();
+    options.setUseNotebook(false);
 
     AssayTask task = new AssayTask();
     task.setLabel("My task");
@@ -114,7 +114,7 @@ public class AssayServiceTests {
     task.setLastModifiedBy(user);
     assay.addTask(task);
 
-    assayService.create(assay);
+    assayService.create(assay, options);
 
     Assert.assertEquals(ASSAY_COUNT + 1, assayRepository.count());
     Assert.assertNotNull(assay.getId());
@@ -157,7 +157,10 @@ public class AssayServiceTests {
     fields.put("stain", "DAPI");
     assay.setFields(fields);
 
-    assayService.create(assay);
+    AssayOptions options = new AssayOptions();
+    options.setUseNotebook(false);
+
+    assayService.create(assay, options);
     Assert.assertEquals(ASSAY_COUNT + 1, assayRepository.count());
     Assert.assertNotNull(assay.getId());
     Assert.assertNotNull(assay.getCode());
@@ -228,7 +231,7 @@ public class AssayServiceTests {
     Study study = studyService.findByCode("CPA-10001").orElseThrow(RecordNotFoundException::new);
     Assay assay = new Assay();
     assay.setStudy(study);
-    String code = namingService.generateAssayCode(assay);
+    String code = assayService.generateAssayCode(assay);
     Assert.assertNotNull(code);
     Assert.assertEquals(study.getCode() + "-001", code);
   }

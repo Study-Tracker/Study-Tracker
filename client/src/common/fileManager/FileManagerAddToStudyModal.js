@@ -31,7 +31,7 @@ const FileManagerAddToStudyModal = ({
   rootFolder,
   folder,
   error,
-  useStudies = true
+  type
 }) => {
 
   const [selectedId, setSelectedId] = React.useState(null);
@@ -53,10 +53,7 @@ const FileManagerAddToStudyModal = ({
 
   const handleSubmit = (values, {setSubmitting}) => {
     console.debug(`Submitting AddFolderToStudy for study: ${setSelectedId}`, values);
-    let url = useStudies
-      ? `/api/internal/study/${selectedId}/storage`
-      : `/api/internal/assay/${selectedId}/storage`;
-    axios.patch(url, values)
+    axios.patch(`/api/internal/${type}/${selectedId}/storage`, values)
     .then(response => {
       if (response.status === 200) {
         notyf.open({message: "Successfully added folder", type: "success"});
@@ -75,10 +72,7 @@ const FileManagerAddToStudyModal = ({
   }
 
   const autocomplete = (input, callback) => {
-    const url = useStudies
-      ? `/api/internal/autocomplete/study?q=${input}`
-      : `/api/internal/autocomplete/assay?q=${input}`;
-    axios.get(url)
+    axios.get(`/api/internal/autocomplete/${type}?q=${input}`)
     .then(response => {
       const options = response.data
       .filter(d => d.active)
@@ -126,7 +120,7 @@ const FileManagerAddToStudyModal = ({
             <Modal show={isOpen} onHide={() => setModalIsOpen(false)}>
 
               <Modal.Header closeButton>
-                <Modal.Title>Add Folder to { useStudies ? "Study" : "Assay" }</Modal.Title>
+                <Modal.Title>Add folder to { type }</Modal.Title>
               </Modal.Header>
 
               <Modal.Body className="mb-3">
@@ -135,8 +129,8 @@ const FileManagerAddToStudyModal = ({
                   <Row>
                     <Col>
                       <p>
-                        Adding a folder to a { useStudies ? "study" : "assay" } will allow users to access
-                        it in the { useStudies ? "Study" : "Assay" } Details page&apos;s Files tab. You can
+                        Adding a folder to a { type } will allow users to access
+                        it in the { type } details page&apos;s Files tab. You can
                         optionally make the folder read-only in this view, as well.
                       </p>
                     </Col>
@@ -145,7 +139,7 @@ const FileManagerAddToStudyModal = ({
                   <Row>
                     <Col>
                       <FormGroup>
-                        <Form.Label>{ useStudies ? "Study" : "Assay" }</Form.Label>
+                        <Form.Label>{ type }</Form.Label>
                         <AsyncSelect
                           placeholder="Search-for and select the record to add this folder to..."
                           className={"react-select-container"}
@@ -213,7 +207,7 @@ FileManagerAddToStudyModal.propTypes = {
   rootFolder: PropTypes.object.isRequired,
   folder: PropTypes.object.isRequired,
   error: PropTypes.string,
-  useStudies: PropTypes.bool
+  type: PropTypes.string.isRequired
 };
 
 export default FileManagerAddToStudyModal;

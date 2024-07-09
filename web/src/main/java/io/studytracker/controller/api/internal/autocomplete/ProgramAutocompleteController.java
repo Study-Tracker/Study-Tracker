@@ -16,40 +16,35 @@
 
 package io.studytracker.controller.api.internal.autocomplete;
 
-import io.studytracker.eln.NotebookEntryService;
-import io.studytracker.eln.NotebookTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.studytracker.mapstruct.dto.response.ProgramSummaryDto;
+import io.studytracker.mapstruct.mapper.ProgramMapper;
+import io.studytracker.model.Program;
+import io.studytracker.service.ProgramService;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/internal/autocomplete/notebook-entry-template")
-public class NotebookTemplateAutocompleteController {
-
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(NotebookTemplateAutocompleteController.class);
+@RequestMapping("/api/internal/autocomplete/program")
+public class ProgramAutocompleteController {
 
   @Autowired
-  private NotebookEntryService notebookEntryService;
+  private ProgramService programService;
+
+  @Autowired
+  private ProgramMapper programMapper;
 
   @GetMapping("")
-  public HttpEntity<List<NotebookTemplate>> findNotebookTemplates(@RequestParam("q") String keyword) {
-    LOGGER.info("findNotebookTemplates: {}", keyword);
-    if (notebookEntryService != null) {
-      List<NotebookTemplate> templates = notebookEntryService.searchNotebookTemplates(keyword);
-      return new ResponseEntity<>(templates, HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
+  public List<ProgramSummaryDto> programSearch(@RequestParam("q") String keyword) {
+    List<Program> programs = programService.findAll().stream()
+        .filter(program -> program.getName().toLowerCase().contains(keyword.toLowerCase()))
+        .filter(Program::isActive)
+        .collect(Collectors.toList());
+    return programMapper.toProgramSummaryList(programs);
   }
 
 }

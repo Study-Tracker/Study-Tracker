@@ -200,4 +200,10 @@ public class EgnyteUtils {
     return childPath.startsWith(parentPath);
   }
 
+  public static String cleanInputObjectName(String input) {
+    return input.replaceAll("_", " ")
+        .replaceAll("\\s+", " ")
+        .trim();
+  }
+
 }
