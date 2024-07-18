@@ -61,6 +61,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,12 +325,21 @@ public class StudyService {
       ELNFolder elnFolder;
       
       // An existing folder was provided
-      if (options.getNotebookFolder() != null
-          && StringUtils.hasText(options.getNotebookFolder().getReferenceId())) {
-        elnFolder = notebookFolderService
-            .findFolderById(options.getNotebookFolder().getReferenceId());
+      if (options.getNotebookFolder() != null && StringUtils.hasText(options.getNotebookFolder().getReferenceId())) {
+        elnFolder = notebookFolderService.findFolderById(options.getNotebookFolder().getReferenceId());
+        elnFolder = elnFolderRepository.save(elnFolder);
+      } else if (options.getNotebookFolder() != null && StringUtils.hasText(options.getNotebookFolder().getUrl())) {
+        String regex = "lib_[a-zA-Z0-9]+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(options.getNotebookFolder().getUrl());
+        if (!matcher.find()) {
+          throw new InvalidRequestException("Cannot extract Benchling foler ID from URL: "
+              + options.getNotebookFolder().getUrl());
+        }
+        elnFolder = notebookFolderService.findFolderById(matcher.group(0));
         elnFolder = elnFolderRepository.save(elnFolder);
       }
+
       // Create a new folder
       else {
         elnFolder = this.createStudyElnFolder(study, program);
