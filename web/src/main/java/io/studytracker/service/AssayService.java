@@ -61,6 +61,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,7 +302,18 @@ public class AssayService {
       
       // An existing folder was provided
       if (options.getNotebookFolder() != null && StringUtils.hasText(options.getNotebookFolder().getReferenceId())) {
-        assayFolder = notebookFolderService.findFolderById(options.getNotebookFolder().getReferenceId());
+        assayFolder = notebookFolderService.findFolderById(
+            options.getNotebookFolder().getReferenceId());
+        assayFolder = elnFolderRepository.save(assayFolder);
+      } else if (options.getNotebookFolder() != null && StringUtils.hasText(options.getNotebookFolder().getUrl())) {
+        String regex = "lib_[a-zA-Z0-9]+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(options.getNotebookFolder().getUrl());
+        if (!matcher.find()) {
+          throw new InvalidRequestException("Cannot extract Benchling foler ID from URL: "
+              + options.getNotebookFolder().getUrl());
+        }
+        assayFolder = notebookFolderService.findFolderById(matcher.group(0));
         assayFolder = elnFolderRepository.save(assayFolder);
       }
       

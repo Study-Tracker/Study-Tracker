@@ -25,6 +25,8 @@ import io.studytracker.model.ELNFolder;
 import io.studytracker.model.User;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +68,16 @@ public class BenchlingServiceTests {
     Assert.assertTrue(optional.isPresent());
     NotebookUser notebookUser = optional.get();
     Assert.assertEquals(notebookUser.getEmail(), user.getEmail());
+  }
+
+  @Test
+  public void getFolderIdFromUrlTest() {
+    String url = "https://testorg.benchling.com/testorg/f/lib_iQIYV5t4-ti-123-lorem-ipsum/prt_SgZ7O6Vt-lorem-ipsum/edit";
+    String regex = "lib_[a-zA-Z0-9]+";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(url);
+    Assert.assertTrue(matcher.find());
+    Assert.assertEquals("lib_iQIYV5t4", matcher.group(0));
   }
 
 }

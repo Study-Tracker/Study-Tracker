@@ -15,12 +15,13 @@
  */
 
 import React from "react";
+import packageJson from "../../../package.json";
 
 const Footer = () => {
   return (
       <div className="footer">
         <div className="text-center">
-          Copyright {new Date().getFullYear()}
+          v{packageJson.version}&nbsp;&nbsp;&#124;&nbsp;&nbsp;Copyright {new Date().getFullYear()}
         </div>
       </div>
   );

@@ -33,6 +33,7 @@ const NotebookInputsCard = ({
 }) => {
 
   const [parentFolder, setParentFolder] = useState(null);
+  const [selectedOption, setSelectedOption] = useState('create');
 
   useEffect(() => {
     let url = null;
@@ -68,30 +69,53 @@ const NotebookInputsCard = ({
         <Row className={"mb-2"}>
 
           <Col sm={6}>
+
             <Form.Group>
               <Form.Label>Notebook Folder</Form.Label>
             </Form.Group>
+
             <Form.Group>
               <Form.Check
                 label={"Create new notebook folder"}
                 type={"radio"}
                 name={"notebookFolderOption"}
                 defaultChecked={!useExistingFolder}
-                onChange={(e) => onChange("useExistingNotebookFolder", !e.target.checked)}
+                onChange={(e) => {
+                  onChange("useExistingNotebookFolder", !e.target.checked);
+                  setSelectedOption('create');
+                }}
               />
             </Form.Group>
+
             <Form.Group>
               <Form.Check
-                label={"Use existing notebook folder"}
+                label={"Select existing notebook folder"}
                 type={"radio"}
                 name={"notebookFolderOption"}
                 defaultChecked={useExistingFolder}
-                onChange={(e) => onChange("useExistingNotebookFolder", e.target.checked)}
+                onChange={(e) => {
+                  onChange("useExistingNotebookFolder", e.target.checked);
+                  setSelectedOption('select');
+                }}
               />
             </Form.Group>
+
+            <Form.Group>
+              <Form.Check
+                  label={"Find notebook folder by URL"}
+                  type={"radio"}
+                  name={"notebookFolderOption"}
+                  defaultChecked={useExistingFolder}
+                  onChange={(e) => {
+                    onChange("useExistingNotebookFolder", e.target.checked);
+                    setSelectedOption('url');
+                  }}
+              />
+            </Form.Group>
+
           </Col>
 
-          <Col sm={6} hidden={useExistingFolder}>
+          <Col sm={6} hidden={selectedOption !== 'create'}>
             <FormGroup>
               <Form.Label>Notebook Folder Path</Form.Label>
               <Form.Control
@@ -112,11 +136,26 @@ const NotebookInputsCard = ({
             </FormGroup>
           </Col>
 
-          <Col sm={6} hidden={!useExistingFolder}>
+          <Col sm={6} hidden={selectedOption !== 'select'}>
             <NotebookFolderDropdown
               onChange={(d) => onChange("notebookFolder", d)}
               parentFolder={parentFolder}
             />
+          </Col>
+
+          <Col sm={6} hidden={selectedOption !== 'url'}>
+            <FormGroup>
+              <Form.Label>Notebook Folder URL</Form.Label>
+              <Form.Control
+                  type="text"
+                  name={"notebookFolder.url"}
+                  value={notebookFolder.url}
+                  onChange={(e) => onChange("notebookFolder.url", e.target.value)}
+              />
+              <Form.Text>
+                Provide the Benchling URL for the notebook entry or folder you'd like to use.
+              </Form.Text>
+            </FormGroup>
           </Col>
 
         </Row>

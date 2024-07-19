@@ -98,23 +98,6 @@ const LegacyStudyControlsCard = ({
                     </FormGroup>
                   </Col>
 
-                  <Col md={6}>
-                    <FormGroup>
-                      <Form.Label>Notebook URL</Form.Label>
-                      <Form.Control
-                          type="text"
-                          name={"notebookFolder.url"}
-                          disabled={!!study}
-                          value={values.notebookFolder.url}
-                          onChange={(e) => onChange("notebookFolder.url", e.target.value)}
-                      />
-                      <Form.Text>
-                        If the study already has an ELN
-                        entry, provide the URL here.
-                      </Form.Text>
-                    </FormGroup>
-                  </Col>
-
                 </Row>
 
               </Col>
