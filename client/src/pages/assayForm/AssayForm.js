@@ -66,7 +66,7 @@ const AssayForm = props => {
     attributes: {},
     notebookFolder: {},
     notebookTemplateId: null,
-    useNotebook: !!study.notebookFolders.length > 0,
+    useNotebook: study.notebookFolders.length > 0,
     useGit: false,
     useStorage: true,
     useExistingNotebookFolder: false,
@@ -410,7 +410,7 @@ const AssayForm = props => {
                     && study.notebookFolders.length > 0
                     && features
                     && features.notebook
-                    && features.notebook.isEnabled ? (
+                    && features.notebook.isEnabled && (
                         <NotebookInputsCard
                             isActive={values.useNotebook}
                             selectedStudy={study}
@@ -418,80 +418,72 @@ const AssayForm = props => {
                             useExistingFolder={values.useExistingNotebookFolder}
                             notebookFolder={values.notebookFolder}
                         />
-                    ) : ''
+                    )
                   }
 
                   {/* Legacy study assay */}
                   {
-                    study.legacy
-                        ? (
-                            <Card>
-                              <Card.Header>
-                                <Card.Title>Legacy Study</Card.Title>
-                                <h6 className="card-subtitle text-muted">Studies
-                                  created
-                                  prior to the introduction of Study Tracker are
-                                  considered legacy. Enabling this option allows
-                                  you to
-                                  specify certain attributes that would
-                                  otherwise be
-                                  automatically generated.</h6>
-                              </Card.Header>
-                              <Card.Body>
-                                <Row>
-
-
-                                  <Col md={12}>
-
-                                    <FormGroup>
-                                      <Form.Label>Notebook URL</Form.Label>
-                                      <Form.Control
-                                          type="text"
-                                          name={"notebookFolder.url"}
-                                          value={values.notebookFolder.url}
-                                          onChange={handleChange}
-                                      />
-                                      <Form.Text>
-                                        If the study already has an ELN
-                                        entry, provide the URL here.
-                                      </Form.Text>
-                                    </FormGroup>
-                                  </Col>
-
-                                </Row>
-                              </Card.Body>
-                            </Card>
-                        ) : ''
+                    study.legacy && assay.notbookFolders.length === 0 && (
+                        <Card>
+                          <Card.Header>
+                            <Card.Title>Legacy Study</Card.Title>
+                            <h6 className="card-subtitle text-muted">Studies
+                              created
+                              prior to the introduction of Study Tracker are
+                              considered legacy. Enabling this option allows
+                              you to
+                              specify certain attributes that would
+                              otherwise be
+                              automatically generated.</h6>
+                          </Card.Header>
+                          <Card.Body>
+                            <Row>
+                              <Col md={12}>
+                                <FormGroup>
+                                  <Form.Label>Notebook URL</Form.Label>
+                                  <Form.Control
+                                      type="text"
+                                      name={"notebookFolder.url"}
+                                      value={values.notebookFolder?.url}
+                                      onChange={handleChange}
+                                  />
+                                  <Form.Text>
+                                    If the study already has an ELN
+                                    entry, provide the URL here.
+                                  </Form.Text>
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Card.Body>
+                        </Card>
+                    )
                   }
 
                   {/* Assay type fields */}
                   {
-                    values.assayType
-                    && values.assayType.fields.length > 0
-                        ? (
-                            <Card>
-                              <Card.Header>
-                                <Card.Title>{values.assayType.name} Fields</Card.Title>
-                                <h6 className="card-subtitle text-muted">
-                                  {values.assayType.description}
-                                </h6>
-                              </Card.Header>
-                              <Card.Body>
-                                <CustomFieldCaptureInputList
-                                    fields={values.assayType.fields}
-                                    data={values.fields}
-                                    handleUpdate={data => {
-                                      setFieldValue("fields", {
-                                        ...values.fields,
-                                        ...data
-                                      });
-                                    }}
-                                    errors={errors}
-                                />
-                              </Card.Body>
-                            </Card>
-                        )
-                        : ''
+                    values.assayType && values.assayType.fields.length > 0 && (
+                        <Card>
+                          <Card.Header>
+                            <Card.Title>{values.assayType.name} Fields</Card.Title>
+                            <h6 className="card-subtitle text-muted">
+                              {values.assayType.description}
+                            </h6>
+                          </Card.Header>
+                          <Card.Body>
+                            <CustomFieldCaptureInputList
+                                fields={values.assayType.fields}
+                                data={values.fields}
+                                handleUpdate={data => {
+                                  setFieldValue("fields", {
+                                    ...values.fields,
+                                    ...data
+                                  });
+                                }}
+                                errors={errors}
+                            />
+                          </Card.Body>
+                        </Card>
+                    )
                   }
 
                   {/* Tasks */}

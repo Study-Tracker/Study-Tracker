@@ -1,6 +1,3 @@
-module.exports = {
-  // webpack: function(config, env) {
-  //   // config.optimization.minimize = false;
-  //   return config;
-  // }
+module.exports = function override(config, env) {
+  return config;
 }
