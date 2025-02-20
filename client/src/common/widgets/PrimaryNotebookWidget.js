@@ -25,8 +25,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBook, faRefresh} from "@fortawesome/free-solid-svg-icons";
 import NotyfContext from "../../context/NotyfContext";
 import IconWidget from "./IconWidget";
-import {useDispatch} from "react-redux";
-import {setTab} from "../../redux/tabSlice";
 
 const PrimaryNotebookWidget = ({record}) => {
 
@@ -37,7 +35,7 @@ const PrimaryNotebookWidget = ({record}) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const notyf = useContext(NotyfContext);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const recordType = record.assayType ? "assay" : record.program ? "study" : "program";
 
   const handleRepairNotebook = () => {
@@ -59,7 +57,7 @@ const PrimaryNotebookWidget = ({record}) => {
     setIsLoading(true);
     setIsSubmitting(true);
     axios.post(url)
-    .then(response => {
+    .then(() => {
       notyf.open({
         type: "success",
         message: "Notebook repaired successfully."
@@ -112,20 +110,20 @@ const PrimaryNotebookWidget = ({record}) => {
             body={(
                 <>
 
-                  {
-                    recordType !== "program" ? (
-                      <Button
-                        variant={"primary"}
-                        onClick={() => {
-                          dispatch(setTab("notebook"));
-                          navigate("#notebook")
-                        }}
-                        className={"mb-2"}
-                      >
-                        Browse contents
-                      </Button>
-                    ) : ""
-                  }
+                  {/*{*/}
+                  {/*  recordType !== "program" ? (*/}
+                  {/*    <Button*/}
+                  {/*      variant={"primary"}*/}
+                  {/*      onClick={() => {*/}
+                  {/*        dispatch(setTab("notebook"));*/}
+                  {/*        navigate("#notebook")*/}
+                  {/*      }}*/}
+                  {/*      className={"mb-2"}*/}
+                  {/*    >*/}
+                  {/*      Browse contents*/}
+                  {/*    </Button>*/}
+                  {/*  ) : ""*/}
+                  {/*}*/}
 
                   {
                     notebook && !!notebook.url ? (

@@ -439,16 +439,13 @@ const AssayForm = props => {
                               </Card.Header>
                               <Card.Body>
                                 <Row>
-
-
                                   <Col md={12}>
-
                                     <FormGroup>
                                       <Form.Label>Notebook URL</Form.Label>
                                       <Form.Control
                                           type="text"
                                           name={"notebookFolder.url"}
-                                          value={values.notebookFolder.url}
+                                          value={values.notebookFolder?.url}
                                           onChange={handleChange}
                                       />
                                       <Form.Text>
@@ -457,7 +454,6 @@ const AssayForm = props => {
                                       </Form.Text>
                                     </FormGroup>
                                   </Col>
-
                                 </Row>
                               </Card.Body>
                             </Card>
