@@ -16,9 +16,12 @@
 
 package io.studytracker.mapstruct.dto.response;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import lombok.Data;
-
-import java.util.*;
 
 @Data
 public class ProgramDetailsDto {

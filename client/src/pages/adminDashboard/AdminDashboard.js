@@ -16,16 +16,27 @@
 
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate} from 'react-router-dom';
-import {Breadcrumb, Card, Col, Container, ListGroup, Row} from "react-bootstrap";
+import {
+  Breadcrumb,
+  Card,
+  Col,
+  Container,
+  ListGroup,
+  Row
+} from "react-bootstrap";
 import UserSettings from "./userSettings/UserSettings";
 import AssayTypeSettings from "./assayTypes/AssayTypeSettings";
 import ProgramSettings from "./program/ProgramSettings";
 import AdminDashboardPlaceholder from "./AdminDashboardPlaceholder";
 import ApiUserSettings from "./apiUserSettings/ApiUserSettings";
-import BenchlingIntegrationSettings from "./benchling/BenchlingIntegrationSettings";
-import EgnyteIntegrationSettings from "./egnyteIntegrationSettings/EgnyteIntegrationSettings";
-import GitlabIntegrationSettings from "./gitLabSettings/GitlabIntegrationSettings";
-import StorageFolderSettings from "./storageFolderSettings/StorageFolderSettings";
+import BenchlingIntegrationSettings
+  from "./benchling/BenchlingIntegrationSettings";
+import EgnyteIntegrationSettings
+  from "./egnyteIntegrationSettings/EgnyteIntegrationSettings";
+import GitlabIntegrationSettings
+  from "./gitLabSettings/GitlabIntegrationSettings";
+import StorageFolderSettings
+  from "./storageFolderSettings/StorageFolderSettings";
 import AWSIntegrationSettings from "./AWSSettings/AWSIntegrationSettings";
 import MSAzureSettings from "./MSSettings/MSAzureSettings";
 

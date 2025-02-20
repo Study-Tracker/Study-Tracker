@@ -21,7 +21,8 @@ import {FormGroup} from "../common";
 import DatePicker from "react-datepicker";
 import AsyncSelect from "react-select/async";
 import axios from "axios";
-import CustomFieldDefinitionDraggableCardList from "../customFields/CustomFieldDefinitionDraggableCardList";
+import CustomFieldDefinitionDraggableCardList
+  from "../customFields/CustomFieldDefinitionDraggableCardList";
 
 const userAutocomplete = (input, callback) => {
   axios.get("/api/internal/autocomplete/user?q=" + input)

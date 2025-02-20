@@ -17,7 +17,13 @@
 import React from "react";
 import {Card, Col, Container, Row} from "react-bootstrap";
 import {ActivityStream} from "../../common/activity";
-import {ActiveStudies, CompletedStudies, NewStudies, TotalStudies, WelcomeBack} from './timelineWidgets';
+import {
+  ActiveStudies,
+  CompletedStudies,
+  NewStudies,
+  TotalStudies,
+  WelcomeBack
+} from './timelineWidgets';
 import {ArrowLeft, ArrowRight} from "react-feather";
 import FrontPagePlaceholder from "./FrontPagePlaceholder";
 

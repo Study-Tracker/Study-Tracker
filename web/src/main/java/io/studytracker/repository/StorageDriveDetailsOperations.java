@@ -17,11 +17,10 @@
 package io.studytracker.repository;
 
 import io.studytracker.model.StorageDriveDetails;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.NoRepositoryBean;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface StorageDriveDetailsOperations<T extends StorageDriveDetails>

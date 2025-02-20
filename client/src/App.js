@@ -35,10 +35,14 @@ import FrontPageView from "./pages/frontPage/FrontPageView";
 import AssayTypeFormView from "./pages/assayTypeForm/AssayTypeFormView";
 import AssayListView from "./pages/assayList/AssayListView";
 import {TemplateFormView} from "./pages/templateForm/TemplateFormView";
-import StudyCollectionFormView from "./pages/studyCollectionForm/StudyCollectionFormView";
-import StudyCollectionDetailsView from "./pages/studyCollectionsDetails/StudyCollectionDetailsView";
-import StudyCollectionListView from "./pages/studyCollectionList/StudyCollectionListView";
-import PasswordResetRequestView from "./pages/passwordResetRequest/PasswordResetRequestView";
+import StudyCollectionFormView
+  from "./pages/studyCollectionForm/StudyCollectionFormView";
+import StudyCollectionDetailsView
+  from "./pages/studyCollectionsDetails/StudyCollectionDetailsView";
+import StudyCollectionListView
+  from "./pages/studyCollectionList/StudyCollectionListView";
+import PasswordResetRequestView
+  from "./pages/passwordResetRequest/PasswordResetRequestView";
 import SearchResultsView from "./pages/searchResults/SearchResultsView";
 import FileManagerView from "./pages/fileManager/FileManagerView";
 import {QueryClient, QueryClientProvider} from "react-query";

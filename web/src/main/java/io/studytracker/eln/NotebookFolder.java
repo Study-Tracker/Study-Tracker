@@ -18,14 +18,18 @@ package io.studytracker.eln;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.studytracker.model.Model;
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
 
 @MappedSuperclass
 @Getter

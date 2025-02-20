@@ -18,9 +18,8 @@ package io.studytracker.mapstruct.dto.response;
 
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveDetails;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class StorageDriveDetailsDto {

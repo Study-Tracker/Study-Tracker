@@ -18,10 +18,9 @@ package io.studytracker.example;
 
 import io.studytracker.model.Keyword;
 import io.studytracker.repository.KeywordRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class ExampleKeywordGenerator implements ExampleDataGenerator<Keyword> {

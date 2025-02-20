@@ -17,7 +17,12 @@
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import React, {useMemo} from "react";
 import {useDropzone} from 'react-dropzone';
-import {faCaretDown, faCaretRight, faFile, faFolder} from "@fortawesome/free-solid-svg-icons";
+import {
+  faCaretDown,
+  faCaretRight,
+  faFile,
+  faFolder
+} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {CardLoadingMessage} from "./loading";
 import {DismissableAlert} from "./errors";

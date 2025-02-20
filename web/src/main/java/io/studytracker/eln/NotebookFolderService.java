@@ -20,7 +20,6 @@ import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
-
 import java.util.List;
 import java.util.Optional;
 

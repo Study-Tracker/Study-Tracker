@@ -26,18 +26,31 @@ import io.studytracker.gitlab.entities.GitLabNewGroupRequest;
 import io.studytracker.gitlab.entities.GitLabNewProjectRequest;
 import io.studytracker.gitlab.entities.GitLabProject;
 import io.studytracker.gitlab.entities.GitLabProjectGroup;
-import io.studytracker.model.*;
-import io.studytracker.repository.*;
+import io.studytracker.model.Assay;
+import io.studytracker.model.GitGroup;
+import io.studytracker.model.GitLabGroup;
+import io.studytracker.model.GitLabIntegration;
+import io.studytracker.model.GitLabRepository;
+import io.studytracker.model.GitRepository;
+import io.studytracker.model.GitServiceType;
+import io.studytracker.model.Program;
+import io.studytracker.model.Study;
+import io.studytracker.repository.AssayRepository;
+import io.studytracker.repository.GitGroupRepository;
+import io.studytracker.repository.GitLabGroupRepository;
+import io.studytracker.repository.GitLabRepositoryRepository;
+import io.studytracker.repository.ProgramRepository;
+import io.studytracker.repository.StudyRepository;
+import io.studytracker.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class GitLabService implements GitService<GitLabIntegration> {

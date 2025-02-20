@@ -17,10 +17,21 @@
 package io.studytracker.events.util;
 
 import io.studytracker.events.EventType;
-import io.studytracker.model.*;
+import io.studytracker.model.Activity;
+import io.studytracker.model.Comment;
+import io.studytracker.model.ExternalLink;
+import io.studytracker.model.Program;
+import io.studytracker.model.Status;
+import io.studytracker.model.Study;
+import io.studytracker.model.StudyConclusions;
+import io.studytracker.model.StudyRelationship;
+import io.studytracker.model.User;
 import io.studytracker.storage.StorageFile;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class StudyActivityUtils {
 

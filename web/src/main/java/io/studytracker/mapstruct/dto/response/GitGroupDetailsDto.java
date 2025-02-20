@@ -17,9 +17,8 @@
 package io.studytracker.mapstruct.dto.response;
 
 import io.studytracker.model.GitServiceType;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class GitGroupDetailsDto {

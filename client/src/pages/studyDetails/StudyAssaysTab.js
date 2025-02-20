@@ -17,11 +17,11 @@
 import {Button, Col, Dropdown, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faArrowDown19,
-    faArrowDown91,
-    faArrowDownAZ,
-    faArrowDownZA,
-    faPlusCircle
+  faArrowDown19,
+  faArrowDown91,
+  faArrowDownAZ,
+  faArrowDownZA,
+  faPlusCircle
 } from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect} from "react";
 import PropTypes from "prop-types";

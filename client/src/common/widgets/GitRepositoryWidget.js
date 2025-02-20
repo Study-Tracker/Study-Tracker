@@ -18,7 +18,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import {Button} from "react-bootstrap";
 import IconWidget from "./IconWidget";
-import {faGitAlt, faGithubSquare, faGitlabSquare} from "@fortawesome/free-brands-svg-icons";
+import {
+  faGitAlt,
+  faGithubSquare,
+  faGitlabSquare
+} from "@fortawesome/free-brands-svg-icons";
 
 const getRepositoryIcon = (repository) => {
   let icon = faGitAlt;

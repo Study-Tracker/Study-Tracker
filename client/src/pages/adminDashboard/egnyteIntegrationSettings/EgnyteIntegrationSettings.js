@@ -19,7 +19,11 @@ import {Col, Dropdown, Row} from "react-bootstrap";
 import axios from "axios";
 import NotyfContext from "../../../context/NotyfContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheckCircle, faCircleXmark, faEdit} from "@fortawesome/free-regular-svg-icons";
+import {
+  faCheckCircle,
+  faCircleXmark,
+  faEdit
+} from "@fortawesome/free-regular-svg-icons";
 import {faGears, faPlusCircle} from "@fortawesome/free-solid-svg-icons";
 import EgnyteIntegrationDetailsCard from "./EgnyteIntegrationDetailsCard";
 import EgnyteIntegrationSetupCard from "./EgnyteIntegrationSetupCard";

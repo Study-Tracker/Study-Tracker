@@ -18,7 +18,11 @@ import React, {useEffect, useState} from "react";
 import {Form} from 'react-bootstrap';
 import {FormGroup} from '../forms/common';
 import {setFilters} from "../../redux/filterSlice";
-import {convertSearchParams, filterNullSearchParams, FilterSidebar} from "./filters";
+import {
+  convertSearchParams,
+  filterNullSearchParams,
+  FilterSidebar
+} from "./filters";
 import {useDispatch, useSelector} from "react-redux";
 import {useSearchParams} from "react-router-dom";
 

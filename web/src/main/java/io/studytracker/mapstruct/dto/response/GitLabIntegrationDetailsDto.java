@@ -16,9 +16,8 @@
 
 package io.studytracker.mapstruct.dto.response;
 
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class GitLabIntegrationDetailsDto {

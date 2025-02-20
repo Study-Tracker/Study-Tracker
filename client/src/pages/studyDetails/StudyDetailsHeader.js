@@ -16,7 +16,8 @@
 
 import {Button, Col, Row} from "react-bootstrap";
 import React from "react";
-import SelectableStatusButton from "../../common/detailsPage/SelectableStatusButton";
+import SelectableStatusButton
+  from "../../common/detailsPage/SelectableStatusButton";
 import PropTypes from "prop-types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTrash} from "@fortawesome/free-solid-svg-icons";

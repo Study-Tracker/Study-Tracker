@@ -17,9 +17,8 @@
 package io.studytracker.mapstruct.dto.form;
 
 import io.studytracker.model.GitServiceType;
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 @Data
 public class GitGroupFormDto {

@@ -27,15 +27,14 @@ import io.studytracker.model.GitLabGroup;
 import io.studytracker.model.GitLabIntegration;
 import io.studytracker.repository.GitGroupRepository;
 import io.studytracker.repository.GitLabGroupRepository;
+import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
-import java.util.Optional;
 
 @Component
 public class GitLabIntegrationInitializer {

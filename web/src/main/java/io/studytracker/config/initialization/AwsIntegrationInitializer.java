@@ -21,19 +21,22 @@ import io.studytracker.config.properties.AWSProperties;
 import io.studytracker.config.properties.AWSProperties.S3Properties;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import io.studytracker.exception.InvalidConfigurationException;
-import io.studytracker.model.*;
+import io.studytracker.model.AwsIntegration;
+import io.studytracker.model.S3BucketDetails;
+import io.studytracker.model.S3FolderDetails;
+import io.studytracker.model.StorageDrive;
 import io.studytracker.model.StorageDrive.DriveType;
+import io.studytracker.model.StorageDriveFolder;
 import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Initializes AWS service configurations and captures records in the database.

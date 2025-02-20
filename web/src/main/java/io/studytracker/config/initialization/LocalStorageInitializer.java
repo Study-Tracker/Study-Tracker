@@ -28,15 +28,14 @@ import io.studytracker.repository.StorageDriveFolderRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageUtils;
+import java.io.File;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.io.File;
-import java.util.Optional;
 
 @Component
 public class LocalStorageInitializer {

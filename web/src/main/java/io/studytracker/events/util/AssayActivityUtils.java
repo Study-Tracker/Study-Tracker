@@ -17,9 +17,13 @@
 package io.studytracker.events.util;
 
 import io.studytracker.events.EventType;
-import io.studytracker.model.*;
+import io.studytracker.model.Activity;
+import io.studytracker.model.Assay;
+import io.studytracker.model.AssayTask;
+import io.studytracker.model.Status;
+import io.studytracker.model.Study;
+import io.studytracker.model.User;
 import io.studytracker.storage.StorageFile;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

@@ -20,9 +20,8 @@ import io.studytracker.exception.DuplicateRecordException;
 import io.studytracker.mapstruct.mapper.KeywordMapper;
 import io.studytracker.model.Keyword;
 import io.studytracker.service.KeywordService;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractKeywordController extends AbstractApiController{
 

@@ -24,14 +24,13 @@ import io.studytracker.eln.NotebookUser;
 import io.studytracker.eln.NotebookUserService;
 import io.studytracker.model.User;
 import io.studytracker.model.UserConfigurations;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public final class BenchlingNotebookUserService

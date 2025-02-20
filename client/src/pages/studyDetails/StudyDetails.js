@@ -21,7 +21,8 @@ import StudyNotebookTab from './StudyNotebookTab';
 import StudyConclusionsTab from "./StudyConclusionsTab";
 import StudyCommentsTab from "./StudyCommentsTab";
 import StudyTimelineTab from "./StudyTimelineTab";
-import AddToStudyCollectionModal from "../../common/modals/AddToStudyCollectionModal";
+import AddToStudyCollectionModal
+  from "../../common/modals/AddToStudyCollectionModal";
 import StudyCollectionsTab from "./StudyCollectionsTab";
 import PropTypes from "prop-types";
 import {useLocation, useNavigate} from "react-router-dom";

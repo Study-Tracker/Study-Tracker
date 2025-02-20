@@ -17,10 +17,9 @@
 package io.studytracker.model;
 
 import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class AssayOptions {
