@@ -16,9 +16,9 @@
 
 package io.studytracker.mapstruct.dto.api;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

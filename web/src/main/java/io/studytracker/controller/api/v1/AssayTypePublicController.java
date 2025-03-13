@@ -21,7 +21,7 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.AssayTypeDto;
 import io.studytracker.mapstruct.dto.api.AssayTypePayloadDto;
 import io.studytracker.model.AssayType;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

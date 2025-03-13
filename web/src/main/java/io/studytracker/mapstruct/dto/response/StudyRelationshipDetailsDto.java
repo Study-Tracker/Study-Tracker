@@ -17,7 +17,7 @@
 package io.studytracker.mapstruct.dto.response;
 
 import io.studytracker.model.RelationshipType;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

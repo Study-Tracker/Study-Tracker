@@ -22,7 +22,7 @@ import io.studytracker.mapstruct.dto.api.AssayTaskDto;
 import io.studytracker.mapstruct.dto.api.AssayTaskPayloadDto;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

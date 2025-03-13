@@ -17,8 +17,8 @@
 package io.studytracker.mapstruct.dto.api;
 
 import io.studytracker.model.TaskStatus;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

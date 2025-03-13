@@ -18,26 +18,25 @@ package io.studytracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -46,7 +45,6 @@ import org.springframework.security.core.GrantedAuthority;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 public class User extends Model {
 
   @Id
@@ -84,7 +82,7 @@ public class User extends Model {
   @LastModifiedDate
   private Date updatedAt;
 
-  @Type(type = "json")
+  @Type(JsonBinaryType.class)
   @Column(name = "attributes", columnDefinition = "json")
   private Map<String, String> attributes = new HashMap<>();
 
@@ -103,7 +101,7 @@ public class User extends Model {
   @Column(name = "credentials_expired", nullable = false)
   private boolean credentialsExpired = false;
 
-  @Type(type = "json")
+  @Type(JsonBinaryType.class)
   @Column(name = "configuration", columnDefinition = "json")
   private Map<String, String> configuration = new HashMap<>();
 

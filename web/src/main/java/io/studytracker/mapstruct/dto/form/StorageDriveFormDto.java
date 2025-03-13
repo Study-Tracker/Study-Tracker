@@ -18,7 +18,7 @@ package io.studytracker.mapstruct.dto.form;
 
 import io.studytracker.model.StorageDrive.DriveType;
 import io.studytracker.model.StorageDriveDetails;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data

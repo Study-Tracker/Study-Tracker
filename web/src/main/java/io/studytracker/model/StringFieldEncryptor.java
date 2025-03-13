@@ -17,15 +17,15 @@
 package io.studytracker.model;
 
 import io.studytracker.config.properties.ApplicationProperties;
+import jakarta.crypto.BadPaddingException;
+import jakarta.crypto.Cipher;
+import jakarta.crypto.IllegalBlockSizeException;
+import jakarta.crypto.spec.SecretKeySpec;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.util.Base64;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.spec.SecretKeySpec;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

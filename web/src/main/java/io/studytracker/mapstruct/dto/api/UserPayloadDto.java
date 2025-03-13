@@ -17,10 +17,10 @@
 package io.studytracker.mapstruct.dto.api;
 
 import io.studytracker.model.UserType;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data

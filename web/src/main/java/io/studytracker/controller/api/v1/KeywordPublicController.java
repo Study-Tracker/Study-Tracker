@@ -21,7 +21,7 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.KeywordDto;
 import io.studytracker.mapstruct.dto.api.KeywordPayloadDto;
 import io.studytracker.model.Keyword;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

@@ -17,9 +17,9 @@
 package io.studytracker.mapstruct.dto.form;
 
 import io.studytracker.mapstruct.dto.response.StudySlimDto;
+import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
