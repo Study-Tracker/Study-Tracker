@@ -16,6 +16,14 @@
 	<name>Study Tracker: Web Services</name>
 	<description>Study Tracker web server and API</description>
 
+	<repositories>
+		<repository>
+			<id>Shibboleth</id>
+			<name>Shibboleth</name>
+			<url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok.version>1.18.30</lombok.version>
@@ -54,23 +62,23 @@
 			<artifactId>spring-security-saml2-service-provider</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.opensaml</groupId>
-			<artifactId>opensaml-core</artifactId>
-			<version>4.0.1</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.opensaml</groupId>-->
+<!--			<artifactId>opensaml-core</artifactId>-->
+<!--			<version>4.0.1</version>-->
+<!--		</dependency>-->
 
-		<dependency>
-			<groupId>org.opensaml</groupId>
-			<artifactId>opensaml-saml-api</artifactId>
-			<version>4.0.1</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.opensaml</groupId>-->
+<!--			<artifactId>opensaml-saml-api</artifactId>-->
+<!--			<version>4.0.1</version>-->
+<!--		</dependency>-->
 
-		<dependency>
-			<groupId>org.opensaml</groupId>
-			<artifactId>opensaml-saml-impl</artifactId>
-			<version>4.0.1</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.opensaml</groupId>-->
+<!--			<artifactId>opensaml-saml-impl</artifactId>-->
+<!--			<version>4.0.1</version>-->
+<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

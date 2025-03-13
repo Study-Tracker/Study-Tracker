@@ -18,6 +18,7 @@ package io.studytracker.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,18 +31,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice(basePackages = {"io.studytracker.controller.api"})
 @RestController
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
-
+  
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
-      MethodArgumentNotValidException ex,
-      HttpHeaders headers,
-      HttpStatus status,
-      WebRequest request) {
+          MethodArgumentNotValidException ex,
+          HttpHeaders headers,
+          HttpStatusCode status,
+          WebRequest request
+  ) {
     ex.printStackTrace();
     ApiError apiError = new ApiError("Validation failed", ex.getBindingResult().toString());
     return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
   }
-
+  
   @ExceptionHandler({UnauthorizedException.class, AccessDeniedException.class})
   public final ResponseEntity<ApiError> unauthorizedError(
       UnauthorizedException ex, WebRequest webRequest) {

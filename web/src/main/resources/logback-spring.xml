@@ -6,7 +6,7 @@
   <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
     <layout class="ch.qos.logback.classic.PatternLayout">
       <Pattern>
-        %d{ISO8601} %-5level [%t] %C{1.}: %msg%n%throwable
+        %d{ISO8601} %-5level [%t] %C{1}: %msg%n%throwable
       </Pattern>
     </layout>
   </appender>
@@ -14,7 +14,7 @@
   <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOGS}/study-tracker.log</file>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <Pattern>%d %p %C{1.} [%t] %m%n%throwable</Pattern>
+      <Pattern>%d %p %C{1} [%t] %m%n%throwable</Pattern>
     </encoder>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

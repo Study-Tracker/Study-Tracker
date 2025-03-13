@@ -22,25 +22,26 @@ import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudyDocument;
 import io.studytracker.mapstruct.mapper.ElasticsearchDocumentMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
-import io.studytracker.search.AssaySearchDocument;
-import io.studytracker.search.DocumentType;
-import io.studytracker.search.GenericSearchHit;
-import io.studytracker.search.GenericSearchHits;
-import io.studytracker.search.SearchService;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import io.studytracker.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.HighlightQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class ElasticsearchSearchService implements SearchService {
 
@@ -58,6 +59,11 @@ public class ElasticsearchSearchService implements SearchService {
 
   @Autowired
   private ElasticsearchOperations elasticsearchOperations;
+  
+  private HighlightQuery getHighlightQuery() {
+    Highlight highlight = new Highlight(List.of(new HighlightField("*")));
+    return new HighlightQuery(highlight, String.class);
+  }
 
   private GenericSearchHits<ElasticsearchPowerSearchDocument> searchAllIndexes(Query query) {
 
@@ -116,9 +122,10 @@ public class ElasticsearchSearchService implements SearchService {
   @Override
   public GenericSearchHits<ElasticsearchPowerSearchDocument> search(String keyword) {
     LOGGER.debug("Searching for keyword: {}", keyword);
-    Query query = new NativeSearchQueryBuilder()
-        .withQuery(QueryBuilders.multiMatchQuery(keyword))
-        .withHighlightFields(new HighlightBuilder.Field("*"))
+    
+    Query query = NativeQuery.builder()
+        .withQuery(q -> q.multiMatch(m -> m.query(keyword)))
+        .withHighlightQuery(getHighlightQuery())
         .build();
     return searchAllIndexes(query);
   }
@@ -126,9 +133,9 @@ public class ElasticsearchSearchService implements SearchService {
   @Override
   public GenericSearchHits<ElasticsearchPowerSearchDocument> search(String keyword, String field) {
     LOGGER.debug("Searching for keyword: {}, field: {}", keyword, field);
-    Query query = new NativeSearchQueryBuilder()
-        .withQuery(QueryBuilders.multiMatchQuery(keyword))
-        .withHighlightFields(new HighlightBuilder.Field("*"))
+    Query query = NativeQuery.builder()
+        .withQuery(q -> q.multiMatch(m -> m.query(keyword)))
+        .withHighlightQuery(getHighlightQuery())
         .withFields(field)
         .build();
     return searchAllIndexes(query);

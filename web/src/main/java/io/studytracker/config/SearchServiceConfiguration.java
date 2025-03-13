@@ -23,7 +23,6 @@ import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.search.SearchService;
 import io.studytracker.search.elasticsearch.ElasticsearchSearchService;
-import java.util.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +32,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration.ClientConfigurationBuilderWithRequiredEndpoint;
 import org.springframework.data.elasticsearch.client.ClientConfiguration.MaybeSecureClientConfigurationBuilder;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import java.util.Calendar;
 
 @Configuration
 @ConditionalOnProperty("search.mode")
@@ -44,7 +46,7 @@ public class SearchServiceConfiguration {
   @Configuration
   @EnableElasticsearchRepositories(basePackages = "io.studytracker.search.elasticsearch")
   @ConditionalOnProperty(name = "search.mode", havingValue = "elasticsearch")
-  public static class ElasticsearchConfiguration {
+  public static class ElasticsearchSearchServiceConfiguration extends ElasticsearchConfiguration {
 
     @Autowired
     private ElasticsearchProperties properties;
@@ -63,9 +65,10 @@ public class SearchServiceConfiguration {
 //
 //    @Value("${elasticsearch.password:#{null}}")
 //    private String password;
-
-    @Bean
-    public RestHighLevelClient client() {
+    
+    
+    @Override
+    public ClientConfiguration clientConfiguration() {
 
       String host = properties.getHost();
       Integer port = properties.getPort();
@@ -88,7 +91,7 @@ public class SearchServiceConfiguration {
       } else {
         configuration = sBuilder.build();
       }
-      return RestClients.create(configuration).rest();
+      return configuration;
     }
 
     @Bean

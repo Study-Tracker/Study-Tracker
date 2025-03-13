@@ -18,15 +18,15 @@ package io.studytracker.benchling.exception;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.ResponseErrorHandler;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatus.Series;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.ResponseErrorHandler;
 
 public class BenchlingExceptionHandler implements ResponseErrorHandler {
 
@@ -38,8 +38,8 @@ public class BenchlingExceptionHandler implements ResponseErrorHandler {
 
   @Override
   public boolean hasError(ClientHttpResponse response) throws IOException {
-    return response.getStatusCode().series() == Series.CLIENT_ERROR
-        || response.getStatusCode().series() == Series.SERVER_ERROR;
+    return response.getStatusCode().is4xxClientError()
+        || response.getStatusCode().is5xxServerError();
   }
 
   @Override

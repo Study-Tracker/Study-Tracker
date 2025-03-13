@@ -16,56 +16,58 @@
 
 package io.studytracker.model;
 
-import io.studytracker.config.properties.ApplicationProperties;
-import jakarta.crypto.BadPaddingException;
-import jakarta.crypto.Cipher;
-import jakarta.crypto.IllegalBlockSizeException;
-import jakarta.crypto.spec.SecretKeySpec;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Encrypts and decrypts fields in the database.
  * From https://sultanov.dev/blog/database-column-level-encryption-with-spring-data-jpa/
  */
-@Component
-@Converter
+@Converter(autoApply = true)
 public class StringFieldEncryptor implements AttributeConverter<String, String> {
 
   private static final String AES = "AES";
-
-  private final Key key;
-  private final Cipher cipher;
-
-  @Autowired
-  public StringFieldEncryptor(ApplicationProperties properties) throws Exception {
-    key = new SecretKeySpec(properties.getSecret().getBytes(), AES);
-    cipher = Cipher.getInstance(AES);
+  private static Key key;
+  
+  public StringFieldEncryptor() {
+  }
+  
+  public StringFieldEncryptor(String secret) {
+    key = new SecretKeySpec(secret.getBytes(), AES);
   }
 
   @Override
   public String convertToDatabaseColumn(String attribute) {
+    if (attribute == null) return null;
     try {
+      Cipher cipher = Cipher.getInstance(AES);
       cipher.init(Cipher.ENCRYPT_MODE, key);
-      if (attribute == null) return null;
       return Base64.getEncoder().encodeToString(cipher.doFinal(attribute.getBytes()));
-    } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+    } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | NoSuchAlgorithmException |
+             NoSuchPaddingException e) {
       throw new IllegalStateException(e);
     }
   }
 
   @Override
   public String convertToEntityAttribute(String dbData) {
+    if (dbData == null) return null;
     try {
-      cipher.init(Cipher.DECRYPT_MODE, key);
-      if (dbData == null) return null;
+      Cipher cipher = Cipher.getInstance(AES);
+      cipher.init(Cipher.ENCRYPT_MODE, key);
       return new String(cipher.doFinal(Base64.getDecoder().decode(dbData)));
-    } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+    } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
+             NoSuchPaddingException e) {
       throw new IllegalStateException(e);
     }
   }

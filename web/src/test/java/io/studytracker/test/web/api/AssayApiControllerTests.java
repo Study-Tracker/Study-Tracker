@@ -16,38 +16,15 @@
 
 package io.studytracker.test.web.api;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import antlr.RecognitionException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
 import io.studytracker.example.ExampleAssayGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.mapstruct.dto.api.AssayPayloadDto;
-import io.studytracker.model.Assay;
-import io.studytracker.model.AssayType;
-import io.studytracker.model.Status;
-import io.studytracker.model.Study;
-import io.studytracker.model.User;
+import io.studytracker.model.*;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.AssayTypeRepository;
 import io.studytracker.repository.StudyRepository;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +37,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -113,7 +101,7 @@ public class AssayApiControllerTests extends AbstractApiControllerTests {
   @Test
   public void findByIdTest() throws Exception {
     Assay assay = assayRepository.findByCode("PPB-10001-001")
-            .orElseThrow(RecognitionException::new);
+            .orElseThrow(RecordNotFoundException::new);
 
     mockMvc
         .perform(get("/api/v1/assay/999999999")
