@@ -88,9 +88,9 @@ public class WebSecurityConfiguration {
     @Autowired
     private AppUserDetailsService appUserDetailsService;
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    private DatabaseAuthenticationProvider dbAuthProvider;
+//    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+//    @Autowired
+//    private DatabaseAuthenticationProvider dbAuthProvider;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -126,10 +126,11 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
       http
-          .authorizeHttpRequests(auth -> auth
-              .requestMatchers( "/api/v1/**").authenticated())
+          .securityMatcher("/api/v1/**")
+          .authorizeHttpRequests(auth ->
+              auth.anyRequest().authenticated())
           .csrf(csrf -> csrf.disable())
           .httpBasic(basic -> basic.disable())
           .cors(cors -> cors

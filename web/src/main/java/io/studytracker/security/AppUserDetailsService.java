@@ -17,8 +17,8 @@
 package io.studytracker.security;
 
 import io.studytracker.model.User;
+import io.studytracker.repository.UserRepository;
 import io.studytracker.security.AppUserDetails.AuthMethod;
-import io.studytracker.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +32,11 @@ public class AppUserDetailsService implements UserDetailsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AppUserDetailsService.class);
 
-  @Autowired private UserService userService;
+  @Autowired private UserRepository userRepository;
 
   @Override
   public AppUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userService.findByUsername(username)
+    User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("Could not find user with username: " + username));
     LOGGER.debug("Loaded user details for username: {}", username);
     return new AppUserDetails(user, AuthMethod.DATABASE);
@@ -44,7 +44,7 @@ public class AppUserDetailsService implements UserDetailsService {
 
   public AppUserDetails loadUserBySAML(Saml2AuthenticatedPrincipal principal) throws UsernameNotFoundException {
     String username = principal.getName();
-    User user = userService.findByUsername(username)
+    User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("Could not find user with username: " + username));
     LOGGER.debug("Loading user by SAMLCredentials: {}", username);
     return new AppUserDetails(user, AuthMethod.SAML);

@@ -16,9 +16,8 @@
 
 package io.studytracker.config;
 
-import io.studytracker.config.properties.ApplicationProperties;
-import io.studytracker.model.StringFieldEncryptor;
 import jakarta.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -29,18 +28,16 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableJpaRepositories(basePackages = "io.studytracker.repository")
 @EnableTransactionManagement
 @EnableJpaAuditing
 public class JpaRepositoryConfiguration {
   
-  @Bean
-  public StringFieldEncryptor stringFieldEncryptor(ApplicationProperties applicationProperties) {
-    return new StringFieldEncryptor(applicationProperties.getSecret());
-  }
+//  @Bean
+//  public StringFieldEncryptor stringFieldEncryptor(ApplicationProperties applicationProperties) {
+//    return new StringFieldEncryptor(applicationProperties.getSecret());
+//  }
 
   @Bean
   public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
