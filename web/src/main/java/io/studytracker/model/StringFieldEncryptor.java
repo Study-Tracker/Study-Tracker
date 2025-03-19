@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * From https://sultanov.dev/blog/database-column-level-encryption-with-spring-data-jpa/
  */
 @Component
-@Converter(autoApply = true)
+@Converter
 public class StringFieldEncryptor implements AttributeConverter<String, String>,
     ApplicationContextAware {
 
@@ -84,11 +84,8 @@ public class StringFieldEncryptor implements AttributeConverter<String, String>,
       String secret = getSecret();
       Key key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), AES);
       Cipher cipher = Cipher.getInstance(AES);
-      cipher.init(Cipher.ENCRYPT_MODE, key);
-//      byte[] decodedBytes = Base64.getDecoder().decode(dbData.trim());
-//      byte[] decryptedBytes = cipher.doFinal(decodedBytes);
-//      return new String(decryptedBytes, StandardCharsets.UTF_8);
-      return new String(cipher.doFinal(Base64.getDecoder().decode(dbData.trim())));
+      cipher.init(Cipher.DECRYPT_MODE, key);
+      return new String(cipher.doFinal(Base64.getDecoder().decode(dbData)));
     } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
              NoSuchPaddingException e) {
       throw new IllegalStateException(e);
