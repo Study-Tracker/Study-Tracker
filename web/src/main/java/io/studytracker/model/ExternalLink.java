@@ -27,6 +27,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.net.URL;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -42,7 +43,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class ExternalLink extends Model {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "hibernate_sequence"
+  )
+  @SequenceGenerator(
+      name = "hibernate_sequence",
+      allocationSize = 1
+  )
   private Long id;
 
   @Column(name = "label", nullable = false)

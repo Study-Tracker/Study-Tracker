@@ -28,7 +28,7 @@ import io.studytracker.Application;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.model.Study;
-import io.studytracker.search.elasticsearch.ElasticsearchSearchService;
+import io.studytracker.search.opensearch.OpensearchSearchService;
 import io.studytracker.service.StudyService;
 import io.studytracker.service.UserService;
 import org.hamcrest.Matchers;
@@ -47,8 +47,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@ActiveProfiles({"web-elasticsearch-test", "example"})
-public class ElasticsearchSearchControllerTests {
+@ActiveProfiles({"web-opensearch-test", "example"})
+public class OpensearchSearchControllerTests {
 
   @Autowired private MockMvc mockMvc;
 
@@ -58,7 +58,7 @@ public class ElasticsearchSearchControllerTests {
 
   @Autowired private UserService userService;
 
-  @Autowired private ElasticsearchSearchService searchService;
+  @Autowired private OpensearchSearchService searchService;
 
   private String username;
 

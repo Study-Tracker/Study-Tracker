@@ -39,6 +39,7 @@ import jakarta.persistence.NamedEntityGraphs;
 import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -94,14 +95,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("gitRepositories")
       },
     subgraphs = {
-          @NamedSubgraph(
-              name = "study-storage-folder-details",
-              attributeNodes = {@NamedAttributeNode("storageDriveFolder")}
-          ),
-          @NamedSubgraph(
-              name = "study-notebook-folder-details",
-              attributeNodes = {@NamedAttributeNode("elnFolder")}
-          )
+        @NamedSubgraph(
+            name = "study-storage-folder-details",
+            attributeNodes = {@NamedAttributeNode(value = "storageDriveFolder", subgraph = "study-folder-drive")}
+        ),
+        @NamedSubgraph(
+            name = "study-notebook-folder-details",
+            attributeNodes = {@NamedAttributeNode("elnFolder")}
+        ),
+        @NamedSubgraph(
+            name = "study-folder-drive",
+            attributeNodes = {@NamedAttributeNode("storageDrive")}
+        )
+
     }
   )
 })
@@ -110,7 +116,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Study extends Model {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "hibernate_sequence"
+  )
+  @SequenceGenerator(
+      name = "hibernate_sequence",
+      allocationSize = 1
+  )
   private Long id;
 
   @Column(name = "code", nullable = false)

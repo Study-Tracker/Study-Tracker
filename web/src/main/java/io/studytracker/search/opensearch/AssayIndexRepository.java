@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.studytracker.search.elasticsearch;
+package io.studytracker.search.opensearch;
 
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchAssayDocument;
 import java.util.Collection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Highlight;
@@ -27,7 +27,7 @@ import org.springframework.data.elasticsearch.core.SearchPage;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 public interface AssayIndexRepository
-    extends ElasticsearchRepository<ElasticsearchAssayDocument, Long> {
+    extends ElasticsearchRepository<OpensearchAssayDocument, Long> {
 
   @Highlight(
       fields = {
@@ -45,7 +45,7 @@ public interface AssayIndexRepository
           @HighlightField(name = "fields.*"),
       })
   @Query("{\"multi_match\": {\"query\": \"?0\" }}")
-  SearchHits<ElasticsearchAssayDocument> findDocumentsByKeyword(String keyword);
+  SearchHits<OpensearchAssayDocument> findDocumentsByKeyword(String keyword);
 
   @Query("{\"multi_match\": {\"query\": \"?0\" }}")
   @Highlight(
@@ -63,7 +63,7 @@ public interface AssayIndexRepository
           @HighlightField(name = "assayType.name"),
           @HighlightField(name = "fields.*"),
       })
-  SearchPage<ElasticsearchAssayDocument> findDocumentsByKeyword(String keyword, Pageable pageable);
+  SearchPage<OpensearchAssayDocument> findDocumentsByKeyword(String keyword, Pageable pageable);
 
   @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": \"?1\" }}")
   @Highlight(
@@ -81,7 +81,7 @@ public interface AssayIndexRepository
           @HighlightField(name = "assayType.name"),
           @HighlightField(name = "fields.*"),
       })
-  SearchHits<ElasticsearchAssayDocument> findDocumentsByKeywordAndField(
+  SearchHits<OpensearchAssayDocument> findDocumentsByKeywordAndField(
       String keyword, Collection<String> fields);
 
   @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": \"?1\" }}")
@@ -100,7 +100,7 @@ public interface AssayIndexRepository
           @HighlightField(name = "assayType.name"),
           @HighlightField(name = "fields.*"),
       })
-  SearchPage<ElasticsearchAssayDocument> findDocumentsByKeywordAndField(
+  SearchPage<OpensearchAssayDocument> findDocumentsByKeywordAndField(
       String keyword, Collection<String> fields, Pageable pageable);
 
 }

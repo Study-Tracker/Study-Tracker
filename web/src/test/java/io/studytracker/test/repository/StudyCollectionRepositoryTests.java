@@ -17,6 +17,8 @@
 package io.studytracker.test.repository;
 
 import io.studytracker.Application;
+import io.studytracker.example.ExampleDataRunner;
+import io.studytracker.example.ExampleStudyCollectionGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Program;
@@ -53,7 +55,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test"})
+@ActiveProfiles({"test", "example"})
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StudyCollectionRepositoryTests {
 
@@ -64,14 +66,12 @@ public class StudyCollectionRepositoryTests {
   @Autowired private StudyRepository studyRepository;
   @Autowired private StudyCollectionRepository studyCollectionRepository;
   @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Before
   public void doBefore() {
-    studyCollectionRepository.deleteAll();
-    studyRepository.deleteAll();
-    programRepository.deleteAll();
-    elnFolderRepository.deleteAll();
-    userRepository.deleteAll();
+    exampleDataRunner.clearDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   private void createUser() {
@@ -109,7 +109,8 @@ public class StudyCollectionRepositoryTests {
 
   private void createProgram() {
 
-    User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("test@email.com")
+        .orElseThrow(RecordNotFoundException::new);
     
     Program program = new Program();
     program.setActive(true);
@@ -125,7 +126,8 @@ public class StudyCollectionRepositoryTests {
 
   private void createStudy() {
 
-    User user = userRepository.findByEmail("test@email.com").orElseThrow(RecordNotFoundException::new);
+    User user = userRepository.findByEmail("test@email.com")
+        .orElseThrow(RecordNotFoundException::new);
     Program program =
         programRepository.findByName("Test Program").orElseThrow(RecordNotFoundException::new);
 
@@ -154,7 +156,8 @@ public class StudyCollectionRepositoryTests {
     User user = userRepository.findAll().get(0);
     Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
 
-    Assert.assertEquals(0, studyCollectionRepository.count());
+    Assert.assertEquals(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT,
+        studyCollectionRepository.count());
 
     StudyCollection studyCollection = new StudyCollection();
     studyCollection.setCreatedBy(user);
@@ -164,7 +167,8 @@ public class StudyCollectionRepositoryTests {
     studyCollection.addStudy(study);
     studyCollectionRepository.save(studyCollection);
 
-    Assert.assertEquals(1, studyCollectionRepository.count());
+    Assert.assertEquals(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT + 1,
+        studyCollectionRepository.count());
     Assert.assertNotNull(studyCollection.getId());
     StudyCollection created =
         studyCollectionRepository
@@ -177,7 +181,10 @@ public class StudyCollectionRepositoryTests {
   public void updatedStudyCollectionTest() {
     newStudyCollectionTest();
     Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
-    StudyCollection created = studyCollectionRepository.findAll().get(0);
+    StudyCollection created = studyCollectionRepository.findAll().stream()
+        .filter(c -> c.getName().equals("Favorites"))
+        .findFirst()
+        .orElseThrow();
     StudyCollection c =
         studyCollectionRepository
             .findById(created.getId())
@@ -194,9 +201,14 @@ public class StudyCollectionRepositoryTests {
   @Test
   public void deleteStudyCollectionTest() {
     newStudyCollectionTest();
-    Assert.assertEquals(1, studyCollectionRepository.count());
-    StudyCollection studyCollection = studyCollectionRepository.findAll().get(0);
+    Assert.assertEquals(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT + 1,
+        studyCollectionRepository.count());
+    StudyCollection studyCollection = studyCollectionRepository.findAll().stream()
+        .filter(c -> c.getName().equals("Favorites"))
+        .findFirst()
+        .orElseThrow();
     studyCollectionRepository.deleteById(studyCollection.getId());
-    Assert.assertEquals(0, studyCollectionRepository.count());
+    Assert.assertEquals(ExampleStudyCollectionGenerator.STUDY_COLLECTION_COUNT,
+        studyCollectionRepository.count());
   }
 }

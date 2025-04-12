@@ -29,6 +29,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -41,7 +42,14 @@ import jakarta.persistence.Table;
 public class StudyRelationship extends Model {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "hibernate_sequence"
+  )
+  @SequenceGenerator(
+      name = "hibernate_sequence",
+      allocationSize = 1
+  )
   private Long id;
 
   @Column(name = "type", nullable = false)

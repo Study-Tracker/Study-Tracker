@@ -30,6 +30,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -60,7 +61,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class StudyCollection extends Model {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "hibernate_sequence"
+  )
+  @SequenceGenerator(
+      name = "hibernate_sequence",
+      allocationSize = 1
+  )
   private Long id;
 
   @Column(name = "name", nullable = false)
@@ -74,7 +82,7 @@ public class StudyCollection extends Model {
 
   @CreatedBy
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "createdBy", nullable = false, updatable = false)
+  @JoinColumn(name = "created_by", nullable = false, updatable = false)
   private User createdBy;
 
   @LastModifiedBy

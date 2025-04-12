@@ -16,19 +16,19 @@
 
 package io.studytracker.mapstruct.mapper;
 
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayTaskDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayTypeDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchCollaboratorDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchCommentDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchConclusionsDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchFolderDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchKeywordDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchLinkDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchProgramDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudyDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudySummaryDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchUserDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchAssayDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchAssayTaskDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchAssayTypeDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchCollaboratorDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchCommentDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchConclusionsDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchFolderDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchKeywordDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchLinkDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchProgramDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchStudyDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchStudySummaryDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchUserDocument;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayTask;
 import io.studytracker.model.AssayType;
@@ -49,61 +49,61 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ElasticsearchDocumentMapper {
 
-  ElasticsearchStudyDocument fromStudy(Study study);
+  OpensearchStudyDocument fromStudy(Study study);
 
-  List<ElasticsearchStudyDocument> fromStudyList(List<Study> studies);
+  List<OpensearchStudyDocument> fromStudyList(List<Study> studies);
 
-  Set<ElasticsearchStudyDocument> fromStudySet(Set<Study> studies);
+  Set<OpensearchStudyDocument> fromStudySet(Set<Study> studies);
 
-  ElasticsearchCollaboratorDocument fromCollaborator(Collaborator collaborator);
+  OpensearchCollaboratorDocument fromCollaborator(Collaborator collaborator);
 
-  List<ElasticsearchCollaboratorDocument> fromCollaboratorList(List<Collaborator> collaborators);
+  List<OpensearchCollaboratorDocument> fromCollaboratorList(List<Collaborator> collaborators);
 
-  Set<ElasticsearchCollaboratorDocument> fromCollaboratorSet(Set<Collaborator> collaborators);
+  Set<OpensearchCollaboratorDocument> fromCollaboratorSet(Set<Collaborator> collaborators);
 
-  ElasticsearchCommentDocument fromCommentt(Comment comment);
+  OpensearchCommentDocument fromCommentt(Comment comment);
 
-  List<ElasticsearchCommentDocument> fromCommentList(List<Comment> comments);
+  List<OpensearchCommentDocument> fromCommentList(List<Comment> comments);
 
-  Set<ElasticsearchCommentDocument> fromCommentSet(Set<Comment> comments);
+  Set<OpensearchCommentDocument> fromCommentSet(Set<Comment> comments);
 
-  ElasticsearchConclusionsDocument fromConclusions(Conclusions conclusions);
+  OpensearchConclusionsDocument fromConclusions(Conclusions conclusions);
 
-  ElasticsearchFolderDocument fromELNFolder(ELNFolder elnFolder);
+  OpensearchFolderDocument fromELNFolder(ELNFolder elnFolder);
 
-  List<ElasticsearchFolderDocument> fromElnFolderList(List<ELNFolder> elnFolderList);
+  List<OpensearchFolderDocument> fromElnFolderList(List<ELNFolder> elnFolderList);
 
-  Set<ElasticsearchFolderDocument> fromElnFolderSet(Set<ELNFolder> folders);
+  Set<OpensearchFolderDocument> fromElnFolderSet(Set<ELNFolder> folders);
 
-  ElasticsearchKeywordDocument fromKeyword(Keyword keyword);
+  OpensearchKeywordDocument fromKeyword(Keyword keyword);
 
-  List<ElasticsearchKeywordDocument> fromKeywordList(List<Keyword> keywords);
+  List<OpensearchKeywordDocument> fromKeywordList(List<Keyword> keywords);
 
-  Set<ElasticsearchKeywordDocument> fromKeywordSet(Set<Keyword> keywords);
+  Set<OpensearchKeywordDocument> fromKeywordSet(Set<Keyword> keywords);
 
-  ElasticsearchLinkDocument fromExternalLink(ExternalLink link);
+  OpensearchLinkDocument fromExternalLink(ExternalLink link);
 
-  List<ElasticsearchLinkDocument> fromExternalLinkList(List<ExternalLink> links);
+  List<OpensearchLinkDocument> fromExternalLinkList(List<ExternalLink> links);
 
-  Set<ElasticsearchLinkDocument> fromExternalLinkSet(Set<ExternalLink> links);
+  Set<OpensearchLinkDocument> fromExternalLinkSet(Set<ExternalLink> links);
 
-  ElasticsearchProgramDocument fromProgram(Program program);
+  OpensearchProgramDocument fromProgram(Program program);
 
-  ElasticsearchUserDocument fromUser(User user);
+  OpensearchUserDocument fromUser(User user);
 
-  List<ElasticsearchUserDocument> fromUserList(List<User> users);
+  List<OpensearchUserDocument> fromUserList(List<User> users);
 
-  Set<ElasticsearchUserDocument> fromUserSet(Set<User> users);
+  Set<OpensearchUserDocument> fromUserSet(Set<User> users);
 
-  ElasticsearchAssayDocument fromAssay(Assay assay);
-  List<ElasticsearchAssayDocument> fromAssayList(List<Assay> assays);
+  OpensearchAssayDocument fromAssay(Assay assay);
+  List<OpensearchAssayDocument> fromAssayList(List<Assay> assays);
 
-  ElasticsearchAssayTypeDocument fromAssayType(AssayType assayType);
+  OpensearchAssayTypeDocument fromAssayType(AssayType assayType);
 
-  ElasticsearchAssayTaskDocument fromAssayTask(AssayTask task);
-  Set<ElasticsearchAssayTaskDocument> fromAssayTaskSet(Set<AssayTask> tasks);
+  OpensearchAssayTaskDocument fromAssayTask(AssayTask task);
+  Set<OpensearchAssayTaskDocument> fromAssayTaskSet(Set<AssayTask> tasks);
 
-  ElasticsearchStudySummaryDocument fromStudySummary(Study study);
+  OpensearchStudySummaryDocument fromStudySummary(Study study);
 
   /** For mapping the {@link ExternalLink#getUrl()} field to a String * */
   default String map(URL url) {

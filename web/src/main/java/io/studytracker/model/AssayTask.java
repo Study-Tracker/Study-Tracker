@@ -38,6 +38,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -56,6 +58,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("fields")
       })
 })
+@Getter
+@Setter
 public class AssayTask extends Task {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -77,6 +81,7 @@ public class AssayTask extends Task {
   private User assignedTo;
 
   @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "due_date")
   private Date dueDate;
 
   @OneToMany(
@@ -95,46 +100,6 @@ public class AssayTask extends Task {
     return assay;
   }
 
-  public void setAssay(Assay assay) {
-    this.assay = assay;
-  }
-
-  public User getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public User getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(User lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
-  public User getAssignedTo() {
-    return assignedTo;
-  }
-
-  public void setAssignedTo(User assignedTo) {
-    this.assignedTo = assignedTo;
-  }
-
-  public Date getDueDate() {
-    return dueDate;
-  }
-
-  public void setDueDate(Date dueDate) {
-    this.dueDate = dueDate;
-  }
-
-  public Set<AssayTaskField> getFields() {
-    return fields;
-  }
-
   public void setFields(Set<AssayTaskField> fields) {
     for (AssayTaskField field: fields) {
       field.setAssayTask(this);
@@ -151,14 +116,6 @@ public class AssayTask extends Task {
     for (AssayTaskField f: assayTaskFields) {
       this.addField(f);
     }
-  }
-
-  public Map<String, Object> getData() {
-    return data;
-  }
-
-  public void setData(Map<String, Object> data) {
-    this.data = data;
   }
 
   public void addData(String key, Object value) {

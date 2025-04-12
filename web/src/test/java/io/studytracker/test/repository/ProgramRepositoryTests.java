@@ -17,6 +17,8 @@
 package io.studytracker.test.repository;
 
 import io.studytracker.Application;
+import io.studytracker.example.ExampleDataRunner;
+import io.studytracker.example.ExampleProgramGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Program;
@@ -46,15 +48,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test"})
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles({"test", "example"})
+//@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ProgramRepositoryTests {
 
   @Autowired private UserRepository userRepository;
@@ -63,12 +63,12 @@ public class ProgramRepositoryTests {
   @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
   @Autowired private ProgramStorageFolderRepository programStorageFolderRepository;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Before
   public void doBefore() {
-    programRepository.deleteAll();
-    elnFolderRepository.deleteAll();
-    userRepository.deleteAll();
+    exampleDataRunner.clearDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   private User createUser() {
@@ -110,9 +110,9 @@ public class ProgramRepositoryTests {
 
     User user = createUser();
     
-    Assert.assertEquals(0, programRepository.count());
-    Assert.assertEquals(0, programStorageFolderRepository.count());
-    Assert.assertEquals(0, elnFolderRepository.count());
+    Assert.assertEquals(ExampleProgramGenerator.PROGRAM_COUNT, programRepository.count());
+    Assert.assertEquals(ExampleProgramGenerator.PROGRAM_COUNT, programStorageFolderRepository.count());
+    Assert.assertEquals(ExampleDataRunner.NOTEBOOK_FOLDER_COUNT, elnFolderRepository.count());
 
     Program program = new Program();
     program.setActive(true);
@@ -125,9 +125,9 @@ public class ProgramRepositoryTests {
 
     programRepository.save(program);
 
-    Assert.assertEquals(1, programRepository.count());
-    Assert.assertEquals(1, programStorageFolderRepository.count());
-    Assert.assertEquals(0, elnFolderRepository.count());
+    Assert.assertEquals(ExampleProgramGenerator.PROGRAM_COUNT +1, programRepository.count());
+    Assert.assertEquals(ExampleProgramGenerator.PROGRAM_COUNT + 1, programStorageFolderRepository.count());
+    Assert.assertEquals(ExampleDataRunner.NOTEBOOK_FOLDER_COUNT, elnFolderRepository.count());
 
     Assert.assertNotNull(program.getId());
 
@@ -150,7 +150,7 @@ public class ProgramRepositoryTests {
 
     created.setStorageFolders(new HashSet<>());
     programRepository.save(created);
-    Assert.assertEquals(0, programStorageFolderRepository.count());
+    Assert.assertEquals(ExampleProgramGenerator.PROGRAM_COUNT, programStorageFolderRepository.count());
 
     Exception exception = null;
     Program duplicate = new Program();
@@ -167,7 +167,7 @@ public class ProgramRepositoryTests {
     }
 
     Assert.assertNotNull(exception);
-    Assert.assertEquals(1, programRepository.count());
+    Assert.assertEquals(ExampleProgramGenerator.PROGRAM_COUNT + 1, programRepository.count());
   }
 
   @Test

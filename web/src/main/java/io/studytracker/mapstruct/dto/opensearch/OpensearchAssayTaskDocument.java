@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.mapstruct.dto.opensearch;
 
 import io.studytracker.model.TaskStatus;
 import java.util.Date;
@@ -23,7 +23,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Data
-public class ElasticsearchAssayTaskDocument {
+public class OpensearchAssayTaskDocument {
 
   private Long id;
 
@@ -38,13 +38,13 @@ public class ElasticsearchAssayTaskDocument {
   private Date updatedAt;
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchUserDocument createdBy;
+  private OpensearchUserDocument createdBy;
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchUserDocument lastModifiedBy;
+  private OpensearchUserDocument lastModifiedBy;
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchUserDocument assignedTo;
+  private OpensearchUserDocument assignedTo;
 
   private Date dueDate;
 

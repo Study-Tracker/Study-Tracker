@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.studytracker.search.elasticsearch;
+package io.studytracker.search.opensearch;
 
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudyDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchStudyDocument;
 import java.util.Collection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Highlight;
@@ -27,7 +27,7 @@ import org.springframework.data.elasticsearch.core.SearchPage;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 public interface StudyIndexRepository
-    extends ElasticsearchRepository<ElasticsearchStudyDocument, Long> {
+    extends ElasticsearchRepository<OpensearchStudyDocument, Long> {
 
   @Highlight(
       fields = {
@@ -49,7 +49,7 @@ public interface StudyIndexRepository
         @HighlightField(name = "conclusions.content")
       })
   @Query("{\"multi_match\": {\"query\": \"?0\" }}")
-  SearchHits<ElasticsearchStudyDocument> findDocumentsByKeyword(String keyword);
+  SearchHits<OpensearchStudyDocument> findDocumentsByKeyword(String keyword);
 
   @Query("{\"multi_match\": {\"query\": \"?0\" }}")
   @Highlight(
@@ -71,7 +71,7 @@ public interface StudyIndexRepository
         @HighlightField(name = "comments.createdBy.displayName"),
         @HighlightField(name = "conclusions.content")
       })
-  SearchPage<ElasticsearchStudyDocument> findDocumentsByKeyword(String keyword, Pageable pageable);
+  SearchPage<OpensearchStudyDocument> findDocumentsByKeyword(String keyword, Pageable pageable);
 
   @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": \"?1\" }}")
   @Highlight(
@@ -93,7 +93,7 @@ public interface StudyIndexRepository
         @HighlightField(name = "comments.createdBy.displayName"),
         @HighlightField(name = "conclusions.content")
       })
-  SearchHits<ElasticsearchStudyDocument> findDocumentsByKeywordAndField(
+  SearchHits<OpensearchStudyDocument> findDocumentsByKeywordAndField(
       String keyword, Collection<String> fields);
 
   @Query("{\"multi_match\": {\"query\": \"?0\", \"fields\": \"?1\" }}")
@@ -116,6 +116,6 @@ public interface StudyIndexRepository
         @HighlightField(name = "comments.createdBy.displayName"),
         @HighlightField(name = "conclusions.content")
       })
-  SearchPage<ElasticsearchStudyDocument> findDocumentsByKeywordAndField(
+  SearchPage<OpensearchStudyDocument> findDocumentsByKeywordAndField(
       String keyword, Collection<String> fields, Pageable pageable);
 }

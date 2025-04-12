@@ -44,7 +44,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles({"gitlab-test", "example"})
 public class GitLabIntegrationServiceTests {
 
-  private static final String EXAMPLE_GROUP = "API Client Test Group";
+  private static final String EXAMPLE_GROUP = "API Testing";
 
   @Autowired
   private GitLabIntegrationService integrationService;

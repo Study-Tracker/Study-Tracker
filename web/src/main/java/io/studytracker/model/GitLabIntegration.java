@@ -24,6 +24,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -38,7 +39,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class GitLabIntegration implements GitServerIntegration {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "hibernate_sequence"
+  )
+  @SequenceGenerator(
+      name = "hibernate_sequence",
+      allocationSize = 1
+  )
   private Long id;
 
   @Column(name = "name", nullable = false)

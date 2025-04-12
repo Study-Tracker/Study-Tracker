@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.mapstruct.dto.opensearch;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.Data;
 
 @Data
-public class ElasticsearchAssayTypeDocument {
+public class OpensearchAssayTypeDocument {
 
   private Long id;
   private String name;

@@ -17,6 +17,7 @@
 package io.studytracker.test.msgraph;
 
 import io.studytracker.Application;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.Assay;
 import io.studytracker.model.AssayType;
 import io.studytracker.model.MSGraphIntegration;
@@ -70,7 +71,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"msgraph-test"})
+@ActiveProfiles({"msgraph-test", "example"})
 public class OneDriveStudyStorageServiceTests {
 
   @Value("${ms-graph.tenant-id}")
@@ -130,21 +131,14 @@ public class OneDriveStudyStorageServiceTests {
   @Autowired
   private ActivityRepository activityRepository;
 
+  @Autowired
+  private ExampleDataRunner exampleDataRunner;
+
   @Before
   public void setup() {
 
-    activityRepository.deleteAll();
-    assayStorageFolderRepository.deleteAll();
-    studyStorageFolderRepository.deleteAll();
-    programStorageFolderRepository.deleteAll();
-    storageDriveFolderRepository.deleteAll();
-    storageDriveRepository.deleteAll();
-    sharePointSiteRepository.deleteAll();
-    msGraphIntegrationRepository.deleteAll();
-    assayRepository.deleteAll();
-    studyRepository.deleteAll();
-    programRepository.deleteAll();
-    userRepository.deleteAll();
+    exampleDataRunner.clearDatabase();
+    exampleDataRunner.populateDatabase();
 
     User user = new User();
     user.setDisplayName("Joe Person");
@@ -287,8 +281,11 @@ public class OneDriveStudyStorageServiceTests {
     programRepository.save(program);
 
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
-    Assert.assertEquals(1, rootFolders.size());
-    StorageDriveFolder rootFolder = rootFolders.get(0);
+    Assert.assertEquals(ExampleDataRunner.STUDY_ROOT_FOLDER_COUNT + 1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.stream()
+        .filter(f -> f.getStorageDrive().getDriveType().equals(DriveType.ONEDRIVE))
+        .findFirst()
+        .orElseThrow();
 
     String folderName = ProgramService.generateProgramStorageFolderName(program);
     StorageFolder storageFolder = storageService.createFolder(rootFolder, folderName);
@@ -401,8 +398,11 @@ public class OneDriveStudyStorageServiceTests {
     Assert.assertNotNull(drives);
     Assert.assertTrue(drives.size() > 0);
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
-    Assert.assertEquals(1, rootFolders.size());
-    StorageDriveFolder rootFolder = rootFolders.get(0);
+    Assert.assertEquals(ExampleDataRunner.STUDY_ROOT_FOLDER_COUNT + 1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.stream()
+        .filter(f -> f.getStorageDrive().getDriveType().equals(DriveType.ONEDRIVE))
+        .findFirst()
+        .orElseThrow();
     StorageFolder folder = null;
     Exception exception = null;
     try {
@@ -420,10 +420,13 @@ public class OneDriveStudyStorageServiceTests {
   public void renameFolderTest() throws Exception {
     List<StorageDrive> drives = storageDriveRepository.findByDriveType(DriveType.ONEDRIVE);
     Assert.assertNotNull(drives);
-    Assert.assertTrue(drives.size() > 0);
+    Assert.assertFalse(drives.isEmpty());
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
-    Assert.assertEquals(1, rootFolders.size());
-    StorageDriveFolder rootFolder = rootFolders.get(0);
+    Assert.assertEquals(ExampleDataRunner.STUDY_ROOT_FOLDER_COUNT + 1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.stream()
+        .filter(f -> f.getStorageDrive().getDriveType().equals(DriveType.ONEDRIVE))
+        .findFirst()
+        .orElseThrow();
     StorageFolder folder = null;
     Exception exception = null;
     String uuid = UUID.randomUUID().toString();
@@ -431,6 +434,7 @@ public class OneDriveStudyStorageServiceTests {
       folder = storageService.createFolder(rootFolder, uuid);
     } catch (Exception e) {
       exception = e;
+      e.printStackTrace();
     }
     Assert.assertNull(exception);
     Assert.assertNotNull(folder);
@@ -443,6 +447,7 @@ public class OneDriveStudyStorageServiceTests {
       updated = storageService.renameFolder(rootFolder.getStorageDrive(), folder.getPath(), uuid + "_renamed");
     } catch (Exception e) {
       exception = e;
+      e.printStackTrace();
     }
     
     Assert.assertNull(exception);
@@ -458,8 +463,11 @@ public class OneDriveStudyStorageServiceTests {
     Assert.assertNotNull(drives);
     Assert.assertTrue(drives.size() > 0);
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
-    Assert.assertEquals(1, rootFolders.size());
-    StorageDriveFolder rootFolder = rootFolders.get(0);
+    Assert.assertEquals(ExampleDataRunner.STUDY_ROOT_FOLDER_COUNT + 1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.stream()
+        .filter(f -> f.getStorageDrive().getDriveType().equals(DriveType.ONEDRIVE))
+        .findFirst()
+        .orElseThrow();
     StorageFolder folder = null;
     StorageFolder parentFolder = null;
     Exception exception = null;
@@ -469,6 +477,7 @@ public class OneDriveStudyStorageServiceTests {
       parentFolder = storageService.createFolder(rootFolder, uuid + "_parent");
     } catch (Exception e) {
       exception = e;
+      e.printStackTrace();
     }
     Assert.assertNull(exception);
     Assert.assertNotNull(folder);
@@ -484,6 +493,7 @@ public class OneDriveStudyStorageServiceTests {
       updated = storageService.moveFolder(rootFolder.getStorageDrive(), folder.getPath(), parentFolder.getPath());
     } catch (Exception e) {
       exception = e;
+      e.printStackTrace();
     }
 
     Assert.assertNull(exception);
@@ -499,8 +509,11 @@ public class OneDriveStudyStorageServiceTests {
     Assert.assertTrue(drives.size() > 0);
     ClassPathResource resource = new ClassPathResource("test.txt");
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
-    Assert.assertEquals(1, rootFolders.size());
-    StorageDriveFolder rootFolder = rootFolders.get(0);
+    Assert.assertEquals(ExampleDataRunner.STUDY_ROOT_FOLDER_COUNT + 1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.stream()
+        .filter(f -> f.getStorageDrive().getDriveType().equals(DriveType.ONEDRIVE))
+        .findFirst()
+        .orElseThrow();
     StorageFile storageFile = null;
     Exception exception = null;
     try {
@@ -518,8 +531,11 @@ public class OneDriveStudyStorageServiceTests {
   public void fetchFileTest() throws Exception {
     saveFileTest();
     List<StorageDriveFolder> rootFolders = storageDriveFolderService.findStudyRootFolders();
-    Assert.assertEquals(1, rootFolders.size());
-    StorageDriveFolder rootFolder = rootFolders.get(0);
+    Assert.assertEquals(ExampleDataRunner.STUDY_ROOT_FOLDER_COUNT + 1, rootFolders.size());
+    StorageDriveFolder rootFolder = rootFolders.stream()
+        .filter(f -> f.getStorageDrive().getDriveType().equals(DriveType.ONEDRIVE))
+        .findFirst()
+        .orElseThrow();
     Resource file = null;
     Exception exception = null;
     try {

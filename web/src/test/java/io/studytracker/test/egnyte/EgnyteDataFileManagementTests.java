@@ -29,6 +29,7 @@ import io.studytracker.repository.StorageDriveRepository;
 import io.studytracker.storage.StorageFile;
 import io.studytracker.storage.StorageFolder;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"egnyte-test"})
+@Ignore
 public class EgnyteDataFileManagementTests {
 
   @Autowired

@@ -33,6 +33,6 @@ public class ExampleDataInitializationRunner implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
-    exampleDataRunner.populateDatabase();
+//    exampleDataRunner.populateDatabase();
   }
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.mapstruct.dto.opensearch;
 
 import io.studytracker.model.Status;
-import io.studytracker.search.AssaySearchDocument;
+import io.studytracker.search.StudySearchDocument;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,31 +29,43 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "st-assays")
+@Document(indexName = "st-studies")
 @Data
-public class ElasticsearchAssayDocument implements AssaySearchDocument<Long> {
+public class OpensearchStudyDocument implements StudySearchDocument<Long> {
 
   @Id private Long id;
 
   private String code;
 
+  private String externalCode;
+
+  private Status status;
+
   private String name;
+
+  @Field(type = FieldType.Nested, includeInParent = true)
+  private OpensearchProgramDocument program;
 
   private String description;
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchAssayTypeDocument assayType;
+  private OpensearchCollaboratorDocument collaborator;
 
-  private Status status;
+  private boolean legacy;
 
-  @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchStudySummaryDocument study;
-
-  @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchUserDocument createdBy;
+  private boolean active;
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchUserDocument lastModifiedBy;
+  private OpensearchFolderDocument notebookFolder;
+
+  @Field(type = FieldType.Nested, includeInParent = true)
+  private OpensearchFolderDocument storageFolder;
+
+  @Field(type = FieldType.Nested, includeInParent = true)
+  private OpensearchUserDocument createdBy;
+
+  @Field(type = FieldType.Nested, includeInParent = true)
+  private OpensearchUserDocument lastModifiedBy;
 
   private Date startDate;
 
@@ -64,18 +76,22 @@ public class ElasticsearchAssayDocument implements AssaySearchDocument<Long> {
   private Date updatedAt;
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private ElasticsearchUserDocument owner;
+  private OpensearchUserDocument owner;
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private Set<ElasticsearchUserDocument> users = new HashSet<>();
+  private Set<OpensearchUserDocument> users = new HashSet<>();
+
+  @Field(type = FieldType.Nested, includeInParent = true)
+  private Set<OpensearchKeywordDocument> keywords = new HashSet<>();
 
   private Map<String, String> attributes = new HashMap<>();
 
-  private boolean active;
-
-  private Map<String, Object> fields = new HashMap<>();
+  @Field(type = FieldType.Nested, includeInParent = true)
+  private Set<OpensearchLinkDocument> externalLinks = new HashSet<>();
 
   @Field(type = FieldType.Nested, includeInParent = true)
-  private Set<ElasticsearchAssayTaskDocument> tasks;
+  private OpensearchConclusionsDocument conclusions;
 
+  @Field(type = FieldType.Nested, includeInParent = true)
+  private Set<OpensearchCommentDocument> comments = new HashSet<>();
 }

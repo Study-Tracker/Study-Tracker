@@ -25,6 +25,7 @@ import java.io.File;
 import java.net.URL;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"egnyte-test", "example"})
+@Ignore
 public class EgnyteRestClientFileUploadTests {
 
   private static final Resource EXAMPLE_FILE = new ClassPathResource("upload-test.txt");

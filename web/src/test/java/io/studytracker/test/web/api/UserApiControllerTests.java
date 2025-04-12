@@ -30,12 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.studytracker.Application;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.mapstruct.dto.api.UserPayloadDto;
 import io.studytracker.mapstruct.mapper.UserMapper;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.service.UserService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +66,15 @@ public class UserApiControllerTests extends AbstractApiControllerTests {
 
   @Autowired
   private UserMapper userMapper;
+
+  @Autowired
+  private ExampleDataRunner exampleDataRunner;
+
+  @Before
+  public void setUp() throws Exception {
+    exampleDataRunner.clearDatabase();
+    exampleDataRunner.populateDatabase();
+  }
 
   @Test
   public void unauthorizedFetchTest() throws Exception {

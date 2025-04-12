@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
 @ToString
 public class SearchProperties {
 
-  @ConfigurationModeConstraint(options = {"elasticsearch"})
+  @ConfigurationModeConstraint(options = {"opensearch"})
   private String mode;
 
 }

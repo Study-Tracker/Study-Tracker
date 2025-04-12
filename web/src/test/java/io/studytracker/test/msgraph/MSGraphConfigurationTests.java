@@ -22,20 +22,16 @@ import com.microsoft.aad.msal4j.ClientCredentialFactory;
 import com.microsoft.aad.msal4j.ClientCredentialParameters;
 import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 import com.microsoft.aad.msal4j.IAuthenticationResult;
-import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
-import com.microsoft.graph.http.GraphServiceException;
 import com.microsoft.graph.models.Drive;
+import com.microsoft.graph.models.DriveCollectionResponse;
 import com.microsoft.graph.models.DriveItem;
+import com.microsoft.graph.models.DriveItemCollectionResponse;
 import com.microsoft.graph.models.Site;
-import com.microsoft.graph.requests.DriveCollectionPage;
-import com.microsoft.graph.requests.DriveItemCollectionPage;
-import com.microsoft.graph.requests.GraphServiceClient;
-import com.microsoft.graph.requests.SiteCollectionPage;
+import com.microsoft.graph.models.SiteCollectionResponse;
+import com.microsoft.graph.serviceclient.GraphServiceClient;
 import io.studytracker.Application;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -72,19 +68,13 @@ public class MSGraphConfigurationTests {
   @Value("${ms-graph.scope}")
   private String scope;
 
-  private GraphServiceClient buildCLient() {
+  private GraphServiceClient buildClient() {
     ClientSecretCredential credential = new ClientSecretCredentialBuilder()
         .clientId(clientId)
         .clientSecret(secret)
         .tenantId(tenantId)
         .build();
-
-    TokenCredentialAuthProvider provider = new TokenCredentialAuthProvider(Arrays.asList(scope), credential);
-
-    return GraphServiceClient
-        .builder()
-        .authenticationProvider(provider)
-        .buildClient();
+    return new GraphServiceClient(credential, scope);
   }
 
   @Test
@@ -117,14 +107,7 @@ public class MSGraphConfigurationTests {
         .build();
     Assert.assertNotNull(credential);
 
-    TokenCredentialAuthProvider provider = new TokenCredentialAuthProvider(Arrays.asList(scope),
-        credential);
-    Assert.assertNotNull(provider);
-
-    GraphServiceClient graphClient = GraphServiceClient
-        .builder()
-        .authenticationProvider(provider)
-        .buildClient();
+    GraphServiceClient graphClient = new GraphServiceClient(credential, scope);
     Assert.assertNotNull(graphClient);
 
   }
@@ -132,38 +115,31 @@ public class MSGraphConfigurationTests {
   @Test
   public void findSharepointSitesTest() throws Exception {
 
-    GraphServiceClient graphClient = buildCLient();
+    GraphServiceClient graphClient = buildClient();
 
     // Get all sites
-    List<Site> siteList = new ArrayList<>();
-    SiteCollectionPage sitePage = graphClient.sites().buildRequest().get();
-    while (sitePage != null) {
-      siteList.addAll(sitePage.getCurrentPage());
-      if (sitePage.getNextPage() == null) {
-        break;
-      } else {
-        sitePage = sitePage.getNextPage().buildRequest().get();
-      }
-    }
+    SiteCollectionResponse sitePage = graphClient.sites().get();
+    List<Site> siteList = sitePage.getValue();
+
     for (Site site : siteList) {
       System.out.println(
-          "Site: " + site.displayName + "  ID: " + site.id + "  URL: " + site.webUrl);
+          "Site: " + site.getDisplayName() + "  ID: " + site.getId() + "  URL: " + site.getWebUrl());
     }
 
     // Get the Study Tracker site
     Site site = siteList.stream()
-        .filter(s -> s.displayName != null && s.displayName.equals("Study Tracker Development"))
+        .filter(s -> s.getDisplayName() != null && s.getDisplayName().equals("Study Tracker Development"))
         .findFirst()
         .orElse(null);
     Assert.assertNotNull(site);
-    Assert.assertEquals("Study Tracker Development", site.displayName);
-    Assert.assertNotNull(site.id);
-    System.out.println("Site: " + site.displayName
-        + " \nID: " + site.id
-        + " \nURL: " + site.webUrl
-        + " \nName: " + site.name
-        + " \nRoot: " + site.root.oDataType
-        + " \nDescription: " + site.description
+    Assert.assertEquals("Study Tracker Development", site.getDisplayName());
+    Assert.assertNotNull(site.getId());
+    System.out.println("Site: " + site.getDisplayName()
+        + " \nID: " + site.getId()
+        + " \nURL: " + site.getWebUrl()
+        + " \nName: " + site.getName()
+        + " \nRoot: " + site.getRoot().getOdataType()
+        + " \nDescription: " + site.getDescription()
     );
 
   }
@@ -171,71 +147,72 @@ public class MSGraphConfigurationTests {
   @Test
   public void findSharepointSiteDrivesTest() throws Exception {
 
-    GraphServiceClient graphClient = buildCLient();
-    SiteCollectionPage sitePage = graphClient.sites().buildRequest().get();
-    Site site = sitePage.getCurrentPage().stream()
-        .filter(s -> s.displayName != null && s.displayName.equals("Study Tracker Development"))
+    GraphServiceClient graphClient = buildClient();
+    SiteCollectionResponse sitePage = graphClient.sites().get();
+    Site site = sitePage.getValue().stream()
+        .filter(s -> s.getDisplayName() != null
+            && s.getDisplayName().equals("Study Tracker Development"))
         .findFirst()
         .orElse(null);
 
     // Get the Study Tracker site drives
-    DriveCollectionPage page = graphClient.sites(site.id).drives().buildRequest().get();
+    DriveCollectionResponse page = graphClient.sites().bySiteId(site.getId()).drives().get();
     Assert.assertNotNull(page);
     System.out.println(page);
-    System.out.println("# Drives: " + page.getCount());
-    for (Drive drive:  page.getCurrentPage()) {
-      System.out.println("ID: " + drive.id + "  Name: " + drive.name + "  URL: " + drive.webUrl);
+    System.out.println("# Drives: " + page.getValue().size());
+    for (Drive drive:  page.getValue()) {
+      System.out.println("ID: " + drive.getId() + "  Name: " + drive.getName()
+          + "  URL: " + drive.getWebUrl());
     }
-    Drive drive = page.getCurrentPage().get(0);
+    Drive drive = page.getValue().get(0);
     Assert.assertNotNull(drive);
 
     // Get the root folder
 
-    Drive stDrive = graphClient.drives(drive.id).buildRequest().get();
+    Drive stDrive = graphClient.drives().byDriveId(drive.getId()).get();
     Assert.assertNotNull(stDrive);
 
-    DriveItem driveRootFolder = graphClient.drives(drive.id).root().itemWithPath("/").buildRequest().get();
+    DriveItem driveRootFolder = graphClient.drives().byDriveId(drive.getId())
+        .items().byDriveItemId("root:/").get();
     Assert.assertNotNull(driveRootFolder);
     System.out.println("Root folder...");
-    System.out.println("Name: " + driveRootFolder.name + "  ID: " + driveRootFolder.id + "  URL: " + driveRootFolder.webUrl);
-    System.out.println("Path: " + driveRootFolder.parentReference.path + "  ID: " + driveRootFolder.parentReference.id + "  Has Parent: " + (driveRootFolder.parentReference != null ? "True":"False"));
+    System.out.println("Name: " + driveRootFolder.getName() + "  ID: " + driveRootFolder.getId()
+        + "  URL: " + driveRootFolder.getWebUrl());
+    System.out.println("Path: " + driveRootFolder.getParentReference().getPath()
+        + "  ID: " + driveRootFolder.getParentReference().getId()
+        + "  Has Parent: " + (driveRootFolder.getParentReference() != null ? "True":"False"));
 
-    driveRootFolder = graphClient.drives(drive.id).root().itemWithPath("/Project A").buildRequest().get();
+    driveRootFolder = graphClient.drives().byDriveId(drive.getId())
+        .items().byDriveItemId("root:/Project A").get();
     Assert.assertNotNull(driveRootFolder);
     System.out.println("Project A folder...");
-    System.out.println("Name: " + driveRootFolder.name + "  ID: " + driveRootFolder.id + "  URL: " + driveRootFolder.webUrl);
-    System.out.println("Path: " + driveRootFolder.parentReference.path + "  ID: " + driveRootFolder.parentReference.id);
+    System.out.println("Name: " + driveRootFolder.getName() + "  ID: " + driveRootFolder.getId()
+        + "  URL: " + driveRootFolder.getWebUrl());
+    System.out.println("Path: " + driveRootFolder.getParentReference().getPath()
+        + "  ID: " + driveRootFolder.getParentReference().getId());
 
     Exception exception = null;
     DriveItem badFolder = null;
     try {
-      badFolder = graphClient.drives(drive.id).root().itemWithPath("/badpath")
-          .buildRequest().get();
+      badFolder = graphClient.drives().byDriveId(drive.getId())
+          .items().byDriveItemId("root:/badpath").get();
     } catch (Exception e) {
       exception = e;
     }
     Assert.assertNotNull(exception);
-    Assert.assertTrue(exception instanceof GraphServiceException);
     Assert.assertNull(badFolder);
 
     // Get the root folder contents
 
-    List<DriveItem> driveItems = new ArrayList<>();
-    DriveItemCollectionPage itemPage = graphClient.drives(drive.id).items(driveRootFolder.id).children().buildRequest().get();
-    while (itemPage != null) {
-      driveItems.addAll(itemPage.getCurrentPage());
-      if (itemPage.getNextPage() == null) {
-        break;
-      } else {
-        itemPage = itemPage.getNextPage().buildRequest().get();
-      }
-    }
+    DriveItemCollectionResponse itemPage = graphClient.drives().byDriveId(drive.getId())
+        .items().byDriveItemId(driveRootFolder.getId()).children().get();
+    List<DriveItem> driveItems = itemPage.getValue();
     Assert.assertFalse(driveItems.isEmpty());
     for (DriveItem item: driveItems) {
-      System.out.println("ID: " + item.id
-          + "  Name: " + item.name
-          + "  URL: " + item.webUrl
-          + "  Last Modified: " + new Date(item.lastModifiedDateTime.toInstant().toEpochMilli()));
+      System.out.println("ID: " + item.getId()
+          + "  Name: " + item.getName()
+          + "  URL: " + item.getWebUrl()
+          + "  Last Modified: " + new Date(item.getLastModifiedDateTime().toInstant().toEpochMilli()));
     }
 
   }
@@ -243,27 +220,30 @@ public class MSGraphConfigurationTests {
   @Test
   public void uploadFileTest() throws Exception {
 
-    GraphServiceClient graphClient = buildCLient();
+    GraphServiceClient graphClient = buildClient();
 
     // Get the Study Tracker site
-    SiteCollectionPage sitePage = graphClient.sites().buildRequest().get();
-    Site site = sitePage.getCurrentPage().stream()
-        .filter(s -> s.displayName != null && s.displayName.equals("Study Tracker Development"))
+    SiteCollectionResponse sitePage = graphClient.sites().get();
+    Site site = sitePage.getValue().stream()
+        .filter(s -> s.getDisplayName() != null
+            && s.getDisplayName().equals("Study Tracker Development"))
         .findFirst()
         .orElse(null);
     Assert.assertNotNull(site);
 
     // Get the Study Tracker site drives
-    DriveCollectionPage drivePage = graphClient.sites(site.id).drives().buildRequest().get();
-    Drive drive = drivePage.getCurrentPage().get(0);
+    DriveCollectionResponse drivePage = graphClient.sites().bySiteId(site.getId())
+        .drives().get();
+    Drive drive = drivePage.getValue().get(0);
     Assert.assertNotNull(drive);
 
     // Get the root folder
 
-    Drive stDrive = graphClient.drives(drive.id).buildRequest().get();
+    Drive stDrive = graphClient.drives().byDriveId(drive.getId()).get();
     Assert.assertNotNull(stDrive);
 
-    DriveItem driveRootFolder = graphClient.drives(drive.id).root().itemWithPath("/").buildRequest().get();
+    DriveItem driveRootFolder = graphClient.drives().byDriveId(drive.getId())
+        .items().byDriveItemId("root:/").get();
     Assert.assertNotNull(driveRootFolder);
 
     // Upload a file
@@ -273,16 +253,16 @@ public class MSGraphConfigurationTests {
     File file = resource.getFile();
     Assert.assertNotNull(file);
     Assert.assertTrue(file.exists());
-    DriveItem item = graphClient.drives(drive.id).items(driveRootFolder.id).children("another-test.txt")
+    DriveItem item = graphClient.drives().byDriveId(drive.getId())
+        .items().byDriveItemId(driveRootFolder.getId()).children().byDriveItemId1("another-test.txt")
         .content()
-        .buildRequest()
-        .put(resource.getInputStream().readAllBytes());
+        .put(resource.getInputStream());
     Assert.assertNotNull(item);
-    Assert.assertEquals("another-test.txt", item.name);
+    Assert.assertEquals("another-test.txt", item.getName());
 
     // Download the file
-    InputStream inputStream = graphClient.drives(drive.id).items(item.id).content()
-        .buildRequest().get();
+    InputStream inputStream = graphClient.drives().byDriveId(drive.getId())
+        .items().byDriveItemId(item.getId()).content().get();
     Assert.assertNotNull(inputStream);
     File downloadedFile = new File("/tmp/downloaded-test.txt");
     FileUtils.copyInputStreamToFile(inputStream, downloadedFile);

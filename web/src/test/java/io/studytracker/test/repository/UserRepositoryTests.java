@@ -17,6 +17,7 @@
 package io.studytracker.test.repository;
 
 import io.studytracker.Application;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.User;
 import io.studytracker.model.UserType;
 import io.studytracker.repository.ActivityRepository;
@@ -39,17 +40,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test"})
+@ActiveProfiles({"test", "example"})
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserRepositoryTests {
 
   @Autowired private UserRepository userRepository;
   @Autowired private ActivityRepository activityRepository;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Before
   public void doBefore() {
-    activityRepository.deleteAll();
-    userRepository.deleteAll();
+    exampleDataRunner.clearDatabase();
   }
 
   @Test

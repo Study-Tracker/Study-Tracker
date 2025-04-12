@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.mapstruct.dto.opensearch;
 
-import io.studytracker.search.DocumentType;
-import io.studytracker.search.PowerSearchDocument;
 import lombok.Data;
 
 @Data
-public class ElasticsearchPowerSearchDocument implements PowerSearchDocument<Long> {
-
-  private Long id;
-  private String index;
-  private DocumentType type;
-  private Object data;
-
+public class OpensearchConclusionsDocument {
+  private String content;
 }

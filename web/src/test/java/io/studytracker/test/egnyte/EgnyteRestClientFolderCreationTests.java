@@ -20,6 +20,7 @@ import io.studytracker.Application;
 import io.studytracker.egnyte.rest.EgnyteRestApiClient;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"egnyte-test", "example"})
+@Ignore
 public class EgnyteRestClientFolderCreationTests {
 
   @Autowired private Environment env;

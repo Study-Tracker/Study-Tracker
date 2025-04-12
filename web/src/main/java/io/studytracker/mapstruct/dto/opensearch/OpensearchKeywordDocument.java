@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.mapstruct.dto.opensearch;
 
 import lombok.Data;
 
 @Data
-public class ElasticsearchFolderDocument {
-  private String url;
-  private String name;
-  private String path;
-  private String referenceId;
+public class OpensearchKeywordDocument {
+  private String keyword;
+  private String category;
 }

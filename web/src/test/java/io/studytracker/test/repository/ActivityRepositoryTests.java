@@ -20,6 +20,7 @@ import io.studytracker.Application;
 import io.studytracker.events.EventType;
 import io.studytracker.events.util.EntityViewUtils;
 import io.studytracker.events.util.StudyActivityUtils;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Activity;
@@ -59,7 +60,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test"})
+@ActiveProfiles({"test", "example"})
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 //@EnableConfigurationProperties({StudyTrackerProperties.class})
 public class ActivityRepositoryTests {
@@ -69,17 +70,14 @@ public class ActivityRepositoryTests {
   @Autowired private ELNFolderRepository elnFolderRepository;
   @Autowired private StudyRepository studyRepository;
   @Autowired private ActivityRepository activityRepository;
-
+  @Autowired private ExampleDataRunner exampleDataRunner;
   @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
 
   @Before
   public void doBefore() {
-    activityRepository.deleteAll();
-    studyRepository.deleteAll();
-    programRepository.deleteAll();
-    elnFolderRepository.deleteAll();
-    userRepository.deleteAll();
+    exampleDataRunner.clearDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   private void createUser() {
@@ -159,11 +157,11 @@ public class ActivityRepositoryTests {
     User user = userRepository.findAll().get(0);
     Study study = studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
 
-    Assert.assertEquals(0, activityRepository.count());
+    Assert.assertEquals(ExampleDataRunner.ACTIVITY_COUNT, activityRepository.count());
     Activity activity = StudyActivityUtils.fromNewStudy(study, user);
     activityRepository.save(activity);
     Assert.assertNotNull(activity.getId());
-    Assert.assertEquals(1, activityRepository.count());
+    Assert.assertEquals(ExampleDataRunner.ACTIVITY_COUNT + 1, activityRepository.count());
   }
 
   private static Map<String, Object> createStudyView(Study study) {
@@ -222,12 +220,15 @@ public class ActivityRepositoryTests {
     activity.addData("oldStatus", Status.ACTIVE);
     activity.addData("newStatus", "COMPLETE");
 
-    Assert.assertEquals(0, activityRepository.count());
+    Assert.assertEquals(ExampleDataRunner.ACTIVITY_COUNT, activityRepository.count());
     activityRepository.save(activity);
     Assert.assertNotNull(activity.getId());
-    Assert.assertEquals(1, activityRepository.count());
+    Assert.assertEquals(ExampleDataRunner.ACTIVITY_COUNT + 1, activityRepository.count());
 
-    Activity created = activityRepository.findAll().get(0);
+    Activity created = activityRepository.findAll().stream()
+        .sorted((a, b) -> b.getDate().compareTo(a.getDate()))
+        .findFirst()
+        .orElseThrow(RecordNotFoundException::new);
     Assert.assertEquals(EventType.STUDY_STATUS_CHANGED, created.getEventType());
     System.out.println(created.getData());
   }

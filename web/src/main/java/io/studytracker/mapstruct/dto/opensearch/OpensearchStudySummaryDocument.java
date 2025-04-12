@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package io.studytracker.mapstruct.dto.elasticsearch;
+package io.studytracker.mapstruct.dto.opensearch;
 
+import io.studytracker.model.Status;
+import io.studytracker.search.StudySearchDocument;
 import lombok.Data;
 
 @Data
-public class ElasticsearchUserDocument {
+public class OpensearchStudySummaryDocument implements StudySearchDocument<Long> {
 
-  private String displayName;
-  private String username;
-  private String email;
+  private Long id;
+  private String code;
+  private String externalCode;
+  private Status status;
+  private String name;
+  private String description;
+
 }

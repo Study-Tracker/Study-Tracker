@@ -21,9 +21,9 @@ import io.studytracker.example.ExampleAssayGenerator;
 import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.example.ExampleStudyGenerator;
 import io.studytracker.exception.RecordNotFoundException;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchPowerSearchDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudyDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchAssayDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchPowerSearchDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchStudyDocument;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
@@ -31,9 +31,9 @@ import io.studytracker.repository.StudyRepository;
 import io.studytracker.search.DocumentType;
 import io.studytracker.search.GenericSearchHit;
 import io.studytracker.search.GenericSearchHits;
-import io.studytracker.search.elasticsearch.AssayIndexRepository;
-import io.studytracker.search.elasticsearch.ElasticsearchSearchService;
-import io.studytracker.search.elasticsearch.StudyIndexRepository;
+import io.studytracker.search.opensearch.AssayIndexRepository;
+import io.studytracker.search.opensearch.OpensearchSearchService;
+import io.studytracker.search.opensearch.StudyIndexRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
@@ -48,12 +48,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test", "example", "elasticsearch-test"})
-public class ElasticsearchSearchServiceTests {
+@ActiveProfiles({"test", "example", "opensearch-test"})
+public class OpensearchSearchServiceTests {
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
-  private ElasticsearchSearchService elasticsearchSearchService;
+  private OpensearchSearchService opensearchSearchService;
 
   @Autowired private ExampleDataRunner exampleDataRunner;
 
@@ -82,17 +82,17 @@ public class ElasticsearchSearchServiceTests {
       Study study = studyRepository.findById(s.getId()).orElseThrow(RecordNotFoundException::new);
       studyList.add(study);
     }
-    elasticsearchSearchService.indexStudies(studyList);
+    opensearchSearchService.indexStudies(studyList);
     Assert.assertEquals(ExampleStudyGenerator.STUDY_COUNT, studyIndexRepository.count());
   }
   @Test
   public void searchStudyIndexTest() {
     this.indexStudiesTest();
-    GenericSearchHits<ElasticsearchStudyDocument> hits = elasticsearchSearchService.searchStudies("legacy");
+    GenericSearchHits<OpensearchStudyDocument> hits = opensearchSearchService.searchStudies("legacy");
     System.out.println(hits.toString());
     Assert.assertNotNull(hits);
     Assert.assertEquals(1, hits.getNumHits().longValue());
-    GenericSearchHit<ElasticsearchStudyDocument> hit = hits.getHits().get(0);
+    GenericSearchHit<OpensearchStudyDocument> hit = hits.getHits().get(0);
     Assert.assertEquals("PPB-00001", hit.getDocument().getCode());
   }
 
@@ -104,18 +104,18 @@ public class ElasticsearchSearchServiceTests {
       Assay assay = assayRepository.findById(a.getId()).orElseThrow(RecordNotFoundException::new);
       assayList.add(assay);
     });
-    elasticsearchSearchService.indexAssays(assayList);
+    opensearchSearchService.indexAssays(assayList);
     Assert.assertEquals(ExampleAssayGenerator.ASSAY_COUNT, assayIndexRepository.count());
   }
 
   @Test
   public void searchAssayIndexTest() {
     this.indexAssaysTest();
-    GenericSearchHits<ElasticsearchAssayDocument> hits = elasticsearchSearchService.searchAssays("histology");
+    GenericSearchHits<OpensearchAssayDocument> hits = opensearchSearchService.searchAssays("histology");
     System.out.println(hits.toString());
     Assert.assertNotNull(hits);
     Assert.assertEquals(1, hits.getNumHits().longValue());
-    GenericSearchHit<ElasticsearchAssayDocument> hit = hits.getHits().get(0);
+    GenericSearchHit<OpensearchAssayDocument> hit = hits.getHits().get(0);
     Assert.assertEquals("PPB-10001-001", hit.getDocument().getCode());
   }
 
@@ -124,18 +124,18 @@ public class ElasticsearchSearchServiceTests {
     this.indexStudiesTest();
     this.indexAssaysTest();
 
-    GenericSearchHits<ElasticsearchPowerSearchDocument> hits = elasticsearchSearchService.search("Lorem ipsum");
+    GenericSearchHits<OpensearchPowerSearchDocument> hits = opensearchSearchService.search("Lorem ipsum");
     System.out.println(hits.toString());
     Assert.assertNotNull(hits);
     Assert.assertEquals(ExampleStudyGenerator.STUDY_COUNT + ExampleAssayGenerator.ASSAY_COUNT, hits.getNumHits().intValue());
 
-    hits = elasticsearchSearchService.search("histology");
+    hits = opensearchSearchService.search("histology");
     System.out.println(hits.toString());
     Assert.assertNotNull(hits);
     Assert.assertEquals(1, hits.getNumHits().intValue());
     Assert.assertEquals(DocumentType.ASSAY, hits.getHits().get(0).getDocument().getType());
 
-    hits = elasticsearchSearchService.search("legacy");
+    hits = opensearchSearchService.search("legacy");
     System.out.println(hits.toString());
     Assert.assertNotNull(hits);
     Assert.assertEquals(1, hits.getNumHits().intValue());
