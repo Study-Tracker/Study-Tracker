@@ -142,7 +142,7 @@ public class StudyBasePrivateControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/study/")
+            post("/api/internal/study")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(study))))
@@ -175,7 +175,7 @@ public class StudyBasePrivateControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/study/")
+            post("/api/internal/study")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toStudyForm(study)))
                 .with(user(user.getEmail())).with(csrf()))

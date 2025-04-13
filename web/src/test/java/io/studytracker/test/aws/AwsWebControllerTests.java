@@ -255,7 +255,7 @@ public class AwsWebControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/study/")
+            post("/api/internal/study")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(form)))
@@ -295,7 +295,7 @@ public class AwsWebControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/study/")
+            post("/api/internal/study")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(form)))
@@ -348,7 +348,7 @@ public class AwsWebControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/study/" + study.getCode() + "/assays/")
+            post("/api/internal/study/" + study.getCode() + "/assays")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(form)))
@@ -388,7 +388,7 @@ public class AwsWebControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/study/" + study.getCode() + "/assays/")
+            post("/api/internal/study/" + study.getCode() + "/assays")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(form)))

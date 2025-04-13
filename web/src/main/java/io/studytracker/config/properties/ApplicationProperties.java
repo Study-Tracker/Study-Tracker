@@ -46,6 +46,8 @@ public class ApplicationProperties {
 
   private String buildTime;
 
+  private boolean skipInitialization = false;
+
   @Override
   public String toString() {
     return "ApplicationProperties{" +

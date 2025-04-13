@@ -80,7 +80,7 @@ public class ExampleDataRunner {
       this.clearDatabase();
 
       LOGGER.info("Reinitializing integrations & drives...");
-      integrationInitializer.run(null);
+      integrationInitializer.run();
 
       LOGGER.info("Inserting example data...");
 

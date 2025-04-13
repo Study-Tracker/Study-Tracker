@@ -137,7 +137,7 @@ public class ProgramControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/program/")
+            post("/api/internal/program")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(mapper.toProgramFormDto(program))))

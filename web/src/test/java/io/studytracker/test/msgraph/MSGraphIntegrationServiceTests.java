@@ -17,6 +17,7 @@
 package io.studytracker.test.msgraph;
 
 import io.studytracker.Application;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
 import io.studytracker.model.SharePointSite;
@@ -40,7 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"msgraph-test"})
+@ActiveProfiles({"msgraph-test", "example"})
 public class MSGraphIntegrationServiceTests {
 
   @Value("${ms-graph.tenant-id}")
@@ -67,12 +68,12 @@ public class MSGraphIntegrationServiceTests {
   @Autowired
   private StorageDriveFolderRepository storageDriveFolderRepository;
 
+  @Autowired
+  private ExampleDataRunner exampleDataRunner;
+
   @Before
   public void setup() {
-    storageDriveFolderRepository.deleteAll();
-    driveRepository.deleteAll();
-    sharePointSiteRepository.deleteAll();
-    msGraphIntegrationRepository.deleteAll();
+    exampleDataRunner.clearDatabase();
   }
 
   @Test

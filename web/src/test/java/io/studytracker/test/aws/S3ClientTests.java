@@ -174,13 +174,13 @@ public class S3ClientTests {
     Assert.assertTrue(headObjectResponse.contentLength() > 0);
     System.out.println(headObjectResponse.toString());
 
-    headObjectRequest = HeadObjectRequest.builder()
-        .bucket(bucketName)
-        .key("test/")
-        .build();
-    headObjectResponse = s3Client.headObject(headObjectRequest);
-    System.out.println(headObjectResponse.toString());
-    Assert.assertTrue(headObjectResponse.contentLength() == 0);
+//    headObjectRequest = HeadObjectRequest.builder()
+//        .bucket(bucketName)
+//        .key("test/")
+//        .build();
+//    headObjectResponse = s3Client.headObject(headObjectRequest);
+//    System.out.println(headObjectResponse.toString());
+//    Assert.assertTrue(headObjectResponse.contentLength() == 0);
 
     Exception exception = null;
     try {

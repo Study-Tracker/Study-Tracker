@@ -219,7 +219,7 @@ public class StudyAssayPrivateControllerTests {
 
     mockMvc
         .perform(
-            post("/api/internal/study/" + study.getCode() + "/assays/")
+            post("/api/internal/study/" + study.getCode() + "/assays")
                 .with(user(user.getEmail())).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(assay)))

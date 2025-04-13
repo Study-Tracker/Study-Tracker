@@ -70,6 +70,7 @@ public class UserInternalControllerTests {
 
   @Before
   public void doBefore() {
+    exampleDataRunner.clearDatabase();
     exampleDataRunner.populateDatabase();
     if (username == null) {
       username = userService.findAll().stream()
