@@ -35,6 +35,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.HstsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,6 +62,9 @@ public class WebSecurityConfiguration {
   @Autowired
   private DatabaseAuthenticationProvider dbAuthProvider;
 
+  @Autowired
+  private AppUserDetailsService appUserDetailsService;
+
   @Bean
   public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler() {
     return new UserAuthenticationSuccessHandler();
@@ -76,32 +82,22 @@ public class WebSecurityConfiguration {
 
   @Bean
   public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-    AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-    builder.authenticationProvider(dbAuthProvider);
-    return builder.build();
+    AuthenticationManagerBuilder authenticationManagerBuilder =
+        http.getSharedObject(AuthenticationManagerBuilder.class);
+    authenticationManagerBuilder.authenticationProvider(dbAuthProvider);
+    return authenticationManagerBuilder.build();
   }
 
-  @Configuration
-  @Order(1)
-  public static class PublicApiSecurityConfiguration  {
-
-    @Autowired
-    private AppUserDetailsService appUserDetailsService;
-
-//    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-//    @Autowired
-//    private DatabaseAuthenticationProvider dbAuthProvider;
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-      CorsConfiguration configuration = new CorsConfiguration();
-      configuration.setAllowedOrigins(Arrays.asList("*"));
-      configuration.setAllowedMethods(Arrays.asList("*"));
-      configuration.setAllowedHeaders(Arrays.asList("*"));
-      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-      source.registerCorsConfiguration("/**", configuration);
-      return source;
-    }
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(Arrays.asList("*"));
+    configuration.setAllowedMethods(Arrays.asList("*"));
+    configuration.setAllowedHeaders(Arrays.asList("*"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 
 //    @Override
 //    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -115,129 +111,63 @@ public class WebSecurityConfiguration {
 //      return builder.build();
 //    }
 
-    @Bean
-    public TokenUtils tokenUtils() {
-      return new TokenUtils();
-    }
+  @Bean
+  public TokenUtils tokenUtils() {
+    return new TokenUtils();
+  }
 
-    @Bean
-    public TokenFilter tokenFilter() {
+  @Bean
+  public TokenFilter tokenFilter() {
       return new TokenFilter();
     }
 
-    @Bean
-    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
-      http
-          .securityMatcher("/api/v1/**")
-          .authorizeHttpRequests(auth ->
-              auth.anyRequest().authenticated())
-          .csrf(csrf -> csrf.disable())
-          .httpBasic(basic -> basic.disable())
-          .cors(cors -> cors
-              .configurationSource(corsConfigurationSource()))
-          .exceptionHandling(
-              h -> h
-                  .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-          .sessionManagement(m -> m
-              .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-          .userDetailsService(appUserDetailsService)
-          .sessionManagement(s -> s
-              .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      ;
-      http.addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
-      return http.build();
-    }
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//      http.antMatcher("/api/v1/**")
-//          .csrf().disable()
-//          .httpBasic().disable()
-//          .cors()
-//          .and()
-//          .authorizeRequests()
-//          .anyRequest().authenticated()
-//          .and()
-//          .userDetailsService(appUserDetailsService)
-//          .exceptionHandling()
-//          .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-//          .and()
-//          .sessionManagement()
-//          .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//
-//      http.addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
-//
-//    }
-
+  @Bean
+  @Order(1)
+  public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .securityMatcher("/api/v1/**")
+        .authorizeHttpRequests(auth ->
+            auth.anyRequest().authenticated())
+        .csrf(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .cors(cors -> cors
+            .configurationSource(corsConfigurationSource()))
+        .exceptionHandling(
+            h -> h
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+        .sessionManagement(m -> m
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//        .authenticationManager(authenticationManager())
+    ;
+    http.addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
+    return http.build();
   }
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-  @Configuration
+  @Bean
   @Order(2)
   @ConditionalOnProperty(name = "security.sso", havingValue = "none", matchIfMissing = true)
-  public static class WebAppSecurityConfiguration {
-
-//    @Autowired private DatabaseAuthenticationProvider dbAuthProvider;
-
-//    @Bean
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//      return super.authenticationManagerBean();
-//    }
-
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//      auth.authenticationProvider(dbAuthProvider);
-//    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-      http
-          .authorizeHttpRequests(auth -> auth
-              .requestMatchers("/static/**", "/error", "/login", "/auth/**").permitAll()
-              .anyRequest().fullyAuthenticated())
-          .formLogin(form -> form
-              .loginPage("/login")
-              .defaultSuccessUrl("/"))
-          .logout(logout -> logout
-              .logoutUrl("/logout")
-              .logoutSuccessUrl("/")
-              .invalidateHttpSession(true))
-          .headers(headers -> headers
-              .frameOptions(f -> f.disable())
-              .httpStrictTransportSecurity(t -> t.disable()))
-          .csrf(csrf -> csrf
-              .ignoringRequestMatchers("/auth/**")
-              .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-      ;
-      return http.build();
-    }
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//      http.authorizeRequests()
-//          .antMatchers("/static/**", "/error", "/login", "/auth/**").permitAll()
-//          .anyRequest().fullyAuthenticated()
-//          .and()
-//          .formLogin()
-//            .loginPage("/login")
-//            .defaultSuccessUrl("/")
-//            .permitAll()
-//          .and()
-//          .logout()
-//            .logoutUrl("/logout")
-//            .logoutSuccessUrl("/")
-//            .invalidateHttpSession(true)
-//          .and()
-//          .headers()
-//            .frameOptions().disable()
-//            .httpStrictTransportSecurity().disable()
-//          .and()
-//          .csrf()
-//            .ignoringAntMatchers("/auth/**")
-//            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//      ;
-//    }
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/static/**", "/error", "/login", "/auth/**").permitAll()
+            .anyRequest().fullyAuthenticated())
+        .formLogin(form -> form
+            .loginPage("/login")
+            .loginProcessingUrl("/auth/login")
+            .defaultSuccessUrl("/"))
+        .logout(logout -> logout
+            .logoutUrl("/logout")
+            .logoutSuccessUrl("/")
+            .invalidateHttpSession(true))
+        .headers(headers -> headers
+            .frameOptions(FrameOptionsConfig::disable)
+            .httpStrictTransportSecurity(HstsConfig::disable))
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers("/auth/**", "/login")
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+//        .authenticationManager(authenticationManager())
+    ;
+    return http.build();
   }
 
 //  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
