@@ -50,7 +50,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"msgraph-test"})
+@ActiveProfiles({"msgraph-test", "example"})
 public class MSGraphConfigurationTests {
 
   @Value("${ms-graph.authority}")

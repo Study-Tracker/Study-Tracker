@@ -19,6 +19,7 @@ package io.studytracker.test.aws;
 
 import io.studytracker.Application;
 import io.studytracker.aws.AwsIntegrationService;
+import io.studytracker.example.ExampleDataRunner;
 import io.studytracker.model.AwsIntegration;
 import io.studytracker.model.S3BucketDetails;
 import io.studytracker.model.StorageDrive;
@@ -27,6 +28,7 @@ import io.studytracker.repository.AwsIntegrationRepository;
 import io.studytracker.repository.StorageDriveRepository;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +40,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"aws-test"})
+@ActiveProfiles({"aws-test", "example"})
 public class AwsIntegrationServiceTests {
 
   @Autowired private AwsIntegrationService awsIntegrationService;
   @Autowired private AwsIntegrationRepository awsIntegrationRepository;
   @Autowired private StorageDriveRepository storageDriveRepository;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Value("${aws.access-key-id}")
   private String accessKeyId;
@@ -57,12 +60,31 @@ public class AwsIntegrationServiceTests {
   @Value("${aws.example-s3-bucket}")
   private String s3BucketName;
 
+  @Before
+  public void init() {
+//    exampleDataRunner.clearDatabase();
+    awsIntegrationRepository.deleteAll();
+//    exampleDataRunner.populateDatabase();
+  }
+
   @Test
-  public void configTest() {
+  public void createIntegrationTest() {
     List<AwsIntegration> integrations = awsIntegrationService.findAll();
     Assert.assertNotNull(integrations);
+    Assert.assertEquals(0, integrations.size());
+
+    AwsIntegration integration = new AwsIntegration();
+    integration.setAccessKeyId(accessKeyId);
+    integration.setRegion(region);
+    integration.setUseIam(false);
+    integration.setName("Test Integration");
+    integration.setSecretAccessKey(secretAccessKey);
+    awsIntegrationService.register(integration);
+
+    integrations = awsIntegrationService.findAll();
+    Assert.assertNotNull(integrations);
     Assert.assertEquals(1, integrations.size());
-    AwsIntegration integration = integrations.get(0);
+    integration = integrations.get(0);
     Assert.assertNotNull(integration);
     Assert.assertNotNull(integration.getAccessKeyId());
     Assert.assertNotNull(integration.getSecretAccessKey());
@@ -97,6 +119,8 @@ public class AwsIntegrationServiceTests {
 
   @Test
   public void addingS3BucketTest() throws Exception {
+    createIntegrationTest();
+
     List<AwsIntegration> integrations = awsIntegrationService.findAll();
     Assert.assertNotNull(integrations);
     Assert.assertEquals(1, integrations.size());

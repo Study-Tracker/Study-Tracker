@@ -46,7 +46,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"aws-test"})
+@ActiveProfiles({"aws-test", "example"})
 public class S3ClientTests {
 
   @Autowired

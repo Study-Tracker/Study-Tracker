@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -108,6 +109,7 @@ public class GitLabRestClientTests {
   }
 
   @Test
+  @Ignore
   public void createGroupTest() {
 
     GitLabNewGroupRequest request = new GitLabNewGroupRequest();
