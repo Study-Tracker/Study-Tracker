@@ -15,14 +15,20 @@ integrated REST API and event dispatcher service for sharing of data.
 
 ## Requirements
 
-- JDK 11+
+- JDK 17+
 - Maven 3+
 - PostgreSQL 12+
-- Elasticsearch 7.10 (optional)
+- OpenSearch 2+ (optional)
 
 NodeJS and NPM are *not* required for building and running the project, as the
 `frontend-maven-plugin` installs them at build time, in order to properly compile the front-end of
 the application.
+
+### Upgrading from Study Tracker v0.9 or earlier
+
+Starting in v1.0, Study Tracker now requires Java 17 and now supports OpenSearch in place of 
+ElasticSearch. Some older initialization scripts have also been removed, so if you are coming 
+from earlier than v0.9.0, you will first want to upgrade to v0.9.11 and then to v1.0+.
 
 ## Documentation
 

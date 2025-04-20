@@ -58,10 +58,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 )
 public class WebSecurityConfiguration {
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-  @Autowired
-  private DatabaseAuthenticationProvider dbAuthProvider;
-
   @Autowired
   private AppUserDetailsService appUserDetailsService;
 
@@ -81,10 +77,15 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
+  public DatabaseAuthenticationProvider dbAuthProvider() {
+    return new DatabaseAuthenticationProvider(passwordEncoder(), appUserDetailsService);
+  }
+
+  @Bean
   public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
     AuthenticationManagerBuilder authenticationManagerBuilder =
         http.getSharedObject(AuthenticationManagerBuilder.class);
-    authenticationManagerBuilder.authenticationProvider(dbAuthProvider);
+    authenticationManagerBuilder.authenticationProvider(dbAuthProvider());
     return authenticationManagerBuilder.build();
   }
 
