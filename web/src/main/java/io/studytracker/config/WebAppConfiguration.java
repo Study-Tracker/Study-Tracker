@@ -19,7 +19,7 @@ package io.studytracker.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
 import io.studytracker.config.properties.StorageProperties;
 import io.studytracker.service.FileSystemStorageService;
 import java.nio.file.Paths;
@@ -77,12 +77,12 @@ public class WebAppConfiguration {
   public ObjectMapper objectMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    objectMapper.registerModule(hibernate5Module());
+    objectMapper.registerModule(hibernate6Module());
     return objectMapper;
   }
 
   @Bean
-  public Module hibernate5Module() {
-    return new Hibernate5Module();
+  public Module hibernate6Module() {
+    return new Hibernate6Module();
   }
 }

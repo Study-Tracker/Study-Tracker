@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.studytracker.search.elasticsearch;
+package io.studytracker.search.opensearch;
 
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchAssayDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchPowerSearchDocument;
-import io.studytracker.mapstruct.dto.elasticsearch.ElasticsearchStudyDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchAssayDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchPowerSearchDocument;
+import io.studytracker.mapstruct.dto.opensearch.OpensearchStudyDocument;
 import io.studytracker.mapstruct.mapper.ElasticsearchDocumentMapper;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
@@ -31,8 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.opensearch.data.client.osc.NativeQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +41,14 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.HighlightQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
 
-public class ElasticsearchSearchService implements SearchService {
+public class OpensearchSearchService implements SearchService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchSearchService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OpensearchSearchService.class);
 
   @Autowired
   private StudyIndexRepository studyIndexRepository;
@@ -61,8 +62,13 @@ public class ElasticsearchSearchService implements SearchService {
 
   @Autowired
   private ElasticsearchOperations elasticsearchOperations;
+  
+  private HighlightQuery getHighlightQuery() {
+    Highlight highlight = new Highlight(List.of(new HighlightField("*")));
+    return new HighlightQuery(highlight, String.class);
+  }
 
-  private GenericSearchHits<ElasticsearchPowerSearchDocument> searchAllIndexes(Query query) {
+  private GenericSearchHits<OpensearchPowerSearchDocument> searchAllIndexes(Query query) {
 
     LOGGER.debug("Searching all indexes for query: {}", query);
 
@@ -72,21 +78,21 @@ public class ElasticsearchSearchService implements SearchService {
     ElasticsearchConverter converter = elasticsearchOperations.getElasticsearchConverter();
 
     // Convert the results
-    List<GenericSearchHit<ElasticsearchPowerSearchDocument>> genericHits = new ArrayList<>();
+    List<GenericSearchHit<OpensearchPowerSearchDocument>> genericHits = new ArrayList<>();
     for (SearchHit<AllDocuments> searchHit: searchHits) {
       String indexName = searchHit.getIndex();
       if (indexName != null && Arrays.asList("st-studies", "st-assays").contains(searchHit.getIndex())) {
 
         // Create the document
-        ElasticsearchPowerSearchDocument document = new ElasticsearchPowerSearchDocument();
+        OpensearchPowerSearchDocument document = new OpensearchPowerSearchDocument();
         Document doc  = Document.from(searchHit.getContent());
         if (indexName.equals("st-studies")) {
-          ElasticsearchStudyDocument studyDocument = converter.read(ElasticsearchStudyDocument.class, doc);
+          OpensearchStudyDocument studyDocument = converter.read(OpensearchStudyDocument.class, doc);
           document.setData(studyDocument);
           document.setType(DocumentType.STUDY);
           document.setId(studyDocument.getId());
         } else if (indexName.equals("st-assays")) {
-          ElasticsearchAssayDocument assayDocument = converter.read(ElasticsearchAssayDocument.class, doc);
+          OpensearchAssayDocument assayDocument = converter.read(OpensearchAssayDocument.class, doc);
           document.setData(assayDocument);
           document.setType(DocumentType.ASSAY);
           document.setId(assayDocument.getId());
@@ -94,7 +100,7 @@ public class ElasticsearchSearchService implements SearchService {
         document.setIndex(indexName);
 
         // Wrap it as a generic search hit
-        GenericSearchHit<ElasticsearchPowerSearchDocument> hit = new GenericSearchHit<>();
+        GenericSearchHit<OpensearchPowerSearchDocument> hit = new GenericSearchHit<>();
         hit.setDocument(document);
         hit.setScore(searchHit.getScore());
         hit.setHighlightFields(searchHit.getHighlightFields());
@@ -105,7 +111,7 @@ public class ElasticsearchSearchService implements SearchService {
     }
 
     // Create the return object
-    GenericSearchHits<ElasticsearchPowerSearchDocument> genericSearchHits = new GenericSearchHits<>();
+    GenericSearchHits<OpensearchPowerSearchDocument> genericSearchHits = new GenericSearchHits<>();
     genericSearchHits.setNumHits(searchHits.getTotalHits());
     genericSearchHits.setMaxScore(searchHits.getMaxScore());
     genericSearchHits.setHits(genericHits);
@@ -117,47 +123,48 @@ public class ElasticsearchSearchService implements SearchService {
   }
 
   @Override
-  public GenericSearchHits<ElasticsearchPowerSearchDocument> search(String keyword) {
+  public GenericSearchHits<OpensearchPowerSearchDocument> search(String keyword) {
     LOGGER.debug("Searching for keyword: {}", keyword);
-    Query query = new NativeSearchQueryBuilder()
-        .withQuery(QueryBuilders.multiMatchQuery(keyword))
-        .withHighlightFields(new HighlightBuilder.Field("*"))
+    
+    Query query = NativeQuery.builder()
+        .withQuery(q -> q.multiMatch(m -> m.query(keyword)))
+        .withHighlightQuery(getHighlightQuery())
         .build();
     return searchAllIndexes(query);
   }
 
   @Override
-  public GenericSearchHits<ElasticsearchPowerSearchDocument> search(String keyword, String field) {
+  public GenericSearchHits<OpensearchPowerSearchDocument> search(String keyword, String field) {
     LOGGER.debug("Searching for keyword: {}, field: {}", keyword, field);
-    Query query = new NativeSearchQueryBuilder()
-        .withQuery(QueryBuilders.multiMatchQuery(keyword))
-        .withHighlightFields(new HighlightBuilder.Field("*"))
+    Query query = NativeQuery.builder()
+        .withQuery(q -> q.multiMatch(m -> m.query(keyword)))
+        .withHighlightQuery(getHighlightQuery())
         .withFields(field)
         .build();
     return searchAllIndexes(query);
   }
 
   @Override
-  public GenericSearchHits<ElasticsearchStudyDocument> searchStudies(String keyword) {
+  public GenericSearchHits<OpensearchStudyDocument> searchStudies(String keyword) {
     LOGGER.info("Searching study index for keyword: {}", keyword);
-    SearchHits<ElasticsearchStudyDocument> hits =
+    SearchHits<OpensearchStudyDocument> hits =
         studyIndexRepository.findDocumentsByKeyword(keyword);
     return GenericSearchHits.fromElasticsearchHits(hits);
   }
 
   @Override
-  public GenericSearchHits<ElasticsearchStudyDocument> searchStudies(String keyword, String field) {
+  public GenericSearchHits<OpensearchStudyDocument> searchStudies(String keyword, String field) {
     LOGGER.info("Searching study index for keyword: {}  field: {}", keyword, field);
-    SearchHits<ElasticsearchStudyDocument> hits =
+    SearchHits<OpensearchStudyDocument> hits =
         studyIndexRepository.findDocumentsByKeywordAndField(keyword, Arrays.asList(field));
     return GenericSearchHits.fromElasticsearchHits(hits);
   }
 
 
   @Override
-  public GenericSearchHits<ElasticsearchAssayDocument> searchAssays(String keyword) {
+  public GenericSearchHits<OpensearchAssayDocument> searchAssays(String keyword) {
     LOGGER.info("Searching assay index for keyword: {}", keyword);
-    SearchHits<ElasticsearchAssayDocument> hits =
+    SearchHits<OpensearchAssayDocument> hits =
         assayIndexRepository.findDocumentsByKeyword(keyword);
     return GenericSearchHits.fromElasticsearchHits(hits);
   }
@@ -165,14 +172,14 @@ public class ElasticsearchSearchService implements SearchService {
   @Override
   public GenericSearchHits<? extends AssaySearchDocument<?>> searchAssays(String keyword, String field) {
     LOGGER.info("Searching assay index for keyword: {}  field: {}", keyword, field);
-    SearchHits<ElasticsearchAssayDocument> hits =
+    SearchHits<OpensearchAssayDocument> hits =
         assayIndexRepository.findDocumentsByKeywordAndField(keyword, Arrays.asList(field));
     return GenericSearchHits.fromElasticsearchHits(hits);
   }
 
   @Override
   public void indexStudy(Study study) {
-    ElasticsearchStudyDocument document = documentMapper.fromStudy(study);
+    OpensearchStudyDocument document = documentMapper.fromStudy(study);
     studyIndexRepository.save(document);
   }
 
@@ -184,7 +191,7 @@ public class ElasticsearchSearchService implements SearchService {
 
   @Override
   public void indexAssay(Assay assay) {
-    ElasticsearchAssayDocument document = documentMapper.fromAssay(assay);
+    OpensearchAssayDocument document = documentMapper.fromAssay(assay);
     assayIndexRepository.save(document);
   }
 

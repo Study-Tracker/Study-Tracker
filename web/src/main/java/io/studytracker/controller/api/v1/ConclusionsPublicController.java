@@ -22,7 +22,7 @@ import io.studytracker.mapstruct.dto.api.StudyConclusionsDto;
 import io.studytracker.mapstruct.dto.api.StudyConclusionsPayloadDto;
 import io.studytracker.model.Study;
 import io.studytracker.model.StudyConclusions;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

@@ -23,9 +23,9 @@ public class SharePointUtils {
 
   public static SharePointSite fromSite(Site site) {
     SharePointSite sharePointSite = new SharePointSite();
-    sharePointSite.setSiteId(site.id);
-    sharePointSite.setName(site.displayName);
-    sharePointSite.setUrl(site.webUrl);
+    sharePointSite.setSiteId(site.getId());
+    sharePointSite.setName(site.getDisplayName());
+    sharePointSite.setUrl(site.getWebUrl());
     sharePointSite.setActive(true);
     return sharePointSite;
   }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.studytracker.search.elasticsearch;
+package io.studytracker.search.opensearch;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

@@ -17,6 +17,8 @@
 package io.studytracker.test.repository;
 
 import io.studytracker.Application;
+import io.studytracker.example.ExampleDataRunner;
+import io.studytracker.example.ExampleUserGenerator;
 import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.exception.StudyTrackerException;
 import io.studytracker.model.Comment;
@@ -43,13 +45,13 @@ import io.studytracker.storage.StorageDriveFolderService;
 import io.studytracker.storage.StorageFolder;
 import io.studytracker.storage.StudyStorageService;
 import io.studytracker.storage.StudyStorageServiceLookup;
+import jakarta.persistence.EntityManagerFactory;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import javax.persistence.EntityManagerFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.Session;
@@ -69,7 +71,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test"})
+@ActiveProfiles({"test", "example"})
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StudyRepositoryTests {
 
@@ -84,17 +86,12 @@ public class StudyRepositoryTests {
   @Autowired private ExternalLinkRepository externalLinkRepository;
   @Autowired private StorageDriveFolderService storageDriveFolderService;
   @Autowired private StudyStorageServiceLookup studyStorageServiceLookup;
+  @Autowired private ExampleDataRunner exampleDataRunner;
 
   @Before
   public void doBefore() {
-    externalLinkRepository.deleteAll();
-    studyConclusionsRepository.deleteAll();
-    activityRepository.deleteAll();
-    commentRepository.deleteAll();
-    studyRepository.deleteAll();
-    programRepository.deleteAll();
-    elnFolderRepository.deleteAll();
-    userRepository.deleteAll();
+    exampleDataRunner.clearDatabase();
+    exampleDataRunner.populateDatabase();
   }
 
   private void createUser() {
@@ -178,7 +175,9 @@ public class StudyRepositoryTests {
       studyRepository.save(study);
       Assert.assertNotNull(study.getId());
 
-      List<Study> studies = studyRepository.findAll();
+      List<Study> studies = studyRepository.findAll().stream()
+          .filter(s -> s.getCode().equals(program.getCode() + "-10001"))
+          .toList();
       Assert.assertNotNull(studies);
       Assert.assertFalse(studies.isEmpty());
 
@@ -246,7 +245,7 @@ public class StudyRepositoryTests {
       Study updated =
           studyRepository.findByCode("TST-10001").orElseThrow(ReflectiveOperationException::new);
       Assert.assertTrue(updated.getUsers().isEmpty());
-      Assert.assertEquals(1, userRepository.count());
+      Assert.assertEquals(ExampleUserGenerator.USER_COUNT + 1, userRepository.count());
 
       transaction.commit();
 
@@ -277,7 +276,7 @@ public class StudyRepositoryTests {
           studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
       User user = userRepository.findAll().get(0);
       Assert.assertNull(study.getConclusions());
-      Assert.assertEquals(0, studyConclusionsRepository.count());
+      Assert.assertEquals(1, studyConclusionsRepository.count());
 
       StudyConclusions conclusions = new StudyConclusions();
       conclusions.setContent("This was a success.");
@@ -292,14 +291,14 @@ public class StudyRepositoryTests {
 
       conclusions = updated.getConclusions();
       Assert.assertNotNull(conclusions.getId());
-      Assert.assertEquals(1, studyConclusionsRepository.count());
+      Assert.assertEquals(2, studyConclusionsRepository.count());
 
       updated.setConclusions(null);
       studyRepository.save(updated);
 
       updated = studyRepository.findById(study.getId()).orElseThrow(RecordNotFoundException::new);
       Assert.assertNull(updated.getConclusions());
-      Assert.assertEquals(0, studyConclusionsRepository.count());
+      Assert.assertEquals(1, studyConclusionsRepository.count());
 
       transaction.commit();
 
@@ -388,10 +387,6 @@ public class StudyRepositoryTests {
       study.addComment(comment2);
 
       studyRepository.save(study);
-      Study updated =
-          studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
-      Assert.assertEquals(2, updated.getComments().size());
-      Assert.assertEquals(2, commentRepository.count());
 
       transaction.commit();
 
@@ -404,6 +399,12 @@ public class StudyRepositoryTests {
     }
 
     Assert.assertNull(exception);
+
+    Study updated =
+        studyRepository.findByCode("TST-10001").orElseThrow(RecordNotFoundException::new);
+    Assert.assertEquals(2, updated.getComments().size());
+    Assert.assertEquals(3, commentRepository.count());
+
   }
 
   @Test

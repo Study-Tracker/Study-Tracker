@@ -151,7 +151,7 @@ public class StudyApiControllerTests extends AbstractApiControllerTests {
 
     mockMvc
         .perform(
-            post("/api/v1/study/")
+            post("/api/v1/study")
                 .header("Authorization", "Bearer " + this.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(study)))
@@ -183,7 +183,7 @@ public class StudyApiControllerTests extends AbstractApiControllerTests {
 
     mockMvc
         .perform(
-            post("/api/v1/study/")
+            post("/api/v1/study")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(study))
                 .with(user(user.getEmail())).with(csrf()))

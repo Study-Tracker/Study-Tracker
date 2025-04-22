@@ -18,10 +18,8 @@ package io.studytracker.msgraph;
 
 import com.azure.identity.ClientSecretCredential;
 import com.azure.identity.ClientSecretCredentialBuilder;
-import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
-import com.microsoft.graph.requests.GraphServiceClient;
+import com.microsoft.graph.serviceclient.GraphServiceClient;
 import io.studytracker.model.MSGraphIntegration;
-import java.util.Arrays;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -49,7 +47,7 @@ public class MSGraphClientFactory {
       return this;
     }
 
-    public GraphServiceClient<?> build() {
+    public GraphServiceClient build() {
       Assert.isTrue(StringUtils.hasText(clientId), "Client ID is required");
       Assert.isTrue(StringUtils.hasText(clientSecret), "Client Secret is required");
       Assert.isTrue(StringUtils.hasText(tenantId), "Tenant ID is required");
@@ -58,15 +56,13 @@ public class MSGraphClientFactory {
           .clientSecret(clientSecret)
           .tenantId(tenantId)
           .build();
-      TokenCredentialAuthProvider provider = new TokenCredentialAuthProvider(
-          Arrays.asList(SCOPE), credential);
-      return GraphServiceClient.builder()
-          .authenticationProvider(provider)
-          .buildClient();
+//      TokenCredentialAuthProvider provider = new TokenCredentialAuthProvider(
+//          Arrays.asList(SCOPE), credential);
+      return new GraphServiceClient(credential, SCOPE);
     }
   }
 
-  public static GraphServiceClient<?> fromIntegrationInstance(MSGraphIntegration integration) {
+  public static GraphServiceClient fromIntegrationInstance(MSGraphIntegration integration) {
     return new MSGraphClientBuilder()
         .clientId(integration.getClientId())
         .clientSecret(integration.getClientSecret())

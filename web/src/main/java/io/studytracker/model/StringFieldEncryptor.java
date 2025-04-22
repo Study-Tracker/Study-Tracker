@@ -17,16 +17,21 @@
 package io.studytracker.model;
 
 import io.studytracker.config.properties.ApplicationProperties;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,37 +40,54 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Converter
-public class StringFieldEncryptor implements AttributeConverter<String, String> {
+public class StringFieldEncryptor implements AttributeConverter<String, String>,
+    ApplicationContextAware {
 
-  private static final String AES = "AES";
+  private static final String AES = "AES"; // "AES/CBC/PKCS5Padding";
+//  private Key key;
+  private static ApplicationContext applicationContext;
 
-  private final Key key;
-  private final Cipher cipher;
+  // No-argument constructor required by JPA
+  public StringFieldEncryptor() {
+  }
 
-  @Autowired
-  public StringFieldEncryptor(ApplicationProperties properties) throws Exception {
-    key = new SecretKeySpec(properties.getSecret().getBytes(), AES);
-    cipher = Cipher.getInstance(AES);
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    StringFieldEncryptor.applicationContext = applicationContext;
+  }
+
+  // Helper method to fetch the secret from ApplicationProperties on demand.
+  private String getSecret() {
+    ApplicationProperties properties = applicationContext.getBean(ApplicationProperties.class);
+    return properties.getSecret();
   }
 
   @Override
   public String convertToDatabaseColumn(String attribute) {
+    if (attribute == null) return null;
     try {
+      String secret = getSecret();
+      Key key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), AES);
+      Cipher cipher = Cipher.getInstance(AES);
       cipher.init(Cipher.ENCRYPT_MODE, key);
-      if (attribute == null) return null;
       return Base64.getEncoder().encodeToString(cipher.doFinal(attribute.getBytes()));
-    } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+    } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | NoSuchAlgorithmException |
+             NoSuchPaddingException e) {
       throw new IllegalStateException(e);
     }
   }
 
   @Override
   public String convertToEntityAttribute(String dbData) {
+    if (dbData == null) return null;
     try {
+      String secret = getSecret();
+      Key key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), AES);
+      Cipher cipher = Cipher.getInstance(AES);
       cipher.init(Cipher.DECRYPT_MODE, key);
-      if (dbData == null) return null;
       return new String(cipher.doFinal(Base64.getDecoder().decode(dbData)));
-    } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+    } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
+             NoSuchPaddingException e) {
       throw new IllegalStateException(e);
     }
   }

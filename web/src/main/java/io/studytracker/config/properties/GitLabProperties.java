@@ -31,7 +31,7 @@ public class GitLabProperties {
 
   private URL url;
 
-  private String accessToken;
+  private String accessKey;
 
   private Integer rootGroupId;
 
@@ -49,7 +49,7 @@ public class GitLabProperties {
   public String toString() {
     return "GitLabProperties{" +
         "url=" + url +
-        ", accessKey='" + accessToken.substring(0,5) + "*****'" +
+        ", accessKey='" + accessKey.substring(0,5) + "*****'" +
         ", rootGroupId=" + rootGroupId +
         ", clientId='" + clientId + '\'' +
         ", clientSecret='" + clientSecret + '\'' +

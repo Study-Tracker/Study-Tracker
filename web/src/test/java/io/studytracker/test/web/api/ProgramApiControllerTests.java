@@ -153,7 +153,7 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
 
     mockMvc
         .perform(
-            post("/api/v1/program/")
+            post("/api/v1/program")
                 .header("Authorization",
                     "Bearer " + this.getTokenUtils().generateToken(user.getEmail()).getToken())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -162,7 +162,7 @@ public class ProgramApiControllerTests extends AbstractApiControllerTests {
 
     mockMvc
         .perform(
-            post("/api/v1/program/")
+            post("/api/v1/program")
                 .header("Authorization", "Bearer " + this.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(dto)))

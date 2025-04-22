@@ -17,7 +17,7 @@
 package io.studytracker.config.properties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -45,6 +45,8 @@ public class ApplicationProperties {
   private String javaVersion;
 
   private String buildTime;
+
+  private boolean skipInitialization = false;
 
   @Override
   public String toString() {

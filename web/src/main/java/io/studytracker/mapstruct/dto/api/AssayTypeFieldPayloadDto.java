@@ -17,7 +17,7 @@
 package io.studytracker.mapstruct.dto.api;
 
 import io.studytracker.model.CustomEntityFieldType;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

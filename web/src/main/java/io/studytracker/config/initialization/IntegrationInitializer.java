@@ -16,14 +16,10 @@
 
 package io.studytracker.config.initialization;
 
-import io.studytracker.config.ConfigOrder;
 import io.studytracker.config.properties.StudyTrackerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,8 +29,7 @@ import org.springframework.stereotype.Component;
  * @since 0.7.1
  */
 @Component
-@Order(ConfigOrder.DATA_INIT+1)
-public class IntegrationInitializer implements ApplicationRunner {
+public class IntegrationInitializer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationInitializer.class);
 
@@ -45,8 +40,8 @@ public class IntegrationInitializer implements ApplicationRunner {
   @Autowired private GitLabIntegrationInitializer gitLabIntegrationInitializer;
   @Autowired private BenchlingIntegrationInitializer benchlingIntegrationInitializer;
 
-  @Override
-  public void run(ApplicationArguments args) throws Exception {
+  public void run() throws Exception {
+
     LOGGER.info("Initializing integrations...");
 
     LOGGER.info("Initializing local storage...");

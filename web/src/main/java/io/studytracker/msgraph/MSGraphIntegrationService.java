@@ -17,10 +17,10 @@
 package io.studytracker.msgraph;
 
 import com.microsoft.graph.models.Drive;
+import com.microsoft.graph.models.DriveCollectionResponse;
 import com.microsoft.graph.models.Site;
-import com.microsoft.graph.requests.DriveCollectionPage;
-import com.microsoft.graph.requests.GraphServiceClient;
-import com.microsoft.graph.requests.SiteCollectionPage;
+import com.microsoft.graph.models.SiteCollectionResponse;
+import com.microsoft.graph.serviceclient.GraphServiceClient;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.MSGraphIntegration;
 import io.studytracker.model.OneDriveDriveDetails;
@@ -114,8 +114,8 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
   public boolean test(MSGraphIntegration instance) {
     LOGGER.info("Testing MSGraphIntegration: {}", instance.getTenantId());
     try {
-      GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(instance);
-      DriveCollectionPage page = client.drives().buildRequest().get();
+      GraphServiceClient client = MSGraphClientFactory.fromIntegrationInstance(instance);
+      DriveCollectionResponse page = client.drives().get();
       return page != null;
     } catch (Exception e) {
       LOGGER.error("MSGraphIntegration test failed: {}", e.getMessage());
@@ -140,30 +140,19 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
   public List<SharePointSite> listAvailableSharepointSites(MSGraphIntegration integration) {
     LOGGER.debug("Listing available SharePoint sites");
-    List<SharePointSite> sites = new ArrayList<>();
-    GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
-    SiteCollectionPage page = client.sites().buildRequest().get();
-    while (page != null) {
-      page.getCurrentPage().forEach(site -> {
-        if (site.webUrl != null && site.displayName != null && site.id != null && !site.webUrl.contains("/personal/")) {
-          sites.add(SharePointUtils.fromSite(site));
-        }
-      });
-      if (page.getNextPage() != null) {
-        page = page.getNextPage().buildRequest().get();
-      } else {
-        page = null;
-      }
-    }
-    return sites;
+    GraphServiceClient client = MSGraphClientFactory.fromIntegrationInstance(integration);
+    SiteCollectionResponse page = client.sites().get();
+    return page.getValue().stream()
+        .map(s -> SharePointUtils.fromSite(s))
+        .toList();
   }
 
   public SharePointSite findSharepointSiteBySiteId(MSGraphIntegration integration, String siteId) {
     LOGGER.debug("Finding SharePoint site by site id: {}", siteId);
-    GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
+    GraphServiceClient client = MSGraphClientFactory.fromIntegrationInstance(integration);
     Site site = null;
     try {
-      site = client.sites(siteId).buildRequest().get();
+      site = client.sites().bySiteId(siteId).get();
     } catch (Exception e) {
       LOGGER.error("Failed to find SharePoint site by site id: {}", siteId);
     }
@@ -183,15 +172,15 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     LOGGER.info("Registering SharePoint site: {}", site.getSiteId());
     List<MSGraphIntegration> integrations = findAll();
     MSGraphIntegration integration = integrations.iterator().next();
-    GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
-    Site s = client.sites(site.getSiteId()).buildRequest().get();
+    GraphServiceClient client = MSGraphClientFactory.fromIntegrationInstance(integration);
+    Site s = client.sites().bySiteId(site.getSiteId()).get();
     if (s == null) {
       throw new IllegalArgumentException("SharePoint site not found");
     }
     site.setMsgraphIntegration(integration);
-    site.setUrl(s.webUrl);
-    if (!StringUtils.hasText(site.getName())) site.setName(s.name);
-    site.setSiteId(s.id);
+    site.setUrl(s.getWebUrl());
+    if (!StringUtils.hasText(site.getName())) site.setName(s.getName());
+    site.setSiteId(s.getId());
     site.setActive(true);
     return sharePointSiteRepository.save(site);
   }
@@ -218,45 +207,33 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
     // Get the client
     MSGraphIntegration integration = findAll().get(0);
-    GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
+    GraphServiceClient client = MSGraphClientFactory.fromIntegrationInstance(integration);
 
     // Make sure the site exists
-    Site s = client.sites(site.getSiteId()).buildRequest().get();
-    if (s == null) {
+    Site s = client.sites().bySiteId(site.getSiteId()).get();
+    if (s == null || s.getId() == null) {
       throw new IllegalArgumentException("SharePoint site not found");
     }
 
     // Get the drives
-    List<Drive> drives = new ArrayList<>();
-    DriveCollectionPage page = client.sites(s.id).drives().buildRequest().get();
-    while (page != null) {
-      page.getCurrentPage().forEach(drive -> {
-        if (drive.webUrl != null && drive.name != null && drive.id != null) {
-          drives.add(drive);
-        }
-      });
-      if (page.getNextPage() != null) {
-        page = page.getNextPage().buildRequest().get();
-      } else {
-        page = null;
-      }
-    }
+    DriveCollectionResponse page = client.sites().bySiteId(s.getId()).drives().get();
 
     // Register the drives
     List<StorageDrive> storageDrives = new ArrayList<>();
-    for (Drive drive: drives) {
+    for (Drive drive: page.getValue()) {
 
       StorageDrive storageDrive = new StorageDrive();
       storageDrive.setDriveType(DriveType.ONEDRIVE);
       storageDrive.setRootPath("/");
-      storageDrive.setDisplayName("SharePoint Site " + site.getName() + " Drive: " + drive.name);
+      storageDrive.setDisplayName("SharePoint Site " + site.getName() + " Drive: "
+          + drive.getName());
       storageDrive.setActive(true);
 
       OneDriveDriveDetails details = new OneDriveDriveDetails();
-      details.setDriveId(drive.id);
-      details.setName(drive.name);
+      details.setDriveId(drive.getId());
+      details.setName(drive.getName());
       details.setMsGraphIntegrationId(integration.getId());
-      details.setWebUrl(drive.webUrl);
+      details.setWebUrl(drive.getWebUrl());
       storageDrive.setDetails(details);
 
       storageDrives.add(storageDrive);
@@ -273,10 +250,10 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
     // Get the client
     MSGraphIntegration integration = findAll().get(0);
-    GraphServiceClient<?> client = MSGraphClientFactory.fromIntegrationInstance(integration);
+    GraphServiceClient client = MSGraphClientFactory.fromIntegrationInstance(integration);
 
     // Make sure the drive exists
-    Drive d = client.drives(drive.getDriveId()).buildRequest().get();
+    Drive d = client.drives().byDriveId(drive.getDriveId()).get();
     if (d == null) {
       throw new IllegalArgumentException("OneDrive drive not found: " + drive.getDriveId());
     }
@@ -285,14 +262,14 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     StorageDrive storageDrive = new StorageDrive();
     storageDrive.setDriveType(DriveType.ONEDRIVE);
     storageDrive.setRootPath("/");
-    storageDrive.setDisplayName("OneDrive Drive: " + d.name);
+    storageDrive.setDisplayName("OneDrive Drive: " + d.getName());
     storageDrive.setActive(true);
 
     OneDriveDriveDetails oneDriveDriveDetails = new OneDriveDriveDetails();
-    oneDriveDriveDetails.setDriveId(d.id);
-    oneDriveDriveDetails.setName(d.name);
+    oneDriveDriveDetails.setDriveId(d.getId());
+    oneDriveDriveDetails.setName(d.getName());
     oneDriveDriveDetails.setMsGraphIntegrationId(integration.getId());
-    oneDriveDriveDetails.setWebUrl(d.webUrl);
+    oneDriveDriveDetails.setWebUrl(d.getWebUrl());
     storageDrive.setDetails(oneDriveDriveDetails);
 
     return storageDriveRepository.save(storageDrive);

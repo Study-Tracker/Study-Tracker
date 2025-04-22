@@ -16,15 +16,16 @@
 
 package io.studytracker.security;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -32,17 +33,26 @@ public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHa
   private static final Logger LOGGER =
       LoggerFactory.getLogger(UserAuthenticationSuccessHandler.class);
 
+  private void logAuthenticationSuccess(Object principal) {
+    String username;
+    if (principal instanceof DefaultSaml2AuthenticatedPrincipal) {
+      DefaultSaml2AuthenticatedPrincipal samlPrincipal =
+          (DefaultSaml2AuthenticatedPrincipal) principal;
+      username = samlPrincipal.getName();
+    } else {
+      UserDetails user = (UserDetails) principal;
+      username = user.getUsername();
+    }
+    LOGGER.info("Successfully authenticated user {}", username);
+  }
+
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse,
       Authentication authentication)
       throws IOException, ServletException {
-    UserDetails user = (UserDetails) authentication.getPrincipal();
-    LOGGER.info(
-        String.format(
-            "Successfully authenticated user %s with granted authorities: %s",
-            user.getUsername(), user.getAuthorities().toString()));
+    logAuthenticationSuccess(authentication.getPrincipal());
   }
 
   @Override
@@ -52,10 +62,6 @@ public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHa
       FilterChain chain,
       Authentication authentication)
       throws IOException, ServletException {
-    UserDetails user = (UserDetails) authentication.getPrincipal();
-    LOGGER.info(
-        String.format(
-            "Successfully authenticated user %s with granted authorities: %s",
-            user.getUsername(), user.getAuthorities().toString()));
+    logAuthenticationSuccess(authentication.getPrincipal());
   }
 }

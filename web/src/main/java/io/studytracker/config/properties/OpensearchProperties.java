@@ -22,11 +22,11 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "elasticsearch")
+@ConfigurationProperties(prefix = "opensearch")
 @Validated
 @Getter
 @Setter
-public class ElasticsearchProperties {
+public class OpensearchProperties {
 
   private String host;
 
@@ -41,7 +41,7 @@ public class ElasticsearchProperties {
 
   @Override
   public String toString() {
-    return "ElasticsearchProperties{" +
+    return "OpensearchProperties{" +
         "host='" + host + '\'' +
         ", port=" + port +
         ", useSsl=" + useSsl +

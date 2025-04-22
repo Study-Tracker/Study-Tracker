@@ -16,10 +16,10 @@
 
 package io.studytracker.mapstruct.dto.response;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

@@ -17,36 +17,36 @@
 package io.studytracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "assay_tasks")
-@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraphs({
   @NamedEntityGraph(
@@ -58,6 +58,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("fields")
       })
 })
+@Getter
+@Setter
 public class AssayTask extends Task {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -79,6 +81,7 @@ public class AssayTask extends Task {
   private User assignedTo;
 
   @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "due_date")
   private Date dueDate;
 
   @OneToMany(
@@ -88,53 +91,13 @@ public class AssayTask extends Task {
       orphanRemoval = true)
   private Set<AssayTaskField> fields = new HashSet<>();
 
-  @Type(type = "json")
+  @Type(JsonBinaryType.class)
   @Column(name = "data", columnDefinition = "json")
   private Map<String, Object> data = new LinkedHashMap<>();
 
   @JsonIgnore
   public Assay getAssay() {
     return assay;
-  }
-
-  public void setAssay(Assay assay) {
-    this.assay = assay;
-  }
-
-  public User getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public User getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(User lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
-  public User getAssignedTo() {
-    return assignedTo;
-  }
-
-  public void setAssignedTo(User assignedTo) {
-    this.assignedTo = assignedTo;
-  }
-
-  public Date getDueDate() {
-    return dueDate;
-  }
-
-  public void setDueDate(Date dueDate) {
-    this.dueDate = dueDate;
-  }
-
-  public Set<AssayTaskField> getFields() {
-    return fields;
   }
 
   public void setFields(Set<AssayTaskField> fields) {
@@ -153,14 +116,6 @@ public class AssayTask extends Task {
     for (AssayTaskField f: assayTaskFields) {
       this.addField(f);
     }
-  }
-
-  public Map<String, Object> getData() {
-    return data;
-  }
-
-  public void setData(Map<String, Object> data) {
-    this.data = data;
   }
 
   public void addData(String key, Object value) {

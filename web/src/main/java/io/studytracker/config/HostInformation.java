@@ -17,7 +17,7 @@
 package io.studytracker.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

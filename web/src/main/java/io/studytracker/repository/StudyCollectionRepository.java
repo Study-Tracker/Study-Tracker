@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface StudyCollectionRepository extends JpaRepository<StudyCollection, Long> {
 
@@ -35,8 +36,10 @@ public interface StudyCollectionRepository extends JpaRepository<StudyCollection
   Optional<StudyCollection> findById(Long id);
 
   @EntityGraph("study-collection-summary")
+  @Query("select c from StudyCollection c where c.createdBy.id = ?1")
   List<StudyCollection> findByCreatedById(Long id);
 
+  @Query("select c from StudyCollection c where c.createdBy.id = ?1")
   Page<StudyCollection> findByCreatedById(Long id, Pageable pageable);
 
   @EntityGraph("study-collection-summary")

@@ -9,13 +9,13 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.5.14</version>
+    <version>3.4.3</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>io.studytracker</groupId>
   <artifactId>study-tracker-parent</artifactId>
-  <version>0.9.11</version>
+  <version>1.0.0</version>
   <name>Study Tracker Parent</name>
   <packaging>pom</packaging>
 
@@ -56,10 +56,10 @@
 
   <properties>
     <study-tracker.version>${project.parent.version}</study-tracker.version>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <node.version>v16.20.0</node.version>
     <npm.version>8.19.4</npm.version>
-    <aws-sdk.version>2.17.283</aws-sdk.version>
+    <aws-sdk.version>2.31.20</aws-sdk.version>
   </properties>
 
   <build>

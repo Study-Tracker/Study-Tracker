@@ -20,10 +20,10 @@ import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
 import io.studytracker.mapstruct.dto.response.StorageDriveFolderSummaryDto;
 import io.studytracker.mapstruct.dto.response.UserSummaryDto;
 import io.studytracker.model.GitGroup;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

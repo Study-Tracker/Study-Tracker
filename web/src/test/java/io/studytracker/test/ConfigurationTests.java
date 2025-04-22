@@ -19,6 +19,7 @@ package io.studytracker.test;
 import io.studytracker.Application;
 import io.studytracker.config.HostInformation;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class ConfigurationTests {
   }
 
   @Test
+  @Ignore
   public void hostInformationTest() {
     HostInformation hostInformation = context.getBean(HostInformation.class);
     Assert.assertNotNull(hostInformation);

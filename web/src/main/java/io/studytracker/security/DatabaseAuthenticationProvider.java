@@ -20,16 +20,14 @@ import io.studytracker.egnyte.exception.UnauthorizedException;
 import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
   private static final Logger LOGGER =
@@ -39,7 +37,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
   private final AppUserDetailsService userDetailsService;
 
-  @Autowired
+//  @Autowired
   public DatabaseAuthenticationProvider(
       PasswordEncoder passwordEncoder, AppUserDetailsService userDetailsService) {
     this.passwordEncoder = passwordEncoder;

@@ -63,10 +63,16 @@ public class GitLabIntegrationInitializer {
     LOGGER.info("Checking GitLab integration status...");
     GitLabProperties gitLabProperties = properties.getGitlab();
 
-    if (gitLabProperties != null && gitLabProperties.getUrl() != null
-        && (StringUtils.hasText(gitLabProperties.getAccessToken())
-        || (StringUtils.hasText(gitLabProperties.getUsername())
-        && StringUtils.hasText(gitLabProperties.getPassword())))) {
+    if (gitLabProperties != null
+        && gitLabProperties.getUrl() != null
+        && (
+            StringUtils.hasText(gitLabProperties.getAccessKey())
+            || (
+                StringUtils.hasText(gitLabProperties.getUsername())
+                && StringUtils.hasText(gitLabProperties.getPassword())
+            )
+        )
+    ) {
 
       List<GitLabIntegration> integrations = gitLabIntegrationService.findAll();
       try {
@@ -77,8 +83,7 @@ public class GitLabIntegrationInitializer {
           registerNewGitLabIntegration();
         }
       } catch (Exception e) {
-        e.printStackTrace();
-        LOGGER.warn("Failed to initialize GitLab integration.");
+        LOGGER.warn("Failed to initialize GitLab integration.", e);
         throw new InvalidConfigurationException(e);
       }
 
@@ -97,7 +102,7 @@ public class GitLabIntegrationInitializer {
     integration.setRootUrl(gitLabProperties.getUrl().toString());
     integration.setUsername(gitLabProperties.getUsername());
     integration.setPassword(gitLabProperties.getPassword());
-    integration.setAccessToken(gitLabProperties.getAccessToken());
+    integration.setAccessToken(gitLabProperties.getAccessKey());
     GitLabIntegration created = gitLabIntegrationService.register(integration);
 
     if (gitLabProperties.getRootGroupId() != null) {
@@ -117,7 +122,7 @@ public class GitLabIntegrationInitializer {
       existing.setRootUrl(gitLabProperties.getUrl().toString());
       existing.setUsername(gitLabProperties.getUsername());
       existing.setPassword(gitLabProperties.getPassword());
-      existing.setAccessToken(gitLabProperties.getAccessToken());
+      existing.setAccessToken(gitLabProperties.getAccessKey());
       existing.setActive(true);
       GitLabIntegration updated = gitLabIntegrationService.update(existing);
 

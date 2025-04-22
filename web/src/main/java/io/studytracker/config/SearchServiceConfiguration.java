@@ -16,15 +16,25 @@
 
 package io.studytracker.config;
 
-import io.studytracker.config.properties.ElasticsearchProperties;
+import io.studytracker.config.properties.OpensearchProperties;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Study;
 import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.search.SearchService;
-import io.studytracker.search.elasticsearch.ElasticsearchSearchService;
+import io.studytracker.search.opensearch.OpensearchSearchService;
 import java.util.Calendar;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.json.JsonpMapper;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.transport.OpenSearchTransport;
+import org.opensearch.client.transport.TransportOptions;
+import org.opensearch.client.transport.rest_client.RestClientOptions;
+import org.opensearch.data.client.osc.OpenSearchClients;
+import org.opensearch.data.client.osc.OpenSearchTemplate;
+import org.opensearch.data.core.OpenSearchOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +44,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration.ClientConfigurationBuilderWithRequiredEndpoint;
 import org.springframework.data.elasticsearch.client.ClientConfiguration.MaybeSecureClientConfigurationBuilder;
-import org.springframework.data.elasticsearch.client.RestClients;
+import org.springframework.data.elasticsearch.config.ElasticsearchConfigurationSupport;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -44,30 +55,25 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class SearchServiceConfiguration {
 
   @Configuration
-  @EnableElasticsearchRepositories(basePackages = "io.studytracker.search.elasticsearch")
-  @ConditionalOnProperty(name = "search.mode", havingValue = "elasticsearch")
-  public static class ElasticsearchConfiguration {
+  @EnableElasticsearchRepositories(basePackages = "io.studytracker.search.opensearch")
+  @ConditionalOnProperty(name = "search.mode", havingValue = "opensearch")
+  public static class OpensearchSearchServiceConfiguration
+      extends ElasticsearchConfigurationSupport {
 
     @Autowired
-    private ElasticsearchProperties properties;
-
-//    @Value("${elasticsearch.host}")
-//    private String host;
-//
-//    @Value("${elasticsearch.port}")
-//    private Integer port;
-//
-//    @Value("${elasticsearch.use-ssl:#{false}}")
-//    private Boolean useSsl;
-//
-//    @Value("${elasticsearch.username:#{null}}")
-//    private String username;
-//
-//    @Value("${elasticsearch.password:#{null}}")
-//    private String password;
+    private OpensearchProperties properties;
 
     @Bean
-    public RestHighLevelClient client() {
+    public JsonpMapper jsonpMapper() {
+      return new JacksonJsonpMapper();
+    }
+
+    public TransportOptions transportOptions() {
+      return new RestClientOptions(RequestOptions.DEFAULT);
+    }
+
+    @Bean
+    public ClientConfiguration clientConfiguration() {
 
       String host = properties.getHost();
       Integer port = properties.getPort();
@@ -90,17 +96,41 @@ public class SearchServiceConfiguration {
       } else {
         configuration = sBuilder.build();
       }
-      return RestClients.create(configuration).rest();
+      return configuration;
     }
 
     @Bean
-    public ElasticsearchSearchService elasticsearchSearchService() {
-      return new ElasticsearchSearchService();
+    public RestClient restClient(ClientConfiguration clientConfiguration) {
+      return OpenSearchClients.getRestClient(clientConfiguration);
+    }
+
+    @Bean
+    public OpenSearchTransport opensearchTransport(RestClient restClient, JsonpMapper jsonpMapper) {
+      return OpenSearchClients.getOpenSearchTransport(restClient, OpenSearchClients.IMPERATIVE_CLIENT,
+          transportOptions(), jsonpMapper());
+    }
+
+    @Bean
+    public OpenSearchClient opensearchClient(OpenSearchTransport transport) {
+      return OpenSearchClients.createImperative(transport);
+    }
+
+    @Bean(name = "elasticsearchTemplate")
+    public OpenSearchOperations opensearchOperations(ElasticsearchConverter elasticsearchConverter,
+        OpenSearchClient elasticsearchClient) {
+      OpenSearchTemplate template = new OpenSearchTemplate(elasticsearchClient, elasticsearchConverter);
+      template.setRefreshPolicy(this.refreshPolicy());
+      return template;
+    }
+
+    @Bean
+    public OpensearchSearchService opensearchSearchService() {
+      return new OpensearchSearchService();
     }
   }
 
   @Configuration
-  @ConditionalOnProperty(name = "search.mode")
+  @ConditionalOnProperty(name = "search.mode", havingValue = "opensearch")
   @EnableScheduling
   public static class ScheduledSearchIndexingConfiguration {
 

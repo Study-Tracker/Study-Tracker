@@ -17,10 +17,13 @@
 package io.studytracker.aws;
 
 import io.studytracker.model.AwsIntegration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -31,14 +34,37 @@ import software.amazon.awssdk.services.s3.S3ClientBuilder;
  */
 public class AWSClientFactory {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(AWSClientFactory.class);
+
   private static AwsCredentialsProvider createCredentialsProvider(AwsIntegration integration) {
+
     if (StringUtils.hasText(integration.getAccessKeyId())
         && StringUtils.hasText(integration.getSecretAccessKey())) {
+      LOGGER.debug("Using AWS credentials from integration: {}", integration.getId());
       AwsCredentials credentials =
-          AwsBasicCredentials.create(integration.getAccessKeyId(), integration.getSecretAccessKey());
+          AwsBasicCredentials.create(integration.getAccessKeyId(),
+              integration.getSecretAccessKey());
       return StaticCredentialsProvider.create(credentials);
     } else {
-      return null;
+
+      // Check for environment variables
+      String accessKeyId = System.getenv("AWS_ACCESS_KEY_ID");
+      String secretAccessKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+      String sessionToken = System.getenv("AWS_SESSION_TOKEN");
+
+      if (StringUtils.hasText(accessKeyId) && StringUtils.hasText(secretAccessKey)) {
+        LOGGER.debug("Using AWS credentials from environment variables");
+        if (StringUtils.hasText(sessionToken)) {
+          return StaticCredentialsProvider.create(
+              AwsSessionCredentials.create(accessKeyId, secretAccessKey, sessionToken));
+        } else {
+          return StaticCredentialsProvider.create(
+              AwsBasicCredentials.create(accessKeyId, secretAccessKey));
+        }
+//        return EnvironmentVariableCredentialsProvider.create();
+      }
+      LOGGER.debug("No AWS credentials provided, using default provider chain");
+      return null; //DefaultCredentialsProvider.create();
     }
   }
 

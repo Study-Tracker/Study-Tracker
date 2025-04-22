@@ -37,12 +37,12 @@ public class OneDriveUtils {
 
   public static String getPathFromDriveItem(DriveItem item) {
     String path;
-    if (item.parentReference == null) {
+    if (item.getParentReference() == null) {
       return null;
-    } else if (item.parentReference.path == null && item.parentReference.name == null) {
+    } else if (item.getParentReference().getPath() == null && item.getParentReference().getName() == null) {
       return "/";
     } else {
-      String[] bits = item.parentReference.path.split("root:");
+      String[] bits = item.getParentReference().getPath().split("root:");
       if (bits.length > 1) {
         path = bits[1];
         if (!path.endsWith("/")) {
@@ -55,29 +55,29 @@ public class OneDriveUtils {
         path = "/";
       }
     }
-    return path + item.name;
+    return path + item.getName();
   }
 
   public static StorageFolder convertDriveItemFolder(DriveItem driveItem) {
     StorageFolder folder = new StorageFolder();
-    folder.setName(driveItem.name);
+    folder.setName(driveItem.getName());
     folder.setPath(getPathFromDriveItem(driveItem));
-    folder.setUrl(driveItem.webUrl);
-    folder.setFolderId(driveItem.id);
-    folder.setLastModified(new Date(driveItem.lastModifiedDateTime.toInstant().toEpochMilli()));
-    folder.setTotalSize(driveItem.size);
+    folder.setUrl(driveItem.getWebUrl());
+    folder.setFolderId(driveItem.getId());
+    folder.setLastModified(new Date(driveItem.getLastModifiedDateTime().toInstant().toEpochMilli()));
+    folder.setTotalSize(driveItem.getSize());
     folder.setDownloadable(false);
     return folder;
   }
 
   public static StorageFile convertDriveItemFile(DriveItem driveItem) {
     StorageFile file = new StorageFile();
-    file.setName(driveItem.name);
+    file.setName(driveItem.getName());
     file.setPath(getPathFromDriveItem(driveItem));
-    file.setUrl(driveItem.webUrl);
-    file.setFileId(driveItem.id);
-    file.setLastModified(new Date(driveItem.lastModifiedDateTime.toInstant().toEpochMilli()));
-    file.setSize(driveItem.size);
+    file.setUrl(driveItem.getWebUrl());
+    file.setFileId(driveItem.getId());
+    file.setLastModified(new Date(driveItem.getLastModifiedDateTime().toInstant().toEpochMilli()));
+    file.setSize(driveItem.getSize());
     file.setDownloadable(true);
     return file;
   }
@@ -87,7 +87,7 @@ public class OneDriveUtils {
     List<StorageFile> files = new ArrayList<>();
     List<StorageFolder> folders = new ArrayList<>();
     for (DriveItem child : children) {
-      if (child.folder != null) {
+      if (child.getFolder() != null) {
         folders.add(convertDriveItemFolder(child));
       } else {
         files.add(convertDriveItemFile(child));

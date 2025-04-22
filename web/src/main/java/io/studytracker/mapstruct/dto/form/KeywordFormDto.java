@@ -16,7 +16,7 @@
 
 package io.studytracker.mapstruct.dto.form;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
