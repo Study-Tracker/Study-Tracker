@@ -45,6 +45,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -124,6 +125,13 @@ public class AuthenticationController {
         AppUserDetails userDetails = (AppUserDetails) principal;
         user = userDetails.getUser();
         LOGGER.debug("Loaded user from userDetails: {}", userDetails.getUsername());
+      } else if (principal instanceof DefaultSaml2AuthenticatedPrincipal) {
+        DefaultSaml2AuthenticatedPrincipal samlPrincipal =
+            (DefaultSaml2AuthenticatedPrincipal) principal;
+        String username = samlPrincipal.getName();
+        user = userService.findByUsername(username)
+            .orElseThrow(() -> new UnknownUserException(username));
+        LOGGER.debug("Loaded user from SAML principal: {}", username);
       } else {
         String username = principal.toString();
         user = userService.findByUsername(username)
