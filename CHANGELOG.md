@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2025-04-XX
 
+### Added
+- Added support for Microsoft Entra ID (formerly Azure AD) SAML SSO authentication.
+
 ### Changed
 - Updated core Spring dependencies to Spring Boot 3. This includes moving to the required minimum Java version of 17.
 - ElasticSearch support has been removed in favor of OpenSearch, due to the licensing changes in ElasticSearch after version 7.10.
