@@ -31,11 +31,14 @@ import org.springframework.validation.annotation.Validated;
 @ToString
 public class SingleSignOnProperties {
 
-  @ConfigurationModeConstraint(options = {"okta-saml"})
+  @ConfigurationModeConstraint(options = {"okta-saml", "entra-saml"})
   private String mode;
 
   @Valid
   private final OktaSsoProperties okta = new OktaSsoProperties();
+
+  @Valid
+  private final EntraSsoProperties entra = new EntraSsoProperties();
 
   @Valid
   private final SamlSsoProperties saml = new SamlSsoProperties();
@@ -45,6 +48,15 @@ public class SingleSignOnProperties {
   @Setter
   @ToString
   public static class OktaSsoProperties {
+
+    private String url;
+
+  }
+
+  @Getter
+  @Setter
+  @ToString
+  public static class EntraSsoProperties {
 
     private String url;
 
