@@ -57,8 +57,8 @@
   <properties>
     <study-tracker.version>${project.parent.version}</study-tracker.version>
     <java.version>17</java.version>
-    <node.version>v16.20.0</node.version>
-    <npm.version>8.19.4</npm.version>
+    <node.version>v22.14.0</node.version>
+    <npm.version>10.9.2</npm.version>
     <aws-sdk.version>2.31.20</aws-sdk.version>
   </properties>
 

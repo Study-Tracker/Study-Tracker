@@ -16,7 +16,7 @@
 
 import {useFormikContext} from 'formik';
 import {useEffect} from 'react';
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const FormikFormErrorNotification = () => {
     const { isSubmitting, errors, submitCount, values } = useFormikContext()
