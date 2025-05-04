@@ -58,14 +58,14 @@ const AssayQuickActionsWidget = ({
   }
 
   const handleAssayDelete = () => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to remove this assay?",
       text: "Removed assays will be hidden from view, but their records will not be deleted. Assays can be recovered in the admin dashboard.",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         axios.delete("/api/internal/assay/" + assay.code)
         .then(() => {
           navigate("/assays")
@@ -116,7 +116,7 @@ const AssayQuickActionsWidget = ({
             <Col xs="6">
               <div className="illustration-text p-3 m-1">
                 <h4 className="illustration-text">
-                  What's next?
+                  What&apos;s next?
                 </h4>
                 <br/>
                 <Dropdown className="me-1 mb-1">
@@ -130,7 +130,7 @@ const AssayQuickActionsWidget = ({
                       (assay.status === "IN_PLANNING" || assay.status === "NEEDS_ATTENTION") && (
                             <Dropdown.Item onClick={() => handleStatusChange("ACTIVE")}>
                               <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
-                              Set status to 'Active'
+                              Set status to &apos;Active&apos;
                             </Dropdown.Item>
                         )
                     }
@@ -139,7 +139,7 @@ const AssayQuickActionsWidget = ({
                         assay.status === "ACTIVE" && (
                             <Dropdown.Item onClick={() => handleStatusChange("COMPLETE")}>
                               <FontAwesomeIcon icon={faSquareCheck} className={"me-2"}/>
-                              Set status to 'Complete'
+                              Set status to &apos;Complete&apos;
                             </Dropdown.Item>
                         )
                     }
@@ -148,7 +148,7 @@ const AssayQuickActionsWidget = ({
                         assay.status === "COMPLETE" && (
                             <Dropdown.Item onClick={() => handleStatusChange("NEEDS_ATTENTION")}>
                               <FontAwesomeIcon icon={faTriangleExclamation} className={"me-2"}/>
-                              Set status to 'Needs attention'
+                              Set status to &apos;Needs attention&apos;
                             </Dropdown.Item>
                         )
                     }

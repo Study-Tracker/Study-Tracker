@@ -72,7 +72,7 @@ const StorageFolderSettings = () => {
   });
 
   const handleFolderDelete = (folder) => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to delete this folder?",
       text: "Removing root folders will not delete the folder in the file system or "
           + "affect any subfolders created from this folder. You can re-register this "

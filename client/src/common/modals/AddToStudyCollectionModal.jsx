@@ -38,7 +38,7 @@ const AddToStudyCollectionModal = ({showModal, isOpen, study}) => {
   });
 
   const handleSubmit = () => {
-    if (!!selected) {
+    if (selected) {
       mutation.mutate(selected, {
         onSuccess: () => {
           queryClient.invalidateQueries("studyCollections");
@@ -48,7 +48,7 @@ const AddToStudyCollectionModal = ({showModal, isOpen, study}) => {
         onError: (e) => {
           console.error(e);
           console.warn("Failed to add study to collection.")
-          swal(
+          swal.fire(
             "Something went wrong",
             "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
           );

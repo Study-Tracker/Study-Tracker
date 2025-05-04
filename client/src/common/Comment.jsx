@@ -54,8 +54,11 @@ const Comment = props => {
     .catch(error => {
       setSubmitting(false);
       console.error(error);
-      swal("Your comment failed to update.",
-          "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
+      swal.fire({
+          title: "Your comment failed to update.",
+          text: "Please try again. If you continue to experience this issues, contact the helpdesk for support.",
+          icon: "error",
+      });
     });
   };
 
@@ -75,12 +78,11 @@ const Comment = props => {
             posted {dateFormat(new Date(comment.createdAt),
               'mm/dd/yy @ h:MM TT')}
             {
-              !!comment.updatedAt
-                  ? (
-                      <span>, edited {dateFormat(
-                          new Date(comment.updatedAt),
-                          'mm/dd/yy @ h:MM TT')}</span>
-                  ) : ''
+              comment.updatedAt && (
+                  <span>
+                    , edited {dateFormat(new Date(comment.updatedAt), 'mm/dd/yy @ h:MM TT')}
+                  </span>
+              )
             }
           </small>
 

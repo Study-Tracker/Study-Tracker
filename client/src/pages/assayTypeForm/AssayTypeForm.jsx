@@ -106,7 +106,7 @@ const AssayTypeForm = props => {
     })
     .catch(e => {
       setSubmitting(false);
-      swal(
+      swal.fire(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
       );
@@ -116,14 +116,14 @@ const AssayTypeForm = props => {
   }
 
   const handleCancel = () => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to leave the page?",
       text: "Any unsaved work will be lost.",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         navigate(-1);
       }
     });

@@ -66,7 +66,7 @@ const StudyQuickActionsWidget = ({
   const handleNewGitRepository = () => {
     setIsSubmitting(true);
     axios.post("/api/internal/study/" + study.id + "/git")
-    .then(response => {
+    .then(() => {
       notyf.open({
         type: "success",
         message: "Git repository created successfully."
@@ -85,21 +85,21 @@ const StudyQuickActionsWidget = ({
   }
 
   const handleStudyDelete = () => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to remove this study?",
       text: "Removed studies will be hidden from view, but their records will not be deleted. Studies can be recovered at a later date.",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         axios({
           url: "/api/internal/study/" + study.code,
           method: 'delete',
           headers: {
             "Content-Type": "application/json"
           }
-        }).then(response => {
+        }).then(() => {
           navigate("/studies")
         })
         .catch(error => {
@@ -141,7 +141,7 @@ const StudyQuickActionsWidget = ({
             <Col xs="6">
               <div className="illustration-text p-3 m-1">
                 <h4 className="illustration-text">
-                  What's next?
+                  What&apos;s next?
                 </h4>
                 <br/>
                 <Dropdown className="me-1 mb-1">
@@ -164,7 +164,7 @@ const StudyQuickActionsWidget = ({
                       (study.status === "IN_PLANNING" || study.status === "NEEDS_ATTENTION") && (
                             <Dropdown.Item onClick={() => handleStatusChange("ACTIVE")}>
                               <FontAwesomeIcon icon={faPersonRunning} className={"me-2"}/>
-                              Set status to 'Active'
+                              Set status to &apos;Active&apos;
                             </Dropdown.Item>
                       )
                     }
@@ -173,7 +173,7 @@ const StudyQuickActionsWidget = ({
                         study.status === "ACTIVE" && (
                             <Dropdown.Item onClick={() => handleStatusChange("COMPLETE")}>
                               <FontAwesomeIcon icon={faSquareCheck} className={"me-2"}/>
-                              Set status to 'Complete'
+                              Set status to &apos;Complete&apos;
                             </Dropdown.Item>
                         )
                     }
@@ -182,7 +182,7 @@ const StudyQuickActionsWidget = ({
                         study.status === "COMPLETE" && (
                             <Dropdown.Item onClick={() => handleStatusChange("NEEDS_ATTENTION")}>
                               <FontAwesomeIcon icon={faTriangleExclamation} className={"me-2"}/>
-                              Set status to 'Needs attention'
+                              Set status to &apos;Needs attention&apos;
                             </Dropdown.Item>
                         )
                     }

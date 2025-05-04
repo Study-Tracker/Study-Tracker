@@ -37,9 +37,9 @@ const StudyFileManagerMenu = ({
   const queryClient = useQueryClient();
 
   let type = "program";
-  if (record.hasOwnProperty("programId")) {
+  if (Object.prototype.hasOwnProperty.call(record, "programId")) {
     type = "study";
-  } else if (record.hasOwnProperty("studyId")) {
+  } else if (Object.prototype.hasOwnProperty.call(record, "studyId")) {
     type = "assay";
   }
 

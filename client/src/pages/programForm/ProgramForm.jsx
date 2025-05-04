@@ -165,8 +165,8 @@ const ProgramForm = ({
         navigate("/program/" + json.id);
       } else {
         setShowLoadingOverlay(false);
-        swal("Something went wrong",
-            !!json.message
+        swal.fire("Something went wrong",
+            json.message
                 ? "Error: " + json.message :
                 "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
         );
@@ -175,7 +175,7 @@ const ProgramForm = ({
     })
     .catch(e => {
       setShowLoadingOverlay(false);
-      swal(
+      swal.fire(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
       );
@@ -187,14 +187,14 @@ const ProgramForm = ({
   };
 
   const handleCancel = () => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to leave the page?",
       text: "Any unsaved work will be lost.",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         navigate("/programs");
       }
     });

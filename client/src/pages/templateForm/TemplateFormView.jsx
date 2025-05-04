@@ -99,7 +99,7 @@ export const TemplateFormView = (props) => {
                         }, 1000);
                       } else {
                         const json = await response.data;
-                        swal('Something went wrong',
+                        swal.fire('Something went wrong',
                             json.message
                                 ? 'Error: ' + json.message
                                 : 'The request failed. Please contact Study Tracker support.'
@@ -108,7 +108,7 @@ export const TemplateFormView = (props) => {
                       }
                     })
                     .catch(error => {
-                      swal(
+                      swal.fire(
                           'Something went wrong',
                           'The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support.'
                       );

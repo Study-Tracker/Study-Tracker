@@ -40,7 +40,7 @@ const UserSettingsTable = ({users, showModal}) => {
   const notyf = useContext(NotyfContext);
 
   const resetUserPassword = (user) => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to reset the password for user: "
           + user["displayName"] + " (" + user["email"] + ")?",
       text: "This will override any existing password reset requests and send a "
@@ -67,7 +67,7 @@ const UserSettingsTable = ({users, showModal}) => {
   });
 
   const toggleUserActive = (user, active) => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to " + (!!active ? "enable" : "disable")
           + " user: " + user["displayName"] + " (" + user["email"] + ")?",
       text: "Disabled users cannot be added to new studies and assays, but they "

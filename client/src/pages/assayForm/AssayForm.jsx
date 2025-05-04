@@ -142,7 +142,7 @@ const AssayForm = props => {
     }
     if (uploadErrors) {
       setSubmitting(false);
-      swal(
+      swal.fire(
           "Something went wrong",
           "There was a problem uploading one or more attached files. If this error persists, please contact Study Tracker support."
       );
@@ -166,8 +166,8 @@ const AssayForm = props => {
       if (response.status === 200 || response.status === 201) {
         navigate("/study/" + study.code + "/assay/" + json.code);
       } else {
-        swal("Something went wrong",
-            !!json.message
+        swal.fire("Something went wrong",
+            json.message
                 ? "Error: " + json.message :
                 "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
         );
@@ -175,7 +175,7 @@ const AssayForm = props => {
       }
     })
     .catch(e => {
-      swal(
+      swal.fire(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
       );
@@ -188,7 +188,7 @@ const AssayForm = props => {
   }
 
   const handleCancel = () => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to leave the page?",
       text: "Any unsaved work will be lost.",
       icon: "warning",

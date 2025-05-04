@@ -58,15 +58,15 @@ const ExternalLinks = props => {
   }
 
   const handleLinkDelete = (link) => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to delete this link?",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         axios.delete("/api/internal/study/" + props.studyCode + "/links/" + link.id, link)
-        .then(response => {
+        .then(() => {
           setLinks(links.filter(l => l.label !== link.label && l.url !== link.url));
         })
         .catch(error => {

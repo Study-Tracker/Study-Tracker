@@ -92,13 +92,13 @@ const StudyRelationships = props => {
   }
 
   const handleRelationshipDelete = (relationship) => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to delete this relationship?",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         axios.delete("/api/internal/study/" + props.studyCode + "/relationships/"
             + relationship.id)
         .then(() => {
@@ -278,7 +278,8 @@ const StudyRelationships = props => {
 
 StudyRelationships.propTypes = {
   studyCode: PropTypes.string.isRequired,
-  user: PropTypes.object
+  user: PropTypes.object,
+  relationships: PropTypes.array.isRequired
 }
 
 export default StudyRelationships;

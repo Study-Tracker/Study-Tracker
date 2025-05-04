@@ -297,23 +297,23 @@ export const UploadFilesModal = ({isOpen, showModal, handleSubmit}) => {
 };
 
 const handleFolderRepairRequest = (url) => {
-  swal({
+  swal.fire({
     title: "Are you sure you want to repair this storage folder?",
     text: "Folder repair could result in a loss of data.",
     icon: "warning",
     buttons: true
   })
   .then(val => {
-    if (val) {
+    if (val.isConfirmed) {
       axios.post(url)
-      .then(response => {
-        swal("Folder Repair Complete",
+      .then(() => {
+        swal.fire("Folder Repair Complete",
             "Refresh the page to view the updated storage folder information.",
             "success")
       })
       .catch(error => {
         console.error(error);
-        swal("Request failed",
+        swal.fire("Request failed",
             "Check the server log for more information.",
             "warning");
       })

@@ -70,13 +70,13 @@ const StudyCollectionDetails = ({
   };
 
   const handleCollectionDelete = () => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to delete this collection?",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         axios.delete("/api/internal/studycollection/" + collection.id)
         .then(() => {
           navigate("/collections");

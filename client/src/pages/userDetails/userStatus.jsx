@@ -42,7 +42,7 @@ export const SelectableUserStatusButton = props => {
     axios.post("/api/internal/user/" + userId + "/status?active=" + active)
     .then(() => window.location.reload())
     .catch(e => {
-      swal(
+      swal.fire(
           "Something went wrong",
           "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
       );

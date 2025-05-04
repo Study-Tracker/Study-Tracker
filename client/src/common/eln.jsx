@@ -19,24 +19,27 @@ import {Button} from "react-bootstrap";
 import {Folder as FolderIcon, RefreshCw} from "react-feather";
 import swal from "sweetalert2";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 const handleFolderRepairRequest = (url) => {
-  swal({
+  swal.fire({
     title: "Are you sure you want to repair this notebook folder?",
     text: "Folder repair could result in a loss of data.",
     icon: "warning",
     buttons: true
   })
   .then(val => {
-    if (val) {
+    if (val.isConfirmed) {
       axios.post(url)
-      .then(response => {
-        swal("Folder Repair Complete",
-            "Refresh the page to view the updated storage folder information.",
-            "success")
+      .then(() => {
+        swal.fire({
+          title: "Folder Repair Complete",
+          text: "Refresh the page to view the updated storage folder information.",
+          icon: "success"
+        });
       })
-      .catch(error => {
-        swal("Request failed",
+      .catch(() => {
+        swal.fire("Request failed",
             "Check the server log for more information.",
             "warning");
       })
@@ -60,9 +63,14 @@ export const RepairableNotebookFolderLink = ({folder, repairUrl}) => {
   }
 }
 
+RepairableNotebookFolderLink.propTypes = {
+  folder: PropTypes.object,
+  repairUrl: PropTypes.string
+}
+
 export const RepairableNotebookFolderButton = ({folder, repairUrl}) => {
-  if (!!folder && !!folder.referenceId && !!folder.url && folder.url
-      !== 'ERROR') {
+  if (!!folder && !!folder.referenceId
+    && !!folder.url && folder.url !== 'ERROR') {
     return (
         <a href={folder.url}
            target="_blank"
@@ -86,4 +94,9 @@ export const RepairableNotebookFolderButton = ({folder, repairUrl}) => {
         </Button>
     )
   }
+}
+
+RepairableNotebookFolderButton.propTypes = {
+  folder: PropTypes.object,
+  repairUrl: PropTypes.string
 }

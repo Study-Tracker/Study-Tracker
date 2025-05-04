@@ -142,7 +142,7 @@ const StudyForm = ({
       } else {
         setSubmitting(false);
         Swal.fire("Something went wrong",
-            !!json.message
+            json.message
                 ? "Error: " + json.message :
                 "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
         );

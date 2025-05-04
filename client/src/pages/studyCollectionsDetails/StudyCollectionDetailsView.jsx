@@ -36,15 +36,15 @@ const StudyCollectionDetailsView = () => {
   const notyf = useContext(NotyfContext);
 
   const handleRemoveStudy = (id) => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to remove this study from the collection?",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         axios.delete("/api/internal/studycollection/" + collection.id + "/" + id)
-        .then(response => {
+        .then(() => {
           setLoadCount(loadCount + 1);
         })
         .catch(error => {

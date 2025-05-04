@@ -50,7 +50,7 @@ const StudyCommentsTab = props => {
     })
     .catch(error => {
       console.error(error);
-      swal("Your comment failed to create.",
+      swal.fire("Your comment failed to create.",
           "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
     })
     .finally(() => {
@@ -80,27 +80,27 @@ const StudyCommentsTab = props => {
     })
     .catch(error => {
       console.error(error);
-      swal("Your comment failed to update.",
+      swal.fire("Your comment failed to update.",
           "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
     });
   }
 
   const handleCommentDelete = (comment) => {
-    swal({
+    swal.fire({
       title: "Are you sure you want to delete this comment?",
       icon: "warning",
       buttons: true
     })
     .then(val => {
-      if (val) {
+      if (val.isConfirmed) {
         axios.delete("/api/internal/study/" + study.code + "/comments/" + comment.id)
-        .then(response => {
+        .then(() => {
           const updated = comments.filter(c => c.id !== comment.id);
           setComments(updated);
         })
         .catch(e => {
           console.error(e)
-          swal("Your comment failed to delete.",
+          swal.fire("Your comment failed to delete.",
               "Please try again. If you continue to experience this issues, contact the helpdesk for support.");
         });
       }
