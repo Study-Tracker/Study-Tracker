@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated core Spring dependencies to Spring Boot 3. This includes moving to the required minimum Java version of 17.
 - ElasticSearch support has been removed in favor of OpenSearch, due to the licensing changes in ElasticSearch after version 7.10.
 - Some configuration properties have been renamed or removed. Please refer to the updated documentation for details.
+- Updated client module to React 18, including all supporting libraries. The minimum NodeJS version is now 22.
+- Switched client packaging to use Vite instead of Webpack. 
 
 ## [0.9.11] - 2025-02-20
 

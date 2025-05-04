@@ -16,7 +16,7 @@
 
 import {useFormikContext} from 'formik';
 import {useEffect} from 'react';
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const FormikFormErrorNotification = () => {
     const { isSubmitting, errors, submitCount, values } = useFormikContext()
@@ -35,7 +35,7 @@ const FormikFormErrorNotification = () => {
             });
             console.debug("Form values", values);
             console.debug("Validation errors", errors);
-            swal("Looks like you forgot something...",
+            swal.fire("Looks like you forgot something...",
                 "Check that all of the required inputs have been filled and then try again.\n\nValidation errors:\n" + err,
                 "warning");
         }
