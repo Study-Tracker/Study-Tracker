@@ -58,7 +58,7 @@ const AWSIntegrationSettings = () => {
         setSettings(response.data[0]);
       }
 
-      axios.get("/api/internal/drives/s3/")
+      axios.get("/api/internal/drives/s3")
       .then(response => {
         console.debug("S3 buckets loaded", response.data);
         setDrives(response.data);
@@ -76,7 +76,7 @@ const AWSIntegrationSettings = () => {
 
   const handleIntegrationFormSubmit = (values, {setSubmitting, resetForm}) => {
     console.debug("Saving AWS integration settings", values);
-    const url = "/api/internal/integrations/aws/" + (values.id || '');
+    const url = `/api/internal/integrations/aws${values.id ? "/" + values.id : ''}`;
     const method = values.id ? 'PUT' : 'POST';
     axios({
       url: url,
@@ -84,7 +84,7 @@ const AWSIntegrationSettings = () => {
       data: values,
       headers: {"Content-Type": "application/json"}
     })
-    .then(response => {
+    .then(() => {
       setLoadCount(loadCount + 1);
       setIntegrationModalIsOpen(false);
       resetForm();
@@ -107,7 +107,7 @@ const AWSIntegrationSettings = () => {
 
   const handleBucketFormSubmit = (values, {setSubmitting, resetForm}) => {
     console.debug("Saving S3 bucket settings", values);
-    const url = "/api/internal/drives/s3/" + (values.id || '');
+    const url = `/api/internal/drives/s3/${values.id ? "/" + values.id : ''}`;
     const method = values.id ? 'PUT' : 'POST';
     axios({
       url: url,
@@ -115,7 +115,7 @@ const AWSIntegrationSettings = () => {
       data: values,
       headers: {"Content-Type": "application/json"}
     })
-    .then(response => {
+    .then(() => {
       setLoadCount(loadCount + 1);
       setBucketModalIsOpen(false);
       resetForm();

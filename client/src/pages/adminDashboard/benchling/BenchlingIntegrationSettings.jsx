@@ -39,31 +39,35 @@ const BenchlingIntegrationSettings = () => {
   const [integrationModalIsOpen, setIntegrationModalIsOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  const {data: settings, isLoading, error} = useQuery("benchlingSettings", async () => {
-    return axios.get("/api/internal/integrations/benchling")
-    .then(response => {
-      console.debug("Benchling settings loaded", response.data);
-      if (response.data.length === 0) {
-        console.warn("No Benchling settings found");
-        return null;
-      } else if (response.data.length === 1) {
-        return response.data[0];
-      } else {
-        console.warn("Multiple Benchling settings found", response.data);
-        return response.data[0];
-      }
-    })
+  const {data: settings, isLoading, error} = useQuery({
+    queryKey: ["benchlingSettings"],
+    queryFn: async () => {
+      return axios.get("/api/internal/integrations/benchling")
+      .then(response => {
+        console.debug("Benchling settings loaded", response.data);
+        if (response.data.length === 0) {
+          console.warn("No Benchling settings found");
+          return null;
+        } else if (response.data.length === 1) {
+          return response.data[0];
+        } else {
+          console.warn("Multiple Benchling settings found", response.data);
+          return response.data[0];
+        }
+      })
+    }
   });
 
-  const changeStatusMutation = useMutation((active) => {
+  const changeStatusMutation = useMutation({
+    mutationFn: (active) => {
       return axios.patch("/api/internal/integrations/benchling/" + settings.id + "?active=" + active)
-    }, {
+    },
     onSuccess: () => {
       notyf.open({
         type: "success",
         message: "Benchling integration settings saved"
       });
-      queryClient.invalidateQueries({queryKey: "benchlingSettings"});
+      queryClient.invalidateQueries({queryKey: ["benchlingSettings"]});
     },
     onError: (error) => {
       console.error(error);

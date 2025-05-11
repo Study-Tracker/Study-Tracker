@@ -62,13 +62,15 @@ const UserSettingsTable = ({users, showModal}) => {
     })
   }
 
-  const toggleStatusMutation = useMutation(({userId, active}) => {
-    return axios.post(`/api/internal/user/${userId}/status?active=${active}`)
+  const toggleStatusMutation = useMutation({
+    mutationFn: ({ userId, active }) => {
+      return axios.post(`/api/internal/user/${userId}/status?active=${active}`)
+    }
   });
 
   const toggleUserActive = (user, active) => {
     swal.fire({
-      title: "Are you sure you want to " + (!!active ? "enable" : "disable")
+      title: "Are you sure you want to " + (active ? "enable" : "disable")
           + " user: " + user["displayName"] + " (" + user["email"] + ")?",
       text: "Disabled users cannot be added to new studies and assays, but they "
           + "will remain associated with existing studies and assays.",
@@ -187,7 +189,7 @@ const UserSettingsTable = ({users, showModal}) => {
                   <Dropdown.Divider/>
 
                   {
-                    !!d.active ? (
+                    d.active ? (
                         <Dropdown.Item
                             className={"text-warning"}
                             onClick={() => toggleUserActive(d, false)}

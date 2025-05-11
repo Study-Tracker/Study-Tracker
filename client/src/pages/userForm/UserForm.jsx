@@ -31,7 +31,7 @@ import axios from "axios";
 import FormikFormErrorNotification
   from "../../common/forms/FormikFormErrorNotification";
 
-const UserForm = props => {
+const UserForm = ({user, users}) => {
 
   const navigate = useNavigate();
   const userDefaults = {
@@ -45,6 +45,7 @@ const UserForm = props => {
     attributes: {},
     credentialsExpired: true
   };
+
   const userSchema = yup.object().shape({
     displayName: yup.string().required("Name is required"),
     admin: yup.boolean(),
@@ -52,7 +53,7 @@ const UserForm = props => {
       .required("Username is required")
       .when("type", {
         is: "STANDARD_USER",
-        then: yup.string().test(
+        then: (schema) => schema.test(
             "username matches email",
             "Standard users must have matching usernames and emails.",
             (value, context) => value === context.parent.email
@@ -63,10 +64,10 @@ const UserForm = props => {
       .required("Email is required")
       .when("id", {
         is: (value) => !value,
-        then: yup.string().test(
+        then: (schema) =>  schema.test(
             "unique",
             "A user with this email is already registered.",
-            value => !props.users.find(u => !!value && u.email && u.email.toLowerCase() === value.toLowerCase())
+            value => !users.find(u => !!value && u.email && u.email.toLowerCase() === value.toLowerCase())
         )
       }),
     type: yup.string()
@@ -86,14 +87,9 @@ const UserForm = props => {
 
   const handleFormSubmit = (values, {setSubmitting}) => {
 
-    const isUpdate = !!values.id;
-    const url = isUpdate
-        ? "/api/internal/user/" + values.id
-        : "/api/internal/user";
-
     axios({
-      url: url,
-      method: isUpdate ? "put" : "post",
+      url: `/api/internal/user${values.id ? "/" + values.id : ""}`,
+      method: values.id ? "put" : "post",
       data: values
     })
     .then(response => {
@@ -129,7 +125,7 @@ const UserForm = props => {
 
   return (
       <Formik
-          initialValues={props.user || userDefaults}
+          initialValues={user || userDefaults}
           validationSchema={userSchema}
           onSubmit={handleFormSubmit}
           validateOnBlur={false}
@@ -155,7 +151,7 @@ const UserForm = props => {
               <Row>
                 <Col>
                   {
-                    !!values.id
+                    values.id
                         ? (
                             <Breadcrumbs crumbs={[
                               {label: "Home", url: "/"},
@@ -181,7 +177,7 @@ const UserForm = props => {
               <Row className="justify-content-end align-items-center">
                 <Col>
                   <h3>
-                    {!!values.id ? "Edit User" : "New User"}
+                    {values.id ? "Edit User" : "New User"}
                   </h3>
                 </Col>
               </Row>
@@ -330,7 +326,7 @@ const UserForm = props => {
                               attributes for external integrations (for example, ELN
                               user names or identifiers). You can add as many or as
                               few attributes
-                              as you'd like. Attribute values should not be left
+                              as you&apos;d like. Attribute values should not be left
                               empty. All values are saved as simple character
                               strings.
                             </h6>
@@ -393,6 +389,7 @@ const UserForm = props => {
 
 UserForm.propTypes = {
   user: PropTypes.object,
+  users: PropTypes.array,
 }
 
 export default UserForm;

@@ -275,9 +275,10 @@ public class WebSecurityConfiguration {
         .headers(headers -> headers
             .frameOptions(FrameOptionsConfig::disable)
             .httpStrictTransportSecurity(HstsConfig::disable))
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/auth/**", "/login")
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+        .csrf(AbstractHttpConfigurer::disable);
+//        .csrf(csrf -> csrf
+//            .ignoringRequestMatchers("/auth/**", "/login")
+//            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
     ;
     return http.build();
   }
@@ -305,9 +306,10 @@ public class WebSecurityConfiguration {
         .headers(headers -> headers
             .frameOptions(FrameOptionsConfig::disable)
             .httpStrictTransportSecurity(HstsConfig::disable))
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/login", "/auth/**")
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+        .csrf(AbstractHttpConfigurer::disable);
+//        .csrf(csrf -> csrf
+//            .ignoringRequestMatchers("/login", "/auth/**")
+//            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
     return http.build();
   }
@@ -323,6 +325,10 @@ public class WebSecurityConfiguration {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/static/**", "/error", "/login/**", "/saml/**", "/auth/**").permitAll()
             .anyRequest().fullyAuthenticated())
+        .formLogin(form -> form
+            .loginPage("/login")
+            .loginProcessingUrl("/auth/login")
+            .defaultSuccessUrl("/"))
         .saml2Login(saml2 -> saml2
             .loginPage("/login")
             .defaultSuccessUrl("/")
@@ -335,9 +341,10 @@ public class WebSecurityConfiguration {
         .headers(headers -> headers
             .frameOptions(FrameOptionsConfig::disable)
             .httpStrictTransportSecurity(HstsConfig::disable))
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/login", "/auth/**")
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+        .csrf(AbstractHttpConfigurer::disable);
+//        .csrf(csrf -> csrf
+//            .ignoringRequestMatchers("/login", "/auth/**")
+//            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
     return http.build();
   }

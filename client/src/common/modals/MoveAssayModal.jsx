@@ -61,8 +61,11 @@ const MoveAssayModal = ({ assay, study, isOpen, setIsOpen }) => {
     })
   }
 
-  const changeStudyMutation = useMutation((newStudy) => {
-    return axios.put(`/api/internal/assay/${assay.id}/study`, {"studyId": newStudy.id});
+  const changeStudyMutation = useMutation({
+    mutationFn: (newStudy) => {
+      return axios.put(`/api/internal/assay/${assay.id}/study`,
+        { "studyId": newStudy.id });
+    }
   })
 
   const handleSubmit = (s) => {
@@ -70,8 +73,8 @@ const MoveAssayModal = ({ assay, study, isOpen, setIsOpen }) => {
     changeStudyMutation.mutate(s, {
       onSuccess: (data) => {
         console.debug("Updated assay", data);
-        queryClient.invalidateQueries({queryKey: "assays"});
-        queryClient.invalidateQueries({queryKey: "assay"});
+        queryClient.invalidateQueries({queryKey: ["assays"]});
+        queryClient.invalidateQueries({queryKey: ["assay"]});
         notyf.success("Assay moved successfully");
         setIsOpen(false);
         navigate(`/study/${s.code}/assay/${data.data.code}`);

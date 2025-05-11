@@ -25,9 +25,12 @@ import {useQuery} from "@tanstack/react-query";
 
 const AssayTypeSettings = () => {
 
-  const {data: assayTypes, isLoading, error} = useQuery("assayTypes", () => {
-    return axios.get("/api/internal/assaytype")
-    .then(response => response.data);
+  const {data: assayTypes, isLoading, error} = useQuery({
+    queryKey: ["assayTypes"],
+    queryFn: () => {
+      return axios.get("/api/internal/assaytype")
+      .then(response => response.data);
+    }
   });
 
   if (isLoading) return <SettingsLoadingMessage/>;

@@ -35,10 +35,10 @@ const AssayTypeFormView = props => {
 
   useEffect(() => {
 
-    axios.get("/api/internal/assaytype/")
+    axios.get("/api/internal/assaytype")
     .then(response => {
       const assayTypes = response.data;
-      if (!!state.assayTypeId) {
+      if (state.assayTypeId) {
         const assayType = assayTypes.find(
             p => p.id === parseInt(state.assayTypeId, 10));
         setState(prevState => ({

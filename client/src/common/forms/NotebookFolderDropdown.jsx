@@ -27,16 +27,18 @@ const NotebookFolderDropdown = ({onChange, parentFolder}) => {
 
   const notyf = useContext(NotyfContext);
 
-  const {data: folders, isLoading} = useQuery(["notebookFolder", parentFolder?.referenceId],  () => {
-    return axios.get(`/api/internal/eln/folder/${parentFolder.referenceId}?loadContents=true`)
-    .then(response => response.data.subFolders || [])
-    .catch(error => {
-      notyf.error("Error loading notebook folders: " + error.message);
-      console.error("Error loading notebook folders: ", error);
-      return error;
-    })
-      ;
-  }, {
+  const {data: folders, isLoading} = useQuery({
+    queryKey: ["notebookFolder", parentFolder?.referenceId],
+    queryFn: () => {
+      return axios.get(
+        `/api/internal/eln/folder/${parentFolder.referenceId}?loadContents=true`)
+      .then(response => response.data.subFolders || [])
+      .catch(error => {
+        notyf.error("Error loading notebook folders: " + error.message);
+        console.error("Error loading notebook folders: ", error);
+        return error;
+      })
+    },
     enabled: !!parentFolder,
     initialData: []
   });
@@ -83,7 +85,7 @@ const NotebookFolderDropdown = ({onChange, parentFolder}) => {
           You must select a program to associate the study with.<br />
         </Form.Text>
         <Form.Text>
-          Select a notebook folder to use for your study. Only folders in the selected Program's project folder will
+          Select a notebook folder to use for your study. Only folders in the selected Program&apos;s project folder will
           be selectable.
         </Form.Text>
       </FormGroup>
@@ -92,6 +94,7 @@ const NotebookFolderDropdown = ({onChange, parentFolder}) => {
 
 NotebookFolderDropdown.propTypes = {
   onChange: PropTypes.func.isRequired,
+  parentFolder: PropTypes.object,
 }
 
 export default NotebookFolderDropdown;

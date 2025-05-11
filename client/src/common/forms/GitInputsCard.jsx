@@ -29,7 +29,7 @@ const GitInputsCard = ({
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    axios.get("/api/internal/integrations/gitlab/")
+    axios.get("/api/internal/integrations/gitlab")
     .then(response => {
       console.debug("GitLab Integration: ", response.data);
       if (response.data.length && response.data[0].active) {

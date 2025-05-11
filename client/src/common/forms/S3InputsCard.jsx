@@ -40,7 +40,7 @@ const S3InputsCard = ({
   const notyf = useContext(NotyfContext);
 
   useEffect(() => {
-    axios.get("/api/internal/integrations/aws/")
+    axios.get("/api/internal/integrations/aws")
     .then(r => {
       console.debug("AWS Integration: ", r.data);
       if (r.data.length && r.data[0].active) {
@@ -162,7 +162,9 @@ const S3InputsCard = ({
 S3InputsCard.propTypes = {
   isActive: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
-  selectedProgram: PropTypes.string
+  selectedProgram: PropTypes.string,
+  selectedStudy: PropTypes.string,
+  errors: PropTypes.object,
 }
 
 export default S3InputsCard;

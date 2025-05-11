@@ -37,23 +37,27 @@ const StudyFileManagerTab = ({study}) => {
     console.debug("Selected folder", folder);
   }
 
-  const {data: folders, isLoading} = useQuery(["storageFolders", study.id], () => {
-    return axios.get(`/api/internal/study/${study.id}/storage`)
-    .then(response => {
-      const defaultFolder = response.data.find(f => f.primary);
-      setSelectedFolder(defaultFolder ? defaultFolder.storageDriveFolder : null);
-      return response.data;
-    })
-    .catch(e => {
-      console.error(e);
-      notyf.error("Failed to load data sources: " + e.message);
-      return e;
-    });
+  const {data: folders, isLoading} = useQuery({
+    queryKey: ["storageFolders", study.id],
+    queryFn: () => {
+      return axios.get(`/api/internal/study/${study.id}/storage`)
+      .then(response => {
+        const defaultFolder = response.data.find(f => f.primary);
+        setSelectedFolder(
+          defaultFolder ? defaultFolder.storageDriveFolder : null);
+        return response.data;
+      })
+      .catch(e => {
+        console.error(e);
+        notyf.error("Failed to load data sources: " + e.message);
+        return e;
+      });
+    }
   });
 
   const repairFolder = () => {
     axios.post("/api/internal/study/" + study.id + "/storage/repair")
-    .then(response => {
+    .then(() => {
       notyf.open({message: "Study folder repaired", type: "success"});
       const s = selectedFolder;
       setSelectedFolder(null);

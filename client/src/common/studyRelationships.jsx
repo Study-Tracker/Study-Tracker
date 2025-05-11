@@ -99,7 +99,7 @@ const StudyRelationships = props => {
     })
     .then(val => {
       if (val.isConfirmed) {
-        axios.delete("/api/internal/study/" + props.studyCode + "/relationships/"
+        axios.delete("/api/internal/study/" + props.studyCode + "/relationships"
             + relationship.id)
         .then(() => {
           setRelationships(relationships.filter(r => r.id !== relationship.id))

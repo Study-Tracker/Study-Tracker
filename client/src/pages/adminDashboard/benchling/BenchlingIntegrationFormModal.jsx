@@ -64,15 +64,18 @@ const BenchlingIntegrationFormModal = ({
     clientSecret: "",
   }
 
-  const saveIntegrationMutation = useMutation(async values => {
-    const url = "/api/internal/integrations/benchling" + (values.id ? `/${values.id}` : '');
-    const method = values.id ? 'PUT' : 'POST';
-    return axios({
-      url: url,
-      method: method,
-      data: values,
-      headers: {"Content-Type": "application/json"}
-    })
+  const saveIntegrationMutation = useMutation({
+    mutationFn: async values => {
+      const url = "/api/internal/integrations/benchling" + (values.id
+        ? `/${values.id}` : '');
+      const method = values.id ? 'PUT' : 'POST';
+      return axios({
+        url: url,
+        method: method,
+        data: values,
+        headers: { "Content-Type": "application/json" }
+      })
+    }
   });
 
   const handleIntegrationFormSubmit = (values, {setSubmitting, resetForm, setErrors}) => {
@@ -80,7 +83,7 @@ const BenchlingIntegrationFormModal = ({
     console.debug("Saving Benchling integration settings", values);
     saveIntegrationMutation.mutate(values, {
       onSuccess: () => {
-        queryClient.invalidateQueries({queryKey: "benchlingSettings"});
+        queryClient.invalidateQueries({queryKey: ["benchlingSettings"]});
         setIsOpen(false);
         resetForm();
         notyf.success("Benchling integration settings saved");

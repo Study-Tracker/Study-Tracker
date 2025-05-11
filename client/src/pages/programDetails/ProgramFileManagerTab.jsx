@@ -37,18 +37,22 @@ const ProgramFileManagerTab = ({program}) => {
     console.debug("Selected folder", folder);
   }
 
-  const {data: folders, isLoading} = useQuery(["storageFolders", program.id], () => {
-    return axios.get(`/api/internal/program/${program.id}/storage`)
-    .then(response => {
-      const defaultFolder = response.data.find(f => f.primary);
-      setSelectedFolder(defaultFolder ? defaultFolder.storageDriveFolder : null);
-      return response.data;
-    })
-    .catch(e => {
-      console.error(e);
-      notyf.error("Failed to load data sources: " + e.message);
-      return e;
-    });
+  const {data: folders, isLoading} = useQuery({
+    queryKey: ["storageFolders", program.id],
+    queryFn: () => {
+      return axios.get(`/api/internal/program/${program.id}/storage`)
+      .then(response => {
+        const defaultFolder = response.data.find(f => f.primary);
+        setSelectedFolder(
+          defaultFolder ? defaultFolder.storageDriveFolder : null);
+        return response.data;
+      })
+      .catch(e => {
+        console.error(e);
+        notyf.error("Failed to load data sources: " + e.message);
+        return e;
+      });
+    }
   });
 
   const repairFolder = () => {

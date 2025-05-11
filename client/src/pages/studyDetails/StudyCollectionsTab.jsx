@@ -22,25 +22,27 @@ import axios from "axios";
 import NotyfContext from "../../context/NotyfContext";
 import {useQuery} from "@tanstack/react-query";
 import {SettingsLoadingMessage} from "../../common/loading";
+import PropTypes from "prop-types";
 
-const StudyCollectionsTab = props => {
+const StudyCollectionsTab = ({study, showCollectionModal}) => {
 
-  const {study, showCollectionModal} = props;
-  // const [collections, setCollections] = useState([]);
   const notyf = useContext(NotyfContext);
 
-  const {data: collections, isLoading, error} = useQuery(["studyCollections", study.id], async () => {
-    return axios.get("/api/internal/study/" + study.id + "/studycollection")
-    .then(response => response.data)
-    .catch(error => {
-      console.error(error);
-      notyf.open({
-        type: "error",
-        message: "Failed to load study collections"
+  const {data: collections, isLoading} = useQuery({
+    queryKey: ["studyCollections", study.id],
+    queryFn: async () => {
+      return axios.get("/api/internal/study/" + study.id + "/studycollection")
+      .then(response => response.data)
+      .catch(error => {
+        console.error(error);
+        notyf.open({
+          type: "error",
+          message: "Failed to load study collections"
+        });
+        return error;
       });
-      return error;
-    });
-  })
+    }
+  });
 
   let rows = (collections || []).sort((a, b) => {
     if (a.name > b.name) {
@@ -60,7 +62,7 @@ const StudyCollectionsTab = props => {
           <td>{collection.studies.length}</td>
           <td>
             {
-              !!collection.shared
+              collection.shared
                   ? <Badge bg="success">Public</Badge>
                   : <Badge bg="warning">Private</Badge>
             }
@@ -122,6 +124,11 @@ const StudyCollectionsTab = props => {
       </Card>
   );
 
+}
+
+StudyCollectionsTab.propTypes = {
+  study: PropTypes.object.isRequired,
+  showCollectionModal: PropTypes.func.isRequired
 }
 
 export default StudyCollectionsTab;

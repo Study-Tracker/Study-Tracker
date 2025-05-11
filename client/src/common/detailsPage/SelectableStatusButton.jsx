@@ -32,10 +32,10 @@ const SelectableStatusButton = ({
 
   const handleChange = (e) => {
     let url = null;
-    if (!!studyId) {
-      url = "/api/internal/study/" + studyId + "/status";
-    } else if (!!assayId) {
-      url = "/api/internal/assay/" + assayId + "/status"
+    if (studyId) {
+      url = `/api/internal/study/${'' + studyId}/status`;
+    } else if (assayId) {
+      url = `/api/internal/assay/${'' + assayId}/status`;
     }
     axios.post(url, {status: e.target.dataset.value})
     .then(() => window.location.reload())
@@ -78,8 +78,8 @@ const SelectableStatusButton = ({
 
 SelectableStatusButton.propTypes = {
   status: PropTypes.string.isRequired,
-  studyId: PropTypes.string,
-  assayId: PropTypes.string
+  studyId: PropTypes.any,
+  assayId: PropTypes.any
 }
 
 export default SelectableStatusButton;
