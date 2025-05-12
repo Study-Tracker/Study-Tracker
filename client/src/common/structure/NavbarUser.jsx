@@ -50,16 +50,13 @@ const NavbarUser = ({isAdmin, userId, displayName}) => {
 
       <Dropdown.Menu drop={"end"}>
 
-        {
-          !!isAdmin
-            ? (
-              <Dropdown.Item as={"a"} href={"/admin"}>
-                <Settings size={18}
-                          className="align-middle me-2"/>
-                Admin Dashboard
-              </Dropdown.Item>
-            ) : ''
-        }
+        { isAdmin && (
+            <Dropdown.Item as={"a"} href={"/admin"}>
+              <Settings size={18}
+                        className="align-middle me-2"/>
+              Admin Dashboard
+            </Dropdown.Item>
+        )}
 
         <Dropdown.Item as={"a"} href={"/user/" + userId}>
           <User size={18} className="align-middle me-2"/>
@@ -73,7 +70,6 @@ const NavbarUser = ({isAdmin, userId, displayName}) => {
 
         <Dropdown.Item
           as={"a"}
-          // href={logoutUrl}
           onClick={handleLogout}
         >
           <LogOut size={18} className="align-middle me-2"/>
