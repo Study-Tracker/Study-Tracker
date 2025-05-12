@@ -124,7 +124,7 @@ const SignInForm = ({ssoOptions, isError, message}) => {
 
                     {
                       !!ssoOptions && !!ssoOptions.sso && !!ssoOptions.sso.okta
-                          ? (
+                          && (
                               <div className="text-center mt-3">
                                 <Button
                                     href={ssoOptions.sso.okta}
@@ -134,7 +134,22 @@ const SignInForm = ({ssoOptions, isError, message}) => {
                                   Sign in with Okta
                                 </Button>
                               </div>
-                          ) : ''
+                          )
+                    }
+
+                    {
+                        !!ssoOptions && !!ssoOptions.sso && !!ssoOptions.sso.entra
+                        && (
+                            <div className="text-center mt-3">
+                              <Button
+                                  href={ssoOptions.sso.entra}
+                                  size={"lg"}
+                                  variant="outline-primary"
+                              >
+                                Sign in with Microsoft
+                              </Button>
+                            </div>
+                        )
                     }
 
                   </Form>

@@ -23,7 +23,7 @@ import {useSelector} from "react-redux";
 import axios from "axios";
 import {useParams} from "react-router-dom";
 
-const UserFormView = props => {
+const UserFormView = () => {
 
   const params = useParams();
   const [state, setState] = useState({
@@ -39,7 +39,7 @@ const UserFormView = props => {
     axios.get("/api/internal/user")
     .then(response => {
       const users = response.data;
-      if (!!state.userId) {
+      if (state.userId) {
         const user = users.find(p => p.id === parseInt(state.userId, 10));
         setState(prevState => ({
           ...prevState,

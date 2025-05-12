@@ -28,13 +28,19 @@ const AddToStudyCollectionModal = ({showModal, isOpen, study}) => {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState(null);
 
-  const {data: collections} = useQuery("collections", async () => {
-    return axios.get("/api/internal/studycollection?visibleToMe=true")
-    .then(response => response.data)
+  const {data: collections} = useQuery({
+    queryKey: ["collections"],
+    queryFn: async () => {
+      return axios.get("/api/internal/studycollection?visibleToMe=true")
+      .then(response => response.data)
+    }
   });
 
-  const mutation = useMutation(async (collectionId) => {
-    return axios.post("/api/internal/studycollection/" + collectionId + "/" + study.id);
+  const mutation = useMutation({
+    mutationFn: async (collectionId) => {
+      return axios.post(
+        "/api/internal/studycollection/" + collectionId + "/" + study.id);
+    }
   });
 
   const handleSubmit = () => {

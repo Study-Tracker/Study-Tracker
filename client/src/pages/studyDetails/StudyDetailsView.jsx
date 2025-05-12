@@ -31,9 +31,12 @@ const StudyDetailsView = props => {
   const user = useSelector(s => s.user.value);
   const features = useSelector(s => s.features.value);
 
-  const {data: study, isLoading, error} = useQuery(["study", params.studyCode], () => {
-    return axios.get("/api/internal/study/" + params.studyCode)
-    .then(response => response.data);
+  const {data: study, isLoading, error} = useQuery({
+    queryKey: ["study", params.studyCode],
+    queryFn: () => {
+      return axios.get("/api/internal/study/" + params.studyCode)
+      .then(response => response.data);
+    }
   });
 
 

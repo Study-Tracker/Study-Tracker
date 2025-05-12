@@ -30,47 +30,39 @@ const StudyDetailHeader = ({
       <Row className="justify-content-between align-items-center">
         <Col>
           <h3>{study.name}</h3>
-          {/*<h5 className="text-muted">{study.code}</h5>*/}
         </Col>
         <Col className="col-auto d-flex">
-          {
-            study.collaborator
-                ? (
-                    <React.Fragment>
-                      <Button
-                          className="me-1 mb-1"
-                          variant="outline-info"
-                          disabled
-                      >
-                        External Study
-                      </Button>
-                      &nbsp;&nbsp;
-                    </React.Fragment>
-                ) : ''
-          }
-          {
-            !study.active
-                ? <Button
+          { study.collaborator && (
+              <React.Fragment>
+                <Button
                     className="me-1 mb-1"
-                    variant="danger"
+                    variant="outline-info"
                     disabled
                 >
-              <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
-                  Removed Study
+                  External Study
                 </Button>
-                : ''
-          }
-          {
-            study.legacy
-                ? <Button
+                &nbsp;&nbsp;
+              </React.Fragment>
+          )}
+          { !study.active && (
+              <Button
+                  className="me-1 mb-1"
+                  variant="danger"
+                  disabled
+              >
+                <FontAwesomeIcon icon={faTrash} className={"me-2"}/>
+                Removed Study
+              </Button>
+          )}
+          { study.legacy && (
+                <Button
                     className="me-1 mb-1"
                     variant="outline-warning"
                     disabled
                 >
                   Legacy Study
                 </Button>
-                : ''
-          }
+          )}
 
           {/* Status button */}
           <SelectableStatusButton status={study.status} studyId={study.id}/>

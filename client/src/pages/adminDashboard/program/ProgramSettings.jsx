@@ -44,14 +44,17 @@ const ProgramSettings = () => {
     }
   };
 
-  const {data: programs, isLoading, error} = useQuery('programs', () => {
-    return axios.get("/api/internal/program?details=true")
-    .then(response => response.data)
-    .catch(error => {
-      console.error(error);
-      notyf.error("Failed to load programs");
-      return error;
-    });
+  const {data: programs, isLoading, error} = useQuery({
+    queryKey: ['programs'],
+    queryFn: () => {
+      return axios.get("/api/internal/program?details=true")
+      .then(response => response.data)
+      .catch(error => {
+        console.error(error);
+        notyf.error("Failed to load programs");
+        return error;
+      });
+    }
   });
 
   const handleStatusChange = (id, active) => {

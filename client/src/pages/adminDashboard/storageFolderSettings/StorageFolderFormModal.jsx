@@ -38,27 +38,35 @@ const StorageFolderFormModal = ({
   const notyf = useContext(NotyfContext);
   const queryClient = useQueryClient();
 
-  const {data: drives, isLoading, error} = useQuery("storageDrives", () => {
-    return axios.get("/api/internal/storage-drives")
-    .then(response => response.data)
-    .catch(e => {
-      console.error(e);
-      notyf.open({message: 'Failed to load available storage drives.', type: 'error'});
-    });
-  })
+  const {data: drives, isLoading} = useQuery({
+    queryKey: ["storageDrives"],
+    queryFn: () => {
+      return axios.get("/api/internal/storage-drives")
+      .then(response => response.data)
+      .catch(e => {
+        console.error(e);
+        notyf.open({
+          message: 'Failed to load available storage drives.',
+          type: 'error'
+        });
+      });
+    }
+  });
 
-  const submitMutation = useMutation((values) => {
-    const url = selectedFolder
+  const submitMutation = useMutation({
+    mutationFn: (values) => {
+      const url = selectedFolder
         ? "/api/internal/storage-drive-folders/" + selectedFolder.id
         : "/api/internal/storage-drive-folders";
-    return axios({
-      url: url,
-      method: values.id ? "PUT" : "POST",
-      data: { storageDriveId: values.storageDrive.id, ...values },
-      headers: {
-        "Content-Type": "application/json"
-      },
-    })
+      return axios({
+        url: url,
+        method: values.id ? "PUT" : "POST",
+        data: { storageDriveId: values.storageDrive.id, ...values },
+        headers: {
+          "Content-Type": "application/json"
+        },
+      })
+    }
   });
 
   const handleSubmitForm = (values, {setSubmitting, resetForm}) => {

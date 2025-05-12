@@ -29,9 +29,12 @@ import DataTable from "../../common/DataTable";
 
 const ProgramStudiesTab = ({program}) => {
 
-  const {data: studies, isLoading, error} = useQuery(["programStudies", program.id], () => {
-    return axios.get(`/api/internal/study?program=${program.id}`)
-    .then(response => response.data);
+  const {data: studies, isLoading, error} = useQuery({
+    queryKey: ["programStudies", program.id],
+    queryFn: () => {
+      return axios.get(`/api/internal/study?program=${program.id}`)
+      .then(response => response.data);
+    }
   });
 
   const columnHelper = createColumnHelper();

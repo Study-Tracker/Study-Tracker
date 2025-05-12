@@ -25,9 +25,12 @@ import {useQuery} from "@tanstack/react-query";
 
 const AssayTimelineTab = ({assay}) => {
 
-  const {data: activity, isLoading, error} = useQuery("activity", () => {
-    return axios.get(`/api/internal/assay/${assay.code}/activity`)
-    .then(response => response.data);
+  const {data: activity, isLoading, error} = useQuery({
+    queryKey: ["activity"],
+    queryFn: () => {
+      return axios.get(`/api/internal/assay/${assay.code}/activity`)
+      .then(response => response.data);
+    }
   });
 
   return (

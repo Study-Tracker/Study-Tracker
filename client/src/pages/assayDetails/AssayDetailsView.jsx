@@ -31,14 +31,20 @@ const AssayDetailsView = props => {
   const features = useSelector(state => state.features.value);
   const {studyCode, assayCode} = params;
 
-  const {data: study, isLoading: studyIsLoading, error: studyError} = useQuery("study", () => {
-    return axios.get("/api/internal/study/" + studyCode)
-    .then(response => response.data);
+  const {data: study, isLoading: studyIsLoading, error: studyError} = useQuery({
+    queryKey: ["study"],
+    queryFn: () => {
+      return axios.get("/api/internal/study/" + studyCode)
+      .then(response => response.data);
+    }
   });
 
-  const {data: assay, isLoading: assayIsLoading, error: assayError} = useQuery("assay", () => {
-    return axios.get("/api/internal/assay/" + assayCode)
-    .then(response => response.data);
+  const {data: assay, isLoading: assayIsLoading, error: assayError} = useQuery({
+    queryKey: ["assay"],
+    queryFn: () => {
+      return axios.get("/api/internal/assay/" + assayCode)
+      .then(response => response.data);
+    }
   });
 
   if (studyIsLoading || assayIsLoading) {

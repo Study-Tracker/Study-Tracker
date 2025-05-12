@@ -40,8 +40,11 @@ const UserSettings = () => {
     }
   }
 
-  const {data: users, isLoading, error} = useQuery("users", () => {
-    return axios.get("/api/internal/user").then(response => response.data);
+  const {data: users, isLoading, error} = useQuery({
+    queryKey: ["users"],
+    queryFn: () => {
+      return axios.get("/api/internal/user").then(response => response.data);
+    }
   });
 
   if (isLoading) return <LoadingMessageCard />

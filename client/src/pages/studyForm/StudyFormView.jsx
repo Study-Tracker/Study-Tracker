@@ -31,10 +31,13 @@ const StudyFormView = () => {
   const user = useSelector(s => s.user.value);
   const features = useSelector(s => s.features.value);
 
-  const {data: programs, isLoading: programsLoading, error: programsError} = useQuery(["programs"], () => {
-    return axios.get("/api/internal/program")
-    .then(response => response.data);
-  })
+  const {data: programs, isLoading: programsLoading, error: programsError} = useQuery({
+    queryKey: ["programs"],
+    queryFn: () => {
+      return axios.get("/api/internal/program")
+      .then(response => response.data);
+    }
+  });
 
   const {data: study, isLoading: studyLoading, error: studyError} = useQuery({
     queryKey: ["study", studyCode],

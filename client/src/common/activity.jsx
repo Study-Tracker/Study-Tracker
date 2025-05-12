@@ -241,10 +241,10 @@ const ActivityMessage = ({activity}) => {
                 <h5 className="text-muted">{activity.data.study.program}</h5>
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
-                <p>
+                <div>
                   <KeywordBadges
                       keywords={activity.data.study.keywords || []}/>
-                </p>
+                </div>
               </div>
             </React.Fragment>
         );
@@ -280,10 +280,10 @@ const ActivityMessage = ({activity}) => {
                 <h5 className="text-muted">{activity.data.study.program}</h5>
                 <div dangerouslySetInnerHTML={createMarkup(
                     activity.data.study.description)}/>
-                <p>
+                <div>
                   <KeywordBadges
                       keywords={activity.data.study.keywords || []}/>
-                </p>
+                </div>
               </div>
             </React.Fragment>
         );
@@ -384,10 +384,10 @@ const ActivityMessage = ({activity}) => {
               </h5>
               <h4>{activity.data.study.name}</h4>
               <h5 className="text-muted">{activity.data.study.program}</h5>
-              <p>
+              <div>
                 <KeywordBadges
                     keywords={activity.data.study.keywords || []}/>
-              </p>
+              </div>
             </div>
           </React.Fragment>
       );

@@ -55,6 +55,7 @@ import org.springframework.security.saml2.provider.service.registration.InMemory
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -109,9 +110,7 @@ public class WebSecurityConfiguration {
   /**
    * Creates SAML2 signing credentials from the keystore
    */
-  @Bean
-  @ConditionalOnProperty(name = "security.sso", havingValue = "okta-saml")
-  public Saml2X509Credential saml2SigningCredential() throws Exception {
+  private Saml2X509Credential createSaml2SigningCredential() throws Exception {
     SamlKeystoreProperties keystore = ssoProperties.getSaml().getKeystore();
     String keystoreLocation = keystore.getLocation();
 
@@ -144,12 +143,30 @@ public class WebSecurityConfiguration {
   }
 
   /**
-   * Configures the SAML2 Service Provider registration
+   * Bean for Okta SAML signing credentials
+   */
+  @Bean
+  @ConditionalOnProperty(name = "security.sso", havingValue = "okta-saml", matchIfMissing = false)
+  public Saml2X509Credential oktaSaml2SigningCredential() throws Exception {
+    return createSaml2SigningCredential();
+  }
+
+  /**
+   * Bean for Entra ID SAML signing credentials
+   */
+  @Bean
+  @ConditionalOnProperty(name = "security.sso", havingValue = "entra-saml", matchIfMissing = false)
+  public Saml2X509Credential entraSaml2SigningCredential() throws Exception {
+    return createSaml2SigningCredential();
+  }
+
+  /**
+   * Configures the SAML2 Service Provider registration for Okta
    */
   @Bean
   @ConditionalOnProperty(name = "security.sso", havingValue = "okta-saml")
-  public RelyingPartyRegistrationRepository relyingPartyRegistrationRepository(
-      Saml2X509Credential saml2SigningCredential) {
+  public RelyingPartyRegistrationRepository oktaRelyingPartyRegistrationRepository(
+      Saml2X509Credential oktaSaml2SigningCredential) {
 
     RelyingPartyRegistration registration = RelyingPartyRegistrations
         .fromMetadataLocation(ssoProperties.getSaml().getMetadataUrl())
@@ -157,8 +174,28 @@ public class WebSecurityConfiguration {
         .entityId(ssoProperties.getSaml().getAudience())
         .assertionConsumerServiceLocation(
             ssoProperties.getSaml().getMetadataBaseUrl() + "/login/saml2/sso/okta")
-//            ssoProperties.getSaml().getMetadataBaseUrl() + "/saml/SSO")
-        .signingX509Credentials(c -> c.add(saml2SigningCredential))
+        .signingX509Credentials(c -> c.add(oktaSaml2SigningCredential))
+        .build();
+
+    return new InMemoryRelyingPartyRegistrationRepository(registration);
+  }
+
+  /**
+   * Configures the SAML2 Service Provider registration for Entra ID
+   */
+  @Bean
+  @ConditionalOnProperty(name = "security.sso", havingValue = "entra-saml")
+  public RelyingPartyRegistrationRepository entraRelyingPartyRegistrationRepository(
+      Saml2X509Credential entraSaml2SigningCredential) {
+
+    RelyingPartyRegistration registration = RelyingPartyRegistrations
+        .fromMetadataLocation(ssoProperties.getSaml().getMetadataUrl())
+        .registrationId("entra")
+        .entityId(ssoProperties.getSaml().getAudience())
+        .assertionConsumerServiceLocation(
+            ssoProperties.getSaml().getMetadataBaseUrl() + "/login/saml2/sso/entra")
+        .signingX509Credentials(c -> c.add(entraSaml2SigningCredential))
+        .assertionConsumerServiceBinding(Saml2MessageBinding.REDIRECT)
         .build();
 
     return new InMemoryRelyingPartyRegistrationRepository(registration);
@@ -238,20 +275,21 @@ public class WebSecurityConfiguration {
         .headers(headers -> headers
             .frameOptions(FrameOptionsConfig::disable)
             .httpStrictTransportSecurity(HstsConfig::disable))
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/auth/**", "/login")
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+        .csrf(AbstractHttpConfigurer::disable);
+//        .csrf(csrf -> csrf
+//            .ignoringRequestMatchers("/auth/**", "/login")
+//            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
     ;
     return http.build();
   }
 
   /**
-   * Configures the SAML2 security filter chain
+   * Configures the Okta SAML2 security filter chain
    */
   @Bean
   @Order(3)
   @ConditionalOnProperty(name = "security.sso", havingValue = "okta-saml")
-  public SecurityFilterChain samlSecurityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain oktaSamlSecurityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/static/**", "/error", "/login/**", "/saml/**", "/auth/**").permitAll()
@@ -268,9 +306,45 @@ public class WebSecurityConfiguration {
         .headers(headers -> headers
             .frameOptions(FrameOptionsConfig::disable)
             .httpStrictTransportSecurity(HstsConfig::disable))
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/login", "/auth/**")
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+        .csrf(AbstractHttpConfigurer::disable);
+//        .csrf(csrf -> csrf
+//            .ignoringRequestMatchers("/login", "/auth/**")
+//            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+
+    return http.build();
+  }
+
+  /**
+   * Configures the Entra ID SAML2 security filter chain
+   */
+  @Bean
+  @Order(3)
+  @ConditionalOnProperty(name = "security.sso", havingValue = "entra-saml")
+  public SecurityFilterChain entraSamlSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/static/**", "/error", "/login/**", "/saml/**", "/auth/**").permitAll()
+            .anyRequest().fullyAuthenticated())
+        .formLogin(form -> form
+            .loginPage("/login")
+            .loginProcessingUrl("/auth/login")
+            .defaultSuccessUrl("/"))
+        .saml2Login(saml2 -> saml2
+            .loginPage("/login")
+            .defaultSuccessUrl("/")
+            .failureUrl("/error"))
+        .logout(logout -> logout
+            .logoutUrl("/logout")
+            .logoutSuccessUrl("/")
+            .invalidateHttpSession(true))
+        .saml2Logout(Customizer.withDefaults())
+        .headers(headers -> headers
+            .frameOptions(FrameOptionsConfig::disable)
+            .httpStrictTransportSecurity(HstsConfig::disable))
+        .csrf(AbstractHttpConfigurer::disable);
+//        .csrf(csrf -> csrf
+//            .ignoringRequestMatchers("/login", "/auth/**")
+//            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
     return http.build();
   }

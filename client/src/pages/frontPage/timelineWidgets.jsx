@@ -73,7 +73,7 @@ export const MyActiveStudies = ({count}) => {
                   <p className="mb-0">
                     You have
                   </p>
-                  <h1 className="illustration-text">{count}</h1>
+                  <h1 className="illustration-text">{'' + count}</h1>
                   <p className="mb-0">
                     active studies
                   </p>
@@ -111,7 +111,7 @@ export const MyCompleteStudies = ({count}) => {
                 </p>
                 <h1 className="illustration-text">
                   <a href={"/studies?myStudy=true&status=COMPLETE"}>
-                    {count}
+                    {'' + count}
                   </a>
                 </h1>
                 <p className="mb-0">

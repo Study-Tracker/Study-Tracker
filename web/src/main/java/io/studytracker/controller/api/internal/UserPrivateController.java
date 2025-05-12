@@ -62,8 +62,7 @@ public class UserPrivateController extends AbstractUserController {
 
   @GetMapping("")
   public List<UserSummaryDto> getAllUsers(
-      @RequestParam(name = "type", required = false) UserType userType
-  ) throws Exception {
+      @RequestParam(name = "type", required = false) UserType userType) {
     if (userType != null) {
       return this.getUserMapper().toUserSummaryList(this.getUserService().findByType(userType));
     } else {
@@ -79,6 +78,22 @@ public class UserPrivateController extends AbstractUserController {
       throw new RecordNotFoundException("User not found: " + id);
     }
     return this.getUserMapper().toUserDetails(optional.get());
+  }
+
+  @PostMapping("")
+  public HttpEntity<UserDetailsDto> createUser(@RequestBody @Valid UserFormDto dto) {
+    LOGGER.info("Registering new user: " + dto.toString());
+    User user = this.createNewUser(this.getUserMapper().fromUserForm(dto));
+    return new ResponseEntity<>(this.getUserMapper().toUserDetails(user), HttpStatus.CREATED);
+  }
+
+  @PutMapping("/{id}")
+  public HttpEntity<UserDetailsDto> updateUser(
+      @PathVariable("id") Long userId,
+      @RequestBody @Valid UserFormDto dto
+  ) {
+    User user = this.updateExistingUser(this.getUserMapper().fromUserForm(dto));
+    return new ResponseEntity<>(this.getUserMapper().toUserDetails(user), HttpStatus.CREATED);
   }
 
   @PostMapping("/{id}/status")
@@ -154,19 +169,4 @@ public class UserPrivateController extends AbstractUserController {
     return activityMapper.toActivityDetailsList(activityService.findByUser(user));
   }
 
-  @PostMapping("")
-  public HttpEntity<UserDetailsDto> createUser(@RequestBody @Valid UserFormDto dto) {
-    LOGGER.info("Registering new user: " + dto.toString());
-    User user = this.createNewUser(this.getUserMapper().fromUserForm(dto));
-    return new ResponseEntity<>(this.getUserMapper().toUserDetails(user), HttpStatus.CREATED);
-  }
-
-  @PutMapping("/{id}")
-  public HttpEntity<UserDetailsDto> updateUser(
-      @PathVariable("id") Long userId,
-      @RequestBody @Valid UserFormDto dto
-  ) {
-    User user = this.updateExistingUser(this.getUserMapper().fromUserForm(dto));
-    return new ResponseEntity<>(this.getUserMapper().toUserDetails(user), HttpStatus.CREATED);
-  }
 }

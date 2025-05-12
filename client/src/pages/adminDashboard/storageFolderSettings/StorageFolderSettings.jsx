@@ -44,14 +44,17 @@ const StorageFolderSettings = () => {
     BROWSER_ROOT: "Browser Root Only"
   }
 
-  const {data: folders, isLoading, error} = useQuery("rootStorageFolders", () => {
-    return axios.get("/api/internal/storage-drive-folders?root=true")
-    .then(response => response.data)
-    .catch(e => {
-      console.error(e);
-      notyf.error('Failed to load available storage folders.');
-      return e;
-    })
+  const {data: folders, isLoading, error} = useQuery({
+    queryKey: ["rootStorageFolders"],
+    queryFn: () => {
+      return axios.get("/api/internal/storage-drive-folders?root=true")
+      .then(response => response.data)
+      .catch(e => {
+        console.error(e);
+        notyf.error('Failed to load available storage folders.');
+        return e;
+      })
+    }
   });
 
   const handleNewFolder = () => {
@@ -67,8 +70,10 @@ const StorageFolderSettings = () => {
     setShowModal(true);
   }
 
-  const deleteMutation = useMutation((folder) => {
-    return axios.delete("/api/internal/storage-drive-folders/" + folder.id)
+  const deleteMutation = useMutation({
+    mutationFn: (folder) => {
+      return axios.delete("/api/internal/storage-drive-folders/" + folder.id)
+    }
   });
 
   const handleFolderDelete = (folder) => {

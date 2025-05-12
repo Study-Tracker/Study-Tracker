@@ -32,12 +32,19 @@ const MoveStudyModal = ({ study, isOpen, setIsOpen }) => {
   const [selectedProgram, setSelectedProgram] = useState(study.program);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {data: programs} = useQuery("programs", () => {
-    return axios.get("/api/internal/program").then((res) => res.data);
-  }, { placeholderData: []})
+  const {data: programs} = useQuery({
+    queryKey: ["programs"],
+    queryFn: () => {
+      return axios.get("/api/internal/program").then((res) => res.data);
+    },
+    placeholderData: []
+  });
 
-  const changeProgramMutation = useMutation((newProgram) => {
-    return axios.put(`/api/internal/study/${study.id}/program`, {"programId": newProgram.id});
+  const changeProgramMutation = useMutation({
+    mutationFn: (newProgram) => {
+      return axios.put(`/api/internal/study/${study.id}/program`,
+        { "programId": newProgram.id });
+    }
   })
 
   const handleSubmit = (program) => {
@@ -45,8 +52,8 @@ const MoveStudyModal = ({ study, isOpen, setIsOpen }) => {
     changeProgramMutation.mutate(program, {
       onSuccess: (data) => {
         console.debug("Updated study", data);
-        queryClient.invalidateQueries({queryKey: "studies"});
-        queryClient.invalidateQueries({queryKey: "study"});
+        queryClient.invalidateQueries({queryKey: ["studies"]});
+        queryClient.invalidateQueries({queryKey: ["study"]});
         notyf.success("Study moved successfully");
         setIsOpen(false);
         navigate(`/study/${data.data.code}`);

@@ -52,17 +52,18 @@ const PrimaryStorageFolderWidget = ({record}) => {
     enabled: !!primaryFolderRef
   });
 
-  const repairMutation = useMutation(() => {
-    let url = null;
-    if (record.assayType) {
-      url = `/api/internal/assay/${record.id}/storage/repair`;
-    } else if (record.program) {
-      url = `/api/internal/study/${record.id}/storage/repair`;
-    } else {
-      url = `/api/internal/program/${record.id}/storage/repair`;
-    }
-    return axios.post(url)
-  }, {
+  const repairMutation = useMutation({
+    mutationFn: () => {
+      let url = null;
+      if (record.assayType) {
+        url = `/api/internal/assay/${record.id}/storage/repair`;
+      } else if (record.program) {
+        url = `/api/internal/study/${record.id}/storage/repair`;
+      } else {
+        url = `/api/internal/program/${record.id}/storage/repair`;
+      }
+      return axios.post(url)
+    },
     onMutate: () => {
       setIsSubmitting(true);
     },

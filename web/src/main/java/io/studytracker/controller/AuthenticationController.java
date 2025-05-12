@@ -158,6 +158,9 @@ public class AuthenticationController {
       if (ssoProperties.getMode().equals("okta-saml")
           && StringUtils.hasText(ssoProperties.getOkta().getUrl())) {
         sso.put("okta", ssoProperties.getOkta().getUrl());
+      } else if (ssoProperties.getMode().equals("entra-saml")
+          && StringUtils.hasText(ssoProperties.getEntra().getUrl())) {
+        sso.put("entra", ssoProperties.getEntra().getUrl());
       }
       data.put("sso", sso);
     }

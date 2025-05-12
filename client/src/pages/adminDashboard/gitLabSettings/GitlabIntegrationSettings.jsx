@@ -70,12 +70,12 @@ const GitlabIntegrationSettings = () => {
     }
     const method = values.id ? 'PUT' : 'POST';
     axios({
-      url: "/api/internal/integrations/gitlab/" + (values.id || ''),
+      url: "/api/internal/integrations/gitlab" + (values.id ? "/" + values.id : ''),
       method: method,
       data: values,
       headers: {"Content-Type": "application/json"}
     })
-    .then(response => {
+    .then(() => {
       setLoadCount(loadCount + 1);
       setIntegrationModalIsOpen(false);
       resetForm();
@@ -99,12 +99,12 @@ const GitlabIntegrationSettings = () => {
   const handleGroupFormSubmit = (values, {setSubmitting, resetForm}) => {
     const method = values.id ? 'PUT' : 'POST';
     axios({
-      url: "/api/internal/integrations/gitlab/" + settings.id + "/groups/registered/" + (values.id || ''),
+      url: "/api/internal/integrations/gitlab/" + settings.id + "/groups/registered" + (values.id ? "/" + values.id : ''),
       method: method,
       data: values,
       headers: {"Content-Type": "application/json"}
     })
-    .then(response => {
+    .then(() => {
       setLoadCount(loadCount + 1);
       setGroupModalIsOpen(false);
       resetForm();

@@ -54,10 +54,11 @@ const TeamMembers = ({users, owner}) => {
           .map((user, i) => {
             return (
                 <OverlayTrigger
-                    placement={"top"}
-                    overlay={<Tooltip>{user.displayName}{owner && user.id === owner.id ? " (owner)" : ""}</Tooltip>}
+                  key={user.id}
+                  placement={"top"}
+                  overlay={<Tooltip>{user.displayName}{owner && user.id === owner.id ? " (owner)" : ""}</Tooltip>}
                 >
-                  <div key={user.id} className={"team-member team-member-35px team-member-circle " + (owner && user.id === owner.id ? "team-member-highlight" : "")}>
+                  <div className={"team-member team-member-35px team-member-circle " + (owner && user.id === owner.id ? "team-member-highlight" : "")}>
                     <span className={"team-member-label fw-bold " + (getLabelClass(i))}>{getUserInitials(user)}</span>
                   </div>
                 </OverlayTrigger>

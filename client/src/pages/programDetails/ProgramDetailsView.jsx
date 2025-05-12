@@ -29,9 +29,12 @@ const ProgramDetailsView = props => {
   const {programId} = useParams();
   const user = useSelector(s => s.user.value);
 
-  const {data: program, isLoading, error} = useQuery(["program", programId], () => {
-    return axios.get(`/api/internal/program/${programId}`)
-    .then(response => response.data);
+  const {data: program, isLoading, error} = useQuery({
+    queryKey: ["program", programId],
+    queryFn: () => {
+      return axios.get(`/api/internal/program/${programId}`)
+      .then(response => response.data);
+    }
   });
 
   if (isLoading) return (

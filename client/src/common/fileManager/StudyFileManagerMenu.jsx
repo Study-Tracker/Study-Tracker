@@ -45,10 +45,11 @@ const StudyFileManagerMenu = ({
 
   console.debug("Storage folders", folders);
 
-  const handleChangeDefaultFolderMutation = useMutation((folder) => {
-    console.debug("Change default folder", folder);
-    return axios.patch(`/api/internal/${type}/${record.id}/storage/${folder.id}`)
-  }, {
+  const handleChangeDefaultFolderMutation = useMutation({
+    mutationFn: (folder) => {
+      console.debug("Change default folder", folder);
+      return axios.patch(`/api/internal/${type}/${record.id}/storage/${folder.id}`)
+    },
     onSuccess: () => {
       notyf.success("Default folder updated successfully");
       queryClient.invalidateQueries(["storageFolders", record.id]);
@@ -73,10 +74,11 @@ const StudyFileManagerMenu = ({
     })
   }
 
-  const removeFolderMutation = useMutation((folder) => {
-    console.debug("Remove folder", folder);
-    return axios.delete(`/api/internal/${type}/${record.id}/storage/${folder.id}`)
-  }, {
+  const removeFolderMutation = useMutation({
+    mutationFn: (folder) => {
+      console.debug("Remove folder", folder);
+      return axios.delete(`/api/internal/${type}/${record.id}/storage/${folder.id}`)
+    },
     onSuccess: () => {
       notyf.success("Folder removed successfully");
       queryClient.invalidateQueries(["storageFolders", record.id]);

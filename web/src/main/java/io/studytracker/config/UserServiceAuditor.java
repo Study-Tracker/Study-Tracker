@@ -18,6 +18,7 @@ package io.studytracker.config;
 
 import io.studytracker.model.User;
 import io.studytracker.service.UserService;
+import java.security.Principal;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
@@ -25,6 +26,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
+import org.springframework.util.StringUtils;
 
 public class UserServiceAuditor implements AuditorAware<User> {
 
@@ -37,14 +40,23 @@ public class UserServiceAuditor implements AuditorAware<User> {
     if (authentication != null
         && authentication.isAuthenticated()
         && !authentication.getPrincipal().toString().equals("anonymousUser")) {
-      String username;
+      String username = null;
+      Object principal = authentication.getPrincipal();
       if (authentication instanceof UsernamePasswordAuthenticationToken) {
         username = authentication.getName();
+      } else if (principal instanceof DefaultSaml2AuthenticatedPrincipal) {
+        DefaultSaml2AuthenticatedPrincipal samlPrincipal =
+            (DefaultSaml2AuthenticatedPrincipal) principal;
+        if (StringUtils.hasText(samlPrincipal.getName())) {
+          username = samlPrincipal.getName();
+        }
       } else {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         username = userDetails.getUsername();
       }
-      user = userService.findByUsername(username).orElse(null);
+      if (StringUtils.hasText(username)) {
+        user = userService.findByUsername(username).orElse(null);
+      }
     }
     return Optional.ofNullable(user);
   }

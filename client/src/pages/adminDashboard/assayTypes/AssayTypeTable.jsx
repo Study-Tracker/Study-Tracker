@@ -148,8 +148,10 @@ const AssayTypeTable = ({assayTypes}) => {
     }
   }
 
-  const mutation = useMutation((assayTypeId) => {
-    return axios.patch(`/api/internal/assaytype/${assayTypeId}`)
+  const mutation = useMutation({
+    mutationFn: (assayTypeId) => {
+      return axios.patch(`/api/internal/assaytype/${assayTypeId}`)
+    }
   });
 
   const toggleActive = (selected) => {
