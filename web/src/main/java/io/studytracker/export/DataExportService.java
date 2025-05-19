@@ -104,6 +104,27 @@ public class DataExportService {
   @Autowired
   private AssayTaskFieldRepository assayTaskFieldRepository;
 
+  @Autowired
+  private AwsIntegrationRepository awsIntegrationRepository;
+
+  @Autowired
+  private EgnyteIntegrationRepository egnyteIntegrationRepository;
+
+  @Autowired
+  private BenchlingIntegrationRepository benchlingIntegrationRepository;
+
+  @Autowired
+  private GitLabIntegrationRepository gitLabIntegrationRepository;
+
+  @Autowired
+  private MSGraphIntegrationRepository mSGraphIntegrationRepository;
+
+  @Autowired
+  private SharePointSiteRepository sharePointSiteRepository;
+
+  @Autowired
+  private ELNFolderRepository eLNFolderRepository;
+
   public Path exportAllDataToCsv() throws IOException {
 
     // Create the temporary export directory
@@ -125,6 +146,8 @@ public class DataExportService {
     exportKeywordsToCsv(tempDir);
     exportStudyCollectionsToCsv(tempDir);
     exportActivitiesToCsv(tempDir);
+    exportIntegrationsToCsv(tempDir);
+    exportElnFolders(tempDir);
 
     return tempDir;
   }
@@ -1175,90 +1198,203 @@ public class DataExportService {
     }
   }
 
-  private void exportExternalLinksToCsv(Path directory) throws IOException {
-    List<ExternalLink> links = externalLinkRepository.findAll();
-    Path filePath = directory.resolve("external_links.csv");
+  private void exportIntegrationsToCsv(Path directory) throws IOException {
+    LOGGER.info("Exporting integrations...");
 
+    // AWS
+    Path filePath = directory.resolve("aws_integrations.csv");
     try (CSVWriter writer = new CSVWriter(new FileWriter(filePath.toFile()))) {
-      // Write header
-      String[] header = {"ID", "Label", "URL", "Study"};
+      String[] header = {
+          "ID",
+          "Name",
+          "AccountNumber",
+          "Region",
+          "UseIam",
+          "Active",
+          "CreatedAt",
+          "UpdatedAt",
+      };
       writer.writeNext(header);
 
-      // Write data rows
-      for (ExternalLink link : links) {
+      for (AwsIntegration integration : awsIntegrationRepository.findAll()) {
         String[] row = {
-            String.valueOf(link.getId()),
-            link.getLabel(),
-            link.getUrl().toString(),
-            link.getStudy().getCode()
+            String.valueOf(integration.getId()),
+            integration.getName(),
+            integration.getAccountNumber(),
+            integration.getRegion(),
+            String.valueOf(integration.isUseIam()),
+            String.valueOf(integration.isActive()),
+            SDF.format(integration.getCreatedAt()),
+            integration.getUpdatedAt() != null ? SDF.format(integration.getUpdatedAt()) : ""
         };
         writer.writeNext(row);
       }
     }
-  }
 
-  private void exportStudyRelationshipsToCsv(Path directory) throws IOException {
-    List<StudyRelationship> relationships = studyRelationshipRepository.findAll();
-    Path filePath = directory.resolve("study_relationships.csv");
-
+    // Egnyte
+    filePath = directory.resolve("egnyte_integrations.csv");
     try (CSVWriter writer = new CSVWriter(new FileWriter(filePath.toFile()))) {
-      // Write header
-      String[] header = {"ID", "SourceStudy", "TargetStudy", "Type"};
+      String[] header = {
+          "ID",
+          "TenantName",
+          "RootUrl",
+          "QPS",
+          "Active",
+          "CreatedAt",
+          "UpdatedAt",
+      };
       writer.writeNext(header);
 
-      // Write data rows
-      for (StudyRelationship relationship : relationships) {
+      for (EgnyteIntegration integration : egnyteIntegrationRepository.findAll()) {
         String[] row = {
-            String.valueOf(relationship.getId()),
-            relationship.getSourceStudy().getCode(),
-            relationship.getTargetStudy().getCode(),
-            relationship.getType().toString()
+            String.valueOf(integration.getId()),
+            integration.getTenantName(),
+            integration.getRootUrl(),
+            String.valueOf(integration.getQps()),
+            String.valueOf(integration.isActive()),
+            SDF.format(integration.getCreatedAt()),
+            integration.getUpdatedAt() != null ? SDF.format(integration.getUpdatedAt()) : ""
         };
         writer.writeNext(row);
       }
     }
-  }
 
-  private void exportAssayTasksToCsv(Path directory) throws IOException {
-    List<AssayTask> tasks = assayTaskRepository.findAll();
-    Path filePath = directory.resolve("assay_tasks.csv");
-
+    // Benchling
+    filePath = directory.resolve("benchling_integrations.csv");
     try (CSVWriter writer = new CSVWriter(new FileWriter(filePath.toFile()))) {
-      // Write header
-      String[] header = {"ID", "Label", "Order", "Status", "AssayCode"};
+      String[] header = {
+          "ID",
+          "Name",
+          "TenantName",
+          "RootUrl",
+          "Active",
+          "CreatedAt",
+          "UpdatedAt",
+      };
       writer.writeNext(header);
 
-      // Write data rows
-      for (AssayTask task : tasks) {
+      for (BenchlingIntegration integration : benchlingIntegrationRepository.findAll()) {
         String[] row = {
-            String.valueOf(task.getId()),
-            task.getLabel(),
-            String.valueOf(task.getOrder()),
-            task.getStatus().toString(),
-            task.getAssay().getCode()
+            String.valueOf(integration.getId()),
+            integration.getName(),
+            integration.getTenantName(),
+            integration.getRootUrl(),
+            String.valueOf(integration.isActive()),
+            SDF.format(integration.getCreatedAt()),
+            integration.getUpdatedAt() != null ? SDF.format(integration.getUpdatedAt()) : ""
         };
         writer.writeNext(row);
       }
     }
-  }
 
-  private void exportStudyConclusionsToCsv(Path directory) throws IOException {
-    List<StudyConclusions> conclusions = studyConclusionsRepository.findAll();
-    Path filePath = directory.resolve("study_conclusions.csv");
-
+    // GitLab
+    filePath = directory.resolve("gitlab_integrations.csv");
     try (CSVWriter writer = new CSVWriter(new FileWriter(filePath.toFile()))) {
-      // Write header
-      String[] header = {"ID", "StudyId", "Content", "Created", "Updated"};
+      String[] header = {
+          "ID",
+          "Name",
+          "RootUrl",
+          "Username",
+          "Active",
+          "CreatedAt",
+          "UpdatedAt",
+      };
       writer.writeNext(header);
 
-      // Write data rows
-      for (StudyConclusions conclusion : conclusions) {
+      for (GitLabIntegration integration : gitLabIntegrationRepository.findAll()) {
         String[] row = {
-            String.valueOf(conclusion.getId()),
-            String.valueOf(conclusion.getStudy().getId()),
-            conclusion.getContent(),
-            conclusion.getCreatedAt().toString(),
-            conclusion.getUpdatedAt() != null ? conclusion.getUpdatedAt().toString() : ""
+            String.valueOf(integration.getId()),
+            integration.getName(),
+            integration.getRootUrl(),
+            integration.getUsername(),
+            String.valueOf(integration.isActive()),
+            SDF.format(integration.getCreatedAt()),
+            integration.getUpdatedAt() != null ? SDF.format(integration.getUpdatedAt()) : ""
+        };
+        writer.writeNext(row);
+      }
+    }
+
+    // MS
+    filePath = directory.resolve("microsoft_integrations.csv");
+    try (CSVWriter writer = new CSVWriter(new FileWriter(filePath.toFile()))) {
+      String[] header = {
+          "ID",
+          "Name",
+          "Domain",
+          "TenantId",
+          "Active",
+          "CreatedAt",
+          "UpdatedAt",
+      };
+      writer.writeNext(header);
+
+      for (MSGraphIntegration integration : mSGraphIntegrationRepository.findAll()) {
+        String[] row = {
+            String.valueOf(integration.getId()),
+            integration.getName(),
+            integration.getDomain(),
+            integration.getTenantId(),
+            String.valueOf(integration.isActive()),
+            SDF.format(integration.getCreatedAt()),
+            integration.getUpdatedAt() != null ? SDF.format(integration.getUpdatedAt()) : ""
+        };
+        writer.writeNext(row);
+      }
+    }
+
+    // SharePoint sites
+    filePath = directory.resolve("sharepoint_sites.csv");
+    try (CSVWriter writer = new CSVWriter(new FileWriter(filePath.toFile()))) {
+      String[] header = {
+          "ID",
+          "Name",
+          "Url",
+          "SiteId",
+          "Active",
+          "CreatedAt",
+          "UpdatedAt",
+      };
+      writer.writeNext(header);
+
+      for (SharePointSite site : sharePointSiteRepository.findAll()) {
+        String[] row = {
+            String.valueOf(site.getId()),
+            site.getName(),
+            site.getUrl(),
+            site.getSiteId(),
+            String.valueOf(site.isActive()),
+            SDF.format(site.getCreatedAt()),
+            site.getUpdatedAt() != null ? SDF.format(site.getUpdatedAt()) : ""
+        };
+        writer.writeNext(row);
+      }
+    }
+
+  }
+
+  private void exportElnFolders(Path directory) throws IOException {
+    LOGGER.info("Exporting ELN folders...");
+    List<ELNFolder> folders = eLNFolderRepository.findAll();
+    Path filePath = directory.resolve("eln_folders.csv");
+
+    try (CSVWriter writer = new CSVWriter(new FileWriter(filePath.toFile()))) {
+      String[] header = {
+          "ID",
+          "Name",
+          "Url",
+          "Path",
+          "ReferenceId"
+      };
+      writer.writeNext(header);
+
+      for (ELNFolder folder : folders) {
+        String[] row = {
+            String.valueOf(folder.getId()),
+            folder.getName(),
+            folder.getUrl(),
+            folder.getPath(),
+            folder.getReferenceId()
         };
         writer.writeNext(row);
       }
