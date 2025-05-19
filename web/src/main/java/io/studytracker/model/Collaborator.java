@@ -24,11 +24,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "collaborators")
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 public class Collaborator extends Model {
 
   @Id
@@ -63,67 +67,4 @@ public class Collaborator extends Model {
   @Column(name = "active", nullable = false)
   private boolean active = true;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public String getOrganizationName() {
-    return organizationName;
-  }
-
-  public void setOrganizationName(String organizationName) {
-    this.organizationName = organizationName;
-  }
-
-  public String getOrganizationLocation() {
-    return organizationLocation;
-  }
-
-  public void setOrganizationLocation(String organizationLocation) {
-    this.organizationLocation = organizationLocation;
-  }
-
-  public String getContactPersonName() {
-    return contactPersonName;
-  }
-
-  public void setContactPersonName(String contactPersonName) {
-    this.contactPersonName = contactPersonName;
-  }
-
-  public String getContactEmail() {
-    return contactEmail;
-  }
-
-  public void setContactEmail(String contactEmail) {
-    this.contactEmail = contactEmail;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
 }

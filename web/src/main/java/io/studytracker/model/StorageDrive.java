@@ -30,6 +30,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -39,9 +41,11 @@ import org.springframework.util.Assert;
 @Entity
 @Table(name = "storage_drives")
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 public class StorageDrive {
 
-  public static enum DriveType {
+  public enum DriveType {
     LOCAL, S3, EGNYTE, ONEDRIVE
   }
 
@@ -82,66 +86,6 @@ public class StorageDrive {
   @Type(JsonBinaryType.class)
   @Column(name = "details", columnDefinition = "json")
   private StorageDriveDetails details;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public DriveType getDriveType() {
-    return driveType;
-  }
-
-  public void setDriveType(DriveType driveType) {
-    this.driveType = driveType;
-  }
-
-  public String getRootPath() {
-    return rootPath;
-  }
-
-  public void setRootPath(String rootPath) {
-    this.rootPath = rootPath;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
-  public Date getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public Date getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public StorageDriveDetails getDetails() {
-    return details;
-  }
 
   public void setDetails(StorageDriveDetails details) {
     Assert.isTrue(StorageDriveDetails.class.isAssignableFrom(details.getClass()),

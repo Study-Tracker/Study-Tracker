@@ -30,6 +30,8 @@ import jakarta.persistence.NamedEntityGraphs;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.net.URL;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -40,6 +42,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
       name = "link-only",
       attributeNodes = {})
 })
+@Getter
+@Setter
 public class ExternalLink extends Model {
 
   @Id
@@ -63,35 +67,4 @@ public class ExternalLink extends Model {
   @JoinColumn(name = "study_id", nullable = false)
   private Study study;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public URL getUrl() {
-    return url;
-  }
-
-  public void setUrl(URL url) {
-    this.url = url;
-  }
-
-  public Study getStudy() {
-    return study;
-  }
-
-  public void setStudy(Study study) {
-    this.study = study;
-  }
 }

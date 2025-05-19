@@ -33,61 +33,6 @@ public class AssayTypeTaskField extends CustomEntityField {
   @JoinColumn(name = "assay_type_task_id", nullable = false)
   private AssayTypeTask assayTypeTask;
 
-//  public AssayTypeTaskField() {
-//    super();
-//  }
-
-//  public AssayTypeTaskField(
-//      AssayTypeTask assayTypeTask,
-//      String displayName,
-//      String fieldName,
-//      CustomEntityFieldType type,
-//      Integer order
-//  ) {
-//    super();
-//    this.setAssayTypeTask(assayTypeTask);
-//    this.setDisplayName(displayName);
-//    this.setFieldName(fieldName);
-//    this.setType(type);
-//    this.setRequired(false);
-//    this.setActive(true);
-//    this.setFieldOrder(order);
-//  }
-//
-//  public AssayTypeTaskField(
-//      AssayTypeTask assayTypeTask,
-//      String displayName,
-//      String fieldName,
-//      CustomEntityFieldType type,
-//      Integer order,
-//      boolean required) {
-//    this.setAssayTypeTask(assayTypeTask);
-//    this.setDisplayName(displayName);
-//    this.setFieldName(fieldName);
-//    this.setType(type);
-//    this.setFieldOrder(order);
-//    this.setRequired(required);
-//    this.setActive(true);
-//  }
-//
-//  public AssayTypeTaskField(
-//      AssayTypeTask assayTypeTask,
-//      String displayName,
-//      String fieldName,
-//      CustomEntityFieldType type,
-//      Integer order,
-//      boolean required,
-//      String description) {
-//    this.setAssayTypeTask(assayTypeTask);
-//    this.setDisplayName(displayName);
-//    this.setFieldName(fieldName);
-//    this.setType(type);
-//    this.setRequired(required);
-//    this.setFieldOrder(order);
-//    this.setActive(true);
-//    this.setDescription(description);
-//  }
-
   public AssayTypeTask getAssayTypeTask() {
     return assayTypeTask;
   }
