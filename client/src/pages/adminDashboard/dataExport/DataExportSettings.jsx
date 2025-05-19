@@ -24,6 +24,8 @@ import { useMutation } from "@tanstack/react-query";
 
 const DataExportSettings = () => {
 
+  const [response, setResponse] = React.useState(null);
+
   const exportMutation = useMutation({
     mutationFn: () => axios.post("/api/internal/export", {}, {
       headers: {
@@ -32,6 +34,7 @@ const DataExportSettings = () => {
     }),
     onSuccess: (response) => {
       console.debug("Export response", response);
+      setResponse(response.data);
     },
     onError: (e) => {
       console.error("Export error", e);
@@ -53,7 +56,7 @@ const DataExportSettings = () => {
             <Col>
               <div className="info-alert">
                 Use this tool to export the contents of your Study Tracker database to a collection of CSV files.
-                This archive can be used for backing-up your data or for migrating to
+                This archive can be used for backing-up your data or for migrating to{" "}
                 <a href="https://labatlas.com" target="_blank" rel="noopener noreferrer">Lab Atlas</a>.
               </div>
             </Col>
@@ -63,7 +66,7 @@ const DataExportSettings = () => {
             <Col>
               { exportMutation.isSuccess ? (
                 <DismissableAlert
-                  message={"Export started successfully. You can find the exported data in your application's temporary storage directory once complete."}
+                  message={response.message || "Export started successfully. You can find the exported data in your application's temporary storage directory once complete."}
                   color="success"
                   dismissable={false}
                 />

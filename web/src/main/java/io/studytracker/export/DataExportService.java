@@ -126,9 +126,13 @@ public class DataExportService {
   private ELNFolderRepository eLNFolderRepository;
 
   public Path exportAllDataToCsv() throws IOException {
+    return exportAllDataToCsv(UUID.randomUUID().toString());
+  }
+
+  public Path exportAllDataToCsv(String jobId) throws IOException {
 
     // Create the temporary export directory
-    Path tempPath = Paths.get(tempDir, "export", "export-" + UUID.randomUUID());
+    Path tempPath = Paths.get(tempDir, "export", "data-export-" + jobId);
     Path tempDir = Files.createDirectories(tempPath);
     LOGGER.info("Exporting data to temporary directory: {}", tempDir.toString());
 
