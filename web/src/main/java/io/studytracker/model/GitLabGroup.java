@@ -30,6 +30,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Table(name = "gitlab_groups", uniqueConstraints = {
@@ -37,6 +39,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 })
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 public class GitLabGroup {
 
   @Id
@@ -66,53 +70,5 @@ public class GitLabGroup {
 
   @Column(name = "path", nullable = false, length = 1024)
   private String path;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public GitLabIntegration getGitLabIntegration() {
-    return gitLabIntegration;
-  }
-
-  public void setGitLabIntegration(GitLabIntegration gitLabIntegration) {
-    this.gitLabIntegration = gitLabIntegration;
-  }
-
-  public GitGroup getGitGroup() {
-    return gitGroup;
-  }
-
-  public void setGitGroup(GitGroup gitGroup) {
-    this.gitGroup = gitGroup;
-  }
-
-  public Integer getGroupId() {
-    return groupId;
-  }
-
-  public void setGroupId(Integer groupId) {
-    this.groupId = groupId;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getPath() {
-    return path;
-  }
-
-  public void setPath(String path) {
-    this.path = path;
-  }
 
 }

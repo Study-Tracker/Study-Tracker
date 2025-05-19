@@ -35,6 +35,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -49,6 +51,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @NamedAttributeNode("storageDrive")
     }),
 })
+@Getter
+@Setter
 public class StorageDriveFolder {
 
   @Id
@@ -106,91 +110,4 @@ public class StorageDriveFolder {
     return folder;
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public StorageDrive getStorageDrive() {
-    return storageDrive;
-  }
-
-  public void setStorageDrive(StorageDrive storageDrive) {
-    this.storageDrive = storageDrive;
-  }
-
-  public String getPath() {
-    return path;
-  }
-
-  public void setPath(String path) {
-    this.path = path;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public boolean isBrowserRoot() {
-    return browserRoot;
-  }
-
-  public void setBrowserRoot(boolean browserRoot) {
-    this.browserRoot = browserRoot;
-  }
-
-  public boolean isStudyRoot() {
-    return studyRoot;
-  }
-
-  public void setStudyRoot(boolean studyRoot) {
-    this.studyRoot = studyRoot;
-  }
-
-  public boolean isWriteEnabled() {
-    return writeEnabled;
-  }
-
-  public void setWriteEnabled(boolean writeEnabled) {
-    this.writeEnabled = writeEnabled;
-  }
-
-  public boolean isDeleteEnabled() {
-    return deleteEnabled;
-  }
-
-  public void setDeleteEnabled(boolean deleteEnabled) {
-    this.deleteEnabled = deleteEnabled;
-  }
-
-  public Date getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public Date getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public StorageDriveFolderDetails getDetails() {
-    return details;
-  }
-
-  public void setDetails(StorageDriveFolderDetails details) {
-    this.details = details;
-  }
 }

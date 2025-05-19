@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added support for Microsoft Entra ID (formerly Azure AD) SAML SSO authentication.
+- Added data export utility that allows a full dump of the database to CSV files. This supports data backup and migration to Lab Atlas.
 
 ### Changed
 - Updated core Spring dependencies to Spring Boot 3. This includes moving to the required minimum Java version of 17.

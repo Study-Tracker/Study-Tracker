@@ -33,6 +33,8 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -42,6 +44,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 })
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 public class GitGroup {
 
   @Id
@@ -82,67 +86,4 @@ public class GitGroup {
   @Temporal(TemporalType.TIMESTAMP)
   private Date updatedAt;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public GitGroup getParentGroup() {
-    return parentGroup;
-  }
-
-  public void setParentGroup(GitGroup parentGroup) {
-    this.parentGroup = parentGroup;
-  }
-
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public String getWebUrl() {
-    return webUrl;
-  }
-
-  public void setWebUrl(String webUrl) {
-    this.webUrl = webUrl;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
-  public Date getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public Date getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public GitServiceType getGitServiceType() {
-    return gitServiceType;
-  }
-
-  public void setGitServiceType(GitServiceType gitServiceType) {
-    this.gitServiceType = gitServiceType;
-  }
 }
