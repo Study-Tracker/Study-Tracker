@@ -39,6 +39,8 @@ import StorageFolderSettings
   from "./storageFolderSettings/StorageFolderSettings";
 import AWSIntegrationSettings from "./AWSSettings/AWSIntegrationSettings";
 import MSAzureSettings from "./MSSettings/MSAzureSettings";
+import DataExportSettings
+  from "@/pages/adminDashboard/dataExport/DataExportSettings";
 
 const settings = {
   "users": {
@@ -110,6 +112,12 @@ const settings = {
     category: "developer",
     label: "API Users",
     tag: ApiUserSettings
+  },
+  "data-export": {
+    id: "data-export",
+    category: "developer",
+    label: "Data Export",
+    tag: DataExportSettings,
   }
 };
 

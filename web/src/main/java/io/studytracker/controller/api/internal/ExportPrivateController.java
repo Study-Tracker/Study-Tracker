@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,7 +53,7 @@ public class ExportPrivateController extends AbstractApiController {
    *
    * @return a response with a job ID that can be used to check the status of the export
    */
-  @GetMapping("")
+  @PostMapping("")
   public ResponseEntity<Map<String, Object>> exportDatabase() {
     LOGGER.info("Received request to export database");
 

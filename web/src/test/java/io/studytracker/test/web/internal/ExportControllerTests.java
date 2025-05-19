@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,7 +73,7 @@ public class ExportControllerTests extends AbstractApiControllerTests {
 
   @Test
   public void unauthorizedFetchTest() throws Exception {
-    mockMvc.perform(get("/api/internal/export")
+    mockMvc.perform(post("/api/internal/export")
         .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().is3xxRedirection());
@@ -80,7 +81,7 @@ public class ExportControllerTests extends AbstractApiControllerTests {
 
   @Test
   public void nonAdminFetchTest() throws Exception {
-    mockMvc.perform(get("/api/internal/export")
+    mockMvc.perform(post("/api/internal/export")
             .with(user(nonAdminUser.getEmail()))
             .with(csrf()))
         .andDo(MockMvcResultHandlers.print())
@@ -89,7 +90,7 @@ public class ExportControllerTests extends AbstractApiControllerTests {
 
   @Test
   public void adminFetchTest() throws Exception {
-    mockMvc.perform(get("/api/internal/export")
+    mockMvc.perform(post("/api/internal/export")
         .with(user(adminUser.getEmail()))
             .with(csrf()))
         .andDo(MockMvcResultHandlers.print())

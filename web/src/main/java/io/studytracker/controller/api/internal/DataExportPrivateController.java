@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/internal/export")
+@Deprecated
 public class DataExportPrivateController {
 
   @Autowired
