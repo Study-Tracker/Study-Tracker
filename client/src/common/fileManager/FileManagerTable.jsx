@@ -92,16 +92,16 @@ const FileManagerTable = ({
       id: "name",
       header: "Name",
       cell: (d) => {
-        if (d.type === 'folder') {
+        if (d.getValue().type === 'folder') {
           return (
               <a
                   className="d-flex justify-content-start file-link"
-                  onClick={() => handleItemClick(d)}
+                  onClick={() => handleItemClick(d.getValue())}
               >
                 <div className="align-self-center">
                   <Folder size={24}/>
                 </div>
-                <div className="align-self-center">{d.name}</div>
+                <div className="align-self-center">{d.getValue().name}</div>
               </a>
           )
         } else {
@@ -137,10 +137,10 @@ const FileManagerTable = ({
       id: "size",
       header: "Size",
       cell: (d) => {
-        if (d.type === "folder") {
-          return d.totalSize ? formatFileSize(d.totalSize) : "-";
+        if (d.getValue().type === "folder") {
+          return d.getValue().totalSize ? formatFileSize(d.getValue().totalSize) : "-";
         } else {
-          return formatFileSize(d.size);
+          return formatFileSize(d.getValue().size);
         }
       },
       sortingFn: (a, b) => {
@@ -160,7 +160,8 @@ const FileManagerTable = ({
     columnHelper.accessor(row => row, {
       id: "actions",
       header: "Actions",
-      cell: (d) => {
+      cell: (cell) => {
+        const d = cell.getValue();
         return (
             <Dropdown className="actions-button">
               <Dropdown.Toggle variant="light">

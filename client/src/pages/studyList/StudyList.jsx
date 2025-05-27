@@ -32,8 +32,8 @@ export const StudyListTable = ({studies}) => {
       header: "Code",
       cell: (d) => {
         return (
-          <a href={"/study/" + d.code}>
-            {d.code}
+          <a href={"/study/" + d.getValue().code}>
+            {d.getValue().code}
           </a>
         )
       },
@@ -47,7 +47,7 @@ export const StudyListTable = ({studies}) => {
       sortingFn: (a, b) => {
         return a.original.status.localeCompare(b.original.status);
       },
-      cell: (d) => <StatusBadge status={d.status}/>
+      cell: (d) => <StatusBadge status={d.getValue().status}/>
     }),
     {
       id: "program",
@@ -92,13 +92,13 @@ export const StudyListTable = ({studies}) => {
           : '';
         return da.localeCompare(db);
       },
-      cell: (d) => d.collaborator && (
+      cell: (d) => d.getValue().collaborator && (
           <div>
             <p style={{fontWeight: 'bold', marginBottom: '0.2rem'}}>
-              {d.collaborator.organizationName}
+              {d.getValue().collaborator.organizationName}
             </p>
             <p>
-              {d.externalCode}
+              {d.getValue().externalCode}
             </p>
           </div>
         )

@@ -32,8 +32,8 @@ const AssayList = ({assays}) => {
         header: "Code",
         cell: (d) => {
           return (
-            <a href={"/study/" + d.study.code + "/assay/" + d.code}>
-              {d.code}
+            <a href={"/study/" + d.getValue().study.code + "/assay/" + d.getValue().code}>
+              {d.getValue().code}
             </a>
           )
         },
@@ -101,14 +101,14 @@ const AssayList = ({assays}) => {
           }
           return 0;
         },
-        cell: (d) => d.study.collaborator
+        cell: (d) => d.getValue().study.collaborator
           ? (
             <div>
               <p style={{fontWeight: 'bold', marginBottom: '0.2rem'}}>
-                {d.study.collaborator.organizationName}
+                {d.getValue().study.collaborator.organizationName}
               </p>
               <p>
-                {d.study.externalCode}
+                {d.getValue().study.externalCode}
               </p>
             </div>
 

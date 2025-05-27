@@ -28,7 +28,7 @@ export const UserTable = ({users}) => {
       header: "Name",
       cell: (d) => {
         return (
-          <a href={"/user/" + d.id}>{d.displayName}</a>
+          <a href={"/user/" + d.getValue().id}>{d.getValue().displayName}</a>
         )
       },
       sortingFn: (a, b) => {
@@ -49,7 +49,7 @@ export const UserTable = ({users}) => {
       id: "admin",
       header: "Admin",
       cell: (d) => {
-        if (d.admin) {
+        if (d.getValue().admin) {
           return (
             <div className="badge badge-danger">
               Admin
@@ -62,7 +62,7 @@ export const UserTable = ({users}) => {
       id: "active",
       header: "Active",
       cell: (d) => {
-        if (d.active) {
+        if (d.getValue().active) {
           return <Badge bg="success">Active</Badge>
         } else {
           return <Badge bg="warning">Inactive</Badge>

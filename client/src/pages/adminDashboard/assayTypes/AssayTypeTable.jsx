@@ -47,7 +47,7 @@ const AssayTypeTable = ({assayTypes}) => {
       id: "name",
       header: "Name",
       cell: (d) => (
-          <Button variant="link" onClick={() => showModal(d)}>{d.name}</Button>
+          <Button variant="link" onClick={() => showModal(d.getValue())}>{d.getValue().name}</Button>
       ),
       sortingFn: (a, b) => {
         return a.original.name.localeCompare(b.original.name);
@@ -62,7 +62,7 @@ const AssayTypeTable = ({assayTypes}) => {
       id: "active",
       header: "Status",
       cell: (d) => {
-        return d.active
+        return d.getValue().active
             ? <Badge bg="success">Active</Badge>
             : <Badge bg="warning">Inactive</Badge>
       }
@@ -70,7 +70,8 @@ const AssayTypeTable = ({assayTypes}) => {
     columnHelper.accessor(row => row, {
       id: "controls",
       header: "",
-      cell: (d) => {
+      cell: (cell) => {
+        const d = cell.getValue();
         return (
             <React.Fragment>
 
@@ -90,12 +91,12 @@ const AssayTypeTable = ({assayTypes}) => {
                   </Dropdown.Item>
 
                   {
-                    d.name === "Generic" ? "" : (
+                    d.getValue().name === "Generic" ? "" : (
                         <React.Fragment>
                           <Dropdown.Divider/>
                           <Dropdown.Item
                               onClick={() => navigate(
-                                  "/assaytypes/" + d.id + "/edit")}
+                                  "/assaytypes/" + d.getValue().id + "/edit")}
                           >
                             <FontAwesomeIcon icon={faEdit}/>
                             &nbsp;&nbsp;
@@ -106,11 +107,11 @@ const AssayTypeTable = ({assayTypes}) => {
                   }
 
                   {
-                    d.name === "Generic" ? "" : (
-                        d.active ? (
+                    d.getValue().name === "Generic" ? "" : (
+                        d.getValue().active ? (
                             <Dropdown.Item
                                 className={"text-warning"}
-                                onClick={() => toggleActive(d)}
+                                onClick={() => toggleActive(d.getValue())}
                             >
                               <FontAwesomeIcon icon={faTimesCircle}/>
                               &nbsp;&nbsp;
@@ -119,7 +120,7 @@ const AssayTypeTable = ({assayTypes}) => {
                         ) : (
                             <Dropdown.Item
                                 className={"text-warning"}
-                                onClick={() => toggleActive(d)}
+                                onClick={() => toggleActive(d.getValue())}
                             >
                               <FontAwesomeIcon icon={faCheckCircle}/>
                               &nbsp;&nbsp;

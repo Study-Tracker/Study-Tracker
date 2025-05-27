@@ -41,9 +41,9 @@ const ProgramsTable = ({programs, showModal, handleStatusChange}) => {
       cell: (d) => (
         <Button
           variant="link"
-          onClick={() => showModal(d)}
+          onClick={() => showModal(d.getValue())}
         >
-          {d.name}
+          {d.getValue().name}
         </Button>
       ),
       sortingFn: (a, b) => {
@@ -69,7 +69,7 @@ const ProgramsTable = ({programs, showModal, handleStatusChange}) => {
       id: "status",
       header: "Status",
       cell: (d) => {
-        if (d.active) {
+        if (d.getValue().active) {
           return <Badge bg="success">Active</Badge>
         } else {
           return <Badge bg="danger">Inactive</Badge>
@@ -79,7 +79,8 @@ const ProgramsTable = ({programs, showModal, handleStatusChange}) => {
     columnHelper.accessor(row => row, {
       id: "controls",
       header: "",
-      cell: (d) => {
+      cell: (cell) => {
+        const d = cell.getValue();
         return (
             <React.Fragment>
               <Dropdown>
