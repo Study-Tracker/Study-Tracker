@@ -79,14 +79,12 @@ const StudyOverviewTab = ({
                       <p>{study.code}</p>
                     </Col>
 
-                    {
-                        study.externalCode && (
-                            <Col sm={4}>
-                              <h6 className="details-label">External Code</h6>
-                              <p>{study.externalCode}</p>
-                            </Col>
-                        )
-                    }
+                    { study.externalCode && (
+                        <Col sm={4}>
+                          <h6 className="details-label">External Code</h6>
+                          <p>{study.externalCode}</p>
+                        </Col>
+                    )}
 
                   </Row>
 
@@ -102,15 +100,12 @@ const StudyOverviewTab = ({
                       <p>{new Date(study.startDate).toLocaleString()}</p>
                     </Col>
 
-                    {
-                      !!study.endDate
-                          ? (
-                              <Col sm={4}>
-                                <h6 className="details-label">End Date</h6>
-                                <p>{new Date(study.endDate).toLocaleString()}</p>
-                              </Col>
-                          ) : ""
-                    }
+                    { study.endDate && (
+                        <Col sm={4}>
+                          <h6 className="details-label">End Date</h6>
+                          <p>{new Date(study.endDate).toLocaleString()}</p>
+                        </Col>
+                    )}
 
                     <Col md={12}>
                       <h6 className="details-label">Study Team</h6>
@@ -119,18 +114,16 @@ const StudyOverviewTab = ({
 
                   </Row>
 
-                  {
-                      study.collaborator && (
-                          <Row>
-                            <Col xs={12}>
-                              <Collaborator
-                                  collaborator={study.collaborator}
-                                  externalCode={study.externalCode}
-                              />
-                            </Col>
-                          </Row>
-                      )
-                  }
+                  { study.collaborator && (
+                      <Row>
+                        <Col xs={12}>
+                          <Collaborator
+                              collaborator={study.collaborator}
+                              externalCode={study.externalCode}
+                          />
+                        </Col>
+                      </Row>
+                  )}
 
                 </Card.Body>
 
@@ -146,13 +139,11 @@ const StudyOverviewTab = ({
               <PrimaryNotebookWidget record={study} />
             </Col>
 
-            {
-              features && features.git && features.git.isEnabled && (
-                    <Col sm={6} className={"d-flex"}>
-                      <GitRepositoryWidget record={study} />
-                    </Col>
-              )
-            }
+            { features?.git?.isEnabled && (
+              <Col sm={6} className={"d-flex"}>
+                <GitRepositoryWidget record={study} />
+              </Col>
+            )}
 
             <Col xs={12}>
 

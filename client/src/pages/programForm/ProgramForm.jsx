@@ -73,7 +73,7 @@ const ProgramForm = ({
       .max(255, "Name cannot be larger than 255 characters")
       .when("id", {
         is: (id) => id === undefined || id === null,
-        then: yup.string()
+        then: (schema) => schema
         .required("Name is required.")
         .trim("Name must not have leading or trailing whitespace")
         .strict()
@@ -95,14 +95,14 @@ const ProgramForm = ({
       .nullable()
       .when("id", {
         is: (id) => id === undefined || id === null,
-        then: yup.object()
+        then: (schema) => schema
           .required("Parent folder is required.")
       }),
     notebookFolder: yup.object()
       .nullable()
       .when("useNotebook", {
         is: true,
-        then: yup.object()
+        then: (schema) => schema
           .shape({
             referenceId: yup.string()
               .required("Notebook folder is required.")
@@ -118,7 +118,7 @@ const ProgramForm = ({
       .nullable()
       .when("useGit", {
         is: true,
-        then: yup.object().required("Git group is required.")
+        then: (schema) => schema.required("Git group is required.")
       }),
   });
 
@@ -226,10 +226,7 @@ const ProgramForm = ({
         {({
           values,
           errors,
-          touched,
           handleChange,
-          handleBlur,
-          handleSubmit,
           isSubmitting,
           setFieldValue,
         }) => (
@@ -285,7 +282,7 @@ const ProgramForm = ({
                         <h6 className="card-subtitle text-muted">
                           Provide a unique name and a brief overview for your program.
                           If this program is no longer active, set the status to
-                          'inactive'. Inactive programs will remain in the system,
+                          &apos;inactive&apos;. Inactive programs will remain in the system,
                           along with their studies, but no new non-legacy studies
                           will be allowed to be created for it.
                         </h6>
@@ -341,7 +338,7 @@ const ProgramForm = ({
                               <Form.Label>Description *</Form.Label>
                               <ReactQuill
                                   theme="snow"
-                                  className={"mb-2 " + (!!errors.description ? "is-invalid" : '')}
+                                  className={"mb-2 " + (errors.description ? "is-invalid" : '')}
                                   name={"description"}
                                   value={values.description}
                                   onChange={content =>
@@ -372,9 +369,9 @@ const ProgramForm = ({
                               </Form.Control.Feedback>
                               <Form.Text>
                                 This code will be used as a prefix when
-                                creating new studies. Eg. a code of 'PG' would
+                                creating new studies. Eg. a code of &apos;PG&apos; would
                                 result in a study code such as
-                                'PG-10001'.
+                                &apos;PG-10001&apos;.
                               </Form.Text>
                             </FormGroup>
                           </Col>
@@ -573,7 +570,7 @@ const ProgramForm = ({
                           about the program, or for adding application-aware
                           attributes for external integrations (for example, ELN
                           identifiers). You can add as many or as few attributes
-                          as you'd like. Attribute values should not be left
+                          as you&apos;d like. Attribute values should not be left
                           empty. All values are saved as simple character
                           strings.
                         </h6>
@@ -632,6 +629,8 @@ ProgramForm.propTypes = {
   programs: PropTypes.array.isRequired,
   features: PropTypes.object,
   elnProjects: PropTypes.array,
+  rootFolders: PropTypes.array,
+  gitGroups: PropTypes.array
 }
 
 export default ProgramForm;

@@ -82,17 +82,17 @@ const StudyForm = ({
       .strict()
       .max(255, "Name cannot be larger than 255 characters"),
     code: yup.string()
-      .nullable(true)
+      .nullable()
       .when("legacy", {
-        is: true,
-        then: yup.string()
+        is: (val) => val === true,
+        then: (schema) => schema
           .typeError("Code is required for legacy studies.")
           .required("Code is required for legacy studies.")
           .matches("^[A-Za-z0-9_-]+$", "Code must contain only alphanumeric, hyphen, and underscore characters.")
           .max(255, "Code cannot be larger than 255 characters")
     }),
     externalCode: yup.string()
-      .nullable(true)
+      .nullable()
       .max(255, "External code cannot be larger than 255 characters")
       .matches("[A-Za-z0-9_-]+", "External code must contain only alphanumeric, hyphen, and underscore characters."),
     status: yup.string().required("Status is required"),
@@ -109,10 +109,10 @@ const StudyForm = ({
     users: yup.array().of(yup.object()).min(1, "At least one user is required"),
     owner: yup.object().required("Owner is required"),
     collaborator: yup.object()
-      .nullable(true)
+      .nullable()
       .when("external", {
-        is: true,
-        then: yup.object()
+        is: val => val === true,
+        then: (schema) => schema
         .required("Collaborator is required for external studies.")
       }),
   });
@@ -208,31 +208,30 @@ const StudyForm = ({
 
               <Row>
                 <Col>
-                  {
-                    !!study
-                        ? (
-                            <Breadcrumbs crumbs={[
-                              {label: "Home", url: "/"},
-                              {
-                                label: "Study Detail",
-                                url: "/study/" + study.code
-                              },
-                              {label: "Edit Study"}
-                            ]}/>
-                        )
-                        : (
-                            <Breadcrumbs crumbs={[
-                              {label: "Home", url: "/"},
-                              {label: "New Study"}
-                            ]}/>
-                        )
+                  { study
+                      ? (
+                          <Breadcrumbs crumbs={[
+                            {label: "Home", url: "/"},
+                            {
+                              label: "Study Detail",
+                              url: "/study/" + study.code
+                            },
+                            {label: "Edit Study"}
+                          ]}/>
+                      )
+                      : (
+                          <Breadcrumbs crumbs={[
+                            {label: "Home", url: "/"},
+                            {label: "New Study"}
+                          ]}/>
+                      )
                   }
                 </Col>
               </Row>
 
               <Row className="justify-content-end align-items-center">
                 <Col>
-                  <h3>{!!study ? "Edit Study" : "New Study"}</h3>
+                  <h3>{study ? "Edit Study" : "New Study"}</h3>
                 </Col>
               </Row>
 
@@ -278,11 +277,10 @@ const StudyForm = ({
                           <Col md={5}>
                             <ProgramDropdown
                                 programs={programs}
-                                selectedProgram={!!values.program
-                                    ? values.program.id : -1}
+                                selectedProgram={values.program?.id}
                                 onChange={(value) => setFieldValue("program", value)}
                                 isInvalid={!!errors.program}
-                                disabled={values.id}
+                                disabled={!!values.id}
                                 isLegacyStudy={values.legacy}
                             />
                           </Col>
@@ -297,7 +295,7 @@ const StudyForm = ({
                                   theme="snow"
                                   name={"description"}
                                   value={values.description}
-                                  className={(!!errors.description ? " is-invalid" : '')}
+                                  className={(errors.description ? " is-invalid" : '')}
                                   onChange={content =>
                                       setFieldValue("description", content)}
                               />
@@ -318,7 +316,7 @@ const StudyForm = ({
                               <Form.Label>Start Date *</Form.Label>
                               <DatePicker
                                   maxlength="2"
-                                  className={"form-control " + (!!errors.startDate ? " is-invalid" : '')}
+                                  className={"form-control " + (errors.startDate ? " is-invalid" : '')}
                                   invalid={!!errors.startDate}
                                   wrapperClassName="form-control"
                                   selected={values.startDate}
@@ -513,7 +511,7 @@ const StudyForm = ({
 }
 
 StudyForm.propTypes = {
-  study: PropTypes.object.isRequired,
+  study: PropTypes.object,
   programs: PropTypes.array.isRequired,
   user: PropTypes.object,
   features: PropTypes.object,

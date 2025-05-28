@@ -91,12 +91,12 @@ const AssayTypeTable = ({assayTypes}) => {
                   </Dropdown.Item>
 
                   {
-                    d.getValue().name === "Generic" ? "" : (
+                    d.name === "Generic" ? "" : (
                         <React.Fragment>
                           <Dropdown.Divider/>
                           <Dropdown.Item
                               onClick={() => navigate(
-                                  "/assaytypes/" + d.getValue().id + "/edit")}
+                                  "/assaytypes/" + d.id + "/edit")}
                           >
                             <FontAwesomeIcon icon={faEdit}/>
                             &nbsp;&nbsp;
@@ -107,11 +107,11 @@ const AssayTypeTable = ({assayTypes}) => {
                   }
 
                   {
-                    d.getValue().name === "Generic" ? "" : (
-                        d.getValue().active ? (
+                    d.name === "Generic" ? "" : (
+                        d.active ? (
                             <Dropdown.Item
                                 className={"text-warning"}
-                                onClick={() => toggleActive(d.getValue())}
+                                onClick={() => toggleActive(d)}
                             >
                               <FontAwesomeIcon icon={faTimesCircle}/>
                               &nbsp;&nbsp;
@@ -120,7 +120,7 @@ const AssayTypeTable = ({assayTypes}) => {
                         ) : (
                             <Dropdown.Item
                                 className={"text-warning"}
-                                onClick={() => toggleActive(d.getValue())}
+                                onClick={() => toggleActive(d)}
                             >
                               <FontAwesomeIcon icon={faCheckCircle}/>
                               &nbsp;&nbsp;

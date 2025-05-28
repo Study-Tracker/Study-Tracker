@@ -48,7 +48,7 @@ const ProgramDropdown = ({
     .map(program => {
       return {
         value: program.id,
-        label: !!program.subProgram ? program.name + ": " + program.subProgram
+        label: program.subProgram ? program.name + ": " + program.subProgram
             : program.name
       };
     });
@@ -62,7 +62,7 @@ const ProgramDropdown = ({
             className={"react-select-container " + (isInvalid ? "is-invalid" : "")}
             invalid={isInvalid}
             classNamePrefix="react-select"
-            value={programOptions.filter(option => {
+            value={programOptions.find(option => {
               return option.value === selectedProgram
             })}
             options={programOptions}
@@ -87,7 +87,7 @@ const ProgramDropdown = ({
 
 ProgramDropdown.propTypes = {
   programs: PropTypes.array.isRequired,
-  selectedProgram: PropTypes.object.isRequired,
+  selectedProgram: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   isInvalid: PropTypes.bool,
   disabled: PropTypes.bool,

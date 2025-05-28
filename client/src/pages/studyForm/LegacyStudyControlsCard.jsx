@@ -112,7 +112,7 @@ const LegacyStudyControlsCard = ({
 }
 
 LegacyStudyControlsCard.propTypes = {
-  study: PropTypes.object.isRequired,
+  study: PropTypes.object,
   values: PropTypes.object.isRequired,
   errors: PropTypes.object,
   onChange: PropTypes.func.isRequired
