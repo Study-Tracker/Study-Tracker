@@ -355,7 +355,7 @@ table td .dropdown {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  margin-left: 10px;
+  //margin-left: 10px;
 
   .team-member-label {
     position: relative;
@@ -369,13 +369,13 @@ table td .dropdown {
     position: relative;
     border-radius: 0.475rem;
     z-index: 0;
-    margin-left: -10px;
+    //margin-left: -10px;
     transition: all 0.3s ease;
 
-    &:hover {
-      transition: all 0.3s ease;
-      z-index: 1;
-    }
+    //&:hover {
+    //  transition: all 0.3s ease;
+    //  z-index: 1;
+    //}
 
     &.team-member-highlight {
       border-radius: 2rem;
@@ -445,6 +445,18 @@ table td .dropdown {
 
   }
 
+  //&:hover {
+  //  .team-member {
+  //    margin-left: 0;
+  //    margin-right: 10px;
+  //  }
+  //}
+
+}
+
+.team-members.animated {
+  margin-left: 10px;
+
   &:hover {
     .team-member {
       margin-left: 0;
@@ -452,6 +464,14 @@ table td .dropdown {
     }
   }
 
+  .team-member {
+    margin-left: -10px;
+
+    &:hover {
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+  }
 }
 
 .team-member.team-member-35px {

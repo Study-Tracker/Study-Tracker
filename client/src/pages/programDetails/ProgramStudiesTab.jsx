@@ -53,14 +53,14 @@ const ProgramStudiesTab = ({program}) => {
         return a.original.code.localeCompare(b.original.code);
       },
     }),
-    {
+    columnHelper.accessor(row => row, {
       id: "status",
       header: "Status",
       sortingFn: (a, b) => {
         return a.original.status.localeCompare(b.original.status);
       },
-      accessorFn: (d) => <StatusBadge status={d.status}/>
-    },
+      cell: (d) => <StatusBadge status={d.getValue().status}/>
+    }),
     {
       id: "updatedAt",
       header: "Last Updated",

@@ -175,8 +175,8 @@ const NotebookInputsCard = ({
 NotebookInputsCard.propTypes = {
   isActive: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
-  selectedProgram: PropTypes.string,
-  selectedStudy: PropTypes.string,
+  selectedProgram: PropTypes.object,
+  selectedStudy: PropTypes.object,
   useExistingFolder: PropTypes.bool,
   notebookFolder: PropTypes.object
 }

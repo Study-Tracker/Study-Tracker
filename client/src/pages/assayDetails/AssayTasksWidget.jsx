@@ -63,7 +63,7 @@ const AssayTasksWidget = ({tasks, handleClick}) => {
       <StatWidget
           label={"Active Tasks"}
           icon={CheckCircle}
-          value={activeCount}
+          value={"" + activeCount}
           color={"info"}
           onClick={handleClick}
       />

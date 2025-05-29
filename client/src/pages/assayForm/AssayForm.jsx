@@ -70,6 +70,7 @@ const AssayForm = props => {
     useGit: false,
     useStorage: true,
     useExistingNotebookFolder: false,
+    useS3: false,
   };
 
   const assaySchema = yup.object().shape({
@@ -166,19 +167,22 @@ const AssayForm = props => {
       if (response.status === 200 || response.status === 201) {
         navigate("/study/" + study.code + "/assay/" + json.code);
       } else {
-        swal.fire("Something went wrong",
-            json.message
-                ? "Error: " + json.message :
-                "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-        );
+        swal.fire({
+          title: "Something went wrong",
+          text: json.message
+            ? "Error: " + json.message :
+            "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support.",
+          icon: "error",
+        });
         console.error("Request failed.");
       }
     })
     .catch(e => {
-      swal.fire(
-          "Something went wrong",
-          "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support."
-      );
+      swal.fire({
+        title: "Something went wrong",
+        text: "The request failed. Please check your inputs and try again. If this error persists, please contact Study Tracker support.",
+        icon: "error",
+      });
       console.error(e);
     })
     .finally(() => {
@@ -238,14 +242,14 @@ const AssayForm = props => {
                       label: "Study " + study.code,
                       url: "/study/" + study.code
                     },
-                    {label: !!values.id ? "Edit Assay" : "New Assay"}
+                    {label: values.id ? "Edit Assay" : "New Assay"}
                   ]}/>
                 </Col>
               </Row>
 
               <Row className="justify-content-end align-items-center">
                 <Col>
-                  <h3>{!!values.id ? "Edit Assay" : "New Assay"}</h3>
+                  <h3>{values.id ? "Edit Assay" : "New Assay"}</h3>
                 </Col>
               </Row>
 
@@ -258,7 +262,7 @@ const AssayForm = props => {
                       <h6 className="card-subtitle text-muted">Select the assay type
                         that best reflects the experiment being done. If an accurate
                         option does not exist, or if this is a new assay type,
-                        select 'Generic'. If Assay names should be descriptive, but
+                        select &apos;Generic&apos;. If Assay names should be descriptive, but
                         do not need to be unique. Describe the
                         objective of your assay in one or two sentences. Select the
                         status that best reflects the current state of your assay.
@@ -292,8 +296,7 @@ const AssayForm = props => {
                         <Col sm={5}>
                           <AssayTypeDropdown
                               assayTypes={assayTypes}
-                              selectedType={!!values.assayType
-                                  ? values.assayType.id : -1}
+                              selectedType={values.assayType?.id}
                               onChange={(data) => {
                                 setFieldValue("assayType", data.assayType);
                                 setFieldValue("tasks", data.tasks);
@@ -314,7 +317,7 @@ const AssayForm = props => {
                                 theme="snow"
                                 name="description"
                                 value={values.description}
-                                className={!!errors.description ? "is-invalid" : ""}
+                                className={errors.description ? "is-invalid" : ""}
                                 onChange={content => setFieldValue("description", content)}
                             />
                             <Form.Control.Feedback type={"invalid"}>
@@ -337,7 +340,7 @@ const AssayForm = props => {
                             <Form.Label>Start Date *</Form.Label>
                             <DatePicker
                                 maxlength="2"
-                                className={"form-control " + (!!errors.startDate ? " is-invalid" : "")}
+                                className={"form-control " + (errors.startDate ? " is-invalid" : "")}
                                 invalid={!!errors.startDate}
                                 name="startDate"
                                 wrapperClassName="form-control"
@@ -408,9 +411,7 @@ const AssayForm = props => {
                   {
                     !values.id
                     && study.notebookFolders.length > 0
-                    && features
-                    && features.notebook
-                    && features.notebook.isEnabled && (
+                    && features?.notebook?.isEnabled && (
                         <NotebookInputsCard
                             isActive={values.useNotebook}
                             selectedStudy={study}
@@ -508,17 +509,14 @@ const AssayForm = props => {
                   </Card>
 
                   {/*S3*/}
-                  {
-                    !values.id ? (
-                        <S3InputsCard
-                            onChange={(key, value) => setFieldValue(key, value)}
-                            isActive={values.useS3}
-                            selectedStudy={study}
-                            errors={errors}
-                        />
-                    ) : ''
-
-                  }
+                  { !values.id && (
+                      <S3InputsCard
+                          onChange={(key, value) => setFieldValue(key, value)}
+                          isActive={values.useS3}
+                          selectedStudy={study}
+                          errors={errors}
+                      />
+                  )}
 
                   {/* Attributes */}
                   <Card>
@@ -529,7 +527,7 @@ const AssayForm = props => {
                         about the assay, or for adding application-aware
                         attributes for external integrations (for example, ELN
                         identifiers). You can add as many or as few attributes
-                        as you'd like. Attribute values should not be left
+                        as you&apos;d like. Attribute values should not be left
                         empty. All values are saved as simple character
                         strings.
                       </h6>

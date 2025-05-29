@@ -43,35 +43,45 @@ const getLabelClass = (i) => {
   }
 }
 
-const TeamMembers = ({users, owner}) => {
+const TeamMembers = ({users, owner, animated = true, limit = 10}) => {
 
   return (
-      <div className={"team-members mb-3 pt-2 pb-2"}>
+      <div className={`team-members mb-3 pt-2 pb-2 ${animated ? "animated" : ""}`}>
         {
           users
           .sort((a, b) => a.displayName.localeCompare(b.displayName))
           .sort((a, b) => owner && a.id === owner.id ? -1 : 1)
           .map((user, i) => {
+            if (i >= limit) {
+              return null;
+            }
             return (
                 <OverlayTrigger
                   key={user.id}
                   placement={"top"}
                   overlay={<Tooltip>{user.displayName}{owner && user.id === owner.id ? " (owner)" : ""}</Tooltip>}
                 >
-                  <div className={"team-member team-member-35px team-member-circle " + (owner && user.id === owner.id ? "team-member-highlight" : "")}>
+                  <div className={`team-member team-member-35px team-member-circle ${(owner && user.id === owner.id) ? "team-member-highlight" : ""}`}>
                     <span className={"team-member-label fw-bold " + (getLabelClass(i))}>{getUserInitials(user)}</span>
                   </div>
                 </OverlayTrigger>
             )
           })
         }
+        {users.length > limit && (
+          <div className="team-member team-member-35px team-member-circle team-member-more">
+            <span className="team-member-label fw-bold">+{users.length - limit}</span>
+          </div>
+        )}
       </div>
   )
 }
 
 TeamMembers.propTypes = {
   users: PropTypes.array.isRequired,
-  owner: PropTypes.object
+  owner: PropTypes.object,
+  animated: PropTypes.bool,
+  limit: PropTypes.number,
 }
 
 export default TeamMembers;
