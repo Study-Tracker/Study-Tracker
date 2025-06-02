@@ -15,14 +15,36 @@
  */
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
-import React from "react";
+import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheckCircle, faHardDrive} from "@fortawesome/free-regular-svg-icons";
 import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
-import {faCancel} from "@fortawesome/free-solid-svg-icons";
+import { faCancel, faTrash } from "@fortawesome/free-solid-svg-icons";
+import NotyfContext from "@/context/NotyfContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
-const OneDriveDriveCard = ({drive}) => {
+const OneDriveDriveCard = ({drive, integration}) => {
+
+  const notyf = useContext(NotyfContext);
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: () => {
+      return axios.delete(`/api/internal/integrations/msgraph/${integration.id}/onedrive/drives/${drive.id}`);
+    },
+    onSuccess: () => {
+      console.log("Drive deleted successfully");
+      notyf.success("Drive deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["oneDriveDrives", integration.id] });
+    },
+    onError: (e) => {
+      console.error("Error deleting drive:", e);
+      notyf.error("Error deleting drive: " + (e.response?.data?.message || e.message));
+    }
+  });
+
   return (
       <Card>
         <Card.Body>
@@ -63,23 +85,28 @@ const OneDriveDriveCard = ({drive}) => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
 
-                  {
-                      drive.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
-                            <FontAwesomeIcon icon={faCancel} className={"me-1"} />
-                            Set Inactive
-                          </Dropdown.Item>
-                      )
-                  }
+                  {/*{*/}
+                  {/*    drive.active && (*/}
+                  {/*        <Dropdown.Item onClick={() => console.log("Click")}>*/}
+                  {/*          <FontAwesomeIcon icon={faCancel} className={"me-1"} />*/}
+                  {/*          Set Inactive*/}
+                  {/*        </Dropdown.Item>*/}
+                  {/*    )*/}
+                  {/*}*/}
 
-                  {
-                      !drive.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
-                            <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
-                            Set Active
-                          </Dropdown.Item>
-                      )
-                  }
+                  {/*{*/}
+                  {/*    !drive.active && (*/}
+                  {/*        <Dropdown.Item onClick={() => console.log("Click")}>*/}
+                  {/*          <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />*/}
+                  {/*          Set Active*/}
+                  {/*        </Dropdown.Item>*/}
+                  {/*    )*/}
+                  {/*}*/}
+
+                  <Dropdown.Item onClick={() => deleteMutation.mutate()}>
+                    <FontAwesomeIcon icon={faTrash} className={"me-1"} />
+                    Remove Drive
+                  </Dropdown.Item>
 
                 </Dropdown.Menu>
               </Dropdown>
@@ -92,7 +119,8 @@ const OneDriveDriveCard = ({drive}) => {
 }
 
 OneDriveDriveCard.propTypes = {
-  drive: PropTypes.object.isRequired
+  drive: PropTypes.object.isRequired,
+  integration: PropTypes.object.isRequired,
 }
 
 export default OneDriveDriveCard;

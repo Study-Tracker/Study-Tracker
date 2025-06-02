@@ -15,14 +15,53 @@
  */
 
 import {Card, Col, Dropdown, Row} from "react-bootstrap";
-import React from "react";
+import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheckCircle} from "@fortawesome/free-regular-svg-icons";
 import {DriveStatusBadge} from "../../../common/fileManager/folderBadges";
-import {faCancel, faSitemap} from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRotateRight,
+  faSitemap, faTrash
+} from "@fortawesome/free-solid-svg-icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import NotyfContext from "@/context/NotyfContext";
 
-const SharePointSiteCard = ({site}) => {
+const SharePointSiteCard = ({site, integration}) => {
+
+  const notyf = useContext(NotyfContext);
+  const queryClient = useQueryClient();
+
+  const refreshMutation = useMutation({
+    mutationFn: () => {
+      return axios.post(`/api/internal/integrations/msgraph/${integration.id}/sharepoint/sites/${site.id}/refresh`);
+    },
+    onSuccess: () => {
+      console.log("Site refreshed successfully");
+      notyf.success("Site refreshed successfully");
+      queryClient.invalidateQueries({ queryKey: ["sharepointSites", integration.id] });
+    },
+    onError: (e) => {
+      console.error("Error refreshing site:", e);
+      notyf.error("Error refreshing site: " + (e.response?.data?.message || e.message));
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => {
+      return axios.delete(`/api/internal/integrations/msgraph/${integration.id}/sharepoint/sites/${site.id}`);
+    },
+    onSuccess: () => {
+      console.log("Site deleted successfully");
+      notyf.success("Site deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["sharepointSites", integration.id] });
+    },
+    onError: (e) => {
+      console.error("Error deleting site:", e);
+      notyf.error("Error deleting site: " + (e.response?.data?.message || e.message));
+    }
+  });
+
   return (
       <Card>
         <Card.Body>
@@ -59,23 +98,15 @@ const SharePointSiteCard = ({site}) => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
 
-                  {
-                      site.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
-                            <FontAwesomeIcon icon={faCancel} className={"me-1"} />
-                            Set Inactive
-                          </Dropdown.Item>
-                      )
-                  }
+                  <Dropdown.Item onClick={() => refreshMutation.mutate()}>
+                    <FontAwesomeIcon icon={faArrowRotateRight} className={"me-1"} />
+                    Refresh Site Drives
+                  </Dropdown.Item>
 
-                  {
-                      !site.active && (
-                          <Dropdown.Item onClick={() => console.log("Click")}>
-                            <FontAwesomeIcon icon={faCheckCircle} className={"me-1"} />
-                            Set Active
-                          </Dropdown.Item>
-                      )
-                  }
+                  <Dropdown.Item onClick={() => deleteMutation.mutate()}>
+                    <FontAwesomeIcon icon={faTrash} className={"me-1"} />
+                    Remove Site
+                  </Dropdown.Item>
 
                 </Dropdown.Menu>
               </Dropdown>
@@ -88,7 +119,8 @@ const SharePointSiteCard = ({site}) => {
 }
 
 SharePointSiteCard.propTypes = {
-  site: PropTypes.object.isRequired
+  site: PropTypes.object.isRequired,
+  integration: PropTypes.object.isRequired,
 }
 
 export default SharePointSiteCard;

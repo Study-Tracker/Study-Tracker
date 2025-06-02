@@ -33,11 +33,13 @@ import io.studytracker.repository.StorageDriveRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -67,6 +69,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     return integrationRepository.findAll();
   }
 
+  @Transactional
   @Override
   public MSGraphIntegration register(MSGraphIntegration instance) {
     LOGGER.info("Registering MSGraphIntegration");
@@ -80,6 +83,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     return integrationRepository.save(instance);
   }
 
+  @Transactional
   @Override
   public MSGraphIntegration update(MSGraphIntegration instance) {
     LOGGER.info("Updating MSGraphIntegration: {}", instance.getId());
@@ -143,6 +147,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     GraphServiceClient client = MSGraphClientFactory.fromIntegrationInstance(integration);
     SiteCollectionResponse page = client.sites().get();
     return page.getValue().stream()
+        .filter(s -> !s.getIsPersonalSite())
         .map(s -> SharePointUtils.fromSite(s))
         .toList();
   }
@@ -168,6 +173,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     return sharePointSiteRepository.findById(id);
   }
 
+  @Transactional
   public SharePointSite registerSharePointSite(SharePointSite site) {
     LOGGER.info("Registering SharePoint site: {}", site.getSiteId());
     List<MSGraphIntegration> integrations = findAll();
@@ -185,12 +191,31 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
     return sharePointSiteRepository.save(site);
   }
 
+  @Transactional
   public SharePointSite updateSharePointSite(SharePointSite site) {
     LOGGER.info("Updating SharePoint site: {}", site.getId());
     SharePointSite s = sharePointSiteRepository.getById(site.getId());
     s.setActive(site.isActive());
     return sharePointSiteRepository.save(s);
   }
+
+  @Transactional
+  public void deleteSharePointSite(SharePointSite site) {
+    LOGGER.info("Deleting SharePoint site: {}", site.getId());
+//    SharePointSite s = sharePointSiteRepository.getById(site.getId());
+//    s.setActive(false);
+//    sharePointSiteRepository.save(s);
+    sharePointSiteRepository.deleteById(site.getId());
+  }
+
+  // Drives
+
+  public Optional<StorageDrive> findRegisteredDriveById(MSGraphIntegration integration, Long id) {
+    LOGGER.debug("Finding registered OneDrive drive by id: {}", id);
+    return this.listRegisteredDrives(integration).stream()
+        .filter(d -> d.getId().equals(id))
+        .findFirst();
+  };
 
   public List<StorageDrive> listRegisteredDrives(MSGraphIntegration integration) {
     LOGGER.debug("Listing registered OneDrive drives for integration: " + integration.getId());
@@ -201,6 +226,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
         .collect(Collectors.toList());
   }
 
+  @Transactional
   public List<StorageDrive> registerSharePointDrives(SharePointSite site) {
 
     LOGGER.info("Registering OneDrive drives for site: {}", site.getSiteId());
@@ -215,12 +241,25 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
       throw new IllegalArgumentException("SharePoint site not found");
     }
 
+    // get existing site drives
+    List<String> existingDrives = storageDriveRepository.findByDriveType(DriveType.ONEDRIVE)
+        .stream()
+        .filter(drive -> drive.getDetails() instanceof OneDriveDriveDetails
+            && ((OneDriveDriveDetails) drive.getDetails()).getMsGraphIntegrationId().equals(integration.getId()))
+        .map(d -> ((OneDriveDriveDetails) d.getDetails()).getDriveId())
+        .collect(Collectors.toList());
+
     // Get the drives
     DriveCollectionResponse page = client.sites().bySiteId(s.getId()).drives().get();
 
     // Register the drives
     List<StorageDrive> storageDrives = new ArrayList<>();
     for (Drive drive: page.getValue()) {
+
+      if (existingDrives.contains(drive.getId())) {
+        LOGGER.info("Drive already registered: {}", drive.getId());
+        continue; // Skip already registered drives
+      }
 
       StorageDrive storageDrive = new StorageDrive();
       storageDrive.setDriveType(DriveType.ONEDRIVE);
@@ -244,6 +283,7 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
   }
 
+  @Transactional
   public StorageDrive registerOneDriveDrive(OneDriveDriveDetails drive) {
 
     LOGGER.info("Registering OneDrive drive: {}", drive.getDriveId());
@@ -274,6 +314,35 @@ public class MSGraphIntegrationService implements IntegrationService<MSGraphInte
 
     return storageDriveRepository.save(storageDrive);
 
+  }
+
+  @Transactional
+  public void deleteOneDriveDrive(StorageDrive drive) {
+    LOGGER.info("Removing OneDrive drive: {}", drive.getId());
+
+    // Make sure the drive is unused
+    List<Long> unusedDrives = storageDriveRepository.findUnusedDrives()
+        .stream()
+        .filter(d -> d.getDriveType() == DriveType.ONEDRIVE)
+        .map(StorageDrive::getId)
+        .toList();
+    LOGGER.debug("Unused drives: {}", unusedDrives);
+    if (!unusedDrives.contains(drive.getId())) {
+      throw new IllegalArgumentException("Drive is in use and cannot be removed: " + drive.getId());
+    }
+    storageDriveRepository.deleteById(drive.getId());
+  }
+
+  @Transactional
+  public void deleteAllUnusedDrives() {
+    LOGGER.info("Removing all unused OneDrive drives");
+    Set<StorageDrive> unusedDrives = storageDriveRepository.findUnusedDrives()
+        .stream()
+        .filter(d -> d.getDriveType() == DriveType.ONEDRIVE)
+        .collect(Collectors.toSet());
+    for (StorageDrive drive : unusedDrives) {
+      storageDriveRepository.deleteById(drive.getId());
+    }
   }
 
 }
