@@ -205,7 +205,7 @@ FileManagerAddToStudyModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setModalIsOpen: PropTypes.func.isRequired,
   rootFolder: PropTypes.object.isRequired,
-  folder: PropTypes.object.isRequired,
+  folder: PropTypes.object,
   error: PropTypes.string,
   type: PropTypes.string.isRequired
 };

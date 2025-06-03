@@ -55,7 +55,7 @@ const AssayTypeForm = props => {
       .max(255, "Name must be less than 255 characters")
       .when("id", {
         is: id => id === undefined || id === null,
-        then: yup.string().test(
+        then: (schema) => schema.test(
             "unique",
             "Name must be unique",
             value => !assayTypes.find(d => !!value && d.name.toLowerCase() === value.toLowerCase())

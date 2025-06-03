@@ -122,7 +122,7 @@ const ApiUserTable = ({
       id: "admin",
       header: "Role",
       cell: (d) => {
-        if (d.admin) {
+        if (d.getValue().admin) {
           return <Badge bg="danger">Admin</Badge>
         } else {
           return <Badge bg="info">User</Badge>
@@ -133,11 +133,11 @@ const ApiUserTable = ({
       id: "status",
       header: "Status",
       cell: (d) => {
-        if (d.locked) {
+        if (d.getValue().locked) {
           return <Badge bg="warning">Locked</Badge>
-        } else if (d.active) {
+        } else if (d.getValue().active) {
           return <Badge bg="success">Active</Badge>
-        } else if (d.credentialsExpired) {
+        } else if (d.getValue().credentialsExpired) {
           return <Badge bg="warning">Password Expired</Badge>
         } else {
           return <Badge bg="danger">Inactive</Badge>
@@ -147,7 +147,8 @@ const ApiUserTable = ({
     columnHelper.accessor(row => row, {
       id: "controls",
       header: "",
-      cell: (d) => {
+      cell: (cell) => {
+        const d = cell.getValue();
         return (
             <React.Fragment>
 

@@ -108,8 +108,8 @@ const UserSettingsTable = ({users, showModal}) => {
       id: "username",
       header: "Username",
       cell: (d) => (
-        <Button variant={"link"} onClick={() => showModal(d)}>
-          {d.username}
+        <Button variant={"link"} onClick={() => showModal(d.getValue())}>
+          {d.getValue().username}
         </Button>
       ),
       sortingFn: (a, b) => {
@@ -120,9 +120,9 @@ const UserSettingsTable = ({users, showModal}) => {
       id: "type",
       header: "Type",
       cell: (d) => {
-        if (d.type === "STANDARD_USER") {
+        if (d.getValue().type === "STANDARD_USER") {
           return <Badge bg="success">Standard</Badge>
-        } else if (d.type === "API_USER") {
+        } else if (d.getValue().type === "API_USER") {
           return <Badge bg="warning">API</Badge>
         } else {
           return <Badge bg="danger">System</Badge>
@@ -133,7 +133,7 @@ const UserSettingsTable = ({users, showModal}) => {
       id: "admin",
       header: "Role",
       cell: (d) => {
-        if (d.admin) {
+        if (d.getValue().admin) {
           return <Badge bg="danger">Admin</Badge>
         } else {
           return <Badge bg="info">User</Badge>
@@ -144,9 +144,9 @@ const UserSettingsTable = ({users, showModal}) => {
       id: "status",
       header: "Status",
       cell: (d) => {
-        if (d.locked) {
+        if (d.getValue().locked) {
           return <Badge bg="warning">Locked</Badge>
-        } else if (d.active) {
+        } else if (d.getValue().active) {
           return <Badge bg="success">Active</Badge>
         } else {
           return <Badge bg="danger">Inactive</Badge>
@@ -156,7 +156,8 @@ const UserSettingsTable = ({users, showModal}) => {
     columnHelper.accessor(row => row, {
       id: "controls",
       header: "",
-      cell: (d) => {
+      cell: (cell) => {
+        const d = cell.getValue();
         return (
             <React.Fragment>
 

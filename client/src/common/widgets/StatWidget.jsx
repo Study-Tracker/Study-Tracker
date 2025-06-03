@@ -26,14 +26,14 @@ const StatWidget = ({label, value, icon: Icon, color, url, onClick}) => {
         <p className="mb-2">{label}</p>
       </React.Fragment>
   );
-  if (!!url) {
+  if (url) {
     component = (
         <a href={url}>
           <h3 className="mb-2">{value}</h3>
           <p className="mb-2">{label}</p>
         </a>
     )
-  } else if (!!onClick) {
+  } else if (onClick) {
     component = (
         <a onClick={onClick}>
           <h3 className="mb-2">{value}</h3>
@@ -70,7 +70,8 @@ StatWidget.propTypes = {
   value: PropTypes.string.isRequired,
   icon: PropTypes.elementType.isRequired,
   color: PropTypes.string.isRequired,
-  url: PropTypes.string
+  url: PropTypes.string,
+  onClick: PropTypes.func,
 }
 
 export default StatWidget;

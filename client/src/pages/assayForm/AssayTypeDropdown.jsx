@@ -119,7 +119,7 @@ const AssayTypeDropdown = ({
 
 AssayTypeDropdown.propTypes = {
   assayTypes: PropTypes.array.isRequired,
-  selectedType: PropTypes.string,
+  selectedType: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   isInvalid: PropTypes.bool,
   disabled: PropTypes.bool

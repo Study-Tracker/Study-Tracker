@@ -247,8 +247,6 @@ const FileManagerContent = ({
                 )
               }
 
-
-
             </div>
 
           </div>
@@ -284,7 +282,7 @@ const FileManagerContent = ({
                   />
                 </div>
                 <div>
-                  <FolderSizeBadge folder={folder} />
+                  { folder && <FolderSizeBadge folder={folder} /> }
                 </div>
               </div>
             </Col>

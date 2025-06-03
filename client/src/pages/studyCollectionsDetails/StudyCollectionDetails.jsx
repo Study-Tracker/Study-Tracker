@@ -99,8 +99,8 @@ const StudyCollectionDetails = ({
       header: "Code",
       cell: (d) => {
         return (
-            <a href={"/study/" + d.code}>
-              {d.code}
+            <a href={"/study/" + d.getValue().code}>
+              {d.getValue().code}
             </a>
         )
       },
@@ -114,7 +114,7 @@ const StudyCollectionDetails = ({
       sortingFn: (a, b) => {
         return a.original.status.label.localeCompare(b.original.status.label);
       },
-      cell: (d) => <StatusBadge status={d.status}/>
+      cell: (d) => <StatusBadge status={d.getValue().status}/>
     }),
     {
       id: "updatedAt",
@@ -149,13 +149,13 @@ const StudyCollectionDetails = ({
             : '';
         return da.localeCompare(db);
       },
-      cell: (d) => d.collaborator && (
+      cell: (d) => d.getValue().collaborator && (
             <div>
               <p style={{fontWeight: 'bold', marginBottom: '0.2rem'}}>
-                {d.collaborator.organizationName}
+                {d.getValue().collaborator.organizationName}
               </p>
               <p>
-                {d.externalCode}
+                {d.getValue().externalCode}
               </p>
             </div>
 

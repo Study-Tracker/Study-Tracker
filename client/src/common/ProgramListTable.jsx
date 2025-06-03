@@ -46,7 +46,7 @@ const ProgramListTable = ({programs}) => {
       id: "active",
       header: "Active",
       cell: (d) => {
-        if (d.active) {
+        if (d.getValue().active) {
           return (
               <Badge bg="success">
                 Active

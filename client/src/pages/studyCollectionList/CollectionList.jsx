@@ -32,8 +32,8 @@ export const MyCollectionTable = ({collections}) => {
       header: "Name",
       cell: (d) => {
         return (
-          <a href={"/collection/" + d.id}>
-            {d.name}
+          <a href={"/collection/" + d.getValue().id}>
+            {d.getValue().name}
           </a>
         )
       },
@@ -50,7 +50,7 @@ export const MyCollectionTable = ({collections}) => {
       id: "shared",
       header: "Visibility",
       cell: (d) => {
-        if (d.shared) {
+        if (d.getValue().shared) {
           return <div className="badge badge-success">Public</div>
         } else {
           return <div className="badge badge-warning">Private</div>
@@ -63,10 +63,9 @@ export const MyCollectionTable = ({collections}) => {
       accessorFn: (d) => new Date(d.updatedAt).toLocaleDateString()
     },
     {
-      dataField: "studies",
-      text: "No. Studies",
-      sort: true,
-      formatter: (cell, d) => d.studies.length
+      id: "noStudies",
+      header: "No. Studies",
+      accessorFn: (d) => d.studies.length
     }
   ], []);
 
@@ -88,8 +87,8 @@ export const PublicCollectionsTable = ({collections}) => {
       header: "Name",
       cell: (d) => {
         return (
-          <a href={"/collection/" + d.id}>
-            {d.name}
+          <a href={"/collection/" + d.getValue().id}>
+            {d.getValue().name}
           </a>
         )
       },

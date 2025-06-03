@@ -19,6 +19,7 @@ package io.studytracker.repository;
 import io.studytracker.model.StorageDrive;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -29,5 +30,8 @@ public interface StorageDriveRepository extends JpaRepository<StorageDrive, Long
 
   @Query("SELECT sd FROM StorageDrive sd JOIN StorageDriveFolder f ON sd.id = f.storageDrive.id WHERE f.id = ?1")
   Optional<StorageDrive> findByStorageDriveFolderId(Long storageDriveFolderId);
+
+  @Query("SELECT d from StorageDrive d WHERE d NOT IN (SELECT sdf.storageDrive FROM StorageDriveFolder sdf)")
+  Set<StorageDrive> findUnusedDrives();
 
 }

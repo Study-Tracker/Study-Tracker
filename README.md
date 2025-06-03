@@ -71,22 +71,22 @@ For a rapid build and deployment in development mode, follow the steps below. Fo
    running the application.
 4. Create a new file, `web/flyway.conf`, using the `flyway.conf.example` file as a template. Fill in
    your database's username, password, and connection URL.
-5. Build the application with Maven:
+5. Build the application with the included Maven wrapper:
 
     ```bash
-    mvn clean package -DskipTests
+    ./mvnw clean package -DskipTests
     ```
 
 6. Run the Flyway plugin to import the Study Tracker database schema and default data:
 
    ```bash
-   mvn -Dflyway.configFiles=web/flyway.conf flyway:clean flyway:migrate
+   ./mvnw -Dflyway.configFiles=web/flyway.conf flyway:clean flyway:migrate
    ```
 
 7. You can run the application with Maven from the `web` directory:
 
    ```bash
-   mvn spring-boot:run 
+   ./mvnw spring-boot:run 
    ```
 
    Or, you can execute the packaged WAR file directly:
@@ -103,7 +103,7 @@ For questions about Study Tracker, or if you would like to contribute, please co
 
 ## License
 
-Copyright 2019-2024 the original authors
+Copyright 2019-2025 the original authors
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
 compliance with the License. You may obtain a copy of the License at

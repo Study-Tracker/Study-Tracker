@@ -40,7 +40,7 @@ const GitLabIntegrationFormModal = ({
       .nullable(true)
       .when("useToken", {
         is: false,
-        then: yup.string()
+        then: (schema) => schema
           .typeError("Username is required when not using an access token.")
           .required("Username is required when not using an access token.")
           .max(255, "Username cannot be longer than 255 characters")
@@ -49,7 +49,7 @@ const GitLabIntegrationFormModal = ({
       .nullable(true)
       .when("useToken", {
         is: false,
-        then: yup.string()
+        then: (schema) => schema
         .typeError("Password is required when not using an access token.")
         .required("Password is required when not using an access token.")
         .max(255, "Password cannot be longer than 255 characters")
@@ -58,7 +58,7 @@ const GitLabIntegrationFormModal = ({
       .nullable(true)
       .when("useToken", {
         is: true,
-        then: yup.string()
+        then: (schema) => schema
         .typeError("Access token is required.")
         .required("Access token is required.")
         .max(1024, "Access token cannot be longer than 1024 characters.")

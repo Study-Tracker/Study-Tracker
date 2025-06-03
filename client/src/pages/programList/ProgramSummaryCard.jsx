@@ -53,7 +53,7 @@ const ProgramSummaryCard = ({ program }) => {
             </Row>
             <Row>
               <Col>
-                <TeamMembers users={program.users} />
+                <TeamMembers users={program.users} limit={10} animated={false} />
               </Col>
             </Row>
             <div className={"d-flex align-items-start"}>

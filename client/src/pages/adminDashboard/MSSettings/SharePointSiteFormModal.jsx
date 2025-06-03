@@ -28,12 +28,13 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 const SharePointSiteFormModal = ({
-    isOpen,
-    setIsOpen,
-    selectedSite,
-    handleFormSubmit,
-    integration,
-    formikRef
+  isOpen,
+  setIsOpen,
+  selectedSite,
+  handleFormSubmit,
+  integration,
+  formikRef,
+  registeredSites = [],
 }) => {
 
   const siteSchema = yup.object().shape({
@@ -54,7 +55,7 @@ const SharePointSiteFormModal = ({
   }
 
   const siteAutoComplete = (input, callback) => {
-    axios.get("/api/internal/integrations/msgraph/" + integration.id + "/sharepoint/available?q=" + input)
+    axios.get("/api/internal/integrations/msgraph/" + integration?.id + "/sharepoint/available?q=" + input)
     .then(response => {
       const options = response.data
       .map(site => {
@@ -182,10 +183,11 @@ const SharePointSiteFormModal = ({
 SharePointSiteFormModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   setIsOpen: PropTypes.func.isRequired,
-  selectedFolder: PropTypes.object,
+  selectedSite: PropTypes.object,
   handleFormSubmit: PropTypes.func.isRequired,
   formikRef: PropTypes.object.isRequired,
-  integration: PropTypes.object.isRequired
+  integration: PropTypes.object,
+  registeredSites: PropTypes.array,
 }
 
 export default SharePointSiteFormModal;

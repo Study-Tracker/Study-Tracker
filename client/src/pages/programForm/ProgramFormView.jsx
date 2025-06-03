@@ -35,7 +35,7 @@ const ProgramFormView = () => {
   const [error, setError] = useState(null);
   const [elnProjects, setElnProjects] = useState(null);
   const [rootFolders, setRootFolders] = useState([]);
-  const [gitGroups, setGitGroups] = useState(null);
+  const [gitGroups, setGitGroups] = useState([]);
   const notyf = useContext(NotyfContext);
   
   useEffect(() => {

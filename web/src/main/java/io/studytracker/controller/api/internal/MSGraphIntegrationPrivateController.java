@@ -30,6 +30,7 @@ import io.studytracker.model.SharePointSite;
 import io.studytracker.model.StorageDrive;
 import io.studytracker.msgraph.MSGraphIntegrationService;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -112,15 +113,30 @@ public class MSGraphIntegrationPrivateController {
     LOGGER.debug("Fetching available Sharepoint sites for integration {}", integrationId);
     MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
-    List<SharePointSite> sites = msGraphIntegrationService.listAvailableSharepointSites(integration);
-    if (StringUtils.hasText(query) && !sites.isEmpty()) {
-      sites = sites.stream()
-          .filter(site -> site.getName().toLowerCase().contains(query.toLowerCase()))
-          .collect(Collectors.toList());
+    List<SharePointSite> sites = new ArrayList<>();
+    sites.addAll(msGraphIntegrationService.listAvailableSharepointSites(integration));
+    sites.addAll(msGraphIntegrationService.listRegisteredSharepointSites(integration));
+    if (sites.isEmpty()) {
+      SharePointSite site = msGraphIntegrationService
+          .findSharepointSiteBySiteId(integration, query);
+      if (site != null) sites.add(site);
     }
-    SharePointSite site = msGraphIntegrationService.findSharepointSiteBySiteId(integration, query);
-    if (site != null) sites.add(site);
-    return sharePointSiteMapper.toDetailsDto(sites);
+
+    return sites.stream()
+        .collect(Collectors.toMap(SharePointSite::getSiteId, site -> site,
+            (s1, s2) -> s1)) // remove duplicates
+        .values()
+        .stream()
+        .filter(s -> StringUtils.hasText(s.getName()))
+        .filter(s -> {
+          if (StringUtils.hasText(query)) {
+            return s.getName().toLowerCase().contains(query.toLowerCase());
+          } else {
+            return true;
+          }
+        })
+        .map(sharePointSiteMapper::toDetailsDto)
+        .toList();
   }
 
   @GetMapping("/{id}/sharepoint/sites")
@@ -141,7 +157,21 @@ public class MSGraphIntegrationPrivateController {
         .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
     SharePointSite site = sharePointSiteMapper.fromFormDto(dto);
     site.setMsgraphIntegration(integration);
-    SharePointSite created = msGraphIntegrationService.registerSharePointSite(site);
+
+    // See if the site is registered already
+    SharePointSite created = msGraphIntegrationService
+        .listRegisteredSharepointSites(integration)
+        .stream()
+        .filter(s -> s.getSiteId().equalsIgnoreCase(site.getSiteId()))
+        .findFirst()
+        .orElse(null);
+    if (created == null) {
+      created = msGraphIntegrationService.registerSharePointSite(site);
+    } else {
+      LOGGER.info("Using existing Sharepoint site registration with ID {}", created.getId());
+    }
+
+    // Register available drives
     msGraphIntegrationService.registerSharePointDrives(created);
     return new ResponseEntity<>(sharePointSiteMapper.toDetailsDto(created), HttpStatus.CREATED);
   }
@@ -162,6 +192,30 @@ public class MSGraphIntegrationPrivateController {
     return new ResponseEntity<>(sharePointSiteMapper.toDetailsDto(updated), HttpStatus.OK);
   }
 
+  @PostMapping("/{id}/sharepoint/sites/{siteId}/refresh")
+  public HttpEntity<?> updateSharePointSiteRegistration(
+      @PathVariable("id") Long integrationId, @PathVariable("siteId") Long siteId) {
+    LOGGER.info("Refreshing Sharepoint site registration for integration {}", integrationId);
+    MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
+        .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
+    SharePointSite site = msGraphIntegrationService.findSharePointSiteById(siteId)
+        .orElseThrow(() -> new RecordNotFoundException("Sharepoint site not found"));
+    msGraphIntegrationService.registerSharePointDrives(site);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{id}/sharepoint/sites/{siteId}")
+  public HttpEntity<?> deleteSharePointSiteRegistration(
+      @PathVariable("id") Long integrationId, @PathVariable("siteId") Long siteId) {
+    LOGGER.info("Deleting Sharepoint site registration {}", siteId);
+    MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
+        .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
+    SharePointSite site = msGraphIntegrationService.findSharePointSiteById(siteId)
+        .orElseThrow(() -> new RecordNotFoundException("Sharepoint site not found"));
+    msGraphIntegrationService.deleteSharePointSite(site);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
   // OneDrive
 
   @GetMapping("/{id}/onedrive/drives")
@@ -174,5 +228,26 @@ public class MSGraphIntegrationPrivateController {
     return storageDriveMapper.toDetailsDto(drives);
   }
 
+  @DeleteMapping("/{id}/onedrive/drives/{driveId}")
+  public HttpEntity<?> deleteOneDriveDriveRegistration(
+      @PathVariable("id") Long integrationId, @PathVariable("driveId") Long driveId) {
+    LOGGER.info("Deleting OneDrive drive registration {}", driveId);
+    MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
+        .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
+    StorageDrive drive = msGraphIntegrationService.findRegisteredDriveById(integration, driveId)
+        .orElseThrow(() -> new RecordNotFoundException("OneDrive drive not found"));
+    msGraphIntegrationService.deleteOneDriveDrive(drive);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{id}/onedrive/drives")
+  public HttpEntity<?> deleteAllUsedOneDriveDriveRegistrations(
+      @PathVariable("id") Long integrationId) {
+    LOGGER.info("Deleting unused OneDrive drives");
+    MSGraphIntegration integration = msGraphIntegrationService.findById(integrationId)
+        .orElseThrow(() -> new RecordNotFoundException("MS Graph integration not found"));
+    msGraphIntegrationService.deleteAllUnusedDrives();
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
 
 }

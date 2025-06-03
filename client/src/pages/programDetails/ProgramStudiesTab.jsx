@@ -44,8 +44,8 @@ const ProgramStudiesTab = ({program}) => {
       header: "Code",
       cell: (d) => {
         return (
-          <a href={"/study/" + d.code}>
-            {d.code}
+          <a href={"/study/" + d.getValue().code}>
+            {d.getValue().code}
           </a>
         )
       },
@@ -53,14 +53,14 @@ const ProgramStudiesTab = ({program}) => {
         return a.original.code.localeCompare(b.original.code);
       },
     }),
-    {
+    columnHelper.accessor(row => row, {
       id: "status",
       header: "Status",
       sortingFn: (a, b) => {
         return a.original.status.localeCompare(b.original.status);
       },
-      accessorFn: (d) => <StatusBadge status={d.status}/>
-    },
+      cell: (d) => <StatusBadge status={d.getValue().status}/>
+    }),
     {
       id: "updatedAt",
       header: "Last Updated",
@@ -86,13 +86,13 @@ const ProgramStudiesTab = ({program}) => {
           : '';
         return da.localeCompare(db);
       },
-      cell: (d) => d.collaborator && (
+      cell: (d) => d.getValue().collaborator && (
           <div>
             <p style={{fontWeight: 'bold', marginBottom: '0.2rem'}}>
-              {d.collaborator.organizationName}
+              {d.getValue().collaborator.organizationName}
             </p>
             <p>
-              {d.externalCode}
+              {d.getValue().externalCode}
             </p>
           </div>
       )

@@ -141,7 +141,7 @@ export const ActiveStudies = ({count}) => {
   return <StatWidget
       label={"My active studies"}
       icon={ChevronsRight}
-      value={count}
+      value={count.toString()}
       color={"info"}
       url={"/studies?myStudy=true&status=IN_PLANNING&status=ACTIVE"}
   />
@@ -152,7 +152,7 @@ ActiveStudies.propTypes = {
 }
 
 export const StudyUpdates = ({count}) => {
-  return <StatWidget label={"Updates this week"} icon={Activity} value={count}
+  return <StatWidget label={"Updates this week"} icon={Activity} value={count.toString()}
                      color={"warning"}/>
 }
 
@@ -161,7 +161,7 @@ StudyUpdates.propTypes = {
 }
 
 export const ActiveUsers = ({count}) => {
-  return <StatWidget label="Active Users" value={count} icon={Users}/>
+  return <StatWidget label="Active Users" value={count.toString()} icon={Users} color={"info"}/>
 }
 
 ActiveUsers.propTypes = {
@@ -169,8 +169,8 @@ ActiveUsers.propTypes = {
 }
 
 export const NewStudies = ({count}) => {
-  return <StatWidget label={"New studies this week"} icon={Star} value={count}
-                     color={"warning"}/>
+  return <StatWidget label={"New studies this week"} icon={Star}
+                     value={count.toString()} color={"warning"}/>
 }
 
 NewStudies.propTypes = {
@@ -179,7 +179,7 @@ NewStudies.propTypes = {
 
 export const CompletedStudies = ({count}) => {
   return <StatWidget label={"Completed studies this month"} icon={ThumbsUp}
-                     value={count} color={"success"}/>
+                     value={count.toString()} color={"success"}/>
 }
 
 CompletedStudies.propTypes = {
@@ -187,7 +187,7 @@ CompletedStudies.propTypes = {
 }
 
 export const TotalStudies = ({count}) => {
-  return <StatWidget label={"Total studies"} icon={Clipboard} value={count}/>
+  return <StatWidget label={"Total studies"} icon={Clipboard} value={count.toString()} color={"info"}/>
 }
 
 TotalStudies.propTypes = {

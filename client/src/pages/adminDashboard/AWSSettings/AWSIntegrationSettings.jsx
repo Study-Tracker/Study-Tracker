@@ -107,7 +107,7 @@ const AWSIntegrationSettings = () => {
 
   const handleBucketFormSubmit = (values, {setSubmitting, resetForm}) => {
     console.debug("Saving S3 bucket settings", values);
-    const url = `/api/internal/drives/s3/${values.id ? "/" + values.id : ''}`;
+    const url = `/api/internal/drives/s3${values.id ? "/" + values.id : ''}`;
     const method = values.id ? 'PUT' : 'POST';
     axios({
       url: url,
@@ -137,8 +137,8 @@ const AWSIntegrationSettings = () => {
   }
 
   const handleStatusToggle = (active) => {
-    axios.patch("/api/internal/integrations/aws/" + settings.id + "?active=" + active)
-    .then(response => {
+    axios.patch(`/api/internal/integrations/aws/${settings.id}?active=${active}`)
+    .then(() => {
       setLoadCount(loadCount + 1);
       notyf.open({
         type: "success",
@@ -156,7 +156,7 @@ const AWSIntegrationSettings = () => {
 
   const handleBucketStatusUpdate = (id, active) => {
     axios.patch("/api/internal/drives/s3/" + id + "?active=" + active)
-    .then(response => {
+    .then(() => {
       setLoadCount(loadCount + 1);
       notyf.open({
         type: "success",
@@ -283,10 +283,11 @@ const AWSIntegrationSettings = () => {
           drives.length > 0 && (
               drives
               .sort((a, b) => a.displayName.localeCompare(b.displayName))
-              .map(drive => (
+              .map((drive, i) => (
                   <S3BucketCard
-                      bucket={drive}
-                      handleStatusUpdate={handleBucketStatusUpdate}
+                    key={`drive-${i}`}
+                    bucket={drive}
+                    handleStatusUpdate={handleBucketStatusUpdate}
                   />
               ))
           )

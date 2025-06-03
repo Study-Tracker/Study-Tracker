@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from "react";
+import React, { useContext } from "react";
 import NoSidebarPageWrapper from "../../common/structure/NoSidebarPageWrapper";
 import LoadingMessage from "../../common/structure/LoadingMessage";
 import ErrorMessage from "../../common/structure/ErrorMessage";
@@ -22,86 +22,77 @@ import AssayForm from "./AssayForm";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import NotyfContext from "@/context/NotyfContext";
 
-const AssayFormView = props => {
+const AssayFormView = () => {
 
   const params = useParams();
+  const notyf = useContext(NotyfContext);
   const user = useSelector(state => state.user.value);
   const features = useSelector(state => state.features.value);
-  const [state, setState] = useState({
-    studyCode: params.studyCode,
-    assayCode: params.assayCode || null,
-    isLoaded: false,
-    isError: false,
+
+  const { data: study, isLoading: isStudyLoading, error: studyError } = useQuery({
+    queryKey: ["study", params.studyCode],
+    queryFn: () => axios.get("/api/internal/study/" + params.studyCode)
+    .then(response => response.data)
+    .catch(e => {
+      console.error(e);
+      notyf.error("Failed to load study: " + e.message);
+    }),
   });
 
-  useEffect(async () => {
-
-    const study = await axios.get("/api/internal/study/" + state.studyCode)
-    .then(async response => await response.data)
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
-
-    let assay = null;
-    if (!!state.assayCode) {
-
-      assay = await axios.get("/api/internal/assay/" + state.assayCode)
-      .then(async response => await response.data)
-      .catch(error => {
-        console.error(error);
-        setState(prevState => ({
-          ...prevState,
-          isError: true,
-          error: error
-        }));
+  const { data: assay, isLoading: isAssayLoading, error: assayError } = useQuery({
+    queryKey: ["assay", params.assayCode],
+    queryFn: () => {
+      return axios.get("/api/internal/assay/" + params.assayCode)
+      .then(response => response.data)
+      .catch(e => {
+        console.error(e);
+        notyf.error("Failed to load assay: " + e.message);
       });
+    },
+    enabled: !!params.assayCode, // Only run if assayCode is provided
+  });
 
-    }
+  const { data: assayTypes, isLoading: isAssayTypesLoading, error: assayTypesError } = useQuery({
+    queryKey: ["assayTypes"],
+    queryFn: () => {
+      return axios.get("/api/internal/assaytype")
+      .then(response => response.data.filter(t => t.active === true))
+      .catch(e => {
+        console.error(e);
+        notyf.error("Failed to load assay types: " + e.message);
+      });
+    },
+  });
 
-    const assayTypes = await axios.get("/api/internal/assaytype/")
-    .then(async response => await response.data.filter(t => t.active === true))
-    .catch(error => {
-      console.error(error);
-      setState(prevState => ({
-        ...prevState,
-        isError: true,
-        error: error
-      }));
-    });
-
-    setState(prevState => ({
-      ...prevState,
-      study: study,
-      assay: assay,
-      assayTypes: assayTypes,
-      isLoaded: true
-    }));
-
-  }, []);
-
-
-  let content = <LoadingMessage/>;
-  if (state.isError) {
-    content = <ErrorMessage/>;
-  } else if (!!user && state.isLoaded) {
-    content = <AssayForm
-        study={state.study}
-        assay={state.assay}
-        user={user}
-        assayTypes={state.assayTypes}
-        features={features}
-    />;
-  }
-  return (
+  if (isStudyLoading || isAssayLoading || isAssayTypesLoading) {
+    return (
       <NoSidebarPageWrapper>
-        {content}
+        <LoadingMessage />
       </NoSidebarPageWrapper>
+    );
+  }
+
+  if (studyError || assayError || assayTypesError) {
+    return (
+      <NoSidebarPageWrapper>
+        <ErrorMessage message={`Error loading data: ${studyError?.message || assayError?.message || assayTypesError?.message}`} />
+      </NoSidebarPageWrapper>
+    );
+  }
+
+  return (
+    <NoSidebarPageWrapper>
+      <AssayForm
+        study={study}
+        assay={assay}
+        user={user}
+        assayTypes={assayTypes}
+        features={features}
+      />
+    </NoSidebarPageWrapper>
   );
 
 }

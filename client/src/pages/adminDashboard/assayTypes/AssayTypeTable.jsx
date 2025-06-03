@@ -47,7 +47,7 @@ const AssayTypeTable = ({assayTypes}) => {
       id: "name",
       header: "Name",
       cell: (d) => (
-          <Button variant="link" onClick={() => showModal(d)}>{d.name}</Button>
+          <Button variant="link" onClick={() => showModal(d.getValue())}>{d.getValue().name}</Button>
       ),
       sortingFn: (a, b) => {
         return a.original.name.localeCompare(b.original.name);
@@ -62,7 +62,7 @@ const AssayTypeTable = ({assayTypes}) => {
       id: "active",
       header: "Status",
       cell: (d) => {
-        return d.active
+        return d.getValue().active
             ? <Badge bg="success">Active</Badge>
             : <Badge bg="warning">Inactive</Badge>
       }
@@ -70,7 +70,8 @@ const AssayTypeTable = ({assayTypes}) => {
     columnHelper.accessor(row => row, {
       id: "controls",
       header: "",
-      cell: (d) => {
+      cell: (cell) => {
+        const d = cell.getValue();
         return (
             <React.Fragment>
 

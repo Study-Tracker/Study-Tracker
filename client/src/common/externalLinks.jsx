@@ -23,6 +23,7 @@ import { PlusCircle } from "react-feather";
 import { Form as FormikForm, Formik } from "formik";
 import * as yup from "yup";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 const ExternalLinks = props => {
 
@@ -80,17 +81,15 @@ const ExternalLinks = props => {
   const linkList = links.map(link => {
     return (
         <li key={"external-link-" + link.id}>
-          <FontAwesomeIcon icon={faLink}/>
-          &nbsp;&nbsp;
-          <a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          {
-            !!props.user ? (
-                <a onClick={() =>  handleLinkDelete(link)}>
-                  <FontAwesomeIcon color={"red"} icon={faTimesCircle}/>
-                </a>
-            ) : ''
-          }
+          <FontAwesomeIcon icon={faLink} className={"me-2"}/>
+          <a href={link.url} target="_blank" rel="noopener noreferrer" className={"me-4"}>
+            {link.label}
+          </a>
+          { props.user && (
+            <a onClick={() =>  handleLinkDelete(link)}>
+              <FontAwesomeIcon color={"red"} icon={faTimesCircle}/>
+            </a>
+          )}
         </li>
     );
   });
@@ -134,7 +133,6 @@ const ExternalLinks = props => {
             handleChange,
             handleSubmit,
             isSubmitting,
-            setFieldValue,
           }) => (
 
               <Modal
@@ -192,19 +190,17 @@ const ExternalLinks = props => {
                       </Col>
 
                     </Row>
-                    {
-                      !!error
-                          ? (
-                              <Row>
-                                <Col sm={12}>
-                                  <Alert variant={"warning"}>
-                                    <div className="alert-message">
-                                      {error}
-                                    </div>
-                                  </Alert>
-                                </Col>
-                              </Row>
-                          ) : ''
+                    { error && (
+                          <Row>
+                            <Col sm={12}>
+                              <Alert variant={"warning"}>
+                                <div className="alert-message">
+                                  {error}
+                                </div>
+                              </Alert>
+                            </Col>
+                          </Row>
+                      )
                     }
                   </FormikForm>
 
@@ -232,6 +228,12 @@ const ExternalLinks = props => {
       </div>
   );
 
+}
+
+ExternalLinks.propTypes = {
+  links: PropTypes.array,
+  studyCode: PropTypes.string.isRequired,
+  user: PropTypes.object,
 }
 
 export default ExternalLinks;

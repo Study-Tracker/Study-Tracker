@@ -162,8 +162,8 @@ const S3InputsCard = ({
 S3InputsCard.propTypes = {
   isActive: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
-  selectedProgram: PropTypes.string,
-  selectedStudy: PropTypes.string,
+  selectedProgram: PropTypes.object,
+  selectedStudy: PropTypes.object,
   errors: PropTypes.object,
 }
 

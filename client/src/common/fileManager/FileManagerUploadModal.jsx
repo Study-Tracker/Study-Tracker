@@ -26,7 +26,7 @@ import NotyfContext from "../../context/NotyfContext";
 import axios from "axios";
 import {LoadingOverlay} from "../loading";
 
-const QueuedFile = ({file, handleRemove, handleSubmit}) => {
+const QueuedFile = ({file, handleRemove}) => {
   return (
       <div className={"dropzone-item d-flex justify-content-between bg-light p-3 mt-2"} key={"file-" + file.name}>
         <div className={"dropzone-file"}>
@@ -37,15 +37,17 @@ const QueuedFile = ({file, handleRemove, handleSubmit}) => {
         </div>
         <div className={"dropzone-progress"}></div>
         <div className={"dropzone-toolbar"}>
-          {/*<Button variant={"outline-info"} className={"me-2"}>*/}
-          {/*  <FontAwesomeIcon icon={faPlay} />*/}
-          {/*</Button>*/}
           <Button variant={"outline-danger"} onClick={() => handleRemove(file)}>
             <FontAwesomeIcon icon={faTrashAlt} />
           </Button>
         </div>
       </div>
   )
+}
+
+QueuedFile.propTypes = {
+  file: PropTypes.object.isRequired,
+  handleRemove: PropTypes.func.isRequired,
 }
 
 const SuccessFile = ({path}) => {
@@ -62,6 +64,10 @@ const SuccessFile = ({path}) => {
         </div>
       </div>
   )
+}
+
+SuccessFile.propTypes = {
+  path: PropTypes.string,
 }
 
 const FileManagerUploadModal = ({
@@ -204,7 +210,7 @@ const FileManagerUploadModal = ({
               <div className={"dropzone-items"}>
                 {
                   queuedFiles.map((f, i) => (
-                      <QueuedFile file={f} handleRemove={handleRemoveFile} />
+                      <QueuedFile key={`queued-file-${i}`} file={f} handleRemove={handleRemoveFile} />
                   ))
                 }
               </div>
@@ -212,7 +218,7 @@ const FileManagerUploadModal = ({
               <div className={"dropzone-items"}>
                 {
                   successFiles.map((f, i) => (
-                      <SuccessFile path={f} />
+                      <SuccessFile key={`success-file-${i}`} path={f} />
                   ))
                 }
               </div>
@@ -262,6 +268,7 @@ FileManagerUploadModal.propTypes = {
   path: PropTypes.string.isRequired,
   error: PropTypes.string,
   handleSuccess: PropTypes.func.isRequired,
+  folderId: PropTypes.number,
 };
 
 export default FileManagerUploadModal;
