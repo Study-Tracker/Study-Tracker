@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-04-XX
+## [1.0.0] - 2025-06-02
 
 ### Added
 - Added support for Microsoft Entra ID (formerly Azure AD) SAML SSO authentication.
 - Added data export utility that allows a full dump of the database to CSV files. This supports data backup and migration to Lab Atlas.
+- Added the ability to remove unused SharePoint sites and drives from the admin dashboard.
 
 ### Changed
 - Updated core Spring dependencies to Spring Boot 3. This includes moving to the required minimum Java version of 17.
