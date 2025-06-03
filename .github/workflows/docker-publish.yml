@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: "study-tracker"
+  IMAGE_NAME: "study-tracker/study-tracker"
 
 permissions:
   contents: read
