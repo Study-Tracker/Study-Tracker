@@ -13,6 +13,8 @@ integrated REST API and event dispatcher service for sharing of data.
 
 ![Study Tracker front page](media/front-page.png)
 
+Looking for a fully-managed Study Tracker? Take a look at [Lab Atlas](https://labatlas.com). 
+
 ## Requirements
 
 - JDK 17+
@@ -99,7 +101,11 @@ For a rapid build and deployment in development mode, follow the steps below. Fo
 
 For questions about Study Tracker, or if you would like to contribute, please contact:
 
-- [Will Oemler, Vesalius Therapeutics](mailto:woemler@vesaliustx.com)
+- [Will Oemler, Dotwise Software](mailto:will@dotwisesoftware.com)
+
+For support or feature requests:
+
+- [support@dotwisesoftware.com](mailto:support@dotwisesoftware.com)
 
 ## License
 
