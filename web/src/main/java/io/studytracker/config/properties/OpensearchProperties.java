@@ -35,6 +35,10 @@ public class OpensearchProperties {
   private Boolean useSsl;
 
   private String username;
+  
+  private Integer connectTimeout = 60000; // 60 seconds
+  
+  private Integer socketTimeout = 50000; // 50 seconds
 
   @JsonIgnore
   private String password;
@@ -46,6 +50,8 @@ public class OpensearchProperties {
         ", port=" + port +
         ", useSsl=" + useSsl +
         ", username='" + username + '\'' +
+        ", connectTimeout=" + connectTimeout +
+        ", socketTimeout=" + socketTimeout +
         ", password='*****'" +
         '}';
   }
