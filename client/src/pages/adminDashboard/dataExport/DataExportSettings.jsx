@@ -80,13 +80,13 @@ const DataExportSettings = () => {
                 <div className="info-alert">
                   <h5>Export Data</h5>
                   <p>
-                    Click the button below to start the export process. You will receive an email with a link to download the archive once the export is complete.
+                    Click the button below to start the export process in a new window. Once the export has completed, a ZIP file with the contents will be downloaded. Do not close this window until the download completes.
                   </p>
                   <div className={"text-center"}>
                     <Button
                       variant={"primary"}
                       size={"lg"}
-                      onClick={() => exportMutation.mutate()}
+                      onClick={() => window.open("/api/internal/export/sync")}
                       disabled={exportMutation.isPending}
                     >
                       <FontAwesomeIcon icon={faFileExport} className={"me-2"} />
