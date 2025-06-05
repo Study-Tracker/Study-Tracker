@@ -21,16 +21,13 @@ import io.studytracker.exception.InsufficientPrivilegesException;
 import io.studytracker.export.CompressionUtil;
 import io.studytracker.export.DataExportService;
 import io.studytracker.model.User;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +35,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -58,6 +57,63 @@ public class ExportPrivateController extends AbstractApiController {
 
   @Autowired
   private CompressionUtil compressionUtil;
+  
+  /**
+   * Synchronously exports all database records to CSV files and then returns them to the user as a downloadable ZIP file.
+   *
+   * @return compressed ZIP file containing all exported CSV files
+   */
+  @GetMapping("/sync")
+  public HttpEntity<Resource> exportDatabaseSync() {
+    LOGGER.info("Received request to export database synchronously");
+
+    // Check if the user is an admin
+    User user = getAuthenticatedUser();
+    if (!user.isAdmin()) {
+      LOGGER.warn("Non-admin user {} attempted to export database", user.getUsername());
+      throw new InsufficientPrivilegesException("Only administrators can export the database");
+    }
+
+    try {
+      // Generate a unique job ID
+      String jobId = UUID.randomUUID().toString();
+      String fileName = "data-export-" + jobId + ".zip";
+      LOGGER.info("Starting synchronous database export job with ID: {}", jobId);
+
+      // Perform the export
+      Path exportPath = dataExportService.exportAllDataToCsv(jobId);
+      Path tempPath = Paths.get(tempDir);
+      Path zipFile = Files.createFile(tempPath.resolve(fileName));
+      compressionUtil.compressDirectoryToZip(exportPath, zipFile);
+
+      // Clean up the CSV directory
+      Files.walk(exportPath)
+          .sorted((a, b) -> -a.compareTo(b))
+          .forEach(path -> {
+            try {
+              Files.delete(path);
+            } catch (IOException e) {
+              LOGGER.error("Failed to delete file {}: {}", path, e.getMessage(), e);
+            }
+          });
+      
+      // Return the ZIP file as a response
+      ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(zipFile));
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentDisposition(ContentDisposition.builder("attachment")
+              .filename(fileName)
+              .build());
+      return ResponseEntity.ok()
+              .headers(headers)
+              .contentLength(resource.contentLength())
+              .contentType(MediaType.APPLICATION_OCTET_STREAM)
+              .body(resource);
+              
+    } catch (IOException e) {
+      LOGGER.error("Error during database export: {}", e.getMessage(), e);
+      throw new RuntimeException("Database export failed", e);
+    }
+  }
 
   /**
    * Triggers an asynchronous export of all database records to CSV files.
