@@ -23,7 +23,6 @@ import io.studytracker.repository.AssayRepository;
 import io.studytracker.repository.StudyRepository;
 import io.studytracker.search.SearchService;
 import io.studytracker.search.opensearch.OpensearchSearchService;
-import java.util.Calendar;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.json.JsonpMapper;
@@ -49,6 +48,8 @@ import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverte
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import java.util.Calendar;
 
 @Configuration
 @ConditionalOnProperty("search.mode")
@@ -88,13 +89,29 @@ public class SearchServiceConfiguration {
       MaybeSecureClientConfigurationBuilder sBuilder = builder.connectedTo(host + ":" + port);
       ClientConfiguration configuration;
       if (useSsl != null && useSsl && username != null && password != null) {
-        configuration = sBuilder.usingSsl().withBasicAuth(username, password).build();
+        configuration = sBuilder
+                .usingSsl()
+                .withBasicAuth(username, password)
+                .withConnectTimeout(properties.getConnectTimeout())
+                .withSocketTimeout(properties.getSocketTimeout())
+                .build();
       } else if (useSsl != null && useSsl) {
-        configuration = sBuilder.usingSsl().build();
+        configuration = sBuilder
+                .usingSsl()
+                .withConnectTimeout(properties.getConnectTimeout())
+                .withSocketTimeout(properties.getSocketTimeout())
+                .build();
       } else if (username != null && password != null) {
-        configuration = sBuilder.withBasicAuth(username, password).build();
+        configuration = sBuilder
+                .withBasicAuth(username, password)
+                .withConnectTimeout(properties.getConnectTimeout())
+                .withSocketTimeout(properties.getSocketTimeout())
+                .build();
       } else {
-        configuration = sBuilder.build();
+        configuration = sBuilder
+                .withConnectTimeout(properties.getConnectTimeout())
+                .withSocketTimeout(properties.getSocketTimeout())
+                .build();
       }
       return configuration;
     }
