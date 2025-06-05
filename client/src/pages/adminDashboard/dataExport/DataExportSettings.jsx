@@ -80,7 +80,7 @@ const DataExportSettings = () => {
                 <div className="info-alert">
                   <h5>Export Data</h5>
                   <p>
-                    Click the button below to start the export process. Once the export has completed, a ZIP file with the contents will be downloaded. Do not close this window after the export begins.
+                    Click the button below to start the export process in a new window. Once the export has completed, a ZIP file with the contents will be downloaded. Do not close this window until the download completes.
                   </p>
                   <div className={"text-center"}>
                     <Button
