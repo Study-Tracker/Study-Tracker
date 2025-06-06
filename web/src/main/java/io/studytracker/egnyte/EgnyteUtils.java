@@ -197,7 +197,7 @@ public class EgnyteUtils {
     if (childPath.endsWith("/")) {
       childPath = childPath.substring(0, childPath.length() - 1);
     }
-    return childPath.startsWith(parentPath);
+    return childPath.startsWith(parentPath + "/");
   }
 
   public static String cleanInputObjectName(String input) {
