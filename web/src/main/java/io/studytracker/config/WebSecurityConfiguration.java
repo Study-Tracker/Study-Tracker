@@ -294,6 +294,10 @@ public class WebSecurityConfiguration {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/static/**", "/error", "/login/**", "/saml/**", "/auth/**").permitAll()
             .anyRequest().fullyAuthenticated())
+        .formLogin(form -> form
+            .loginPage("/login")
+            .loginProcessingUrl("/auth/login")
+            .defaultSuccessUrl("/"))
         .saml2Login(saml2 -> saml2
             .loginPage("/login")
             .defaultSuccessUrl("/")
