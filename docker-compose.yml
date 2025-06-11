@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_CONFIG_LOCATION=/app/config/application.properties
+      - DB_HOST=postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=study-tracker
+      - DB_PORT=5432
+      - DB_SCHEMA=public
+#      - SPRING_OPENSEARCH_URIS=http://opensearch:9200
+      - JAVA_OPTS=-Xmx512m
+    volumes:
+      - ./.docker/data:/data
+      - ./.docker/config:/app/config
+    depends_on:
+      - postgres
+#      - opensearch
+    restart: unless-stopped
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=study-tracker
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+ # OpenSearch database
+#  opensearch:
+#    image: opensearchproject/opensearch:2.11.0
+#    ports:
+#      - "9200:9200"
+#      - "9600:9600"
+#    environment:
+#      - discovery.type=single-node
+#      - bootstrap.memory_lock=true
+#      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+#      - "DISABLE_SECURITY_PLUGIN=true"
+#    volumes:
+#      - opensearch-data:/usr/share/opensearch/data
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+#      nofile:
+#        soft: 65536
+#        hard: 65536
+#    restart: unless-stopped
+
+volumes:
+  postgres-data:
+#  opensearch-data:

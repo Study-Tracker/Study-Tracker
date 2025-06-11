@@ -57,6 +57,7 @@ Tracker, [see Gitbook](https://study-tracker.gitbook.io/documentation/).
 ### Single Sign-on
 
 - Okta
+- Microsoft Entra ID (Azure AD)
 
 ### Source Code Management
 
@@ -96,6 +97,38 @@ For a rapid build and deployment in development mode, follow the steps below. Fo
    ```bash
    java -jar web/target/study-tracker.war
    ```
+
+## Docker Support
+
+An official Study Tracker Docker image is available from the [GitHub Container Registry](https://github.com/Study-Tracker/Study-Tracker/pkgs/container/study-tracker). 
+You can build the image locally from source by running the following command from the root of the project:
+
+```bash
+docker buildx build --platform linux/amd64 -t study-tracker .
+```
+
+An example `docker-compose.yml` file is available in the root of the project, which you can use 
+for quickly spinning up a local instance of Study Tracker with PostgreSQL. 
+1. Create a folder name`.docker`.
+2. Create two folders inside `.docker` named `config` and `data`.
+3. Create a file named `application.properties` inside the `.docker/config` folder, and copy the 
+   following contents into it:
+   ```properties
+   server.port=8080
+   application.host-name=localhost
+   application.secret=studytrackerstudytracker
+   admin.email=your-email@domain.com
+   admin.password=password
+   storage.temp-dir=/tmp
+   storage.local-dir=/data
+   ```
+4. Run the following command from the root of the project to start the application:
+
+   ```bash
+   docker compose -f docker-compose.yml up
+   ```
+5. You can now access Study Tracker at `http://localhost:8080` and log in with the email and 
+   password defined in the `application.properties` file.
 
 ## Contact
 
