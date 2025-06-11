@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - 2025-06-10
 
+### Added
+- Added an example docker-compose.yml file for easier initial setup and testing of Study Tracker with a PostgreSQL database.
+
 ### Fixed
 - Fixed username/password login when using Okta SAML.
 
