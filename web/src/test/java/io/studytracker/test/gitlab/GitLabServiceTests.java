@@ -173,12 +173,14 @@ public class GitLabServiceTests {
 
     Study study = new Study();
     study.setName("Example Study: In-vitro experiment");
+    study.setCode("TST-123");
+
     String projectName = GitLabUtils.getStudyProjectName(study);
     String projectPath = GitLabUtils.getStudyProjectPath(study);
     System.out.println(projectName);
     System.out.println(projectPath);
-    Assert.assertEquals("Example Study In-vitro experiment", projectName);
-    Assert.assertEquals("example-study-in-vitro-experiment", projectPath);
+    Assert.assertEquals("TST-123 - Example Study In-vitro experiment", projectName);
+    Assert.assertEquals("tst-123-example-study-in-vitro-experiment", projectPath);
     Assert.assertTrue(projectName.length() < 255);
     Assert.assertTrue(projectPath.length() < 255);
 
