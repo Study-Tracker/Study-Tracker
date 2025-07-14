@@ -22,20 +22,8 @@ import io.studytracker.exception.RecordNotFoundException;
 import io.studytracker.gitlab.GitLabIntegrationService;
 import io.studytracker.gitlab.GitLabService;
 import io.studytracker.gitlab.GitLabUtils;
-import io.studytracker.model.GitGroup;
-import io.studytracker.model.GitLabGroup;
-import io.studytracker.model.GitLabIntegration;
-import io.studytracker.model.GitLabRepository;
-import io.studytracker.model.GitRepository;
-import io.studytracker.model.GitServiceType;
-import io.studytracker.model.Program;
-import io.studytracker.model.Study;
-import io.studytracker.repository.AssayRepository;
-import io.studytracker.repository.GitLabGroupRepository;
-import io.studytracker.repository.GitLabRepositoryRepository;
-import io.studytracker.repository.ProgramRepository;
-import io.studytracker.repository.StudyRepository;
-import java.util.List;
+import io.studytracker.model.*;
+import io.studytracker.repository.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +34,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -175,18 +165,22 @@ public class GitLabServiceTests {
   @Test
   public void repositoryNamingTest() {
 
-    String description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    String description = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>";
     String trimmed = GitLabUtils.trimRepositoryDescription(description);
     System.out.println(trimmed);
     Assert.assertTrue(trimmed.length() < 255);
+    Assert.assertEquals("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", trimmed);
 
-    Program program = programRepository.findByName(EXAMPLE_PROGRAM)
-        .orElseThrow(RecordNotFoundException::new);
-    Study study = studyRepository.findByProgramId(program.getId()).get(0);
+    Study study = new Study();
+    study.setName("Example Study: In-vitro experiment");
+    study.setCode("TST-123");
+
     String projectName = GitLabUtils.getStudyProjectName(study);
     String projectPath = GitLabUtils.getStudyProjectPath(study);
     System.out.println(projectName);
     System.out.println(projectPath);
+    Assert.assertEquals("TST-123 - Example Study In-vitro experiment", projectName);
+    Assert.assertEquals("tst-123-example-study-in-vitro-experiment", projectPath);
     Assert.assertTrue(projectName.length() < 255);
     Assert.assertTrue(projectPath.length() < 255);
 

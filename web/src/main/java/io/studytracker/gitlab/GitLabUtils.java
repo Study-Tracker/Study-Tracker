@@ -25,10 +25,11 @@ import io.studytracker.gitlab.entities.GitLabUser;
 import io.studytracker.model.Assay;
 import io.studytracker.model.Program;
 import io.studytracker.model.Study;
-import java.text.BreakIterator;
-import java.util.Locale;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+
+import java.text.BreakIterator;
+import java.util.Locale;
 
 public class GitLabUtils {
 
@@ -52,11 +53,11 @@ public class GitLabUtils {
   }
 
   public static String getProgramGroupName(Program program) {
-    return program.getName().replaceAll("[^\\w\\d\\s_+.]", "");
+    return program.getName().replaceAll("[^\\w\\d\\s_+.-]", "");
   }
 
   public static String getStudyProjectName(Study study) {
-    return study.getCode() + " - " + study.getName().replaceAll("[^\\w\\d\\s_+.]", "");
+    return study.getCode() + " - " + study.getName().replaceAll("[^\\w\\d\\s_+.-]", "");
   }
 
   public static String getStudyProjectPath(Study study) {
@@ -64,7 +65,7 @@ public class GitLabUtils {
   }
 
   public static String getAssayProjectName(Assay assay) {
-    return assay.getCode() + " - " + assay.getName().replaceAll("[^\\w\\d\\s_+.]", "");
+    return assay.getCode() + " - " + assay.getName().replaceAll("[^\\w\\d\\s_+.-]", "");
   }
 
   public static String getAssayProjectPath(Assay assay) {
@@ -111,7 +112,7 @@ public class GitLabUtils {
 
   public static String trimRepositoryDescription(String description) {
     BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
-    String cleaned = description.replaceAll("<[^>]*>", "");
+    String cleaned = description.replaceAll("<[^>]*>", "").replaceAll("\\..+", ".");
     iterator.setText(cleaned);
     int start = iterator.first();
     int end = iterator.next();

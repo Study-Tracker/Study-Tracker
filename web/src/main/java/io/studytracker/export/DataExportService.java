@@ -495,6 +495,7 @@ public class DataExportService {
       // Write header
       String[] header = {
           "ID",
+          "GitRepositoryId",
           "GitLabGroupId",
           "RepositoryId",
           "Name",
@@ -506,6 +507,7 @@ public class DataExportService {
       for (GitLabRepository repository : gitLabRepositoryRepository.findAll()) {
         String[] row = {
             String.valueOf(repository.getId()),
+            String.valueOf(repository.getGitRepository().getId()),
             String.valueOf(repository.getGitLabGroup().getId()),
             String.valueOf(repository.getRepositoryId()),
             repository.getName(),
@@ -909,8 +911,8 @@ public class DataExportService {
             assay.getName(),
             assay.getDescription(),
             assay.getStatus().toString(),
-            assay.getCreatedBy().toString(),
-            assay.getLastModifiedBy() != null ? assay.getLastModifiedBy().getDisplayName() : "",
+            String.valueOf(assay.getCreatedBy().getId()),
+            assay.getLastModifiedBy() != null ? String.valueOf(assay.getLastModifiedBy().getId()) : "",
             assay.getOwner().getId().toString(),
             SDF.format(assay.getCreatedAt()),
             assay.getUpdatedAt() != null ? SDF.format(assay.getUpdatedAt()) : "",
@@ -1022,7 +1024,7 @@ public class DataExportService {
             task.getLastModifiedBy() != null ? String.valueOf(task.getLastModifiedBy().getId()) : "",
             task.getAssignedTo() != null ? String.valueOf(task.getAssignedTo().getId()) : "",
             task.getDueDate() != null ? SDF.format(task.getDueDate()) : "",
-            objectMapper.writeValueAsString(task.getData())
+            task.getData() != null ? objectMapper.writeValueAsString(task.getData()) : "{}"
         };
         writer.writeNext(row);
       }
