@@ -71,16 +71,19 @@ export const StudyListTable = ({studies}) => {
       id: "startDate",
       header: "Start Date",
       accessorFn: (d) => new Date(d.startDate).toLocaleDateString(),
+      sortingFn: (a, b) => a.original.startDate - b.original.startDate,
     },
     {
       id: "createdAt",
       header: "Created",
       accessorFn: (d) => new Date(d.createdAt).toLocaleDateString(),
+      sortingFn: (a, b) => a.original.createdAt - b.original.createdAt,
     },
     {
       id: "updatedAt",
       header: "Last Updated",
       accessorFn: (d) => new Date(d.updatedAt).toLocaleDateString(),
+      sortingFn: (a, b) => a.original.updatedAt - b.original.updatedAt,
     },
     columnHelper.accessor(row => row, {
       id: "cro",

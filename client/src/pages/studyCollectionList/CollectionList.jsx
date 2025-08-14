@@ -60,7 +60,8 @@ export const MyCollectionTable = ({collections}) => {
     {
       id: "updatedAt",
       header: "Last Updated",
-      accessorFn: (d) => new Date(d.updatedAt).toLocaleDateString()
+      accessorFn: (d) => new Date(d.updatedAt).toLocaleDateString(),
+      sortingFn: (a, b) => a.original.updatedAt - b.original.updatedAt,
     },
     {
       id: "noStudies",
