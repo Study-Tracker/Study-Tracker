@@ -26,10 +26,10 @@ public interface GitRepositoryRepository extends JpaRepository<GitRepository, Lo
   @Query("select r from GitRepository r where r.gitGroup.id = ?1")
   List<GitRepository> findByGitGroupId(Long gitGroupId);
 
-  @Query("select s.gitRepositories from Study s")
+  @Query("select s.gitRepositories from Study s where s.id = ?1")
   List<GitRepository> findByStudyId(Long studyId);
 
-  @Query("select a.gitRepositories from Assay a")
-  List<GitRepository> findByAssayId(Long assay);
+  @Query("select a.gitRepositories from Assay a where a.id = ?1")
+  List<GitRepository> findByAssayId(Long assayId);
 
 }
