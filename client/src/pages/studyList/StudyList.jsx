@@ -71,19 +71,31 @@ export const StudyListTable = ({studies}) => {
       id: "startDate",
       header: "Start Date",
       accessorFn: (d) => new Date(d.startDate).toLocaleDateString(),
-      sortingFn: (a, b) => a.original.startDate - b.original.startDate,
+      sortingFn: (a, b) => {
+        const dateA = a.original.startDate ? new Date(a.original.startDate) : new Date(0);
+        const dateB = b.original.startDate ? new Date(b.original.startDate) : new Date(0);
+        return dateA.getTime() - dateB.getTime();
+      },
     },
     {
       id: "createdAt",
       header: "Created",
       accessorFn: (d) => new Date(d.createdAt).toLocaleDateString(),
-      sortingFn: (a, b) => a.original.createdAt - b.original.createdAt,
+      sortingFn: (a, b) => {
+        const dateA = a.original.createdAt ? new Date(a.original.createdAt) : new Date(0);
+        const dateB = b.original.createdAt ? new Date(b.original.createdAt) : new Date(0);
+        return dateA.getTime() - dateB.getTime();
+      },
     },
     {
       id: "updatedAt",
       header: "Last Updated",
       accessorFn: (d) => new Date(d.updatedAt).toLocaleDateString(),
-      sortingFn: (a, b) => a.original.updatedAt - b.original.updatedAt,
+      sortingFn: (a, b) => {
+        const dateA = a.original.updatedAt ? new Date(a.original.updatedAt) : new Date(0);
+        const dateB = b.original.updatedAt ? new Date(b.original.updatedAt) : new Date(0);
+        return dateA.getTime() - dateB.getTime();
+      },
     },
     columnHelper.accessor(row => row, {
       id: "cro",
