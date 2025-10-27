@@ -47,7 +47,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ActiveProfiles({"web-benchling-test", "example"})
 public class NotebookServiceControllerTest {
 
-  private static final int PROJECT_FOLDER_COUNT = 4;
+  private static final int PROJECT_FOLDER_COUNT = 5;
 
   @Autowired private ExampleDataRunner exampleDataRunner;
 

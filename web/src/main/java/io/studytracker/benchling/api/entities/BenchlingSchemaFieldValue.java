@@ -27,5 +27,5 @@ public class BenchlingSchemaFieldValue {
   private boolean isMulti;
   private String textValue;
   private String type;
-  private String value;
+  private Object value;
 }
