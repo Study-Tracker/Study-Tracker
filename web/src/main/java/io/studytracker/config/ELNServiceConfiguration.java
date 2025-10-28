@@ -45,7 +45,6 @@ public class ELNServiceConfiguration {
     httpMessageConverter.setObjectMapper(benchlingElnObjectMapper());
     restTemplate.getMessageConverters().add(0, httpMessageConverter);
     SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-    requestFactory.setOutputStreaming(false);
     restTemplate.setRequestFactory(requestFactory);
     return restTemplate;
   }
