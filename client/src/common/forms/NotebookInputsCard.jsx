@@ -153,20 +153,15 @@ const NotebookInputsCard = ({
                   onChange={(e) => onChange("notebookFolder.url", e.target.value)}
               />
               <Form.Text>
-                Provide the Benchling URL for the notebook entry or folder you'd like to use.
+                Provide the Benchling URL for the notebook entry or folder you&apos;d like to use.
               </Form.Text>
             </FormGroup>
           </Col>
 
         </Row>
 
-        <Row>
-          <Col md={6}>
-            <NotebookEntryTemplatesDropdown
-                onChange={selected => onChange("notebookTemplateId", selected || "") }
-            />
-          </Col>
-        </Row>
+        <NotebookEntryTemplatesDropdown onChange={onChange} />
+
       </FeatureToggleCard>
   )
 

@@ -20,6 +20,8 @@ import io.studytracker.benchling.api.AbstractBenchlingApiService;
 import io.studytracker.benchling.api.BenchlingElnRestClient;
 import io.studytracker.benchling.api.entities.BenchlingEntryRequest;
 import io.studytracker.benchling.api.entities.BenchlingEntryRequest.CustomField;
+import io.studytracker.benchling.api.entities.BenchlingEntryRequest.Field;
+import io.studytracker.benchling.api.entities.BenchlingEntrySchema;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplate;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
 import io.studytracker.eln.NotebookEntry;
@@ -29,8 +31,10 @@ import io.studytracker.eln.NotebookUser;
 import io.studytracker.eln.NotebookUserService;
 import io.studytracker.exception.NotebookException;
 import io.studytracker.model.Assay;
+import io.studytracker.model.AssayOptions;
 import io.studytracker.model.ELNFolder;
 import io.studytracker.model.Study;
+import io.studytracker.model.StudyOptions;
 import io.studytracker.model.User;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -58,7 +62,7 @@ public final class BenchlingNotebookEntryService
   public List<NotebookTemplate> findEntryTemplates() {
     LOGGER.info("Fetching Benchling notebook entry templates.");
     BenchlingElnRestClient client = this.getClient();
-    List<BenchlingEntryTemplate> templates = new ArrayList<>();
+    List<NotebookTemplate> templates = new ArrayList<>();
     String nextToken = null;
     boolean hasNext = true;
     while (hasNext) {
@@ -67,7 +71,7 @@ public final class BenchlingNotebookEntryService
       nextToken = templateList.getNextToken();
       hasNext = StringUtils.hasText(nextToken);
     }
-    return this.convertNotebookEntryTemplates(templates);
+    return templates;
   }
 
   @Override
@@ -82,17 +86,22 @@ public final class BenchlingNotebookEntryService
     LOGGER.info("Fetching Benchling notebook entry template: " + id);
     BenchlingElnRestClient client = this.getClient();
     BenchlingEntryTemplate template = client.findEntryTemplateById(id);
-    return Optional.of(this.convertNotebookEntryTemplate(template));
+    if (template.getSchema() != null && StringUtils.hasText(template.getSchema().getId())) {
+      BenchlingEntrySchema schema = client.findEntrySchemaById(template.getSchema().getId())
+          .orElse(null);
+      if (schema != null) {
+        template.setSchema(schema);
+      }
+    }
+    return Optional.of(template);
   }
 
-  @Override
-  public NotebookEntry createStudyNotebookEntry(Study study, ELNFolder studyFolder) throws NotebookException {
-    return this.createStudyNotebookEntry(study, studyFolder, null);
-  }
 
   @Override
   public NotebookEntry createStudyNotebookEntry(Study study, ELNFolder studyFolder,
       NotebookTemplate template) throws NotebookException {
+
+    StudyOptions options = study.getOptions();
 
     BenchlingEntryRequest request = new BenchlingEntryRequest();
     request.setName(study.getCode() + " Study Summary: " + study.getName());
@@ -115,33 +124,39 @@ public final class BenchlingNotebookEntryService
 
     // Entry template
     if (template != null) {
-      request.setEntryTemplateId(template.getReferenceId());
+      request.setEntryTemplateId(template.getId());
+      request.setSchemaId(((BenchlingEntryTemplate) template).getSchema().getId());
     }
 
     // Custom fields
     Map<String, CustomField> customFields = new LinkedHashMap<>();
-    customFields.put("Name", new CustomField(study.getName()));
-    customFields.put("Code", new CustomField(study.getCode()));
-    customFields.put(
-        "Description", new CustomField(study.getDescription().replaceAll("<.+?>", "")));
-    customFields.put("Program", new CustomField(study.getProgram().getName()));
+    customFields.put("StudyTracker.Name", new CustomField(study.getName()));
+    customFields.put("StudyTracker.Code", new CustomField(study.getCode()));
+    customFields.put("StudyTracker.Description",
+        new CustomField(study.getDescription().replaceAll("<.+?>", "")));
+    customFields.put("StudyTracker.Program", new CustomField(study.getProgram().getName()));
     if (study.getExternalCode() != null) {
-      customFields.put("External Code", new CustomField(study.getExternalCode()));
+      customFields.put("StudyTracker.ExternalCode", new CustomField(study.getExternalCode()));
     }
     request.setCustomFields(customFields);
+
+    // Template fields
+    if (options.getNotebookTemplateFields() != null
+        && !options.getNotebookTemplateFields().isEmpty()) {
+      for (Map.Entry<String, Object> entry : options.getNotebookTemplateFields().entrySet()) {
+        request.addField(entry.getKey(), entry.getValue());
+      }
+    }
     
     BenchlingElnRestClient client = this.getClient();
     return this.convertBenchlingEntry(client.createEntry(request));
   }
 
   @Override
-  public NotebookEntry createAssayNotebookEntry(Assay assay, ELNFolder folder) throws NotebookException {
-    return this.createAssayNotebookEntry(assay, folder, null);
-  }
-
-  @Override
   public NotebookEntry createAssayNotebookEntry(Assay assay, ELNFolder folder, NotebookTemplate template)
       throws NotebookException {
+
+    AssayOptions options = assay.getOptions();
 
     BenchlingEntryRequest request = new BenchlingEntryRequest();
     request.setName(assay.getCode() + " Assay Summary: " + assay.getName());
@@ -164,39 +179,30 @@ public final class BenchlingNotebookEntryService
 
     // Entry template
     if (template != null) {
-      request.setEntryTemplateId(template.getReferenceId());
+      request.setEntryTemplateId(template.getId());
+      request.setSchemaId(((BenchlingEntryTemplate) template).getSchema().getId());
     }
 
     // Custom fields
     Map<String, CustomField> customFields = new LinkedHashMap<>();
-    customFields.put("Name", new CustomField(assay.getName()));
-    customFields.put("Code", new CustomField(assay.getCode()));
-    customFields.put(
-        "Description", new CustomField(assay.getDescription().replaceAll("<.+?>", "")));
-    customFields.put("Assay Type", new CustomField(assay.getAssayType().getName()));
-    customFields.put("Study", new CustomField(assay.getStudy().getCode()));
+    customFields.put("StudyTracker.Name", new CustomField(assay.getName()));
+    customFields.put("StudyTracker.Code", new CustomField(assay.getCode()));
+    customFields.put("StudyTracker.Description",
+        new CustomField(assay.getDescription().replaceAll("<.+?>", "")));
+    customFields.put("StudyTracker.AssayType", new CustomField(assay.getAssayType().getName()));
+    customFields.put("StudyTracker.Study", new CustomField(assay.getStudy().getCode()));
     request.setCustomFields(customFields);
+
+    // Template fields
+    if (options.getNotebookTemplateFields() != null
+        && !options.getNotebookTemplateFields().isEmpty()) {
+      for (Map.Entry<String, Object> entry : options.getNotebookTemplateFields().entrySet()) {
+        request.addField(entry.getKey(), entry.getValue());
+      }
+    }
     
     BenchlingElnRestClient client = this.getClient();
     return this.convertBenchlingEntry(client.createEntry(request));
   }
-
-
-  private NotebookTemplate convertNotebookEntryTemplate(BenchlingEntryTemplate benchlingTemplate) {
-    NotebookTemplate template = new NotebookTemplate();
-    template.setName(benchlingTemplate.getName());
-    template.setReferenceId(benchlingTemplate.getId());
-    return template;
-  }
-
-  private List<NotebookTemplate> convertNotebookEntryTemplates(
-      List<BenchlingEntryTemplate> benchlingEntryTemplates) {
-    List<NotebookTemplate> templates = new ArrayList<>();
-    for (BenchlingEntryTemplate benchlingEntryTemplate : benchlingEntryTemplates) {
-      templates.add(this.convertNotebookEntryTemplate(benchlingEntryTemplate));
-    }
-    return templates;
-  }
-
 
 }

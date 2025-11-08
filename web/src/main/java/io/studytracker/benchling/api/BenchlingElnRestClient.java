@@ -17,6 +17,10 @@
 package io.studytracker.benchling.api;
 
 import io.studytracker.benchling.api.entities.BenchlingAuthenticationToken;
+import io.studytracker.benchling.api.entities.BenchlingCustomEntity;
+import io.studytracker.benchling.api.entities.BenchlingCustomEntity.BenchlingCustomEntityList;
+import io.studytracker.benchling.api.entities.BenchlingDropdown;
+import io.studytracker.benchling.api.entities.BenchlingDropdown.BenchlingDropdownList;
 import io.studytracker.benchling.api.entities.BenchlingEntry;
 import io.studytracker.benchling.api.entities.BenchlingEntryList;
 import io.studytracker.benchling.api.entities.BenchlingEntryRequest;
@@ -460,6 +464,90 @@ public final class BenchlingElnRestClient {
       schema = response.getBody();
     }
     return Optional.ofNullable(schema);
+  }
+
+  /**
+   * Find all available dropdowns
+   * @param nextToken
+   * @return
+   */
+  public BenchlingDropdownList findDropdowns(String nextToken) {
+    LOGGER.debug("Requesting all Benchling dropdowns");
+    String url = resolveUrl("/api/v2/dropdowns", Collections.singletonMap("nextToken", nextToken));
+    HttpHeaders headers = getHeaders();
+    HttpEntity<BenchlingDropdownList> request = new HttpEntity<>(headers);
+    ResponseEntity<BenchlingDropdownList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingDropdownList.class);
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      return response.getBody();
+    } else {
+      throw new BenchlingException("Failed to fetch dropdown list.");
+    }
+  }
+
+  /**
+   * Retrieves a single dropdown ({@link BenchlingDropdown}), identified by its PKID.
+   * @param id
+   * @return
+   */
+  public Optional<BenchlingDropdown> findDropdownById(@NotNull String id) {
+    LOGGER.debug("Requesting dropdown with ID: " + id);
+    String url = resolveUrl("/api/v2/dropdowns/" + id);
+    HttpHeaders headers = getHeaders();
+    HttpEntity<BenchlingDropdown> request = new HttpEntity<>(headers);
+    ResponseEntity<BenchlingDropdown> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingDropdown.class);
+    BenchlingDropdown dropdown = null;
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      dropdown = response.getBody();
+    }
+    return Optional.ofNullable(dropdown);
+  }
+
+  /**
+   * Find a list of custom entitites, optionally filtered by {@code schemaId}.
+   * @param nextToken
+   * @param schemaId
+   * @return
+   */
+  public BenchlingCustomEntityList findCustomEntities(String nextToken, String schemaId,
+      String nameIncludes) {
+    LOGGER.debug("Requesting Benchling custom entities: schemaId={}, nameIncludes={}",
+        schemaId, nameIncludes);
+    Map<String, String> map = new HashMap<>();
+    map.put("nextToken", nextToken);
+    map.put("schemaId", schemaId);
+    map.put("nameIncludes", nameIncludes);
+    String url = resolveUrl("/api/v2/custom-entities", map);
+    LOGGER.debug("URL: {}", url);
+    HttpHeaders headers = getHeaders();
+    HttpEntity<BenchlingCustomEntityList> request = new HttpEntity<>(headers);
+    ResponseEntity<BenchlingCustomEntityList> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingCustomEntityList.class);
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      return response.getBody();
+    } else {
+      throw new BenchlingException("Failed to fetch custom entity list.");
+    }
+  }
+
+  /**
+   * Retrieves a single custom entity ({@link BenchlingCustomEntity}), identified by its PKID.
+   * @param id
+   * @return
+   */
+  public Optional<BenchlingCustomEntity> findCustomEntityById(@NotNull String id) {
+    LOGGER.debug("Requesting custom entity with ID: " + id);
+    String url = resolveUrl("/api/v2/custom-entities/" + id);
+    HttpHeaders headers = getHeaders();
+    HttpEntity<BenchlingCustomEntity> request = new HttpEntity<>(headers);
+    ResponseEntity<BenchlingCustomEntity> response =
+        restTemplate.exchange(url, HttpMethod.GET, request, BenchlingCustomEntity.class);
+    BenchlingCustomEntity entity = null;
+    if (response.getStatusCode().equals(HttpStatus.OK)) {
+      entity = response.getBody();
+    }
+    return Optional.ofNullable(entity);
   }
   
   /**

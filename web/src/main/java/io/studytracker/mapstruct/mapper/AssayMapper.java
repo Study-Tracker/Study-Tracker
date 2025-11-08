@@ -36,6 +36,14 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring", uses = {StorageDriveFolderMapper.class})
 public interface AssayMapper {
 
+  @Mapping(target = "options.useNotebook", source = "useNotebook")
+  @Mapping(target = "options.notebookFolder", source = "notebookFolder")
+  @Mapping(target = "options.notebookTemplateId", source = "notebookTemplateId")
+  @Mapping(target = "options.useStorage", source = "useStorage")
+  @Mapping(target = "options.useGit", source = "useGit")
+  @Mapping(target = "options.useS3", source = "useS3")
+  @Mapping(target = "options.s3FolderId", source = "s3FolderId")
+  @Mapping(target = "options.notebookTemplateFields", source = "notebookTemplateFields")
   Assay fromAssayForm(AssayFormDto dto);
   AssayFormDto toAssayForm(Assay assay);
 

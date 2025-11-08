@@ -120,6 +120,7 @@ public abstract class AbstractAssayController extends AbstractApiController {
   protected Assay createAssay(Assay assay, Study study, User user, AssayOptions options) {
 
     assay.setStudy(study);
+    assay.setOptions(options);
 
     // Assay team
     Set<User> team = new HashSet<>();

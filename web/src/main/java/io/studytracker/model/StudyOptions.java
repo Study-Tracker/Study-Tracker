@@ -18,7 +18,9 @@ package io.studytracker.model;
 
 import io.studytracker.mapstruct.dto.response.NotebookFolderDetailsDto;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 
 @Data
@@ -27,6 +29,7 @@ public class StudyOptions {
   private boolean useNotebook = true;
   private NotebookFolderDetailsDto notebookFolder;
   private String notebookTemplateId;
+  private Map<String, Object> notebookTemplateFields = new HashMap<>();
   private boolean useGit = false;
   private boolean useStorage = true;
   private boolean useS3 = false;

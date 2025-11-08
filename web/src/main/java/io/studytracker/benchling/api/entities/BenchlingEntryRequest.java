@@ -42,7 +42,7 @@ public class BenchlingEntryRequest {
     customFields.put(key, new CustomField(value));
   }
 
-  public void addField(String key, String value) {
+  public void addField(String key, Object value) {
     fields.put(key, new Field(value));
   }
 
@@ -61,11 +61,11 @@ public class BenchlingEntryRequest {
   @Data
   public static class Field {
 
-    private String value;
+    private Object value;
 
     private Field() {}
 
-    public Field(String value) {
+    public Field(Object value) {
       this.value = value;
     }
   }

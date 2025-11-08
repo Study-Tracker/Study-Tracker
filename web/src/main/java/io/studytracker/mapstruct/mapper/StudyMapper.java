@@ -45,6 +45,7 @@ public interface StudyMapper {
   @Mapping(target = "options.useGit", source = "useGit")
   @Mapping(target = "options.useS3", source = "useS3")
   @Mapping(target = "options.s3FolderId", source = "s3FolderId")
+  @Mapping(target = "options.notebookTemplateFields", source = "notebookTemplateFields")
   Study fromStudyForm(StudyFormDto dto);
   StudyFormDto toStudyForm(Study study);
 
