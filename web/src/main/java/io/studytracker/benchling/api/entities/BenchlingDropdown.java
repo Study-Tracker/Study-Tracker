@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,32 @@
 package io.studytracker.benchling.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.studytracker.eln.NotebookTemplate;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BenchlingEntryTemplate implements NotebookTemplate {
+public class BenchlingDropdown {
 
   private String id;
-  private String webUrl;
-  private String apiUrl;
-  private Date createdAt;
-  private Date modifiedAt;
-  private BenchlingUser creator;
   private String name;
-  private Map<String, BenchlingSchemaFieldValue> fields = new LinkedHashMap<>();
-  private Map<String, BenchlingCustomField> customFields = new LinkedHashMap<>();
-  private BenchlingEntrySchema schema;
-  private String templateCollectionId;
+  private BenchlingArchiveRecord archiveRecord;
+  private List<BenchlingDropdownOption> options = new ArrayList<>();
+
+  @Data
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class BenchlingDropdownOption {
+    private String id;
+    private String name;
+    private BenchlingArchiveRecord archiveRecord;
+  }
+
+  @Data
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class BenchlingDropdownList {
+    private List<BenchlingDropdown> dropdowns = new ArrayList<>();
+    private String nextToken;
+  }
+
 }

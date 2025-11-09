@@ -40,6 +40,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import java.util.Date;
 import java.util.HashSet;
@@ -229,6 +230,9 @@ public class Assay extends Model {
       joinColumns = @JoinColumn(name = "assay_id", nullable = false),
       inverseJoinColumns = @JoinColumn(name = "git_repository_id", nullable = false))
   private Set<GitRepository> gitRepositories = new HashSet<>();
+
+  @Transient
+  private AssayOptions options = new AssayOptions();
 
   public void addTask(AssayTask task) {
     task.setAssay(this);

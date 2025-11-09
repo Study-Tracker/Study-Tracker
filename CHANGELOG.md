@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-11-07
+
+### Added
+- Added support for Benchling notebook template input fields. The study and assay forms will now populate with input fields if the selected notebook template has required fields.
+
+### Changed
+- Changed the format of the custom attributes that Study Tracker attaches to Benchling lab notebooks, so as not to conflict with template fields.
+
+### Fixed
+- Resolved an issue that would result in Benchling notebook creation to fail if required template fields were not provided during creation.
+
 ## [1.0.5] - 2025-10-28
 
 ### Fixed

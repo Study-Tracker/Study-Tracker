@@ -17,6 +17,8 @@
 package io.studytracker.benchling.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 
 @Data
@@ -24,9 +26,12 @@ import lombok.Data;
 public class BenchlingSchemaFieldDefinition {
 
   private String id;
-  private boolean isRequired;
-  private boolean isMulti;
+  private @JsonProperty(value = "isRequired") boolean isRequired;
+  private @JsonProperty(value = "isMulti") boolean isMulti;
   private String name;
   private String type;
   private BenchlingArchiveRecord archiveRecord;
+  private String dropdownId;
+  private String schemaId;
+
 }

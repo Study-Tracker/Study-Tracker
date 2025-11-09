@@ -49,6 +49,7 @@ public class AssayFormDto {
   private FileStoreFolderDetailsDto storageFolder;
   private boolean active = true;
   private String notebookTemplateId;
+  private Map<String, Object> notebookTemplateFields = new HashMap<>();
   private Date createdAt;
   private Date updatedAt;
   private Set<UserSlimDto> users = new HashSet<>();

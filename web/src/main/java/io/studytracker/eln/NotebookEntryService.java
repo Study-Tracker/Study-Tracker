@@ -47,15 +47,6 @@ public interface NotebookEntryService<F extends NotebookFolder> {
   Optional<NotebookTemplate> findEntryTemplateById(String id);
 
   /**
-   * Creates a blank notebook entry for a study in the ELN and returns a {@link NotebookEntry}.
-   *
-   * @param study
-   * @return
-   * @throws NotebookException
-   */
-  NotebookEntry createStudyNotebookEntry(Study study, F studyFolder) throws NotebookException;
-
-  /**
    * Creates a blank notebook entry from the provided template for a study in the ELN and returns a
    * {@link NotebookEntry}.
    *
@@ -65,15 +56,6 @@ public interface NotebookEntryService<F extends NotebookFolder> {
    */
   NotebookEntry createStudyNotebookEntry(Study study, F studyFolder, NotebookTemplate template)
       throws NotebookException;
-
-  /**
-   * Creates a blank notebook entry for an assay in the ELN and returns a {@link NotebookEntry}.
-   *
-   * @param assay
-   * @return
-   * @throws NotebookException
-   */
-  NotebookEntry createAssayNotebookEntry(Assay assay, F assayFolder) throws NotebookException;
 
   /**
    * Creates a blank notebook entry from the provided template for an assay in the ELN and returns a

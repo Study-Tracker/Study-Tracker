@@ -47,6 +47,7 @@ public class StudyFormDto {
   private ProgramSummaryDto program;
   private @NotBlank String description;
   private String notebookTemplateId;
+  private Map<String, Object> notebookTemplateFields = new HashMap<>();
   private CollaboratorDetailsDto collaborator;
   private boolean legacy = false;
   private boolean active = true;

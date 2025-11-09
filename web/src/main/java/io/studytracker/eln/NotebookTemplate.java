@@ -18,8 +18,9 @@ package io.studytracker.eln;
 
 import lombok.Data;
 
-@Data
-public class NotebookTemplate {
-  private String name;
-  private String referenceId;
+public interface NotebookTemplate {
+  String getId();
+  void setId(String id);
+  String getName();
+  void setName(String name);
 }

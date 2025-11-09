@@ -67,6 +67,7 @@ const StudyForm = ({
     owner: user,
     notebookFolder: {},
     notebookTemplateId: null,
+    notebookTemplateFields: {},
     useNotebook: true,
     useExistingNotebookFolder: false,
     useGit: false,
@@ -189,11 +190,12 @@ const StudyForm = ({
         validateOnChange={false}
     >
       {({
-          values,
-          errors,
-          handleChange,
-          setFieldValue,
-          isSubmitting,
+        values,
+        errors,
+        handleChange,
+        setFieldValue,
+        isSubmitting,
+        handleSubmit
       }) => (
           <Container fluid className="animated fadeIn max-width-1200">
 
@@ -479,6 +481,7 @@ const StudyForm = ({
                           variant="primary"
                           type="submit"
                           className={"me-4"}
+                          onClick={handleSubmit}
                         >
                           Submit
                         </Button>

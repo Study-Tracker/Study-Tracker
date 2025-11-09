@@ -66,6 +66,7 @@ const AssayForm = props => {
     attributes: {},
     notebookFolder: {},
     notebookTemplateId: null,
+    notebookTemplateFields: {},
     useNotebook: study.notebookFolders.length > 0,
     useGit: false,
     useStorage: true,
@@ -221,6 +222,7 @@ const AssayForm = props => {
           handleChange,
           setFieldValue,
           isSubmitting,
+          handleSubmit
         }) => (
 
           <Container fluid className="animated fadeIn max-width-1200">
@@ -550,6 +552,7 @@ const AssayForm = props => {
                             variant="primary"
                             type="submit"
                             className={"me-2"}
+                            onClick={handleSubmit}
                         >
                           Submit
                         </Button>

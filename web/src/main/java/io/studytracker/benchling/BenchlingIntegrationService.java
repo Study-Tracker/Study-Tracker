@@ -17,10 +17,16 @@
 package io.studytracker.benchling;
 
 import io.studytracker.benchling.api.BenchlingElnRestClient;
+import io.studytracker.benchling.api.entities.BenchlingCustomEntity;
+import io.studytracker.benchling.api.entities.BenchlingCustomEntity.BenchlingCustomEntityList;
+import io.studytracker.benchling.api.entities.BenchlingDropdown;
+import io.studytracker.benchling.api.entities.BenchlingDropdown.BenchlingDropdownList;
 import io.studytracker.benchling.api.entities.BenchlingEntryTemplateList;
+import io.studytracker.eln.NotebookTemplate;
 import io.studytracker.integration.IntegrationService;
 import io.studytracker.model.BenchlingIntegration;
 import io.studytracker.repository.BenchlingIntegrationRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -29,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 @Service
 public class BenchlingIntegrationService implements IntegrationService<BenchlingIntegration> {
@@ -124,4 +131,69 @@ public class BenchlingIntegrationService implements IntegrationService<Benchling
         i.setActive(false);
         benchlingIntegrationRepository.save(i);
     }
+
+  /**
+   * Finds all Benchling dropdowns for the given integration.
+   * @param instance
+   * @return
+   */
+  public List<BenchlingDropdown> findDropdowns(BenchlingIntegration instance) {
+    BenchlingElnRestClient client = benchlingClientFactory.createBenchlingClient(instance);
+    List<BenchlingDropdown> dropdowns = new ArrayList<>();
+    String nextToken = null;
+    boolean hasNext = true;
+    while (hasNext) {
+      BenchlingDropdownList dropdownList = client.findDropdowns(nextToken);
+      dropdowns.addAll(dropdownList.getDropdowns());
+      nextToken = dropdownList.getNextToken();
+      hasNext = StringUtils.hasText(nextToken);
+    }
+    return dropdowns;
+  }
+
+  /**
+   * Finds a Benchling dropdown by ID.
+   * @param instance
+   * @param id
+   * @return
+   */
+  public Optional<BenchlingDropdown> findDropdownById(BenchlingIntegration instance, String id) {
+    BenchlingElnRestClient client = benchlingClientFactory.createBenchlingClient(instance);
+    Optional<BenchlingDropdown> optional = client.findDropdownById(id);
+    return optional;
+  }
+
+  /**
+   * Finds all Benchling custom entities for the given integration and schema ID.
+   * @param instance
+   * @param schemaId
+   * @return
+   */
+  public List<BenchlingCustomEntity> findCustomEntities(BenchlingIntegration instance,
+      String schemaId, String nameIncludes) {
+    BenchlingElnRestClient client = benchlingClientFactory.createBenchlingClient(instance);
+    List<BenchlingCustomEntity> entities = new ArrayList<>();
+    String token = null;
+    boolean hasNext = true;
+    while (hasNext) {
+      BenchlingCustomEntityList list = client.findCustomEntities(token, schemaId, nameIncludes);
+      entities.addAll(list.getCustomEntities());
+      token = list.getNextToken();
+      hasNext = StringUtils.hasText(token);
+    }
+    return entities;
+  }
+
+  /**
+   * Finds a Benchling custom entity by ID.
+   * @param integration
+   * @param id
+   * @return
+   */
+  public Optional<BenchlingCustomEntity> findCustomEntityById(BenchlingIntegration integration,
+      String id) {
+    BenchlingElnRestClient client = benchlingClientFactory.createBenchlingClient(integration);
+    return client.findCustomEntityById(id);
+  }
+
 }
