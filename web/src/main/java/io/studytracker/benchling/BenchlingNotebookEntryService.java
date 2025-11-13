@@ -125,7 +125,9 @@ public final class BenchlingNotebookEntryService
     // Entry template
     if (template != null) {
       request.setEntryTemplateId(template.getId());
-      request.setSchemaId(((BenchlingEntryTemplate) template).getSchema().getId());
+      if (((BenchlingEntryTemplate) template).getSchema() != null) {
+        request.setSchemaId(((BenchlingEntryTemplate) template).getSchema().getId());
+      }
     }
 
     // Custom fields
@@ -180,7 +182,9 @@ public final class BenchlingNotebookEntryService
     // Entry template
     if (template != null) {
       request.setEntryTemplateId(template.getId());
-      request.setSchemaId(((BenchlingEntryTemplate) template).getSchema().getId());
+      if (((BenchlingEntryTemplate) template).getSchema() != null) {
+        request.setSchemaId(((BenchlingEntryTemplate) template).getSchema().getId());
+      }
     }
 
     // Custom fields
