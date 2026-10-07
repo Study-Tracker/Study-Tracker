@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.4.3</version>
+    <version>3.5.16</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -57,9 +57,9 @@
   <properties>
     <study-tracker.version>${project.parent.version}</study-tracker.version>
     <java.version>17</java.version>
-    <node.version>v22.14.0</node.version>
-    <npm.version>10.9.2</npm.version>
-    <aws-sdk.version>2.31.20</aws-sdk.version>
+    <node.version>v22.23.3</node.version>
+    <npm.version>10.9.9</npm.version>
+    <aws-sdk.version>2.55.12</aws-sdk.version>
   </properties>
 
   <build>
@@ -71,18 +71,18 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>flatten-maven-plugin</artifactId>
-          <version>1.1.0</version>
+          <version>1.7.3</version>
         </plugin>
 
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.10.0</version>
+          <version>1.15.4</version>
         </plugin>
 
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.3.1</version>
         </plugin>
 
       </plugins>
