@@ -1,19 +1,40 @@
-# File storage
-storage.local-dir=/tmp
-storage.overwrite-existing=true
-storage.use-existing=true
-storage.max-folder-read-depth=1
+application.host-name=localhost
+application.secret=studytrackerstudytracker
+#logging.level.root=debug
+application.skip-initialization=true
 
-# Data source
+admin.email=
+admin.password=
+
+# Database
 db.username=studytracker
 db.password=studytracker
 db.host=localhost
+db.port=5432
 db.name=study-tracker-test
-db.port=27017
-db.connectionString=mongodb://${db.host}:${db.port}
+db.schema=study-tracker-test
+spring.jpa.hibernate.ddl-auto=create
 
-# Event management
+## Flyway
+#spring.flyway.enabled=false
+spring.flyway.locations=classpath:db/migration
+
+### Events
 events.mode=local
-
-# Activity recording
 activity.mode=local
+
+notebook.mode=none
+
+storage.mode=local
+storage.use-existing=true
+storage.max-folder-read-depth=3
+storage.overwrite-existing=true
+storage.temp-dir=/tmp
+storage.local-dir=${storage.temp-dir}
+
+study.study-code-counter-start=10001
+study.study-code-min-digits=5
+study.assay-code-counter-start=1
+study.assay-code-min-digits=3
+study.external-code-counter-start=1
+study.external-code-min-digits=5
